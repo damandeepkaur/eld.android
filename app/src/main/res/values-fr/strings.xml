@@ -1,0 +1,335 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">BSM Application universel</string>
+    <string name="no_network">No Network Available</string>
+    <string name="app_compatability">Remarque: Compatible avec Android 4.0.3 à 6.0.1</string>
+    <string name="str_pw">Mot de passe</string>
+    <string name="str_username">Nom d\'utilisateur</string>
+    <string name="str_employee_id">Identification de l\’employé(e)</string>
+    <string name="str_domain_name">Nom de domaine</string>
+    <string name="str_licence">Permis de conduire</string>
+    <string name="str_home_address">Adresse à domicile</string>
+    <string name="str_name">Nom</string>
+    <string name="str_change_pw">Changer le mot de passe</string>
+    <string name="str_current_pw">Mot de passe actuel</string>
+    <string name="str_new_pw">Nouveau mot de passe</string>
+    <string name="str_new_pw_confirm">confirmer le mot de passe</string>
+    <string name="str_signature">Signature</string>
+    <string name="str_change_signature">Changer la signature</string>
+    <string name="str_is_day_light">À l\'\heure d\'\été:</string>
+    <string name="str_hos_time_zone">Fuseau horaire:</string>
+    <string name="str_hos_lbl_cycle">CYCLE:</string>
+    <string name="str_hos_rules">Règles</string>
+    <string name="str_hos_add_event">Ajouter un événement</string>
+    <string name="str_hos_event_start_time">Début de l\'événement</string>
+    <string name="str_hos_event_duty_status">Statut du service</string>
+    <string name="str_hos_comment_modified">[Modifié]</string>
+    <string name="warning">Avertissement</string>
+    <string name="str_hos_codriver">CO-CHAUFFEUR</string>
+    <string name="str_hos_ondutyleft">TEMPS EN SERVICE RESTANT</string>
+    <string name="str_hos_drive">CONDUITE</string>
+    <string name="str_hos_distancedriven">DISTANCE PARCOURUE</string>
+    <string name="str_hos_permit">NUMÉRO DE PERMIS</string>
+    <string name="str_hos_orgaddress">ADRESSE ORG</string>
+    <string name="str_hos_homeaddress">ADRESSE MAISON</string>
+    <string name="str_hos_shiftstart">DÉBUT TRAVAIL</string>
+    <string name="str_hos_drivingleft">TEMPS EN CONDUITE RESTANT</string>
+    <string name="str_hos_cycle">CYCLE</string>
+    <string name="str_hos_startodom">ODOMÈTRE DE DÉPART</string>
+    <string name="str_hos_timezone">FUSEAU HORAIRE</string>
+    <string name="str_hos_orgname">NOM ORG</string>
+    <string name="str_hos_equipment">ÉQUIPEMENT :</string>
+    <string name="str_hos_licenseplate">PLAQUE D\'IMMATRICULATION :</string>
+    <string name="str_hos_licenseprovince">PROVINCE D\'IMMATRICULATION</string>
+    <string name="str_hos_shipdocno">Numéro du document d\'expédition</string>
+    <string name="str_hos_permitnum">Numéro de permis</string>
+    <string name="str_hos_trailerlicense">Plaque d\'immatriculation de la remorque</string>
+    <string name="str_hos_listoftrips">LISTE DE TRAJETS</string>
+    <string name="str_coworker_name">#Co-Worker Name</string>
+    <string name="str_rescan">SCANNER À NOUVEAU</string>
+
+
+    <string name="openDrawer">Ouvert</string>
+    <string name="closeDrawer">Fermer</string>
+
+    <!-- MenuStrings -->
+    <string name="menu_home">Page principale</string>
+    <string name="menu_inspec">Formulaires</string>
+    <string name="menu_hos">Heures de service</string>
+    <string name="menu_email">Envoyer le courriel</string>
+    <string name="menu_settings">Paramètres</string>
+    <string name="menu_asset">Changement de véhicule</string>
+    <string name="menu_logout">Fermeture de session</string>
+    <string name="menu_coworkerlogin">Connexion du collègue </string>
+    <string name="menu_coworkerlogout">Déconnexion du collègue</string>
+    <string name="menu_switchuser">Changer l\'utilisateur</string>
+
+    <string name="next">Suivant &gt;</string>
+    <string name="back">&lt;  Arrière</string>
+    <!-- AddNewProfileView -->
+    <string name="fullname">Nom au complet</string>
+    <string name="email">Adresse courriel</string>
+    <string name="phonenum"># de téléphone</string>
+    <string name="licence">Dl 123454</string>
+    <string name="address">Adresse </string>
+    <string name="terminal">Accueil du terminal</string>
+    <string name="tzone">Fuseau horaire</string>
+    <string name="cycle">CYCLE</string>
+
+    <!--- GENERIC -->
+    <string name="generic_cancel">Annuler</string>
+    <string name="app_name_orig">SentinelDrive</string>
+    <string name="generic_scan">Scanner</string>
+    <string name="notification_message">NOTIFICATION</string>
+    <string name="box_connection_message">BOX CONNECTION</string>
+    <string name="comments">Commentaires</string>
+    <string name="str_are_u_sure">Are you sure you like to CANCEL?</string>
+    <string name="question">Question</string>
+    <string name="str_is_there_defect">Est-ce qu\'il y a des défectuosités?</string>
+    <string name="alert_q_back">What would you like to do?</string>
+    <string name="str_logout">Me déconnecter</string>
+    <string name="str_logout_offduty">Hors service et me déconnecter</string>
+    <string name="str_rvw_unsigned_logs">Réviser le journal de bord non signé</string>
+    <string name="str_posttripinspectionalert">Compléter une inspection post-trajet</string>
+    <string name="str_logout_action">Choisir une action</string>
+    <string name="str_logout_cancel">Annuler</string>
+    <!-- Login -->
+    <string name="login_btn_takeatour">Visite guidée</string>
+    <string name="login_btn_login">Ouverture de session</string>
+    <string name="login_btn_forgotpassword">Mot de passe oublié</string>
+    <string name="login_lbl_rememberme">Retenir mon nom d\'utilisateur</string>
+    <string name="login_txthint_domain">Domaine</string>
+    <string name="login_txthint_password">Mot de passe </string>
+    <string name="login_txthint_username">Nom d\'utilisateur</string>
+    <string name="loginerror">Connexion échouée</string>
+    <string name="login_success">Connexion réussie</string>
+    <string name="login_comment">Connexion réussie en tant que</string>
+    <!-- FORGOT PASSWORD -->
+    <string name="fp_txthint_authcode">Code d\'autorisation</string>
+    <string name="fp_txthint_newpass">Nouveau mot de passe</string>
+    <string name="fp_txthint_retypepass">Entrer le mot de passe de nouveau</string>
+    <string name="fp_btn_resetpass">Réinitialiser le mot de passe</string>
+    <string name="conform_password">Confirmer le mot de passe</string>
+    <string name="enter_password">ENTER PASSWORD</string>
+
+    <!-- ADD NEW PROFILE -->
+    <string name="anp_txt_newhere">Vous êtes nouveau ici</string>
+    <string name="anp_txt_getstarted">Commençons tout de suite</string>
+    <string name="profile">Profil</string>
+    <string name="pus">Succès de la mise à jour du profil </string>
+
+    <!-- SETUP FINISHED -->
+    <string name="sf_txt_setupfinished">La configuration est  terminée</string>
+    <string name="sf_txt_quicktour">Visite guidée rapide de l\'application</string>
+    <string name="sf_btn_taketour">Visite guidée </string>
+    <string name="sf_btn_skiptour">Quitter la visite guidée</string>
+
+    <!-- CATEGORY -->
+    <string name="odometer">Odométre(KM):</string>
+    <string name="attacment">Attelage:</string>
+    <string name="vehcile">Véhicule</string>
+    <string name="select_all">Sélectionner le tout</string>
+    <string name="header_attachment">Attelage</string>
+    <string name="button_save">Sauvegarder</string>
+    <string name="button_clr_defects">CLEAR DEFECTS</string>
+
+    <!-- DASHBOARD-->
+    <string name="db_btn_addpretrip">Ajouter le pré-trajet</string>
+    <string name="db_btn_addposttrip">Ajouter le post-trajet</string>
+    <string name="db_btn_addTrailePreTrip">Ajouter un pré-trajet pour la remorque</string>
+    <string name="db_btn_addTrailerPostTrip">Ajouter un post-trajet pour la remorque</string>
+    <string name="db_btn_notifications">Notifications</string>
+    <string name="db_txt_driving">Conduite</string>
+    <string name="db_txt_onduty">En service</string>
+    <string name="db_txt_break">Pause</string>
+    <string name="db_txt_cycle">CYCLE</string>
+    <string name="db_vehicle">Aucun véhicule sélectionné </string>
+    <string name="db_unsigned_logsheet_dialog_title">Signez les journaux de bord</string>
+    <string name="db_unsigned_logsheet_us_text">Vous avez des journaux de bord non-signés dans les 7 derniers jours</string>
+    <string name="db_unsigned_logsheet_ca_text">Vous avez des journaux de bord non-signés dans les 14 derniers jours</string>
+    <!-- dashboard notification-->
+    <string name="mostly_sunny">Mostly sunny</string>
+
+    <!-- driverstatus item and dropdown-->
+    <string name="hod">HOD</string>
+
+    <!--ErrorMessages-->
+    <string name="error_message">Sélectionner les items à sauvegarder</string>
+    <string name="sign_error_message">Ajouter la signature au profil pour sauvegarder les formulaires d\'inspection</string>
+    <string name="save_error">Erreur sauvegardé</string>
+    <string name="defect">Entrer le commentaire de la defectuosité</string>
+    <string name="error">Erreur </string>
+    <string name="error_msg">Message d\'erreur</string>
+    <string name="logouterror">Erreur de fermeture de session</string>
+    <!--HOS-->
+    <string name="hos_txt_graph">Graphique</string>
+    <string name="hos_txt_events">Evénements</string>
+    <string name="hos_txt_logsheet">Journal de bord</string>
+    <string name="hos_txt_offduty">En congé</string>
+    <string name="hos_txt_sleepingberth">Couchette</string>
+
+    <string name="hos_txt_sleeping">SLEEPING </string>
+    <string name="hos_txt_berth">BERTH</string>
+
+    <string name="hos_txt_driving">Conduite</string>
+    <string name="hos_txt_onduty">En service</string>
+    <string name="hos_txt_summary">Sommaire</string>
+    <string name="hos_txt_location">Localisation</string>
+    <string name="hos_txt_total">Total</string>
+
+
+    <!--SETTINGS-->
+    <string name="str_tcp_com_title">TCP/IP Communication </string>
+    <string name="str_bluetooth_title">Bluetooth </string>
+
+
+    <string name="str_box_gps_title">Boîte GPS </string>
+    <string name="str_serial_title">Port série de la boîte </string>
+    <string name="str_odo_type_title">Odomètre des unités </string>
+    <string name="str_locked_to_box_id">Assigné au No. de la boîte </string>
+    <string name="str_mi_set">MI</string>
+    <string name="str_km_set">KM</string>
+    <string name="str_my_profile">Mon profile </string>
+    <string name="str_first_login_page">Première page d\'ouverture de session</string>
+    <string name="str_must_scan">Scan obligatoire pour sélectionner le véhicule</string>
+    <string name="str_insp_history_day">Inspection de l\'historique</string>
+    <string name="str_insp_history_count">Inspection du compte de l\'historique</string>
+    <string name="str_image_limit">Limite de l\'image de la pièce jointe</string>
+    <string name="str_hour_threshold">Seuil des heures de violation</string>
+    <string name="str_search_types">Types de recherche</string>
+    <string name="str_lock_on_driving">Verrouiller l\'écran lors de la conduite</string>
+    <string name="str_manual_odo_input">Entrer l\'odomètre</string>
+    <string name="str_app_version">Version de l\'application</string>
+    <string name="locservice">Service de localisation</string>
+    <string name="str_network">Réseau</string>
+    <string name="str_on">En marche</string>
+    <string name="str_off">En arrêt</string>
+
+    <!--Excemption-->
+    <string name="str_exceptions">Exemptions: </string>
+    <string name="str_24_cycle_reset">Réinitialisationd u cycle de 24 hrs §395.1</string>
+    <string name="str_oilfield_waiting_time">Temps d\'attente du champs pétrolier </string>
+    <string name="str_100_air_mile_radius">Rayon de 100 air-mile du conducteur §395.1</string>
+    <string name="str_150_air_mile_radius">Rayon de 150 air-mile du conducteur §395.1</string>
+    <string name="str_trans_construct_sandequipment">Transport des équipements de construction (sable)</string>
+    <string name="spaces">&#160;&#160;&#160;&#160;</string>
+    <string name="alert_title">Alert</string>
+    <string name="break_alert_q">Êtes-vous sûr de prendre une pause de 30 minutes?</string>
+    <string name="Yes">Oui</string>
+    <string name="No">Non</string>
+
+
+    <string name="str_email_address">Adresse courriel:</string>
+    <string name="str_from">De:</string>
+    <string name="str_to">À:</string>
+    <string name="str_send">Envoyer</string>
+    <string name="str_log_sheet">Journal de bord</string>
+    <string name="str_pre_trip_insp">Inspection pré-trajet</string>
+    <string name="str_post_trip_insp">Inspection post-trajet</string>
+    <!-- calendarItem-->
+    <string name="sunday">Dimanche</string>
+    <string name="jan">JAN</string>
+    <string name="comment">Entrer un commentaire</string>
+    <string name="delete">Supprimer</string>
+
+    <!-- hos_driving and hos_offduty and onduty and sleepingberth-->
+    <string name="hours">Heures</string>
+    <string name="minutes">Minutes</string>
+    <string name="seconds">SECONDES</string>
+
+    <string name="daily">Journalier</string>
+    <string name="seven_days">7 Jours</string>
+    <string name="eight_days">8 Jours</string>
+    <string name="fourteen_days">14 Jours</string>
+
+    <!-- inspection list view fragment
+   -->
+    <string name="add">Ajouter</string>
+    <!-- select assets-->
+    <string name="search_vehicle">Véhicules cherchés</string>
+    <string name="str_must_scan_barcode">Please scan barcode to select!</string>
+    <string name="search">Recherche</string>
+    <string name="not_in_vehicle">Absent du véhicule</string>
+    <string name="asset">Sélectionner un véhicule</string>
+    <string name="str_enter_asset_name">Entrer le nom du véhicule</string>
+    <string name="found_barcode">Code à barres trouvé:</string>
+    <string name="scan_failed">Scan échoué</string>
+    <string name="scanner_top">    Tenir l\'appareil photo pour capturer automatiquement l\'image  </string>
+    <string name="scanner_bottom">Attendre afin que le code à barres scan automatiquement!</string>
+    <string name="clear">Autorisé</string>
+    <string name="forms">Formulaires</string>
+    <string name="ok">OK</string>
+    <string name="loading">Chargement...</string>
+    <string name="success_message">Message envoyé</string>
+    <string name="form_saved">Formulaire sauvegarder avec succès</string>
+    <string name="cancel_change">Annuler le changement</string>
+    <string name="signcomment">Signer le journal de bord</string>
+    <string name="sign">Êtes-vous certain de vouloir signer le journal de bord??</string>
+    <string name="nosignature">Aucune signature détectée</string>
+    <string name="signaturecomment">Ajouter votre signature à votre profil.</string>
+
+    <string name="deleve">supprimer l\'événement</string>
+    <string name="del">Êtes-vous certain de vouloir supprimer cet événement?</string>
+
+    <string name="str_messages">MESSAGES</string>
+    <string name="deltrip">Delete Event</string>
+    <string name="delconfirmation">Are you sure you would like to delete this trip?</string>
+    <string name="inspection_type_alert">Pour ajouter des formulaires, veuillez choisir un type d\'inspection.</string>
+
+    <!-- Fuel Form-->
+    <string name="fuel_form">NEW FUEL FORM</string>
+    <string name="fuel_amount">FUEL AMOUNT</string>
+    <string name="str_liters">Liters</string>
+    <string name="str_gallon">Gallon</string>
+    <string name="str_select_date_time">Select Date &amp; Time </string>
+    <string name="str_odometer">ODOMETER</string>
+    <string name="str_kilometer">Kilometer</string>
+    <string name="str_miles">Miles</string>
+    <string name="str_attachments">Attachments</string>
+    <string name="str_gallary">Gallery</string>
+    <string name="str_camara">Camera</string>
+    <string name="str_help">help</string>
+
+    <!-- Drive Mode -->
+    <string name="drivemode_drivetime">DRIVE TIME</string>
+    <string name="drivemode_dutycycle">HOS CYCLE</string>
+    <string name="drivemode_screen">SCREEN </string>
+    <string name="drivemode_locked"> LOCKED</string>
+
+    <!--new-->
+    <string name="str_attach_available">Accessoires disponibles</string>
+    <string name="str_today">AUJOURD\'HUI</string>
+
+    <!-- coworker logout-->
+    <string name="coworkerlogout_title">DÉCONNEXION COÉQUIPIER</string>
+
+    <!-- switch driver -->
+    <string name="switch_to_driver">Changer de chauffeur</string>
+
+    <!-- add new trailer-->
+    <string name="str_description">Description</string>
+    <string name="str_license">License Plate</string>
+    <string name="str_license_location">License Plate Jurisdiction</string>
+    <string name="str_weight_unit">Weight Unit</string>
+    <string name="str_weight">Weight</string>
+
+    <!-- Ignition off alert-->
+    <string name="alert_title_Ign_Off">Moteur en arrêt</string>
+    <string name="alert_sub_Ign_Off">Allez-vous hors service?</string>
+
+    <!-- Settings Fixed mount -->
+    <string name="str_select_vehicle">Voulez-vous sélectionner?</string>
+    <string name="str_fixed_mount_vehicle">Support fixe du véhicule : </string>
+    <string name="msg_drive_vehicle">Êtes-vous certain de conduire le véhicule?</string>
+    <string name="str_fixed_mount">Support fixe</string>
+    <string name="settings_saved">Paramètres sauvegardés</string>
+    <string name="failed_to_save_settings">Failed to save settings</string>
+
+    <!-- Trailer Only Inspections-->
+    <string name="str_Trailer">Remorque</string>
+    <string name="str_VehicleLower">Véhicule</string>
+    <string name="str_OdometerLower">Odometer</string>
+    <string name="str_DriverLower">Driver</string>
+
+    <string name="str_inspectorView">#INSPECTOR VIEW</string>
+</resources>

@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:local="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/background"
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="@dimen/login_container_width"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:paddingTop="@dimen/attach_image_button">
+
+        <ImageView
+            android:layout_width="@dimen/forgot_password_layout"
+            android:layout_height="@dimen/forgot_password_layout"
+            android:src="@drawable/logo"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingTop="@dimen/attach_layout_margin"
+            android:text="@string/app_name_orig"
+            android:textSize="@dimen/generic_textview_txtsize"/>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/appVerMsg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingBottom="@dimen/attach_layout_margin"
+        android:paddingTop="@dimen/attach_layout_margin"
+        android:text="V55- Compatible for 5.4"
+        android:textSize="@dimen/generic_textview_txtsize"/>
+
+    <TextView
+        android:id="@+id/companyVerMsg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="V5 - Support Android 4,5,6,7"
+        android:textSize="@dimen/generic_textview_txtsize"/>
+
+    <LinearLayout
+        android:layout_width="@dimen/login_container_width"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/generic_edittext_margin"
+            android:layout_marginTop="@dimen/generic_edittext_margin">
+
+            <EditText
+                android:id="@+id/username"
+                android:layout_width="@dimen/login_container_width"
+                android:layout_height="wrap_content"
+                android:completionThreshold="1"
+                android:hint="@string/login_txthint_username"
+                android:imeOptions="actionNext"
+                android:singleLine="true"
+                android:text="dev12"
+                android:textSize="@dimen/generic_edittext_txtsize"/>
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/generic_edittext_margin"
+            android:layout_marginTop="@dimen/generic_edittext_margin"
+            local:passwordToggleEnabled="true">
+
+            <EditText
+                android:id="@+id/password"
+                android:layout_width="@dimen/login_container_width"
+                android:layout_height="wrap_content"
+                android:hint="@string/login_txthint_password"
+                android:imeOptions="actionNext"
+                android:inputType="textPassword"
+                android:singleLine="true"
+                android:text="1234"
+                android:textSize="@dimen/generic_edittext_txtsize"/>
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/generic_edittext_margin"
+            android:layout_marginTop="@dimen/generic_edittext_margin">
+
+            <EditText
+                android:id="@+id/domain"
+                android:layout_width="@dimen/login_container_width"
+                android:layout_height="wrap_content"
+                android:hint="@string/login_txthint_domain"
+                android:imeOptions="actionDone"
+                android:singleLine="true"
+                android:text="bsm12"
+                android:textSize="@dimen/generic_edittext_txtsize"/>
+        </android.support.design.widget.TextInputLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="@dimen/small_margin">
+
+            <CheckBox
+                android:id="@+id/chk_remember_me"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/generic_button_txt_size"/>
+
+            <TextView
+                android:id="@+id/lbl_remember_me"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="@dimen/small_margin"
+                android:text="@string/login_lbl_rememberme"
+                android:textSize="@dimen/generic_edittext_txtsize"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="@dimen/attach_layout_margin"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/lbl_no_network"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/no_network"
+                android:textColor="@color/color_red"
+                android:textSize="@dimen/generic_edittext_txtsize"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/attach_layout_margin"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/go_to_forgot_password"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/generic_button_height"
+                android:layout_weight="1"
+                android:background="@drawable/lighted_border"
+                android:paddingBottom="@dimen/small_margin"
+                android:paddingLeft="@dimen/small_margin"
+                android:paddingRight="@dimen/small_margin"
+                android:paddingTop="@dimen/small_margin"
+                android:text="@string/login_btn_forgotpassword"
+                android:textColor="@color/cancel_btn_color"
+                android:textSize="@dimen/generic_button_txt_size"/>
+
+            <Button
+                android:id="@+id/execute_login"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/generic_button_height"
+                android:layout_marginLeft="@dimen/NewProfile_margin"
+                android:layout_weight="1"
+                android:background="@drawable/logindrawable"
+                android:paddingBottom="@dimen/small_margin"
+                android:paddingLeft="@dimen/NewProfile_layout"
+                android:paddingRight="@dimen/NewProfile_layout"
+                android:paddingTop="@dimen/small_margin"
+                android:text="@string/login_btn_login"
+                android:textColor="@color/next_btn_color"
+                android:textSize="@dimen/generic_button_txt_size"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="@dimen/login_container_width"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="bottom|center"
+        android:orientation="vertical"
+        android:paddingBottom="@dimen/radius">
+
+        <Button
+            android:id="@+id/take_a_tour"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/tourdrawble"
+            android:paddingBottom="@dimen/small_margin"
+            android:paddingLeft="@dimen/attach_image_button"
+            android:paddingRight="@dimen/attach_image_button"
+            android:paddingTop="@dimen/small_margin"
+            android:text="@string/login_btn_takeatour"
+            android:textSize="@dimen/generic_button_txt_size"/>
+    </LinearLayout>
+</LinearLayout>
