@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:local="http://schemas.android.com/apk/res-auto">
+
+	<item android:id="@+id/action_help"
+		android:icon="@drawable/help"
+		android:title="@string/str_help"
+		local:showAsAction="always" />
+
+	<item android:id="@+id/action_select_barcode_scan"
+		android:icon="@drawable/qr_white"
+		android:title="@string/generic_scan"
+		local:showAsAction="always" />
+</menu>
