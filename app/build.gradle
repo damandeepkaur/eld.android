@@ -12,12 +12,22 @@ android {
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
-
+	
+	signingConfigs {
+        release {
+            storeFile file("android-release-key.keystore")
+            storePassword "BSMP@ssw0rd"
+            keyAlias "releasekey"
+            keyPassword "BSMP@ssw0rd"
+        }
+    }
+	
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             buildConfigField "boolean", "USE_LOG", "false"
+			signingConfig signingConfigs.release
         }
         debug {
             buildConfigField "boolean", "USE_LOG", "true"
@@ -32,6 +42,7 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+	
 }
 
 allprojects {
