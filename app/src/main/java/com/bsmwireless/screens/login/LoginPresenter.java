@@ -1,11 +1,6 @@
 package com.bsmwireless.screens.login;
 
-import com.bsmwireless.common.App;
-import com.bsmwireless.common.Constants;
 import com.bsmwireless.domain.interactors.LoginUserInteractor;
-
-import javax.inject.Inject;
-import javax.inject.Named;
 
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
@@ -14,8 +9,6 @@ import timber.log.Timber;
 
 public class LoginPresenter {
 
-    @Inject
-    @Named(Constants.UI_THREAD)
     Scheduler mUiThread;
 
     LoginView mView;
@@ -24,12 +17,12 @@ public class LoginPresenter {
 
     CompositeDisposable mDisposables;
 
-    public LoginPresenter(LoginView view, LoginUserInteractor interactor) {
-        App.getComponent().inject(this);
+    public LoginPresenter(LoginView view, LoginUserInteractor interactor, Scheduler uiThread) {
 
         mView = view;
         mLoginUserInteractor = interactor;
         mDisposables = new CompositeDisposable();
+        mUiThread = uiThread;
 
         Timber.d("LoginPresenter() CREATED");
     }
@@ -46,19 +39,19 @@ public class LoginPresenter {
         String password = mView.getPassword();
         String domain = mView.getDomain();
 
-        if (username != null && username.isEmpty()) {
+        if (username == null || username.isEmpty()) {
             mView.showErrorMessage("Username Required");
             return;
-        } else if (password.isEmpty()) {
+        } else if (password == null || password.isEmpty()) {
             mView.showErrorMessage("Password Required");
             return;
-        } else if (domain.isEmpty()) {
+        } else if (domain == null || domain.isEmpty()) {
             mView.showErrorMessage("Domain Required");
             return;
         }
 
         Disposable disposable = mLoginUserInteractor.loginUser(username, password, domain, keepToken)
-                .observeOn(mUiThread)
+                          .observeOn(mUiThread)
                 .subscribe(
                         status -> {
                             Timber.i("LoginUser status = %b", status);

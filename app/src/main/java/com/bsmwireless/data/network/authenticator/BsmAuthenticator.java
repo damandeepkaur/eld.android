@@ -8,11 +8,8 @@ import android.accounts.NetworkErrorException;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 
 import com.bsmwireless.screens.login.LoginActivity;
-
-import javax.inject.Inject;
 
 public class BsmAuthenticator extends AbstractAccountAuthenticator {
     public static final String ACCOUNT_NAME = "com.bsmwireless.account.name";

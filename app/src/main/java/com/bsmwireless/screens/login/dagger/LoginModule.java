@@ -8,6 +8,8 @@ import com.bsmwireless.screens.login.LoginView;
 
 import dagger.Module;
 import dagger.Provides;
+import io.reactivex.Scheduler;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 
 @Module
 public class LoginModule {
@@ -32,8 +34,8 @@ public class LoginModule {
 
     @LoginScope
     @Provides
-    LoginPresenter providePresenter(@NonNull LoginView view,@NonNull LoginUserInteractor interactor) {
-        return new LoginPresenter(view, interactor);
+    LoginPresenter providePresenter(@NonNull LoginView view, @NonNull LoginUserInteractor interactor) {
+        return new LoginPresenter(view, interactor, AndroidSchedulers.mainThread());
     }
 
 }
