@@ -53,6 +53,7 @@
                     android:src="@drawable/searchicon"/>
 
                 <ImageButton
+                    android:id="@+id/select_options"
                     android:layout_width="@dimen/attach_image_button"
                     android:layout_height="@dimen/attach_image_button"
                     android:layout_gravity="center_vertical"

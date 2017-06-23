@@ -35,4 +35,8 @@
     <dimen name="NewProfile_layout">15dp</dimen>
     <dimen name="NewProfile_margin">60dp</dimen>
     <dimen name="forgot_password_layout">100dp</dimen>
+
+    <!-- HelperView -->
+    <dimen name="helper_text_size">24dp</dimen>
+    <dimen name="helper_text_width">150dp</dimen>
 </resources>
