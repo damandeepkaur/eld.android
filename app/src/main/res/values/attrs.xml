@@ -18,5 +18,14 @@
         <attr name="allowSingleTap" format="boolean" />
         <attr name="animateOnClick" format="boolean" />
     </declare-styleable>
+
+    <declare-styleable name="FontTextView">
+        <attr name="font">
+            <enum name="none" value="0"/>
+            <enum name="sans_serif" value="1"/>
+            <enum name="bebasNeue" value="2"/>
+            <enum name="fonty" value="3"/>
+        </attr>
+    </declare-styleable>
 </resources>
 

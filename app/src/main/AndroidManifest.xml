@@ -50,7 +50,7 @@
 
         <activity
             android:name="com.bsmwireless.screens.help.HelpActivity"
-            android:theme="@style/Theme.Transparent"/>
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
 
         <activity android:name="com.bsmwireless.screens.barcode.BarcodeScannerActivity"
             android:theme="@style/Theme.BsmAppFullScreen" />

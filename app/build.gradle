@@ -8,12 +8,12 @@ android {
         applicationId "app.bsmuniversal.com"
         minSdkVersion 14
         targetSdkVersion 25
-        versionCode 1
-        versionName "1.0"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"		
+        versionCode 2
+        versionName "1.0.1"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
-	
-	signingConfigs {
+
+    signingConfigs {
         release {
             storeFile file("android-release-key.keystore")
             storePassword "BSMP@ssw0rd"
@@ -21,13 +21,13 @@ android {
             keyPassword "BSMP@ssw0rd"
         }
     }
-	
+
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             buildConfigField "boolean", "USE_LOG", "false"
-			signingConfig signingConfigs.release
+            signingConfig signingConfigs.release
         }
         debug {
             buildConfigField "boolean", "USE_LOG", "true"
@@ -41,21 +41,21 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
-    }	
-	
-	lintOptions {
+    }
+
+    lintOptions {
         disable 'MissingTranslation', 'ExtraTranslation'
-		abortOnError false
-	}	
+        abortOnError false
+    }
 }
 
 def getGitCommitVersion() {
-	def stdout = new ByteArrayOutputStream()
-	exec {
-			commandLine 'git', 'rev-parse', '--short' , 'HEAD'
-			standardOutput = stdout
-		}
-	return stdout.toString().trim()
+    def stdout = new ByteArrayOutputStream()
+    exec {
+        commandLine 'git', 'rev-parse', '--short' , 'HEAD'
+        standardOutput = stdout
+    }
+    return stdout.toString().trim()
 }
 
 def getDate() {
@@ -64,7 +64,7 @@ def getDate() {
 
 // generate version information for jenkins
 task getBuildAppInfo {
-    println "Build-Version: " + android.defaultConfig.versionName + '.' + getDate() + '-' + getGitCommitVersion()		
+    println "Build-Version: " + android.defaultConfig.versionName + '.' + getDate() + '-' + getGitCommitVersion()
 }
 
 project.afterEvaluate {
@@ -74,31 +74,31 @@ project.afterEvaluate {
 // copy successful build output to apk repository if providing 'release.storage.path'
 // final apk file name format:  ELD_v<Version>_<YYmmdd><p|d>_<githash>.apk
 gradle.buildFinished{ result ->
-  if(result.getFailure() == null) {
-  
-		// this copy action ONLY perform when -Drelease.storage.path provided 
-		if ( System.getProperty("release.storage.path") != null ) {	
-		
-			def storagePath= System.getProperty("release.storage.path") + getDate() +'/'
-			def serverFlag='p'			
-			if ( System.getProperty("build.target").equalsIgnoreCase( 'DEV' )  ) {	
-				serverFlag='d'
-			}
-			
-			def appName='ELD_v' + android.defaultConfig.versionName + '_' + getDate() + serverFlag + '_' + getGitCommitVersion()
-			
-			println "Copy build result to: " + storagePath + appName
-			
-			copy {
-				from 'build/outputs/apk'
-				into storagePath
-				include 'app-release.apk'				
-				rename { String fileName ->
-					fileName.replace('app-release', appName)
-				}			
-			}
-		}		
-	}
+    if(result.getFailure() == null) {
+
+        // this copy action ONLY perform when -Drelease.storage.path provided
+        if ( System.getProperty("release.storage.path") != null ) {
+
+            def storagePath= System.getProperty("release.storage.path") + getDate() +'/'
+            def serverFlag='p'
+            if ( System.getProperty("build.target").equalsIgnoreCase( 'DEV' )  ) {
+                serverFlag='d'
+            }
+
+            def appName='ELD_v' + android.defaultConfig.versionName + '_' + getDate() + serverFlag + '_' + getGitCommitVersion()
+
+            println "Copy build result to: " + storagePath + appName
+
+            copy {
+                from 'build/outputs/apk'
+                into storagePath
+                include 'app-release.apk'
+                rename { String fileName ->
+                    fileName.replace('app-release', appName)
+                }
+            }
+        }
+    }
 }
 
 allprojects {

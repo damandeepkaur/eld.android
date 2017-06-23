@@ -43,12 +43,6 @@ public class NetworkModule {
 
     @Singleton
     @Provides
-    Cache provideCache(Context context) {
-        return new Cache(context.getCacheDir(), CACHE_SIZE);
-    }
-
-    @Singleton
-    @Provides
     CookieJar provideCookieJar() {
         return new CookieJar() {
             private final HashMap<HttpUrl, List<Cookie>> cookieStore = new HashMap<>();

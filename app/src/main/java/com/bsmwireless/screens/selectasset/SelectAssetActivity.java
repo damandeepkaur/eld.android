@@ -2,6 +2,7 @@ package com.bsmwireless.screens.selectasset;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -21,7 +22,10 @@ import com.bsmwireless.screens.barcode.BarcodeScannerActivity;
 import com.bsmwireless.screens.help.HelpActivity;
 import com.bsmwireless.screens.selectasset.dagger.DaggerSelectAssetComponent;
 import com.bsmwireless.screens.selectasset.dagger.SelectAssetModule;
+import com.bsmwireless.widgets.GravityDrawable;
+import com.bsmwireless.widgets.HelpView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -50,6 +54,14 @@ public class SelectAssetActivity extends AppCompatActivity implements SelectAsse
 
     @BindView(R.id.list_view_vehicles)
     ListView mVehiclesList;
+
+    @BindView(R.id.select_options)
+    View mSelectOptionsButton;
+
+    @BindView(R.id.not_in_vehicle_button)
+    View mNotInVehicleButton;
+
+    View mScanView;
 
     @Inject
     SelectAssetPresenter mPresenter;
@@ -97,6 +109,9 @@ public class SelectAssetActivity extends AppCompatActivity implements SelectAsse
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_select_asset, menu);
+
+        new Handler().post(() -> mScanView = findViewById(R.id.action_select_barcode_scan));
+
         return true;
     }
 
@@ -105,7 +120,17 @@ public class SelectAssetActivity extends AppCompatActivity implements SelectAsse
         switch (item.getItemId()) {
             case R.id.action_help:
                 Intent intent = new Intent(this, HelpActivity.class);
-                intent.putExtra(HelpActivity.HELP_IMAGE_ID_TEG, R.drawable.select_vehicle_phone);
+
+                //TODO: use corrected help widget with translated strings when UI is ready
+                ArrayList<HelpView.HelpModel> list = new ArrayList<>();
+
+                list.add(new HelpView.HelpModel(searchBox, "Or enter asset", HelpView.ArrowType.CLOCKWISE, HelpView.PositionType.TOP, GravityDrawable.GravityType.END));
+                list.add(new HelpView.HelpModel(mSelectOptionsButton, "Click to view options", HelpView.ArrowType.CLOCKWISE, HelpView.PositionType.TOP, GravityDrawable.GravityType.END));
+                list.add(new HelpView.HelpModel(mNotInVehicleButton, "Click in case of no vehicle selected", HelpView.ArrowType.STRAIGHT, HelpView.PositionType.BOTTOM, GravityDrawable.GravityType.CENTER));
+                list.add(new HelpView.HelpModel(mScanView, "Please use QR code to select asset", HelpView.ArrowType.CLOCKWISE, HelpView.PositionType.RIGHT, GravityDrawable.GravityType.START));
+
+                intent.putExtra(HelpActivity.HELP_MODEL_EXTRA, list);
+
                 startActivity(intent);
                 break;
             case R.id.action_select_barcode_scan:
