@@ -13,8 +13,9 @@ import static com.bsmwireless.common.Constants.CONNECTION_TIMEOUT;
 import static com.bsmwireless.common.Constants.READ_TIMEOUT;
 
 public class HttpClientManager {
-    private String mId;
-    private String mDomain;
+    private String mDriverId;
+    private String mOrg;
+    private String mCluster;
     private String mToken;
 
     private OkHttpClient mClient;
@@ -23,10 +24,11 @@ public class HttpClientManager {
         Interceptor auth = chain -> {
             Request request = chain.request();
 
-            if (mToken != null && mDomain != null && mId != null) {
+            if (mToken != null && mOrg != null && mCluster != null && mDriverId != null) {
                 request = request.newBuilder()
-                        .header("X-Domain", mDomain)
-                        .header("X-DriveId", mId)
+                        .header("X-Driver", mDriverId)
+                        .header("X-Org", mOrg)
+                        .header("X-Cluster", mCluster)
                         .header("X-Token", mToken)
                         .build();
             }
@@ -44,9 +46,10 @@ public class HttpClientManager {
                 .build();
     }
 
-    public void setHeaders(String id, String domain, String token) {
-        mId = id;
-        mDomain = domain;
+    public void setHeaders(String driverId, String org, String cluster, String token) {
+        mDriverId = driverId;
+        mOrg = org;
+        mCluster = cluster;
         mToken = token;
     }
 

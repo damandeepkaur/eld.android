@@ -1,62 +1,54 @@
 package com.bsmwireless.data.network;
 
-import java.util.List;
-
+import com.bsmwireless.models.CUDTripInfo;
 import com.bsmwireless.models.Category;
+import com.bsmwireless.models.Driver;
 import com.bsmwireless.models.DriverLog;
-import com.bsmwireless.models.Location;
-import com.bsmwireless.models.LoginRequest;
-import com.bsmwireless.models.Trailer;
-import com.bsmwireless.models.User;
-
-import com.bsmwireless.models.VehicleAttributes;
-import com.bsmwireless.models.Response;
+import com.bsmwireless.models.DriverStatus;
+import com.bsmwireless.models.EmailReport;
 import com.bsmwireless.models.Event;
 import com.bsmwireless.models.HOSAlert;
-import com.bsmwireless.models.Rule;
-import com.bsmwireless.models.CUDTripInfo;
-import com.bsmwireless.models.EmailReport;
+import com.bsmwireless.models.Location;
+import com.bsmwireless.models.LoginRequest;
+import com.bsmwireless.models.NewRule;
 import com.bsmwireless.models.Registry;
 import com.bsmwireless.models.RegistryInformation;
-import com.bsmwireless.models.NewRule;
 import com.bsmwireless.models.Report;
-import com.bsmwireless.models.Driver;
-import com.bsmwireless.models.DriverStatus;
+import com.bsmwireless.models.Response;
+import com.bsmwireless.models.Rule;
+import com.bsmwireless.models.Trailer;
+import com.bsmwireless.models.User;
 import com.bsmwireless.models.Vehicle;
+import com.bsmwireless.models.VehicleAttributes;
+
+import java.util.List;
 
 import io.reactivex.Observable;
-
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
-import retrofit2.http.Headers;
 import retrofit2.http.POST;
-
 import retrofit2.http.PUT;
-
 import retrofit2.http.Path;
 
 public interface ServiceApi {
 
-    @POST("/sdmobile/v1/login/driver")
-    @Headers({
-            "JsonStub-User-Key: 8858fc3d-005d-46fb-9a16-fdde59734b74",
-            "JsonStub-Project-Key: 6e352cd2-52f5-4870-91ab-7ef4ab16de78"
-    })
+    @POST("/sdmobile/rest/v1/login/driver")
     Observable<User> loginUser(@Body LoginRequest request);
 
 
-    @POST("/sdmobile/v1/sync/vehicles/{field}/{keyword}/{type}/{isscan}")
+    @GET("/sdmobile/rest/v1/sync/vehicles/{field}/{keyword}/{isscan}")
     Observable<List<Vehicle>> searchVehicles(@Path("field") int field, @Path("keyword") String keyword,
-                                             @Path("type") int type, @Path("isscan") int isscan);
+                                             @Path("isscan") int isScan);
 
     /**
      * Vehicle attributes.
+     *
      * @param boxId id of the box paired with the vehicle.
      * @return Vehicle Attributes Response {@link VehicleAttributes}.
      */
     @GET("/sdmobile/v1/sync/vehicles/{boxid}")
-            Observable<VehicleAttributes> vehicleAttributes(@Path("boxid") Integer boxId);
+    Observable<VehicleAttributes> vehicleAttributes(@Path("boxid") Integer boxId);
 
     /**
      * Sync Inspection Items.
