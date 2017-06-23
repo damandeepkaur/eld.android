@@ -12,9 +12,6 @@ import okhttp3.Cache;
 
 import static com.bsmwireless.common.Constants.CACHE_SIZE;
 
-/**
- * Created by anartem on 14.06.2017.
- */
 @Module
 public class CacheModule {
     @Singleton

@@ -120,7 +120,6 @@ public class SelectAssetActivity extends AppCompatActivity implements SelectAsse
         switch (item.getItemId()) {
             case R.id.action_help:
                 Intent intent = new Intent(this, HelpActivity.class);
-                //intent.putExtra(HelpActivity.HELP_IMAGE_ID_TEG, R.drawable.select_vehicle_phone);
 
                 //TODO: use corrected help widget with translated strings when UI is ready
                 ArrayList<HelpView.HelpModel> list = new ArrayList<>();
