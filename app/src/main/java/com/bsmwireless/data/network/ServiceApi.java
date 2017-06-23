@@ -19,7 +19,6 @@ import com.bsmwireless.models.Rule;
 import com.bsmwireless.models.Trailer;
 import com.bsmwireless.models.User;
 import com.bsmwireless.models.Vehicle;
-import com.bsmwireless.models.VehicleAttributes;
 
 import java.util.List;
 
@@ -33,22 +32,37 @@ import retrofit2.http.Path;
 
 public interface ServiceApi {
 
+    /**
+     * Login request Vehicle.
+     *
+     * @param request - model with login information
+     * @return User Response {@link User}.
+     */
     @POST("/sdmobile/rest/v1/login/driver")
     Observable<User> loginUser(@Body LoginRequest request);
 
 
+    /**
+     * Search Vehicle.
+     *
+     * @param field   search field enum: 0 - SAP, 1 - legacy number, 2 - equip number,
+     *                3 - description, 4 - license plate, 5 - boxId
+     * @param keyword search keyword
+     * @param isScan  enum: 0 - search vehicle, 1 - scan vehicle
+     * @return Vehicle Attributes Response {@link Vehicle}.
+     */
     @GET("/sdmobile/rest/v1/sync/vehicles/{field}/{keyword}/{isscan}")
     Observable<List<Vehicle>> searchVehicles(@Path("field") int field, @Path("keyword") String keyword,
                                              @Path("isscan") int isScan);
 
     /**
-     * Vehicle attributes.
+     * Get Vehicle by boxId.
      *
      * @param boxId id of the box paired with the vehicle.
-     * @return Vehicle Attributes Response {@link VehicleAttributes}.
+     * @return Vehicle Attributes Response {@link Vehicle}.
      */
-    @GET("/sdmobile/v1/sync/vehicles/{boxid}")
-    Observable<VehicleAttributes> vehicleAttributes(@Path("boxid") Integer boxId);
+    @GET("/sdmobile/rest/v1/sync/vehicles/{boxId}")
+    Observable<Vehicle> getVehicleByBoxId(@Path("boxId") Integer boxId);
 
     /**
      * Sync Inspection Items.
@@ -59,7 +73,8 @@ public interface ServiceApi {
      * @return Sync Inspection Items Response {@link Category}.
      */
     @GET("/sdmobile/v1/sync/inspection_items/categories/{boxid}/{categoryids}/{language}")
-    Observable<List<Category>> syncInspectionItems(@Path("boxid") Integer boxId, @Path("categoryIds") String categoryIds, @Path("language") String language);
+    Observable<List<Category>> syncInspectionItems(@Path("boxid") Integer boxId, @Path("categoryIds")
+            String categoryIds, @Path("language") String language);
 
     /**
      * Sync Inspection Items (Box).
@@ -70,7 +85,8 @@ public interface ServiceApi {
      * @return Sync Inspection Items Response {@link Category}.
      */
     @GET("/sdmobile/v1/sync/inspection_items/box/{boxid}/{lastupdate}/{language}")
-    Observable<List<Category>> syncInspectionBoxes(@Path("boxid") Integer boxId, @Path("lastupdate") String lastUpdate, @Path("language") String language);
+    Observable<List<Category>> syncInspectionBoxes(@Path("boxid") Integer boxId, @Path("lastupdate")
+            String lastUpdate, @Path("language") String language);
 
     /**
      * Sync Inspection Items (Trailer).

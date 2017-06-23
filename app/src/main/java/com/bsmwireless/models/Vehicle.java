@@ -5,11 +5,17 @@ import android.os.Parcelable;
 
 import com.google.gson.annotations.SerializedName;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 public class Vehicle implements Parcelable {
     @SerializedName("id")
     private Integer mId;
 
-    @SerializedName("boxid")
+    @SerializedName("name")
+    private String mName;
+
+    @SerializedName("boxId")
     private Integer mBoxId;
 
     @SerializedName("license")
@@ -24,38 +30,7 @@ public class Vehicle implements Parcelable {
     @SerializedName("dot")
     private String mDot;
 
-    public final static Parcelable.Creator<Vehicle> CREATOR = new Creator<Vehicle>() {
-
-        @SuppressWarnings({
-                "unchecked"
-        })
-        public Vehicle createFromParcel(Parcel in) {
-            Vehicle instance = new Vehicle();
-            instance.mId = ((Integer) in.readValue((Integer.class.getClassLoader())));
-            instance.mBoxId = ((Integer) in.readValue((Integer.class.getClassLoader())));
-            instance.mLicense = ((String) in.readValue((String.class.getClassLoader())));
-            instance.mProvince = ((String) in.readValue((String.class.getClassLoader())));
-            instance.mWeight = ((Integer) in.readValue((Integer.class.getClassLoader())));
-            instance.mDot = ((String) in.readValue((String.class.getClassLoader())));
-            return instance;
-        }
-
-        public Vehicle[] newArray(int size) {
-            return (new Vehicle[size]);
-        }
-
-    };
-
     public Vehicle() {
-    }
-
-    public Vehicle(Integer id, Integer boxId, String license, String province, Integer weight, String dot) {
-        mId = id;
-        mBoxId = boxId;
-        mLicense = license;
-        mProvince = province;
-        mWeight = weight;
-        mDot = dot;
     }
 
     public Integer getId() {
@@ -63,7 +38,15 @@ public class Vehicle implements Parcelable {
     }
 
     public void setId(Integer id) {
-        this.mId = id;
+        mId = id;
+    }
+
+    public String getName() {
+        return mName;
+    }
+
+    public void setName(String name) {
+        mName = name;
     }
 
     public Integer getBoxId() {
@@ -71,7 +54,7 @@ public class Vehicle implements Parcelable {
     }
 
     public void setBoxId(Integer boxId) {
-        this.mBoxId = boxId;
+        mBoxId = boxId;
     }
 
     public String getLicense() {
@@ -79,7 +62,7 @@ public class Vehicle implements Parcelable {
     }
 
     public void setLicense(String license) {
-        this.mLicense = license;
+        mLicense = license;
     }
 
     public String getProvince() {
@@ -87,7 +70,7 @@ public class Vehicle implements Parcelable {
     }
 
     public void setProvince(String province) {
-        this.mProvince = province;
+        mProvince = province;
     }
 
     public Integer getWeight() {
@@ -95,7 +78,7 @@ public class Vehicle implements Parcelable {
     }
 
     public void setWeight(Integer weight) {
-        this.mWeight = weight;
+        mWeight = weight;
     }
 
     public String getDot() {
@@ -103,56 +86,84 @@ public class Vehicle implements Parcelable {
     }
 
     public void setDot(String dot) {
-        this.mDot = dot;
+        mDot = dot;
     }
 
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeValue(mId);
-        dest.writeValue(mBoxId);
-        dest.writeValue(mLicense);
-        dest.writeValue(mProvince);
-        dest.writeValue(mWeight);
-        dest.writeValue(mDot);
-    }
-
+    @Override
     public int describeContents() {
         return 0;
     }
 
     @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeValue(this.mId);
+        dest.writeString(this.mName);
+        dest.writeValue(this.mBoxId);
+        dest.writeString(this.mLicense);
+        dest.writeString(this.mProvince);
+        dest.writeValue(this.mWeight);
+        dest.writeString(this.mDot);
+    }
+
+    protected Vehicle(Parcel in) {
+        this.mId = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.mName = in.readString();
+        this.mBoxId = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.mLicense = in.readString();
+        this.mProvince = in.readString();
+        this.mWeight = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.mDot = in.readString();
+    }
+
+    public static final Parcelable.Creator<Vehicle> CREATOR = new Parcelable.Creator<Vehicle>() {
+        @Override
+        public Vehicle createFromParcel(Parcel source) {
+            return new Vehicle(source);
+        }
+
+        @Override
+        public Vehicle[] newArray(int size) {
+            return new Vehicle[size];
+        }
+    };
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
+
         if (o == null || getClass() != o.getClass()) return false;
 
         Vehicle vehicle = (Vehicle) o;
 
-        if (mId != null ? !mId.equals(vehicle.mId) : vehicle.mId != null) return false;
-        if (mBoxId != null ? !mBoxId.equals(vehicle.mBoxId) : vehicle.mBoxId != null) return false;
-        if (mLicense != null ? !mLicense.equals(vehicle.mLicense) : vehicle.mLicense != null)
-            return false;
-        if (mProvince != null ? !mProvince.equals(vehicle.mProvince) : vehicle.mProvince != null)
-            return false;
-        if (mWeight != null ? !mWeight.equals(vehicle.mWeight) : vehicle.mWeight != null)
-            return false;
-        return mDot != null ? mDot.equals(vehicle.mDot) : vehicle.mDot == null;
-
+        return new EqualsBuilder()
+                .append(mId, vehicle.mId)
+                .append(mName, vehicle.mName)
+                .append(mBoxId, vehicle.mBoxId)
+                .append(mLicense, vehicle.mLicense)
+                .append(mProvince, vehicle.mProvince)
+                .append(mWeight, vehicle.mWeight)
+                .append(mDot, vehicle.mDot)
+                .isEquals();
     }
 
     @Override
     public int hashCode() {
-        int result = mId != null ? mId.hashCode() : 0;
-        result = 31 * result + (mBoxId != null ? mBoxId.hashCode() : 0);
-        result = 31 * result + (mLicense != null ? mLicense.hashCode() : 0);
-        result = 31 * result + (mProvince != null ? mProvince.hashCode() : 0);
-        result = 31 * result + (mWeight != null ? mWeight.hashCode() : 0);
-        result = 31 * result + (mDot != null ? mDot.hashCode() : 0);
-        return result;
+        return new HashCodeBuilder(17, 37)
+                .append(mId)
+                .append(mName)
+                .append(mBoxId)
+                .append(mLicense)
+                .append(mProvince)
+                .append(mWeight)
+                .append(mDot)
+                .toHashCode();
     }
 
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("Vehicle{");
         sb.append("mId=").append(mId);
+        sb.append(", mName='").append(mName).append('\'');
         sb.append(", mBoxId=").append(mBoxId);
         sb.append(", mLicense='").append(mLicense).append('\'');
         sb.append(", mProvince='").append(mProvince).append('\'');

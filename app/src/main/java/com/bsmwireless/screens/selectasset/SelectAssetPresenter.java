@@ -31,11 +31,11 @@ public class SelectAssetPresenter {
         mDisposables = new CompositeDisposable();
     }
 
-    public void onSearchTextChanged(int selectedPropertyId, String searchText, boolean isTrailer, boolean isScan) {
+    public void onSearchTextChanged(int selectedPropertyId, String searchText, boolean isScan) {
         if (searchText.isEmpty()) {
             mView.showEmptyList();
         } else {
-            mDisposables.add(mVehiclesInteractor.searchVehicles(selectedPropertyId, searchText, isTrailer, isScan).
+            mDisposables.add(mVehiclesInteractor.searchVehicles(selectedPropertyId, searchText, isScan).
                     observeOn(mUiThread)
                     .subscribe(
                             vehicles -> {

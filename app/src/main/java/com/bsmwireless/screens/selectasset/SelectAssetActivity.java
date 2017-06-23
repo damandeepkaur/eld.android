@@ -47,10 +47,10 @@ public class SelectAssetActivity extends AppCompatActivity implements SelectAsse
     private static final int BARCODE_REQUEST_CODE = 101;
 
     @BindView(R.id.txt_search_veh_name)
-    EditText searchBox;
+    EditText mSearchBox;
 
     @BindView(R.id.radio_group)
-    View radioGroup;
+    View mRadioGroup;
 
     @BindView(R.id.list_view_vehicles)
     ListView mVehiclesList;
@@ -68,9 +68,7 @@ public class SelectAssetActivity extends AppCompatActivity implements SelectAsse
 
     private Unbinder mUnbinder;
 
-    private int mSelectedSearchProperty;
-
-    private boolean isTrailer = false;
+    private int mSelectedSearchProperty = 5;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,14 +88,14 @@ public class SelectAssetActivity extends AppCompatActivity implements SelectAsse
             actionBar.setDisplayShowTitleEnabled(false);
         }
 
-        searchBox.addTextChangedListener(new TextWatcher() {
+        mSearchBox.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                mPresenter.onSearchTextChanged(mSelectedSearchProperty, s.toString(), isTrailer, false);
+                mPresenter.onSearchTextChanged(mSelectedSearchProperty, s.toString(), false);
             }
 
             @Override
@@ -124,7 +122,7 @@ public class SelectAssetActivity extends AppCompatActivity implements SelectAsse
                 //TODO: use corrected help widget with translated strings when UI is ready
                 ArrayList<HelpView.HelpModel> list = new ArrayList<>();
 
-                list.add(new HelpView.HelpModel(searchBox, "Or enter asset", HelpView.ArrowType.CLOCKWISE, HelpView.PositionType.TOP, GravityDrawable.GravityType.END));
+                list.add(new HelpView.HelpModel(mSearchBox, "Or enter asset", HelpView.ArrowType.CLOCKWISE, HelpView.PositionType.TOP, GravityDrawable.GravityType.END));
                 list.add(new HelpView.HelpModel(mSelectOptionsButton, "Click to view options", HelpView.ArrowType.CLOCKWISE, HelpView.PositionType.TOP, GravityDrawable.GravityType.END));
                 list.add(new HelpView.HelpModel(mNotInVehicleButton, "Click in case of no vehicle selected", HelpView.ArrowType.STRAIGHT, HelpView.PositionType.BOTTOM, GravityDrawable.GravityType.CENTER));
                 list.add(new HelpView.HelpModel(mScanView, "Please use QR code to select asset", HelpView.ArrowType.CLOCKWISE, HelpView.PositionType.RIGHT, GravityDrawable.GravityType.START));
@@ -154,7 +152,7 @@ public class SelectAssetActivity extends AppCompatActivity implements SelectAsse
 
     @OnClick(R.id.txt_search_veh_name)
     void onSearchBoxClicked() {
-        radioGroup.setVisibility((radioGroup.getVisibility() == VISIBLE) ? GONE : VISIBLE);
+        mRadioGroup.setVisibility((mRadioGroup.getVisibility() == VISIBLE) ? GONE : VISIBLE);
     }
 
     @OnClick({R.id.radio_sap, R.id.radio_legacy, R.id.radio_serial,
@@ -199,8 +197,8 @@ public class SelectAssetActivity extends AppCompatActivity implements SelectAsse
             String barcodeId = data.getStringExtra(BARCODE_UUID);
             String type = data.getStringExtra(BARCODE_TYPE);
             Timber.v(barcodeId + " type:" + type);
-            searchBox.setText(barcodeId);
-            mPresenter.onSearchTextChanged(mSelectedSearchProperty, barcodeId, isTrailer, true);
+            mSearchBox.setText(barcodeId);
+            mPresenter.onSearchTextChanged(mSelectedSearchProperty, barcodeId, true);
         }
     }
 
@@ -209,7 +207,7 @@ public class SelectAssetActivity extends AppCompatActivity implements SelectAsse
         String[] vehiclesArray = new String[vehicles.size()];
         int i = 0;
         for (Vehicle vehicle : vehicles) {
-            vehiclesArray[i++] = vehicle.getProvince() + " [" + vehicle.getBoxId() + "]";
+            vehiclesArray[i++] = vehicle.getName() + " [" + vehicle.getBoxId() + "]";
         }
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this,

@@ -10,6 +10,9 @@ public class VehicleEntity {
     @ColumnInfo(name = "id")
     private Integer mId;
 
+    @ColumnInfo(name = "name")
+    private String mName;
+
     @ColumnInfo(name = "box_id")
     private Integer mBoxId;
 
@@ -31,6 +34,14 @@ public class VehicleEntity {
 
     public void setId(Integer id) {
         mId = id;
+    }
+
+    public String getName() {
+        return mName;
+    }
+
+    public void setName(String name) {
+        mName = name;
     }
 
     public Integer getBoxId() {
@@ -72,4 +83,5 @@ public class VehicleEntity {
     public void setDot(String dot) {
         mDot = dot;
     }
+
 }

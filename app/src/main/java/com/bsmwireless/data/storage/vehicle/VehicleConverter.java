@@ -10,6 +10,7 @@ public class VehicleConverter {
         if (entity != null) {
             vehicle = new Vehicle();
             vehicle.setId(entity.getId());
+            vehicle.setName(entity.getName());
             vehicle.setBoxId(entity.getBoxId());
             vehicle.setLicense(entity.getLicense());
             vehicle.setProvince(entity.getProvince());
@@ -26,6 +27,7 @@ public class VehicleConverter {
         if (vehicle != null) {
             entity = new VehicleEntity();
             entity.setId(vehicle.getId());
+            entity.setName(vehicle.getName());
             entity.setBoxId(vehicle.getBoxId());
             entity.setLicense(vehicle.getLicense());
             entity.setProvince(vehicle.getProvince());
