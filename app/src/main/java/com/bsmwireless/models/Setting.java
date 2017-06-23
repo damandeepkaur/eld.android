@@ -5,6 +5,9 @@ import android.os.Parcelable;
 
 import com.google.gson.annotations.SerializedName;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 public class Setting implements Parcelable {
     @SerializedName("name")
     private String mName;
@@ -62,20 +65,23 @@ public class Setting implements Parcelable {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
+
         if (o == null || getClass() != o.getClass()) return false;
 
         Setting setting = (Setting) o;
 
-        if (mName != null ? !mName.equals(setting.mName) : setting.mName != null) return false;
-        return mValue != null ? mValue.equals(setting.mValue) : setting.mValue == null;
-
+        return new EqualsBuilder()
+                .append(mName, setting.mName)
+                .append(mValue, setting.mValue)
+                .isEquals();
     }
 
     @Override
     public int hashCode() {
-        int result = mName != null ? mName.hashCode() : 0;
-        result = 31 * result + (mValue != null ? mValue.hashCode() : 0);
-        return result;
+        return new HashCodeBuilder(17, 37)
+                .append(mName)
+                .append(mValue)
+                .toHashCode();
     }
 
     @Override

@@ -13,11 +13,21 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        release {
+            storeFile file("android-release-key.keystore")
+            storePassword "BSMP@ssw0rd"
+            keyAlias "releasekey"
+            keyPassword "BSMP@ssw0rd"
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             buildConfigField "boolean", "USE_LOG", "false"
+            signingConfig signingConfigs.release
         }
         debug {
             buildConfigField "boolean", "USE_LOG", "true"
@@ -31,6 +41,63 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    lintOptions {
+        disable 'MissingTranslation', 'ExtraTranslation'
+        abortOnError false
+    }
+}
+
+def getGitCommitVersion() {
+    def stdout = new ByteArrayOutputStream()
+    exec {
+        commandLine 'git', 'rev-parse', '--short' , 'HEAD'
+        standardOutput = stdout
+    }
+    return stdout.toString().trim()
+}
+
+def getDate() {
+    new Date().format('YYMMdd')
+}
+
+// generate version information for jenkins
+task getBuildAppInfo {
+    println "Build-Version: " + android.defaultConfig.versionName + '.' + getDate() + '-' + getGitCommitVersion()
+}
+
+project.afterEvaluate {
+    preBuild.dependsOn getBuildAppInfo
+}
+
+// copy successful build output to apk repository if providing 'release.storage.path'
+// final apk file name format:  ELD_v<Version>_<YYmmdd><p|d>_<githash>.apk
+gradle.buildFinished{ result ->
+    if(result.getFailure() == null) {
+
+        // this copy action ONLY perform when -Drelease.storage.path provided
+        if ( System.getProperty("release.storage.path") != null ) {
+
+            def storagePath= System.getProperty("release.storage.path") + getDate() +'/'
+            def serverFlag='p'
+            if ( System.getProperty("build.target").equalsIgnoreCase( 'DEV' )  ) {
+                serverFlag='d'
+            }
+
+            def appName='ELD_v' + android.defaultConfig.versionName + '_' + getDate() + serverFlag + '_' + getGitCommitVersion()
+
+            println "Copy build result to: " + storagePath + appName
+
+            copy {
+                from 'build/outputs/apk'
+                into storagePath
+                include 'app-release.apk'
+                rename { String fileName ->
+                    fileName.replace('app-release', appName)
+                }
+            }
+        }
     }
 }
 

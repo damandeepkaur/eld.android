@@ -1,0 +1,16 @@
+The customed keys have certificate expiration over 30 years
+
+
+Android App Debug Key
+=================
+keystore=debug.keystore
+keystore_password=android
+keystore_alias=androiddebugkey
+
+
+Android App Release Key
+===================
+keystore=android-release-key.keystore
+keyalias=releasekey
+keyalias_password=BSMP@ssw0rd
+keystore_password=BSMP@ssw0rd

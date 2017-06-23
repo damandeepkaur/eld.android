@@ -8,12 +8,12 @@ import com.bsmwireless.screens.login.LoginView;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import io.reactivex.Observable;
+import io.reactivex.schedulers.Schedulers;
 
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
@@ -28,19 +28,18 @@ public class LoginPresenterTest {
     private static final String PASSWORD = "password";
     private static final String DOMAIN = "domain";
 
-
     @Mock
     LoginView mView;
 
     @Mock
     LoginUserInteractor mLoginUserInteractor;
 
-    @InjectMocks
     LoginPresenter mLoginPresenter;
 
     @Before
     public void before() throws Exception {
         MockitoAnnotations.initMocks(this);
+        mLoginPresenter = new LoginPresenter(mView, mLoginUserInteractor, Schedulers.trampoline());
     }
 
 
@@ -100,5 +99,17 @@ public class LoginPresenterTest {
 
         //then
         verify(mView).goToMainScreen();
+    }
+
+    @Test
+    public void testForgotPasswordButtonPressed() {
+        //given
+        //nothing to do here
+
+        //when
+        mLoginPresenter.onForgotPasswordButtonClicked();
+
+        //then
+        verify(mView).goToForgotPasswordScreen();
     }
 }
