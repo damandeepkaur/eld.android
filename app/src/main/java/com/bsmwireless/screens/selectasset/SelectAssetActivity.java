@@ -22,8 +22,8 @@ import com.bsmwireless.screens.barcode.BarcodeScannerActivity;
 import com.bsmwireless.screens.help.HelpActivity;
 import com.bsmwireless.screens.selectasset.dagger.DaggerSelectAssetComponent;
 import com.bsmwireless.screens.selectasset.dagger.SelectAssetModule;
-import com.bsmwireless.widgets.GravityDrawable;
-import com.bsmwireless.widgets.HelpView;
+import com.bsmwireless.widgets.helpview.GravityDrawable;
+import com.bsmwireless.widgets.helpview.HelpView;
 
 import java.util.ArrayList;
 import java.util.List;

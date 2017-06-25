@@ -34,15 +34,6 @@
             android:name="com.bsmwireless.screens.taketour.TakeTourActivity"
             android:theme="@style/Theme.BsmApp"/>
 
-        <service android:name="com.bsmwireless.data.network.authenticator.BsmAuthenticatorService">
-            <intent-filter>
-                <action android:name="android.accounts.AccountAuthenticator" />
-            </intent-filter>
-            <meta-data
-                android:name="android.accounts.AccountAuthenticator"
-                android:resource="@xml/authenticator" />
-        </service>
-
         <activity
             android:name="com.bsmwireless.screens.selectasset.SelectAssetActivity"
             android:windowSoftInputMode="stateHidden|adjustResize"
@@ -54,6 +45,15 @@
 
         <activity android:name="com.bsmwireless.screens.barcode.BarcodeScannerActivity"
             android:theme="@style/Theme.BsmAppFullScreen" />
+
+        <service android:name="com.bsmwireless.data.network.authenticator.BsmAuthenticatorService">
+            <intent-filter>
+                <action android:name="android.accounts.AccountAuthenticator" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accounts.AccountAuthenticator"
+                android:resource="@xml/authenticator" />
+        </service>
 
     </application>
 
