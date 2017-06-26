@@ -97,6 +97,16 @@ gradle.buildFinished{ result ->
                     fileName.replace('app-release', appName)
                 }
             }
+			
+			// rename local apk file in order for Jenkins uploading to external FTP
+			copy {
+                from 'build/outputs/apk'
+                into 'build/outputs/apk'
+                include 'app-release.apk'
+                rename { String fileName ->
+                    fileName.replace('app-release', appName)
+                }
+            }
         }
     }
 }
