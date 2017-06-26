@@ -194,7 +194,6 @@ public class HOSGraphView extends View {
                 y1 = y2;
 
             } catch (ParseException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }
