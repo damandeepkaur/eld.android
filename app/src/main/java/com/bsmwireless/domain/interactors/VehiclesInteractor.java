@@ -10,7 +10,6 @@ import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.data.storage.vehicle.VehicleConverter;
 import com.bsmwireless.models.Vehicle;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -20,9 +19,6 @@ import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 
-/**
- * Created by mekhtiev on 14.06.2017.
- */
 public class VehiclesInteractor {
     private static final int NOT_IN_VEHICLE_ID = -1;
 
@@ -49,8 +45,8 @@ public class VehiclesInteractor {
         App.getComponent().inject(this);
     }
 
-    public Observable<List<Vehicle>> searchVehicles(int selectedPropertyId, String searchText, boolean isScan) {
-        return mServiceApi.searchVehicles(selectedPropertyId, searchText, isScan ? 1 : 0).subscribeOn(mIoThread);
+    public Observable<List<Vehicle>> searchVehicles(int selectedProperty, String searchText, boolean isScan) {
+        return mServiceApi.searchVehicles(selectedProperty, searchText, isScan ? 1 : 0).subscribeOn(mIoThread);
     }
 
     public Completable saveSelectedVehicle(Vehicle vehicle) {

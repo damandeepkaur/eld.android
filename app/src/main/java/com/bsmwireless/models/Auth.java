@@ -96,18 +96,6 @@ public class Auth implements Parcelable {
     }
 
     @Override
-    public String toString() {
-        final StringBuffer sb = new StringBuffer("Auth{");
-        sb.append("mToken='").append(mToken).append('\'');
-        sb.append(", mCluster='").append(mCluster).append('\'');
-        sb.append(", mDomain='").append(mDomain).append('\'');
-        sb.append(", mDriverId=").append(mDriverId);
-        sb.append(", mOrgId=").append(mOrgId);
-        sb.append('}');
-        return sb.toString();
-    }
-
-    @Override
     public int describeContents() {
         return 0;
     }
@@ -143,4 +131,16 @@ public class Auth implements Parcelable {
             return new Auth[size];
         }
     };
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("Auth{");
+        sb.append("mToken='").append(mToken).append('\'');
+        sb.append(", mCluster='").append(mCluster).append('\'');
+        sb.append(", mDomain='").append(mDomain).append('\'');
+        sb.append(", mDriverId=").append(mDriverId);
+        sb.append(", mOrgId=").append(mOrgId);
+        sb.append('}');
+        return sb.toString();
+    }
 }

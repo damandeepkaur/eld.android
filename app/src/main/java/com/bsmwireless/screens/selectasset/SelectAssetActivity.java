@@ -6,14 +6,14 @@ import android.os.Handler;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
-import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.bsmwireless.common.App;
@@ -24,9 +24,11 @@ import com.bsmwireless.screens.selectasset.dagger.DaggerSelectAssetComponent;
 import com.bsmwireless.screens.selectasset.dagger.SelectAssetModule;
 import com.bsmwireless.widgets.GravityDrawable;
 import com.bsmwireless.widgets.HelpView;
+import com.jakewharton.rxbinding2.widget.RxTextView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
@@ -35,22 +37,33 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import timber.log.Timber;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 import static com.bsmwireless.screens.barcode.BarcodeScannerActivity.BARCODE_TYPE;
 import static com.bsmwireless.screens.barcode.BarcodeScannerActivity.BARCODE_UUID;
+import static com.bsmwireless.screens.selectasset.SelectAssetPresenter.SearchProperty.BOX_ID;
+import static com.bsmwireless.screens.selectasset.SelectAssetPresenter.SearchProperty.DESCRIPTION;
+import static com.bsmwireless.screens.selectasset.SelectAssetPresenter.SearchProperty.LEGACY;
+import static com.bsmwireless.screens.selectasset.SelectAssetPresenter.SearchProperty.LICENSE_PLATE;
+import static com.bsmwireless.screens.selectasset.SelectAssetPresenter.SearchProperty.SAP;
+import static com.bsmwireless.screens.selectasset.SelectAssetPresenter.SearchProperty.SERIAL;
 
 public class SelectAssetActivity extends AppCompatActivity implements SelectAssetView {
 
     private static final int BARCODE_REQUEST_CODE = 101;
+    private static final int DEBOUNCE_TIMEOUT = 500;
 
     @BindView(R.id.txt_search_veh_name)
     EditText mSearchBox;
 
+    @BindView(R.id.radio_group_container)
+    View mRadioGroupContainer;
+
     @BindView(R.id.radio_group)
-    View mRadioGroup;
+    RadioGroup mRadioGroup;
 
     @BindView(R.id.list_view_vehicles)
     ListView mVehiclesList;
@@ -68,7 +81,8 @@ public class SelectAssetActivity extends AppCompatActivity implements SelectAsse
 
     private Unbinder mUnbinder;
 
-    private int mSelectedSearchProperty = 5;
+    private boolean mIsBarcodeResult;
+    private SelectAssetPresenter.SearchProperty mSelectedSearchProperty = BOX_ID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,20 +102,13 @@ public class SelectAssetActivity extends AppCompatActivity implements SelectAsse
             actionBar.setDisplayShowTitleEnabled(false);
         }
 
-        mSearchBox.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                mPresenter.onSearchTextChanged(mSelectedSearchProperty, s.toString(), false);
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-            }
-        });
+        RxTextView.textChanges(mSearchBox).debounce(DEBOUNCE_TIMEOUT, TimeUnit.MILLISECONDS)
+                .map(CharSequence::toString)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(text -> {
+                    mPresenter.onSearchTextChanged(mSelectedSearchProperty, text, mIsBarcodeResult);
+                    if (mIsBarcodeResult) mIsBarcodeResult = false;
+                });
     }
 
     @Override
@@ -152,7 +159,7 @@ public class SelectAssetActivity extends AppCompatActivity implements SelectAsse
 
     @OnClick(R.id.txt_search_veh_name)
     void onSearchBoxClicked() {
-        mRadioGroup.setVisibility((mRadioGroup.getVisibility() == VISIBLE) ? GONE : VISIBLE);
+        mRadioGroupContainer.setVisibility((mRadioGroupContainer.getVisibility() == VISIBLE) ? GONE : VISIBLE);
     }
 
     @OnClick({R.id.radio_sap, R.id.radio_legacy, R.id.radio_serial,
@@ -160,27 +167,28 @@ public class SelectAssetActivity extends AppCompatActivity implements SelectAsse
     void onPropertySelected(View view) {
         switch (view.getId()) {
             case R.id.radio_sap:
-                mSelectedSearchProperty = 0;
+                mSelectedSearchProperty = SAP;
                 break;
             case R.id.radio_legacy:
-                mSelectedSearchProperty = 1;
+                mSelectedSearchProperty = LEGACY;
                 break;
             case R.id.radio_serial:
-                mSelectedSearchProperty = 2;
+                mSelectedSearchProperty = SERIAL;
                 break;
             case R.id.radio_description:
-                mSelectedSearchProperty = 3;
+                mSelectedSearchProperty = DESCRIPTION;
                 break;
             case R.id.radio_license_plate:
-                mSelectedSearchProperty = 4;
+                mSelectedSearchProperty = LICENSE_PLATE;
                 break;
             case R.id.radio_box_id:
-                mSelectedSearchProperty = 5;
+                mSelectedSearchProperty = BOX_ID;
                 break;
             default:
-                mSelectedSearchProperty = 0;
+                mSelectedSearchProperty = BOX_ID;
                 break;
         }
+        mRadioGroupContainer.setVisibility(GONE);
     }
 
     @Override
@@ -197,8 +205,10 @@ public class SelectAssetActivity extends AppCompatActivity implements SelectAsse
             String barcodeId = data.getStringExtra(BARCODE_UUID);
             String type = data.getStringExtra(BARCODE_TYPE);
             Timber.v(barcodeId + " type:" + type);
+            mRadioGroup.check(R.id.radio_serial);
+            mSelectedSearchProperty = SERIAL;
+            mIsBarcodeResult = true;
             mSearchBox.setText(barcodeId);
-            mPresenter.onSearchTextChanged(mSelectedSearchProperty, barcodeId, true);
         }
     }
 

@@ -1,7 +1,6 @@
 package com.bsmwireless.domain.interactors;
 
 import android.os.Build;
-import android.util.Log;
 
 import com.bsmwireless.common.App;
 import com.bsmwireless.common.Constants;
@@ -52,6 +51,7 @@ public class LoginUserInteractor {
         request.setUsername(name);
         request.setPassword(password);
         request.setDomain(domain);
+        request.setDriverType(0);
         request.setAppVersion(BuildConfig.VERSION_NAME);
         request.setDeviceType(DEVICE_TYPE);
         request.setOsVersion(Build.VERSION.RELEASE);
@@ -59,8 +59,10 @@ public class LoginUserInteractor {
         return mServiceApi.loginUser(request)
                 .subscribeOn(mIoThread)
                 .doOnNext(user -> {
-                    mClientManager.setHeaders(String.valueOf(user.getId()), String.valueOf(user.getAuth().getOrgId()),
-                            user.getAuth().getCluster(), user.getAuth().getToken());
+                    mClientManager.setHeaders(String.valueOf(user.getId()),
+                            String.valueOf(user.getAuth().getOrgId()),
+                            user.getAuth().getCluster(),
+                            user.getAuth().getToken());
 
                     String accountName = mPreferencesManager.setAccountName(name, domain);
 
