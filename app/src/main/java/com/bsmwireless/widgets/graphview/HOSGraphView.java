@@ -125,18 +125,15 @@ public class HOSGraphView extends View {
         mBarPaint.setStrokeWidth(4);
     }
 
-    private void drawGridBackground(Canvas canvas)
-    {
+    private void drawGridBackground(Canvas canvas) {
         // paint the interior of the Box
-        for (int i = 0; i <= mDutyStatusCount; i++)
-        {
+        for(int i = 0; i <= mDutyStatusCount; i++) {
             canvas.drawLine(mGraphLeft, mGraphTop + (i * mSegmentHeight), mGraphLeft + mGraphWidth, mGraphTop + (i * mSegmentHeight), mGridPaint);
         }
 
         // draw the tick lines
         float xDelta = mGraphWidth / (mHoursCount * mSegmentsPerHour);
-        for (int i = 0; i <= mHoursCount * mSegmentsPerHour; i++)
-        {
+        for(int i = 0; i <= mHoursCount * mSegmentsPerHour; i++) {
             float tickX = mGraphLeft + (i * xDelta);
             float tickHeight = mSegmentHeight / 4;
             float delta = 0;
@@ -159,8 +156,7 @@ public class HOSGraphView extends View {
         }
     }
 
-    private void drawLog(List<DriverLog> logdata, Canvas canvas)
-    {
+    private void drawLog(List<DriverLog> logdata, Canvas canvas) {
         if (logdata == null || logdata.size() == 0) {
             return;
         }
@@ -172,8 +168,7 @@ public class HOSGraphView extends View {
         x1 = mGraphLeft;
         y1 = mGraphTop + (logdata.get(0).getType() - 101) * mSegmentHeight + mSegmentHeight / 2;
 
-        for (int i = 1; i < logdata.size(); i++)
-        {
+        for(int i = 1; i < logdata.size(); i++) {
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
             try {
                 Date logDate = format.parse(logdata.get(i).getLogTime());
