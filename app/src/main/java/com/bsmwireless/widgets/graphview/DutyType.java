@@ -4,18 +4,18 @@ import app.bsmuniversal.com.R;
 
 public enum DutyType {
 
-    OFF_DUTY(101, "OFF DUTY", R.color.offduty_light),
-    SLEEPER_BERTH(102, "SLEEPER BERTH", R.color.sleepingberth_light),
-    DRIVING(103, "DRIVING", R.color.driving_light),
-    ON_DUTY(104, "ON DUTY", R.color.onduty_light);
+    OFF_DUTY(101, R.string.hos_txt_offduty, R.color.offduty_light),
+    SLEEPER_BERTH(102, R.string.hos_txt_sleepingberth, R.color.sleepingberth_light),
+    DRIVING(103, R.string.hos_txt_driving, R.color.driving_light),
+    ON_DUTY(104, R.string.hos_txt_onduty, R.color.onduty_light);
 
     private int mType;
-    private String mName;
+    private int mNameRes;
     private int mColor;
 
-    DutyType(int type, String name, int color) {
+    DutyType(int type, int nameRes, int color) {
         mType = type;
-        mName = name;
+        mNameRes = nameRes;
         mColor = color;
     }
 
@@ -23,14 +23,14 @@ public enum DutyType {
         return mType;
     }
 
-    public static String getTypeNameById(int type) {
+    public static int getTypeNameResById(int type) {
         for (DutyType t:
                 DutyType.values()) {
             if (t.mType == type) {
-                return t.mName;
+                return t.mNameRes;
             }
         }
-        return "";
+        return R.string.hos_txt_offduty;
     }
 
     public static int getTypeColorById(int type) {

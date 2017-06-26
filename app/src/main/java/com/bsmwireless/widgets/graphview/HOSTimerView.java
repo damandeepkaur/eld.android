@@ -50,8 +50,6 @@ public class HOSTimerView extends RelativeLayout {
     private void init(Context context, AttributeSet attrs, int defStyleAttr) {
         mRootView = inflate(context, R.layout.hos_timer_view, this);
 
-        mUnbinder = ButterKnife.bind(this, mRootView);
-
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.HOSTimerView, defStyleAttr, 0);
         try {
             mType = typedArray.getInteger(R.styleable.HOSTimerView_duty, 0);
@@ -59,7 +57,7 @@ public class HOSTimerView extends RelativeLayout {
 
             mRootView.setBackgroundColor(ContextCompat.getColor(getContext(), DutyType.getTypeColorById(mType)));
 
-            mTypeTV.setText(DutyType.getTypeNameById(mType));
+            mTypeTV.setText(getResources().getString(DutyType.getTypeNameResById(mType)));
             mTypeTV.setVisibility(mShowHeader ? VISIBLE : GONE);
         } finally {
             typedArray.recycle();
@@ -67,8 +65,14 @@ public class HOSTimerView extends RelativeLayout {
     }
 
     @Override
-    protected void finalize() throws Throwable {
+    protected void onFinishInflate() {
+        super.onFinishInflate();
+        mUnbinder = ButterKnife.bind(this, mRootView);
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
         mUnbinder.unbind();
-        super.finalize();
+        super.onDetachedFromWindow();
     }
 }

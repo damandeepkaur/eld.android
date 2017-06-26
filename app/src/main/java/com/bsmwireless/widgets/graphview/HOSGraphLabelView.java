@@ -53,8 +53,6 @@ public class HOSGraphLabelView extends RelativeLayout {
 
         mRootView = inflate(context, R.layout.hos_graph_label_vew, this);
 
-        mUnbinder = ButterKnife.bind(this, mRootView);
-
         mLabelTV.setTypeface(mFontCache.get(FontCache.BEBAS_NEUE));
 
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.HOSGraphLabelView, defStyleAttr, 0);
@@ -64,7 +62,7 @@ public class HOSGraphLabelView extends RelativeLayout {
 
             mRootView.setBackgroundColor(ContextCompat.getColor(getContext(), DutyType.getTypeColorById(mType)));
 
-            mLabelTV.setText(DutyType.getTypeNameById(mType));
+            mLabelTV.setText(getResources().getString(DutyType.getTypeNameResById(mType)));
             mLabelTV.setVisibility(mShowLabel ? VISIBLE : GONE);
         } finally {
             typedArray.recycle();
@@ -72,8 +70,14 @@ public class HOSGraphLabelView extends RelativeLayout {
     }
 
     @Override
-    protected void finalize() throws Throwable {
+    protected void onFinishInflate() {
+        super.onFinishInflate();
+        mUnbinder = ButterKnife.bind(this, mRootView);
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
         mUnbinder.unbind();
-        super.finalize();
+        super.onDetachedFromWindow();
     }
 }

@@ -77,13 +77,17 @@ public class HOSView extends LinearLayout {
         mRootView = inflate(context,
                             getOrientation() == VERTICAL ? R.layout.hos_view_vertical : R.layout.hos_view_horizontal,
                             this);
+    }
 
+    @Override
+    protected void onFinishInflate() {
+        super.onFinishInflate();
         mUnbinder = ButterKnife.bind(this, mRootView);
     }
 
     @Override
-    protected void finalize() throws Throwable {
+    protected void onDetachedFromWindow() {
         mUnbinder.unbind();
-        super.finalize();
+        super.onDetachedFromWindow();
     }
 }
