@@ -1,4 +1,4 @@
-package com.bsmwireless.widgets;
+package com.bsmwireless.widgets.helpview;
 
 import android.content.Context;
 import android.graphics.Rect;
@@ -15,6 +15,8 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import com.bsmwireless.widgets.common.FontTextView;
 
 import app.bsmuniversal.com.R;
 

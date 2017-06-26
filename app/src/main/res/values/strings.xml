@@ -359,4 +359,10 @@
 
     <!-- Authenticator -->
     <string name="account_label">BSM Wireless</string>
+
+    <!--Graph view-->
+    <string name="timer_default_time">00:00</string>
+    <string name="timer_default_type">OFF DUTY</string>
+    <string name="timer_hours_minutes">HOURS MINUTES</string>
+    <string name="string_total">TOTAL</string>
 </resources>

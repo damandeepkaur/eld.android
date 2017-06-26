@@ -1,14 +1,24 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>
 <resources>
-	<declare-styleable name="customfont">
-		<attr name="textformat" format="string"/>
-	</declare-styleable>
+
 	<attr name="direction">
         <enum name="rightToLeft" value="0" />
         <enum name="bottomToTop" value="1" />
         <enum name="leftToRight" value="2" />
         <enum name="topToBottom" value="3" />
     </attr>
+
+    <attr name="duty" format="enum">
+        <enum name="off_duty" value="101"/>
+        <enum name="sleeper_berth" value="102"/>
+        <enum name="driving" value="103"/>
+        <enum name="on_duty" value="104"/>
+    </attr>
+
+    <declare-styleable name="customfont">
+        <attr name="textformat" format="string"/>
+    </declare-styleable>
+
     <declare-styleable name="MultiDirectionSlidingDrawer">
         <attr name="handle" format="reference" />
         <attr name="content" format="reference" />
@@ -26,6 +36,16 @@
             <enum name="bebasNeue" value="2"/>
             <enum name="fonty" value="3"/>
         </attr>
+    </declare-styleable>
+
+    <declare-styleable name="HOSTimerView">
+        <attr name="duty"/>
+        <attr name="showHeader" format="boolean"/>
+    </declare-styleable>
+
+    <declare-styleable name="HOSGraphLabelView">
+        <attr name="duty"/>
+        <attr name="showLabel" format="boolean"/>
     </declare-styleable>
 </resources>
 

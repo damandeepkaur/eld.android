@@ -1,4 +1,4 @@
-package com.bsmwireless.widgets;
+package com.bsmwireless.widgets.helpview;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
