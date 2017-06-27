@@ -113,6 +113,7 @@ public class LoginActivity extends BaseActivity implements LoginView {
     @Override
     public void goToMainScreen() {
         startActivity(new Intent(this, SelectAssetActivity.class));
+        finish();
     }
 
     @Override

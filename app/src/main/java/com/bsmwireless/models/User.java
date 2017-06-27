@@ -373,39 +373,6 @@ public class User implements Parcelable {
     }
 
     @Override
-    public String toString() {
-        final StringBuffer sb = new StringBuffer("User{");
-        sb.append("mId=").append(mId);
-        sb.append(", mOrgId=").append(mOrgId);
-        sb.append(", mEmployeeId='").append(mEmployeeId).append('\'');
-        sb.append(", mPassword='").append(mPassword).append('\'');
-        sb.append(", mIsSupervisorInt=").append(mIsSupervisorInt);
-        sb.append(", mTimezone='").append(mTimezone).append('\'');
-        sb.append(", mSignatureId=").append(mSignatureId);
-        sb.append(", mAddress='").append(mAddress).append('\'');
-        sb.append(", mCity='").append(mCity).append('\'');
-        sb.append(", mState='").append(mState).append('\'');
-        sb.append(", mCountry='").append(mCountry).append('\'');
-        sb.append(", mSignature='").append(mSignature).append('\'');
-        sb.append(", mUpdated=").append(mUpdated);
-        sb.append(", mOrganization='").append(mOrganization).append('\'');
-        sb.append(", mSetting=").append(mSetting);
-        sb.append(", mAuth=").append(mAuth);
-        sb.append(", mIsSupervisor=").append(mIsSupervisor);
-        sb.append(", mFirstName='").append(mFirstName).append('\'');
-        sb.append(", mMidName='").append(mMidName).append('\'');
-        sb.append(", mLastName='").append(mLastName).append('\'');
-        sb.append(", mRuleException='").append(mRuleException).append('\'');
-        sb.append(", mApplyDST=").append(mApplyDST);
-        sb.append(", mUsCycle=").append(mUsCycle);
-        sb.append(", mCaCycle=").append(mCaCycle);
-        sb.append(", mLastModified=").append(mLastModified);
-        sb.append(", mOrgAddr='").append(mOrgAddr).append('\'');
-        sb.append('}');
-        return sb.toString();
-    }
-
-    @Override
     public int describeContents() {
         return 0;
     }
@@ -484,4 +451,37 @@ public class User implements Parcelable {
             return new User[size];
         }
     };
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("User{");
+        sb.append("mId=").append(mId);
+        sb.append(", mOrgId=").append(mOrgId);
+        sb.append(", mEmployeeId='").append(mEmployeeId).append('\'');
+        sb.append(", mPassword='").append(mPassword).append('\'');
+        sb.append(", mIsSupervisorInt=").append(mIsSupervisorInt);
+        sb.append(", mTimezone='").append(mTimezone).append('\'');
+        sb.append(", mSignatureId=").append(mSignatureId);
+        sb.append(", mAddress='").append(mAddress).append('\'');
+        sb.append(", mCity='").append(mCity).append('\'');
+        sb.append(", mState='").append(mState).append('\'');
+        sb.append(", mCountry='").append(mCountry).append('\'');
+        sb.append(", mSignature='").append(mSignature).append('\'');
+        sb.append(", mUpdated=").append(mUpdated);
+        sb.append(", mOrganization='").append(mOrganization).append('\'');
+        sb.append(", mSetting=").append(mSetting);
+        sb.append(", mAuth=").append(mAuth);
+        sb.append(", mIsSupervisor=").append(mIsSupervisor);
+        sb.append(", mFirstName='").append(mFirstName).append('\'');
+        sb.append(", mMidName='").append(mMidName).append('\'');
+        sb.append(", mLastName='").append(mLastName).append('\'');
+        sb.append(", mRuleException='").append(mRuleException).append('\'');
+        sb.append(", mApplyDST=").append(mApplyDST);
+        sb.append(", mUsCycle=").append(mUsCycle);
+        sb.append(", mCaCycle=").append(mCaCycle);
+        sb.append(", mLastModified=").append(mLastModified);
+        sb.append(", mOrgAddr='").append(mOrgAddr).append('\'');
+        sb.append('}');
+        return sb.toString();
+    }
 }
