@@ -3,10 +3,9 @@ package com.bsmwireless.screens.help;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.view.View;
 import android.view.WindowManager;
 
-import com.bsmwireless.widgets.HelpView;
+import com.bsmwireless.widgets.helpview.HelpView;
 
 import java.util.ArrayList;
 

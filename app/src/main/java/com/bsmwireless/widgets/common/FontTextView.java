@@ -1,4 +1,4 @@
-package com.bsmwireless.widgets;
+package com.bsmwireless.widgets.common;
 
 
 import android.content.Context;
@@ -75,11 +75,11 @@ public class FontTextView extends AppCompatTextView {
                 break;
 
             case BEBAS_NEUE:
-                typeface = mFontCache.get("fonts/BebasNeue.otf");
+                typeface = mFontCache.get(FontCache.BEBAS_NEUE);
                 break;
 
             case FONTY:
-                typeface = mFontCache.get("fonts/Fonty.ttf");
+                typeface = mFontCache.get(FontCache.FONTY);
                 break;
         }
 
