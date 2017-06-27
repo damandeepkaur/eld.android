@@ -11,9 +11,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 public class Response implements Parcelable {
 
-    @SerializedName("responseCode")
-    @Expose
-    private Integer mResponseCode;
     @SerializedName("message")
     @Expose
     private String mMessage;
@@ -25,7 +22,6 @@ public class Response implements Parcelable {
         })
         public Response createFromParcel(Parcel in) {
             Response instance = new Response();
-            instance.mResponseCode = ((Integer) in.readValue((Integer.class.getClassLoader())));
             instance.mMessage = ((String) in.readValue((String.class.getClassLoader())));
             return instance;
         }
@@ -35,14 +31,6 @@ public class Response implements Parcelable {
         }
 
     };
-
-    public Integer getResponseCode() {
-        return mResponseCode;
-    }
-
-    public void setResponseCode(Integer responseCode) {
-        this.mResponseCode = responseCode;
-    }
 
     public String getMessage() {
         return mMessage;
@@ -55,7 +43,6 @@ public class Response implements Parcelable {
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("Response{");
-        sb.append("mResponseCode=").append(mResponseCode);
         sb.append(", mMessage='").append(mMessage).append('\'');
         sb.append('}');
         return sb.toString();
@@ -63,7 +50,7 @@ public class Response implements Parcelable {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(mResponseCode).append(mMessage).toHashCode();
+        return new HashCodeBuilder().append(mMessage).toHashCode();
     }
 
     @Override
@@ -75,11 +62,10 @@ public class Response implements Parcelable {
             return false;
         }
         Response rhs = ((Response) other);
-        return new EqualsBuilder().append(mResponseCode, rhs.mResponseCode).append(mMessage, rhs.mMessage).isEquals();
+        return new EqualsBuilder().append(mMessage, rhs.mMessage).isEquals();
     }
 
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeValue(mResponseCode);
         dest.writeValue(mMessage);
     }
 

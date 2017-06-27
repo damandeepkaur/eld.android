@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 public class PreferencesManager {
     private static final String KEY_ACCOUNT_NAME = "account_name";
     private static final String KEY_SELECTED_VEHICLE_ID = "selected_vehicle_id";
+    private static final String KEY_SELECTED_BOX_ID = "selected_box_id";
 
     private SharedPreferences mPreferences;
 
@@ -34,5 +35,15 @@ public class PreferencesManager {
 
     public int getSelectedVehicleId() {
         return mPreferences.getInt(KEY_SELECTED_VEHICLE_ID, -1);
+    }
+
+    public void setSelectedBoxId(int boxId) {
+        SharedPreferences.Editor editor = mPreferences.edit();
+        editor.putInt(KEY_SELECTED_BOX_ID, boxId);
+        editor.apply();
+    }
+
+    public int getSelectedBoxId() {
+        return mPreferences.getInt(KEY_SELECTED_BOX_ID, -1);
     }
 }

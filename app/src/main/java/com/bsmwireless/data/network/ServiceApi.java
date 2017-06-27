@@ -23,9 +23,11 @@ import com.bsmwireless.models.Vehicle;
 import java.util.List;
 
 import io.reactivex.Observable;
+
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
+import retrofit2.http.Header;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
@@ -193,13 +195,31 @@ public interface ServiceApi {
     Observable<Response> updateDriver(@Body Driver driver);
 
     /**
-     * Update current driver status.
+     * Certify driver.
+     *
+     * @param status driver status.
+     * @return certify driver response {@link Response}.
+     */
+    @POST("v1/sync/driver/certify")
+    Observable<Response> certifyDriver(@Body DriverStatus status, @Header("X-Box") int boxId);
+
+    /**
+     * Logout current driver.
+     *
+     * @param status driver status.
+     * @return driver logout response {@link Response}.
+     */
+    @POST("v1/sync/driver/logout")
+    Observable<Response> logoutDriver(@Body DriverStatus status, @Header("X-Box") int boxId);
+
+    /**
+     * Sync current driver status.
      *
      * @param status driver status.
      * @return update driver status response {@link Response}.
      */
-    @PUT("v1/app/drivers/currentstatus")
-    Observable<Response> updateDriverStatus(@Body DriverStatus status);
+    @POST("v1/sync/driver/status")
+    Observable<Response> syncDriverStatus(@Body List<DriverStatus> status);
 
     /**
      * Submit (add) HOS alert.

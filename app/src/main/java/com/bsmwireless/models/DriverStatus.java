@@ -11,42 +11,98 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 public class DriverStatus implements Parcelable {
 
-    @SerializedName("driverid")
+    @SerializedName("recordStatus")
     @Expose
-    private Integer mDriverId;
-    @SerializedName("boxid")
+    private String mRecordStatus;
+    @SerializedName("recordOrigin")
+    @Expose
+    private Integer mRecordOrigin;
+    @SerializedName("eventType")
+    @Expose
+    private Integer mEventType;
+    @SerializedName("eventCode")
+    @Expose
+    private Integer mEventCode;
+    @SerializedName("eventTime")
+    @Expose
+    private Integer mEventTime;
+    @SerializedName("odometer")
+    @Expose
+    private Integer mOdometer;
+    @SerializedName("engineHours")
+    @Expose
+    private Integer mEngineHours;
+    @SerializedName("lat")
+    @Expose
+    private Integer mLat;
+    @SerializedName("lng")
+    @Expose
+    private Integer mLng;
+    @SerializedName("distance")
+    @Expose
+    private Integer mDistance;
+    @SerializedName("comment")
+    @Expose
+    private String mComment;
+    @SerializedName("locationDesc")
+    @Expose
+    private String mLocationDesc;
+    @SerializedName("checksum")
+    @Expose
+    private String mChecksum;
+    @SerializedName("shippingId")
+    @Expose
+    private String mShippingId;
+    @SerializedName("coDriverId")
+    @Expose
+    private Integer mCoDriverId;
+    @SerializedName("boxId")
     @Expose
     private Integer mBoxId;
-    @SerializedName("datetime")
+    @SerializedName("id")
     @Expose
-    private Long mDateTime;
-    @SerializedName("todaysec")
+    private Integer mId;
+    @SerializedName("tzOffset")
     @Expose
-    private Integer mTodaySec;
-    @SerializedName("totalsec")
+    private Integer mTzOffset;
+    @SerializedName("timezone")
     @Expose
-    private Integer mTotalSec;
-    @SerializedName("availablesec")
+    private String mTimezone;
+    @SerializedName("miStatus")
     @Expose
-    private Integer mAvailableSec;
-    @SerializedName("cycle")
+    private Boolean mMiStatus;
+    @SerializedName("ddStatus")
     @Expose
-    private String mCycle;
+    private Boolean mDdStatus;
 
     public final static Parcelable.Creator<DriverStatus> CREATOR = new Creator<DriverStatus>() {
 
         @SuppressWarnings({
-            "unchecked"
+                "unchecked"
         })
         public DriverStatus createFromParcel(Parcel in) {
             DriverStatus instance = new DriverStatus();
-            instance.mDriverId = ((Integer) in.readValue((Integer.class.getClassLoader())));
+            instance.mRecordStatus = ((String) in.readValue((String.class.getClassLoader())));
+            instance.mRecordOrigin = ((Integer) in.readValue((Integer.class.getClassLoader())));
+            instance.mEventType = ((Integer) in.readValue((Integer.class.getClassLoader())));
+            instance.mEventCode = ((Integer) in.readValue((Integer.class.getClassLoader())));
+            instance.mEventTime = ((Integer) in.readValue((Integer.class.getClassLoader())));
+            instance.mOdometer = ((Integer) in.readValue((Integer.class.getClassLoader())));
+            instance.mEngineHours = ((Integer) in.readValue((Integer.class.getClassLoader())));
+            instance.mLat = ((Integer) in.readValue((Integer.class.getClassLoader())));
+            instance.mLng = ((Integer) in.readValue((Integer.class.getClassLoader())));
+            instance.mDistance = ((Integer) in.readValue((Integer.class.getClassLoader())));
+            instance.mComment = ((String) in.readValue((String.class.getClassLoader())));
+            instance.mLocationDesc = ((String) in.readValue((String.class.getClassLoader())));
+            instance.mChecksum = ((String) in.readValue((String.class.getClassLoader())));
+            instance.mShippingId = ((String) in.readValue((String.class.getClassLoader())));
+            instance.mCoDriverId = ((Integer) in.readValue((Integer.class.getClassLoader())));
             instance.mBoxId = ((Integer) in.readValue((Integer.class.getClassLoader())));
-            instance.mDateTime = ((Long) in.readValue((Long.class.getClassLoader())));
-            instance.mTodaySec = ((Integer) in.readValue((Integer.class.getClassLoader())));
-            instance.mTotalSec = ((Integer) in.readValue((Integer.class.getClassLoader())));
-            instance.mAvailableSec = ((Integer) in.readValue((Integer.class.getClassLoader())));
-            instance.mCycle = ((String) in.readValue((String.class.getClassLoader())));
+            instance.mId = ((Integer) in.readValue((Integer.class.getClassLoader())));
+            instance.mTzOffset = ((Integer) in.readValue((Integer.class.getClassLoader())));
+            instance.mTimezone = ((String) in.readValue((String.class.getClassLoader())));
+            instance.mMiStatus = ((Boolean) in.readValue((Boolean.class.getClassLoader())));
+            instance.mDdStatus = ((Boolean) in.readValue((Boolean.class.getClassLoader())));
             return instance;
         }
 
@@ -56,12 +112,124 @@ public class DriverStatus implements Parcelable {
 
     };
 
-    public Integer getDriverId() {
-        return mDriverId;
+    public String getRecordStatus() {
+        return mRecordStatus;
     }
 
-    public void setDriverId(Integer driverId) {
-        this.mDriverId = driverId;
+    public void setRecordStatus(String recordStatus) {
+        this.mRecordStatus = recordStatus;
+    }
+
+    public Integer getRecordOrigin() {
+        return mRecordOrigin;
+    }
+
+    public void setRecordOrigin(Integer recordOrigin) {
+        this.mRecordOrigin = recordOrigin;
+    }
+
+    public Integer getEventType() {
+        return mEventType;
+    }
+
+    public void setEventType(Integer eventType) {
+        this.mEventType = eventType;
+    }
+
+    public Integer getEventCode() {
+        return mEventCode;
+    }
+
+    public void setEventCode(Integer eventCode) {
+        this.mEventCode = eventCode;
+    }
+
+    public Integer getEventTime() {
+        return mEventTime;
+    }
+
+    public void setEventTime(Integer eventTime) {
+        this.mEventTime = eventTime;
+    }
+
+    public Integer getOdometer() {
+        return mOdometer;
+    }
+
+    public void setOdometer(Integer odometer) {
+        this.mOdometer = odometer;
+    }
+
+    public Integer getEngineHours() {
+        return mEngineHours;
+    }
+
+    public void setEngineHours(Integer engineHours) {
+        this.mEngineHours = engineHours;
+    }
+
+    public Integer getLat() {
+        return mLat;
+    }
+
+    public void setLat(Integer lat) {
+        this.mLat = lat;
+    }
+
+    public Integer getLng() {
+        return mLng;
+    }
+
+    public void setLng(Integer lng) {
+        this.mLng = lng;
+    }
+
+    public Integer getDistance() {
+        return mDistance;
+    }
+
+    public void setDistance(Integer distance) {
+        this.mDistance = distance;
+    }
+
+    public String getComment() {
+        return mComment;
+    }
+
+    public void setComment(String comment) {
+        this.mComment = comment;
+    }
+
+    public String getLocationDesc() {
+        return mLocationDesc;
+    }
+
+    public void setLocationDesc(String locationDesc) {
+        this.mLocationDesc = locationDesc;
+    }
+
+    public String getChecksum() {
+        return mChecksum;
+    }
+
+    public void setChecksum(String checksum) {
+        this.mChecksum = checksum;
+    }
+
+    public String getShippingId() {
+        return mShippingId;
+    }
+
+    public void setShippingId(String shippingId) {
+        this.mShippingId = shippingId;
+    }
+
+    public Integer getCoDriverId() {
+        return mCoDriverId;
+    }
+
+    public void setCoDriverId(Integer coDriverId) {
+        this.mCoDriverId = coDriverId;
     }
 
     public Integer getBoxId() {
@@ -72,63 +240,99 @@ public class DriverStatus implements Parcelable {
         this.mBoxId = boxId;
     }
 
-    public Long getDateTime() {
-        return mDateTime;
+    public Integer getId() {
+        return mId;
     }
 
-    public void setDateTime(Long dateTime) {
-        this.mDateTime = dateTime;
+    public void setId(Integer id) {
+        this.mId = id;
     }
 
-    public Integer getTodaySec() {
-        return mTodaySec;
+    public Integer getTzOffset() {
+        return mTzOffset;
     }
 
-    public void setTodaySec(Integer todaySec) {
-        this.mTodaySec = todaySec;
+    public void setTzOffset(Integer tzOffset) {
+        this.mTzOffset = tzOffset;
     }
 
-    public Integer getTotalSec() {
-        return mTotalSec;
+    public String getTimezone() {
+        return mTimezone;
     }
 
-    public void setTotalSec(Integer totalSec) {
-        this.mTotalSec = totalSec;
+    public void setTimezone(String timezone) {
+        this.mTimezone = timezone;
     }
 
-    public Integer getAvailableSec() {
-        return mAvailableSec;
+    public Boolean getMiStatus() {
+        return mMiStatus;
     }
 
-    public void setAvailableSec(Integer availableSec) {
-        this.mAvailableSec = availableSec;
+    public void setMiStatus(Boolean miStatus) {
+        this.mMiStatus = miStatus;
     }
 
-    public String getCycle() {
-        return mCycle;
+    public Boolean getDdStatus() {
+        return mDdStatus;
     }
 
-    public void setCycle(String cycle) {
-        this.mCycle = cycle;
+    public void setDdStatus(Boolean ddStatus) {
+        this.mDdStatus = ddStatus;
     }
 
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("DriverStatus{");
-        sb.append("mDriverId=").append(mDriverId);
+        sb.append("mRecordStatus='").append(mRecordStatus).append('\'');
+        sb.append(", mRecordOrigin=").append(mRecordOrigin);
+        sb.append(", mEventType=").append(mEventType);
+        sb.append(", mEventCode=").append(mEventCode);
+        sb.append(", mEventTime=").append(mEventTime);
+        sb.append(", mOdometer=").append(mOdometer);
+        sb.append(", mEngineHours=").append(mEngineHours);
+        sb.append(", mLat=").append(mLat);
+        sb.append(", mLng=").append(mLng);
+        sb.append(", mDistance=").append(mDistance);
+        sb.append(", mComment='").append(mComment).append('\'');
+        sb.append(", mLocationDesc='").append(mLocationDesc).append('\'');
+        sb.append(", mChecksum='").append(mChecksum).append('\'');
+        sb.append(", mShippingId='").append(mShippingId).append('\'');
+        sb.append(", mCoDriverId=").append(mCoDriverId);
         sb.append(", mBoxId=").append(mBoxId);
-        sb.append(", mDateTime=").append(mDateTime);
-        sb.append(", mTodaySec=").append(mTodaySec);
-        sb.append(", mTotalSec=").append(mTotalSec);
-        sb.append(", mAvailableSec=").append(mAvailableSec);
-        sb.append(", mCycle='").append(mCycle).append('\'');
+        sb.append(", mId=").append(mId);
+        sb.append(", mTzOffset=").append(mTzOffset);
+        sb.append(", mTimezone='").append(mTimezone).append('\'');
+        sb.append(", mMiStatus=").append(mMiStatus);
+        sb.append(", mDdStatus=").append(mDdStatus);
         sb.append('}');
         return sb.toString();
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(mDriverId).append(mBoxId).append(mDateTime).append(mTodaySec).append(mTotalSec).append(mAvailableSec).append(mCycle).toHashCode();
+        return new HashCodeBuilder()
+                .append(mRecordStatus)
+                .append(mRecordOrigin)
+                .append(mEventType)
+                .append(mEventCode)
+                .append(mEventTime)
+                .append(mOdometer)
+                .append(mEngineHours)
+                .append(mLat)
+                .append(mLng)
+                .append(mDistance)
+                .append(mComment)
+                .append(mLocationDesc)
+                .append(mChecksum)
+                .append(mShippingId)
+                .append(mCoDriverId)
+                .append(mBoxId)
+                .append(mId)
+                .append(mTzOffset)
+                .append(mTimezone)
+                .append(mMiStatus)
+                .append(mDdStatus)
+                .toHashCode();
     }
 
     @Override
@@ -140,20 +344,55 @@ public class DriverStatus implements Parcelable {
             return false;
         }
         DriverStatus rhs = ((DriverStatus) other);
-        return new EqualsBuilder().append(mDriverId, rhs.mDriverId).append(mBoxId, rhs.mBoxId).append(mDateTime, rhs.mDateTime).append(mTodaySec, rhs.mTodaySec).append(mTotalSec, rhs.mTotalSec).append(mAvailableSec, rhs.mAvailableSec).append(mCycle, rhs.mCycle).isEquals();
+        return new EqualsBuilder()
+                .append(mRecordStatus, rhs.mRecordStatus)
+                .append(mRecordOrigin, rhs.mRecordOrigin)
+                .append(mEventType, rhs.mEventType)
+                .append(mEventCode, rhs.mEventCode)
+                .append(mEventTime, rhs.mEventTime)
+                .append(mOdometer, rhs.mOdometer)
+                .append(mEngineHours, rhs.mEngineHours)
+                .append(mLat, rhs.mLat)
+                .append(mLng, rhs.mLng)
+                .append(mDistance, rhs.mDistance)
+                .append(mComment, rhs.mComment)
+                .append(mLocationDesc, rhs.mLocationDesc)
+                .append(mChecksum, rhs.mChecksum)
+                .append(mShippingId, rhs.mShippingId)
+                .append(mCoDriverId, rhs.mCoDriverId)
+                .append(mBoxId, rhs.mBoxId)
+                .append(mId, rhs.mId).append(mTzOffset, rhs.mTzOffset)
+                .append(mTimezone, rhs.mTimezone)
+                .append(mMiStatus, rhs.mMiStatus)
+                .append(mDdStatus, rhs.mDdStatus)
+                .isEquals();
     }
 
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeValue(mDriverId);
+        dest.writeValue(mRecordStatus);
+        dest.writeValue(mRecordOrigin);
+        dest.writeValue(mEventType);
+        dest.writeValue(mEventCode);
+        dest.writeValue(mEventTime);
+        dest.writeValue(mOdometer);
+        dest.writeValue(mEngineHours);
+        dest.writeValue(mLat);
+        dest.writeValue(mLng);
+        dest.writeValue(mDistance);
+        dest.writeValue(mComment);
+        dest.writeValue(mLocationDesc);
+        dest.writeValue(mChecksum);
+        dest.writeValue(mShippingId);
+        dest.writeValue(mCoDriverId);
         dest.writeValue(mBoxId);
-        dest.writeValue(mDateTime);
-        dest.writeValue(mTodaySec);
-        dest.writeValue(mTotalSec);
-        dest.writeValue(mAvailableSec);
-        dest.writeValue(mCycle);
+        dest.writeValue(mId);
+        dest.writeValue(mTzOffset);
+        dest.writeValue(mTimezone);
+        dest.writeValue(mMiStatus);
+        dest.writeValue(mDdStatus);
     }
 
     public int describeContents() {
-        return  0;
+        return 0;
     }
 }
