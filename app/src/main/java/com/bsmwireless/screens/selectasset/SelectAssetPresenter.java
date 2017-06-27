@@ -24,6 +24,25 @@ public class SelectAssetPresenter {
 
     private CompositeDisposable mDisposables;
 
+    public enum SearchProperty {
+        SAP(0),
+        LEGACY(1),
+        SERIAL(2),
+        DESCRIPTION(3),
+        LICENSE_PLATE(4),
+        BOX_ID(5);
+
+        private final int mValue;
+
+        SearchProperty(int value) {
+            mValue = value;
+        }
+
+        public int getValue() {
+            return mValue;
+        }
+    }
+
     public SelectAssetPresenter(SelectAssetView view, VehiclesInteractor interactor) {
         App.getComponent().inject(this);
         mView = view;
@@ -31,11 +50,11 @@ public class SelectAssetPresenter {
         mDisposables = new CompositeDisposable();
     }
 
-    public void onSearchTextChanged(int selectedPropertyId, String searchText, boolean isTrailer, boolean isScan) {
+    public void onSearchTextChanged(SearchProperty searchProperty, String searchText, boolean isScan) {
         if (searchText.isEmpty()) {
             mView.showEmptyList();
         } else {
-            mDisposables.add(mVehiclesInteractor.searchVehicles(selectedPropertyId, searchText, isTrailer, isScan).
+            mDisposables.add(mVehiclesInteractor.searchVehicles(searchProperty.getValue(), searchText, isScan).
                     observeOn(mUiThread)
                     .subscribe(
                             vehicles -> {

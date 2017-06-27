@@ -24,7 +24,7 @@ public class LoginPresenter {
         mDisposables = new CompositeDisposable();
         mUiThread = uiThread;
 
-        Timber.d("LoginPresenter() CREATED");
+        Timber.d("CREATED");
     }
 
     public void onForgotPasswordButtonClicked() {
@@ -49,6 +49,7 @@ public class LoginPresenter {
             mView.showErrorMessage("Domain Required");
             return;
         }
+        mView.setLoginButtonEnabled(false);
 
         Disposable disposable = mLoginUserInteractor.loginUser(username, password, domain, keepToken)
                           .observeOn(mUiThread)
@@ -60,11 +61,13 @@ public class LoginPresenter {
                                 mView.goToMainScreen();
                             } else {
                                 mView.showErrorMessage("Login failed");
+                                mView.setLoginButtonEnabled(true);
                             }
                         },
                         error -> {
                             Timber.e("LoginUser error: %s", error);
                             mView.showErrorMessage("Exception:" + error.toString());
+                            mView.setLoginButtonEnabled(true);
                         }
                 );
         mDisposables.add(disposable);
@@ -72,7 +75,7 @@ public class LoginPresenter {
 
     public void onDestroy() {
         mDisposables.dispose();
-        Timber.d("LoginPresenter() DESTROYED");
+        Timber.d("DESTROYED");
     }
 
     public void onLoadUserData() {

@@ -11,4 +11,5 @@ public interface SelectAssetView {
     void showEmptyList();
 
     void goToMainScreen();
+
 }

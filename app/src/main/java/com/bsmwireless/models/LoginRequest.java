@@ -15,6 +15,9 @@ public class LoginRequest {
     @SerializedName("domain")
     private String mDomain;
 
+    @SerializedName("driverType")
+    private Integer mDriverType;
+
     @SerializedName("lastUpdated")
     private long mLastUpdated;
 
@@ -51,6 +54,14 @@ public class LoginRequest {
         mDomain = domain;
     }
 
+    public Integer getDriverType() {
+        return mDriverType;
+    }
+
+    public void setDriverType(Integer driverType) {
+        mDriverType = driverType;
+    }
+
     public long getLastUpdated() {
         return mLastUpdated;
     }
@@ -84,24 +95,10 @@ public class LoginRequest {
     }
 
     @Override
-    public String toString() {
-        final StringBuilder sb = new StringBuilder("LoginRequest{");
-        sb.append("mUsername='").append(mUsername).append('\'');
-        sb.append(", mPassword='").append(mPassword).append('\'');
-        sb.append(", mDomain='").append(mDomain).append('\'');
-        sb.append(", mLastUpdated=").append(mLastUpdated);
-        sb.append(", mAppVersion='").append(mAppVersion).append('\'');
-        sb.append(", mDeviceType='").append(mDeviceType).append('\'');
-        sb.append(", mOsVersion='").append(mOsVersion).append('\'');
-        sb.append('}');
-        return sb.toString();
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
 
-        if (!(o instanceof LoginRequest)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
 
         LoginRequest that = (LoginRequest) o;
 
@@ -110,6 +107,7 @@ public class LoginRequest {
                 .append(mUsername, that.mUsername)
                 .append(mPassword, that.mPassword)
                 .append(mDomain, that.mDomain)
+                .append(mDriverType, that.mDriverType)
                 .append(mAppVersion, that.mAppVersion)
                 .append(mDeviceType, that.mDeviceType)
                 .append(mOsVersion, that.mOsVersion)
@@ -122,10 +120,26 @@ public class LoginRequest {
                 .append(mUsername)
                 .append(mPassword)
                 .append(mDomain)
+                .append(mDriverType)
                 .append(mLastUpdated)
                 .append(mAppVersion)
                 .append(mDeviceType)
                 .append(mOsVersion)
                 .toHashCode();
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("LoginRequest{");
+        sb.append("mUsername='").append(mUsername).append('\'');
+        sb.append(", mPassword='").append(mPassword).append('\'');
+        sb.append(", mDomain='").append(mDomain).append('\'');
+        sb.append(", mDriverType=").append(mDriverType);
+        sb.append(", mLastUpdated=").append(mLastUpdated);
+        sb.append(", mAppVersion='").append(mAppVersion).append('\'');
+        sb.append(", mDeviceType='").append(mDeviceType).append('\'');
+        sb.append(", mOsVersion='").append(mOsVersion).append('\'');
+        sb.append('}');
+        return sb.toString();
     }
 }

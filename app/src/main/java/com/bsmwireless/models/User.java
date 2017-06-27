@@ -1,85 +1,376 @@
+
 package com.bsmwireless.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class User implements Parcelable {
+
     @SerializedName("id")
-    private int mId;
-
-    @SerializedName("firstname")
-    private String mFirstName;
-
-    @SerializedName("midname")
-    private String mMidName;
-
-    @SerializedName("lastname")
-    private String mLastName;
-
-    @SerializedName("uscycle")
-    private int mUsCycle;
-
-    @SerializedName("cacycle")
-    private int mCaCycle;
-
-    @SerializedName("cyclecountry")
-    private int mCycleCountry;
-
-    @SerializedName("ruleexception")
-    private String mRuleException;
-
-    @SerializedName("address")
-    private String mAddress;
-
-    @SerializedName("city")
-    private String mCity;
-
-    @SerializedName("state")
-    private String mState;
-
-    @SerializedName("country")
-    private String mCountry;
-
-    @SerializedName("isSupervisor")
-    private boolean mIsSupervisor;
-
-    @SerializedName("organization")
-    private String mOrganization;
-
-    @SerializedName("organizationAddress")
-    private String mOrganizationAddress;
-
-    @SerializedName("signature")
-    private String mSignature;
-
+    @Expose
+    private Integer mId;
+    @SerializedName("orgid")
+    @Expose
+    private Integer mOrgId;
+    @SerializedName("employeeid")
+    @Expose
+    private String mEmployeeId;
+    @SerializedName("password")
+    @Expose
+    private String mPassword;
+    @SerializedName("issupervisor")
+    @Expose
+    private Integer mIsSupervisorInt;
     @SerializedName("timezone")
-    private double mTimezone;
-
-    @SerializedName("applydst")
-    private int mApplyDst;
-
-    @SerializedName("license")
-    private String mLicense;
-
-    @SerializedName("email")
-    private String mEmail;
-
-    @SerializedName("lastmodified")
-    private String mLastModified;
-
+    @Expose
+    private String mTimezone;
+    @SerializedName("signatureid")
+    @Expose
+    private Integer mSignatureId;
+    @SerializedName("address")
+    @Expose
+    private String mAddress;
+    @SerializedName("city")
+    @Expose
+    private String mCity;
+    @SerializedName("state")
+    @Expose
+    private String mState;
+    @SerializedName("country")
+    @Expose
+    private String mCountry;
+    @SerializedName("signature")
+    @Expose
+    private String mSignature;
     @SerializedName("updated")
-    private boolean mUpdated;
-
+    @Expose
+    private Boolean mUpdated;
+    @SerializedName("organization")
+    @Expose
+    private String mOrganization;
     @SerializedName("configuration")
-    private List<Setting> mConfiguration;
+    @Expose
+    private List<Setting> mSetting;
+    @SerializedName("auth")
+    @Expose
+    private Auth mAuth;
+    @SerializedName("isSupervisor")
+    @Expose
+    private Boolean mIsSupervisor;
+    @SerializedName("firstName")
+    @Expose
+    private String mFirstName;
+    @SerializedName("midName")
+    @Expose
+    private String mMidName;
+    @SerializedName("lastName")
+    @Expose
+    private String mLastName;
+    @SerializedName("ruleException")
+    @Expose
+    private String mRuleException;
+    @SerializedName("applyDST")
+    @Expose
+    private Integer mApplyDST;
+    @SerializedName("usCycle")
+    @Expose
+    private Integer mUsCycle;
+    @SerializedName("caCycle")
+    @Expose
+    private Integer mCaCycle;
+    @SerializedName("lastModified")
+    @Expose
+    private Long mLastModified;
+    @SerializedName("orgAddr")
+    @Expose
+    private String mOrgAddr;
 
-    @SerializedName("token")
-    private String mToken;
+    public Integer getId() {
+        return mId;
+    }
+
+    public void setId(Integer id) {
+        this.mId = id;
+    }
+
+    public Integer getOrgId() {
+        return mOrgId;
+    }
+
+    public void setOrgId(Integer orgId) {
+        this.mOrgId = orgId;
+    }
+
+    public String getEmployeeId() {
+        return mEmployeeId;
+    }
+
+    public void setEmployeeId(String employeeId) {
+        this.mEmployeeId = employeeId;
+    }
+
+    public String getPassword() {
+        return mPassword;
+    }
+
+    public void setPassword(String password) {
+        this.mPassword = password;
+    }
+
+    public Integer getIsSupervisorInt() {
+        return mIsSupervisorInt;
+    }
+
+    public void setIsSupervisorInt(Integer isSupervisorInt) {
+        this.mIsSupervisorInt = isSupervisorInt;
+    }
+
+    public String getTimezone() {
+        return mTimezone;
+    }
+
+    public void setTimezone(String timezone) {
+        this.mTimezone = timezone;
+    }
+
+    public Integer getSignatureId() {
+        return mSignatureId;
+    }
+
+    public void setSignatureId(Integer signatureId) {
+        this.mSignatureId = signatureId;
+    }
+
+    public String getAddress() {
+        return mAddress;
+    }
+
+    public void setAddress(String address) {
+        this.mAddress = address;
+    }
+
+    public String getCity() {
+        return mCity;
+    }
+
+    public void setCity(String city) {
+        this.mCity = city;
+    }
+
+    public String getState() {
+        return mState;
+    }
+
+    public void setState(String state) {
+        this.mState = state;
+    }
+
+    public String getCountry() {
+        return mCountry;
+    }
+
+    public void setCountry(String country) {
+        this.mCountry = country;
+    }
+
+    public String getSignature() {
+        return mSignature;
+    }
+
+    public void setSignature(String signature) {
+        this.mSignature = signature;
+    }
+
+    public Boolean getUpdated() {
+        return mUpdated;
+    }
+
+    public void setUpdated(Boolean updated) {
+        this.mUpdated = updated;
+    }
+
+    public String getOrganization() {
+        return mOrganization;
+    }
+
+    public void setOrganization(String organization) {
+        this.mOrganization = organization;
+    }
+
+    public List<Setting> getSetting() {
+        return mSetting;
+    }
+
+    public void setSetting(List<Setting> configuration) {
+        this.mSetting = configuration;
+    }
+
+    public Auth getAuth() {
+        return mAuth;
+    }
+
+    public void setAuth(Auth auth) {
+        this.mAuth = auth;
+    }
+
+    public Boolean getIsSupervisor() {
+        return mIsSupervisor;
+    }
+
+    public void setIsSupervisor(Boolean isSupervisor) {
+        this.mIsSupervisor = isSupervisor;
+    }
+
+    public String getFirstName() {
+        return mFirstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.mFirstName = firstName;
+    }
+
+    public String getMidName() {
+        return mMidName;
+    }
+
+    public void setMidName(String midName) {
+        this.mMidName = midName;
+    }
+
+    public String getLastName() {
+        return mLastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.mLastName = lastName;
+    }
+
+    public String getRuleException() {
+        return mRuleException;
+    }
+
+    public void setRuleException(String ruleException) {
+        this.mRuleException = ruleException;
+    }
+
+    public Integer getApplyDST() {
+        return mApplyDST;
+    }
+
+    public void setApplyDST(Integer applyDST) {
+        this.mApplyDST = applyDST;
+    }
+
+    public Integer getUsCycle() {
+        return mUsCycle;
+    }
+
+    public void setUsCycle(Integer usCycle) {
+        this.mUsCycle = usCycle;
+    }
+
+    public Integer getCaCycle() {
+        return mCaCycle;
+    }
+
+    public void setCaCycle(Integer caCycle) {
+        this.mCaCycle = caCycle;
+    }
+
+    public Long getLastModified() {
+        return mLastModified;
+    }
+
+    public void setLastModified(Long lastModified) {
+        this.mLastModified = lastModified;
+    }
+
+    public String getOrgAddr() {
+        return mOrgAddr;
+    }
+
+    public void setOrgAddr(String orgAddr) {
+        this.mOrgAddr = orgAddr;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        User user = (User) o;
+
+        return new EqualsBuilder()
+                .append(mId, user.mId)
+                .append(mOrgId, user.mOrgId)
+                .append(mEmployeeId, user.mEmployeeId)
+                .append(mPassword, user.mPassword)
+                .append(mIsSupervisorInt, user.mIsSupervisorInt)
+                .append(mTimezone, user.mTimezone)
+                .append(mSignatureId, user.mSignatureId)
+                .append(mAddress, user.mAddress)
+                .append(mCity, user.mCity)
+                .append(mState, user.mState)
+                .append(mCountry, user.mCountry)
+                .append(mSignature, user.mSignature)
+                .append(mUpdated, user.mUpdated)
+                .append(mOrganization, user.mOrganization)
+                .append(mSetting, user.mSetting)
+                .append(mAuth, user.mAuth)
+                .append(mIsSupervisor, user.mIsSupervisor)
+                .append(mFirstName, user.mFirstName)
+                .append(mMidName, user.mMidName)
+                .append(mLastName, user.mLastName)
+                .append(mRuleException, user.mRuleException)
+                .append(mApplyDST, user.mApplyDST)
+                .append(mUsCycle, user.mUsCycle)
+                .append(mCaCycle, user.mCaCycle)
+                .append(mLastModified, user.mLastModified)
+                .append(mOrgAddr, user.mOrgAddr)
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .append(mId)
+                .append(mOrgId)
+                .append(mEmployeeId)
+                .append(mPassword)
+                .append(mIsSupervisorInt)
+                .append(mTimezone)
+                .append(mSignatureId)
+                .append(mAddress)
+                .append(mCity)
+                .append(mState)
+                .append(mCountry)
+                .append(mSignature)
+                .append(mUpdated)
+                .append(mOrganization)
+                .append(mSetting)
+                .append(mAuth)
+                .append(mIsSupervisor)
+                .append(mFirstName)
+                .append(mMidName)
+                .append(mLastName)
+                .append(mRuleException)
+                .append(mApplyDST)
+                .append(mUsCycle)
+                .append(mCaCycle)
+                .append(mLastModified)
+                .append(mOrgAddr)
+                .toHashCode();
+    }
 
     @Override
     public int describeContents() {
@@ -88,61 +379,65 @@ public class User implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(this.mId);
-        dest.writeString(this.mFirstName);
-        dest.writeString(this.mMidName);
-        dest.writeString(this.mLastName);
-        dest.writeInt(this.mUsCycle);
-        dest.writeInt(this.mCaCycle);
-        dest.writeInt(this.mCycleCountry);
-        dest.writeString(this.mRuleException);
+        dest.writeValue(this.mId);
+        dest.writeValue(this.mOrgId);
+        dest.writeString(this.mEmployeeId);
+        dest.writeString(this.mPassword);
+        dest.writeValue(this.mIsSupervisorInt);
+        dest.writeString(this.mTimezone);
+        dest.writeValue(this.mSignatureId);
         dest.writeString(this.mAddress);
         dest.writeString(this.mCity);
         dest.writeString(this.mState);
         dest.writeString(this.mCountry);
-        dest.writeByte(this.mIsSupervisor ? (byte) 1 : (byte) 0);
-        dest.writeString(this.mOrganization);
-        dest.writeString(this.mOrganizationAddress);
         dest.writeString(this.mSignature);
-        dest.writeDouble(this.mTimezone);
-        dest.writeInt(this.mApplyDst);
-        dest.writeString(this.mLicense);
-        dest.writeString(this.mEmail);
-        dest.writeString(this.mLastModified);
-        dest.writeByte(this.mUpdated ? (byte) 1 : (byte) 0);
-        dest.writeList(this.mConfiguration);
-        dest.writeString(this.mToken);
+        dest.writeValue(this.mUpdated);
+        dest.writeString(this.mOrganization);
+        dest.writeList(this.mSetting);
+        dest.writeParcelable(this.mAuth, flags);
+        dest.writeValue(this.mIsSupervisor);
+        dest.writeString(this.mFirstName);
+        dest.writeString(this.mMidName);
+        dest.writeString(this.mLastName);
+        dest.writeString(this.mRuleException);
+        dest.writeValue(this.mApplyDST);
+        dest.writeValue(this.mUsCycle);
+        dest.writeValue(this.mCaCycle);
+        dest.writeValue(this.mLastModified);
+        dest.writeString(this.mOrgAddr);
     }
 
     public User() {
     }
 
     protected User(Parcel in) {
-        this.mId = in.readInt();
-        this.mFirstName = in.readString();
-        this.mMidName = in.readString();
-        this.mLastName = in.readString();
-        this.mUsCycle = in.readInt();
-        this.mCaCycle = in.readInt();
-        this.mCycleCountry = in.readInt();
-        this.mRuleException = in.readString();
+        this.mId = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.mOrgId = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.mEmployeeId = in.readString();
+        this.mPassword = in.readString();
+        this.mIsSupervisorInt = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.mTimezone = in.readString();
+        this.mSignatureId = (Integer) in.readValue(Integer.class.getClassLoader());
         this.mAddress = in.readString();
         this.mCity = in.readString();
         this.mState = in.readString();
         this.mCountry = in.readString();
-        this.mIsSupervisor = in.readByte() != 0;
-        this.mOrganization = in.readString();
-        this.mOrganizationAddress = in.readString();
         this.mSignature = in.readString();
-        this.mTimezone = in.readDouble();
-        this.mApplyDst = in.readInt();
-        this.mLicense = in.readString();
-        this.mEmail = in.readString();
-        this.mLastModified = in.readString();
-        this.mUpdated = in.readByte() != 0;
-        this.mConfiguration = new ArrayList<>();
-        in.readList(this.mConfiguration, Setting.class.getClassLoader());
-        this.mToken = in.readString();
+        this.mUpdated = (Boolean) in.readValue(Boolean.class.getClassLoader());
+        this.mOrganization = in.readString();
+        this.mSetting = new ArrayList<>();
+        in.readList(this.mSetting, Setting.class.getClassLoader());
+        this.mAuth = in.readParcelable(Auth.class.getClassLoader());
+        this.mIsSupervisor = (Boolean) in.readValue(Boolean.class.getClassLoader());
+        this.mFirstName = in.readString();
+        this.mMidName = in.readString();
+        this.mLastName = in.readString();
+        this.mRuleException = in.readString();
+        this.mApplyDST = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.mUsCycle = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.mCaCycle = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.mLastModified = (Long) in.readValue(Integer.class.getClassLoader());
+        this.mOrgAddr = in.readString();
     }
 
     public static final Parcelable.Creator<User> CREATOR = new Parcelable.Creator<User>() {
@@ -157,303 +452,35 @@ public class User implements Parcelable {
         }
     };
 
-    public int getId() {
-        return mId;
-    }
-
-    public void setId(int id) {
-        mId = id;
-    }
-
-    public String getFirstName() {
-        return mFirstName;
-    }
-
-    public void setFirstName(String firstName) {
-        mFirstName = firstName;
-    }
-
-    public String getMidName() {
-        return mMidName;
-    }
-
-    public void setMidName(String midName) {
-        mMidName = midName;
-    }
-
-    public String getLastName() {
-        return mLastName;
-    }
-
-    public void setLastName(String lastName) {
-        mLastName = lastName;
-    }
-
-    public int getUsCycle() {
-        return mUsCycle;
-    }
-
-    public void setUsCycle(int usCycle) {
-        mUsCycle = usCycle;
-    }
-
-    public int getCaCycle() {
-        return mCaCycle;
-    }
-
-    public void setCaCycle(int caCycle) {
-        mCaCycle = caCycle;
-    }
-
-    public int getCycleCountry() {
-        return mCycleCountry;
-    }
-
-    public void setCycleCountry(int cycleCountry) {
-        mCycleCountry = cycleCountry;
-    }
-
-    public String getRuleException() {
-        return mRuleException;
-    }
-
-    public void setRuleException(String ruleException) {
-        mRuleException = ruleException;
-    }
-
-    public String getAddress() {
-        return mAddress;
-    }
-
-    public void setAddress(String address) {
-        mAddress = address;
-    }
-
-    public String getCity() {
-        return mCity;
-    }
-
-    public void setCity(String city) {
-        mCity = city;
-    }
-
-    public String getState() {
-        return mState;
-    }
-
-    public void setState(String state) {
-        mState = state;
-    }
-
-    public String getCountry() {
-        return mCountry;
-    }
-
-    public void setCountry(String country) {
-        mCountry = country;
-    }
-
-    public boolean isSupervisor() {
-        return mIsSupervisor;
-    }
-
-    public void setSupervisor(boolean supervisor) {
-        mIsSupervisor = supervisor;
-    }
-
-    public String getOrganization() {
-        return mOrganization;
-    }
-
-    public void setOrganization(String organization) {
-        mOrganization = organization;
-    }
-
-    public String getOrganizationAddress() {
-        return mOrganizationAddress;
-    }
-
-    public void setOrganizationAddress(String organizationAddress) {
-        mOrganizationAddress = organizationAddress;
-    }
-
-    public String getSignature() {
-        return mSignature;
-    }
-
-    public void setSignature(String signature) {
-        mSignature = signature;
-    }
-
-    public double getTimezone() {
-        return mTimezone;
-    }
-
-    public void setTimezone(double timezone) {
-        mTimezone = timezone;
-    }
-
-    public int getApplyDst() {
-        return mApplyDst;
-    }
-
-    public void setApplyDst(int applyDst) {
-        mApplyDst = applyDst;
-    }
-
-    public String getLicense() {
-        return mLicense;
-    }
-
-    public void setLicense(String license) {
-        mLicense = license;
-    }
-
-    public String getEmail() {
-        return mEmail;
-    }
-
-    public void setEmail(String email) {
-        mEmail = email;
-    }
-
-    public String getLastModified() {
-        return mLastModified;
-    }
-
-    public void setLastModified(String lastModified) {
-        mLastModified = lastModified;
-    }
-
-    public boolean isUpdated() {
-        return mUpdated;
-    }
-
-    public void setUpdated(boolean updated) {
-        mUpdated = updated;
-    }
-
-    public List<Setting> getConfiguration() {
-        return mConfiguration;
-    }
-
-    public void setConfiguration(List<Setting> configuration) {
-        mConfiguration = configuration;
-    }
-
-    public String getToken() {
-        return mToken;
-    }
-
-    public void setToken(String token) {
-        mToken = token;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        User user = (User) o;
-
-        if (mId != user.mId) return false;
-        if (mUsCycle != user.mUsCycle) return false;
-        if (mCaCycle != user.mCaCycle) return false;
-        if (mCycleCountry != user.mCycleCountry) return false;
-        if (mIsSupervisor != user.mIsSupervisor) return false;
-        if (Double.compare(user.mTimezone, mTimezone) != 0) return false;
-        if (mApplyDst != user.mApplyDst) return false;
-        if (mUpdated != user.mUpdated) return false;
-        if (mFirstName != null ? !mFirstName.equals(user.mFirstName) : user.mFirstName != null)
-            return false;
-        if (mMidName != null ? !mMidName.equals(user.mMidName) : user.mMidName != null)
-            return false;
-        if (mLastName != null ? !mLastName.equals(user.mLastName) : user.mLastName != null)
-            return false;
-        if (mRuleException != null ? !mRuleException.equals(user.mRuleException) : user.mRuleException != null)
-            return false;
-        if (mAddress != null ? !mAddress.equals(user.mAddress) : user.mAddress != null)
-            return false;
-        if (mCity != null ? !mCity.equals(user.mCity) : user.mCity != null) return false;
-        if (mState != null ? !mState.equals(user.mState) : user.mState != null) return false;
-        if (mCountry != null ? !mCountry.equals(user.mCountry) : user.mCountry != null)
-            return false;
-        if (mOrganization != null ? !mOrganization.equals(user.mOrganization) : user.mOrganization != null)
-            return false;
-        if (mOrganizationAddress != null ? !mOrganizationAddress.equals(user.mOrganizationAddress) : user.mOrganizationAddress != null)
-            return false;
-        if (mSignature != null ? !mSignature.equals(user.mSignature) : user.mSignature != null)
-            return false;
-        if (mLicense != null ? !mLicense.equals(user.mLicense) : user.mLicense != null)
-            return false;
-        if (mEmail != null ? !mEmail.equals(user.mEmail) : user.mEmail != null) return false;
-        if (mLastModified != null ? !mLastModified.equals(user.mLastModified) : user.mLastModified != null)
-            return false;
-        if (mConfiguration != null ? !mConfiguration.equals(user.mConfiguration) : user.mConfiguration != null)
-            return false;
-        return mToken != null ? mToken.equals(user.mToken) : user.mToken == null;
-
-    }
-
-    @Override
-    public int hashCode() {
-        int result;
-        long temp;
-        result = mId;
-        result = 31 * result + (mFirstName != null ? mFirstName.hashCode() : 0);
-        result = 31 * result + (mMidName != null ? mMidName.hashCode() : 0);
-        result = 31 * result + (mLastName != null ? mLastName.hashCode() : 0);
-        result = 31 * result + mUsCycle;
-        result = 31 * result + mCaCycle;
-        result = 31 * result + mCycleCountry;
-        result = 31 * result + (mRuleException != null ? mRuleException.hashCode() : 0);
-        result = 31 * result + (mAddress != null ? mAddress.hashCode() : 0);
-        result = 31 * result + (mCity != null ? mCity.hashCode() : 0);
-        result = 31 * result + (mState != null ? mState.hashCode() : 0);
-        result = 31 * result + (mCountry != null ? mCountry.hashCode() : 0);
-        result = 31 * result + (mIsSupervisor ? 1 : 0);
-        result = 31 * result + (mOrganization != null ? mOrganization.hashCode() : 0);
-        result = 31 * result + (mOrganizationAddress != null ? mOrganizationAddress.hashCode() : 0);
-        result = 31 * result + (mSignature != null ? mSignature.hashCode() : 0);
-        temp = Double.doubleToLongBits(mTimezone);
-        result = 31 * result + (int) (temp ^ (temp >>> 32));
-        result = 31 * result + mApplyDst;
-        result = 31 * result + (mLicense != null ? mLicense.hashCode() : 0);
-        result = 31 * result + (mEmail != null ? mEmail.hashCode() : 0);
-        result = 31 * result + (mLastModified != null ? mLastModified.hashCode() : 0);
-        result = 31 * result + (mUpdated ? 1 : 0);
-        result = 31 * result + (mConfiguration != null ? mConfiguration.hashCode() : 0);
-        result = 31 * result + (mToken != null ? mToken.hashCode() : 0);
-        return result;
-    }
-
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("User{");
         sb.append("mId=").append(mId);
-        sb.append(", mFirstName='").append(mFirstName).append('\'');
-        sb.append(", mMidName='").append(mMidName).append('\'');
-        sb.append(", mLastName='").append(mLastName).append('\'');
-        sb.append(", mUsCycle=").append(mUsCycle);
-        sb.append(", mCaCycle=").append(mCaCycle);
-        sb.append(", mCycleCountry=").append(mCycleCountry);
-        sb.append(", mRuleException='").append(mRuleException).append('\'');
+        sb.append(", mOrgId=").append(mOrgId);
+        sb.append(", mEmployeeId='").append(mEmployeeId).append('\'');
+        sb.append(", mPassword='").append(mPassword).append('\'');
+        sb.append(", mIsSupervisorInt=").append(mIsSupervisorInt);
+        sb.append(", mTimezone='").append(mTimezone).append('\'');
+        sb.append(", mSignatureId=").append(mSignatureId);
         sb.append(", mAddress='").append(mAddress).append('\'');
         sb.append(", mCity='").append(mCity).append('\'');
         sb.append(", mState='").append(mState).append('\'');
         sb.append(", mCountry='").append(mCountry).append('\'');
-        sb.append(", mIsSupervisor=").append(mIsSupervisor);
-        sb.append(", mOrganization='").append(mOrganization).append('\'');
-        sb.append(", mOrganizationAddress='").append(mOrganizationAddress).append('\'');
         sb.append(", mSignature='").append(mSignature).append('\'');
-        sb.append(", mTimezone=").append(mTimezone);
-        sb.append(", mApplyDst=").append(mApplyDst);
-        sb.append(", mLicense='").append(mLicense).append('\'');
-        sb.append(", mEmail='").append(mEmail).append('\'');
-        sb.append(", mLastModified='").append(mLastModified).append('\'');
         sb.append(", mUpdated=").append(mUpdated);
-        sb.append(", mConfiguration=").append(mConfiguration);
-        sb.append(", mToken='").append(mToken).append('\'');
+        sb.append(", mOrganization='").append(mOrganization).append('\'');
+        sb.append(", mSetting=").append(mSetting);
+        sb.append(", mAuth=").append(mAuth);
+        sb.append(", mIsSupervisor=").append(mIsSupervisor);
+        sb.append(", mFirstName='").append(mFirstName).append('\'');
+        sb.append(", mMidName='").append(mMidName).append('\'');
+        sb.append(", mLastName='").append(mLastName).append('\'');
+        sb.append(", mRuleException='").append(mRuleException).append('\'');
+        sb.append(", mApplyDST=").append(mApplyDST);
+        sb.append(", mUsCycle=").append(mUsCycle);
+        sb.append(", mCaCycle=").append(mCaCycle);
+        sb.append(", mLastModified=").append(mLastModified);
+        sb.append(", mOrgAddr='").append(mOrgAddr).append('\'');
         sb.append('}');
         return sb.toString();
     }
