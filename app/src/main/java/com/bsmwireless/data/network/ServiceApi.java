@@ -4,7 +4,7 @@ import com.bsmwireless.models.CUDTripInfo;
 import com.bsmwireless.models.Category;
 import com.bsmwireless.models.Driver;
 import com.bsmwireless.models.DriverLog;
-import com.bsmwireless.models.DriverStatus;
+import com.bsmwireless.models.ELDDriverStatus;
 import com.bsmwireless.models.EmailReport;
 import com.bsmwireless.models.Event;
 import com.bsmwireless.models.HOSAlert;
@@ -14,7 +14,7 @@ import com.bsmwireless.models.NewRule;
 import com.bsmwireless.models.Registry;
 import com.bsmwireless.models.RegistryInformation;
 import com.bsmwireless.models.Report;
-import com.bsmwireless.models.Response;
+import com.bsmwireless.models.ResponseMessage;
 import com.bsmwireless.models.Rule;
 import com.bsmwireless.models.Trailer;
 import com.bsmwireless.models.User;
@@ -23,9 +23,11 @@ import com.bsmwireless.models.Vehicle;
 import java.util.List;
 
 import io.reactivex.Observable;
+
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
+import retrofit2.http.Header;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
@@ -151,115 +153,128 @@ public interface ServiceApi {
      * Submit driver time log.
      *
      * @param logs driver logs list.
-     * @return delete driver logs response {@link Response}.
+     * @return delete driver logs response {@link ResponseMessage}.
      */
     @DELETE("v1/app/dlogs")
-    Observable<Response> deleteDriverLogs(@Body List<DriverLog> logs);
+    Observable<ResponseMessage> deleteDriverLogs(@Body List<DriverLog> logs);
 
     /**
      * Submit driver time log.
      *
      * @param logs driver logs list.
-     * @return update driver logs response {@link Response}.
+     * @return update driver logs response {@link ResponseMessage}.
      */
     @PUT("v1/app/dlogs")
-    Observable<Response> updateDriverLogs(@Body List<DriverLog> logs);
+    Observable<ResponseMessage> updateDriverLogs(@Body List<DriverLog> logs);
 
     /**
      * Submit pre-trip or post-trip inspection, including defects and images.
      *
      * @param cudReport report information.
-     * @return delete report response {@link Response}.
+     * @return delete report response {@link ResponseMessage}.
      */
     @DELETE("v1/app/inspections")
-    Observable<Response> deleteCUDInspection(@Body Report cudReport);
+    Observable<ResponseMessage> deleteCUDInspection(@Body Report cudReport);
 
     /**
      * Submit pre-trip or post-trip inspection, including defects and images.
      *
      * @param cudReport report information.
-     * @return update report response {@link Response}.
+     * @return update report response {@link ResponseMessage}.
      */
     @PUT("v1/app/inspections")
-    Observable<Response> updateCUDInspection(@Body Report cudReport);
+    Observable<ResponseMessage> updateCUDInspection(@Body Report cudReport);
 
     /**
      * Submit driver profile.
      *
      * @param driver driver information.
-     * @return update driver information response {@link Response}.
+     * @return update driver information response {@link ResponseMessage}.
      */
     @PUT("v1/app/drivers")
-    Observable<Response> updateDriver(@Body Driver driver);
+    Observable<ResponseMessage> updateDriver(@Body Driver driver);
 
     /**
-     * Update current driver status.
+     * Sync current driver status.
+     * According doc section 4.5.1.1;4.5.1.2; 4.5.1.3; 4.5.1.4; 4.5.1.7; It sends a single new record.
      *
      * @param status driver status.
-     * @return update driver status response {@link Response}.
+     * @param boxId box identifier (required).
+     * @return update driver status response {@link ResponseMessage}.
      */
-    @PUT("v1/app/drivers/currentstatus")
-    Observable<Response> updateDriverStatus(@Body DriverStatus status);
+    @POST("v1/sync/driver/status")
+    Observable<ResponseMessage> syncDriverStatus(@Body ELDDriverStatus status, @Header("X-Box") int boxId);
+
+    /**
+     * Sync current driver statuses.
+     * Send ELD driver duty status; According doc section 4.5.1.1;4.5.1.2; 4.5.1.3; 4.5.1.4; 4.5.1.7; It sends a list of new records ordered by event time.
+     *
+     * @param statusList driver status list.
+     * @param boxId box identifier (optional).
+     * @return update driver status response {@link ResponseMessage}.
+     */
+    @POST("v1/sync/driver/statuses")
+    Observable<ResponseMessage> syncDriverStatuses(@Body List<ELDDriverStatus> statusList, @Header("X-Box") int boxId);
 
     /**
      * Submit (add) HOS alert.
      *
      * @param alert alert information.
-     * @return Add HOS alert response {@link Response}.
+     * @return Add HOS alert response {@link ResponseMessage}.
      */
     @POST("v1/app/hos/alerts")
-    Observable<Response> addHOSAlert(@Body HOSAlert alert);
+    Observable<ResponseMessage> addHOSAlert(@Body HOSAlert alert);
 
     /**
      * Submit trip information (Delete).
      *
      * @param tripInfo trip info.
-     * @return Update trip reponse {@link Response}.
+     * @return Update trip reponse {@link ResponseMessage}.
      */
     @DELETE("v1/app/trips")
-    Observable<Response> deleteCUDTripInfo(@Body CUDTripInfo tripInfo);
+    Observable<ResponseMessage> deleteCUDTripInfo(@Body CUDTripInfo tripInfo);
 
     /**
      * Submit trip information (Update).
      *
      * @param tripInfo trip info.
-     * @return Update trip reponse {@link Response}.
+     * @return Update trip reponse {@link ResponseMessage}.
      */
     @PUT("v1/app/trips")
-    Observable<Response> updateCUDTripInfo(@Body CUDTripInfo tripInfo);
+    Observable<ResponseMessage> updateCUDTripInfo(@Body CUDTripInfo tripInfo);
 
     /**
      * Submit newRule selection.
      *
      * @param newRule newRule information.
-     * @return Add newRule response {@link Response}.
+     * @return Add newRule response {@link ResponseMessage}.
      */
     @POST("v1/app/rules")
-    Observable<Response> addRule(@Body NewRule newRule);
+    Observable<ResponseMessage> addRule(@Body NewRule newRule);
 
     /**
      * Submit emailing report request.
      *
      * @param report report information.
-     * @return Email report response {@link Response}.
+     * @return Email report response {@link ResponseMessage}.
      */
     @POST("v1/app/reports")
-    Observable<Response> emailReport(@Body EmailReport report);
+    Observable<ResponseMessage> emailReport(@Body EmailReport report);
 
     /**
      * Submit event, including box WIFI connect/disconnect, sensor failure.
      *
      * @param event event information.
-     * @return Add Event Response {@link Response}.
+     * @return Add Event ResponseMessage {@link ResponseMessage}.
      */
     @POST("v1/app/events")
-    Observable<Response> addEvent(@Body Event event);
+    Observable<ResponseMessage> addEvent(@Body Event event);
 
     /**
      * This service doesn’t require session token.
      *
      * @param registry registry information.
-     * @return Registry Response {@link RegistryInformation}.
+     * @return Registry ResponseMessage {@link RegistryInformation}.
      */
     @POST("/registry/v1/sd")
     Observable<RegistryInformation> registry(@Body Registry registry);
