@@ -1,5 +1,6 @@
 package com.bsmwireless.data.network;
 
+import com.bsmwireless.models.Auth;
 import com.bsmwireless.models.CUDTripInfo;
 import com.bsmwireless.models.Category;
 import com.bsmwireless.models.Driver;
@@ -9,7 +10,7 @@ import com.bsmwireless.models.EmailReport;
 import com.bsmwireless.models.Event;
 import com.bsmwireless.models.HOSAlert;
 import com.bsmwireless.models.Location;
-import com.bsmwireless.models.LoginRequest;
+import com.bsmwireless.models.LoginData;
 import com.bsmwireless.models.NewRule;
 import com.bsmwireless.models.Registry;
 import com.bsmwireless.models.RegistryInformation;
@@ -41,7 +42,7 @@ public interface ServiceApi {
      * @return User Response {@link User}.
      */
     @POST("v1/login/driver")
-    Observable<User> loginUser(@Body LoginRequest request);
+    Observable<User> loginUser(@Body LoginData request);
 
     /**
      * Search Vehicle.
@@ -278,4 +279,10 @@ public interface ServiceApi {
      */
     @POST("/registry/v1/sd")
     Observable<RegistryInformation> registry(@Body Registry registry);
+
+    @POST("/v1/sync/app/newtoken")
+    Observable<Auth> refreshToken();
+
+    @POST("/v1/sync/app/logout")
+    Observable<ResponseMessage> logout(@Body ELDDriverStatus status);
 }
