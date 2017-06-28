@@ -11,7 +11,6 @@ import com.bsmwireless.models.Event;
 import com.bsmwireless.models.HOSAlert;
 import com.bsmwireless.models.Location;
 import com.bsmwireless.models.LoginData;
-import com.bsmwireless.models.LogoutData;
 import com.bsmwireless.models.NewRule;
 import com.bsmwireless.models.Registry;
 import com.bsmwireless.models.RegistryInformation;
@@ -285,5 +284,5 @@ public interface ServiceApi {
     Observable<Auth> refreshToken();
 
     @POST("/v1/sync/app/logout")
-    Observable<ResponseMessage> logout(@Body LogoutData logoutData);
+    Observable<ResponseMessage> logout(@Body ELDDriverStatus status);
 }

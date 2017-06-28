@@ -25,7 +25,7 @@ public class ELDDriverStatus implements Parcelable {
     private Integer mEventCode;
     @SerializedName("eventTime")
     @Expose
-    private Integer mEventTime;
+    private Long mEventTime;
     @SerializedName("odometer")
     @Expose
     private Integer mOdometer;
@@ -34,10 +34,10 @@ public class ELDDriverStatus implements Parcelable {
     private Integer mEngineHours;
     @SerializedName("lat")
     @Expose
-    private Integer mLat;
+    private Double mLat;
     @SerializedName("lng")
     @Expose
-    private Integer mLng;
+    private Double mLng;
     @SerializedName("distance")
     @Expose
     private Integer mDistance;
@@ -64,7 +64,7 @@ public class ELDDriverStatus implements Parcelable {
     private Integer mId;
     @SerializedName("tzOffset")
     @Expose
-    private Integer mTzOffset;
+    private Double mTzOffset;
     @SerializedName("timezone")
     @Expose
     private String mTimezone;
@@ -75,49 +75,12 @@ public class ELDDriverStatus implements Parcelable {
     @Expose
     private Boolean mDdStatus;
 
-    public final static Parcelable.Creator<ELDDriverStatus> CREATOR = new Creator<ELDDriverStatus>() {
-
-        @SuppressWarnings({
-                "unchecked"
-        })
-        public ELDDriverStatus createFromParcel(Parcel in) {
-            ELDDriverStatus instance = new ELDDriverStatus();
-            instance.mRecordStatus = ((String) in.readValue((String.class.getClassLoader())));
-            instance.mRecordOrigin = ((Integer) in.readValue((Integer.class.getClassLoader())));
-            instance.mEventType = ((Integer) in.readValue((Integer.class.getClassLoader())));
-            instance.mEventCode = ((Integer) in.readValue((Integer.class.getClassLoader())));
-            instance.mEventTime = ((Integer) in.readValue((Integer.class.getClassLoader())));
-            instance.mOdometer = ((Integer) in.readValue((Integer.class.getClassLoader())));
-            instance.mEngineHours = ((Integer) in.readValue((Integer.class.getClassLoader())));
-            instance.mLat = ((Integer) in.readValue((Integer.class.getClassLoader())));
-            instance.mLng = ((Integer) in.readValue((Integer.class.getClassLoader())));
-            instance.mDistance = ((Integer) in.readValue((Integer.class.getClassLoader())));
-            instance.mComment = ((String) in.readValue((String.class.getClassLoader())));
-            instance.mLocationDesc = ((String) in.readValue((String.class.getClassLoader())));
-            instance.mChecksum = ((String) in.readValue((String.class.getClassLoader())));
-            instance.mShippingId = ((String) in.readValue((String.class.getClassLoader())));
-            instance.mCoDriverId = ((Integer) in.readValue((Integer.class.getClassLoader())));
-            instance.mBoxId = ((Integer) in.readValue((Integer.class.getClassLoader())));
-            instance.mId = ((Integer) in.readValue((Integer.class.getClassLoader())));
-            instance.mTzOffset = ((Integer) in.readValue((Integer.class.getClassLoader())));
-            instance.mTimezone = ((String) in.readValue((String.class.getClassLoader())));
-            instance.mMiStatus = ((Boolean) in.readValue((Boolean.class.getClassLoader())));
-            instance.mDdStatus = ((Boolean) in.readValue((Boolean.class.getClassLoader())));
-            return instance;
-        }
-
-        public ELDDriverStatus[] newArray(int size) {
-            return (new ELDDriverStatus[size]);
-        }
-
-    };
-
     public String getRecordStatus() {
         return mRecordStatus;
     }
 
     public void setRecordStatus(String recordStatus) {
-        this.mRecordStatus = recordStatus;
+        mRecordStatus = recordStatus;
     }
 
     public Integer getRecordOrigin() {
@@ -125,7 +88,7 @@ public class ELDDriverStatus implements Parcelable {
     }
 
     public void setRecordOrigin(Integer recordOrigin) {
-        this.mRecordOrigin = recordOrigin;
+        mRecordOrigin = recordOrigin;
     }
 
     public Integer getEventType() {
@@ -133,7 +96,7 @@ public class ELDDriverStatus implements Parcelable {
     }
 
     public void setEventType(Integer eventType) {
-        this.mEventType = eventType;
+        mEventType = eventType;
     }
 
     public Integer getEventCode() {
@@ -141,15 +104,15 @@ public class ELDDriverStatus implements Parcelable {
     }
 
     public void setEventCode(Integer eventCode) {
-        this.mEventCode = eventCode;
+        mEventCode = eventCode;
     }
 
-    public Integer getEventTime() {
+    public Long getEventTime() {
         return mEventTime;
     }
 
-    public void setEventTime(Integer eventTime) {
-        this.mEventTime = eventTime;
+    public void setEventTime(Long eventTime) {
+        mEventTime = eventTime;
     }
 
     public Integer getOdometer() {
@@ -157,7 +120,7 @@ public class ELDDriverStatus implements Parcelable {
     }
 
     public void setOdometer(Integer odometer) {
-        this.mOdometer = odometer;
+        mOdometer = odometer;
     }
 
     public Integer getEngineHours() {
@@ -165,23 +128,23 @@ public class ELDDriverStatus implements Parcelable {
     }
 
     public void setEngineHours(Integer engineHours) {
-        this.mEngineHours = engineHours;
+        mEngineHours = engineHours;
     }
 
-    public Integer getLat() {
+    public Double getLat() {
         return mLat;
     }
 
-    public void setLat(Integer lat) {
-        this.mLat = lat;
+    public void setLat(Double lat) {
+        mLat = lat;
     }
 
-    public Integer getLng() {
+    public Double getLng() {
         return mLng;
     }
 
-    public void setLng(Integer lng) {
-        this.mLng = lng;
+    public void setLng(Double lng) {
+        mLng = lng;
     }
 
     public Integer getDistance() {
@@ -189,7 +152,7 @@ public class ELDDriverStatus implements Parcelable {
     }
 
     public void setDistance(Integer distance) {
-        this.mDistance = distance;
+        mDistance = distance;
     }
 
     public String getComment() {
@@ -197,7 +160,7 @@ public class ELDDriverStatus implements Parcelable {
     }
 
     public void setComment(String comment) {
-        this.mComment = comment;
+        mComment = comment;
     }
 
     public String getLocationDesc() {
@@ -205,7 +168,7 @@ public class ELDDriverStatus implements Parcelable {
     }
 
     public void setLocationDesc(String locationDesc) {
-        this.mLocationDesc = locationDesc;
+        mLocationDesc = locationDesc;
     }
 
     public String getChecksum() {
@@ -213,7 +176,7 @@ public class ELDDriverStatus implements Parcelable {
     }
 
     public void setChecksum(String checksum) {
-        this.mChecksum = checksum;
+        mChecksum = checksum;
     }
 
     public String getShippingId() {
@@ -221,7 +184,7 @@ public class ELDDriverStatus implements Parcelable {
     }
 
     public void setShippingId(String shippingId) {
-        this.mShippingId = shippingId;
+        mShippingId = shippingId;
     }
 
     public Integer getCoDriverId() {
@@ -229,7 +192,7 @@ public class ELDDriverStatus implements Parcelable {
     }
 
     public void setCoDriverId(Integer coDriverId) {
-        this.mCoDriverId = coDriverId;
+        mCoDriverId = coDriverId;
     }
 
     public Integer getBoxId() {
@@ -237,7 +200,7 @@ public class ELDDriverStatus implements Parcelable {
     }
 
     public void setBoxId(Integer boxId) {
-        this.mBoxId = boxId;
+        mBoxId = boxId;
     }
 
     public Integer getId() {
@@ -245,15 +208,15 @@ public class ELDDriverStatus implements Parcelable {
     }
 
     public void setId(Integer id) {
-        this.mId = id;
+        mId = id;
     }
 
-    public Integer getTzOffset() {
+    public Double getTzOffset() {
         return mTzOffset;
     }
 
-    public void setTzOffset(Integer tzOffset) {
-        this.mTzOffset = tzOffset;
+    public void setTzOffset(Double tzOffset) {
+        mTzOffset = tzOffset;
     }
 
     public String getTimezone() {
@@ -261,7 +224,7 @@ public class ELDDriverStatus implements Parcelable {
     }
 
     public void setTimezone(String timezone) {
-        this.mTimezone = timezone;
+        mTimezone = timezone;
     }
 
     public Boolean getMiStatus() {
@@ -269,7 +232,7 @@ public class ELDDriverStatus implements Parcelable {
     }
 
     public void setMiStatus(Boolean miStatus) {
-        this.mMiStatus = miStatus;
+        mMiStatus = miStatus;
     }
 
     public Boolean getDdStatus() {
@@ -277,7 +240,7 @@ public class ELDDriverStatus implements Parcelable {
     }
 
     public void setDdStatus(Boolean ddStatus) {
-        this.mDdStatus = ddStatus;
+        mDdStatus = ddStatus;
     }
 
     @Override
@@ -309,8 +272,41 @@ public class ELDDriverStatus implements Parcelable {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ELDDriverStatus that = (ELDDriverStatus) o;
+
+        return new EqualsBuilder()
+                .append(mRecordStatus, that.mRecordStatus)
+                .append(mRecordOrigin, that.mRecordOrigin)
+                .append(mEventType, that.mEventType)
+                .append(mEventCode, that.mEventCode)
+                .append(mEventTime, that.mEventTime)
+                .append(mOdometer, that.mOdometer)
+                .append(mEngineHours, that.mEngineHours)
+                .append(mLat, that.mLat)
+                .append(mLng, that.mLng)
+                .append(mDistance, that.mDistance)
+                .append(mComment, that.mComment)
+                .append(mLocationDesc, that.mLocationDesc)
+                .append(mChecksum, that.mChecksum)
+                .append(mShippingId, that.mShippingId)
+                .append(mCoDriverId, that.mCoDriverId)
+                .append(mBoxId, that.mBoxId)
+                .append(mId, that.mId)
+                .append(mTzOffset, that.mTzOffset)
+                .append(mTimezone, that.mTimezone)
+                .append(mMiStatus, that.mMiStatus)
+                .append(mDdStatus, that.mDdStatus)
+                .isEquals();
+    }
+
+    @Override
     public int hashCode() {
-        return new HashCodeBuilder()
+        return new HashCodeBuilder(17, 37)
                 .append(mRecordStatus)
                 .append(mRecordOrigin)
                 .append(mEventType)
@@ -336,63 +332,71 @@ public class ELDDriverStatus implements Parcelable {
     }
 
     @Override
-    public boolean equals(Object other) {
-        if (other == this) {
-            return true;
-        }
-        if (!(other instanceof ELDDriverStatus)) {
-            return false;
-        }
-        ELDDriverStatus rhs = ((ELDDriverStatus) other);
-        return new EqualsBuilder()
-                .append(mRecordStatus, rhs.mRecordStatus)
-                .append(mRecordOrigin, rhs.mRecordOrigin)
-                .append(mEventType, rhs.mEventType)
-                .append(mEventCode, rhs.mEventCode)
-                .append(mEventTime, rhs.mEventTime)
-                .append(mOdometer, rhs.mOdometer)
-                .append(mEngineHours, rhs.mEngineHours)
-                .append(mLat, rhs.mLat)
-                .append(mLng, rhs.mLng)
-                .append(mDistance, rhs.mDistance)
-                .append(mComment, rhs.mComment)
-                .append(mLocationDesc, rhs.mLocationDesc)
-                .append(mChecksum, rhs.mChecksum)
-                .append(mShippingId, rhs.mShippingId)
-                .append(mCoDriverId, rhs.mCoDriverId)
-                .append(mBoxId, rhs.mBoxId)
-                .append(mId, rhs.mId).append(mTzOffset, rhs.mTzOffset)
-                .append(mTimezone, rhs.mTimezone)
-                .append(mMiStatus, rhs.mMiStatus)
-                .append(mDdStatus, rhs.mDdStatus)
-                .isEquals();
-    }
-
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeValue(mRecordStatus);
-        dest.writeValue(mRecordOrigin);
-        dest.writeValue(mEventType);
-        dest.writeValue(mEventCode);
-        dest.writeValue(mEventTime);
-        dest.writeValue(mOdometer);
-        dest.writeValue(mEngineHours);
-        dest.writeValue(mLat);
-        dest.writeValue(mLng);
-        dest.writeValue(mDistance);
-        dest.writeValue(mComment);
-        dest.writeValue(mLocationDesc);
-        dest.writeValue(mChecksum);
-        dest.writeValue(mShippingId);
-        dest.writeValue(mCoDriverId);
-        dest.writeValue(mBoxId);
-        dest.writeValue(mId);
-        dest.writeValue(mTzOffset);
-        dest.writeValue(mTimezone);
-        dest.writeValue(mMiStatus);
-        dest.writeValue(mDdStatus);
-    }
-
     public int describeContents() {
         return 0;
     }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.mRecordStatus);
+        dest.writeValue(this.mRecordOrigin);
+        dest.writeValue(this.mEventType);
+        dest.writeValue(this.mEventCode);
+        dest.writeValue(this.mEventTime);
+        dest.writeValue(this.mOdometer);
+        dest.writeValue(this.mEngineHours);
+        dest.writeValue(this.mLat);
+        dest.writeValue(this.mLng);
+        dest.writeValue(this.mDistance);
+        dest.writeString(this.mComment);
+        dest.writeString(this.mLocationDesc);
+        dest.writeString(this.mChecksum);
+        dest.writeString(this.mShippingId);
+        dest.writeValue(this.mCoDriverId);
+        dest.writeValue(this.mBoxId);
+        dest.writeValue(this.mId);
+        dest.writeValue(this.mTzOffset);
+        dest.writeString(this.mTimezone);
+        dest.writeValue(this.mMiStatus);
+        dest.writeValue(this.mDdStatus);
+    }
+
+    public ELDDriverStatus() {
+    }
+
+    protected ELDDriverStatus(Parcel in) {
+        this.mRecordStatus = in.readString();
+        this.mRecordOrigin = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.mEventType = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.mEventCode = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.mEventTime = (Long) in.readValue(Long.class.getClassLoader());
+        this.mOdometer = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.mEngineHours = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.mLat = (Double) in.readValue(Double.class.getClassLoader());
+        this.mLng = (Double) in.readValue(Double.class.getClassLoader());
+        this.mDistance = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.mComment = in.readString();
+        this.mLocationDesc = in.readString();
+        this.mChecksum = in.readString();
+        this.mShippingId = in.readString();
+        this.mCoDriverId = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.mBoxId = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.mId = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.mTzOffset = (Double) in.readValue(Double.class.getClassLoader());
+        this.mTimezone = in.readString();
+        this.mMiStatus = (Boolean) in.readValue(Boolean.class.getClassLoader());
+        this.mDdStatus = (Boolean) in.readValue(Boolean.class.getClassLoader());
+    }
+
+    public static final Creator<ELDDriverStatus> CREATOR = new Creator<ELDDriverStatus>() {
+        @Override
+        public ELDDriverStatus createFromParcel(Parcel source) {
+            return new ELDDriverStatus(source);
+        }
+
+        @Override
+        public ELDDriverStatus[] newArray(int size) {
+            return new ELDDriverStatus[size];
+        }
+    };
 }
