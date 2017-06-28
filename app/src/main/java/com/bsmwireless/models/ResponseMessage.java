@@ -9,25 +9,25 @@ import com.google.gson.annotations.SerializedName;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-public class Response implements Parcelable {
+public class ResponseMessage implements Parcelable {
 
     @SerializedName("message")
     @Expose
     private String mMessage;
 
-    public final static Parcelable.Creator<Response> CREATOR = new Creator<Response>() {
+    public final static Parcelable.Creator<ResponseMessage> CREATOR = new Creator<ResponseMessage>() {
 
         @SuppressWarnings({
             "unchecked"
         })
-        public Response createFromParcel(Parcel in) {
-            Response instance = new Response();
+        public ResponseMessage createFromParcel(Parcel in) {
+            ResponseMessage instance = new ResponseMessage();
             instance.mMessage = ((String) in.readValue((String.class.getClassLoader())));
             return instance;
         }
 
-        public Response[] newArray(int size) {
-            return (new Response[size]);
+        public ResponseMessage[] newArray(int size) {
+            return (new ResponseMessage[size]);
         }
 
     };
@@ -42,7 +42,7 @@ public class Response implements Parcelable {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("Response{");
+        final StringBuilder sb = new StringBuilder("ResponseMessage{");
         sb.append(", mMessage='").append(mMessage).append('\'');
         sb.append('}');
         return sb.toString();
@@ -58,10 +58,10 @@ public class Response implements Parcelable {
         if (other == this) {
             return true;
         }
-        if (!(other instanceof Response)) {
+        if (!(other instanceof ResponseMessage)) {
             return false;
         }
-        Response rhs = ((Response) other);
+        ResponseMessage rhs = ((ResponseMessage) other);
         return new EqualsBuilder().append(mMessage, rhs.mMessage).isEquals();
     }
 

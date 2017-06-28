@@ -9,7 +9,7 @@ import com.google.gson.annotations.SerializedName;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-public class DriverStatus implements Parcelable {
+public class ELDDriverStatus implements Parcelable {
 
     @SerializedName("recordStatus")
     @Expose
@@ -75,13 +75,13 @@ public class DriverStatus implements Parcelable {
     @Expose
     private Boolean mDdStatus;
 
-    public final static Parcelable.Creator<DriverStatus> CREATOR = new Creator<DriverStatus>() {
+    public final static Parcelable.Creator<ELDDriverStatus> CREATOR = new Creator<ELDDriverStatus>() {
 
         @SuppressWarnings({
                 "unchecked"
         })
-        public DriverStatus createFromParcel(Parcel in) {
-            DriverStatus instance = new DriverStatus();
+        public ELDDriverStatus createFromParcel(Parcel in) {
+            ELDDriverStatus instance = new ELDDriverStatus();
             instance.mRecordStatus = ((String) in.readValue((String.class.getClassLoader())));
             instance.mRecordOrigin = ((Integer) in.readValue((Integer.class.getClassLoader())));
             instance.mEventType = ((Integer) in.readValue((Integer.class.getClassLoader())));
@@ -106,8 +106,8 @@ public class DriverStatus implements Parcelable {
             return instance;
         }
 
-        public DriverStatus[] newArray(int size) {
-            return (new DriverStatus[size]);
+        public ELDDriverStatus[] newArray(int size) {
+            return (new ELDDriverStatus[size]);
         }
 
     };
@@ -282,7 +282,7 @@ public class DriverStatus implements Parcelable {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("DriverStatus{");
+        final StringBuilder sb = new StringBuilder("ELDDriverStatus{");
         sb.append("mRecordStatus='").append(mRecordStatus).append('\'');
         sb.append(", mRecordOrigin=").append(mRecordOrigin);
         sb.append(", mEventType=").append(mEventType);
@@ -340,10 +340,10 @@ public class DriverStatus implements Parcelable {
         if (other == this) {
             return true;
         }
-        if (!(other instanceof DriverStatus)) {
+        if (!(other instanceof ELDDriverStatus)) {
             return false;
         }
-        DriverStatus rhs = ((DriverStatus) other);
+        ELDDriverStatus rhs = ((ELDDriverStatus) other);
         return new EqualsBuilder()
                 .append(mRecordStatus, rhs.mRecordStatus)
                 .append(mRecordOrigin, rhs.mRecordOrigin)

@@ -2,13 +2,10 @@ package com.bsmwireless.domain.interactors;
 
 import com.bsmwireless.common.App;
 import com.bsmwireless.common.Constants;
-import com.bsmwireless.data.network.HttpClientManager;
 import com.bsmwireless.data.network.ServiceApi;
-import com.bsmwireless.data.network.authenticator.TokenManager;
-import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.PreferencesManager;
-import com.bsmwireless.models.DriverStatus;
-import com.bsmwireless.models.Response;
+import com.bsmwireless.models.ELDDriverStatus;
+import com.bsmwireless.models.ResponseMessage;
 
 import java.util.List;
 
@@ -34,15 +31,11 @@ public class DriverStatusInteractor {
         App.getComponent().inject(this);
     }
 
-    public Observable<Response> syncDriverStatus(List<DriverStatus> statusList) {
-        return mServiceApi.syncDriverStatus(statusList).subscribeOn(mIoThread);
+    public Observable<ResponseMessage> syncDriverStatus(ELDDriverStatus status) {
+        return mServiceApi.syncDriverStatus(status, mPreferencesManager.getSelectedBoxId()).subscribeOn(mIoThread);
     }
 
-    public Observable<Response> logoutDriver(DriverStatus status) {
-        return mServiceApi.logoutDriver(status, mPreferencesManager.getSelectedBoxId()).subscribeOn(mIoThread);
-    }
-
-    public Observable<Response> certifyDriver(DriverStatus status) {
-        return mServiceApi.certifyDriver(status, mPreferencesManager.getSelectedBoxId()).subscribeOn(mIoThread);
+    public Observable<ResponseMessage> syncDriverStatuses(List<ELDDriverStatus> statusList) {
+        return mServiceApi.syncDriverStatuses(statusList, mPreferencesManager.getSelectedBoxId()).subscribeOn(mIoThread);
     }
 }
