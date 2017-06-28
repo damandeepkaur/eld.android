@@ -28,15 +28,6 @@ public class DriverStatusInteractor {
     Scheduler mIoThread;
 
     @Inject
-    AppDatabase mAppDatabase;
-
-    @Inject
-    HttpClientManager mClientManager;
-
-    @Inject
-    TokenManager mTokenManager;
-
-    @Inject
     PreferencesManager mPreferencesManager;
 
     public DriverStatusInteractor() {
