@@ -1,0 +1,99 @@
+package com.bsmwireless.models;
+
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+import java.util.List;
+
+public class InspectionReport implements Parcelable {
+
+    @SerializedName("inspections")
+    @Expose
+    private List<Inspection> mInspectionList = null;
+    @SerializedName("trailers")
+    @Expose
+    private List<Vehicle> mVehicleAttributeList = null;
+
+    public static final Creator<InspectionReport> CREATOR = new Creator<InspectionReport>() {
+
+        @SuppressWarnings({"unchecked"})
+        @Override
+        public InspectionReport createFromParcel(Parcel in) {
+            InspectionReport instance = new InspectionReport();
+            in.readList(instance.mInspectionList, (Inspection.class.getClassLoader()));
+            in.readList(instance.mVehicleAttributeList, (Vehicle.class.getClassLoader()));
+            return instance;
+        }
+
+        @Override
+        public InspectionReport[] newArray(int size) {
+            return new InspectionReport[0];
+        }
+    };
+
+    public List<Inspection> getInspectionList() {
+        return mInspectionList;
+    }
+
+    public void setInspectionList(List<Inspection> mInspectionList) {
+        this.mInspectionList = mInspectionList;
+    }
+
+    public List<Vehicle> getVehicleAttributeList() {
+        return mVehicleAttributeList;
+    }
+
+    public void setVehicleAttributeList(List<Vehicle> mVehicleAttributeList) {
+        this.mVehicleAttributeList = mVehicleAttributeList;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("InspectionReport{");
+        sb.append("mInspectionList=").append(mInspectionList);
+        sb.append(", mVehicleAttributeList=").append(mVehicleAttributeList);
+        sb.append('}');
+        return sb.toString();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder().append(mInspectionList)
+                .append(mVehicleAttributeList)
+                .toHashCode();
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        // self check
+        if (this == other) {
+            return true;
+        }
+        // null check and type check (cast)
+        if (other == null || getClass() != other.getClass()) {
+            return false;
+        }
+        InspectionReport rhs = ((InspectionReport) other);
+        // field comparison
+        return new EqualsBuilder().append(mInspectionList, rhs.mInspectionList)
+                .append(mVehicleAttributeList, rhs.mVehicleAttributeList)
+                .isEquals();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeList(mInspectionList);
+        dest.writeList(mVehicleAttributeList);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+}
