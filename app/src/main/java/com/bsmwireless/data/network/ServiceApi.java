@@ -274,7 +274,7 @@ public interface ServiceApi {
      * @return Inspection Report Response {@link InspectionReport}
      */
     @GET("/v1/sync/inspections/report/{lastUpdate}/{isTrailer}/{beginDate}")
-    Observable<InspectionReport> syncInspectionReport(@Path("lastUpdate") int lastUpdate,
+    Observable<InspectionReport> syncInspectionReport(@Path("lastUpdate") Long lastUpdate,
                                                       @Path("isTrailer") int isTrailer,
-                                                      @Path("beginDate") int beginDate);
+                                                      @Path("beginDate") Long beginDate);
 }

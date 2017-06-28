@@ -36,10 +36,10 @@ public class Inspection implements Parcelable {
     private boolean mDst;
     @SerializedName("logtime")
     @Expose
-    private Integer mLogTime;
+    private Long mLogTime;
     @SerializedName("updatetime")
     @Expose
-    private Integer mUpdateTime;
+    private Long mUpdateTime;
     @SerializedName("trailerid")
     @Expose
     private Integer mTrailerId;
@@ -66,10 +66,10 @@ public class Inspection implements Parcelable {
     private Boolean mSafe;
     @SerializedName("startTime")
     @Expose
-    private Integer mStartTime;
+    private Long mStartTime;
     @SerializedName("utcWriteTime")
     @Expose
-    private Integer mUtcWriteTime;
+    private Long mUtcWriteTime;
     @SerializedName("defects")
     @Expose
     private List<InspectionDefect> mDefectList = null;
@@ -91,8 +91,8 @@ public class Inspection implements Parcelable {
             instance.mTrailerOnFly = ((String) in.readValue((String.class.getClassLoader())));
             instance.mTz = ((String) in.readValue((String.class.getClassLoader())));
             instance.mDst = ((Boolean) in.readValue((Boolean.class.getClassLoader())));
-            instance.mLogTime = ((Integer) in.readValue((Integer.class.getClassLoader())));
-            instance.mUpdateTime = ((Integer) in.readValue((Integer.class.getClassLoader())));
+            instance.mLogTime = ((Long) in.readValue((Long.class.getClassLoader())));
+            instance.mUpdateTime = ((Long) in.readValue((Long.class.getClassLoader())));
             instance.mTrailerId = ((Integer) in.readValue((Integer.class.getClassLoader())));
             instance.mId = ((Integer) in.readValue((Integer.class.getClassLoader())));
             instance.mOdometer = ((Integer) in.readValue((Integer.class.getClassLoader())));
@@ -101,8 +101,8 @@ public class Inspection implements Parcelable {
             instance.mLng = ((Double) in.readValue((Double.class.getClassLoader())));
             instance.mType = ((Integer) in.readValue((Integer.class.getClassLoader())));
             instance.mSafe = ((Boolean) in.readValue((Boolean.class.getClassLoader())));
-            instance.mStartTime = ((Integer) in.readValue((Integer.class.getClassLoader())));
-            instance.mUtcWriteTime = ((Integer) in.readValue((Integer.class.getClassLoader())));
+            instance.mStartTime = ((Long) in.readValue((Long.class.getClassLoader())));
+            instance.mUtcWriteTime = ((Long) in.readValue((Long.class.getClassLoader())));
             in.readList(instance.mDefectList, (InspectionDefect.class.getClassLoader()));
             instance.mTrailerSafe = ((Boolean) in.readValue((Boolean.class.getClassLoader())));
             return instance;
@@ -170,19 +170,19 @@ public class Inspection implements Parcelable {
         this.mDst = mDst;
     }
 
-    public Integer getLogTime() {
+    public Long getLogTime() {
         return mLogTime;
     }
 
-    public void setLogTime(Integer mLogTime) {
+    public void setLogTime(Long mLogTime) {
         this.mLogTime = mLogTime;
     }
 
-    public Integer getUpdateTime() {
+    public Long getUpdateTime() {
         return mUpdateTime;
     }
 
-    public void setUpdateTime(Integer mUpdateTime) {
+    public void setUpdateTime(Long mUpdateTime) {
         this.mUpdateTime = mUpdateTime;
     }
 
@@ -250,19 +250,19 @@ public class Inspection implements Parcelable {
         this.mSafe = mSafe;
     }
 
-    public Integer getStartTime() {
+    public Long getStartTime() {
         return mStartTime;
     }
 
-    public void setStartTime(Integer mStartTime) {
+    public void setStartTime(Long mStartTime) {
         this.mStartTime = mStartTime;
     }
 
-    public Integer getUtcWriteTime() {
+    public Long getUtcWriteTime() {
         return mUtcWriteTime;
     }
 
-    public void setUtcWriteTime(Integer mUtcWriteTime) {
+    public void setUtcWriteTime(Long mUtcWriteTime) {
         this.mUtcWriteTime = mUtcWriteTime;
     }
 
