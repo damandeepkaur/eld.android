@@ -285,5 +285,5 @@ public interface ServiceApi {
     Observable<Auth> refreshToken();
 
     @POST("/v1/sync/app/logout")
-    Observable<Response> logout(@Body LogoutData logoutData);
+    Observable<ResponseMessage> logout(@Body LogoutData logoutData);
 }
