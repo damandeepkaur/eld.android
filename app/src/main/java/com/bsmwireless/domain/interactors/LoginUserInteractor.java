@@ -2,8 +2,6 @@ package com.bsmwireless.domain.interactors;
 
 import android.os.Build;
 
-import com.bsmwireless.common.App;
-import com.bsmwireless.common.Constants;
 import com.bsmwireless.data.network.HttpClientManager;
 import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.network.authenticator.TokenManager;
@@ -11,9 +9,6 @@ import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.data.storage.users.UserConverter;
 import com.bsmwireless.models.LoginRequest;
-
-import javax.inject.Inject;
-import javax.inject.Named;
 
 import app.bsmuniversal.com.BuildConfig;
 import io.reactivex.Observable;
@@ -23,27 +18,26 @@ import static com.bsmwireless.common.Constants.DEVICE_TYPE;
 
 public class LoginUserInteractor {
 
-    @Inject
-    ServiceApi mServiceApi;
+    private ServiceApi mServiceApi;
 
-    @Inject
-    @Named(Constants.IO_THREAD)
-    Scheduler mIoThread;
+    private Scheduler mIoThread;
 
-    @Inject
-    AppDatabase mAppDatabase;
+    private AppDatabase mAppDatabase;
 
-    @Inject
-    HttpClientManager mClientManager;
+    private HttpClientManager mClientManager;
 
-    @Inject
-    TokenManager mTokenManager;
+    private TokenManager mTokenManager;
 
-    @Inject
-    PreferencesManager mPreferencesManager;
+    private PreferencesManager mPreferencesManager;
 
-    public LoginUserInteractor() {
-        App.getComponent().inject(this);
+    public LoginUserInteractor(ServiceApi serviceApi, Scheduler ioThread, AppDatabase appDatabase, HttpClientManager clientManager,
+                               TokenManager tokenManager, PreferencesManager preferencesManager) {
+        this.mServiceApi = serviceApi;
+        this.mIoThread = ioThread;
+        this.mAppDatabase = appDatabase;
+        this.mClientManager = clientManager;
+        this.mTokenManager = tokenManager;
+        this.mPreferencesManager = preferencesManager;
     }
 
     public Observable<Boolean> loginUser(final String name, final String password, final String domain, boolean keepToken) {

@@ -9,13 +9,13 @@ import timber.log.Timber;
 
 public class LoginPresenter {
 
-    Scheduler mUiThread;
+    private Scheduler mUiThread;
 
-    LoginView mView;
+    private LoginView mView;
 
-    LoginUserInteractor mLoginUserInteractor;
+    private LoginUserInteractor mLoginUserInteractor;
 
-    CompositeDisposable mDisposables;
+    private CompositeDisposable mDisposables;
 
     public LoginPresenter(LoginView view, LoginUserInteractor interactor, Scheduler uiThread) {
 
