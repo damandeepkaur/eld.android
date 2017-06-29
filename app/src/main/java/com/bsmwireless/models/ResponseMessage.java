@@ -9,40 +9,28 @@ import com.google.gson.annotations.SerializedName;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-public class Response implements Parcelable {
+public class ResponseMessage implements Parcelable {
 
-    @SerializedName("responseCode")
-    @Expose
-    private Integer mResponseCode;
     @SerializedName("message")
     @Expose
     private String mMessage;
 
-    public final static Parcelable.Creator<Response> CREATOR = new Creator<Response>() {
+    public final static Parcelable.Creator<ResponseMessage> CREATOR = new Creator<ResponseMessage>() {
 
         @SuppressWarnings({
             "unchecked"
         })
-        public Response createFromParcel(Parcel in) {
-            Response instance = new Response();
-            instance.mResponseCode = ((Integer) in.readValue((Integer.class.getClassLoader())));
+        public ResponseMessage createFromParcel(Parcel in) {
+            ResponseMessage instance = new ResponseMessage();
             instance.mMessage = ((String) in.readValue((String.class.getClassLoader())));
             return instance;
         }
 
-        public Response[] newArray(int size) {
-            return (new Response[size]);
+        public ResponseMessage[] newArray(int size) {
+            return (new ResponseMessage[size]);
         }
 
     };
-
-    public Integer getResponseCode() {
-        return mResponseCode;
-    }
-
-    public void setResponseCode(Integer responseCode) {
-        this.mResponseCode = responseCode;
-    }
 
     public String getMessage() {
         return mMessage;
@@ -54,8 +42,7 @@ public class Response implements Parcelable {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("Response{");
-        sb.append("mResponseCode=").append(mResponseCode);
+        final StringBuilder sb = new StringBuilder("ResponseMessage{");
         sb.append(", mMessage='").append(mMessage).append('\'');
         sb.append('}');
         return sb.toString();
@@ -63,7 +50,7 @@ public class Response implements Parcelable {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(mResponseCode).append(mMessage).toHashCode();
+        return new HashCodeBuilder().append(mMessage).toHashCode();
     }
 
     @Override
@@ -71,15 +58,14 @@ public class Response implements Parcelable {
         if (other == this) {
             return true;
         }
-        if (!(other instanceof Response)) {
+        if (!(other instanceof ResponseMessage)) {
             return false;
         }
-        Response rhs = ((Response) other);
-        return new EqualsBuilder().append(mResponseCode, rhs.mResponseCode).append(mMessage, rhs.mMessage).isEquals();
+        ResponseMessage rhs = ((ResponseMessage) other);
+        return new EqualsBuilder().append(mMessage, rhs.mMessage).isEquals();
     }
 
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeValue(mResponseCode);
         dest.writeValue(mMessage);
     }
 

@@ -53,12 +53,16 @@ public class VehiclesInteractor {
         return Completable.fromAction(() -> {
             mAppDatabase.vehicleModel().insertVehicle(VehicleConverter.toEntity(vehicle));
             mPreferencesManager.setSelectedVehicleId(vehicle.getId());
+            mPreferencesManager.setSelectedBoxId(vehicle.getBoxId());
         }).subscribeOn(mIoThread);
     }
 
     public Completable cleanSelectedVehicle() {
         return Completable.fromAction(
-                () -> mPreferencesManager.setSelectedVehicleId(NOT_IN_VEHICLE_ID))
+                () ->  {
+                    mPreferencesManager.setSelectedVehicleId(NOT_IN_VEHICLE_ID);
+                    mPreferencesManager.setSelectedBoxId(NOT_IN_VEHICLE_ID);
+                })
                 .subscribeOn(mIoThread);
     }
 }

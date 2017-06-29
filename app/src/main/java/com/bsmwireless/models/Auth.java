@@ -14,18 +14,29 @@ public class Auth implements Parcelable {
     @SerializedName("token")
     @Expose
     private String mToken;
+
     @SerializedName("cluster")
     @Expose
     private String mCluster;
+
     @SerializedName("domain")
     @Expose
     private String mDomain;
+
     @SerializedName("driverId")
     @Expose
     private Integer mDriverId;
+
     @SerializedName("orgId")
     @Expose
     private Integer mOrgId;
+
+    @SerializedName("tokenExpire")
+    @Expose
+    private long mTokenExpire;
+
+    public Auth() {
+    }
 
     public String getToken() {
         return mToken;
@@ -67,6 +78,14 @@ public class Auth implements Parcelable {
         this.mOrgId = orgId;
     }
 
+    public long getTokenExpire() {
+        return mTokenExpire;
+    }
+
+    public void setTokenExpire(long tokenExpire) {
+        mTokenExpire = tokenExpire;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -76,6 +95,7 @@ public class Auth implements Parcelable {
         Auth auth = (Auth) o;
 
         return new EqualsBuilder()
+                .append(mTokenExpire, auth.mTokenExpire)
                 .append(mToken, auth.mToken)
                 .append(mCluster, auth.mCluster)
                 .append(mDomain, auth.mDomain)
@@ -92,7 +112,21 @@ public class Auth implements Parcelable {
                 .append(mDomain)
                 .append(mDriverId)
                 .append(mOrgId)
+                .append(mTokenExpire)
                 .toHashCode();
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("Auth{");
+        sb.append("mToken='").append(mToken).append('\'');
+        sb.append(", mCluster='").append(mCluster).append('\'');
+        sb.append(", mDomain='").append(mDomain).append('\'');
+        sb.append(", mDriverId=").append(mDriverId);
+        sb.append(", mOrgId=").append(mOrgId);
+        sb.append(", mTokenExpire=").append(mTokenExpire);
+        sb.append('}');
+        return sb.toString();
     }
 
     @Override
@@ -107,9 +141,7 @@ public class Auth implements Parcelable {
         dest.writeString(this.mDomain);
         dest.writeValue(this.mDriverId);
         dest.writeValue(this.mOrgId);
-    }
-
-    public Auth() {
+        dest.writeLong(this.mTokenExpire);
     }
 
     protected Auth(Parcel in) {
@@ -118,9 +150,10 @@ public class Auth implements Parcelable {
         this.mDomain = in.readString();
         this.mDriverId = (Integer) in.readValue(Integer.class.getClassLoader());
         this.mOrgId = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.mTokenExpire = in.readLong();
     }
 
-    public static final Parcelable.Creator<Auth> CREATOR = new Parcelable.Creator<Auth>() {
+    public static final Creator<Auth> CREATOR = new Creator<Auth>() {
         @Override
         public Auth createFromParcel(Parcel source) {
             return new Auth(source);
@@ -131,16 +164,4 @@ public class Auth implements Parcelable {
             return new Auth[size];
         }
     };
-
-    @Override
-    public String toString() {
-        final StringBuilder sb = new StringBuilder("Auth{");
-        sb.append("mToken='").append(mToken).append('\'');
-        sb.append(", mCluster='").append(mCluster).append('\'');
-        sb.append(", mDomain='").append(mDomain).append('\'');
-        sb.append(", mDriverId=").append(mDriverId);
-        sb.append(", mOrgId=").append(mOrgId);
-        sb.append('}');
-        return sb.toString();
-    }
 }
