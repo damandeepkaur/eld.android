@@ -6,11 +6,9 @@ import android.os.Parcelable;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class InspectionReport implements Parcelable {
@@ -45,7 +43,7 @@ public class InspectionReport implements Parcelable {
         return mInspectionList;
     }
 
-    public void setInspectionList(ArrayList<Inspection> mInspectionList) {
+    public void setInspectionList(List<Inspection> mInspectionList) {
         this.mInspectionList = mInspectionList;
     }
 
