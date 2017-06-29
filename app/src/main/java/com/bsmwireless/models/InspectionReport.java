@@ -20,6 +20,8 @@ public class InspectionReport implements Parcelable {
     @Expose
     private List<Vehicle> mVehicleAttributeList = null;
 
+    public InspectionReport() {}
+
     private InspectionReport(Parcel in) {
         in.readTypedList(mInspectionList, Inspection.CREATOR);
         in.readTypedList(mVehicleAttributeList, Vehicle.CREATOR);

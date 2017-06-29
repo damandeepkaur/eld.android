@@ -36,6 +36,8 @@ public class InspectionDefect implements Parcelable {
     @Expose
     private String mImages;
 
+    public InspectionDefect() {}
+
     private InspectionDefect(Parcel in) {
         mClearedDriverId = in.readInt();
         mClearedDriverName = in.readString();

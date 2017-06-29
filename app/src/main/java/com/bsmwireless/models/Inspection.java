@@ -77,6 +77,8 @@ public class Inspection implements Parcelable {
     @Expose
     private Boolean mTrailerSafe;
 
+    public Inspection() {}
+
     private Inspection(Parcel in) {
         mCategories = in.readString();
         mAddress = in.readString();
