@@ -1,10 +1,7 @@
 package com.bsmwireless.domain.interactors;
 
-import com.bsmwireless.common.App;
 import com.bsmwireless.common.Constants;
-import com.bsmwireless.data.network.HttpClientManager;
 import com.bsmwireless.data.network.ServiceApi;
-import com.bsmwireless.data.network.authenticator.TokenManager;
 import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.data.storage.vehicle.VehicleConverter;
@@ -22,27 +19,20 @@ import io.reactivex.Scheduler;
 public class VehiclesInteractor {
     private static final int NOT_IN_VEHICLE_ID = -1;
 
-    @Inject
-    ServiceApi mServiceApi;
+    private final ServiceApi mServiceApi;
+
+    private final Scheduler mIoThread;
+
+    private final AppDatabase mAppDatabase;
+
+    private final PreferencesManager mPreferencesManager;
 
     @Inject
-    @Named(Constants.IO_THREAD)
-    Scheduler mIoThread;
-
-    @Inject
-    AppDatabase mAppDatabase;
-
-    @Inject
-    HttpClientManager mClientManager;
-
-    @Inject
-    TokenManager mTokenManager;
-
-    @Inject
-    PreferencesManager mPreferencesManager;
-
-    public VehiclesInteractor() {
-        App.getComponent().inject(this);
+    public VehiclesInteractor(ServiceApi serviceApi, @Named(Constants.IO_THREAD) Scheduler ioThread, AppDatabase appDatabase, PreferencesManager preferencesManager) {
+        this.mServiceApi = serviceApi;
+        this.mIoThread = ioThread;
+        this.mAppDatabase = appDatabase;
+        this.mPreferencesManager = preferencesManager;
     }
 
     public Observable<List<Vehicle>> searchVehicles(int selectedProperty, String searchText, boolean isScan) {

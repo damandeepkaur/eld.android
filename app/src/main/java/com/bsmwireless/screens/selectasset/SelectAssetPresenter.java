@@ -1,10 +1,7 @@
 package com.bsmwireless.screens.selectasset;
 
-import android.util.Log;
-
-import com.bsmwireless.common.App;
 import com.bsmwireless.common.Constants;
-import com.bsmwireless.domain.interactors.InspectionsInteractor;
+import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.domain.interactors.VehiclesInteractor;
 import com.bsmwireless.models.Vehicle;
 
@@ -15,19 +12,16 @@ import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
 import timber.log.Timber;
 
+@ActivityScope
 public class SelectAssetPresenter {
 
-    @Inject
-    @Named(Constants.UI_THREAD)
-    Scheduler mUiThread;
+    private final Scheduler mUiThread;
 
-    private SelectAssetView mView;
+    private final SelectAssetView mView;
 
-    private VehiclesInteractor mVehiclesInteractor;
+    private final VehiclesInteractor mVehiclesInteractor;
 
-    private InspectionsInteractor mInspectionsInteractor;
-
-    private CompositeDisposable mDisposables;
+    private final CompositeDisposable mDisposables;
 
     public enum SearchProperty {
         SAP(0),
@@ -48,11 +42,12 @@ public class SelectAssetPresenter {
         }
     }
 
-    public SelectAssetPresenter(SelectAssetView view, VehiclesInteractor interactor) {
-        App.getComponent().inject(this);
+    @Inject
+    public SelectAssetPresenter(SelectAssetView view, VehiclesInteractor interactor, @Named(Constants.UI_THREAD) Scheduler uiThread) {
         mView = view;
         mVehiclesInteractor = interactor;
         mDisposables = new CompositeDisposable();
+        mUiThread = uiThread;
     }
 
     public void onSearchTextChanged(SearchProperty searchProperty, String searchText, boolean isScan) {

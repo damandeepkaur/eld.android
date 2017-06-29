@@ -1,24 +1,30 @@
 package com.bsmwireless.screens.login;
 
+import com.bsmwireless.common.Constants;
+import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.domain.interactors.LoginUserInteractor;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import timber.log.Timber;
 
+@ActivityScope
 public class LoginPresenter {
 
-    Scheduler mUiThread;
+    private final Scheduler mUiThread;
 
-    LoginView mView;
+    private final LoginView mView;
 
-    LoginUserInteractor mLoginUserInteractor;
+    private final LoginUserInteractor mLoginUserInteractor;
 
-    CompositeDisposable mDisposables;
+    private final CompositeDisposable mDisposables;
 
-    public LoginPresenter(LoginView view, LoginUserInteractor interactor, Scheduler uiThread) {
-
+    @Inject
+    public LoginPresenter(LoginView view, LoginUserInteractor interactor, @Named(Constants.UI_THREAD) Scheduler uiThread) {
         mView = view;
         mLoginUserInteractor = interactor;
         mDisposables = new CompositeDisposable();

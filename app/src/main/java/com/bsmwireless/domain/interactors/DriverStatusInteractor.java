@@ -1,6 +1,5 @@
 package com.bsmwireless.domain.interactors;
 
-import com.bsmwireless.common.App;
 import com.bsmwireless.common.Constants;
 import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.storage.PreferencesManager;
@@ -17,18 +16,17 @@ import io.reactivex.Scheduler;
 
 public class DriverStatusInteractor {
 
-    @Inject
-    ServiceApi mServiceApi;
+    private final ServiceApi mServiceApi;
+
+    private final Scheduler mIoThread;
+
+    private final PreferencesManager mPreferencesManager;
 
     @Inject
-    @Named(Constants.IO_THREAD)
-    Scheduler mIoThread;
-
-    @Inject
-    PreferencesManager mPreferencesManager;
-
-    public DriverStatusInteractor() {
-        App.getComponent().inject(this);
+    public DriverStatusInteractor(ServiceApi serviceApi, @Named(Constants.IO_THREAD) Scheduler ioThread, PreferencesManager preferencesManager) {
+        this.mServiceApi = serviceApi;
+        this.mIoThread = ioThread;
+        this.mPreferencesManager = preferencesManager;
     }
 
     public Observable<ResponseMessage> syncDriverStatus(ELDDriverStatus status) {

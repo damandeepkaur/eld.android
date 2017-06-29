@@ -2,7 +2,6 @@ package com.bsmwireless.domain.interactors;
 
 import android.os.Build;
 
-import com.bsmwireless.common.App;
 import com.bsmwireless.common.Constants;
 import com.bsmwireless.data.network.HttpClientManager;
 import com.bsmwireless.data.network.ServiceApi;
@@ -26,27 +25,27 @@ import static com.bsmwireless.common.Constants.DEVICE_TYPE;
 
 public class LoginUserInteractor {
 
-    @Inject
-    ServiceApi mServiceApi;
+    private final ServiceApi mServiceApi;
+
+    private final Scheduler mIoThread;
+
+    private final AppDatabase mAppDatabase;
+
+    private final HttpClientManager mClientManager;
+
+    private final TokenManager mTokenManager;
+
+    private final PreferencesManager mPreferencesManager;
 
     @Inject
-    @Named(Constants.IO_THREAD)
-    Scheduler mIoThread;
-
-    @Inject
-    AppDatabase mAppDatabase;
-
-    @Inject
-    HttpClientManager mClientManager;
-
-    @Inject
-    TokenManager mTokenManager;
-
-    @Inject
-    PreferencesManager mPreferencesManager;
-
-    public LoginUserInteractor() {
-        App.getComponent().inject(this);
+    public LoginUserInteractor(ServiceApi serviceApi, @Named(Constants.IO_THREAD) Scheduler ioThread, AppDatabase appDatabase, HttpClientManager clientManager,
+                               TokenManager tokenManager, PreferencesManager preferencesManager) {
+        this.mServiceApi = serviceApi;
+        this.mIoThread = ioThread;
+        this.mAppDatabase = appDatabase;
+        this.mClientManager = clientManager;
+        this.mTokenManager = tokenManager;
+        this.mPreferencesManager = preferencesManager;
     }
 
     public Observable<Boolean> loginUser(final String name, final String password, final String domain, boolean keepToken) {
