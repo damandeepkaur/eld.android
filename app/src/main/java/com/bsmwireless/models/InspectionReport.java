@@ -45,16 +45,16 @@ public class InspectionReport implements Parcelable {
         return mInspectionList;
     }
 
-    public void setInspectionList(List<Inspection> mInspectionList) {
-        this.mInspectionList = mInspectionList;
+    public void setInspectionList(List<Inspection> inspectionList) {
+        this.mInspectionList = inspectionList;
     }
 
     public List<Vehicle> getVehicleAttributeList() {
         return mVehicleAttributeList;
     }
 
-    public void setVehicleAttributeList(List<Vehicle> mVehicleAttributeList) {
-        this.mVehicleAttributeList = mVehicleAttributeList;
+    public void setVehicleAttributeList(List<Vehicle> vehicleAttributeList) {
+        this.mVehicleAttributeList = vehicleAttributeList;
     }
 
     @Override

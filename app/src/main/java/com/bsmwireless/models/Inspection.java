@@ -121,168 +121,168 @@ public class Inspection implements Parcelable {
         return mCategories;
     }
 
-    public void setCategories(String mCategories) {
-        this.mCategories = mCategories;
+    public void setCategories(String categories) {
+        this.mCategories = categories;
     }
 
     public String getAddress() {
         return mAddress;
     }
 
-    public void setAddress(String mAddress) {
-        this.mAddress = mAddress;
+    public void setAddress(String address) {
+        this.mAddress = address;
     }
 
     public Integer getDriverId() {
         return mDriverId;
     }
 
-    public void setDriverId(Integer mDriverId) {
-        this.mDriverId = mDriverId;
+    public void setDriverId(Integer driverId) {
+        this.mDriverId = driverId;
     }
 
     public String getDriverName() {
         return mDriverName;
     }
 
-    public void setDriverName(String mDriverName) {
-        this.mDriverName = mDriverName;
+    public void setDriverName(String driverName) {
+        this.mDriverName = driverName;
     }
 
     public String getTrailerOnFly() {
         return mTrailerOnFly;
     }
 
-    public void setTrailerOnFly(String mTrailerOnFly) {
-        this.mTrailerOnFly = mTrailerOnFly;
+    public void setTrailerOnFly(String trailerOnFly) {
+        this.mTrailerOnFly = trailerOnFly;
     }
 
     public String getTz() {
         return mTz;
     }
 
-    public void setTz(String mTz) {
-        this.mTz = mTz;
+    public void setTz(String tz) {
+        this.mTz = tz;
     }
 
     public boolean isDst() {
         return mDst;
     }
 
-    public void setDst(boolean mDst) {
-        this.mDst = mDst;
+    public void setDst(boolean dst) {
+        this.mDst = dst;
     }
 
     public Long getLogTime() {
         return mLogTime;
     }
 
-    public void setLogTime(Long mLogTime) {
-        this.mLogTime = mLogTime;
+    public void setLogTime(Long logTime) {
+        this.mLogTime = logTime;
     }
 
     public Long getUpdateTime() {
         return mUpdateTime;
     }
 
-    public void setUpdateTime(Long mUpdateTime) {
-        this.mUpdateTime = mUpdateTime;
+    public void setUpdateTime(Long updateTime) {
+        this.mUpdateTime = updateTime;
     }
 
     public Integer getTrailerId() {
         return mTrailerId;
     }
 
-    public void setTrailerId(Integer mTrailerId) {
-        this.mTrailerId = mTrailerId;
+    public void setTrailerId(Integer trailerId) {
+        this.mTrailerId = trailerId;
     }
 
     public Integer getId() {
         return mId;
     }
 
-    public void setId(Integer mId) {
-        this.mId = mId;
+    public void setId(Integer id) {
+        this.mId = id;
     }
 
     public Integer getOdometer() {
         return mOdometer;
     }
 
-    public void setOdometer(Integer mOdometer) {
-        this.mOdometer = mOdometer;
+    public void setOdometer(Integer odometer) {
+        this.mOdometer = odometer;
     }
 
     public String getAttachCats() {
         return mAttachCats;
     }
 
-    public void setAttachCats(String mAttachCats) {
-        this.mAttachCats = mAttachCats;
+    public void setAttachCats(String attachCats) {
+        this.mAttachCats = attachCats;
     }
 
     public Double getLat() {
         return mLat;
     }
 
-    public void setLat(Double mLat) {
-        this.mLat = mLat;
+    public void setLat(Double lat) {
+        this.mLat = lat;
     }
 
     public Double getLng() {
         return mLng;
     }
 
-    public void setLng(Double mLng) {
-        this.mLng = mLng;
+    public void setLng(Double lng) {
+        this.mLng = lng;
     }
 
     public Integer getType() {
         return mType;
     }
 
-    public void setType(Integer mType) {
-        this.mType = mType;
+    public void setType(Integer type) {
+        this.mType = type;
     }
 
     public Boolean getSafe() {
         return mSafe;
     }
 
-    public void setSafe(Boolean mSafe) {
-        this.mSafe = mSafe;
+    public void setSafe(Boolean safe) {
+        this.mSafe = safe;
     }
 
     public Long getStartTime() {
         return mStartTime;
     }
 
-    public void setStartTime(Long mStartTime) {
-        this.mStartTime = mStartTime;
+    public void setStartTime(Long startTime) {
+        this.mStartTime = startTime;
     }
 
     public Long getUtcWriteTime() {
         return mUtcWriteTime;
     }
 
-    public void setUtcWriteTime(Long mUtcWriteTime) {
-        this.mUtcWriteTime = mUtcWriteTime;
+    public void setUtcWriteTime(Long utcWriteTime) {
+        this.mUtcWriteTime = utcWriteTime;
     }
 
     public List<InspectionDefect> getDefectsList() {
         return mDefectList;
     }
 
-    public void setDefectsList(List<InspectionDefect> mDefectsList) {
-        this.mDefectList = mDefectsList;
+    public void setDefectsList(List<InspectionDefect> defectsList) {
+        this.mDefectList = defectsList;
     }
 
     public Boolean getTrailerSafe() {
         return mTrailerSafe;
     }
 
-    public void setTrailerSafe(Boolean mTrailerSafe) {
-        this.mTrailerSafe = mTrailerSafe;
+    public void setTrailerSafe(Boolean trailerSafe) {
+        this.mTrailerSafe = trailerSafe;
     }
 
     @Override

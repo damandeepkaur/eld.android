@@ -67,64 +67,64 @@ public class InspectionDefect implements Parcelable {
         return mId;
     }
 
-    public void setId(Integer mId) {
-        this.mId = mId;
+    public void setId(Integer id) {
+        this.mId = id;
     }
 
     public Integer getInspectionItemId() {
         return mInspectionItemId;
     }
 
-    public void setInspectionItemId(Integer mInspectionItemId) {
-        this.mInspectionItemId = mInspectionItemId;
+    public void setInspectionItemId(Integer inspectionItemId) {
+        this.mInspectionItemId = inspectionItemId;
     }
 
     public String getComments() {
         return mComments;
     }
 
-    public void setComments(String mComments) {
-        this.mComments = mComments;
+    public void setComments(String comments) {
+        this.mComments = comments;
     }
 
     public Integer getTrailerId() {
         return mTrailerId;
     }
 
-    public void setTrailerId(Integer mTrailerId) {
-        this.mTrailerId = mTrailerId;
+    public void setTrailerId(Integer trailerId) {
+        this.mTrailerId = trailerId;
     }
 
     public boolean isCleared() {
         return mCleared;
     }
 
-    public void setCleared(boolean mCleared) {
-        this.mCleared = mCleared;
+    public void setCleared(boolean cleared) {
+        this.mCleared = cleared;
     }
 
     public String getImages() {
         return mImages;
     }
 
-    public void setImages(String mImages) {
-        this.mImages = mImages;
+    public void setImages(String images) {
+        this.mImages = images;
     }
 
     public Integer getClearedDriverId() {
         return mClearedDriverId;
     }
 
-    public void setClearedDriverId(Integer mClearedDriverId) {
-        this.mClearedDriverId = mClearedDriverId;
+    public void setClearedDriverId(Integer clearedDriverId) {
+        this.mClearedDriverId = clearedDriverId;
     }
 
     public String getClearedDriverName() {
         return mClearedDriverName;
     }
 
-    public void setClearedDriverName(String mClearedDriverName) {
-        this.mClearedDriverName = mClearedDriverName;
+    public void setClearedDriverName(String clearedDriverName) {
+        this.mClearedDriverName = clearedDriverName;
     }
 
     @Override
