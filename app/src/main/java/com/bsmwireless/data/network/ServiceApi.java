@@ -2,7 +2,7 @@ package com.bsmwireless.data.network;
 
 import com.bsmwireless.models.Auth;
 import com.bsmwireless.models.CUDTripInfo;
-import com.bsmwireless.models.Category;
+import com.bsmwireless.models.SyncInspectionCategory;
 import com.bsmwireless.models.Driver;
 import com.bsmwireless.models.DriverLog;
 import com.bsmwireless.models.ELDDriverStatus;
@@ -68,39 +68,35 @@ public interface ServiceApi {
     Observable<Vehicle> getVehicleByBoxId(@Path("boxId") Integer boxId);
 
     /**
-     * Sync Inspection Items.
+     * Inspection Categories from category Ids
      *
      * @param boxId       id of the box paired with the vehicle.
      * @param categoryIds list of inspection category ids, comma separated.
-     * @param language    language code such as en, fr or es.
-     * @return Sync Inspection Items Response {@link Category}.
+     * @return Sync Inspection Items Response {@link SyncInspectionCategory}.
      */
-    @GET("v1/sync/inspection_items/categories/{boxid}/{categoryids}/{language}")
-    Observable<List<Category>> syncInspectionItems(@Path("boxid") Integer boxId,
-                                                   @Path("categoryIds") String categoryIds,
-                                                   @Path("language") String language);
+    @GET("v1/sync/inspection_items/search/{categoryIds}")
+    Observable<List<SyncInspectionCategory>> getInspectionItemsByCategoryIds(@Header("X-Box") Integer boxId,
+                                                                             @Path("categoryIds") String categoryIds);
 
     /**
-     * Sync Inspection Items (Box).
+     * Inspection Categories for the box. It is used after driver selects a vehicle, which maps to a box
      *
-     * @param boxId      id of the box paired with the vehicle.
-     * @param lastUpdate last update epoch time (UTC).
-     * @param language   language code such as en, fr or es.
-     * @return Sync Inspection Items Response {@link Category}.
+     * @param boxId       id of the box paired with the vehicle.
+     * @param lastUpdate list of inspection category ids, comma separated.
+     * @return Sync Inspection Items Response {@link SyncInspectionCategory}.
      */
-    @GET("v1/sync/inspection_items/box/{boxid}/{lastupdate}/{language}")
-    Observable<List<Category>> syncInspectionBoxes(@Path("boxid") Integer boxId,
-                                                   @Path("lastupdate") String lastUpdate,
-                                                   @Path("language") String language);
+    @GET("v1/sync/inspection_items/{lastupdate}")
+    Observable<List<SyncInspectionCategory>> getInspectionItemsByLastUpdate(@Header("X-Box") Integer boxId,
+                                                                            @Path("lastupdate") long lastUpdate);
 
     /**
      * Sync Inspection Items (Trailer).
      *
      * @param trailerId id of the box paired with the trailer (TBD: boxid or trailer?).
-     * @return Sync Inspection Items Response {@link Category}.
+     * @return Sync Inspection Items Response {@link SyncInspectionCategory}.
      */
     @GET("v1/sync/inspection_items/trailer/{trailerid}")
-    Observable<List<Category>> syncInspectionTrailers(@Path("trailerid") Integer trailerId);
+    Observable<List<SyncInspectionCategory>> syncInspectionTrailers(@Path("trailerid") Integer trailerId);
 
     /**
      * Get last 14 days of driver time log, trip info and rule selection history.
