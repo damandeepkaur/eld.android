@@ -6,9 +6,11 @@ import android.os.Parcelable;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class InspectionReport implements Parcelable {
@@ -20,15 +22,17 @@ public class InspectionReport implements Parcelable {
     @Expose
     private List<Vehicle> mVehicleAttributeList = null;
 
+    private InspectionReport(Parcel in) {
+        in.readTypedList(mInspectionList, Inspection.CREATOR);
+        in.readTypedList(mVehicleAttributeList, Vehicle.CREATOR);
+    }
+
     public static final Creator<InspectionReport> CREATOR = new Creator<InspectionReport>() {
 
         @SuppressWarnings({"unchecked"})
         @Override
         public InspectionReport createFromParcel(Parcel in) {
-            InspectionReport instance = new InspectionReport();
-            in.readList(instance.mInspectionList, (Inspection.class.getClassLoader()));
-            in.readList(instance.mVehicleAttributeList, (Vehicle.class.getClassLoader()));
-            return instance;
+            return new InspectionReport(in);
         }
 
         @Override
@@ -41,7 +45,7 @@ public class InspectionReport implements Parcelable {
         return mInspectionList;
     }
 
-    public void setInspectionList(List<Inspection> mInspectionList) {
+    public void setInspectionList(ArrayList<Inspection> mInspectionList) {
         this.mInspectionList = mInspectionList;
     }
 
@@ -88,8 +92,8 @@ public class InspectionReport implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeList(mInspectionList);
-        dest.writeList(mVehicleAttributeList);
+        dest.writeTypedList(mInspectionList);
+        dest.writeTypedList(mVehicleAttributeList);
     }
 
     @Override

@@ -36,22 +36,23 @@ public class InspectionDefect implements Parcelable {
     @Expose
     private String mImages;
 
+    private InspectionDefect(Parcel in) {
+        mClearedDriverId = in.readInt();
+        mClearedDriverName = in.readString();
+        mId = in.readInt();
+        mInspectionItemId = in.readInt();
+        mComments = in.readString();
+        mTrailerId = in.readInt();
+        mCleared = in.readByte() != 0;
+        mImages = in.readString();
+    }
 
     public final static Parcelable.Creator<InspectionDefect> CREATOR = new Creator<InspectionDefect>() {
 
         @SuppressWarnings({"unchecked"})
         @Override
         public InspectionDefect createFromParcel(Parcel in) {
-            InspectionDefect instance = new InspectionDefect();
-            instance.mClearedDriverId = ((Integer) in.readValue((Integer.class.getClassLoader())));
-            instance.mClearedDriverName = ((String) in.readValue((String.class.getClassLoader())));
-            instance.mId = ((Integer) in.readValue((Integer.class.getClassLoader())));
-            instance.mInspectionItemId = ((Integer) in.readValue((Integer.class.getClassLoader())));
-            instance.mComments = ((String) in.readValue((String.class.getClassLoader())));
-            instance.mTrailerId = ((Integer) in.readValue((Integer.class.getClassLoader())));
-            instance.mCleared = ((Boolean) in.readValue((Boolean.class.getClassLoader())));
-            instance.mImages = ((String) in.readValue((String.class.getClassLoader())));
-            return instance;
+            return new InspectionDefect(in);
         }
 
         @Override
@@ -177,14 +178,14 @@ public class InspectionDefect implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeValue(mClearedDriverId);
-        dest.writeValue(mClearedDriverName);
-        dest.writeValue(mId);
-        dest.writeValue(mInspectionItemId);
-        dest.writeValue(mComments);
-        dest.writeValue(mTrailerId);
-        dest.writeValue(mCleared);
-        dest.writeValue(mImages);
+        dest.writeInt(mClearedDriverId);
+        dest.writeString(mClearedDriverName);
+        dest.writeInt(mId);
+        dest.writeInt(mInspectionItemId);
+        dest.writeString(mComments);
+        dest.writeInt(mTrailerId);
+        dest.writeByte((byte) (mCleared ? 1 : 0));
+        dest.writeString(mImages);
     }
 
     @Override

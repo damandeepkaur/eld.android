@@ -9,6 +9,7 @@ import com.google.gson.annotations.SerializedName;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Inspection implements Parcelable {
@@ -77,35 +78,36 @@ public class Inspection implements Parcelable {
     @Expose
     private Boolean mTrailerSafe;
 
+    private Inspection(Parcel in) {
+        mCategories = in.readString();
+        mAddress = in.readString();
+        mDriverId = in.readInt();
+        mDriverName = in.readString();
+        mTrailerOnFly = in.readString();
+        mTz = in.readString();
+        mDst = in.readByte() != 0;
+        mLogTime = in.readLong();
+        mUpdateTime = in.readLong();
+        mTrailerId = in.readInt();
+        mId = in.readInt();
+        mOdometer = in.readInt();
+        mAttachCats = in.readString();
+        mLat = in.readDouble();
+        mLng = in.readDouble();
+        mType = in.readInt();
+        mSafe = in.readByte() != 0;
+        mStartTime = in.readLong();
+        mUtcWriteTime = in.readLong();
+        in.readTypedList(mDefectList, InspectionDefect.CREATOR);
+        mTrailerSafe = in.readByte() != 0;
+    }
 
     public final static Parcelable.Creator<Inspection> CREATOR = new Creator<Inspection>() {
 
         @SuppressWarnings({"unchecked"})
         @Override
         public Inspection createFromParcel(Parcel in) {
-            Inspection instance = new Inspection();
-            instance.mCategories = ((String) in.readValue((String.class.getClassLoader())));
-            instance.mAddress = ((String) in.readValue((String.class.getClassLoader())));
-            instance.mDriverId = ((Integer) in.readValue((Integer.class.getClassLoader())));
-            instance.mDriverName = ((String) in.readValue((String.class.getClassLoader())));
-            instance.mTrailerOnFly = ((String) in.readValue((String.class.getClassLoader())));
-            instance.mTz = ((String) in.readValue((String.class.getClassLoader())));
-            instance.mDst = ((Boolean) in.readValue((Boolean.class.getClassLoader())));
-            instance.mLogTime = ((Long) in.readValue((Long.class.getClassLoader())));
-            instance.mUpdateTime = ((Long) in.readValue((Long.class.getClassLoader())));
-            instance.mTrailerId = ((Integer) in.readValue((Integer.class.getClassLoader())));
-            instance.mId = ((Integer) in.readValue((Integer.class.getClassLoader())));
-            instance.mOdometer = ((Integer) in.readValue((Integer.class.getClassLoader())));
-            instance.mAttachCats = ((String) in.readValue((String.class.getClassLoader())));
-            instance.mLat = ((Double) in.readValue((Double.class.getClassLoader())));
-            instance.mLng = ((Double) in.readValue((Double.class.getClassLoader())));
-            instance.mType = ((Integer) in.readValue((Integer.class.getClassLoader())));
-            instance.mSafe = ((Boolean) in.readValue((Boolean.class.getClassLoader())));
-            instance.mStartTime = ((Long) in.readValue((Long.class.getClassLoader())));
-            instance.mUtcWriteTime = ((Long) in.readValue((Long.class.getClassLoader())));
-            in.readList(instance.mDefectList, (InspectionDefect.class.getClassLoader()));
-            instance.mTrailerSafe = ((Boolean) in.readValue((Boolean.class.getClassLoader())));
-            return instance;
+            return new Inspection(in);
         }
 
         @Override
@@ -374,27 +376,27 @@ public class Inspection implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeValue(mCategories);
-        dest.writeValue(mAddress);
-        dest.writeValue(mDriverId);
-        dest.writeValue(mDriverName);
-        dest.writeValue(mTrailerOnFly);
-        dest.writeValue(mTz);
-        dest.writeValue(mDst);
-        dest.writeValue(mLogTime);
-        dest.writeValue(mUpdateTime);
-        dest.writeValue(mTrailerId);
-        dest.writeValue(mId);
-        dest.writeValue(mOdometer);
-        dest.writeValue(mAttachCats);
-        dest.writeValue(mLat);
-        dest.writeValue(mLng);
-        dest.writeValue(mType);
-        dest.writeValue(mSafe);
-        dest.writeValue(mStartTime);
-        dest.writeValue(mUtcWriteTime);
-        dest.writeList(mDefectList);
-        dest.writeValue(mTrailerSafe);
+        dest.writeString(mCategories);
+        dest.writeString(mAddress);
+        dest.writeInt(mDriverId);
+        dest.writeString(mDriverName);
+        dest.writeString(mTrailerOnFly);
+        dest.writeString(mTz);
+        dest.writeByte((byte) (mDst ? 1 : 0));
+        dest.writeLong(mLogTime);
+        dest.writeLong(mUpdateTime);
+        dest.writeInt(mTrailerId);
+        dest.writeInt(mId);
+        dest.writeInt(mOdometer);
+        dest.writeString(mAttachCats);
+        dest.writeDouble(mLat);
+        dest.writeDouble(mLng);
+        dest.writeInt(mType);
+        dest.writeByte((byte) (mSafe ? 1 : 0));
+        dest.writeLong(mStartTime);
+        dest.writeLong(mUtcWriteTime);
+        dest.writeTypedList(mDefectList);
+        dest.writeByte((byte) (mTrailerSafe ? 1 : 0));
     }
 
     @Override
