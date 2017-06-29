@@ -53,7 +53,7 @@ public interface ServiceApi {
      * @param isScan  enum: 0 - search vehicle, 1 - scan vehicle
      * @return Vehicle Attributes Response {@link Vehicle}.
      */
-    @GET("v1/sync/vehicles/{field}/{keyword}/{isscan}")
+    @GET("v1/app/vehicles/{field}/{keyword}/{isscan}")
     Observable<List<Vehicle>> searchVehicles(@Path("field") int field,
                                              @Path("keyword") String keyword,
                                              @Path("isscan") int isScan);
@@ -64,7 +64,7 @@ public interface ServiceApi {
      * @param boxId id of the box paired with the vehicle.
      * @return Vehicle Attributes Response {@link Vehicle}.
      */
-    @GET("v1/sync/vehicles/{boxId}")
+    @GET("v1/app/vehicles/{boxId}")
     Observable<Vehicle> getVehicleByBoxId(@Path("boxId") Integer boxId);
 
     /**
@@ -199,7 +199,7 @@ public interface ServiceApi {
      * @param boxId box identifier (required).
      * @return update driver status response {@link ResponseMessage}.
      */
-    @POST("v1/sync/driver/status")
+    @POST("v1/app/driver/status")
     Observable<ResponseMessage> syncDriverStatus(@Body ELDDriverStatus status, @Header("X-Box") int boxId);
 
     /**
@@ -210,7 +210,7 @@ public interface ServiceApi {
      * @param boxId box identifier (optional).
      * @return update driver status response {@link ResponseMessage}.
      */
-    @POST("v1/sync/driver/statuses")
+    @POST("v1/app/driver/statuses")
     Observable<ResponseMessage> syncDriverStatuses(@Body List<ELDDriverStatus> statusList, @Header("X-Box") int boxId);
 
     /**
