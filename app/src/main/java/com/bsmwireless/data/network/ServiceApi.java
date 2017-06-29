@@ -295,8 +295,9 @@ public interface ServiceApi {
      * @param beginDate begin date info
      * @return Inspection Report Response {@link InspectionReport}
      */
-    @GET("/v1/sync/inspections/report/{lastUpdate}/{isTrailer}/{beginDate}")
+    @GET("v1/sync/inspections/report/{lastUpdate}/{isTrailer}/{beginDate}")
     Observable<InspectionReport> syncInspectionReport(@Path("lastUpdate") Long lastUpdate,
                                                       @Path("isTrailer") int isTrailer,
-                                                      @Path("beginDate") Long beginDate);
+                                                      @Path("beginDate") Long beginDate,
+                                                      @Header("X-Box") int boxId);
 }
