@@ -49,7 +49,7 @@ public interface ServiceApi {
      *
      * @param field   search field enum: 0 - SAP, 1 - legacy number, 2 - equip number,
      *                3 - description, 4 - license plate, 5 - boxId
-     * @param keyword search keyword
+     * @param keyword search keyword.
      * @param isScan  enum: 0 - search vehicle, 1 - scan vehicle
      * @return Vehicle Attributes Response {@link Vehicle}.
      */
