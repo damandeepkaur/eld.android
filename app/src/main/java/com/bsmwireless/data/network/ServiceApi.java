@@ -9,6 +9,7 @@ import com.bsmwireless.models.ELDDriverStatus;
 import com.bsmwireless.models.EmailReport;
 import com.bsmwireless.models.Event;
 import com.bsmwireless.models.HOSAlert;
+import com.bsmwireless.models.InspectionReport;
 import com.bsmwireless.models.Location;
 import com.bsmwireless.models.LoginData;
 import com.bsmwireless.models.NewRule;
@@ -285,4 +286,18 @@ public interface ServiceApi {
 
     @POST("/v1/sync/app/logout")
     Observable<ResponseMessage> logout(@Body ELDDriverStatus status);
+
+    /**
+     * Sync Inspection Report.
+     *
+     * @param lastUpdate long unix timestamp
+     * @param isTrailer enum: 0 - regular vehicle, 1 - trailer
+     * @param beginDate begin date info
+     * @return Inspection Report Response {@link InspectionReport}
+     */
+    @GET("v1/sync/inspections/report/{lastUpdate}/{isTrailer}/{beginDate}")
+    Observable<InspectionReport> syncInspectionReport(@Path("lastUpdate") Long lastUpdate,
+                                                      @Path("isTrailer") int isTrailer,
+                                                      @Path("beginDate") Long beginDate,
+                                                      @Header("X-Box") int boxId);
 }
