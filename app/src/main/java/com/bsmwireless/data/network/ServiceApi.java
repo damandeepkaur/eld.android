@@ -37,7 +37,7 @@ public interface ServiceApi {
     /**
      * Login request Vehicle.
      *
-     * @param request - model with login information
+     * @param request - model with login information.
      * @return User Response {@link User}.
      */
     @POST("v1/login/driver")
