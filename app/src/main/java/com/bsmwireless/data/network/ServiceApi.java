@@ -309,6 +309,11 @@ public interface ServiceApi {
     @POST("/v1/sync/app/newtoken")
     Observable<Auth> refreshToken();
 
+    /**
+     *
+     * @param status driver status
+     * @return
+     */
     @POST("/v1/sync/app/logout")
     Observable<ResponseMessage> logout(@Body ELDDriverStatus status);
 }
