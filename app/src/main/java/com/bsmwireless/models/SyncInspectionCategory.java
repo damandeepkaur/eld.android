@@ -16,7 +16,7 @@ public class SyncInspectionCategory implements Parcelable {
 
     @SerializedName("groupId")
     @Expose
-    private Integer groupId;
+    private Integer mGroupId;
 
     @SerializedName("barCode")
     @Expose
@@ -26,9 +26,9 @@ public class SyncInspectionCategory implements Parcelable {
     @Expose
     private String mSType;
 
-    @SerializedName("items")
+    @SerializedName("mItems")
     @Expose
-    private List<SyncInspectionItem> items = null;
+    private List<SyncInspectionItem> mItems = null;
 
     @SerializedName("desc")
     @Expose
@@ -55,10 +55,10 @@ public class SyncInspectionCategory implements Parcelable {
         SyncInspectionCategory that = (SyncInspectionCategory) o;
 
         return new EqualsBuilder()
-                .append(groupId, that.groupId)
+                .append(mGroupId, that.mGroupId)
                 .append(mBarcode, that.mBarcode)
                 .append(mSType, that.mSType)
-                .append(items, that.items)
+                .append(mItems, that.mItems)
                 .append(mDesc, that.mDesc)
                 .append(mId, that.mId)
                 .append(mScannable, that.mScannable)
@@ -69,10 +69,10 @@ public class SyncInspectionCategory implements Parcelable {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
-                .append(groupId)
+                .append(mGroupId)
                 .append(mBarcode)
                 .append(mSType)
-                .append(items)
+                .append(mItems)
                 .append(mDesc)
                 .append(mId)
                 .append(mScannable)
@@ -81,11 +81,11 @@ public class SyncInspectionCategory implements Parcelable {
     }
 
     public Integer getGroupId() {
-        return groupId;
+        return mGroupId;
     }
 
     public void setGroupId(Integer groupId) {
-        this.groupId = groupId;
+        this.mGroupId = groupId;
     }
 
     public String getBarcode() {
@@ -105,11 +105,11 @@ public class SyncInspectionCategory implements Parcelable {
     }
 
     public List<SyncInspectionItem> getItems() {
-        return items;
+        return mItems;
     }
 
     public void setItems(List<SyncInspectionItem> items) {
-        this.items = items;
+        this.mItems = items;
     }
 
     public SyncDescription getDesc() {
@@ -147,10 +147,10 @@ public class SyncInspectionCategory implements Parcelable {
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("SyncInspectionCategory{");
-        sb.append("groupId=").append(groupId);
+        sb.append("mGroupId=").append(mGroupId);
         sb.append(", mBarcode='").append(mBarcode).append('\'');
         sb.append(", mSType=").append(mSType);
-        sb.append(", items=").append(items);
+        sb.append(", mItems=").append(mItems);
         sb.append(", mDesc=").append(mDesc);
         sb.append(", mId=").append(mId);
         sb.append(", mScannable=").append(mScannable);
@@ -166,10 +166,10 @@ public class SyncInspectionCategory implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeValue(this.groupId);
+        dest.writeValue(this.mGroupId);
         dest.writeString(this.mBarcode);
         dest.writeString(this.mSType);
-        dest.writeList(this.items);
+        dest.writeList(this.mItems);
         dest.writeParcelable(this.mDesc, flags);
         dest.writeValue(this.mId);
         dest.writeValue(this.mScannable);
@@ -180,11 +180,11 @@ public class SyncInspectionCategory implements Parcelable {
     }
 
     protected SyncInspectionCategory(Parcel in) {
-        this.groupId = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.mGroupId = (Integer) in.readValue(Integer.class.getClassLoader());
         this.mBarcode = in.readString();
         this.mSType = in.readString();
-        this.items = new ArrayList<SyncInspectionItem>();
-        in.readList(this.items, SyncInspectionItem.class.getClassLoader());
+        this.mItems = new ArrayList<SyncInspectionItem>();
+        in.readList(this.mItems, SyncInspectionItem.class.getClassLoader());
         this.mDesc = in.readParcelable(SyncDescription.class.getClassLoader());
         this.mId = (Integer) in.readValue(Integer.class.getClassLoader());
         this.mScannable = (Boolean) in.readValue(Boolean.class.getClassLoader());
