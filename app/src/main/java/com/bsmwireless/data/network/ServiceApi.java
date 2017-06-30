@@ -2,13 +2,13 @@ package com.bsmwireless.data.network;
 
 import com.bsmwireless.models.Auth;
 import com.bsmwireless.models.CUDTripInfo;
-import com.bsmwireless.models.SyncInspectionCategory;
 import com.bsmwireless.models.Driver;
 import com.bsmwireless.models.DriverLog;
 import com.bsmwireless.models.ELDDriverStatus;
 import com.bsmwireless.models.EmailReport;
 import com.bsmwireless.models.Event;
 import com.bsmwireless.models.HOSAlert;
+import com.bsmwireless.models.InspectionReport;
 import com.bsmwireless.models.Location;
 import com.bsmwireless.models.LoginData;
 import com.bsmwireless.models.NewRule;
@@ -17,6 +17,7 @@ import com.bsmwireless.models.RegistryInformation;
 import com.bsmwireless.models.Report;
 import com.bsmwireless.models.ResponseMessage;
 import com.bsmwireless.models.Rule;
+import com.bsmwireless.models.SyncInspectionCategory;
 import com.bsmwireless.models.Trailer;
 import com.bsmwireless.models.User;
 import com.bsmwireless.models.Vehicle;
@@ -24,7 +25,6 @@ import com.bsmwireless.models.Vehicle;
 import java.util.List;
 
 import io.reactivex.Observable;
-
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
@@ -47,7 +47,7 @@ public interface ServiceApi {
     /**
      * Search Vehicle.
      *
-     * @param field  search field enum: 0 - SAP, 1 - legacy number, 2 - equip number,
+     * @param field   search field enum: 0 - SAP, 1 - legacy number, 2 - equip number,
      *                3 - description, 4 - license plate, 5 - boxId
      * @param keyword search keyword
      * @param isScan  enum: 0 - search vehicle, 1 - scan vehicle
@@ -81,112 +81,34 @@ public interface ServiceApi {
     /**
      * Inspection Categories for the box. It is used after driver selects a vehicle, which maps to a box
      *
-     * @param boxId       id of the box paired with the vehicle.
+     * @param boxId      id of the box paired with the vehicle.
      * @param lastUpdate list of inspection category ids, comma separated.
      * @return Sync Inspection Items Response {@link SyncInspectionCategory}.
      */
     @GET("v1/sync/inspection_items/{lastupdate}")
     Observable<List<SyncInspectionCategory>> getInspectionItemsByLastUpdate(@Header("X-Box") Integer boxId,
                                                                             @Path("lastupdate") long lastUpdate);
-    /**
-     * Get last 14 days of driver time log, trip info and rule selection history.
-     * TODO: API not ready
-     *
-     * @return
-     */
-    @GET("v1/sync/dlogs")
-    Observable<Object> syncDriverLogs();
 
     /**
-     * Get assigned rule selections to the driver.
+     * Sync Inspection Report.
      *
-     * @param boxId      id of the box paired with the vehicle.
-     * @param lastUpdate last update epoch time (UTC).
-     * @return Sync Rules Response {@link Rule}.
+     * @param lastUpdate long unix timestamp
+     * @param isTrailer  enum: 0 - regular vehicle, 1 - trailer
+     * @param beginDate  begin date info
+     * @return Inspection Report Response {@link InspectionReport}
      */
-    @GET("v1/sync/rules/{boxid}/{lastupdate}")
-    Observable<Rule> syncRules(@Path("boxid") Integer boxId, @Path("lastupdate") String lastUpdate);
-
-    /**
-     * For driver to add a trailer on the fly.
-     * TODO: API not ready
-     *
-     * @param trailer description of the trailer.
-     * @return
-     */
-    @GET("v1/app/trailers")
-    Observable<Object> createTrailer(@Body Trailer trailer);
-
-    /**
-     * Resolving addresses from the latitude/longitude pairs.
-     * TODO: What does it mean [{latlng}]?
-     *
-     * @param latLng Coordinate list.
-     * @return
-     */
-    @GET("v1/app/addresses/[{latlng}]")
-    Observable<List<Location>> geocoding(@Path("latlng") List<Location> latLng);
-
-    /**
-     * Retrieve last 24 hour inspection report.
-     *
-     * @param boxId id of the box paired with the vehicle.
-     * @return Inspection Report Response {@link Report}.
-     */
-    @GET("v1/app/inspections/{boxid}")
-    Observable<List<Report>> inspectionReport(@Path("boxid") Integer boxId);
-
-    /**
-     * Submit driver time log.
-     *
-     * @param logs driver logs list.
-     * @return delete driver logs response {@link ResponseMessage}.
-     */
-    @DELETE("v1/app/dlogs")
-    Observable<ResponseMessage> deleteDriverLogs(@Body List<DriverLog> logs);
-
-    /**
-     * Submit driver time log.
-     *
-     * @param logs driver logs list.
-     * @return update driver logs response {@link ResponseMessage}.
-     */
-    @PUT("v1/app/dlogs")
-    Observable<ResponseMessage> updateDriverLogs(@Body List<DriverLog> logs);
-
-    /**
-     * Submit pre-trip or post-trip inspection, including defects and images.
-     *
-     * @param cudReport report information.
-     * @return delete report response {@link ResponseMessage}.
-     */
-    @DELETE("v1/app/inspections")
-    Observable<ResponseMessage> deleteCUDInspection(@Body Report cudReport);
-
-    /**
-     * Submit pre-trip or post-trip inspection, including defects and images.
-     *
-     * @param cudReport report information.
-     * @return update report response {@link ResponseMessage}.
-     */
-    @PUT("v1/app/inspections")
-    Observable<ResponseMessage> updateCUDInspection(@Body Report cudReport);
-
-    /**
-     * Submit driver profile.
-     *
-     * @param driver driver information.
-     * @return update driver information response {@link ResponseMessage}.
-     */
-    @PUT("v1/app/drivers")
-    Observable<ResponseMessage> updateDriver(@Body Driver driver);
+    @GET("v1/sync/inspections/report/{lastUpdate}/{isTrailer}/{beginDate}")
+    Observable<InspectionReport> syncInspectionReport(@Path("lastUpdate") Long lastUpdate,
+                                                      @Path("isTrailer") int isTrailer,
+                                                      @Path("beginDate") Long beginDate,
+                                                      @Header("X-Box") int boxId);
 
     /**
      * Sync current driver status.
      * According doc section 4.5.1.1;4.5.1.2; 4.5.1.3; 4.5.1.4; 4.5.1.7; It sends a single new record.
      *
      * @param status driver status.
-     * @param boxId box identifier (required).
+     * @param boxId  box identifier (required).
      * @return update driver status response {@link ResponseMessage}.
      */
     @POST("v1/app/driver/status")
@@ -197,11 +119,111 @@ public interface ServiceApi {
      * Send ELD driver duty status; According doc section 4.5.1.1;4.5.1.2; 4.5.1.3; 4.5.1.4; 4.5.1.7; It sends a list of new records ordered by event time.
      *
      * @param statusList driver status list.
-     * @param boxId box identifier (optional).
+     * @param boxId      box identifier (optional).
      * @return update driver status response {@link ResponseMessage}.
      */
     @POST("v1/app/driver/statuses")
     Observable<ResponseMessage> syncDriverStatuses(@Body List<ELDDriverStatus> statusList, @Header("X-Box") int boxId);
+
+    /**
+     * Get last 14 days of driver time log, trip info and rule selection history.
+     *
+     * @return
+     */
+    //TODO: Check this request with real server and update if necessary
+    @GET("v1/sync/dlogs")
+    Observable<Object> syncDriverLogs();
+
+    /**
+     * Get assigned rule selections to the driver.
+     *
+     * @param boxId      id of the box paired with the vehicle.
+     * @param lastUpdate last update epoch time (UTC).
+     * @return Sync Rules Response {@link Rule}.
+     */
+    //TODO: Check this request with real server and update if necessary
+    @GET("v1/sync/rules/{boxid}/{lastupdate}")
+    Observable<Rule> syncRules(@Path("boxid") Integer boxId, @Path("lastupdate") String lastUpdate);
+
+    /**
+     * For driver to add a trailer on the fly.
+     *
+     * @param trailer description of the trailer.
+     * @return
+     */
+    //TODO: Check this request with real server and update if necessary
+    @GET("v1/app/trailers")
+    Observable<Object> createTrailer(@Body Trailer trailer);
+
+    /**
+     * Resolving addresses from the latitude/longitude pairs.
+     *
+     * @param latLng Coordinate list.
+     * @return
+     */
+    //TODO: Check this request with real server and update if necessary
+    @GET("v1/app/addresses/[{latlng}]")
+    Observable<List<Location>> geocoding(@Path("latlng") List<Location> latLng);
+
+    /**
+     * Retrieve last 24 hour inspection report.
+     *
+     * @param boxId id of the box paired with the vehicle.
+     * @return Inspection Report Response {@link Report}.
+     */
+    //TODO: Check this request with real server and update if necessary
+    @GET("v1/app/inspections/{boxid}")
+    Observable<List<Report>> inspectionReport(@Path("boxid") Integer boxId);
+
+    /**
+     * Submit driver time log.
+     *
+     * @param logs driver logs list.
+     * @return delete driver logs response {@link ResponseMessage}.
+     */
+    //TODO: Check this request with real server and update if necessary
+    @DELETE("v1/app/dlogs")
+    Observable<ResponseMessage> deleteDriverLogs(@Body List<DriverLog> logs);
+
+    /**
+     * Submit driver time log.
+     *
+     * @param logs driver logs list.
+     * @return update driver logs response {@link ResponseMessage}.
+     */
+    //TODO: Check this request with real server and update if necessary
+    @PUT("v1/app/dlogs")
+    Observable<ResponseMessage> updateDriverLogs(@Body List<DriverLog> logs);
+
+    /**
+     * Submit pre-trip or post-trip inspection, including defects and images.
+     *
+     * @param cudReport report information.
+     * @return delete report response {@link ResponseMessage}.
+     */
+    //TODO: Check this request with real server and update if necessary
+    @DELETE("v1/app/inspections")
+    Observable<ResponseMessage> deleteCUDInspection(@Body Report cudReport);
+
+    /**
+     * Submit pre-trip or post-trip inspection, including defects and images.
+     *
+     * @param cudReport report information.
+     * @return update report response {@link ResponseMessage}.
+     */
+    //TODO: Check this request with real server and update if necessary
+    @PUT("v1/app/inspections")
+    Observable<ResponseMessage> updateCUDInspection(@Body Report cudReport);
+
+    /**
+     * Submit driver profile.
+     *
+     * @param driver driver information.
+     * @return update driver information response {@link ResponseMessage}.
+     */
+    //TODO: Check this request with real server and update if necessary
+    @PUT("v1/app/drivers")
+    Observable<ResponseMessage> updateDriver(@Body Driver driver);
 
     /**
      * Submit (add) HOS alert.
@@ -210,6 +232,7 @@ public interface ServiceApi {
      * @return Add HOS alert response {@link ResponseMessage}.
      */
     @POST("v1/app/hos/alerts")
+    //TODO: Check this request with real server and update if necessary
     Observable<ResponseMessage> addHOSAlert(@Body HOSAlert alert);
 
     /**
@@ -219,6 +242,7 @@ public interface ServiceApi {
      * @return Update trip reponse {@link ResponseMessage}.
      */
     @DELETE("v1/app/trips")
+    //TODO: Check this request with real server and update if necessary
     Observable<ResponseMessage> deleteCUDTripInfo(@Body CUDTripInfo tripInfo);
 
     /**
@@ -228,6 +252,7 @@ public interface ServiceApi {
      * @return Update trip reponse {@link ResponseMessage}.
      */
     @PUT("v1/app/trips")
+    //TODO: Check this request with real server and update if necessary
     Observable<ResponseMessage> updateCUDTripInfo(@Body CUDTripInfo tripInfo);
 
     /**
@@ -237,6 +262,7 @@ public interface ServiceApi {
      * @return Add newRule response {@link ResponseMessage}.
      */
     @POST("v1/app/rules")
+    //TODO: Check this request with real server and update if necessary
     Observable<ResponseMessage> addRule(@Body NewRule newRule);
 
     /**
@@ -246,6 +272,7 @@ public interface ServiceApi {
      * @return Email report response {@link ResponseMessage}.
      */
     @POST("v1/app/reports")
+    //TODO: Check this request with real server and update if necessary
     Observable<ResponseMessage> emailReport(@Body EmailReport report);
 
     /**
@@ -255,6 +282,7 @@ public interface ServiceApi {
      * @return Add Event ResponseMessage {@link ResponseMessage}.
      */
     @POST("v1/app/events")
+    //TODO: Check this request with real server and update if necessary
     Observable<ResponseMessage> addEvent(@Body Event event);
 
     /**
@@ -264,11 +292,15 @@ public interface ServiceApi {
      * @return Registry ResponseMessage {@link RegistryInformation}.
      */
     @POST("/registry/v1/sd")
+    //TODO: Check this request with real server and update if necessary
     Observable<RegistryInformation> registry(@Body Registry registry);
 
     @POST("/v1/sync/app/newtoken")
+        //TODO: Check this request with real server and update if necessary
     Observable<Auth> refreshToken();
 
     @POST("/v1/sync/app/logout")
+        //TODO: Check this request with real server and update if necessary
     Observable<ResponseMessage> logout(@Body ELDDriverStatus status);
+
 }
