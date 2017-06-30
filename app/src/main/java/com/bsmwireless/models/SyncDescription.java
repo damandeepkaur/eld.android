@@ -12,15 +12,15 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 public class SyncDescription implements Parcelable {
     @SerializedName("en")
     @Expose
-    private String mEn;
+    private String mEnglish;
 
     @SerializedName("fr")
     @Expose
-    private String mFr;
+    private String mFrench;
 
     @SerializedName("es")
     @Expose
-    private String mEs;
+    private String mSpanish;
 
     @Override
     public boolean equals(Object o) {
@@ -31,43 +31,43 @@ public class SyncDescription implements Parcelable {
         SyncDescription that = (SyncDescription) o;
 
         return new EqualsBuilder()
-                .append(mEn, that.mEn)
-                .append(mFr, that.mFr)
-                .append(mEs, that.mEs)
+                .append(mEnglish, that.mEnglish)
+                .append(mFrench, that.mFrench)
+                .append(mSpanish, that.mSpanish)
                 .isEquals();
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
-                .append(mEn)
-                .append(mFr)
-                .append(mEs)
+                .append(mEnglish)
+                .append(mFrench)
+                .append(mSpanish)
                 .toHashCode();
     }
 
-    public String getEn() {
-        return mEn;
+    public String getEnglish() {
+        return mEnglish;
     }
 
-    public void setEn(String en) {
-        mEn = en;
+    public void setEnglish(String english) {
+        mEnglish = english;
     }
 
-    public String getFr() {
-        return mFr;
+    public String getFrench() {
+        return mFrench;
     }
 
-    public void setFr(String fr) {
-        mFr = fr;
+    public void setFrench(String french) {
+        mFrench = french;
     }
 
-    public String getEs() {
-        return mEs;
+    public String getSpanish() {
+        return mSpanish;
     }
 
-    public void setEs(String es) {
-        mEs = es;
+    public void setSpanish(String spanish) {
+        mSpanish = spanish;
     }
 
     @Override
@@ -77,18 +77,18 @@ public class SyncDescription implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(this.mEn);
-        dest.writeString(this.mFr);
-        dest.writeString(this.mEs);
+        dest.writeString(this.mEnglish);
+        dest.writeString(this.mFrench);
+        dest.writeString(this.mSpanish);
     }
 
     public SyncDescription() {
     }
 
     protected SyncDescription(Parcel in) {
-        this.mEn = in.readString();
-        this.mFr = in.readString();
-        this.mEs = in.readString();
+        this.mEnglish = in.readString();
+        this.mFrench = in.readString();
+        this.mSpanish = in.readString();
     }
 
     public static final Parcelable.Creator<SyncDescription> CREATOR = new Parcelable.Creator<SyncDescription>() {
@@ -102,4 +102,14 @@ public class SyncDescription implements Parcelable {
             return new SyncDescription[size];
         }
     };
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("SyncDescription{");
+        sb.append("mEnglish='").append(mEnglish).append('\'');
+        sb.append(", mFrench='").append(mFrench).append('\'');
+        sb.append(", mSpanish='").append(mSpanish).append('\'');
+        sb.append('}');
+        return sb.toString();
+    }
 }

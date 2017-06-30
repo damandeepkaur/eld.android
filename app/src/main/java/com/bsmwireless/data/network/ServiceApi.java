@@ -88,16 +88,6 @@ public interface ServiceApi {
     @GET("v1/sync/inspection_items/{lastupdate}")
     Observable<List<SyncInspectionCategory>> getInspectionItemsByLastUpdate(@Header("X-Box") Integer boxId,
                                                                             @Path("lastupdate") long lastUpdate);
-
-    /**
-     * Sync Inspection Items (Trailer).
-     *
-     * @param trailerId id of the box paired with the trailer (TBD: boxid or trailer?).
-     * @return Sync Inspection Items Response {@link SyncInspectionCategory}.
-     */
-    @GET("v1/sync/inspection_items/trailer/{trailerid}")
-    Observable<List<SyncInspectionCategory>> syncInspectionTrailers(@Path("trailerid") Integer trailerId);
-
     /**
      * Get last 14 days of driver time log, trip info and rule selection history.
      * TODO: API not ready

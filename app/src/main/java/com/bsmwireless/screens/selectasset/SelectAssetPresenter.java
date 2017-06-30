@@ -1,7 +1,10 @@
 package com.bsmwireless.screens.selectasset;
 
+import android.util.Log;
+
 import com.bsmwireless.common.App;
 import com.bsmwireless.common.Constants;
+import com.bsmwireless.domain.interactors.InspectionsInteractor;
 import com.bsmwireless.domain.interactors.VehiclesInteractor;
 import com.bsmwireless.models.Vehicle;
 
@@ -21,6 +24,8 @@ public class SelectAssetPresenter {
     private SelectAssetView mView;
 
     private VehiclesInteractor mVehiclesInteractor;
+
+    private InspectionsInteractor mInspectionsInteractor;
 
     private CompositeDisposable mDisposables;
 

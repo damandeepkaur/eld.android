@@ -24,7 +24,7 @@ public class SyncInspectionCategory implements Parcelable {
 
     @SerializedName("stype")
     @Expose
-    private Integer mSType;
+    private String mSType;
 
     @SerializedName("items")
     @Expose
@@ -96,11 +96,11 @@ public class SyncInspectionCategory implements Parcelable {
         mBarcode = barcode;
     }
 
-    public Integer getSType() {
+    public String getSType() {
         return mSType;
     }
 
-    public void setSType(Integer SType) {
+    public void setSType(String SType) {
         mSType = SType;
     }
 
@@ -168,7 +168,7 @@ public class SyncInspectionCategory implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeValue(this.groupId);
         dest.writeString(this.mBarcode);
-        dest.writeValue(this.mSType);
+        dest.writeString(this.mSType);
         dest.writeList(this.items);
         dest.writeParcelable(this.mDesc, flags);
         dest.writeValue(this.mId);
@@ -182,7 +182,7 @@ public class SyncInspectionCategory implements Parcelable {
     protected SyncInspectionCategory(Parcel in) {
         this.groupId = (Integer) in.readValue(Integer.class.getClassLoader());
         this.mBarcode = in.readString();
-        this.mSType = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.mSType = in.readString();
         this.items = new ArrayList<SyncInspectionItem>();
         in.readList(this.items, SyncInspectionItem.class.getClassLoader());
         this.mDesc = in.readParcelable(SyncDescription.class.getClassLoader());
