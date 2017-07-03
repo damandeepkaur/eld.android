@@ -4,7 +4,6 @@ import com.bsmwireless.models.Auth;
 import com.bsmwireless.models.CUDTripInfo;
 import com.bsmwireless.models.Driver;
 import com.bsmwireless.models.DriverLog;
-import com.bsmwireless.models.PairVehicle;
 import com.bsmwireless.models.ELDDriverStatus;
 import com.bsmwireless.models.EmailReport;
 import com.bsmwireless.models.Event;
