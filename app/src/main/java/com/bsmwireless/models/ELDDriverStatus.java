@@ -308,7 +308,7 @@ public class ELDDriverStatus implements Parcelable {
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("ELDDriverStatus{");
-        sb.append("mStatus=").append(mStatus).append('\'');;
+        sb.append("mStatus=").append(mStatus).append('\'');
         sb.append(", mOrigin=").append(mOrigin);
         sb.append(", mEventType=").append(mEventType);
         sb.append(", mEventCode=").append(mEventCode);
@@ -318,16 +318,16 @@ public class ELDDriverStatus implements Parcelable {
         sb.append(", mLat=").append(mLat);
         sb.append(", mLng='").append(mLng);
         sb.append(", mDistance=").append(mDistance);
-        sb.append(", mComment=").append(mComment).append('\'');;
-        sb.append(", mLocation=").append(mLocation).append('\'');;
-        sb.append(", mCheckSum=").append(mCheckSum).append('\'');;
-        sb.append(", mShippingId=").append(mShippingId).append('\'');;
+        sb.append(", mComment=").append(mComment).append('\'');
+        sb.append(", mLocation=").append(mLocation).append('\'');
+        sb.append(", mCheckSum=").append(mCheckSum).append('\'');
+        sb.append(", mShippingId=").append(mShippingId).append('\'');
         sb.append(", mCoDriverId=").append(mCoDriverId);
         sb.append(", mBoxId=").append(mBoxId);
         sb.append(", mVehicleId=").append(mVehicleId);
         sb.append(", mId=").append(mId);
         sb.append(", mTzOffset=").append(mTzOffset);
-        sb.append(", mTimezone=").append(mTimezone).append('\'');;
+        sb.append(", mTimezone=").append(mTimezone).append('\'');
         sb.append(", mMobileTime=").append(mMobileTime);
         sb.append(", mDriverId=").append(mDriverId);
         sb.append(", mMalfunction=").append(mMalfunction);
