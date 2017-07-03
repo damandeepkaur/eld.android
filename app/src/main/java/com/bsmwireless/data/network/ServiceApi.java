@@ -4,6 +4,7 @@ import com.bsmwireless.models.Auth;
 import com.bsmwireless.models.CUDTripInfo;
 import com.bsmwireless.models.Driver;
 import com.bsmwireless.models.DriverLog;
+import com.bsmwireless.models.PairVehicle;
 import com.bsmwireless.models.ELDDriverStatus;
 import com.bsmwireless.models.EmailReport;
 import com.bsmwireless.models.Event;
@@ -303,4 +304,13 @@ public interface ServiceApi {
         //TODO: Check this request with real server and update if necessary
     Observable<ResponseMessage> logout(@Body ELDDriverStatus status);
 
+    /**
+     * Link the driver to the vehicle, fetch unidentified record for update, and carrier's change requests.
+     *
+     * @param boxId id of the box paired with the vehicle.
+     * @return Pair Vehicle Response {@link PairVehicle}
+     */
+    //TODO check this request with real server and update if necessary
+    @POST("v1/login/pair")
+    Observable<List<PairVehicle>> loginPairVehicle(@Header("X-Box") int boxId);
 }
