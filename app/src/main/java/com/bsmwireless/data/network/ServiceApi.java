@@ -312,5 +312,5 @@ public interface ServiceApi {
      */
     //TODO check this request with real server and update if necessary
     @POST("v1/login/pair")
-    Observable<List<PairVehicle>> loginPairVehicle(@Header("X-Box") int boxId);
+    Observable<List<ELDDriverStatus>> loginPairVehicle(@Header("X-Box") int boxId);
 }
