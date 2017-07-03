@@ -10,7 +10,7 @@ import com.bsmwireless.data.network.authenticator.TokenManager;
 import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.data.storage.users.UserConverter;
-import com.bsmwireless.models.LoginRequest;
+import com.bsmwireless.models.LoginData;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -47,7 +47,7 @@ public class LoginUserInteractor {
     }
 
     public Observable<Boolean> loginUser(final String name, final String password, final String domain, boolean keepToken) {
-        LoginRequest request = new LoginRequest();
+        LoginData request = new LoginData();
         request.setUsername(name);
         request.setPassword(password);
         request.setDomain(domain);

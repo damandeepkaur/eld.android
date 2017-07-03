@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-public class LoginRequest {
+public class LoginData {
     @SerializedName("username")
     private String mUsername;
 
@@ -100,7 +100,7 @@ public class LoginRequest {
 
         if (o == null || getClass() != o.getClass()) return false;
 
-        LoginRequest that = (LoginRequest) o;
+        LoginData that = (LoginData) o;
 
         return new EqualsBuilder()
                 .append(mLastUpdated, that.mLastUpdated)
@@ -130,7 +130,7 @@ public class LoginRequest {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("LoginRequest{");
+        final StringBuilder sb = new StringBuilder("LoginData{");
         sb.append("mUsername='").append(mUsername).append('\'');
         sb.append(", mPassword='").append(mPassword).append('\'');
         sb.append(", mDomain='").append(mDomain).append('\'');
