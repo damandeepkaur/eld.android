@@ -311,7 +311,7 @@ public interface ServiceApi {
 
     /**
      *
-     * @param status driver status.
+     * @param status driver status
      * @return
      */
     @POST("/v1/sync/app/logout")
