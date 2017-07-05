@@ -27,28 +27,12 @@ public class RecordsInteractor {
     @Named(Constants.IO_THREAD)
     Scheduler mIoThread;
 
-    @Inject
-    AppDatabase mAppDatabase;
-
-    @Inject
-    HttpClientManager mClientManager;
-
-    @Inject
-    TokenManager mTokenManager;
-
-    @Inject
-    PreferencesManager mPreferencesManager;
-
     public RecordsInteractor() {
         App.getComponent().inject(this);
     }
 
-    public Observable<List<ELDDriverStatus>> syncUnidentifyRecords() {
-        return mServiceApi.syncUnidentifyRecords().subscribeOn(mIoThread);
-    }
-
     public Observable<ResponseMessage> postUnidentifyRecords(List<ELDDriverStatus> records) {
-        return mServiceApi.postUnidentifyRecords(records).subscribeOn(mIoThread);
+        return mServiceApi.updateUnidentifyRecords(records).subscribeOn(mIoThread);
     }
 
     public Observable<List<ELDDriverStatus>> syncUnidentifyRecords(long startTime, long endTime) {

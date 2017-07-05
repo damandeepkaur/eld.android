@@ -59,20 +59,13 @@ public interface ServiceApi {
                                              @Path("isscan") int isScan);
 
     /**
-     * Fetch unidentify records for update.
+     * Update unidentified records or change record request.
      *
-     * @return List of unidentify records {@link ELDDriverStatus}.
-     */
-    @GET("v1/sync/records/unidentified")
-    Observable<List<ELDDriverStatus>> syncUnidentifyRecords();
-
-    /**
-     * Post updated unidentify records.
-     *
+     * @param records records list.
      * @return Response {@link ResponseMessage}.
      */
-    @POST("v1/sync/records/unidentified")
-    Observable<ResponseMessage> postUnidentifyRecords(@Body List<ELDDriverStatus> records);
+    @PUT("v1/sync/records/update")
+    Observable<ResponseMessage> updateUnidentifyRecords(@Body List<ELDDriverStatus> records);
 
     /**
      * Fetch processed driver records.
