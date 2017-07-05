@@ -69,7 +69,6 @@
                 android:hint="@string/login_txthint_username"
                 android:imeOptions="actionNext"
                 android:singleLine="true"
-                android:text="dev12"
                 android:textSize="@dimen/generic_edittext_txtsize"/>
         </android.support.design.widget.TextInputLayout>
 
@@ -88,7 +87,6 @@
                 android:imeOptions="actionNext"
                 android:inputType="textPassword"
                 android:singleLine="true"
-                android:text="1234"
                 android:textSize="@dimen/generic_edittext_txtsize"/>
         </android.support.design.widget.TextInputLayout>
 
@@ -105,7 +103,6 @@
                 android:hint="@string/login_txthint_domain"
                 android:imeOptions="actionDone"
                 android:singleLine="true"
-                android:text="bsm12"
                 android:textSize="@dimen/generic_edittext_txtsize"/>
         </android.support.design.widget.TextInputLayout>
 

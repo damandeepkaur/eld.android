@@ -10,7 +10,10 @@ import com.bsmwireless.data.network.authenticator.TokenManager;
 import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.data.storage.users.UserConverter;
+import com.bsmwireless.models.ELDDriverStatus;
 import com.bsmwireless.models.LoginData;
+
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -73,6 +76,15 @@ public class LoginUserInteractor {
                     }
                 })
                 .map(user -> user != null);
+    }
+
+    public Observable<List<ELDDriverStatus>> loginPair() {
+        int boxId = mPreferencesManager.getSelectedBoxId();
+        if (boxId == PreferencesManager.NOT_FOUND_VALUE) {
+            return Observable.error(new Throwable("Not found selected boxId"));
+        } else {
+            return mServiceApi.loginPairVehicle(boxId).subscribeOn(mIoThread);
+        }
     }
 
     public String getUserName() {

@@ -1,6 +1,7 @@
 package com.bsmwireless.common.dagger;
 
 import com.bsmwireless.domain.interactors.DriverStatusInteractor;
+import com.bsmwireless.domain.interactors.InspectionsInteractor;
 import com.bsmwireless.domain.interactors.LoginUserInteractor;
 import com.bsmwireless.domain.interactors.RecordsInteractor;
 import com.bsmwireless.domain.interactors.VehiclesInteractor;
@@ -34,4 +35,6 @@ public interface AppComponent {
     void inject(HOSGraphView hosGraphView);
 
     void inject(HOSGraphLabelView hosGraphLabelView);
+
+    void inject(InspectionsInteractor inspectionsInteractor);
 }
