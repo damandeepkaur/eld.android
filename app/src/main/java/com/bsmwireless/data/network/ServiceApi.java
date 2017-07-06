@@ -38,7 +38,7 @@ public interface ServiceApi {
     /**
      * Login request Vehicle.
      *
-     * @param request - model with login information
+     * @param request - model with login information.
      * @return User Response {@link User}.
      */
     @POST("v1/login/driver")
@@ -312,4 +312,12 @@ public interface ServiceApi {
     @POST("v1/app/logout")
     Observable<ResponseMessage> logout(@Body ELDDriverStatus status);
 
+    /**
+     * Link the driver to the vehicle, fetch unidentified record for update, and carrier's change requests.
+     *
+     * @param boxId id of the box paired with the vehicle.
+     * @return Pair Vehicle Response {@link ELDDriverStatus}
+     */
+    @POST("v1/login/pair")
+    Observable<List<ELDDriverStatus>> loginPairVehicle(@Header("X-Box") int boxId);
 }
