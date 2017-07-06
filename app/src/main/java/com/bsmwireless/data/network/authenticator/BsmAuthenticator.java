@@ -13,9 +13,11 @@ import com.bsmwireless.screens.login.LoginActivity;
 
 public class BsmAuthenticator extends AbstractAccountAuthenticator {
     public static final String ACCOUNT_NAME = "com.bsmwireless.account.name";
-    public static final String ACCOUNT_TYPE = "com.bsmwireless.account.type";
+    public static final String ACCOUNT_DRIVER = "com.bsmwireless.account.driver";
+    public static final String ACCOUNT_CLUSTER = "com.bsmwireless.account.cluster";
+    public static final String ACCOUNT_ORG = "com.bsmwireless.account.org";
     public static final String ACCOUNT_DOMAIN = "com.bsmwireless.account.domain";
-    public static final String ACCOUNT_ID = "com.bsmwireless.account.id";
+    public static final String ACCOUNT_TYPE = "com.bsmwireless.account.type";
     public static final String TOKEN_TYPE = "Full access";
     public static final String TOKEN_LABEL = "Full access to an BSM Wireless account";
 
@@ -39,10 +41,15 @@ public class BsmAuthenticator extends AbstractAccountAuthenticator {
 
     @Override
     public Bundle getAuthToken(AccountAuthenticatorResponse response, Account account, String authTokenType, Bundle options) throws NetworkErrorException {
+        final Bundle result = new Bundle();
+
+        if (!ACCOUNT_TYPE.equals(authTokenType)) {
+            result.putString(AccountManager.KEY_ERROR_MESSAGE, "invalid auth token type");
+            return result;
+        }
+
         AccountManager accountManager = AccountManager.get(mContext);
         String authToken = accountManager.peekAuthToken(account, authTokenType);
-
-        final Bundle result = new Bundle();
 
         if (authToken != null && !authToken.isEmpty()) {
             result.putString(AccountManager.KEY_ACCOUNT_NAME, account.name);
@@ -58,7 +65,6 @@ public class BsmAuthenticator extends AbstractAccountAuthenticator {
 
         return result;
     }
-
 
     @Override
     public String getAuthTokenLabel(String authTokenType) {

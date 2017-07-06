@@ -6,6 +6,7 @@ public class PreferencesManager {
     private static final String KEY_ACCOUNT_NAME = "account_name";
     private static final String KEY_SELECTED_VEHICLE_ID = "selected_vehicle_id";
     private static final String KEY_SELECTED_BOX_ID = "selected_box_id";
+    private static final String KEY_REMEMBER_USER_ENABLED = "keep_user_enabled";
 
     public static final int NOT_FOUND_VALUE = -1;
 
@@ -15,9 +16,7 @@ public class PreferencesManager {
         mPreferences = preferences;
     }
 
-    public String setAccountName(String name, String domain) {
-        String accountName = name + " : " + domain;
-
+    public String setAccountName(String accountName) {
         SharedPreferences.Editor editor = mPreferences.edit();
         editor.putString(KEY_ACCOUNT_NAME, accountName);
         editor.apply();
@@ -47,5 +46,15 @@ public class PreferencesManager {
 
     public int getSelectedBoxId() {
         return mPreferences.getInt(KEY_SELECTED_BOX_ID, NOT_FOUND_VALUE);
+    }
+
+    public void setRememberUserEnabled(boolean rememberUserEnabled) {
+        SharedPreferences.Editor editor = mPreferences.edit();
+        editor.putBoolean(KEY_REMEMBER_USER_ENABLED, rememberUserEnabled);
+        editor.apply();
+    }
+
+    public boolean isRememberUserEnabled() {
+        return mPreferences.getBoolean(KEY_REMEMBER_USER_ENABLED, false);
     }
 }

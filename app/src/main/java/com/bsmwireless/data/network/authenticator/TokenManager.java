@@ -3,28 +3,36 @@ package com.bsmwireless.data.network.authenticator;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.content.Context;
-import android.os.Bundle;
+import android.os.Build;
+import android.util.Base64;
+
+import com.bsmwireless.models.Auth;
+
+import timber.log.Timber;
 
 public class TokenManager {
-    Context mContext;
+    private Context mContext;
 
     public TokenManager(Context context) {
         mContext = context;
     }
 
-    public void setToken(String accountName, String name, String password, String id, String domain, String token) {
-        Account account = new Account(accountName, BsmAuthenticator.ACCOUNT_TYPE);
-
-        Bundle bundle = new Bundle();
-        bundle.putString(BsmAuthenticator.ACCOUNT_NAME, name);
-        bundle.putString(BsmAuthenticator.ACCOUNT_ID, id);
-        bundle.putString(BsmAuthenticator.ACCOUNT_DOMAIN, domain);
-
-        //TODO: add password if we are going to provide auto re-login
-
+    public void setToken(String accountName, String name, Auth auth) {
         AccountManager accountManager = AccountManager.get(mContext);
-        accountManager.addAccountExplicitly(account, null, bundle);
-        accountManager.setAuthToken(account, BsmAuthenticator.TOKEN_TYPE, token);
+        Account account = getAccount(name);
+
+        if (account == null) {
+            account = new Account(accountName, BsmAuthenticator.ACCOUNT_TYPE);
+
+            accountManager.addAccountExplicitly(account, null, null);
+            accountManager.setAuthToken(account, BsmAuthenticator.TOKEN_TYPE, auth.getToken());
+        }
+
+        accountManager.setUserData(account, BsmAuthenticator.ACCOUNT_NAME, name);
+        accountManager.setUserData(account, BsmAuthenticator.ACCOUNT_DRIVER, String.valueOf(auth.getDriverId()));
+        accountManager.setUserData(account, BsmAuthenticator.ACCOUNT_ORG, String.valueOf(auth.getOrgId()));
+        accountManager.setUserData(account, BsmAuthenticator.ACCOUNT_CLUSTER, auth.getCluster());
+        accountManager.setUserData(account, BsmAuthenticator.ACCOUNT_DOMAIN, auth.getDomain());
     }
 
     public String getName(String accountName) {
@@ -32,14 +40,24 @@ public class TokenManager {
         return account == null ? null : AccountManager.get(mContext).getUserData(account, BsmAuthenticator.ACCOUNT_NAME);
     }
 
-    public String getId(String accountName) {
+    public String getDriver(String accountName) {
         Account account = getAccount(accountName);
-        return account == null ? null : AccountManager.get(mContext).getUserData(account, BsmAuthenticator.ACCOUNT_ID);
+        return account == null ? null : AccountManager.get(mContext).getUserData(account, BsmAuthenticator.ACCOUNT_DRIVER);
     }
 
     public String getDomain(String accountName) {
         Account account = getAccount(accountName);
         return account == null ? null : AccountManager.get(mContext).getUserData(account, BsmAuthenticator.ACCOUNT_DOMAIN);
+    }
+
+    public String getOrg(String accountName) {
+        Account account = getAccount(accountName);
+        return account == null ? null : AccountManager.get(mContext).getUserData(account, BsmAuthenticator.ACCOUNT_ORG);
+    }
+
+    public String getCluster(String accountName) {
+        Account account = getAccount(accountName);
+        return account == null ? null : AccountManager.get(mContext).getUserData(account, BsmAuthenticator.ACCOUNT_CLUSTER);
     }
 
     public String getToken(String accountName) {
@@ -54,6 +72,37 @@ public class TokenManager {
     }
 
     private Account getAccount(String accountName) {
-        return accountName == null ? null : new Account(accountName, BsmAuthenticator.ACCOUNT_TYPE);
+        Account[] accounts = AccountManager.get(mContext).getAccountsByType(BsmAuthenticator.ACCOUNT_TYPE);
+
+        for (Account account : accounts) {
+            if (account.name.equals(accountName)) {
+                return account;
+            }
+        }
+
+        return null;
+    }
+
+    public void removeAccount(String accountName) {
+        Account account = getAccount(accountName);
+        if (account != null) {
+            if (Build.VERSION.SDK_INT < 22) {
+                AccountManager.get(mContext).removeAccount(account, null, null);
+            } else {
+                AccountManager.get(mContext).removeAccountExplicitly(account);
+            }
+        }
+    }
+
+    //TODO: should we use encryption for account name?
+    public String getAccountName(String user, String domain) {
+        String accountName = user + ":" + domain;
+        try {
+            accountName = Base64.encodeToString(accountName.getBytes("UTF-8"), Base64.DEFAULT);
+        } catch (Exception e) {
+            Timber.e(e, "Account name encoding failed");
+        }
+
+        return accountName;
     }
 }

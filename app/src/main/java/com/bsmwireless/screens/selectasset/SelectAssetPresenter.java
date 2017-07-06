@@ -1,32 +1,18 @@
 package com.bsmwireless.screens.selectasset;
 
-import android.util.Log;
-
-import com.bsmwireless.common.App;
-import com.bsmwireless.common.Constants;
 import com.bsmwireless.domain.interactors.InspectionsInteractor;
 import com.bsmwireless.domain.interactors.VehiclesInteractor;
 import com.bsmwireless.models.Vehicle;
-
-import javax.inject.Inject;
-import javax.inject.Named;
 
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
 import timber.log.Timber;
 
 public class SelectAssetPresenter {
-
-    @Inject
-    @Named(Constants.UI_THREAD)
-    Scheduler mUiThread;
-
+    private Scheduler mUiThread;
     private SelectAssetView mView;
-
     private VehiclesInteractor mVehiclesInteractor;
-
     private InspectionsInteractor mInspectionsInteractor;
-
     private CompositeDisposable mDisposables;
 
     public enum SearchProperty {
@@ -48,19 +34,21 @@ public class SelectAssetPresenter {
         }
     }
 
-    public SelectAssetPresenter(SelectAssetView view, VehiclesInteractor interactor) {
-        App.getComponent().inject(this);
+    public SelectAssetPresenter(SelectAssetView view, VehiclesInteractor interactor, Scheduler uiThread) {
         mView = view;
         mVehiclesInteractor = interactor;
         mDisposables = new CompositeDisposable();
+        mUiThread = uiThread;
+
+        Timber.d("CREATED");
     }
 
     public void onSearchTextChanged(SearchProperty searchProperty, String searchText, boolean isScan) {
         if (searchText.isEmpty()) {
             mView.showEmptyList();
         } else {
-            mDisposables.add(mVehiclesInteractor.searchVehicles(searchProperty.getValue(), searchText, isScan).
-                    observeOn(mUiThread)
+            mDisposables.add(mVehiclesInteractor.searchVehicles(searchProperty.getValue(), searchText, isScan)
+                    .observeOn(mUiThread)
                     .subscribe(
                             vehicles -> {
                                 if (vehicles != null && !vehicles.isEmpty()) {

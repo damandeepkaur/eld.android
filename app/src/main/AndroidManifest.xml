@@ -3,6 +3,10 @@
           package="app.bsmuniversal.com">
 
     <uses-permission
+        android:name="android.permission.GET_ACCOUNTS"
+        android:maxSdkVersion="22"/>
+
+    <uses-permission
         android:name="android.permission.MANAGE_ACCOUNTS"
         android:maxSdkVersion="22"/>
 

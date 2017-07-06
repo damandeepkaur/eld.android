@@ -2,9 +2,6 @@ package com.bsmwireless.domain.interactors;
 
 import android.os.Build;
 
-import com.bsmwireless.common.App;
-import com.bsmwireless.common.Constants;
-import com.bsmwireless.data.network.HttpClientManager;
 import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.network.authenticator.TokenManager;
 import com.bsmwireless.data.storage.AppDatabase;
@@ -12,38 +9,24 @@ import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.data.storage.users.UserConverter;
 import com.bsmwireless.models.LoginData;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-
 import app.bsmuniversal.com.BuildConfig;
 import io.reactivex.Observable;
-import io.reactivex.Scheduler;
+import io.reactivex.schedulers.Schedulers;
 
 import static com.bsmwireless.common.Constants.DEVICE_TYPE;
 
 public class LoginUserInteractor {
 
-    @Inject
-    ServiceApi mServiceApi;
+    private ServiceApi mServiceApi;
+    private AppDatabase mAppDatabase;
+    private TokenManager mTokenManager;
+    private PreferencesManager mPreferencesManager;
 
-    @Inject
-    @Named(Constants.IO_THREAD)
-    Scheduler mIoThread;
-
-    @Inject
-    AppDatabase mAppDatabase;
-
-    @Inject
-    HttpClientManager mClientManager;
-
-    @Inject
-    TokenManager mTokenManager;
-
-    @Inject
-    PreferencesManager mPreferencesManager;
-
-    public LoginUserInteractor() {
-        App.getComponent().inject(this);
+    public LoginUserInteractor(ServiceApi serviceApi, PreferencesManager preferencesManager, AppDatabase appDatabase, TokenManager tokenManager) {
+        mServiceApi = serviceApi;
+        mPreferencesManager = preferencesManager;
+        mAppDatabase = appDatabase;
+        mTokenManager = tokenManager;
     }
 
     public Observable<Boolean> loginUser(final String name, final String password, final String domain, boolean keepToken) {
@@ -57,20 +40,16 @@ public class LoginUserInteractor {
         request.setOsVersion(Build.VERSION.RELEASE);
 
         return mServiceApi.loginUser(request)
-                .subscribeOn(mIoThread)
+                .subscribeOn(Schedulers.io())
                 .doOnNext(user -> {
-                    mClientManager.setHeaders(String.valueOf(user.getId()),
-                            String.valueOf(user.getAuth().getOrgId()),
-                            user.getAuth().getCluster(),
-                            user.getAuth().getToken());
+                    String accountName = mTokenManager.getAccountName(name, domain);
 
-                    String accountName = mPreferencesManager.setAccountName(name, domain);
+                    //TODO if !keepToken remove account on exit and clear shared preferences
+                    mPreferencesManager.setAccountName(accountName);
+                    mPreferencesManager.setRememberUserEnabled(keepToken);
 
+                    mTokenManager.setToken(accountName, name, user.getAuth());
                     mAppDatabase.userModel().insertUser(UserConverter.toEntity(accountName, user));
-
-                    if (keepToken) {
-                        mTokenManager.setToken(accountName, name, password, String.valueOf(user.getId()), domain, user.getAuth().getToken());
-                    }
                 })
                 .map(user -> user != null);
     }

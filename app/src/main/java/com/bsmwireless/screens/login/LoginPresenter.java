@@ -8,17 +8,12 @@ import io.reactivex.disposables.Disposable;
 import timber.log.Timber;
 
 public class LoginPresenter {
-
-    Scheduler mUiThread;
-
-    LoginView mView;
-
-    LoginUserInteractor mLoginUserInteractor;
-
-    CompositeDisposable mDisposables;
+    private Scheduler mUiThread;
+    private LoginView mView;
+    private LoginUserInteractor mLoginUserInteractor;
+    private CompositeDisposable mDisposables;
 
     public LoginPresenter(LoginView view, LoginUserInteractor interactor, Scheduler uiThread) {
-
         mView = view;
         mLoginUserInteractor = interactor;
         mDisposables = new CompositeDisposable();
@@ -52,7 +47,7 @@ public class LoginPresenter {
         mView.setLoginButtonEnabled(false);
 
         Disposable disposable = mLoginUserInteractor.loginUser(username, password, domain, keepToken)
-                          .observeOn(mUiThread)
+                .observeOn(mUiThread)
                 .subscribe(
                         status -> {
                             Timber.i("LoginUser status = %b", status);

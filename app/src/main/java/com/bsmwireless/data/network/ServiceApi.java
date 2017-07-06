@@ -295,12 +295,21 @@ public interface ServiceApi {
     //TODO: Check this request with real server and update if necessary
     Observable<RegistryInformation> registry(@Body Registry registry);
 
-    @POST("/v1/sync/app/newtoken")
-        //TODO: Check this request with real server and update if necessary
+    /**
+     * Request to update current token
+     *
+     * @return Auth data {@link Auth}
+     */
+    @POST("v1/app/newtoken")
     Observable<Auth> refreshToken();
 
-    @POST("/v1/sync/app/logout")
-        //TODO: Check this request with real server and update if necessary
+    /**
+     * User logout
+     *
+     * @param status
+     * @return Logout response {@link ResponseMessage}
+     */
+    @POST("v1/app/logout")
     Observable<ResponseMessage> logout(@Body ELDDriverStatus status);
 
 }
