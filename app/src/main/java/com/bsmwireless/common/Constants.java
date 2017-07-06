@@ -8,6 +8,6 @@ public interface Constants {
     String UI_THREAD = "UI_THREAD";
     String IO_THREAD = "IO_THREAD";
 
-    String BASE_URL = "https://devsd.bsmtechnologies.com:8443/sdmobile/rest/";
+    String BASE_URL = "https://devsd.bsmtechnologies.com/sdmobile/rest/";
     String DEVICE_TYPE = "Android";
 }
