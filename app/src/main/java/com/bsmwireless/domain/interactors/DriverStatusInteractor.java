@@ -7,6 +7,8 @@ import com.bsmwireless.models.ResponseMessage;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
 
@@ -15,6 +17,7 @@ public class DriverStatusInteractor {
     private ServiceApi mServiceApi;
     private PreferencesManager mPreferencesManager;
 
+    @Inject
     public DriverStatusInteractor(ServiceApi serviceApi, PreferencesManager preferencesManager) {
         mServiceApi = serviceApi;
         mPreferencesManager = preferencesManager;

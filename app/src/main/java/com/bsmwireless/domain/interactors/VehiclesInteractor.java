@@ -8,6 +8,8 @@ import com.bsmwireless.models.Vehicle;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
@@ -19,6 +21,7 @@ public class VehiclesInteractor {
     private AppDatabase mAppDatabase;
     private PreferencesManager mPreferencesManager;
 
+    @Inject
     public VehiclesInteractor(ServiceApi serviceApi, PreferencesManager preferencesManager, AppDatabase appDatabase) {
         mServiceApi = serviceApi;
         mPreferencesManager = preferencesManager;

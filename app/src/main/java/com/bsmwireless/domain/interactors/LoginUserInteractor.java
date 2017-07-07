@@ -12,6 +12,8 @@ import com.bsmwireless.models.LoginData;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import app.bsmuniversal.com.BuildConfig;
 import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
@@ -25,6 +27,7 @@ public class LoginUserInteractor {
     private TokenManager mTokenManager;
     private PreferencesManager mPreferencesManager;
 
+    @Inject
     public LoginUserInteractor(ServiceApi serviceApi, PreferencesManager preferencesManager, AppDatabase appDatabase, TokenManager tokenManager) {
         mServiceApi = serviceApi;
         mPreferencesManager = preferencesManager;

@@ -1,15 +1,18 @@
 package com.bsmwireless.screens.selectasset;
 
+import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.domain.interactors.InspectionsInteractor;
 import com.bsmwireless.domain.interactors.VehiclesInteractor;
 import com.bsmwireless.models.Vehicle;
 
-import io.reactivex.Scheduler;
+import javax.inject.Inject;
+
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import timber.log.Timber;
 
+@ActivityScope
 public class SelectAssetPresenter {
-    private Scheduler mUiThread;
     private SelectAssetView mView;
     private VehiclesInteractor mVehiclesInteractor;
     private InspectionsInteractor mInspectionsInteractor;
@@ -34,11 +37,11 @@ public class SelectAssetPresenter {
         }
     }
 
-    public SelectAssetPresenter(SelectAssetView view, VehiclesInteractor interactor, Scheduler uiThread) {
+    @Inject
+    public SelectAssetPresenter(SelectAssetView view, VehiclesInteractor interactor) {
         mView = view;
         mVehiclesInteractor = interactor;
         mDisposables = new CompositeDisposable();
-        mUiThread = uiThread;
 
         Timber.d("CREATED");
     }
@@ -48,7 +51,7 @@ public class SelectAssetPresenter {
             mView.showEmptyList();
         } else {
             mDisposables.add(mVehiclesInteractor.searchVehicles(searchProperty.getValue(), searchText, isScan)
-                    .observeOn(mUiThread)
+                    .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
                             vehicles -> {
                                 if (vehicles != null && !vehicles.isEmpty()) {
@@ -68,19 +71,21 @@ public class SelectAssetPresenter {
 
     public void onNotInVehicleButtonClicked() {
         mDisposables.add(mVehiclesInteractor.cleanSelectedVehicle()
-                .observeOn(mUiThread)
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(() -> mView.goToMainScreen(),
                         Timber::e));
     }
 
     public void onVehicleListItemClicked(Vehicle vehicle) {
         mDisposables.add(mVehiclesInteractor.saveSelectedVehicle(vehicle)
-                .observeOn(mUiThread)
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(() -> mView.goToMainScreen(),
                         Timber::e));
     }
 
     public void onDestroy() {
         mDisposables.dispose();
+
+        Timber.d("DESTROYED");
     }
 }

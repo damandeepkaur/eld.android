@@ -7,6 +7,8 @@ import com.bsmwireless.models.SyncInspectionCategory;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
 
@@ -15,6 +17,7 @@ public class InspectionsInteractor {
     private ServiceApi mServiceApi;
     private PreferencesManager mPreferencesManager;
 
+    @Inject
     public InspectionsInteractor(ServiceApi serviceApi, PreferencesManager preferencesManager) {
         mServiceApi = serviceApi;
         mPreferencesManager = preferencesManager;
