@@ -59,6 +59,25 @@ public interface ServiceApi {
                                              @Path("isscan") int isScan);
 
     /**
+     * Update unidentified records or change record request.
+     *
+     * @param records records list.
+     * @return Response {@link ResponseMessage}.
+     */
+    @PUT("v1/sync/records/update")
+    Observable<ResponseMessage> updateUnidentifyRecords(@Body List<ELDDriverStatus> records);
+
+    /**
+     * Fetch processed driver records.
+     *
+     * @param startTime start time.
+     * @param endTime end time.
+     * @return List of unidentify records {@link ELDDriverStatus}.
+     */
+    @GET("v1/sync/records/search/{start}/{end}")
+    Observable<List<ELDDriverStatus>> syncUnidentifyRecords(@Path("start") long startTime, @Path("end") long endTime);
+
+    /**
      * Get Vehicle by boxId.
      *
      * @param boxId id of the box paired with the vehicle.
@@ -289,7 +308,7 @@ public interface ServiceApi {
      * This service doesn’t require session token.
      *
      * @param registry registry information.
-     * @return Registry ResponseMessage {@link RegistryInformation}.
+     * @return Registry Response {@link RegistryInformation}.
      */
     @POST("/registry/v1/sd")
     //TODO: Check this request with real server and update if necessary
