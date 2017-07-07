@@ -10,6 +10,7 @@ import io.reactivex.Scheduler;
 import io.reactivex.android.plugins.RxAndroidPlugins;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.Function;
+import io.reactivex.plugins.RxJavaPlugins;
 import io.reactivex.schedulers.Schedulers;
 
 public class RxSchedulerRule implements TestRule {
@@ -19,13 +20,27 @@ public class RxSchedulerRule implements TestRule {
         return new Statement() {
             @Override
             public void evaluate() throws Throwable {
-                // Override the default AndroidSchedulers.mainThread() Scheduler
-                RxAndroidPlugins.setInitMainThreadSchedulerHandler(new Function<Callable<Scheduler>, Scheduler>() {
+                // Override the default AndroidSchedulers.mainThread() scheduler
+                Function<Callable<Scheduler>, Scheduler> testAndroidHandler = new Function<Callable<Scheduler>, Scheduler>() {
                     @Override
                     public Scheduler apply(@NonNull Callable<Scheduler> schedulerCallable) throws Exception {
                         return Schedulers.trampoline();
                     }
-                });
+                };
+
+                // Override the default java schedulers
+                Function<Scheduler, Scheduler> testJavaHandler = new Function<Scheduler, Scheduler>() {
+                    @Override
+                    public Scheduler apply(@NonNull Scheduler scheduler) throws Exception {
+                        return Schedulers.trampoline();
+                    }
+                };
+
+                RxAndroidPlugins.setInitMainThreadSchedulerHandler(testAndroidHandler);
+
+                RxJavaPlugins.setIoSchedulerHandler(testJavaHandler);
+                RxJavaPlugins.setNewThreadSchedulerHandler(testJavaHandler);
+                RxJavaPlugins.setComputationSchedulerHandler(testJavaHandler);
 
                 try {
                     base.evaluate();
