@@ -46,6 +46,7 @@ public class RxSchedulerRule implements TestRule {
                     base.evaluate();
                 } finally {
                     RxAndroidPlugins.reset();
+                    RxJavaPlugins.reset();
                 }
             }
         };
