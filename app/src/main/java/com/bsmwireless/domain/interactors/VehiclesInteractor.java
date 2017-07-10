@@ -28,8 +28,8 @@ public class VehiclesInteractor {
         mAppDatabase = appDatabase;
     }
 
-    public Observable<List<Vehicle>> searchVehicles(int selectedProperty, String searchText, boolean isScan) {
-        return mServiceApi.searchVehicles(selectedProperty, searchText, isScan ? 1 : 0).subscribeOn(Schedulers.io());
+    public Observable<List<Vehicle>> searchVehicles(String searchText) {
+        return mServiceApi.searchVehicles(searchText).subscribeOn(Schedulers.io());
     }
 
     public Completable saveSelectedVehicle(Vehicle vehicle) {

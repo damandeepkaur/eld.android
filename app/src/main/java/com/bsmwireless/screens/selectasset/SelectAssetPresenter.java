@@ -18,25 +18,6 @@ public class SelectAssetPresenter {
     private InspectionsInteractor mInspectionsInteractor;
     private CompositeDisposable mDisposables;
 
-    public enum SearchProperty {
-        SAP(0),
-        LEGACY(1),
-        SERIAL(2),
-        DESCRIPTION(3),
-        LICENSE_PLATE(4),
-        BOX_ID(5);
-
-        private final int mValue;
-
-        SearchProperty(int value) {
-            mValue = value;
-        }
-
-        public int getValue() {
-            return mValue;
-        }
-    }
-
     @Inject
     public SelectAssetPresenter(SelectAssetView view, VehiclesInteractor interactor) {
         mView = view;
@@ -46,11 +27,11 @@ public class SelectAssetPresenter {
         Timber.d("CREATED");
     }
 
-    public void onSearchTextChanged(SearchProperty searchProperty, String searchText, boolean isScan) {
+    public void onSearchTextChanged(String searchText) {
         if (searchText.isEmpty()) {
             mView.showEmptyList();
         } else {
-            mDisposables.add(mVehiclesInteractor.searchVehicles(searchProperty.getValue(), searchText, isScan)
+            mDisposables.add(mVehiclesInteractor.searchVehicles(searchText)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
                             vehicles -> {
