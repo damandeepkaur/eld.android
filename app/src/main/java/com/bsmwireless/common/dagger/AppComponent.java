@@ -1,40 +1,31 @@
 package com.bsmwireless.common.dagger;
 
-import com.bsmwireless.domain.interactors.DriverStatusInteractor;
-import com.bsmwireless.domain.interactors.InspectionsInteractor;
-import com.bsmwireless.domain.interactors.LoginUserInteractor;
-import com.bsmwireless.domain.interactors.RecordsInteractor;
-import com.bsmwireless.domain.interactors.VehiclesInteractor;
-import com.bsmwireless.screens.login.LoginPresenter;
-import com.bsmwireless.screens.selectasset.SelectAssetPresenter;
+import com.bsmwireless.data.network.ServiceApi;
+import com.bsmwireless.data.network.authenticator.TokenManager;
+import com.bsmwireless.data.storage.AppDatabase;
+import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.widgets.common.FontTextView;
-import com.bsmwireless.widgets.graphview.HOSGraphView;
 import com.bsmwireless.widgets.graphview.HOSGraphLabelView;
+import com.bsmwireless.widgets.graphview.HOSGraphView;
 
 import javax.inject.Singleton;
 
 import dagger.Component;
 
 @Singleton
-@Component(modules = {ThreadsModule.class, ContextModule.class, NetworkModule.class, DatabaseModule.class, TokenModule.class, PreferencesModule.class, CacheModule.class})
+@Component(modules = {ContextModule.class, NetworkModule.class, DatabaseModule.class, TokenModule.class, PreferencesModule.class, CacheModule.class})
 public interface AppComponent {
-    void inject(LoginPresenter loginPresenter);
+    ServiceApi serviceApi();
 
-    void inject(LoginUserInteractor loginUserInteractor);
+    AppDatabase appDatabase();
 
-    void inject(SelectAssetPresenter selectAssetPresenter);
+    TokenManager tokenManager();
 
-    void inject(VehiclesInteractor vehiclesInteractor);
+    PreferencesManager prefsManager();
 
     void inject(FontTextView fontTextView);
-
-    void inject(DriverStatusInteractor driverStatusInteractor);
-
-    void inject(RecordsInteractor recordsInteractor);
 
     void inject(HOSGraphView hosGraphView);
 
     void inject(HOSGraphLabelView hosGraphLabelView);
-
-    void inject(InspectionsInteractor inspectionsInteractor);
 }

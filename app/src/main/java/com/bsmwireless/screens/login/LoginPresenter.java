@@ -1,28 +1,26 @@
 package com.bsmwireless.screens.login;
 
+import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.domain.interactors.LoginUserInteractor;
 
-import io.reactivex.Scheduler;
+import javax.inject.Inject;
+
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import timber.log.Timber;
 
+@ActivityScope
 public class LoginPresenter {
+    private LoginView mView;
+    private LoginUserInteractor mLoginUserInteractor;
+    private CompositeDisposable mDisposables;
 
-    Scheduler mUiThread;
-
-    LoginView mView;
-
-    LoginUserInteractor mLoginUserInteractor;
-
-    CompositeDisposable mDisposables;
-
-    public LoginPresenter(LoginView view, LoginUserInteractor interactor, Scheduler uiThread) {
-
+    @Inject
+    public LoginPresenter(LoginView view, LoginUserInteractor interactor) {
         mView = view;
         mLoginUserInteractor = interactor;
         mDisposables = new CompositeDisposable();
-        mUiThread = uiThread;
 
         Timber.d("CREATED");
     }
@@ -52,7 +50,7 @@ public class LoginPresenter {
         mView.setLoginButtonEnabled(false);
 
         Disposable disposable = mLoginUserInteractor.loginUser(username, password, domain, keepToken)
-                          .observeOn(mUiThread)
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         status -> {
                             Timber.i("LoginUser status = %b", status);
@@ -75,6 +73,7 @@ public class LoginPresenter {
 
     public void onDestroy() {
         mDisposables.dispose();
+
         Timber.d("DESTROYED");
     }
 

@@ -6,14 +6,15 @@ import com.bsmwireless.screens.login.LoginPresenter;
 import com.bsmwireless.screens.login.LoginView;
 
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import app.bsmuniversal.com.RxSchedulerRule;
 import io.reactivex.Observable;
-import io.reactivex.schedulers.Schedulers;
 
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
@@ -23,6 +24,9 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class LoginPresenterTest {
+
+    @ClassRule
+    public static final RxSchedulerRule RULE = new RxSchedulerRule();
 
     private static final String USERNAME = "username";
     private static final String PASSWORD = "password";
@@ -39,7 +43,7 @@ public class LoginPresenterTest {
     @Before
     public void before() throws Exception {
         MockitoAnnotations.initMocks(this);
-        mLoginPresenter = new LoginPresenter(mView, mLoginUserInteractor, Schedulers.trampoline());
+        mLoginPresenter = new LoginPresenter(mView, mLoginUserInteractor);
     }
 
 

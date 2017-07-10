@@ -1,11 +1,12 @@
 package com.bsmwireless.common.dagger;
 
-import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.bsmwireless.common.Constants;
 import com.bsmwireless.data.network.HttpClientManager;
 import com.bsmwireless.data.network.ServiceApi;
+import com.bsmwireless.data.network.authenticator.TokenManager;
+import com.bsmwireless.data.storage.PreferencesManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,7 +18,6 @@ import app.bsmuniversal.com.BuildConfig;
 
 import dagger.Module;
 import dagger.Provides;
-import okhttp3.Cache;
 import okhttp3.Cookie;
 import okhttp3.CookieJar;
 import okhttp3.HttpUrl;
@@ -26,8 +26,6 @@ import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-
-import static com.bsmwireless.common.Constants.CACHE_SIZE;
 import static okhttp3.logging.HttpLoggingInterceptor.Level.BODY;
 import static okhttp3.logging.HttpLoggingInterceptor.Level.NONE;
 
@@ -62,8 +60,8 @@ public class NetworkModule {
 
     @Singleton
     @Provides
-    HttpClientManager provideHttpClientManager(HttpLoggingInterceptor logger, Cache cache, CookieJar cookieJar) {
-        return new HttpClientManager(logger, cache, cookieJar);
+    HttpClientManager provideHttpClientManager(HttpLoggingInterceptor logger, TokenManager tokenManager, PreferencesManager preferencesManager, CookieJar cookieJar) {
+        return new HttpClientManager(logger, tokenManager, preferencesManager, cookieJar);
     }
 
     @Provides

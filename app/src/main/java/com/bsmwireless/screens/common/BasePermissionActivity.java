@@ -30,6 +30,7 @@ public abstract class BasePermissionActivity extends BaseActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_PERMISSION) {
             if (hasAllPermissions(getDesiredPermissions())) {
                 onPermissionGranted();
