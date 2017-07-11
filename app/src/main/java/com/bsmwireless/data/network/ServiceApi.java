@@ -73,15 +73,6 @@ public interface ServiceApi {
     Observable<List<ELDDriverStatus>> syncUnidentifyRecords(@Path("start") long startTime, @Path("end") long endTime);
 
     /**
-     * Get Vehicle by boxId.
-     *
-     * @param boxId id of the box paired with the vehicle.
-     * @return Vehicle Attributes Response {@link Vehicle}.
-     */
-    @GET("v1/app/vehicles/{boxId}")
-    Observable<Vehicle> getVehicleByBoxId(@Path("boxId") Integer boxId);
-
-    /**
      * Inspection Categories from category Ids
      *
      * @param boxId       id of the box paired with the vehicle.

@@ -12,7 +12,6 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.bsmwireless.common.App;
@@ -39,8 +38,6 @@ import butterknife.Unbinder;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import timber.log.Timber;
 
-import static android.view.View.GONE;
-import static android.view.View.VISIBLE;
 import static com.bsmwireless.screens.barcode.BarcodeScannerActivity.BARCODE_TYPE;
 import static com.bsmwireless.screens.barcode.BarcodeScannerActivity.BARCODE_UUID;
 
