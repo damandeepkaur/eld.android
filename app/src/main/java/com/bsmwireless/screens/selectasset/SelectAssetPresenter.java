@@ -28,8 +28,9 @@ public class SelectAssetPresenter {
     }
 
     public void onSearchTextChanged(String searchText) {
-        if (searchText.isEmpty()) {
+        if (searchText.isEmpty() || searchText.length() < 3) {
             mView.showEmptyList();
+            mView.showErrorMessage();
         } else {
             mDisposables.add(mVehiclesInteractor.searchVehicles(searchText)
                     .observeOn(AndroidSchedulers.mainThread())

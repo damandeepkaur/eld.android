@@ -17,6 +17,7 @@ import android.widget.Toast;
 import com.bsmwireless.common.App;
 import com.bsmwireless.models.Vehicle;
 import com.bsmwireless.screens.barcode.BarcodeScannerActivity;
+import com.bsmwireless.screens.common.BaseActivity;
 import com.bsmwireless.screens.help.HelpActivity;
 import com.bsmwireless.screens.selectasset.dagger.DaggerSelectAssetComponent;
 import com.bsmwireless.screens.selectasset.dagger.SelectAssetModule;
@@ -41,7 +42,7 @@ import timber.log.Timber;
 import static com.bsmwireless.screens.barcode.BarcodeScannerActivity.BARCODE_TYPE;
 import static com.bsmwireless.screens.barcode.BarcodeScannerActivity.BARCODE_UUID;
 
-public class SelectAssetActivity extends AppCompatActivity implements SelectAssetView {
+public class SelectAssetActivity extends BaseActivity implements SelectAssetView {
 
     private static final int BARCODE_REQUEST_CODE = 101;
     private static final int DEBOUNCE_TIMEOUT = 500;
@@ -186,5 +187,10 @@ public class SelectAssetActivity extends AppCompatActivity implements SelectAsse
     @Override
     public void goToMainScreen() {
         Toast.makeText(this, "Go to main screen", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showErrorMessage() {
+        Toast.makeText(this, "Search keyword must contain minimum 3 characters", Toast.LENGTH_LONG).show();
     }
 }
