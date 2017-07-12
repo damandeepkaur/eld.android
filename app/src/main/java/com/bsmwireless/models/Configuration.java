@@ -8,7 +8,7 @@ import com.google.gson.annotations.SerializedName;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-public class SyncConfiguration implements Parcelable {
+public class Configuration implements Parcelable {
     @SerializedName("name")
     private String mName;
 
@@ -26,23 +26,23 @@ public class SyncConfiguration implements Parcelable {
         dest.writeString(this.mValue);
     }
 
-    public SyncConfiguration() {
+    public Configuration() {
     }
 
-    protected SyncConfiguration(Parcel in) {
+    protected Configuration(Parcel in) {
         this.mName = in.readString();
         this.mValue = in.readString();
     }
 
-    public static final Parcelable.Creator<SyncConfiguration> CREATOR = new Parcelable.Creator<SyncConfiguration>() {
+    public static final Parcelable.Creator<Configuration> CREATOR = new Parcelable.Creator<Configuration>() {
         @Override
-        public SyncConfiguration createFromParcel(Parcel source) {
-            return new SyncConfiguration(source);
+        public Configuration createFromParcel(Parcel source) {
+            return new Configuration(source);
         }
 
         @Override
-        public SyncConfiguration[] newArray(int size) {
-            return new SyncConfiguration[size];
+        public Configuration[] newArray(int size) {
+            return new Configuration[size];
         }
     };
 
@@ -68,7 +68,7 @@ public class SyncConfiguration implements Parcelable {
 
         if (o == null || getClass() != o.getClass()) return false;
 
-        SyncConfiguration setting = (SyncConfiguration) o;
+        Configuration setting = (Configuration) o;
 
         return new EqualsBuilder()
                 .append(mName, setting.mName)
@@ -86,7 +86,7 @@ public class SyncConfiguration implements Parcelable {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("SyncConfiguration{");
+        final StringBuilder sb = new StringBuilder("Configuration{");
         sb.append("mName='").append(mName).append('\'');
         sb.append(", mValue='").append(mValue).append('\'');
         sb.append('}');

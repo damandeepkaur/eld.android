@@ -1,6 +1,7 @@
 package com.bsmwireless.data.storage.eldevents;
 
 import android.arch.persistence.room.Dao;
+import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
 
@@ -16,7 +17,7 @@ import static android.arch.persistence.room.OnConflictStrategy.REPLACE;
 @Dao
 public interface ELDEventDao {
     @Query("SELECT * FROM events")
-    List<ELDEventEntity> getEvents();
+    List<ELDEventEntity> getAll();
 
     @Query("SELECT * FROM events WHERE isSync = 0")
     Flowable<List<ELDEventEntity>> getUnsyncEvents();
@@ -27,8 +28,8 @@ public interface ELDEventDao {
     @Query("SELECT * FROM events WHERE id = :id")
     Flowable<ELDEventEntity> getEventById(int id);
 
-    @Query("DELETE FROM events WHERE id = :id")
-    int deleteEventById(int id);
+    @Delete
+    void delete(ELDEventEntity user);
 
     @Insert(onConflict = REPLACE)
     long insertEvent(ELDEventEntity event);

@@ -10,7 +10,7 @@ import com.bsmwireless.models.Event;
 import com.bsmwireless.models.HOSAlert;
 import com.bsmwireless.models.InspectionReport;
 import com.bsmwireless.models.Location;
-import com.bsmwireless.models.LoginData;
+import com.bsmwireless.models.LoginModel;
 import com.bsmwireless.models.NewRule;
 import com.bsmwireless.models.Registry;
 import com.bsmwireless.models.RegistryInformation;
@@ -144,7 +144,7 @@ public interface ServiceApi {
      * @return User Response {@link User}.
      */
     @POST("v1/login/driver")
-    Observable<User> loginUser(@Body LoginData request);
+    Observable<User> loginUser(@Body LoginModel request);
 
     /**
      * Search Vehicle.

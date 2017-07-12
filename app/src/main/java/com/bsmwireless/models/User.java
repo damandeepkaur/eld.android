@@ -49,7 +49,7 @@ public class User implements Parcelable {
     private String mOrganization;
     @SerializedName("configuration")
     @Expose
-    private List<SyncConfiguration> mConfigurations;
+    private List<Configuration> mConfigurations;
     @SerializedName("syncTime")
     @Expose
     private Long mSyncTime;
@@ -175,11 +175,11 @@ public class User implements Parcelable {
         mOrganization = organization;
     }
 
-    public List<SyncConfiguration> getConfigurations() {
+    public List<Configuration> getConfigurations() {
         return mConfigurations;
     }
 
-    public void setConfigurations(List<SyncConfiguration> configurations) {
+    public void setConfigurations(List<Configuration> configurations) {
         mConfigurations = configurations;
     }
 
@@ -424,7 +424,7 @@ public class User implements Parcelable {
         this.mSignature = in.readString();
         this.mUpdated = (Boolean) in.readValue(Boolean.class.getClassLoader());
         this.mOrganization = in.readString();
-        this.mConfigurations = in.createTypedArrayList(SyncConfiguration.CREATOR);
+        this.mConfigurations = in.createTypedArrayList(Configuration.CREATOR);
         this.mSyncTime = (Long) in.readValue(Long.class.getClassLoader());
         this.mAuth = in.readParcelable(Auth.class.getClassLoader());
         this.mIsSupervisor = (Boolean) in.readValue(Boolean.class.getClassLoader());

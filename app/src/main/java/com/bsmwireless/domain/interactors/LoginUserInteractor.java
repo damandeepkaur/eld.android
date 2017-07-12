@@ -1,24 +1,19 @@
 package com.bsmwireless.domain.interactors;
 
-import android.os.Build;
-
 import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.network.authenticator.TokenManager;
 import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.data.storage.users.UserConverter;
 import com.bsmwireless.models.ELDEvent;
-import com.bsmwireless.models.LoginData;
+import com.bsmwireless.models.LoginModel;
 
 import java.util.List;
 
 import javax.inject.Inject;
 
-import app.bsmuniversal.com.BuildConfig;
 import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
-
-import static com.bsmwireless.common.Constants.DEVICE_TYPE;
 
 public class LoginUserInteractor {
 
@@ -36,7 +31,7 @@ public class LoginUserInteractor {
     }
 
     public Observable<Boolean> loginUser(final String name, final String password, final String domain, boolean keepToken) {
-        LoginData request = new LoginData();
+        LoginModel request = new LoginModel();
         request.setUsername(name);
         request.setPassword(password);
         request.setDomain(domain);
