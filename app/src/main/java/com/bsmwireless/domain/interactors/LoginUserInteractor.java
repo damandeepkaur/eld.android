@@ -41,9 +41,6 @@ public class LoginUserInteractor {
         request.setPassword(password);
         request.setDomain(domain);
         request.setDriverType(0);
-        request.setAppVersion(BuildConfig.VERSION_NAME);
-        request.setDeviceType(DEVICE_TYPE);
-        request.setOsVersion(Build.VERSION.RELEASE);
 
         return mServiceApi.loginUser(request)
                 .subscribeOn(Schedulers.io())

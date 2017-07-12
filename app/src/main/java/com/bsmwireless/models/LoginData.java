@@ -1,5 +1,6 @@
 package com.bsmwireless.models;
 
+import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -21,14 +22,12 @@ public class LoginData {
     @SerializedName("lastUpdated")
     private long mLastUpdated;
 
-    @SerializedName("appVersion")
-    private String mAppVersion;
+    @SerializedName("appInfo")
+    private String mAppInfo;
 
-    @SerializedName("deviceType")
-    private String mDeviceType;
-
-    @SerializedName("osVersion")
-    private String mOsVersion;
+    public LoginData() {
+        mAppInfo = new Gson().toJson(new AppInfo());
+    }
 
     public String getUsername() {
         return mUsername;
@@ -70,47 +69,21 @@ public class LoginData {
         mLastUpdated = lastUpdated;
     }
 
-    public String getAppVersion() {
-        return mAppVersion;
-    }
-
-    public void setAppVersion(String appVersion) {
-        mAppVersion = appVersion;
-    }
-
-    public String getDeviceType() {
-        return mDeviceType;
-    }
-
-    public void setDeviceType(String deviceType) {
-        mDeviceType = deviceType;
-    }
-
-    public String getOsVersion() {
-        return mOsVersion;
-    }
-
-    public void setOsVersion(String osVersion) {
-        mOsVersion = osVersion;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
 
         if (o == null || getClass() != o.getClass()) return false;
 
-        LoginData that = (LoginData) o;
+        LoginData loginData = (LoginData) o;
 
         return new EqualsBuilder()
-                .append(mLastUpdated, that.mLastUpdated)
-                .append(mUsername, that.mUsername)
-                .append(mPassword, that.mPassword)
-                .append(mDomain, that.mDomain)
-                .append(mDriverType, that.mDriverType)
-                .append(mAppVersion, that.mAppVersion)
-                .append(mDeviceType, that.mDeviceType)
-                .append(mOsVersion, that.mOsVersion)
+                .append(mLastUpdated, loginData.mLastUpdated)
+                .append(mUsername, loginData.mUsername)
+                .append(mPassword, loginData.mPassword)
+                .append(mDomain, loginData.mDomain)
+                .append(mDriverType, loginData.mDriverType)
+                .append(mAppInfo, loginData.mAppInfo)
                 .isEquals();
     }
 
@@ -122,9 +95,7 @@ public class LoginData {
                 .append(mDomain)
                 .append(mDriverType)
                 .append(mLastUpdated)
-                .append(mAppVersion)
-                .append(mDeviceType)
-                .append(mOsVersion)
+                .append(mAppInfo)
                 .toHashCode();
     }
 
@@ -136,9 +107,7 @@ public class LoginData {
         sb.append(", mDomain='").append(mDomain).append('\'');
         sb.append(", mDriverType=").append(mDriverType);
         sb.append(", mLastUpdated=").append(mLastUpdated);
-        sb.append(", mAppVersion='").append(mAppVersion).append('\'');
-        sb.append(", mDeviceType='").append(mDeviceType).append('\'');
-        sb.append(", mOsVersion='").append(mOsVersion).append('\'');
+        sb.append(", mAppInfo=").append(mAppInfo);
         sb.append('}');
         return sb.toString();
     }
