@@ -47,16 +47,11 @@ public interface ServiceApi {
     /**
      * Search Vehicle.
      *
-     * @param field   search field enum: 0 - SAP, 1 - legacy number, 2 - equip number,
-     *                3 - description, 4 - license plate, 5 - boxId
      * @param keyword search keyword.
-     * @param isScan  enum: 0 - search vehicle, 1 - scan vehicle
      * @return Vehicle Attributes Response {@link Vehicle}.
      */
-    @GET("v1/app/vehicles/{field}/{keyword}/{isscan}")
-    Observable<List<Vehicle>> searchVehicles(@Path("field") int field,
-                                             @Path("keyword") String keyword,
-                                             @Path("isscan") int isScan);
+    @GET("v1/app/vehicles/search/{keyword}")
+    Observable<List<Vehicle>> searchVehicles(@Path("keyword") String keyword);
 
     /**
      * Update unidentified records or change record request.
@@ -76,15 +71,6 @@ public interface ServiceApi {
      */
     @GET("v1/sync/records/search/{start}/{end}")
     Observable<List<ELDDriverStatus>> syncUnidentifyRecords(@Path("start") long startTime, @Path("end") long endTime);
-
-    /**
-     * Get Vehicle by boxId.
-     *
-     * @param boxId id of the box paired with the vehicle.
-     * @return Vehicle Attributes Response {@link Vehicle}.
-     */
-    @GET("v1/app/vehicles/{boxId}")
-    Observable<Vehicle> getVehicleByBoxId(@Path("boxId") Integer boxId);
 
     /**
      * Inspection Categories from category Ids

@@ -12,4 +12,5 @@ public interface SelectAssetView {
 
     void goToMainScreen();
 
+    void showErrorMessage();
 }
