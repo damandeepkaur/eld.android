@@ -1,10 +1,8 @@
 package com.bsmwireless.domain.interactors;
 
 import android.accounts.NetworkErrorException;
-import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 
+import com.bsmwireless.common.utils.NetworkUtils;
 import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.PreferencesManager;
@@ -25,23 +23,21 @@ public class ELDEventsInteractor {
     private ServiceApi mServiceApi;
     private PreferencesManager mPreferencesManager;
     private ELDEventDao mELDEventDao;
-    private Context mContext;
 
     @Inject
-    public ELDEventsInteractor(ServiceApi serviceApi, PreferencesManager preferencesManager, AppDatabase appDatabase, Context context) {
+    public ELDEventsInteractor(ServiceApi serviceApi, PreferencesManager preferencesManager, AppDatabase appDatabase) {
         mServiceApi = serviceApi;
         mPreferencesManager = preferencesManager;
-        mELDEventDao = appDatabase.getELDEventDao();
-        mContext = context;
+        mELDEventDao = appDatabase.ELDEventDao();
     }
 
     public Observable<ResponseMessage> updateELDEvents(List<ELDEvent> events) {
-        if (isOnlineMode()) {
+        if (NetworkUtils.isOnlineMode()) {
             return mServiceApi.updateELDEvents(events)
                     .subscribeOn(Schedulers.io())
-                    .doOnError(throwable -> events.forEach(event -> storeEvent(event, false)));
+                    .doOnError(throwable -> storeEvents(events, false));
         } else {
-            events.forEach(event -> storeEvent(event, false));
+            storeEvents(events, false);
             return Observable.error(new NetworkErrorException("No Internet Connection"));
         }
     }
@@ -54,7 +50,7 @@ public class ELDEventsInteractor {
     }
 
     public Observable<ResponseMessage> postNewELDEvent(ELDEvent event) {
-        if (isOnlineMode()) {
+        if (NetworkUtils.isOnlineMode()) {
             return mServiceApi.postNewELDEvent(event, mPreferencesManager.getSelectedBoxId())
                     .subscribeOn(Schedulers.io())
                     .doOnError(throwable -> storeEvent(event, false));
@@ -65,12 +61,12 @@ public class ELDEventsInteractor {
     }
 
     public Observable<ResponseMessage> postNewELDEvents(List<ELDEvent> events) {
-        if (isOnlineMode()) {
+        if (NetworkUtils.isOnlineMode()) {
             return mServiceApi.postNewELDEvents(events, mPreferencesManager.getSelectedBoxId())
                     .subscribeOn(Schedulers.io())
                     .doOnError(throwable -> events.forEach(event -> storeEvent(event, false)));
         } else {
-            events.forEach(event -> storeEvent(event, false));
+            storeEvents(events, false);
             return Observable.error(new NetworkErrorException("No Internet Connection"));
         }
     }
@@ -97,11 +93,5 @@ public class ELDEventsInteractor {
                         .subscribe(responseMessage -> storeEvents(unsyncEvents, true));
             }
         });
-    }
-
-    public boolean isOnlineMode() {
-        ConnectivityManager cm = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo netInfo = cm.getActiveNetworkInfo();
-        return (netInfo != null && netInfo.isConnected());
     }
 }

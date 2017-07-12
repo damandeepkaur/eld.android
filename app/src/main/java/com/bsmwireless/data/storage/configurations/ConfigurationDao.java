@@ -15,15 +15,15 @@ public interface ConfigurationDao {
     @Query("SELECT * FROM configurations")
     List<ConfigurationEntity> getAll();
 
-    @Query("SELECT * FROM configurations WHERE userId = :userId")
+    @Query("SELECT * FROM configurations WHERE user_id = :userId")
     Flowable<ConfigurationEntity> getByUserId(int userId);
 
-    @Query("DELETE FROM configurations WHERE userId = :userId")
+    @Query("DELETE FROM configurations WHERE user_id = :userId")
     int deleteByUserId(int userId);
 
     @Insert(onConflict = REPLACE)
-    long insert(ConfigurationEntity event);
+    long insert(ConfigurationEntity configuration);
 
     @Insert(onConflict = REPLACE)
-    void insertAll(ConfigurationEntity... users);
+    void insertAll(ConfigurationEntity... configurations);
 }

@@ -12,6 +12,9 @@ import timber.log.Timber;
 
 @ActivityScope
 public class LoginPresenter {
+    private final static int DRIVER_USER_TYPE = 0;
+    private final static int CO_DRIVER_USER_TYPE = 1;
+
     private LoginView mView;
     private LoginUserInteractor mLoginUserInteractor;
     private CompositeDisposable mDisposables;
@@ -49,7 +52,7 @@ public class LoginPresenter {
         }
         mView.setLoginButtonEnabled(false);
 
-        Disposable disposable = mLoginUserInteractor.loginUser(username, password, domain, keepToken)
+        Disposable disposable = mLoginUserInteractor.loginUser(username, password, domain, keepToken, DRIVER_USER_TYPE)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         status -> {

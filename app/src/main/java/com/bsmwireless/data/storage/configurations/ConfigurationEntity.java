@@ -6,7 +6,7 @@ import android.arch.persistence.room.Entity;
 @Entity(tableName = "configurations")
 public class ConfigurationEntity {
 
-    @ColumnInfo(name = "userId")
+    @ColumnInfo(name = "user_id")
     private Integer mUserId;
 
     @ColumnInfo(name = "name")

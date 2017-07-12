@@ -30,12 +30,12 @@ public class LoginUserInteractor {
         mTokenManager = tokenManager;
     }
 
-    public Observable<Boolean> loginUser(final String name, final String password, final String domain, boolean keepToken) {
+    public Observable<Boolean> loginUser(final String name, final String password, final String domain, boolean keepToken, int driverType) {
         LoginModel request = new LoginModel();
         request.setUsername(name);
         request.setPassword(password);
         request.setDomain(domain);
-        request.setDriverType(0);
+        request.setDriverType(driverType);
 
         return mServiceApi.loginUser(request)
                 .subscribeOn(Schedulers.io())

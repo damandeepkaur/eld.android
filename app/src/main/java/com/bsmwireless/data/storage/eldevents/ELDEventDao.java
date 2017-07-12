@@ -19,21 +19,21 @@ public interface ELDEventDao {
     @Query("SELECT * FROM events")
     List<ELDEventEntity> getAll();
 
-    @Query("SELECT * FROM events WHERE isSync = 0")
+    @Query("SELECT * FROM events WHERE is_sync = 0")
     Flowable<List<ELDEventEntity>> getUnsyncEvents();
 
-    @Query("SELECT * FROM events WHERE eventTime > :startTime AND eventTime < :endTime")
+    @Query("SELECT * FROM events WHERE event_time > :startTime AND event_time < :endTime")
     List<ELDEventEntity> getEventsForInterval(long startTime, long endTime);
 
     @Query("SELECT * FROM events WHERE id = :id")
     Flowable<ELDEventEntity> getEventById(int id);
 
     @Delete
-    void delete(ELDEventEntity user);
+    void delete(ELDEventEntity event);
 
     @Insert(onConflict = REPLACE)
     long insertEvent(ELDEventEntity event);
 
     @Insert(onConflict = REPLACE)
-    void insertAll(ELDEventEntity... users);
+    void insertAll(ELDEventEntity... events);
 }

@@ -9,21 +9,21 @@ public class ELDEventEntity {
     @PrimaryKey
     @ColumnInfo(name = "id")
     private int mId;
-    @ColumnInfo(name = "isSync")
+    @ColumnInfo(name = "is_sync")
     private boolean mIsSync = true;
-    @ColumnInfo(name = "eventType")
+    @ColumnInfo(name = "event_type")
     private Integer mEventType;
-    @ColumnInfo(name = "eventCode")
+    @ColumnInfo(name = "event_code")
     private Integer mEventCode;
     @ColumnInfo(name = "status")
     private Integer mStatus;
     @ColumnInfo(name = "origin")
     private Integer mOrigin;
-    @ColumnInfo(name = "eventTime")
+    @ColumnInfo(name = "event_time")
     private Long mEventTime;
     @ColumnInfo(name = "odometer")
     private Integer mOdometer;
-    @ColumnInfo(name = "engineHours")
+    @ColumnInfo(name = "engine_hours")
     private Integer mEngineHours;
     @ColumnInfo(name = "lat")
     private Double mLat;
@@ -35,23 +35,23 @@ public class ELDEventEntity {
     private String mComment;
     @ColumnInfo(name = "location")
     private String mLocation;
-    @ColumnInfo(name = "checksum")
+    @ColumnInfo(name = "check_sum")
     private String mCheckSum;
-    @ColumnInfo(name = "shippingId")
+    @ColumnInfo(name = "shipping_id")
     private String mShippingId;
-    @ColumnInfo(name = "coDriverId")
+    @ColumnInfo(name = "co_driver_id")
     private Integer mCoDriverId;
-    @ColumnInfo(name = "boxId")
+    @ColumnInfo(name = "box_id")
     private Integer mBoxId;
-    @ColumnInfo(name = "vehicleId")
+    @ColumnInfo(name = "vehicle_id")
     private Integer mVehicleId;
-    @ColumnInfo(name = "tzOffset")
+    @ColumnInfo(name = "tz_offset")
     private Double mTzOffset;
     @ColumnInfo(name = "timezone")
     private String mTimezone;
-    @ColumnInfo(name = "mobileTime")
+    @ColumnInfo(name = "mobile_time")
     private Long mMobileTime;
-    @ColumnInfo(name = "driverId")
+    @ColumnInfo(name = "driver_id")
     private Integer mDriverId;
     @ColumnInfo(name = "malfunction")
     private Boolean mMalfunction;

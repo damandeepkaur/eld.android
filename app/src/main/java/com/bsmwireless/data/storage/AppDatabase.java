@@ -14,5 +14,5 @@ import com.bsmwireless.data.storage.vehicles.VehicleEntity;
 public abstract class AppDatabase extends RoomDatabase {
     public abstract UserDao userDao();
     public abstract VehicleDao vehicleDao();
-    public abstract ELDEventDao getELDEventDao();
+    public abstract ELDEventDao ELDEventDao();
 }

@@ -31,27 +31,27 @@ public class UserEntity {
     private Boolean mUpdated;
     @ColumnInfo(name = "organization")
     private String mOrganization;
-    @ColumnInfo(name = "syncTime")
+    @ColumnInfo(name = "sync_time")
     private Long mSyncTime;
-    @ColumnInfo(name = "isSupervisor")
+    @ColumnInfo(name = "is_supervisor")
     private Boolean mIsSupervisor;
-    @ColumnInfo(name = "firstName")
+    @ColumnInfo(name = "first_name")
     private String mFirstName;
-    @ColumnInfo(name = "midName")
+    @ColumnInfo(name = "mid_name")
     private String mMidName;
-    @ColumnInfo(name = "lastName")
+    @ColumnInfo(name = "last_name")
     private String mLastName;
-    @ColumnInfo(name = "ruleException")
+    @ColumnInfo(name = "rule_exception")
     private String mRuleException;
-    @ColumnInfo(name = "applyDST")
+    @ColumnInfo(name = "apply_dst")
     private Integer mApplyDST;
-    @ColumnInfo(name = "usCycle")
+    @ColumnInfo(name = "us_cycle")
     private Integer mUsCycle;
-    @ColumnInfo(name = "caCycle")
+    @ColumnInfo(name = "ca_cycle")
     private Integer mCaCycle;
-    @ColumnInfo(name = "cycleCountry")
+    @ColumnInfo(name = "cycle_country")
     private Integer mCycleCountry;
-    @ColumnInfo(name = "orgAddr")
+    @ColumnInfo(name = "org_addr")
     private String mOrgAddr;
 
     public String getAccountName() {
