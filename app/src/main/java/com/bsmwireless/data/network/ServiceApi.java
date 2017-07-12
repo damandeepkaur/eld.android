@@ -4,7 +4,7 @@ import com.bsmwireless.models.Auth;
 import com.bsmwireless.models.CUDTripInfo;
 import com.bsmwireless.models.Driver;
 import com.bsmwireless.models.DriverLog;
-import com.bsmwireless.models.ELDDriverStatus;
+import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.EmailReport;
 import com.bsmwireless.models.Event;
 import com.bsmwireless.models.HOSAlert;
@@ -34,43 +34,63 @@ import retrofit2.http.PUT;
 import retrofit2.http.Path;
 
 public interface ServiceApi {
+    /**
+     * Request to update current token
+     *
+     * @return Auth data {@link Auth}
+     */
+    @POST("v1/app/newtoken")
+    Observable<Auth> refreshToken();
 
     /**
-     * Login request Vehicle.
+     * User logout
      *
-     * @param request - model with login information.
-     * @return User Response {@link User}.
+     * @param logoutEvent
+     * @return Logout response {@link ResponseMessage}
      */
-    @POST("v1/login/driver")
-    Observable<User> loginUser(@Body LoginData request);
+    @POST("v1/app/logout")
+    Observable<ResponseMessage> logout(@Body ELDEvent logoutEvent);
 
     /**
-     * Search Vehicle.
+     * Send ELD event;
+     * Send ELD certify event; According doc section 4.5.1.4. It does same thing as dutyevents
      *
-     * @param keyword search keyword.
-     * @return Vehicle Attributes Response {@link Vehicle}.
+     * @param event driver status.
+     * @param boxId box identifier (required).
+     * @return update driver status response {@link ResponseMessage}.
      */
-    @GET("v1/app/vehicles/search/{keyword}")
-    Observable<List<Vehicle>> searchVehicles(@Path("keyword") String keyword);
+    @POST("v1/app/driver/certify")
+    Observable<ResponseMessage> postNewELDEvent(@Body ELDEvent event, @Header("X-Box") int boxId);
 
     /**
-     * Update unidentified records or change record request.
+     * Send ELD events;
+     * Send ELD driver duty status; According doc section 4.5.1.1; 4.5.1.2; 4.5.1.3; 4.5.1.4; 4.5.1.7; It sends a list of new records ordered by event time.
      *
-     * @param records records list.
-     * @return Response {@link ResponseMessage}.
+     * @param statusList driver status list.
+     * @param boxId      box identifier (optional).
+     * @return update driver status response {@link ResponseMessage}.
      */
-    @PUT("v1/sync/records/update")
-    Observable<ResponseMessage> updateUnidentifyRecords(@Body List<ELDDriverStatus> records);
+    @POST("v1/app/driver/dutyevents")
+    Observable<ResponseMessage> postNewELDEvents(@Body List<ELDEvent> statusList, @Header("X-Box") int boxId);
 
     /**
      * Fetch processed driver records.
      *
      * @param startTime start time.
      * @param endTime end time.
-     * @return List of unidentify records {@link ELDDriverStatus}.
+     * @return List of unidentified or changed event records {@link ELDEvent}.
      */
     @GET("v1/sync/records/search/{start}/{end}")
-    Observable<List<ELDDriverStatus>> syncUnidentifyRecords(@Path("start") long startTime, @Path("end") long endTime);
+    Observable<List<ELDEvent>> getELDEvents(@Path("start") long startTime, @Path("end") long endTime);
+
+    /**
+     * Update unidentified records or change record request.
+     *
+     * @param events events list.
+     * @return Response {@link ResponseMessage}.
+     */
+    @PUT("v1/sync/records/update")
+    Observable<ResponseMessage> updateELDEvents(@Body List<ELDEvent> events);
 
     /**
      * Inspection Categories from category Ids
@@ -109,26 +129,32 @@ public interface ServiceApi {
                                                       @Header("X-Box") int boxId);
 
     /**
-     * Sync current driver status.
-     * According doc section 4.5.1.1;4.5.1.2; 4.5.1.3; 4.5.1.4; 4.5.1.7; It sends a single new record.
+     * Link the driver to the vehicle, fetch unidentified record for update, and carrier's change requests.
      *
-     * @param status driver status.
-     * @param boxId  box identifier (required).
-     * @return update driver status response {@link ResponseMessage}.
+     * @param boxId id of the box paired with the vehicle.
+     * @return Pair Vehicle Response {@link ELDEvent}
      */
-    @POST("v1/app/driver/status")
-    Observable<ResponseMessage> syncDriverStatus(@Body ELDDriverStatus status, @Header("X-Box") int boxId);
+    @POST("v1/login/pair")
+    Observable<List<ELDEvent>> loginPairVehicle(@Header("X-Box") int boxId);
 
     /**
-     * Sync current driver statuses.
-     * Send ELD driver duty status; According doc section 4.5.1.1;4.5.1.2; 4.5.1.3; 4.5.1.4; 4.5.1.7; It sends a list of new records ordered by event time.
+     * Login request Vehicle.
      *
-     * @param statusList driver status list.
-     * @param boxId      box identifier (optional).
-     * @return update driver status response {@link ResponseMessage}.
+     * @param request - model with login information.
+     * @return User Response {@link User}.
      */
-    @POST("v1/app/driver/statuses")
-    Observable<ResponseMessage> syncDriverStatuses(@Body List<ELDDriverStatus> statusList, @Header("X-Box") int boxId);
+    @POST("v1/login/driver")
+    Observable<User> loginUser(@Body LoginData request);
+
+    /**
+     * Search Vehicle.
+     *
+     * @param keyword search keyword.
+     * @return Vehicle Attributes Response {@link Vehicle}.
+     */
+    @GET("v1/app/vehicles/search/{keyword}")
+    Observable<List<Vehicle>> searchVehicles(@Path("keyword") String keyword);
+
 
     /**
      * Get last 14 days of driver time log, trip info and rule selection history.
@@ -299,30 +325,4 @@ public interface ServiceApi {
     @POST("/registry/v1/sd")
     //TODO: Check this request with real server and update if necessary
     Observable<RegistryInformation> registry(@Body Registry registry);
-
-    /**
-     * Request to update current token
-     *
-     * @return Auth data {@link Auth}
-     */
-    @POST("v1/app/newtoken")
-    Observable<Auth> refreshToken();
-
-    /**
-     * User logout
-     *
-     * @param status
-     * @return Logout response {@link ResponseMessage}
-     */
-    @POST("v1/app/logout")
-    Observable<ResponseMessage> logout(@Body ELDDriverStatus status);
-
-    /**
-     * Link the driver to the vehicle, fetch unidentified record for update, and carrier's change requests.
-     *
-     * @param boxId id of the box paired with the vehicle.
-     * @return Pair Vehicle Response {@link ELDDriverStatus}
-     */
-    @POST("v1/login/pair")
-    Observable<List<ELDDriverStatus>> loginPairVehicle(@Header("X-Box") int boxId);
 }

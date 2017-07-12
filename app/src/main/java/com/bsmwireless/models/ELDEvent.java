@@ -9,20 +9,22 @@ import com.google.gson.annotations.SerializedName;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-public class ELDDriverStatus implements Parcelable {
-
-    @SerializedName("status")
+public class ELDEvent implements Parcelable {
+    @SerializedName("id")
     @Expose
-    private Integer mStatus;
-    @SerializedName("origin")
-    @Expose
-    private Integer mOrigin;
+    private Integer mId;
     @SerializedName("eventType")
     @Expose
     private Integer mEventType;
     @SerializedName("eventCode")
     @Expose
     private Integer mEventCode;
+    @SerializedName("status")
+    @Expose
+    private Integer mStatus;
+    @SerializedName("origin")
+    @Expose
+    private Integer mOrigin;
     @SerializedName("eventTime")
     @Expose
     private Long mEventTime;
@@ -62,9 +64,6 @@ public class ELDDriverStatus implements Parcelable {
     @SerializedName("vehicleId")
     @Expose
     private Integer mVehicleId;
-    @SerializedName("id")
-    @Expose
-    private Integer mId;
     @SerializedName("tzOffset")
     @Expose
     private Double mTzOffset;
@@ -84,9 +83,9 @@ public class ELDDriverStatus implements Parcelable {
     @Expose
     private Boolean mDiagnostic;
 
-    public ELDDriverStatus() {}
+    public ELDEvent() {}
 
-    private ELDDriverStatus(Parcel in) {
+    private ELDEvent(Parcel in) {
         this.mStatus = in.readInt();
         this.mOrigin = in.readInt();
         this.mEventType = in.readInt();
@@ -147,6 +146,10 @@ public class ELDDriverStatus implements Parcelable {
 
     public Long getEventTime() {
         return mEventTime;
+    }
+
+    public void setEventTime(Long eventTime) {
+        mEventTime = eventTime;
     }
 
     public void setEventCode(Long eventTime) {
@@ -307,8 +310,9 @@ public class ELDDriverStatus implements Parcelable {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("ELDDriverStatus{");
-        sb.append("mStatus=").append(mStatus).append('\'');
+        final StringBuilder sb = new StringBuilder("ELDEvent{");
+        sb.append("mId=").append(mId);
+        sb.append(", mStatus=").append(mStatus).append('\'');
         sb.append(", mOrigin=").append(mOrigin);
         sb.append(", mEventType=").append(mEventType);
         sb.append(", mEventCode=").append(mEventCode);
@@ -325,7 +329,6 @@ public class ELDDriverStatus implements Parcelable {
         sb.append(", mCoDriverId=").append(mCoDriverId);
         sb.append(", mBoxId=").append(mBoxId);
         sb.append(", mVehicleId=").append(mVehicleId);
-        sb.append(", mId=").append(mId);
         sb.append(", mTzOffset=").append(mTzOffset);
         sb.append(", mTimezone=").append(mTimezone).append('\'');
         sb.append(", mMobileTime=").append(mMobileTime);
@@ -346,7 +349,7 @@ public class ELDDriverStatus implements Parcelable {
         if (other == null || getClass() != other.getClass()) {
             return false;
         }
-        ELDDriverStatus rhs = ((ELDDriverStatus) other);
+        ELDEvent rhs = ((ELDEvent) other);
         // field comparison
         return new EqualsBuilder().append(mStatus, rhs.mStatus)
                 .append(mOrigin, rhs.mOrigin)
@@ -438,15 +441,16 @@ public class ELDDriverStatus implements Parcelable {
         dest.writeByte((byte) (mDiagnostic ? 1 : 0));
     }
 
-    public static final Creator<ELDDriverStatus> CREATOR = new Creator<ELDDriverStatus>() {
+    public static final Creator<ELDEvent> CREATOR = new Creator<ELDEvent>() {
         @Override
-        public ELDDriverStatus createFromParcel(Parcel source) {
-            return new ELDDriverStatus(source);
+        public ELDEvent createFromParcel(Parcel source) {
+            return new ELDEvent(source);
         }
 
         @Override
-        public ELDDriverStatus[] newArray(int size) {
-            return new ELDDriverStatus[size];
+        public ELDEvent[] newArray(int size) {
+            return new ELDEvent[size];
         }
     };
+
 }

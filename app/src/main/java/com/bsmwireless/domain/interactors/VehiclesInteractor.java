@@ -3,7 +3,7 @@ package com.bsmwireless.domain.interactors;
 import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.PreferencesManager;
-import com.bsmwireless.data.storage.vehicle.VehicleConverter;
+import com.bsmwireless.data.storage.vehicles.VehicleConverter;
 import com.bsmwireless.models.Vehicle;
 
 import java.util.List;
@@ -34,7 +34,7 @@ public class VehiclesInteractor {
 
     public Completable saveSelectedVehicle(Vehicle vehicle) {
         return Completable.fromAction(() -> {
-            mAppDatabase.vehicleModel().insertVehicle(VehicleConverter.toEntity(vehicle));
+            mAppDatabase.vehicleDao().insertVehicle(VehicleConverter.toEntity(vehicle));
             mPreferencesManager.setSelectedVehicleId(vehicle.getId());
             mPreferencesManager.setSelectedBoxId(vehicle.getBoxId());
         }).subscribeOn(Schedulers.io());

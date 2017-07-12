@@ -8,7 +8,7 @@ import com.google.gson.annotations.SerializedName;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-public class Setting implements Parcelable {
+public class SyncConfiguration implements Parcelable {
     @SerializedName("name")
     private String mName;
 
@@ -26,23 +26,23 @@ public class Setting implements Parcelable {
         dest.writeString(this.mValue);
     }
 
-    public Setting() {
+    public SyncConfiguration() {
     }
 
-    protected Setting(Parcel in) {
+    protected SyncConfiguration(Parcel in) {
         this.mName = in.readString();
         this.mValue = in.readString();
     }
 
-    public static final Parcelable.Creator<Setting> CREATOR = new Parcelable.Creator<Setting>() {
+    public static final Parcelable.Creator<SyncConfiguration> CREATOR = new Parcelable.Creator<SyncConfiguration>() {
         @Override
-        public Setting createFromParcel(Parcel source) {
-            return new Setting(source);
+        public SyncConfiguration createFromParcel(Parcel source) {
+            return new SyncConfiguration(source);
         }
 
         @Override
-        public Setting[] newArray(int size) {
-            return new Setting[size];
+        public SyncConfiguration[] newArray(int size) {
+            return new SyncConfiguration[size];
         }
     };
 
@@ -68,7 +68,7 @@ public class Setting implements Parcelable {
 
         if (o == null || getClass() != o.getClass()) return false;
 
-        Setting setting = (Setting) o;
+        SyncConfiguration setting = (SyncConfiguration) o;
 
         return new EqualsBuilder()
                 .append(mName, setting.mName)
@@ -86,7 +86,7 @@ public class Setting implements Parcelable {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("Setting{");
+        final StringBuilder sb = new StringBuilder("SyncConfiguration{");
         sb.append("mName='").append(mName).append('\'');
         sb.append(", mValue='").append(mValue).append('\'');
         sb.append('}');

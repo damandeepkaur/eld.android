@@ -1,5 +1,6 @@
 package com.bsmwireless.screens.selectasset;
 
+
 import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.domain.interactors.InspectionsInteractor;
 import com.bsmwireless.domain.interactors.VehiclesInteractor;

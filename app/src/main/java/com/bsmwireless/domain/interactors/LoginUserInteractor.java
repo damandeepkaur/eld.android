@@ -7,7 +7,7 @@ import com.bsmwireless.data.network.authenticator.TokenManager;
 import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.data.storage.users.UserConverter;
-import com.bsmwireless.models.ELDDriverStatus;
+import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.LoginData;
 
 import java.util.List;
@@ -52,12 +52,12 @@ public class LoginUserInteractor {
                     mPreferencesManager.setRememberUserEnabled(keepToken);
 
                     mTokenManager.setToken(accountName, name, user.getAuth());
-                    mAppDatabase.userModel().insertUser(UserConverter.toEntity(accountName, user));
+                    mAppDatabase.userDao().insertUser(UserConverter.toEntity(accountName, user));
                 })
                 .map(user -> user != null);
     }
 
-    public Observable<List<ELDDriverStatus>> loginPair() {
+    public Observable<List<ELDEvent>> loginPair() {
         int boxId = mPreferencesManager.getSelectedBoxId();
         if (boxId == PreferencesManager.NOT_FOUND_VALUE) {
             return Observable.error(new Throwable("Not found selected boxId"));
@@ -73,4 +73,5 @@ public class LoginUserInteractor {
     public String getDomainName() {
         return mTokenManager.getDomain(mPreferencesManager.getAccountName());
     }
+
 }
