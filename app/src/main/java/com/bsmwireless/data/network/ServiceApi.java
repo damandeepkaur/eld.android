@@ -10,6 +10,7 @@ import com.bsmwireless.models.Event;
 import com.bsmwireless.models.HOSAlert;
 import com.bsmwireless.models.InspectionReport;
 import com.bsmwireless.models.Location;
+import com.bsmwireless.models.LogSheetHeader;
 import com.bsmwireless.models.LoginData;
 import com.bsmwireless.models.NewRule;
 import com.bsmwireless.models.Registry;
@@ -325,4 +326,26 @@ public interface ServiceApi {
      */
     @POST("v1/login/pair")
     Observable<List<ELDDriverStatus>> loginPairVehicle(@Header("X-Box") int boxId);
+
+    /**
+     * Sync LogSheet header information.
+     *
+     * @param startLogDay epoch unix time stamp, in miliseconds.
+     * @param endLogDay epoch unix time stamp, in miliseconds.
+     * @return LogSheet Response {@link LogSheetHeader}
+     */
+    @GET("v1/sync/logsheet/headers/{start}/{end}")
+    Observable<List<LogSheetHeader>> syncLogSheets(@Path("start") Long startLogDay,
+                                                   @Path("end") Long endLogDay);
+
+    /**
+     * Send LogSheet header information. If logday is same,
+     * server will do the update of the existing record.
+     * Full record is required for each call.
+     *
+     * @param logSheetHeader info.
+     * @return Update LogSheet header Response {@link ResponseMessage}
+     */
+    @PUT("v1/sync/logsheet/header")
+    Observable<ResponseMessage> updateLogSheetHeader(@Body LogSheetHeader logSheetHeader);
 }
