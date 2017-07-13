@@ -2,6 +2,7 @@ package app.bsmuniversal.com.presentation;
 
 
 import com.bsmwireless.domain.interactors.LoginUserInteractor;
+import com.bsmwireless.models.User;
 import com.bsmwireless.screens.login.LoginPresenter;
 import com.bsmwireless.screens.login.LoginView;
 
@@ -18,6 +19,7 @@ import io.reactivex.Observable;
 
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.matches;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -81,7 +83,8 @@ public class LoginPresenterTest {
         when(mView.getUsername()).thenReturn(USERNAME);
         when(mView.getPassword()).thenReturn(PASSWORD);
         when(mView.getDomain()).thenReturn(DOMAIN);
-        when(mLoginUserInteractor.loginUser(anyString(), anyString(), anyString(), anyBoolean())).thenReturn(Observable.just(false));
+        when(mLoginUserInteractor.loginUser(anyString(), anyString(), anyString(), anyBoolean(),
+                eq(User.DriverType.DRIVER))).thenReturn(Observable.just(false));
 
         //when
         mLoginPresenter.onLoginButtonClicked(false);
@@ -96,7 +99,8 @@ public class LoginPresenterTest {
         when(mView.getUsername()).thenReturn(USERNAME);
         when(mView.getPassword()).thenReturn(PASSWORD);
         when(mView.getDomain()).thenReturn(DOMAIN);
-        when(mLoginUserInteractor.loginUser(anyString(), anyString(), anyString(), anyBoolean())).thenReturn(Observable.just(true));
+        when(mLoginUserInteractor.loginUser(anyString(), anyString(), anyString(), anyBoolean(),
+                eq(User.DriverType.DRIVER))).thenReturn(Observable.just(true));
 
         //when
         mLoginPresenter.onLoginButtonClicked(false);
