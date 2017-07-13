@@ -130,6 +130,28 @@ public interface ServiceApi {
                                                       @Header("X-Box") int boxId);
 
     /**
+     * Get LogSheet header information list.
+     *
+     * @param startLogDay epoch unix time stamp, in miliseconds.
+     * @param endLogDay epoch unix time stamp, in miliseconds.
+     * @return LogSheet Response {@link LogSheetHeader}
+     */
+    @GET("v1/sync/logsheet/headers/{start}/{end}")
+    Observable<List<LogSheetHeader>> getLogSheets(@Path("start") Long startLogDay,
+                                                  @Path("end") Long endLogDay);
+
+    /**
+     * Send LogSheet header information. If logday is same,
+     * server will do the update of the existing record.
+     * Full record is required for each call.
+     *
+     * @param logSheetHeader info.
+     * @return Update LogSheet header Response {@link ResponseMessage}
+     */
+    @PUT("v1/sync/logsheet/header")
+    Observable<ResponseMessage> updateLogSheetHeader(@Body LogSheetHeader logSheetHeader);
+
+    /**
      * Link the driver to the vehicle, fetch unidentified record for update, and carrier's change requests.
      *
      * @param boxId id of the box paired with the vehicle.
@@ -326,26 +348,4 @@ public interface ServiceApi {
     @POST("/registry/v1/sd")
     //TODO: Check this request with real server and update if necessary
     Observable<RegistryInformation> registry(@Body Registry registry);
-
-    /**
-     * Sync LogSheet header information.
-     *
-     * @param startLogDay epoch unix time stamp, in miliseconds.
-     * @param endLogDay epoch unix time stamp, in miliseconds.
-     * @return LogSheet Response {@link LogSheetHeader}
-     */
-    @GET("v1/sync/logsheet/headers/{start}/{end}")
-    Observable<List<LogSheetHeader>> syncLogSheets(@Path("start") Long startLogDay,
-                                                   @Path("end") Long endLogDay);
-
-    /**
-     * Send LogSheet header information. If logday is same,
-     * server will do the update of the existing record.
-     * Full record is required for each call.
-     *
-     * @param logSheetHeader info.
-     * @return Update LogSheet header Response {@link ResponseMessage}
-     */
-    @PUT("v1/sync/logsheet/header")
-    Observable<ResponseMessage> updateLogSheetHeader(@Body LogSheetHeader logSheetHeader);
 }
