@@ -1,9 +1,11 @@
 package com.bsmwireless.domain.interactors;
 
 import com.bsmwireless.data.network.ServiceApi;
+import com.bsmwireless.data.network.authenticator.TokenManager;
 import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.data.storage.vehicle.VehicleConverter;
+import com.bsmwireless.models.ELDDriverStatus;
 import com.bsmwireless.models.Vehicle;
 
 import java.util.List;
@@ -19,13 +21,15 @@ public class VehiclesInteractor {
 
     private ServiceApi mServiceApi;
     private AppDatabase mAppDatabase;
+    private TokenManager mTokenManager;
     private PreferencesManager mPreferencesManager;
 
     @Inject
-    public VehiclesInteractor(ServiceApi serviceApi, PreferencesManager preferencesManager, AppDatabase appDatabase) {
+    public VehiclesInteractor(ServiceApi serviceApi, PreferencesManager preferencesManager, AppDatabase appDatabase, TokenManager tokenManager) {
         mServiceApi = serviceApi;
         mPreferencesManager = preferencesManager;
         mAppDatabase = appDatabase;
+        mTokenManager = tokenManager;
     }
 
     public Observable<List<Vehicle>> searchVehicles(String searchText) {
@@ -47,5 +51,24 @@ public class VehiclesInteractor {
                     mPreferencesManager.setSelectedBoxId(NOT_IN_VEHICLE_ID);
                 })
                 .subscribeOn(Schedulers.io());
+    }
+
+    public Observable<List<ELDDriverStatus>> pairVehicle(ELDDriverStatus status) {
+        int boxId = mPreferencesManager.getSelectedBoxId();
+        if (boxId == PreferencesManager.NOT_FOUND_VALUE) {
+            return Observable.error(new Throwable("Not found selected boxId"));
+        } else {
+            return mServiceApi.pairVehicle(status, boxId).subscribeOn(Schedulers.io());
+        }
+    }
+
+    public Integer getDriverId() {
+        String id = mTokenManager.getDriver(mPreferencesManager.getAccountName());
+        return id == null || id.isEmpty() ? -1 : Integer.valueOf(id);
+    }
+
+    public Observable<String> getTimezone(int driverId) {
+        //TODO: get time zone from database
+        return Observable.just("America/Puerto_Rico");
     }
 }

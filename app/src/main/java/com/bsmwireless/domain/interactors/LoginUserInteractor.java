@@ -1,7 +1,5 @@
 package com.bsmwireless.domain.interactors;
 
-import android.os.Build;
-
 import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.network.authenticator.TokenManager;
 import com.bsmwireless.data.storage.AppDatabase;
@@ -14,11 +12,8 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import app.bsmuniversal.com.BuildConfig;
 import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
-
-import static com.bsmwireless.common.Constants.DEVICE_TYPE;
 
 public class LoginUserInteractor {
 
@@ -51,18 +46,18 @@ public class LoginUserInteractor {
                     mPreferencesManager.setAccountName(accountName);
                     mPreferencesManager.setRememberUserEnabled(keepToken);
 
-                    mTokenManager.setToken(accountName, name, user.getAuth());
+                    mTokenManager.setToken(accountName, name, domain, user.getAuth());
                     mAppDatabase.userModel().insertUser(UserConverter.toEntity(accountName, user));
                 })
                 .map(user -> user != null);
     }
 
-    public Observable<List<ELDDriverStatus>> loginPair() {
+    public Observable<List<ELDDriverStatus>> loginPair(ELDDriverStatus status) {
         int boxId = mPreferencesManager.getSelectedBoxId();
         if (boxId == PreferencesManager.NOT_FOUND_VALUE) {
             return Observable.error(new Throwable("Not found selected boxId"));
         } else {
-            return mServiceApi.loginPairVehicle(boxId).subscribeOn(Schedulers.io());
+            return mServiceApi.pairVehicle(status, boxId).subscribeOn(Schedulers.io());
         }
     }
 

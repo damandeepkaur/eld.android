@@ -17,7 +17,7 @@ public class TokenManager {
         mContext = context;
     }
 
-    public void setToken(String accountName, String name, Auth auth) {
+    public void setToken(String accountName, String name, String domain, Auth auth) {
         AccountManager accountManager = AccountManager.get(mContext);
         Account account = getAccount(name);
 
@@ -29,10 +29,10 @@ public class TokenManager {
         }
 
         accountManager.setUserData(account, BsmAuthenticator.ACCOUNT_NAME, name);
+        accountManager.setUserData(account, BsmAuthenticator.ACCOUNT_DOMAIN, domain);
         accountManager.setUserData(account, BsmAuthenticator.ACCOUNT_DRIVER, String.valueOf(auth.getDriverId()));
         accountManager.setUserData(account, BsmAuthenticator.ACCOUNT_ORG, String.valueOf(auth.getOrgId()));
         accountManager.setUserData(account, BsmAuthenticator.ACCOUNT_CLUSTER, auth.getCluster());
-        accountManager.setUserData(account, BsmAuthenticator.ACCOUNT_DOMAIN, auth.getDomain());
     }
 
     public String getName(String accountName) {
