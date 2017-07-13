@@ -10,7 +10,7 @@ public class ELDEventEntity {
     @ColumnInfo(name = "id")
     private int mId;
     @ColumnInfo(name = "is_sync")
-    private boolean mIsSync = true;
+    private boolean mSync = true;
     @ColumnInfo(name = "event_type")
     private Integer mEventType;
     @ColumnInfo(name = "event_code")
@@ -66,12 +66,12 @@ public class ELDEventEntity {
         mId = id;
     }
 
-    public boolean isIsSync() {
-        return mIsSync;
+    public boolean isSync() {
+        return mSync;
     }
 
-    public void setIsSync(boolean sync) {
-        mIsSync = sync;
+    public void setSync(boolean sync) {
+        mSync = sync;
     }
 
     public Integer getEventType() {

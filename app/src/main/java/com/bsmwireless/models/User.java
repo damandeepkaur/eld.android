@@ -13,6 +13,12 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import java.util.List;
 
 public class User implements Parcelable {
+    public enum DriverType {
+        DRIVER,
+        CO_DRIVER,
+        EXEMPT,
+        CARRIER
+    }
 
     @SerializedName("id")
     @Expose

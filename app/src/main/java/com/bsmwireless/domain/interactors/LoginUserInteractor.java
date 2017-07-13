@@ -7,6 +7,7 @@ import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.data.storage.users.UserConverter;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.LoginModel;
+import com.bsmwireless.models.User;
 
 import java.util.List;
 
@@ -30,12 +31,12 @@ public class LoginUserInteractor {
         mTokenManager = tokenManager;
     }
 
-    public Observable<Boolean> loginUser(final String name, final String password, final String domain, boolean keepToken, int driverType) {
+    public Observable<Boolean> loginUser(final String name, final String password, final String domain, boolean keepToken, User.DriverType driverType) {
         LoginModel request = new LoginModel();
         request.setUsername(name);
         request.setPassword(password);
         request.setDomain(domain);
-        request.setDriverType(driverType);
+        request.setDriverType(driverType.ordinal());
 
         return mServiceApi.loginUser(request)
                 .subscribeOn(Schedulers.io())

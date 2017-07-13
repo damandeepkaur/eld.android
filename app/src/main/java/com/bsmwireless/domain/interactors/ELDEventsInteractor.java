@@ -73,14 +73,14 @@ public class ELDEventsInteractor {
 
     private void storeEvent(ELDEvent event, boolean isSynced) {
         ELDEventEntity entity = ELDEventConverter.toEntity(event);
-        entity.setIsSync(isSynced);
+        entity.setSync(isSynced);
         mELDEventDao.insertEvent(entity);
     }
 
     private void storeEvents(List<ELDEvent> events, boolean isSynced) {
         ELDEventEntity[] entities = ELDEventConverter.toEntityList(events).toArray(new ELDEventEntity[events.size()]);
         for (int i = 0; i < entities.length; i++) {
-            entities[i].setIsSync(isSynced);
+            entities[i].setSync(isSynced);
         }
         mELDEventDao.insertAll(entities);
     }
