@@ -1,4 +1,4 @@
-package com.bsmwireless.data.storage.vehicle;
+package com.bsmwireless.data.storage.vehicles;
 
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;

@@ -16,7 +16,7 @@ public class LogSheetInteractor {
     private ServiceApi mServiceApi;
 
     @Inject
-    private LogSheetInteractor(ServiceApi serviceApi) {
+    public LogSheetInteractor(ServiceApi serviceApi) {
         mServiceApi = serviceApi;
     }
 

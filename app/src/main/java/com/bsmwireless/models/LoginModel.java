@@ -6,7 +6,7 @@ import com.google.gson.annotations.SerializedName;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-public class LoginData {
+public class LoginModel {
     @SerializedName("username")
     private String mUsername;
 
@@ -25,7 +25,7 @@ public class LoginData {
     @SerializedName("appInfo")
     private String mAppInfo;
 
-    public LoginData() {
+    public LoginModel() {
         mAppInfo = new Gson().toJson(new AppInfo());
     }
 
@@ -75,15 +75,15 @@ public class LoginData {
 
         if (o == null || getClass() != o.getClass()) return false;
 
-        LoginData loginData = (LoginData) o;
+        LoginModel loginModel = (LoginModel) o;
 
         return new EqualsBuilder()
-                .append(mLastUpdated, loginData.mLastUpdated)
-                .append(mUsername, loginData.mUsername)
-                .append(mPassword, loginData.mPassword)
-                .append(mDomain, loginData.mDomain)
-                .append(mDriverType, loginData.mDriverType)
-                .append(mAppInfo, loginData.mAppInfo)
+                .append(mLastUpdated, loginModel.mLastUpdated)
+                .append(mUsername, loginModel.mUsername)
+                .append(mPassword, loginModel.mPassword)
+                .append(mDomain, loginModel.mDomain)
+                .append(mDriverType, loginModel.mDriverType)
+                .append(mAppInfo, loginModel.mAppInfo)
                 .isEquals();
     }
 
@@ -101,7 +101,7 @@ public class LoginData {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("LoginData{");
+        final StringBuilder sb = new StringBuilder("LoginModel{");
         sb.append("mUsername='").append(mUsername).append('\'');
         sb.append(", mPassword='").append(mPassword).append('\'');
         sb.append(", mDomain='").append(mDomain).append('\'');

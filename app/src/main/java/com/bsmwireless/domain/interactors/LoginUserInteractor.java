@@ -1,24 +1,20 @@
 package com.bsmwireless.domain.interactors;
 
-import android.os.Build;
-
 import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.network.authenticator.TokenManager;
 import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.data.storage.users.UserConverter;
-import com.bsmwireless.models.ELDDriverStatus;
-import com.bsmwireless.models.LoginData;
+import com.bsmwireless.models.ELDEvent;
+import com.bsmwireless.models.LoginModel;
+import com.bsmwireless.models.User;
 
 import java.util.List;
 
 import javax.inject.Inject;
 
-import app.bsmuniversal.com.BuildConfig;
 import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
-
-import static com.bsmwireless.common.Constants.DEVICE_TYPE;
 
 public class LoginUserInteractor {
 
@@ -35,12 +31,12 @@ public class LoginUserInteractor {
         mTokenManager = tokenManager;
     }
 
-    public Observable<Boolean> loginUser(final String name, final String password, final String domain, boolean keepToken) {
-        LoginData request = new LoginData();
+    public Observable<Boolean> loginUser(final String name, final String password, final String domain, boolean keepToken, User.DriverType driverType) {
+        LoginModel request = new LoginModel();
         request.setUsername(name);
         request.setPassword(password);
         request.setDomain(domain);
-        request.setDriverType(0);
+        request.setDriverType(driverType.ordinal());
 
         return mServiceApi.loginUser(request)
                 .subscribeOn(Schedulers.io())
@@ -52,12 +48,12 @@ public class LoginUserInteractor {
                     mPreferencesManager.setRememberUserEnabled(keepToken);
 
                     mTokenManager.setToken(accountName, name, user.getAuth());
-                    mAppDatabase.userModel().insertUser(UserConverter.toEntity(accountName, user));
+                    mAppDatabase.userDao().insertUser(UserConverter.toEntity(accountName, user));
                 })
                 .map(user -> user != null);
     }
 
-    public Observable<List<ELDDriverStatus>> loginPair() {
+    public Observable<List<ELDEvent>> loginPair() {
         int boxId = mPreferencesManager.getSelectedBoxId();
         if (boxId == PreferencesManager.NOT_FOUND_VALUE) {
             return Observable.error(new Throwable("Not found selected boxId"));
@@ -73,4 +69,5 @@ public class LoginUserInteractor {
     public String getDomainName() {
         return mTokenManager.getDomain(mPreferencesManager.getAccountName());
     }
+
 }

@@ -10,32 +10,25 @@ import com.google.gson.annotations.SerializedName;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class User implements Parcelable {
+    public enum DriverType {
+        DRIVER,
+        CO_DRIVER,
+        EXEMPT,
+        CARRIER
+    }
 
     @SerializedName("id")
     @Expose
     private Integer mId;
-    @SerializedName("orgid")
-    @Expose
-    private Integer mOrgId;
-    @SerializedName("employeeid")
-    @Expose
-    private String mEmployeeId;
-    @SerializedName("password")
-    @Expose
-    private String mPassword;
-    @SerializedName("issupervisor")
-    @Expose
-    private Integer mIsSupervisorInt;
     @SerializedName("timezone")
     @Expose
     private String mTimezone;
-    @SerializedName("signatureid")
+    @SerializedName("email")
     @Expose
-    private Integer mSignatureId;
+    private String mEmail;
     @SerializedName("address")
     @Expose
     private String mAddress;
@@ -48,6 +41,9 @@ public class User implements Parcelable {
     @SerializedName("country")
     @Expose
     private String mCountry;
+    @SerializedName("license")
+    @Expose
+    private String mLicense;
     @SerializedName("signature")
     @Expose
     private String mSignature;
@@ -59,7 +55,10 @@ public class User implements Parcelable {
     private String mOrganization;
     @SerializedName("configuration")
     @Expose
-    private List<Setting> mSetting;
+    private List<Configuration> mConfigurations;
+    @SerializedName("syncTime")
+    @Expose
+    private Long mSyncTime;
     @SerializedName("auth")
     @Expose
     private Auth mAuth;
@@ -87,9 +86,9 @@ public class User implements Parcelable {
     @SerializedName("caCycle")
     @Expose
     private Integer mCaCycle;
-    @SerializedName("lastModified")
+    @SerializedName("cycleCountry")
     @Expose
-    private Long mLastModified;
+    private Integer mCycleCountry;
     @SerializedName("orgAddr")
     @Expose
     private String mOrgAddr;
@@ -99,39 +98,7 @@ public class User implements Parcelable {
     }
 
     public void setId(Integer id) {
-        this.mId = id;
-    }
-
-    public Integer getOrgId() {
-        return mOrgId;
-    }
-
-    public void setOrgId(Integer orgId) {
-        this.mOrgId = orgId;
-    }
-
-    public String getEmployeeId() {
-        return mEmployeeId;
-    }
-
-    public void setEmployeeId(String employeeId) {
-        this.mEmployeeId = employeeId;
-    }
-
-    public String getPassword() {
-        return mPassword;
-    }
-
-    public void setPassword(String password) {
-        this.mPassword = password;
-    }
-
-    public Integer getIsSupervisorInt() {
-        return mIsSupervisorInt;
-    }
-
-    public void setIsSupervisorInt(Integer isSupervisorInt) {
-        this.mIsSupervisorInt = isSupervisorInt;
+        mId = id;
     }
 
     public String getTimezone() {
@@ -139,15 +106,15 @@ public class User implements Parcelable {
     }
 
     public void setTimezone(String timezone) {
-        this.mTimezone = timezone;
+        mTimezone = timezone;
     }
 
-    public Integer getSignatureId() {
-        return mSignatureId;
+    public String getEmail() {
+        return mEmail;
     }
 
-    public void setSignatureId(Integer signatureId) {
-        this.mSignatureId = signatureId;
+    public void setEmail(String email) {
+        mEmail = email;
     }
 
     public String getAddress() {
@@ -155,7 +122,7 @@ public class User implements Parcelable {
     }
 
     public void setAddress(String address) {
-        this.mAddress = address;
+        mAddress = address;
     }
 
     public String getCity() {
@@ -163,7 +130,7 @@ public class User implements Parcelable {
     }
 
     public void setCity(String city) {
-        this.mCity = city;
+        mCity = city;
     }
 
     public String getState() {
@@ -171,7 +138,7 @@ public class User implements Parcelable {
     }
 
     public void setState(String state) {
-        this.mState = state;
+        mState = state;
     }
 
     public String getCountry() {
@@ -179,7 +146,15 @@ public class User implements Parcelable {
     }
 
     public void setCountry(String country) {
-        this.mCountry = country;
+        mCountry = country;
+    }
+
+    public String getLicense() {
+        return mLicense;
+    }
+
+    public void setLicense(String license) {
+        mLicense = license;
     }
 
     public String getSignature() {
@@ -187,7 +162,7 @@ public class User implements Parcelable {
     }
 
     public void setSignature(String signature) {
-        this.mSignature = signature;
+        mSignature = signature;
     }
 
     public Boolean getUpdated() {
@@ -195,7 +170,7 @@ public class User implements Parcelable {
     }
 
     public void setUpdated(Boolean updated) {
-        this.mUpdated = updated;
+        mUpdated = updated;
     }
 
     public String getOrganization() {
@@ -203,15 +178,23 @@ public class User implements Parcelable {
     }
 
     public void setOrganization(String organization) {
-        this.mOrganization = organization;
+        mOrganization = organization;
     }
 
-    public List<Setting> getSetting() {
-        return mSetting;
+    public List<Configuration> getConfigurations() {
+        return mConfigurations;
     }
 
-    public void setSetting(List<Setting> configuration) {
-        this.mSetting = configuration;
+    public void setConfigurations(List<Configuration> configurations) {
+        mConfigurations = configurations;
+    }
+
+    public Long getSyncTime() {
+        return mSyncTime;
+    }
+
+    public void setSyncTime(Long syncTime) {
+        mSyncTime = syncTime;
     }
 
     public Auth getAuth() {
@@ -219,15 +202,15 @@ public class User implements Parcelable {
     }
 
     public void setAuth(Auth auth) {
-        this.mAuth = auth;
+        mAuth = auth;
     }
 
-    public Boolean getIsSupervisor() {
+    public Boolean getSupervisor() {
         return mIsSupervisor;
     }
 
-    public void setIsSupervisor(Boolean isSupervisor) {
-        this.mIsSupervisor = isSupervisor;
+    public void setSupervisor(Boolean supervisor) {
+        mIsSupervisor = supervisor;
     }
 
     public String getFirstName() {
@@ -235,7 +218,7 @@ public class User implements Parcelable {
     }
 
     public void setFirstName(String firstName) {
-        this.mFirstName = firstName;
+        mFirstName = firstName;
     }
 
     public String getMidName() {
@@ -243,7 +226,7 @@ public class User implements Parcelable {
     }
 
     public void setMidName(String midName) {
-        this.mMidName = midName;
+        mMidName = midName;
     }
 
     public String getLastName() {
@@ -251,7 +234,7 @@ public class User implements Parcelable {
     }
 
     public void setLastName(String lastName) {
-        this.mLastName = lastName;
+        mLastName = lastName;
     }
 
     public String getRuleException() {
@@ -259,7 +242,7 @@ public class User implements Parcelable {
     }
 
     public void setRuleException(String ruleException) {
-        this.mRuleException = ruleException;
+        mRuleException = ruleException;
     }
 
     public Integer getApplyDST() {
@@ -267,7 +250,7 @@ public class User implements Parcelable {
     }
 
     public void setApplyDST(Integer applyDST) {
-        this.mApplyDST = applyDST;
+        mApplyDST = applyDST;
     }
 
     public Integer getUsCycle() {
@@ -275,7 +258,7 @@ public class User implements Parcelable {
     }
 
     public void setUsCycle(Integer usCycle) {
-        this.mUsCycle = usCycle;
+        mUsCycle = usCycle;
     }
 
     public Integer getCaCycle() {
@@ -283,15 +266,15 @@ public class User implements Parcelable {
     }
 
     public void setCaCycle(Integer caCycle) {
-        this.mCaCycle = caCycle;
+        mCaCycle = caCycle;
     }
 
-    public Long getLastModified() {
-        return mLastModified;
+    public Integer getCycleCountry() {
+        return mCycleCountry;
     }
 
-    public void setLastModified(Long lastModified) {
-        this.mLastModified = lastModified;
+    public void setCycleCountry(Integer cycleCountry) {
+        mCycleCountry = cycleCountry;
     }
 
     public String getOrgAddr() {
@@ -299,7 +282,7 @@ public class User implements Parcelable {
     }
 
     public void setOrgAddr(String orgAddr) {
-        this.mOrgAddr = orgAddr;
+        mOrgAddr = orgAddr;
     }
 
     @Override
@@ -312,20 +295,18 @@ public class User implements Parcelable {
 
         return new EqualsBuilder()
                 .append(mId, user.mId)
-                .append(mOrgId, user.mOrgId)
-                .append(mEmployeeId, user.mEmployeeId)
-                .append(mPassword, user.mPassword)
-                .append(mIsSupervisorInt, user.mIsSupervisorInt)
                 .append(mTimezone, user.mTimezone)
-                .append(mSignatureId, user.mSignatureId)
+                .append(mEmail, user.mEmail)
                 .append(mAddress, user.mAddress)
                 .append(mCity, user.mCity)
                 .append(mState, user.mState)
                 .append(mCountry, user.mCountry)
+                .append(mLicense, user.mLicense)
                 .append(mSignature, user.mSignature)
                 .append(mUpdated, user.mUpdated)
                 .append(mOrganization, user.mOrganization)
-                .append(mSetting, user.mSetting)
+                .append(mConfigurations, user.mConfigurations)
+                .append(mSyncTime, user.mSyncTime)
                 .append(mAuth, user.mAuth)
                 .append(mIsSupervisor, user.mIsSupervisor)
                 .append(mFirstName, user.mFirstName)
@@ -335,7 +316,7 @@ public class User implements Parcelable {
                 .append(mApplyDST, user.mApplyDST)
                 .append(mUsCycle, user.mUsCycle)
                 .append(mCaCycle, user.mCaCycle)
-                .append(mLastModified, user.mLastModified)
+                .append(mCycleCountry, user.mCycleCountry)
                 .append(mOrgAddr, user.mOrgAddr)
                 .isEquals();
     }
@@ -344,20 +325,18 @@ public class User implements Parcelable {
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
                 .append(mId)
-                .append(mOrgId)
-                .append(mEmployeeId)
-                .append(mPassword)
-                .append(mIsSupervisorInt)
                 .append(mTimezone)
-                .append(mSignatureId)
+                .append(mEmail)
                 .append(mAddress)
                 .append(mCity)
                 .append(mState)
                 .append(mCountry)
+                .append(mLicense)
                 .append(mSignature)
                 .append(mUpdated)
                 .append(mOrganization)
-                .append(mSetting)
+                .append(mConfigurations)
+                .append(mSyncTime)
                 .append(mAuth)
                 .append(mIsSupervisor)
                 .append(mFirstName)
@@ -367,9 +346,40 @@ public class User implements Parcelable {
                 .append(mApplyDST)
                 .append(mUsCycle)
                 .append(mCaCycle)
-                .append(mLastModified)
+                .append(mCycleCountry)
                 .append(mOrgAddr)
                 .toHashCode();
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("User{");
+        sb.append("mId=").append(mId);
+        sb.append(", mTimezone='").append(mTimezone).append('\'');
+        sb.append(", mEmail='").append(mEmail).append('\'');
+        sb.append(", mAddress='").append(mAddress).append('\'');
+        sb.append(", mCity='").append(mCity).append('\'');
+        sb.append(", mState='").append(mState).append('\'');
+        sb.append(", mCountry='").append(mCountry).append('\'');
+        sb.append(", mLicense='").append(mLicense).append('\'');
+        sb.append(", mSignature='").append(mSignature).append('\'');
+        sb.append(", mUpdated=").append(mUpdated);
+        sb.append(", mOrganization='").append(mOrganization).append('\'');
+        sb.append(", mConfigurations=").append(mConfigurations);
+        sb.append(", mSyncTime=").append(mSyncTime);
+        sb.append(", mAuth=").append(mAuth);
+        sb.append(", mIsSupervisor=").append(mIsSupervisor);
+        sb.append(", mFirstName='").append(mFirstName).append('\'');
+        sb.append(", mMidName='").append(mMidName).append('\'');
+        sb.append(", mLastName='").append(mLastName).append('\'');
+        sb.append(", mRuleException='").append(mRuleException).append('\'');
+        sb.append(", mApplyDST=").append(mApplyDST);
+        sb.append(", mUsCycle=").append(mUsCycle);
+        sb.append(", mCaCycle=").append(mCaCycle);
+        sb.append(", mCycleCountry=").append(mCycleCountry);
+        sb.append(", mOrgAddr='").append(mOrgAddr).append('\'');
+        sb.append('}');
+        return sb.toString();
     }
 
     @Override
@@ -380,20 +390,18 @@ public class User implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeValue(this.mId);
-        dest.writeValue(this.mOrgId);
-        dest.writeString(this.mEmployeeId);
-        dest.writeString(this.mPassword);
-        dest.writeValue(this.mIsSupervisorInt);
         dest.writeString(this.mTimezone);
-        dest.writeValue(this.mSignatureId);
+        dest.writeString(this.mEmail);
         dest.writeString(this.mAddress);
         dest.writeString(this.mCity);
         dest.writeString(this.mState);
         dest.writeString(this.mCountry);
+        dest.writeString(this.mLicense);
         dest.writeString(this.mSignature);
         dest.writeValue(this.mUpdated);
         dest.writeString(this.mOrganization);
-        dest.writeList(this.mSetting);
+        dest.writeTypedList(this.mConfigurations);
+        dest.writeValue(this.mSyncTime);
         dest.writeParcelable(this.mAuth, flags);
         dest.writeValue(this.mIsSupervisor);
         dest.writeString(this.mFirstName);
@@ -403,7 +411,7 @@ public class User implements Parcelable {
         dest.writeValue(this.mApplyDST);
         dest.writeValue(this.mUsCycle);
         dest.writeValue(this.mCaCycle);
-        dest.writeValue(this.mLastModified);
+        dest.writeValue(this.mCycleCountry);
         dest.writeString(this.mOrgAddr);
     }
 
@@ -412,21 +420,18 @@ public class User implements Parcelable {
 
     protected User(Parcel in) {
         this.mId = (Integer) in.readValue(Integer.class.getClassLoader());
-        this.mOrgId = (Integer) in.readValue(Integer.class.getClassLoader());
-        this.mEmployeeId = in.readString();
-        this.mPassword = in.readString();
-        this.mIsSupervisorInt = (Integer) in.readValue(Integer.class.getClassLoader());
         this.mTimezone = in.readString();
-        this.mSignatureId = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.mEmail = in.readString();
         this.mAddress = in.readString();
         this.mCity = in.readString();
         this.mState = in.readString();
         this.mCountry = in.readString();
+        this.mLicense = in.readString();
         this.mSignature = in.readString();
         this.mUpdated = (Boolean) in.readValue(Boolean.class.getClassLoader());
         this.mOrganization = in.readString();
-        this.mSetting = new ArrayList<>();
-        in.readList(this.mSetting, Setting.class.getClassLoader());
+        this.mConfigurations = in.createTypedArrayList(Configuration.CREATOR);
+        this.mSyncTime = (Long) in.readValue(Long.class.getClassLoader());
         this.mAuth = in.readParcelable(Auth.class.getClassLoader());
         this.mIsSupervisor = (Boolean) in.readValue(Boolean.class.getClassLoader());
         this.mFirstName = in.readString();
@@ -436,7 +441,7 @@ public class User implements Parcelable {
         this.mApplyDST = (Integer) in.readValue(Integer.class.getClassLoader());
         this.mUsCycle = (Integer) in.readValue(Integer.class.getClassLoader());
         this.mCaCycle = (Integer) in.readValue(Integer.class.getClassLoader());
-        this.mLastModified = (Long) in.readValue(Integer.class.getClassLoader());
+        this.mCycleCountry = (Integer) in.readValue(Integer.class.getClassLoader());
         this.mOrgAddr = in.readString();
     }
 
@@ -451,37 +456,4 @@ public class User implements Parcelable {
             return new User[size];
         }
     };
-
-    @Override
-    public String toString() {
-        final StringBuilder sb = new StringBuilder("User{");
-        sb.append("mId=").append(mId);
-        sb.append(", mOrgId=").append(mOrgId);
-        sb.append(", mEmployeeId='").append(mEmployeeId).append('\'');
-        sb.append(", mPassword='").append(mPassword).append('\'');
-        sb.append(", mIsSupervisorInt=").append(mIsSupervisorInt);
-        sb.append(", mTimezone='").append(mTimezone).append('\'');
-        sb.append(", mSignatureId=").append(mSignatureId);
-        sb.append(", mAddress='").append(mAddress).append('\'');
-        sb.append(", mCity='").append(mCity).append('\'');
-        sb.append(", mState='").append(mState).append('\'');
-        sb.append(", mCountry='").append(mCountry).append('\'');
-        sb.append(", mSignature='").append(mSignature).append('\'');
-        sb.append(", mUpdated=").append(mUpdated);
-        sb.append(", mOrganization='").append(mOrganization).append('\'');
-        sb.append(", mSetting=").append(mSetting);
-        sb.append(", mAuth=").append(mAuth);
-        sb.append(", mIsSupervisor=").append(mIsSupervisor);
-        sb.append(", mFirstName='").append(mFirstName).append('\'');
-        sb.append(", mMidName='").append(mMidName).append('\'');
-        sb.append(", mLastName='").append(mLastName).append('\'');
-        sb.append(", mRuleException='").append(mRuleException).append('\'');
-        sb.append(", mApplyDST=").append(mApplyDST);
-        sb.append(", mUsCycle=").append(mUsCycle);
-        sb.append(", mCaCycle=").append(mCaCycle);
-        sb.append(", mLastModified=").append(mLastModified);
-        sb.append(", mOrgAddr='").append(mOrgAddr).append('\'');
-        sb.append('}');
-        return sb.toString();
-    }
 }
