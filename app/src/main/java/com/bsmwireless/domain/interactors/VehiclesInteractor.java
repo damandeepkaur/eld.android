@@ -4,8 +4,8 @@ import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.network.authenticator.TokenManager;
 import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.PreferencesManager;
-import com.bsmwireless.data.storage.vehicle.VehicleConverter;
-import com.bsmwireless.models.ELDDriverStatus;
+import com.bsmwireless.data.storage.vehicles.VehicleConverter;
+import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.Vehicle;
 
 import java.util.List;
@@ -38,7 +38,7 @@ public class VehiclesInteractor {
 
     public Completable saveSelectedVehicle(Vehicle vehicle) {
         return Completable.fromAction(() -> {
-            mAppDatabase.vehicleModel().insertVehicle(VehicleConverter.toEntity(vehicle));
+            mAppDatabase.vehicleDao().insertVehicle(VehicleConverter.toEntity(vehicle));
             mPreferencesManager.setSelectedVehicleId(vehicle.getId());
             mPreferencesManager.setSelectedBoxId(vehicle.getBoxId());
         }).subscribeOn(Schedulers.io());
@@ -53,12 +53,12 @@ public class VehiclesInteractor {
                 .subscribeOn(Schedulers.io());
     }
 
-    public Observable<List<ELDDriverStatus>> pairVehicle(ELDDriverStatus status) {
+    public Observable<List<ELDEvent>> pairVehicle(ELDEvent event) {
         int boxId = mPreferencesManager.getSelectedBoxId();
         if (boxId == PreferencesManager.NOT_FOUND_VALUE) {
             return Observable.error(new Throwable("Not found selected boxId"));
         } else {
-            return mServiceApi.pairVehicle(status, boxId).subscribeOn(Schedulers.io());
+            return mServiceApi.pairVehicle(event, boxId).subscribeOn(Schedulers.io());
         }
     }
 

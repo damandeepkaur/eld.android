@@ -1,5 +1,7 @@
 package com.bsmwireless.common.dagger;
 
+import android.content.Context;
+
 import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.network.authenticator.TokenManager;
 import com.bsmwireless.data.storage.AppDatabase;
@@ -15,6 +17,8 @@ import dagger.Component;
 @Singleton
 @Component(modules = {ContextModule.class, NetworkModule.class, DatabaseModule.class, TokenModule.class, PreferencesModule.class, CacheModule.class})
 public interface AppComponent {
+    Context context();
+
     ServiceApi serviceApi();
 
     AppDatabase appDatabase();

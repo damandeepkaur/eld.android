@@ -2,6 +2,7 @@ package com.bsmwireless.screens.login;
 
 import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.domain.interactors.LoginUserInteractor;
+import com.bsmwireless.models.User;
 
 import javax.inject.Inject;
 
@@ -49,7 +50,7 @@ public class LoginPresenter {
         }
         mView.setLoginButtonEnabled(false);
 
-        Disposable disposable = mLoginUserInteractor.loginUser(username, password, domain, keepToken)
+        Disposable disposable = mLoginUserInteractor.loginUser(username, password, domain, keepToken, User.DriverType.DRIVER)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         status -> {

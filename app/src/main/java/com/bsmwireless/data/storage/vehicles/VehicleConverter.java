@@ -1,4 +1,4 @@
-package com.bsmwireless.data.storage.vehicle;
+package com.bsmwireless.data.storage.vehicles;
 
 import com.bsmwireless.models.Vehicle;
 

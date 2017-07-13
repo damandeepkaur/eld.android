@@ -2,8 +2,9 @@ package com.bsmwireless.screens.selectasset;
 
 import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.domain.interactors.BlackBoxInteractor;
+import com.bsmwireless.domain.interactors.ELDEventsInteractor;
 import com.bsmwireless.domain.interactors.VehiclesInteractor;
-import com.bsmwireless.models.ELDDriverStatus;
+import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.Vehicle;
 
 import javax.inject.Inject;
@@ -16,13 +17,15 @@ import timber.log.Timber;
 public class SelectAssetPresenter {
     private SelectAssetView mView;
     private VehiclesInteractor mVehiclesInteractor;
+    private ELDEventsInteractor mELDEventsInteractor;
     private BlackBoxInteractor mBlackBoxInteractor;
     private CompositeDisposable mDisposables;
 
     @Inject
-    public SelectAssetPresenter(SelectAssetView view, VehiclesInteractor vehiclesInteractor, BlackBoxInteractor blackBoxInteractor) {
+    public SelectAssetPresenter(SelectAssetView view, VehiclesInteractor vehiclesInteractor, ELDEventsInteractor eventsInteractor, BlackBoxInteractor blackBoxInteractor) {
         mView = view;
         mVehiclesInteractor = vehiclesInteractor;
+        mELDEventsInteractor = eventsInteractor;
         mBlackBoxInteractor = blackBoxInteractor;
         mDisposables = new CompositeDisposable();
 
@@ -61,36 +64,34 @@ public class SelectAssetPresenter {
     }
 
     public void onVehicleListItemClicked(Vehicle vehicle) {
-        ELDDriverStatus status = new ELDDriverStatus();
+        ELDEvent event = new ELDEvent();
         int id = mVehiclesInteractor.getDriverId();
 
         //TODO: get real data for hos
-        status.setEngineHours(50);
+        event.setEngineHours(50);
 
-        status.setMobileTime(System.currentTimeMillis());
-        status.setDriverId(id);
-        status.setVehicleId(vehicle.getId());
-        status.setBoxId(vehicle.getBoxId());
+        event.setMobileTime(System.currentTimeMillis());
+        event.setDriverId(id);
+        event.setVehicleId(vehicle.getId());
+        event.setBoxId(vehicle.getBoxId());
 
         mDisposables.add(mVehiclesInteractor.saveSelectedVehicle(vehicle)
                 .andThen(mVehiclesInteractor.getTimezone(id))
                 .flatMap(timeZone -> {
-                    status.setTimezone(timeZone);
+                    event.setTimezone(timeZone);
 
                     return mBlackBoxInteractor.getData();
                 })
                 .flatMap(blackBox -> {
-                    status.setOdometer(blackBox.getOdometer());
-                    status.setLat(blackBox.getLat());
-                    status.setLng(blackBox.getLon());
+                    event.setOdometer(blackBox.getOdometer());
+                    event.setLat(blackBox.getLat());
+                    event.setLng(blackBox.getLon());
 
-                    return mVehiclesInteractor.pairVehicle(status);
+                    return mVehiclesInteractor.pairVehicle(event);
                 })
+                .doOnNext(events -> mELDEventsInteractor.storeEvents(events, true))
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(statuses -> {
-                            //TODO: store statuses
-                            mView.goToMainScreen();
-                        },
+                .subscribe(events -> mView.goToMainScreen(),
                         Timber::e));
     }
 
