@@ -9,6 +9,7 @@ import com.bsmwireless.models.Event;
 import com.bsmwireless.models.HOSAlert;
 import com.bsmwireless.models.InspectionReport;
 import com.bsmwireless.models.Location;
+import com.bsmwireless.models.LogSheetHeader;
 import com.bsmwireless.models.LoginModel;
 import com.bsmwireless.models.NewRule;
 import com.bsmwireless.models.Registry;
@@ -82,15 +83,6 @@ public interface ServiceApi {
     Observable<ResponseMessage> postNewELDEvents(@Body List<ELDEvent> statusList, @Header("X-Box") int boxId);
 
     /**
-     * Update unidentified records or change record request.
-     *
-     * @param events events list.
-     * @return Response {@link ResponseMessage}.
-     */
-    @PUT("v1/sync/records/update")
-    Observable<ResponseMessage> updateELDEvents(@Body List<ELDEvent> events);
-
-    /**
      * Fetch processed driver records.
      *
      * @param startTime start time.
@@ -99,6 +91,15 @@ public interface ServiceApi {
      */
     @GET("v1/sync/records/search/{start}/{end}")
     Observable<List<ELDEvent>> getELDEvents(@Path("start") long startTime, @Path("end") long endTime);
+
+    /**
+     * Update unidentified records or change record request.
+     *
+     * @param events events list.
+     * @return Response {@link ResponseMessage}.
+     */
+    @PUT("v1/sync/records/update")
+    Observable<ResponseMessage> updateELDEvents(@Body List<ELDEvent> events);
 
     /**
      * Inspection Categories from category Ids
@@ -135,6 +136,28 @@ public interface ServiceApi {
                                                       @Path("isTrailer") int isTrailer,
                                                       @Path("beginDate") Long beginDate,
                                                       @Header("X-Box") int boxId);
+
+    /**
+     * Get LogSheet header information list.
+     *
+     * @param startLogDay epoch unix time stamp, in miliseconds.
+     * @param endLogDay epoch unix time stamp, in miliseconds.
+     * @return LogSheet Response {@link LogSheetHeader}
+     */
+    @GET("v1/sync/logsheet/headers/{start}/{end}")
+    Observable<List<LogSheetHeader>> getLogSheets(@Path("start") Long startLogDay,
+                                                  @Path("end") Long endLogDay);
+
+    /**
+     * Send LogSheet header information. If logday is same,
+     * server will do the update of the existing record.
+     * Full record is required for each call.
+     *
+     * @param logSheetHeader info.
+     * @return Update LogSheet header Response {@link ResponseMessage}
+     */
+    @PUT("v1/sync/logsheet/header")
+    Observable<ResponseMessage> updateLogSheetHeader(@Body LogSheetHeader logSheetHeader);
 
     /**
      * Link the driver to the vehicle, fetch unidentified record for update, and carrier's change requests.

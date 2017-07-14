@@ -8,8 +8,8 @@ android {
         applicationId "app.bsmuniversal.com"
         minSdkVersion 14
         targetSdkVersion 25
-        versionCode 12
-        versionName "1.0.11"
+        versionCode 14
+        versionName "1.0.13"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         javaCompileOptions {
@@ -103,9 +103,9 @@ gradle.buildFinished{ result ->
                     fileName.replace('app-release', appName)
                 }
             }
-			
-			// rename local apk file in order for Jenkins uploading to external FTP
-			copy {
+
+            // rename local apk file in order for Jenkins uploading to external FTP
+            copy {
                 from 'build/outputs/apk'
                 into 'build/outputs/apk'
                 include 'app-release.apk'
