@@ -22,13 +22,22 @@ public class VehiclesInteractor {
     private AppDatabase mAppDatabase;
     private TokenManager mTokenManager;
     private PreferencesManager mPreferencesManager;
+    private BlackBoxInteractor mBlackBoxInteractor;
+    private ELDEventsInteractor mELDEventsInteractor;
 
     @Inject
-    public VehiclesInteractor(ServiceApi serviceApi, PreferencesManager preferencesManager, AppDatabase appDatabase, TokenManager tokenManager) {
+    public VehiclesInteractor(ServiceApi serviceApi,
+                              PreferencesManager preferencesManager,
+                              AppDatabase appDatabase,
+                              TokenManager tokenManager,
+                              BlackBoxInteractor blackBoxInteractor,
+                              ELDEventsInteractor eventsInteractor) {
         mServiceApi = serviceApi;
         mPreferencesManager = preferencesManager;
         mAppDatabase = appDatabase;
         mTokenManager = tokenManager;
+        mBlackBoxInteractor = blackBoxInteractor;
+        mELDEventsInteractor = eventsInteractor;
     }
 
     public Observable<List<Vehicle>> searchVehicles(String searchText) {
@@ -51,12 +60,31 @@ public class VehiclesInteractor {
                 });
     }
 
-    public Observable<List<ELDEvent>> pairVehicle(int boxId, ELDEvent event) {
-        if (boxId == PreferencesManager.NOT_FOUND_VALUE) {
-            return Observable.error(new Throwable("Not found selected boxId"));
-        } else {
-            return mServiceApi.pairVehicle(event, boxId);
-        }
+    public Observable<List<ELDEvent>> pairVehicle(Vehicle vehicle) {
+        ELDEvent event = new ELDEvent();
+        int id = getDriverId();
+
+        //TODO: get real data for hos
+        event.setEngineHours(50);
+
+        event.setMobileTime(System.currentTimeMillis());
+        event.setDriverId(id);
+        event.setVehicleId(vehicle.getId());
+        event.setBoxId(vehicle.getBoxId());
+
+        return mBlackBoxInteractor.getData()
+                .flatMap(blackBox -> {
+                    event.setTimezone(getTimezone(id));
+                    event.setOdometer(blackBox.getOdometer());
+                    event.setLat(blackBox.getLat());
+                    event.setLng(blackBox.getLon());
+
+                    return mServiceApi.pairVehicle(event, vehicle.getBoxId());
+                })
+                .doOnNext(events -> {
+                    saveSelectedVehicle(vehicle);
+                    mELDEventsInteractor.storeEvents(events, true);
+                });
     }
 
     public Integer getDriverId() {
