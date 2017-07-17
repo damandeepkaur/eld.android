@@ -11,6 +11,7 @@ import javax.inject.Inject;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
 @ActivityScope
@@ -38,6 +39,7 @@ public class SelectAssetPresenter {
             mView.showErrorMessage();
         } else {
             mDisposables.add(mVehiclesInteractor.searchVehicles(searchText)
+                    .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
                             vehicles -> {
@@ -58,6 +60,7 @@ public class SelectAssetPresenter {
 
     public void onNotInVehicleButtonClicked() {
         mDisposables.add(mVehiclesInteractor.cleanSelectedVehicle()
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(() -> mView.goToMainScreen(),
                         Timber::e));
@@ -75,21 +78,20 @@ public class SelectAssetPresenter {
         event.setVehicleId(vehicle.getId());
         event.setBoxId(vehicle.getBoxId());
 
-        mDisposables.add(mVehiclesInteractor.saveSelectedVehicle(vehicle)
-                .andThen(mVehiclesInteractor.getTimezone(id))
-                .flatMap(timeZone -> {
-                    event.setTimezone(timeZone);
-
-                    return mBlackBoxInteractor.getData();
-                })
+        mDisposables.add(mBlackBoxInteractor.getData()
                 .flatMap(blackBox -> {
+                    event.setTimezone(mVehiclesInteractor.getTimezone(id));
                     event.setOdometer(blackBox.getOdometer());
                     event.setLat(blackBox.getLat());
                     event.setLng(blackBox.getLon());
 
-                    return mVehiclesInteractor.pairVehicle(event);
+                    return mVehiclesInteractor.pairVehicle(vehicle.getBoxId(), event);
                 })
-                .doOnNext(events -> mELDEventsInteractor.storeEvents(events, true))
+                .doOnNext(events -> {
+                    mVehiclesInteractor.saveSelectedVehicle(vehicle);
+                    mELDEventsInteractor.storeEvents(events, true);
+                })
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(events -> mView.goToMainScreen(),
                         Timber::e));

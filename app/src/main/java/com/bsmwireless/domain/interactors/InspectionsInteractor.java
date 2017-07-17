@@ -28,7 +28,7 @@ public class InspectionsInteractor {
         if (boxId == PreferencesManager.NOT_FOUND_VALUE) {
             return Observable.error(new Throwable("Not found selected boxId"));
         } else {
-            return mServiceApi.getInspectionItemsByCategoryIds(boxId, categoryIds).subscribeOn(Schedulers.io());
+            return mServiceApi.getInspectionItemsByCategoryIds(boxId, categoryIds);
         }
     }
 
@@ -37,7 +37,7 @@ public class InspectionsInteractor {
         if (boxId == PreferencesManager.NOT_FOUND_VALUE) {
             return Observable.error(new Throwable("Not found selected boxId"));
         } else {
-            return mServiceApi.getInspectionItemsByLastUpdate(boxId, lastUpdate).subscribeOn(Schedulers.io());
+            return mServiceApi.getInspectionItemsByLastUpdate(boxId, lastUpdate);
         }
     }
 
@@ -46,7 +46,7 @@ public class InspectionsInteractor {
         if (boxId == PreferencesManager.NOT_FOUND_VALUE) {
             return Observable.error(new Throwable("Not found selected boxId"));
         } else {
-            return mServiceApi.syncInspectionReport(lastUpdate, isTrailer, beginDate, boxId).subscribeOn(Schedulers.io());
+            return mServiceApi.syncInspectionReport(lastUpdate, isTrailer, beginDate, boxId);
         }
     }
 }

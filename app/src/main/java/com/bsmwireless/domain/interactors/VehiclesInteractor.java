@@ -14,7 +14,6 @@ import javax.inject.Inject;
 
 import io.reactivex.Completable;
 import io.reactivex.Observable;
-import io.reactivex.schedulers.Schedulers;
 
 public class VehiclesInteractor {
     private static final int NOT_IN_VEHICLE_ID = -1;
@@ -33,7 +32,7 @@ public class VehiclesInteractor {
     }
 
     public Observable<List<Vehicle>> searchVehicles(String searchText) {
-        return mServiceApi.searchVehicles(searchText).subscribeOn(Schedulers.io());
+        return mServiceApi.searchVehicles(searchText);
     }
 
     public Completable saveSelectedVehicle(Vehicle vehicle) {
@@ -41,7 +40,7 @@ public class VehiclesInteractor {
             mAppDatabase.vehicleDao().insertVehicle(VehicleConverter.toEntity(vehicle));
             mPreferencesManager.setSelectedVehicleId(vehicle.getId());
             mPreferencesManager.setSelectedBoxId(vehicle.getBoxId());
-        }).subscribeOn(Schedulers.io());
+        });
     }
 
     public Completable cleanSelectedVehicle() {
@@ -49,16 +48,14 @@ public class VehiclesInteractor {
                 () ->  {
                     mPreferencesManager.setSelectedVehicleId(NOT_IN_VEHICLE_ID);
                     mPreferencesManager.setSelectedBoxId(NOT_IN_VEHICLE_ID);
-                })
-                .subscribeOn(Schedulers.io());
+                });
     }
 
-    public Observable<List<ELDEvent>> pairVehicle(ELDEvent event) {
-        int boxId = mPreferencesManager.getSelectedBoxId();
+    public Observable<List<ELDEvent>> pairVehicle(int boxId, ELDEvent event) {
         if (boxId == PreferencesManager.NOT_FOUND_VALUE) {
             return Observable.error(new Throwable("Not found selected boxId"));
         } else {
-            return mServiceApi.pairVehicle(event, boxId).subscribeOn(Schedulers.io());
+            return mServiceApi.pairVehicle(event, boxId);
         }
     }
 
@@ -67,8 +64,7 @@ public class VehiclesInteractor {
         return id == null || id.isEmpty() ? -1 : Integer.valueOf(id);
     }
 
-    public Observable<String> getTimezone(int driverId) {
-        //TODO: get time zone from database
-        return Observable.just("America/Puerto_Rico");
+    public String getTimezone(int driverId) {
+        return mAppDatabase.userDao().getTimezoneById(driverId).getTimezone();
     }
 }

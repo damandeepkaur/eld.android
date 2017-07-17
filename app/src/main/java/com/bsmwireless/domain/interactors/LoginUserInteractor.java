@@ -40,7 +40,6 @@ public class LoginUserInteractor {
         request.setDriverType(driverType.ordinal());
 
         return mServiceApi.loginUser(request)
-                .subscribeOn(Schedulers.io())
                 .doOnNext(user -> {
                     String accountName = mTokenManager.getAccountName(name, domain);
 
@@ -55,11 +54,11 @@ public class LoginUserInteractor {
     }
 
     public Observable<ResponseMessage> logoutUser(ELDEvent event) {
-        return mServiceApi.logout(event).subscribeOn(Schedulers.io());
+        return mServiceApi.logout(event);
     }
 
     public Observable<ResponseMessage> updateUser(User user) {
-        return mServiceApi.updateProfile(user).subscribeOn(Schedulers.io());
+        return mServiceApi.updateProfile(user);
     }
 
     public String getUserName() {
