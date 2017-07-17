@@ -34,7 +34,6 @@ public class ELDEventsInteractor {
     public Observable<ResponseMessage> updateELDEvents(List<ELDEvent> events) {
         if (NetworkUtils.isOnlineMode()) {
             return mServiceApi.updateELDEvents(events)
-                    .subscribeOn(Schedulers.io())
                     .doOnError(throwable -> storeEvents(events, false));
         } else {
             storeEvents(events, false);
@@ -44,7 +43,6 @@ public class ELDEventsInteractor {
 
     public Observable<List<ELDEvent>> getELDEvents(long startTime, long endTime) {
         return mServiceApi.getELDEvents(startTime, endTime)
-                .subscribeOn(Schedulers.io())
                 .onErrorReturn(throwable -> ELDEventConverter.toModelList(mELDEventDao.getEventsForInterval(startTime, endTime)))
                 .doOnNext(events -> storeEvents(events, false));
     }
@@ -52,7 +50,6 @@ public class ELDEventsInteractor {
     public Observable<ResponseMessage> postNewELDEvent(ELDEvent event) {
         if (NetworkUtils.isOnlineMode()) {
             return mServiceApi.postNewELDEvent(event, mPreferencesManager.getSelectedBoxId())
-                    .subscribeOn(Schedulers.io())
                     .doOnError(throwable -> storeEvent(event, false));
         } else {
             storeEvent(event, false);
@@ -63,7 +60,6 @@ public class ELDEventsInteractor {
     public Observable<ResponseMessage> postNewELDEvents(List<ELDEvent> events) {
         if (NetworkUtils.isOnlineMode()) {
             return mServiceApi.postNewELDEvents(events, mPreferencesManager.getSelectedBoxId())
-                    .subscribeOn(Schedulers.io())
                     .doOnError(throwable -> events.forEach(event -> storeEvent(event, false)));
         } else {
             storeEvents(events, false);
@@ -71,16 +67,16 @@ public class ELDEventsInteractor {
         }
     }
 
-    private void storeEvent(ELDEvent event, boolean isSynced) {
+    public void storeEvent(ELDEvent event, boolean isSynced) {
         ELDEventEntity entity = ELDEventConverter.toEntity(event);
         entity.setSync(isSynced);
         mELDEventDao.insertEvent(entity);
     }
 
-    private void storeEvents(List<ELDEvent> events, boolean isSynced) {
+    public void storeEvents(List<ELDEvent> events, boolean isSynced) {
         ELDEventEntity[] entities = ELDEventConverter.toEntityList(events).toArray(new ELDEventEntity[events.size()]);
-        for (int i = 0; i < entities.length; i++) {
-            entities[i].setSync(isSynced);
+        for (ELDEventEntity entity : entities) {
+            entity.setSync(isSynced);
         }
         mELDEventDao.insertAll(entities);
     }

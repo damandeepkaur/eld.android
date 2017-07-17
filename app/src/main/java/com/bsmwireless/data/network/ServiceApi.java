@@ -2,7 +2,6 @@ package com.bsmwireless.data.network;
 
 import com.bsmwireless.models.Auth;
 import com.bsmwireless.models.CUDTripInfo;
-import com.bsmwireless.models.Driver;
 import com.bsmwireless.models.DriverLog;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.EmailReport;
@@ -62,6 +61,15 @@ public interface ServiceApi {
      */
     @POST("v1/app/driver/certify")
     Observable<ResponseMessage> postNewELDEvent(@Body ELDEvent event, @Header("X-Box") int boxId);
+
+    /**
+     * Update user profile and signature
+     *
+     * @param user user information.
+     * @return update user information response {@link ResponseMessage}.
+     */
+    @PUT("v1/app/driver/profile")
+    Observable<ResponseMessage> updateProfile(@Body User user);
 
     /**
      * Send ELD events;
@@ -154,11 +162,12 @@ public interface ServiceApi {
     /**
      * Link the driver to the vehicle, fetch unidentified record for update, and carrier's change requests.
      *
+     * @param status current driver status
      * @param boxId id of the box paired with the vehicle.
      * @return Pair Vehicle Response {@link ELDEvent}
      */
     @POST("v1/login/pair")
-    Observable<List<ELDEvent>> loginPairVehicle(@Header("X-Box") int boxId);
+    Observable<List<ELDEvent>> pairVehicle(@Body ELDEvent status, @Header("X-Box") int boxId);
 
     /**
      * Login request Vehicle.
@@ -177,7 +186,6 @@ public interface ServiceApi {
      */
     @GET("v1/app/vehicles/search/{keyword}")
     Observable<List<Vehicle>> searchVehicles(@Path("keyword") String keyword);
-
 
     /**
      * Get last 14 days of driver time log, trip info and rule selection history.
@@ -268,16 +276,6 @@ public interface ServiceApi {
     //TODO: Check this request with real server and update if necessary
     @PUT("v1/app/inspections")
     Observable<ResponseMessage> updateCUDInspection(@Body Report cudReport);
-
-    /**
-     * Submit driver profile.
-     *
-     * @param driver driver information.
-     * @return update driver information response {@link ResponseMessage}.
-     */
-    //TODO: Check this request with real server and update if necessary
-    @PUT("v1/app/drivers")
-    Observable<ResponseMessage> updateDriver(@Body Driver driver);
 
     /**
      * Submit (add) HOS alert.
