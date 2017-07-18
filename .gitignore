@@ -38,4 +38,5 @@ gradle.properties
 /captures
 /app/build
 /app/*.apk
+/app/schemas
 

@@ -21,10 +21,10 @@ public class LogSheetInteractor {
     }
 
     public Observable<List<LogSheetHeader>> syncLogSheetHeader(Long startLogDay, Long endLogDay) {
-        return mServiceApi.getLogSheets(startLogDay, endLogDay).subscribeOn(Schedulers.io());
+        return mServiceApi.getLogSheets(startLogDay, endLogDay);
     }
 
     public Observable<ResponseMessage> updateLogSheetHeader(LogSheetHeader logSheetHeader) {
-        return mServiceApi.updateLogSheetHeader(logSheetHeader).subscribeOn(Schedulers.io());
+        return mServiceApi.updateLogSheetHeader(logSheetHeader);
     }
 }

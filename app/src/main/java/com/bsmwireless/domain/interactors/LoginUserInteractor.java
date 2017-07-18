@@ -7,6 +7,7 @@ import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.data.storage.users.UserConverter;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.LoginModel;
+import com.bsmwireless.models.ResponseMessage;
 import com.bsmwireless.models.User;
 
 import java.util.List;
@@ -39,7 +40,6 @@ public class LoginUserInteractor {
         request.setDriverType(driverType.ordinal());
 
         return mServiceApi.loginUser(request)
-                .subscribeOn(Schedulers.io())
                 .doOnNext(user -> {
                     String accountName = mTokenManager.getAccountName(name, domain);
 
@@ -47,19 +47,18 @@ public class LoginUserInteractor {
                     mPreferencesManager.setAccountName(accountName);
                     mPreferencesManager.setRememberUserEnabled(keepToken);
 
-                    mTokenManager.setToken(accountName, name, user.getAuth());
+                    mTokenManager.setToken(accountName, name, domain, user.getAuth());
                     mAppDatabase.userDao().insertUser(UserConverter.toEntity(accountName, user));
                 })
                 .map(user -> user != null);
     }
 
-    public Observable<List<ELDEvent>> loginPair() {
-        int boxId = mPreferencesManager.getSelectedBoxId();
-        if (boxId == PreferencesManager.NOT_FOUND_VALUE) {
-            return Observable.error(new Throwable("Not found selected boxId"));
-        } else {
-            return mServiceApi.loginPairVehicle(boxId).subscribeOn(Schedulers.io());
-        }
+    public Observable<ResponseMessage> logoutUser(ELDEvent event) {
+        return mServiceApi.logout(event);
+    }
+
+    public Observable<ResponseMessage> updateUser(User user) {
+        return mServiceApi.updateProfile(user);
     }
 
     public String getUserName() {

@@ -18,6 +18,9 @@ public interface UserDao {
     @Query("SELECT * FROM users WHERE id = :id LIMIT 1")
     Flowable<UserEntity> getUserById(int id);
 
+    @Query("SELECT timezone FROM users WHERE id = :id LIMIT 1")
+    UserEntity getTimezoneById(int id);
+
     @Query("DELETE FROM users WHERE id = :id")
     int deleteUserById(int id);
 
