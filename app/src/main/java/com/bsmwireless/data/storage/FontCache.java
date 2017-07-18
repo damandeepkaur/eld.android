@@ -4,6 +4,9 @@ import android.content.Context;
 import android.graphics.Typeface;
 
 import java.util.HashMap;
+
+import javax.inject.Inject;
+
 import timber.log.Timber;
 
 public class FontCache {
@@ -14,6 +17,7 @@ public class FontCache {
     private Context mContext;
     private HashMap<String, Typeface> mFontCache = new HashMap<>();
 
+    @Inject
     public FontCache(Context context) {
         mContext = context;
     }

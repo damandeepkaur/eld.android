@@ -5,10 +5,10 @@ import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import com.bsmwireless.common.App;
-import com.bsmwireless.screens.taketour.TakeTourActivity;
+import com.bsmwireless.data.storage.FontCache;
 import com.bsmwireless.screens.common.BaseActivity;
 import com.bsmwireless.screens.selectasset.SelectAssetActivity;
 import com.bsmwireless.screens.login.dagger.DaggerLoginComponent;
@@ -39,8 +39,14 @@ public class LoginActivity extends BaseActivity implements LoginView {
     @BindView(R.id.execute_login)
     Button mLoginButton;
 
+    @BindView(R.id.lbl_remember_me)
+    TextView mRememberMe;
+
     @Inject
     LoginPresenter mPresenter;
+
+    @Inject
+    FontCache fontCache;
 
     private Unbinder mUnbinder;
 
@@ -59,6 +65,15 @@ public class LoginActivity extends BaseActivity implements LoginView {
         } else {
             mPresenter.onLoadUserData();
         }
+
+        setEditTextInputsTypeface();
+    }
+
+    private void setEditTextInputsTypeface()  {
+        mUserName.setTypeface(fontCache.get(FontCache.SANS_SERIF));
+        mPassword.setTypeface(fontCache.get(FontCache.SANS_SERIF));
+        mDomain.setTypeface(fontCache.get(FontCache.SANS_SERIF));
+        mRememberMe.setTypeface(fontCache.get(FontCache.SANS_SERIF));
     }
 
     @Override
@@ -72,16 +87,6 @@ public class LoginActivity extends BaseActivity implements LoginView {
     void executeLogin() {
         //TODO: check if remember me activated
         mPresenter.onLoginButtonClicked(true);
-    }
-
-    @OnClick(R.id.go_to_forgot_password)
-    void goToForgotPassword() {
-        mPresenter.onForgotPasswordButtonClicked();
-    }
-
-    @OnClick(R.id.take_a_tour)
-    void takeTour() {
-        startActivity(new Intent(this, TakeTourActivity.class));
     }
 
     @Override
@@ -114,11 +119,6 @@ public class LoginActivity extends BaseActivity implements LoginView {
     public void goToMainScreen() {
         startActivity(new Intent(this, SelectAssetActivity.class));
         finish();
-    }
-
-    @Override
-    public void goToForgotPasswordScreen() {
-        Toast.makeText(this, "Going to forgot password screen", Toast.LENGTH_SHORT).show();
     }
 
     @Override

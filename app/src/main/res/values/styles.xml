@@ -56,6 +56,9 @@
         <item name="android:textAppearanceSmallPopupMenu">@style/myPopupMenuTextAppearanceSmall</item>
         <item name="textAppearanceLargePopupMenu">@style/myPopupMenuTextAppearanceLarge</item>
         <item name="android:textAppearanceLargePopupMenu">@style/myPopupMenuTextAppearanceLarge</item>
+
+        <!-- Added new default color in order to achieve same color for widgets within app-->
+        <item name="colorControlActivated">@color/nasty_green</item>
     </style>
 
     <style name="myPopupMenuStyle" parent="@style/Widget.AppCompat.Light.PopupMenu">
@@ -125,6 +128,10 @@
         <item name="android:textSize">@dimen/helper_text_size</item>
         <item name="android:gravity">center</item>
         <item name="app.bsmuniversal.com:font">fonty</item>
+    </style>
+
+    <style name="TextAppearance.TextInputLayout.Green" parent="@android:style/TextAppearance">
+        <item name="android:textColor">@color/nasty_green</item>
     </style>
 
 </resources>

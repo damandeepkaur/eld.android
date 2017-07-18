@@ -108,16 +108,4 @@ public class LoginPresenterTest {
         //then
         verify(mView).goToMainScreen();
     }
-
-    @Test
-    public void testForgotPasswordButtonPressed() {
-        //given
-        //nothing to do here
-
-        //when
-        mLoginPresenter.onForgotPasswordButtonClicked();
-
-        //then
-        verify(mView).goToForgotPasswordScreen();
-    }
 }
