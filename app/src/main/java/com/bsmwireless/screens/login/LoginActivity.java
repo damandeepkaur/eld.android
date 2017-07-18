@@ -5,10 +5,8 @@ import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import com.bsmwireless.common.App;
-import com.bsmwireless.data.storage.FontCache;
 import com.bsmwireless.screens.common.BaseActivity;
 import com.bsmwireless.screens.selectasset.SelectAssetActivity;
 import com.bsmwireless.screens.login.dagger.DaggerLoginComponent;
@@ -39,8 +37,8 @@ public class LoginActivity extends BaseActivity implements LoginView {
     @BindView(R.id.execute_login)
     Button mLoginButton;
 
-    @BindView(R.id.lbl_remember_me)
-    TextView mRememberMe;
+    @BindView(R.id.switchButton)
+    Button mSwitchButton;
 
     @Inject
     LoginPresenter mPresenter;

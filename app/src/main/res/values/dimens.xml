@@ -61,18 +61,9 @@
     <dimen name="graph_total_padding">10dp</dimen>
 
     <!-- Login Activity -->
-    <dimen name="login_button_width">300dp</dimen>
-    <dimen name="login_button_height">49dp</dimen>
     <dimen name="login_button_margin_left">31dp</dimen>
     <dimen name="login_button_margin_right">29dp</dimen>
-    <dimen name="login_button_margin_top">403dp</dimen>
-    <dimen name="edit_text_margin_left">16dp</dimen>
-    <dimen name="edit_text_margin_right">16dp</dimen>
-    <dimen name="text_input_username_top_margin">105dp</dimen>
-    <dimen name="text_input_password_top_margin">185dp</dimen>
-    <dimen name="text_input_domain_top_margin">265dp</dimen>
-    <dimen name="remember_text_view_margin_top">355dp</dimen>
-    <dimen name="remember_text_view_margin_left">16dp</dimen>
-    <dimen name="toggle_button_margin_right">16dp</dimen>
-    <dimen name="toggle_button_margin_top">354dp</dimen>
+    <dimen name="relative_layout_padding">16dp</dimen>
+    <dimen name="generic_margin_top">16dp</dimen>
+    <dimen name="generic_margin_top_larger">24dp</dimen>
 </resources>

@@ -5,8 +5,6 @@ import android.graphics.Typeface;
 
 import java.util.HashMap;
 
-import javax.inject.Inject;
-
 import timber.log.Timber;
 
 public class FontCache {
