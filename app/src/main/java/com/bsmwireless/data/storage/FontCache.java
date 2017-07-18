@@ -17,7 +17,6 @@ public class FontCache {
     private Context mContext;
     private HashMap<String, Typeface> mFontCache = new HashMap<>();
 
-    @Inject
     public FontCache(Context context) {
         mContext = context;
     }

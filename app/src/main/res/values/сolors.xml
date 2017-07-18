@@ -35,4 +35,9 @@
     <color name="graph_header_paint_color">#555555</color>
     <color name="graph_bar_paint_color">#90C34D</color>
 
+    <!-- Login Activity -->
+    <color name="black">#2f2f2f</color>
+    <color name="greyish_brown">#484848</color>
+    <color name="brownish_grey">#6b6b6b</color>
+
 </resources>

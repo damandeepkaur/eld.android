@@ -98,7 +98,6 @@
     <string name="login_btn_takeatour">TAKE A TOUR</string>
     <string name="login_btn_login">LOGIN</string>
     <string name="login_btn_forgotpassword">FORGOT PASSWORD</string>
-    <string name="login_lbl_rememberme">Remember me</string>
     <string name="login_txthint_domain">Company</string>
     <string name="login_txthint_password">Password</string>
     <string name="login_txthint_username">User Name</string>
@@ -365,4 +364,8 @@
     <string name="timer_default_type">OFF DUTY</string>
     <string name="timer_hours_minutes">HOURS MINUTES</string>
     <string name="string_total">TOTAL</string>
+
+    <!-- Login Activity -->
+    <string name="login_lbl_rememberme">Remember me</string>
+
 </resources>

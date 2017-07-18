@@ -45,9 +45,6 @@ public class LoginActivity extends BaseActivity implements LoginView {
     @Inject
     LoginPresenter mPresenter;
 
-    @Inject
-    FontCache fontCache;
-
     private Unbinder mUnbinder;
 
     @Override
@@ -65,15 +62,6 @@ public class LoginActivity extends BaseActivity implements LoginView {
         } else {
             mPresenter.onLoadUserData();
         }
-
-        setEditTextInputsTypeface();
-    }
-
-    private void setEditTextInputsTypeface()  {
-        mUserName.setTypeface(fontCache.get(FontCache.SANS_SERIF));
-        mPassword.setTypeface(fontCache.get(FontCache.SANS_SERIF));
-        mDomain.setTypeface(fontCache.get(FontCache.SANS_SERIF));
-        mRememberMe.setTypeface(fontCache.get(FontCache.SANS_SERIF));
     }
 
     @Override
