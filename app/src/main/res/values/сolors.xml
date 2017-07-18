@@ -17,6 +17,7 @@
     <color name="material_blue_A200">#ff448aff</color>
     <color name="cancel_btn_color">#FFDD7328</color>
     <color name="next_btn_color">#FF6CAC4A</color>
+    <color name="nasty_green">#7ac144</color>
 
     <!-- App Specific -->
     <color name="help_transparent_background">#99000000</color>
