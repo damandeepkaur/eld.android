@@ -90,7 +90,7 @@
         android:layout_below="@id/domainWrapper"
         android:layout_marginTop="@dimen/generic_margin_top" />
 
-    <Button
+    <android.support.v7.widget.AppCompatButton
         android:id="@+id/execute_login"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
