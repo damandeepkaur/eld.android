@@ -250,7 +250,7 @@
     <string name="str_must_scan_barcode">Please scan barcode to select!</string>
     <string name="search">Recherche</string>
     <string name="not_in_vehicle">Absent du véhicule</string>
-    <string name="asset">Sélectionner un véhicule</string>
+    <string name="select_asset">Sélectionner un véhicule</string>
     <string name="str_enter_asset_name">Entrer le nom du véhicule</string>
     <string name="found_barcode">Code à barres trouvé:</string>
     <string name="scan_failed">Scan échoué</string>

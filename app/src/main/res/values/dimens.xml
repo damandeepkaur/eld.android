@@ -15,6 +15,16 @@
 -->
 
 <resources>
+    <dimen name="navigation_header_right_padding">16dp</dimen>
+    <dimen name="navigation_header_left_padding">16dp</dimen>
+    <dimen name="navigation_header_bottom_padding">16dp</dimen>
+    <dimen name="nav_header_vertical_spacing">16dp</dimen>
+    <dimen name="nav_header_height">131dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="action_bar_height">80dp</dimen>
+    <dimen name="navigation_header_top_padding">51dp</dimen>
+
+    <!-- START OLD DIMENS -->
     <dimen name="small_margin">5dp</dimen>
     <dimen name="textview_extrasmall">10sp</dimen>
     <dimen name="textview_smaller">12sp</dimen>
@@ -42,12 +52,8 @@
     <dimen name="NewProfile_layout">15dp</dimen>
     <dimen name="NewProfile_margin">60dp</dimen>
     <dimen name="forgot_password_layout">100dp</dimen>
-
-    <!-- HelperView -->
     <dimen name="helper_text_size">24dp</dimen>
     <dimen name="helper_text_width">150dp</dimen>
-
-    <!--Graphview dimens-->
     <dimen name="graph_view_top_offset">40dp</dimen>
     <dimen name="graph_view_left_offset">2dp</dimen>
     <dimen name="graph_view_right_offset">2dp</dimen>
@@ -58,4 +64,5 @@
     <dimen name="graph_timer_height">75dp</dimen>
     <dimen name="graph_timer_width">75dp</dimen>
     <dimen name="graph_total_padding">10dp</dimen>
+    <!-- END OLD DIMENS -->
 </resources>

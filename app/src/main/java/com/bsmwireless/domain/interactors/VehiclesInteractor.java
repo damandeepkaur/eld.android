@@ -95,4 +95,13 @@ public class VehiclesInteractor {
     public String getTimezone(int driverId) {
         return mAppDatabase.userDao().getTimezoneById(driverId).getTimezone();
     }
+
+    public int getCurrentBoxId() {
+        return mPreferencesManager.getSelectedBoxId();
+    }
+
+    public int getAssetsNumber() {
+        //TODO: implement getting assets number
+        return 1;
+    }
 }

@@ -4,6 +4,7 @@ import android.accounts.NetworkErrorException;
 
 import com.bsmwireless.common.utils.NetworkUtils;
 import com.bsmwireless.data.network.ServiceApi;
+import com.bsmwireless.data.network.authenticator.TokenManager;
 import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.data.storage.eldevents.ELDEventConverter;
@@ -23,12 +24,14 @@ public class ELDEventsInteractor {
     private ServiceApi mServiceApi;
     private PreferencesManager mPreferencesManager;
     private ELDEventDao mELDEventDao;
+    private TokenManager mTokenManager;
 
     @Inject
-    public ELDEventsInteractor(ServiceApi serviceApi, PreferencesManager preferencesManager, AppDatabase appDatabase) {
+    public ELDEventsInteractor(ServiceApi serviceApi, PreferencesManager preferencesManager, AppDatabase appDatabase,TokenManager tokenManager) {
         mServiceApi = serviceApi;
         mPreferencesManager = preferencesManager;
         mELDEventDao = appDatabase.ELDEventDao();
+        mTokenManager = tokenManager;
     }
 
     public Observable<ResponseMessage> updateELDEvents(List<ELDEvent> events) {
@@ -49,7 +52,9 @@ public class ELDEventsInteractor {
 
     public Observable<ResponseMessage> postNewELDEvent(ELDEvent event) {
         if (NetworkUtils.isOnlineMode()) {
-            return mServiceApi.postNewELDEvent(event, mPreferencesManager.getSelectedBoxId())
+            int boxId = mPreferencesManager.getSelectedBoxId();
+            int driverId = Integer.parseInt(mTokenManager.getDriver(mPreferencesManager.getAccountName()));
+            return mServiceApi.postNewELDEvent(event, driverId, boxId)
                     .doOnError(throwable -> storeEvent(event, false));
         } else {
             storeEvent(event, false);
@@ -59,7 +64,9 @@ public class ELDEventsInteractor {
 
     public Observable<ResponseMessage> postNewELDEvents(List<ELDEvent> events) {
         if (NetworkUtils.isOnlineMode()) {
-            return mServiceApi.postNewELDEvents(events, mPreferencesManager.getSelectedBoxId())
+            int boxId = mPreferencesManager.getSelectedBoxId();
+            int driverId = Integer.parseInt(mTokenManager.getDriver(mPreferencesManager.getAccountName()));
+            return mServiceApi.postNewELDEvents(events, driverId, boxId)
                     .doOnError(throwable -> events.forEach(event -> storeEvent(event, false)));
         } else {
             storeEvents(events, false);

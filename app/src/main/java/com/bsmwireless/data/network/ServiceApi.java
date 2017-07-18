@@ -49,44 +49,51 @@ public interface ServiceApi {
      * @return Logout response {@link ResponseMessage}
      */
     @POST("v1/app/logout")
-    Observable<ResponseMessage> logout(@Body ELDEvent logoutEvent);
+    Observable<ResponseMessage> logout(@Body ELDEvent logoutEvent, @Header("X-Driver") int driverId);
 
     /**
      * Send ELD event;
      * Send ELD certify event; According doc section 4.5.1.4. It does same thing as dutyevents
      *
-     * @param event driver status.
-     * @param boxId box identifier (required).
+     * @param event    driver status.
+     * @param driverId driver identifier (required).
+     * @param boxId    box identifier (required).
      * @return update driver status response {@link ResponseMessage}.
      */
     @POST("v1/app/driver/certify")
-    Observable<ResponseMessage> postNewELDEvent(@Body ELDEvent event, @Header("X-Box") int boxId);
+    Observable<ResponseMessage> postNewELDEvent(@Body ELDEvent event, @Header("X-Driver") int driverId,
+                                                @Header("X-Box") int boxId);
 
     /**
      * Update user profile and signature
      *
-     * @param user user information.
+     * @param user     user information.
+     * @param driverId driver identifier (required).
+     * @param boxId    box identifier (required).
      * @return update user information response {@link ResponseMessage}.
      */
     @PUT("v1/app/driver/profile")
-    Observable<ResponseMessage> updateProfile(@Body User user);
+    Observable<ResponseMessage> updateProfile(@Body User user, @Header("X-Driver") int driverId,
+                                              @Header("X-Box") int boxId);
 
     /**
      * Send ELD events;
      * Send ELD driver duty status; According doc section 4.5.1.1; 4.5.1.2; 4.5.1.3; 4.5.1.4; 4.5.1.7; It sends a list of new records ordered by event time.
      *
      * @param statusList driver status list.
-     * @param boxId      box identifier (optional).
+     * @param driverId driver identifier (required).
+     * @param boxId    box identifier (required).
      * @return update driver status response {@link ResponseMessage}.
      */
     @POST("v1/app/driver/dutyevents")
-    Observable<ResponseMessage> postNewELDEvents(@Body List<ELDEvent> statusList, @Header("X-Box") int boxId);
+    Observable<ResponseMessage> postNewELDEvents(@Body List<ELDEvent> statusList, @Header("X-Driver") int driverId,
+                                                 @Header("X-Box") int boxId);
 
     /**
      * Fetch processed driver records.
      *
      * @param startTime start time.
-     * @param endTime end time.
+     * @param endTime   end time.
      * @return List of unidentified or changed event records {@link ELDEvent}.
      */
     @GET("v1/sync/records/search/{start}/{end}")
@@ -141,7 +148,7 @@ public interface ServiceApi {
      * Get LogSheet header information list.
      *
      * @param startLogDay epoch unix time stamp, in miliseconds.
-     * @param endLogDay epoch unix time stamp, in miliseconds.
+     * @param endLogDay   epoch unix time stamp, in miliseconds.
      * @return LogSheet Response {@link LogSheetHeader}
      */
     @GET("v1/sync/logsheet/headers/{start}/{end}")
@@ -163,7 +170,7 @@ public interface ServiceApi {
      * Link the driver to the vehicle, fetch unidentified record for update, and carrier's change requests.
      *
      * @param status current driver status
-     * @param boxId id of the box paired with the vehicle.
+     * @param boxId  id of the box paired with the vehicle.
      * @return Pair Vehicle Response {@link ELDEvent}
      */
     @POST("v1/login/pair")
