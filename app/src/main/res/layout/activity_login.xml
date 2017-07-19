@@ -88,13 +88,13 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:layout_below="@id/domainWrapper"
-        android:layout_marginTop="@dimen/generic_margin_top" />
+        android:layout_marginTop="@dimen/generic_margin_top_larger" />
 
     <android.support.v7.widget.AppCompatButton
         android:id="@+id/execute_login"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/lbl_remember_me"
+        android:layout_below="@id/switchButton"
         android:layout_centerHorizontal="true"
         android:layout_marginEnd="@dimen/login_button_margin_right"
         android:layout_marginLeft="@dimen/login_button_margin_left"
