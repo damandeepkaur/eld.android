@@ -1,9 +1,50 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>
 <resources>
+
+    <!-- Base application theme -->
+    <style name="AppTheme" parent="AppTheme.NoActionBar">
+        <item name="colorPrimary">@color/greyish_brown</item>
+        <item name="colorPrimaryDark">@color/black</item>
+        <item name="colorAccent">@color/nasty_green</item>
+        <item name="windowActionBarOverlay">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+    </style>
+
+    <style name="AppTheme.NoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="windowActionBar">false</item>
+    </style>
+
+    <style name="ActionBarTheme" parent="style/ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="android:homeAsUpIndicator">@drawable/ic_arrow_back_green_24dp</item>
+    </style>
+
+    <style name="ActionBarTitleTextStyle" parent="@style/TextAppearance.AppCompat.Widget.ActionBar.Title">
+        <item name="android:textColor">@color/nasty_green</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:lineSpacingExtra">8sp</item>
+    </style>
+
+    <style name="DriverProfileTheme" parent="AppTheme">
+
+    </style>
+
+    <style name="DriverProfileEditViewStyle">
+        <item name="android:textSize">@dimen/driver_profile_item_title_text_size</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">@color/primary_text</item>
+        <item name="android:lineSpacingExtra">@dimen/driver_profile_item_title_line_spacing</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:maxLines">1</item>
+    </style>
+
     <style name="Theme.Splash" parent="MyTheme.Base">
         <item name="android:windowBackground">@drawable/background</item>
         <item name="android:windowNoTitle">true</item>
     </style>
+
     <style name="Theme.BsmAppWithBGFullScreen" parent="Theme.BsmAppFullScreen">
         <item name="android:windowBackground">@drawable/background</item>
     </style>
@@ -31,7 +72,6 @@
         <item name="windowActionBar">false</item>
         <!--    <item name="android:actionBarStyle">@style/CustomActionBarTheme</item>-->
     </style>
-
 
     <!-- Base theme applied no matter what API -->
     <style name="MyTheme.Base" parent="Theme.AppCompat">
@@ -61,9 +101,11 @@
     <style name="myPopupMenuStyle" parent="@style/Widget.AppCompat.Light.PopupMenu">
         <item name="android:popupBackground">@color/lighter_gray</item>
     </style>
+
     <style name="myPopupMenuTextAppearanceSmall" parent="@style/TextAppearance.AppCompat.Light.Widget.PopupMenu.Small">
         <item name="android:textColor">#444444</item>
     </style>
+
     <style name="myPopupMenuTextAppearanceLarge" parent="@style/TextAppearance.AppCompat.Light.Widget.PopupMenu.Large">
         <item name="android:textColor">#444444</item>
     </style>
@@ -73,8 +115,6 @@
         <item name="color">@android:color/white</item>
         <item name="drawableSize">20dp</item>
     </style>
-
-
 
     <style name="CustomTheme" parent="Theme.AppCompat.Light">
 
@@ -93,12 +133,12 @@
         <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
     </style>
 
-
     <style name="custom_dialog" parent="Theme.AppCompat.Light.Dialog">
         <item name="windowNoTitle">true</item>
         <item name="android:windowNoTitle">true</item>
         <item name="windowActionBar">false</item>
     </style>
+
     <style name="Theme.Transparent" parent="android:Theme">
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@color/help_transparent_background</item>

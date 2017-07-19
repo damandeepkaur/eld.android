@@ -47,7 +47,7 @@
     <dimen name="helper_text_size">24dp</dimen>
     <dimen name="helper_text_width">150dp</dimen>
 
-    <!--Graphview dimens-->
+    <!-- Graphview dimens -->
     <dimen name="graph_view_top_offset">40dp</dimen>
     <dimen name="graph_view_left_offset">2dp</dimen>
     <dimen name="graph_view_right_offset">2dp</dimen>
@@ -58,4 +58,19 @@
     <dimen name="graph_timer_height">75dp</dimen>
     <dimen name="graph_timer_width">75dp</dimen>
     <dimen name="graph_total_padding">10dp</dimen>
+
+    <!-- App dimens -->
+    <dimen name="action_bar_height">80dp</dimen>
+
+    <!-- Driver profile dimens -->
+    <dimen name="driver_profile_item_margin">16dp</dimen>
+    <dimen name="driver_profile_item_title_text_size">16sp</dimen>
+    <dimen name="driver_profile_item_value_text_size">14sp</dimen>
+    <dimen name="driver_profile_item_title_line_spacing">8sp</dimen>
+    <dimen name="driver_profile_item_value_line_spacing">6sp</dimen>
+    <dimen name="driver_profile_change_sign_button_size">24dp</dimen>
+    <dimen name="driver_profile_signature_height">225dp</dimen>
+    <dimen name="driver_profile_signature_margin">15dp</dimen>
+    <dimen name="driver_profile_shadow_size">4dp</dimen>
+    <item format="float" name="driver_profile_button_letter_spacing" type="dimen">0.26</item>
 </resources>

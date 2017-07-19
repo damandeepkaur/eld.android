@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/driver_profile_signature_height">
+
+        <com.bsmwireless.widgets.signview.DriverSignView android:id="@+id/driver_sign"
+                                                         android:layout_width="match_parent"
+                                                         android:layout_height="match_parent"
+                                                         android:layout_margin="@dimen/driver_profile_signature_margin"/>
+
+        <Button android:id="@+id/change_button"
+                android:layout_width="@dimen/driver_profile_change_sign_button_size"
+                android:layout_height="@dimen/driver_profile_change_sign_button_size"
+                android:layout_margin="@dimen/driver_profile_item_margin"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentRight="true"
+                android:background="@drawable/ic_create_green_24dp"/>
+
+    </RelativeLayout>
+
+    <LinearLayout android:id="@+id/control_buttons"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:orientation="vertical"
+                  android:focusableInTouchMode="true"
+                  android:visibility="gone">
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="@dimen/driver_profile_shadow_size"
+            android:background="@drawable/drop_shadow" />
+
+        <LinearLayout android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:orientation="horizontal"
+                      android:gravity="end">
+            <Button android:id="@+id/clear_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/transparent"
+                    android:textColor="@color/cancel_color"
+                    android:textSize="@dimen/driver_profile_item_value_text_size"
+                    android:textStyle="normal"
+                    android:letterSpacing="@dimen/driver_profile_button_letter_spacing"
+                    android:text="@string/clear"/>
+            <Button android:id="@+id/ok_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/transparent"
+                    android:textSize="@dimen/driver_profile_item_value_text_size"
+                    android:textStyle="normal"
+                    android:textColor="@color/nasty_green"
+                    android:letterSpacing="@dimen/driver_profile_button_letter_spacing"
+                    android:text="@string/ok"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

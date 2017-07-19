@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:local="http://schemas.android.com/apk/res-auto"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/white">
+
+    <LinearLayout android:layout_width="match_parent"
+                  android:layout_height="match_parent"
+                  android:orientation="vertical">
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/driver_profile_item_margin">
+
+            <EditText
+                android:id="@+id/name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/driver_profile_item_name"
+                android:theme="@style/DriverProfileEditViewStyle"/>
+
+        </android.support.design.widget.TextInputLayout>
+
+        <View android:layout_width="match_parent"
+              android:layout_height="1dp"
+              android:background="?android:attr/listDivider"/>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/driver_profile_item_margin">
+
+            <EditText
+                android:id="@+id/emp_id"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/driver_profile_item_emp_id"
+                android:theme="@style/DriverProfileEditViewStyle"
+                android:editable="false"/>
+
+        </android.support.design.widget.TextInputLayout>
+
+        <View android:layout_width="match_parent"
+              android:layout_height="1dp"
+              android:background="?android:attr/listDivider"/>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/driver_profile_item_margin">
+
+            <EditText
+                android:id="@+id/company"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/driver_profile_item_company"
+                android:theme="@style/DriverProfileEditViewStyle"
+                android:editable="false"/>
+
+        </android.support.design.widget.TextInputLayout>
+
+        <View android:layout_width="match_parent"
+              android:layout_height="1dp"
+              android:background="?android:attr/listDivider"/>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/driver_profile_item_margin">
+
+            <EditText
+                android:id="@+id/license"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/driver_profile_item_license"
+                android:theme="@style/DriverProfileEditViewStyle"
+                android:editable="false"/>
+
+        </android.support.design.widget.TextInputLayout>
+
+        <View android:layout_width="match_parent"
+              android:layout_height="1dp"
+              android:background="?android:attr/listDivider"/>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/driver_profile_item_margin">
+
+            <EditText
+                android:id="@+id/home_addr"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/driver_profile_item_home_addr"
+                android:theme="@style/DriverProfileEditViewStyle"/>
+
+        </android.support.design.widget.TextInputLayout>
+
+        <View android:layout_width="match_parent"
+              android:layout_height="1dp"
+              android:background="?android:attr/listDivider"/>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/driver_profile_item_margin">
+
+            <EditText
+                android:id="@+id/home_terminal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/driver_profile_item_home_terminal"
+                android:theme="@style/DriverProfileEditViewStyle"
+                android:editable="false"/>
+
+        </android.support.design.widget.TextInputLayout>
+
+        <View android:layout_width="match_parent"
+              android:layout_height="1dp"
+              android:background="?android:attr/listDivider"/>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/driver_profile_item_margin">
+
+            <EditText
+                android:id="@+id/time_zone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/driver_profile_item_time_zone"
+                android:theme="@style/DriverProfileEditViewStyle"
+                android:editable="false"/>
+
+        </android.support.design.widget.TextInputLayout>
+
+        <View android:layout_width="match_parent"
+              android:layout_height="1dp"
+              android:background="?android:attr/listDivider"/>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/driver_profile_item_margin"
+            local:passwordToggleEnabled="true">
+
+            <EditText
+                android:id="@+id/password"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/driver_profile_item_password"
+                android:theme="@style/DriverProfileEditViewStyle"
+                android:inputType="textPassword"
+                android:editable="false"/>
+
+        </android.support.design.widget.TextInputLayout>
+
+        <View android:layout_width="match_parent"
+              android:layout_height="1dp"
+              android:background="?android:attr/listDivider"/>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/driver_profile_item_margin">
+
+            <EditText
+                android:id="@+id/cycle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/driver_profile_item_cycle"
+                android:theme="@style/DriverProfileEditViewStyle"
+                android:editable="false"/>
+
+        </android.support.design.widget.TextInputLayout>
+
+        <com.bsmwireless.widgets.signview.SignatureView android:id="@+id/signature_view"
+                                                        android:layout_width="match_parent"
+                                                        android:layout_height="wrap_content"
+                                                        android:background="@color/signature_background"/>
+
+    </LinearLayout>
+
+</ScrollView>

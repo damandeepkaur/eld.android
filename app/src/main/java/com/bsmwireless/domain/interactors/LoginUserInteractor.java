@@ -5,6 +5,7 @@ import com.bsmwireless.data.network.authenticator.TokenManager;
 import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.data.storage.users.UserConverter;
+import com.bsmwireless.data.storage.users.UserEntity;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.LoginModel;
 import com.bsmwireless.models.ResponseMessage;
@@ -14,6 +15,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
 
@@ -67,6 +69,10 @@ public class LoginUserInteractor {
 
     public String getDomainName() {
         return mTokenManager.getDomain(mPreferencesManager.getAccountName());
+    }
+
+    public Flowable<UserEntity> getUser() {
+        return mAppDatabase.userDao().getUserByAccountName(mPreferencesManager.getAccountName());
     }
 
 }

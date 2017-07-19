@@ -256,9 +256,7 @@
     <string name="scan_failed">Scan failed</string>
     <string name="scanner_top">Hold Camera to automatically take image</string>
     <string name="scanner_bottom">Avoid glare and shadows. Hold camera approximately 6 inches from QR code</string>
-    <string name="clear">Clear</string>
     <string name="forms">FORMS</string>
-    <string name="ok">OK</string>
     <string name="loading">loading...</string>
     <string name="success_message">SuccessMessage</string>
     <string name="form_saved">Form Saved Successfully</string>
@@ -365,4 +363,23 @@
     <string name="timer_default_type">OFF DUTY</string>
     <string name="timer_hours_minutes">HOURS MINUTES</string>
     <string name="string_total">TOTAL</string>
+
+    <!-- Driver Profile -->
+    <string name="driver_profile">Driver profile</string>
+    <string name="driver_profile_item_name">Name</string>
+    <string name="driver_profile_item_emp_id">Employee ID</string>
+    <string name="driver_profile_item_company">Company</string>
+    <string name="driver_profile_item_license">Driver license</string>
+    <string name="driver_profile_item_home_addr">Home address</string>
+    <string name="driver_profile_item_home_terminal">Home terminal</string>
+    <string name="driver_profile_item_time_zone">Time zone</string>
+    <string name="driver_profile_item_password">Password</string>
+    <string name="driver_profile_item_cycle">Cycle</string>
+    <string name="driver_profile_menu_eld">ELD</string>
+    <string name="driver_profile_menu_sign">Sign</string>
+    <string name="driver_profile_menu_occupants">Occupants</string>
+    <string name="driver_profile_user_updated">User updated</string>
+
+    <string name="ok">Ok</string>
+    <string name="clear">Clear</string>
 </resources>
