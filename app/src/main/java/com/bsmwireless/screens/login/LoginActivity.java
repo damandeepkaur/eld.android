@@ -3,7 +3,8 @@ package com.bsmwireless.screens.login;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
-import android.widget.Button;
+import android.support.v7.widget.AppCompatButton;
+import android.support.v7.widget.SwitchCompat;
 import android.widget.EditText;
 
 import com.bsmwireless.common.App;
@@ -35,10 +36,10 @@ public class LoginActivity extends BaseActivity implements LoginView {
     EditText mDomain;
 
     @BindView(R.id.execute_login)
-    Button mLoginButton;
+    AppCompatButton mLoginButton;
 
     @BindView(R.id.switchButton)
-    Button mSwitchButton;
+    SwitchCompat mSwitchButton;
 
     @Inject
     LoginPresenter mPresenter;
@@ -71,8 +72,7 @@ public class LoginActivity extends BaseActivity implements LoginView {
 
     @OnClick(R.id.execute_login)
     void executeLogin() {
-        //TODO: check if remember me activated
-        mPresenter.onLoginButtonClicked(true);
+        mPresenter.onLoginButtonClicked(true, mSwitchButton.isChecked());
     }
 
     @Override
