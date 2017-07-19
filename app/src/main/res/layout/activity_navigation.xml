@@ -23,8 +23,7 @@
                 android:layout_height="@dimen/action_bar_height"
                 android:fitsSystemWindows="true"
                 app:titleTextAppearance="@style/ActionBarTitleTextStyle"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-                app:layout_scrollFlags="scroll|enterAlways|snap"/>
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
 
         </android.support.design.widget.AppBarLayout>
 

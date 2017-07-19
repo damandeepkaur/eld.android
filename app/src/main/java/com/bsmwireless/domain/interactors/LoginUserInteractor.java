@@ -1,7 +1,5 @@
 package com.bsmwireless.domain.interactors;
 
-import android.util.Log;
-
 import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.network.authenticator.TokenManager;
 import com.bsmwireless.data.storage.AppDatabase;

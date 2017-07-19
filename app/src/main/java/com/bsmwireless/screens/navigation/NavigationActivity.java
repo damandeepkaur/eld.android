@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.NavigationView.OnNavigationItemSelectedListener;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -28,6 +29,7 @@ import javax.inject.Inject;
 import app.bsmuniversal.com.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.Unbinder;
 
 public class NavigationActivity extends BaseActivity implements OnNavigationItemSelectedListener, NavigateView {
     @BindView(R.id.navigation_drawer)
@@ -76,7 +78,13 @@ public class NavigationActivity extends BaseActivity implements OnNavigationItem
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.nav_home:
-                open(new HomeFragment(), false);
+                Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.navigation_content);
+                if (fragment == null) {
+                    fragment = new HomeFragment();
+                } else if (fragment instanceof HomeFragment) {
+                    break;
+                }
+                open((BaseFragment) fragment, false);
                 break;
             case R.id.nav_inspector_view:
                 Toast.makeText(this, "Go to inspector screen", Toast.LENGTH_SHORT).show();
@@ -174,8 +182,21 @@ public class NavigationActivity extends BaseActivity implements OnNavigationItem
         @BindView(R.id.assets_number)
         TextView assetNumber;
 
+        private Unbinder mUnbinder;
+
         HeaderViewHolder(View view) {
-            ButterKnife.bind(this, view);
+            mUnbinder = ButterKnife.bind(this, view);
         }
+
+        void unbind() {
+            mUnbinder.unbind();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        mPresenter.onDestroy();
+        mHeaderViewHolder.unbind();
+        super.onDestroy();
     }
 }
