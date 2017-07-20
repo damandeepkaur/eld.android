@@ -27,7 +27,7 @@ public class LoginPresenter {
         Timber.d("CREATED");
     }
 
-    public void onLoginButtonClicked(boolean keepToken, boolean rememberMeChecked) {
+    public void onLoginButtonClicked(boolean keepToken) {
         Timber.d("onLoginButtonClicked()");
 
         String username = mView.getUsername();

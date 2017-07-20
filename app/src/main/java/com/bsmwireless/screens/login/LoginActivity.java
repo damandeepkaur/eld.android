@@ -72,7 +72,7 @@ public class LoginActivity extends BaseActivity implements LoginView {
 
     @OnClick(R.id.execute_login)
     void executeLogin() {
-        mPresenter.onLoginButtonClicked(true, mSwitchButton.isChecked());
+        mPresenter.onLoginButtonClicked(mSwitchButton.isChecked());
     }
 
     @Override
