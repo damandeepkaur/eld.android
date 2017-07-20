@@ -65,6 +65,7 @@ public class LoginActivity extends BaseActivity implements LoginView {
 
     @Override
     protected void onDestroy() {
+        mPresenter.onExitUser();
         mPresenter.onDestroy();
         mUnbinder.unbind();
         super.onDestroy();

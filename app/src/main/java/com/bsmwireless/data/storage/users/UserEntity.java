@@ -27,14 +27,14 @@ public class UserEntity {
     private String mLicense;
     @ColumnInfo(name = "signature")
     private String mSignature;
+    @ColumnInfo(name = "exempt")
+    private Boolean mExempt;
     @ColumnInfo(name = "updated")
     private Boolean mUpdated;
     @ColumnInfo(name = "organization")
     private String mOrganization;
     @ColumnInfo(name = "sync_time")
     private Long mSyncTime;
-    @ColumnInfo(name = "is_supervisor")
-    private Boolean mIsSupervisor;
     @ColumnInfo(name = "first_name")
     private String mFirstName;
     @ColumnInfo(name = "mid_name")
@@ -134,6 +134,14 @@ public class UserEntity {
         mSignature = signature;
     }
 
+    public Boolean getExempt() {
+        return mExempt;
+    }
+
+    public void setExempt(Boolean exempt) {
+        this.mExempt = exempt;
+    }
+
     public Boolean getUpdated() {
         return mUpdated;
     }
@@ -156,14 +164,6 @@ public class UserEntity {
 
     public void setSyncTime(Long syncTime) {
         mSyncTime = syncTime;
-    }
-
-    public Boolean getIsSupervisor() {
-        return mIsSupervisor;
-    }
-
-    public void setIsSupervisor(Boolean supervisor) {
-        mIsSupervisor = supervisor;
     }
 
     public String getFirstName() {

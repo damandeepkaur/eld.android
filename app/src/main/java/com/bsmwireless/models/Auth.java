@@ -19,10 +19,6 @@ public class Auth implements Parcelable {
     @Expose
     private String mCluster;
 
-    @SerializedName("domain")
-    @Expose
-    private String mDomain;
-
     @SerializedName("driverId")
     @Expose
     private Integer mDriverId;
@@ -31,7 +27,7 @@ public class Auth implements Parcelable {
     @Expose
     private Integer mOrgId;
 
-    @SerializedName("tokenExpire")
+    @SerializedName("expire")
     @Expose
     private long mTokenExpire;
 
@@ -52,14 +48,6 @@ public class Auth implements Parcelable {
 
     public void setCluster(String cluster) {
         this.mCluster = cluster;
-    }
-
-    public String getDomain() {
-        return mDomain;
-    }
-
-    public void setDomain(String domain) {
-        this.mDomain = domain;
     }
 
     public Integer getDriverId() {
@@ -98,7 +86,6 @@ public class Auth implements Parcelable {
                 .append(mTokenExpire, auth.mTokenExpire)
                 .append(mToken, auth.mToken)
                 .append(mCluster, auth.mCluster)
-                .append(mDomain, auth.mDomain)
                 .append(mDriverId, auth.mDriverId)
                 .append(mOrgId, auth.mOrgId)
                 .isEquals();
@@ -109,7 +96,6 @@ public class Auth implements Parcelable {
         return new HashCodeBuilder(17, 37)
                 .append(mToken)
                 .append(mCluster)
-                .append(mDomain)
                 .append(mDriverId)
                 .append(mOrgId)
                 .append(mTokenExpire)
@@ -121,7 +107,6 @@ public class Auth implements Parcelable {
         final StringBuilder sb = new StringBuilder("Auth{");
         sb.append("mToken='").append(mToken).append('\'');
         sb.append(", mCluster='").append(mCluster).append('\'');
-        sb.append(", mDomain='").append(mDomain).append('\'');
         sb.append(", mDriverId=").append(mDriverId);
         sb.append(", mOrgId=").append(mOrgId);
         sb.append(", mTokenExpire=").append(mTokenExpire);
@@ -138,7 +123,6 @@ public class Auth implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.mToken);
         dest.writeString(this.mCluster);
-        dest.writeString(this.mDomain);
         dest.writeValue(this.mDriverId);
         dest.writeValue(this.mOrgId);
         dest.writeLong(this.mTokenExpire);
@@ -147,7 +131,6 @@ public class Auth implements Parcelable {
     protected Auth(Parcel in) {
         this.mToken = in.readString();
         this.mCluster = in.readString();
-        this.mDomain = in.readString();
         this.mDriverId = (Integer) in.readValue(Integer.class.getClassLoader());
         this.mOrgId = (Integer) in.readValue(Integer.class.getClassLoader());
         this.mTokenExpire = in.readLong();

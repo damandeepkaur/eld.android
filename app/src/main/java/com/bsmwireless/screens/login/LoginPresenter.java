@@ -78,4 +78,8 @@ public class LoginPresenter {
     public void onLoadUserData() {
         mView.loadUserData(mLoginUserInteractor.getUserName(), mLoginUserInteractor.getDomainName());
     }
+
+    public void onExitUser() {
+        mLoginUserInteractor.removeAccount();
+    }
 }

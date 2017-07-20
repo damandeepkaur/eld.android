@@ -69,4 +69,10 @@ public class LoginUserInteractor {
         return mTokenManager.getDomain(mPreferencesManager.getAccountName());
     }
 
+    public void removeAccount() {
+        if (mPreferencesManager.isRememberUserEnabled())
+            return;
+        mAppDatabase.userDao().deleteUserByAccountName(mPreferencesManager.getAccountName());
+        mPreferencesManager.clearValues();
+    }
 }
