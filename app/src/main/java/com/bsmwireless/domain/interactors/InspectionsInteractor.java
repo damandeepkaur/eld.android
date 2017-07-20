@@ -10,7 +10,6 @@ import java.util.List;
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
-import io.reactivex.schedulers.Schedulers;
 
 public class InspectionsInteractor {
 
@@ -24,29 +23,29 @@ public class InspectionsInteractor {
     }
 
     public Observable<List<SyncInspectionCategory>> getInspectionItemsByCategoryIds(String categoryIds) {
-        int boxId = mPreferencesManager.getSelectedBoxId();
+        int boxId = mPreferencesManager.getBoxId();
         if (boxId == PreferencesManager.NOT_FOUND_VALUE) {
-            return Observable.error(new Throwable("Not found selected boxId"));
+            return Observable.error(new Throwable("Not in vehicle"));
         } else {
-            return mServiceApi.getInspectionItemsByCategoryIds(boxId, categoryIds);
+            return mServiceApi.getInspectionItemsByCategoryIds(categoryIds);
         }
     }
 
     public Observable<List<SyncInspectionCategory>> getInspectionItemsByLastUpdate(long lastUpdate) {
-        int boxId = mPreferencesManager.getSelectedBoxId();
+        int boxId = mPreferencesManager.getBoxId();
         if (boxId == PreferencesManager.NOT_FOUND_VALUE) {
-            return Observable.error(new Throwable("Not found selected boxId"));
+            return Observable.error(new Throwable("Not in vehicle"));
         } else {
-            return mServiceApi.getInspectionItemsByLastUpdate(boxId, lastUpdate);
+            return mServiceApi.getInspectionItemsByLastUpdate(lastUpdate);
         }
     }
 
     public Observable<InspectionReport> syncInspectionReport(long lastUpdate, int isTrailer, long beginDate) {
-        int boxId = mPreferencesManager.getSelectedBoxId();
+        int boxId = mPreferencesManager.getBoxId();
         if (boxId == PreferencesManager.NOT_FOUND_VALUE) {
-            return Observable.error(new Throwable("Not found selected boxId"));
+            return Observable.error(new Throwable("Not in vehicle"));
         } else {
-            return mServiceApi.syncInspectionReport(lastUpdate, isTrailer, beginDate, boxId);
+            return mServiceApi.syncInspectionReport(lastUpdate, isTrailer, beginDate);
         }
     }
 }
