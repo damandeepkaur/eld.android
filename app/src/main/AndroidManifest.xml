@@ -41,7 +41,6 @@
 
         <activity
             android:name="com.bsmwireless.screens.navigation.NavigationActivity"
-            android:label="@string/menu_home"
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="stateHidden|adjustResize">
             <intent-filter>

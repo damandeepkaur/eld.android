@@ -114,6 +114,7 @@ public class NavigationActivity extends BaseActivity implements OnNavigationItem
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setTitle(R.string.menu_home);
 
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, mToolbar, 0, 0);
         mDrawerLayout.addDrawerListener(mDrawerToggle);
@@ -122,6 +123,9 @@ public class NavigationActivity extends BaseActivity implements OnNavigationItem
 
         View header = mNavigationView.getHeaderView(0);
         mHeaderViewHolder = new HeaderViewHolder(header);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
     }
 
     public void open(BaseFragment fragment, boolean useBackStack) {
@@ -160,7 +164,8 @@ public class NavigationActivity extends BaseActivity implements OnNavigationItem
 
     @Override
     public void setBoxId(int boxId) {
-        mHeaderViewHolder.boxId.setText(getResources().getString(R.string.box) + " " + boxId);
+        String boxString = getResources().getString(R.string.box) + " " + ((boxId > 0) ? boxId : "-");
+        mHeaderViewHolder.boxId.setText(boxString);
     }
 
     @Override
