@@ -18,20 +18,17 @@ import java.util.List;
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
-import io.reactivex.schedulers.Schedulers;
 
 public class ELDEventsInteractor {
     private ServiceApi mServiceApi;
     private PreferencesManager mPreferencesManager;
     private ELDEventDao mELDEventDao;
-    private TokenManager mTokenManager;
 
     @Inject
-    public ELDEventsInteractor(ServiceApi serviceApi, PreferencesManager preferencesManager, AppDatabase appDatabase,TokenManager tokenManager) {
+    public ELDEventsInteractor(ServiceApi serviceApi, PreferencesManager preferencesManager, AppDatabase appDatabase) {
         mServiceApi = serviceApi;
         mPreferencesManager = preferencesManager;
         mELDEventDao = appDatabase.ELDEventDao();
-        mTokenManager = tokenManager;
     }
 
     public Observable<ResponseMessage> updateELDEvents(List<ELDEvent> events) {
@@ -52,9 +49,7 @@ public class ELDEventsInteractor {
 
     public Observable<ResponseMessage> postNewELDEvent(ELDEvent event) {
         if (NetworkUtils.isOnlineMode()) {
-            int boxId = mPreferencesManager.getSelectedBoxId();
-            int driverId = Integer.parseInt(mTokenManager.getDriver(mPreferencesManager.getAccountName()));
-            return mServiceApi.postNewELDEvent(event, driverId, boxId)
+            return mServiceApi.postNewELDEvent(event)
                     .doOnError(throwable -> storeEvent(event, false));
         } else {
             storeEvent(event, false);
@@ -64,9 +59,7 @@ public class ELDEventsInteractor {
 
     public Observable<ResponseMessage> postNewELDEvents(List<ELDEvent> events) {
         if (NetworkUtils.isOnlineMode()) {
-            int boxId = mPreferencesManager.getSelectedBoxId();
-            int driverId = Integer.parseInt(mTokenManager.getDriver(mPreferencesManager.getAccountName()));
-            return mServiceApi.postNewELDEvents(events, driverId, boxId)
+            return mServiceApi.postNewELDEvents(events)
                     .doOnError(throwable -> events.forEach(event -> storeEvent(event, false)));
         } else {
             storeEvents(events, false);

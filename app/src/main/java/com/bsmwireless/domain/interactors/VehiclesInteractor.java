@@ -44,19 +44,17 @@ public class VehiclesInteractor {
         return mServiceApi.searchVehicles(searchText);
     }
 
-    public Completable saveSelectedVehicle(Vehicle vehicle) {
-        return Completable.fromAction(() -> {
-            mAppDatabase.vehicleDao().insertVehicle(VehicleConverter.toEntity(vehicle));
-            mPreferencesManager.setSelectedVehicleId(vehicle.getId());
-            mPreferencesManager.setSelectedBoxId(vehicle.getBoxId());
-        });
+    public void saveVehicle(Vehicle vehicle) {
+        mAppDatabase.vehicleDao().insertVehicle(VehicleConverter.toEntity(vehicle));
+        mPreferencesManager.setVehicleId(vehicle.getId());
+        mPreferencesManager.setBoxId(vehicle.getBoxId());
     }
 
     public Completable cleanSelectedVehicle() {
         return Completable.fromAction(
-                () ->  {
-                    mPreferencesManager.setSelectedVehicleId(NOT_IN_VEHICLE_ID);
-                    mPreferencesManager.setSelectedBoxId(NOT_IN_VEHICLE_ID);
+                () -> {
+                    mPreferencesManager.setVehicleId(NOT_IN_VEHICLE_ID);
+                    mPreferencesManager.setBoxId(NOT_IN_VEHICLE_ID);
                 });
     }
 
@@ -82,7 +80,7 @@ public class VehiclesInteractor {
                     return mServiceApi.pairVehicle(event, vehicle.getBoxId());
                 })
                 .doOnNext(events -> {
-                    saveSelectedVehicle(vehicle);
+                    saveVehicle(vehicle);
                     mELDEventsInteractor.storeEvents(events, true);
                 });
     }
@@ -96,8 +94,8 @@ public class VehiclesInteractor {
         return mAppDatabase.userDao().getTimezoneById(driverId).getTimezone();
     }
 
-    public int getCurrentBoxId() {
-        return mPreferencesManager.getSelectedBoxId();
+    public int getBoxId() {
+        return mPreferencesManager.getBoxId();
     }
 
     public int getAssetsNumber() {

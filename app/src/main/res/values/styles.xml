@@ -8,6 +8,7 @@
         <item name="windowActionBarOverlay">true</item>
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:windowTranslucentStatus">true</item>
+        <item name="colorControlHighlight">@android:color/transparent</item>
     </style>
 
     <style name="AppTheme.NoActionBar" parent="Theme.AppCompat.Light.NoActionBar">

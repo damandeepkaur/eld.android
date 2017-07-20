@@ -49,45 +49,36 @@ public interface ServiceApi {
      * @return Logout response {@link ResponseMessage}
      */
     @POST("v1/app/logout")
-    Observable<ResponseMessage> logout(@Body ELDEvent logoutEvent, @Header("X-Driver") int driverId);
+    Observable<ResponseMessage> logout(@Body ELDEvent logoutEvent);
 
     /**
      * Send ELD event;
      * Send ELD certify event; According doc section 4.5.1.4. It does same thing as dutyevents
      *
-     * @param event    driver status.
-     * @param driverId driver identifier (required).
-     * @param boxId    box identifier (required).
+     * @param event driver status.
      * @return update driver status response {@link ResponseMessage}.
      */
     @POST("v1/app/driver/certify")
-    Observable<ResponseMessage> postNewELDEvent(@Body ELDEvent event, @Header("X-Driver") int driverId,
-                                                @Header("X-Box") int boxId);
+    Observable<ResponseMessage> postNewELDEvent(@Body ELDEvent event);
 
     /**
      * Update user profile and signature
      *
-     * @param user     user information.
-     * @param driverId driver identifier (required).
-     * @param boxId    box identifier (required).
+     * @param user user information.
      * @return update user information response {@link ResponseMessage}.
      */
     @PUT("v1/app/driver/profile")
-    Observable<ResponseMessage> updateProfile(@Body User user, @Header("X-Driver") int driverId,
-                                              @Header("X-Box") int boxId);
+    Observable<ResponseMessage> updateProfile(@Body User user);
 
     /**
      * Send ELD events;
      * Send ELD driver duty status; According doc section 4.5.1.1; 4.5.1.2; 4.5.1.3; 4.5.1.4; 4.5.1.7; It sends a list of new records ordered by event time.
      *
      * @param statusList driver status list.
-     * @param driverId driver identifier (required).
-     * @param boxId    box identifier (required).
      * @return update driver status response {@link ResponseMessage}.
      */
     @POST("v1/app/driver/dutyevents")
-    Observable<ResponseMessage> postNewELDEvents(@Body List<ELDEvent> statusList, @Header("X-Driver") int driverId,
-                                                 @Header("X-Box") int boxId);
+    Observable<ResponseMessage> postNewELDEvents(@Body List<ELDEvent> statusList);
 
     /**
      * Fetch processed driver records.
@@ -111,24 +102,20 @@ public interface ServiceApi {
     /**
      * Inspection Categories from category Ids
      *
-     * @param boxId       id of the box paired with the vehicle.
      * @param categoryIds list of inspection category ids, comma separated.
      * @return Sync Inspection Items Response {@link SyncInspectionCategory}.
      */
     @GET("v1/sync/inspection_items/search/{categoryIds}")
-    Observable<List<SyncInspectionCategory>> getInspectionItemsByCategoryIds(@Header("X-Box") Integer boxId,
-                                                                             @Path("categoryIds") String categoryIds);
+    Observable<List<SyncInspectionCategory>> getInspectionItemsByCategoryIds(@Path("categoryIds") String categoryIds);
 
     /**
      * Inspection Categories for the box. It is used after driver selects a vehicle, which maps to a box
      *
-     * @param boxId      id of the box paired with the vehicle.
      * @param lastUpdate list of inspection category ids, comma separated.
      * @return Sync Inspection Items Response {@link SyncInspectionCategory}.
      */
     @GET("v1/sync/inspection_items/{lastupdate}")
-    Observable<List<SyncInspectionCategory>> getInspectionItemsByLastUpdate(@Header("X-Box") Integer boxId,
-                                                                            @Path("lastupdate") long lastUpdate);
+    Observable<List<SyncInspectionCategory>> getInspectionItemsByLastUpdate(@Path("lastupdate") long lastUpdate);
 
     /**
      * Sync Inspection Report.
@@ -141,8 +128,7 @@ public interface ServiceApi {
     @GET("v1/sync/inspections/report/{lastUpdate}/{isTrailer}/{beginDate}")
     Observable<InspectionReport> syncInspectionReport(@Path("lastUpdate") Long lastUpdate,
                                                       @Path("isTrailer") int isTrailer,
-                                                      @Path("beginDate") Long beginDate,
-                                                      @Header("X-Box") int boxId);
+                                                      @Path("beginDate") Long beginDate);
 
     /**
      * Get LogSheet header information list.

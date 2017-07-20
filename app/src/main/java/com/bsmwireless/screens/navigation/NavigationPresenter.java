@@ -59,7 +59,7 @@ public class NavigationPresenter {
         } else {
             mView.setDriverName(mLoginUserInteractor.getUserName());
             mView.setCoDriversNumber(mLoginUserInteractor.getCoDriversNumber());
-            mView.setBoxId(mVehiclesInteractor.getCurrentBoxId());
+            mView.setBoxId(mVehiclesInteractor.getBoxId());
             mView.setAssetsNumber(mVehiclesInteractor.getAssetsNumber());
         }
     }

@@ -73,15 +73,13 @@ public class LoginUserInteractor {
                     logoutEvent.setLat(blackBox.getLat());
                     logoutEvent.setLng(blackBox.getLon());
 
-                    return mServiceApi.logout(logoutEvent, driverId)
+                    return mServiceApi.logout(logoutEvent)
                             .map(responseMessage -> responseMessage.getMessage().equals("ACK"));
                 });
     }
 
     public Observable<ResponseMessage> updateUser(User user) {
-        int boxId = mPreferencesManager.getSelectedBoxId();
-        int driverId = Integer.parseInt(mTokenManager.getDriver(mPreferencesManager.getAccountName()));
-        return mServiceApi.updateProfile(user, driverId, boxId);
+        return mServiceApi.updateProfile(user);
     }
 
     public String getUserName() {
