@@ -10,6 +10,41 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 public class ELDEvent implements Parcelable {
+    public enum EventType {
+        DUTY_STATUS_CHANGING(1),
+        INTERMEDIATE_LOG(2),
+        CERTIFICATION_OF_RECORDS(4),
+        LOGIN_LOGOUT(5),
+        ENGINE_POWER_CHANGING(6);
+
+        private int mType;
+
+        EventType(int type) {
+            mType = type;
+        }
+
+        public int getValue() {
+            return mType;
+        }
+    }
+
+    public enum StatusCode {
+        ACTIVE(1),
+        INACTIVE_CHANGED(2),
+        INACTIVE_CHANGE_REQUESTED(3),
+        INACTIVE_CHANGE_REJECTED(4);
+
+        private int mCode;
+
+        StatusCode(int code) {
+            mCode = code;
+        }
+
+        public int getValue() {
+            return mCode;
+        }
+    }
+
     @SerializedName("id")
     @Expose
     private Integer mId;
@@ -83,7 +118,8 @@ public class ELDEvent implements Parcelable {
     @Expose
     private Boolean mDiagnostic;
 
-    public ELDEvent() {}
+    public ELDEvent() {
+    }
 
     private ELDEvent(Parcel in) {
         this.mStatus = in.readInt();

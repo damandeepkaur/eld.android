@@ -74,15 +74,15 @@ public class DriverProfileActivity extends BaseActivity implements DriverProfile
 
         mSignatureLayout.setOnSaveListener(this);
 
-        mCompanyTextView.setOnFocusChangeListener((v, hasFocus) -> {
-            if (!hasFocus && !mCompanyTextView.getText().toString().isEmpty()) {
-                mPresenter.onSaveCompanyClicked(mCompanyTextView.getText().toString());
-            }
-        });
-
         mAddressTextView.setOnFocusChangeListener((v, hasFocus) -> {
             if (!hasFocus && !mAddressTextView.getText().toString().isEmpty()) {
                 mPresenter.onSaveHomeAddressClicked(mAddressTextView.getText().toString());
+            }
+        });
+
+        mPasswordTextView.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus) {
+                mPasswordTextView.setText("");
             }
         });
     }

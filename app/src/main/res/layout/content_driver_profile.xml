@@ -57,7 +57,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/driver_profile_item_company"
-                android:theme="@style/DriverProfileEditViewStyle"/>
+                android:theme="@style/DriverProfileEditViewStyle"
+                android:editable="false"/>
 
         </android.support.design.widget.TextInputLayout>
 

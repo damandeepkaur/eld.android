@@ -14,8 +14,9 @@
         android:name="android.permission.AUTHENTICATE_ACCOUNTS"
         android:maxSdkVersion="22"/>
 
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
     <application
         android:name="com.bsmwireless.common.App"
@@ -27,12 +28,7 @@
         <activity
             android:name="com.bsmwireless.screens.login.LoginActivity"
             android:label="@string/app_name"
-            android:theme="@style/Theme.BsmAppWithBGFullScreen">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
-        </activity>
+            android:theme="@style/Theme.BsmAppWithBGFullScreen"/>
 
         <activity
             android:name="com.bsmwireless.screens.taketour.TakeTourActivity"
@@ -40,8 +36,18 @@
 
         <activity
             android:name="com.bsmwireless.screens.selectasset.SelectAssetActivity"
-            android:windowSoftInputMode="stateHidden|adjustResize"
-            android:theme="@style/Theme.BsmApp"/>
+            android:theme="@style/Theme.BsmApp"
+            android:windowSoftInputMode="stateHidden|adjustResize"/>
+
+        <activity
+            android:name="com.bsmwireless.screens.navigation.NavigationActivity"
+            android:theme="@style/AppTheme"
+            android:windowSoftInputMode="stateHidden|adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
 
         <activity
             android:name="com.bsmwireless.screens.help.HelpActivity"
@@ -53,15 +59,16 @@
         <activity android:name="com.bsmwireless.screens.driverprofile.DriverProfileActivity"
                   android:label="@string/driver_profile"
                   android:windowSoftInputMode="stateHidden"
+                  android:parentActivityName="com.bsmwireless.screens.navigation.NavigationActivity"
                   android:theme="@style/DriverProfileTheme"/>
 
         <service android:name="com.bsmwireless.data.network.authenticator.BsmAuthenticatorService">
             <intent-filter>
-                <action android:name="android.accounts.AccountAuthenticator" />
+                <action android:name="android.accounts.AccountAuthenticator"/>
             </intent-filter>
             <meta-data
                 android:name="android.accounts.AccountAuthenticator"
-                android:resource="@xml/authenticator" />
+                android:resource="@xml/authenticator"/>
         </service>
 
     </application>

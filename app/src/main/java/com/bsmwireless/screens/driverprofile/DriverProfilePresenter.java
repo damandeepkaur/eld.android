@@ -53,18 +53,8 @@ public class DriverProfilePresenter {
 
     public void onSaveSignatureClicked(String signature) {
         if (mUserEntity != null) {
-            User user = UserConverter.toUser(mUserEntity);
+            User user = getEmptyUser(mUserEntity);
             user.setSignature(signature);
-            updateUser(user);
-        } else {
-            mView.showError(new Exception());
-        }
-    }
-
-    public void onSaveCompanyClicked(String company) {
-        if (mUserEntity != null) {
-            User user = UserConverter.toUser(mUserEntity);
-            user.setOrganization(company);
             updateUser(user);
         } else {
             mView.showError(new Exception());
@@ -73,7 +63,7 @@ public class DriverProfilePresenter {
 
     public void onSaveHomeAddressClicked(String address) {
         if (mUserEntity != null) {
-            User user = UserConverter.toUser(mUserEntity);
+            User user = getEmptyUser(mUserEntity);
             user.setAddress(address);
             updateUser(user);
         } else {
@@ -92,5 +82,17 @@ public class DriverProfilePresenter {
                                                     mView.showError(throwable);
                                                 })
         );
+    }
+
+    private User getEmptyUser(UserEntity userEntity) {
+        User user = new User();
+        user.setId(userEntity.getId());
+        user.setUsername(mLoginUserInteractor.getUserName());
+        user.setPassword("1234");
+        user.setTimezone(userEntity.getTimezone());
+        user.setFirstName(userEntity.getFirstName());
+        user.setLastName(userEntity.getLastName());
+        user.setCycleCountry(userEntity.getCycleCountry());
+        return user;
     }
 }

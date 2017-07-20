@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Typeface;
 
 import java.util.HashMap;
+
 import timber.log.Timber;
 
 public class FontCache {

@@ -27,11 +27,6 @@ public class LoginPresenter {
         Timber.d("CREATED");
     }
 
-    public void onForgotPasswordButtonClicked() {
-        Timber.d("onForgotPasswordButtonClicked()");
-        mView.goToForgotPasswordScreen();
-    }
-
     public void onLoginButtonClicked(boolean keepToken) {
         Timber.d("onLoginButtonClicked()");
 

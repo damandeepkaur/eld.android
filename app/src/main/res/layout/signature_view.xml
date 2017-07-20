@@ -29,6 +29,7 @@
                   android:layout_height="wrap_content"
                   android:orientation="vertical"
                   android:focusableInTouchMode="true"
+                  android:background="@android:color/white"
                   android:visibility="gone">
 
         <View

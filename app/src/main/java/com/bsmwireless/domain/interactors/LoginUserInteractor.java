@@ -16,19 +16,24 @@ import javax.inject.Inject;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
 
+import static com.bsmwireless.models.ELDEvent.EventType.LOGIN_LOGOUT;
+
 public class LoginUserInteractor {
 
     private ServiceApi mServiceApi;
     private AppDatabase mAppDatabase;
     private TokenManager mTokenManager;
     private PreferencesManager mPreferencesManager;
+    private BlackBoxInteractor mBlackBoxInteractor;
 
     @Inject
-    public LoginUserInteractor(ServiceApi serviceApi, PreferencesManager preferencesManager, AppDatabase appDatabase, TokenManager tokenManager) {
+    public LoginUserInteractor(ServiceApi serviceApi, PreferencesManager preferencesManager, AppDatabase appDatabase,
+                               TokenManager tokenManager, BlackBoxInteractor blackBoxInteractor) {
         mServiceApi = serviceApi;
         mPreferencesManager = preferencesManager;
         mAppDatabase = appDatabase;
         mTokenManager = tokenManager;
+        mBlackBoxInteractor = blackBoxInteractor;
     }
 
     public Observable<Boolean> loginUser(final String name, final String password, final String domain, boolean keepToken, User.DriverType driverType) {
@@ -52,8 +57,27 @@ public class LoginUserInteractor {
                 .map(user -> user != null);
     }
 
-    public Observable<ResponseMessage> logoutUser(ELDEvent event) {
-        return mServiceApi.logout(event);
+    public Observable<Boolean> logoutUser() {
+        ELDEvent logoutEvent = new ELDEvent();
+        int driverId = getDriverId();
+        logoutEvent.setEventType(LOGIN_LOGOUT.getValue());
+        logoutEvent.setEventCode(ELDEvent.StatusCode.ACTIVE.getValue());
+        logoutEvent.setEventTime(System.currentTimeMillis());
+        logoutEvent.setMobileTime(System.currentTimeMillis());
+        logoutEvent.setDriverId(getDriverId());
+        //TODO: get real data for hos
+        logoutEvent.setEngineHours(50);
+
+        return mBlackBoxInteractor.getData()
+                .flatMap(blackBox -> {
+                    logoutEvent.setTimezone(getTimezone(driverId));
+                    logoutEvent.setOdometer(blackBox.getOdometer());
+                    logoutEvent.setLat(blackBox.getLat());
+                    logoutEvent.setLng(blackBox.getLon());
+
+                    return mServiceApi.logout(logoutEvent)
+                            .map(responseMessage -> responseMessage.getMessage().equals("ACK"));
+                });
     }
 
     public Observable<ResponseMessage> updateUser(User user) {
@@ -67,6 +91,11 @@ public class LoginUserInteractor {
         return mTokenManager.getName(mPreferencesManager.getAccountName());
     }
 
+    public int getCoDriversNumber() {
+        //TODO: implement getting co drivers number
+        return 1;
+    }
+
     public String getDomainName() {
         return mTokenManager.getDomain(mPreferencesManager.getAccountName());
     }
@@ -75,8 +104,17 @@ public class LoginUserInteractor {
         return mAppDatabase.userDao().getUserById(getDriverId());
     }
 
+    public boolean isLoginActive() {
+        return mTokenManager.getToken(mPreferencesManager.getAccountName()) != null;
+    }
+
     public Integer getDriverId() {
         String id = mTokenManager.getDriver(mPreferencesManager.getAccountName());
         return id == null || id.isEmpty() ? -1 : Integer.valueOf(id);
     }
+
+    public String getTimezone(int driverId) {
+        return mAppDatabase.userDao().getTimezoneById(driverId).getTimezone();
+    }
+
 }
