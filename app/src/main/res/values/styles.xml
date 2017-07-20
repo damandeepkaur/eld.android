@@ -18,6 +18,7 @@
 
     <style name="ActionBarTheme" parent="style/ThemeOverlay.AppCompat.Dark.ActionBar">
         <item name="android:homeAsUpIndicator">@drawable/ic_arrow_back_green_24dp</item>
+        <item name="colorControlNormal">@color/nasty_green</item>
     </style>
 
     <style name="ActionBarTitleTextStyle" parent="@style/TextAppearance.AppCompat.Widget.ActionBar.Title">
