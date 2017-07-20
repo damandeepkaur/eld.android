@@ -1,6 +1,7 @@
 package com.bsmwireless.screens.selectasset;
 
 import com.bsmwireless.domain.interactors.VehiclesInteractor;
+import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.Vehicle;
 
 import org.junit.Before;
@@ -15,8 +16,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import app.bsmuniversal.com.RxSchedulerRule;
+import io.reactivex.Completable;
 import io.reactivex.Observable;
 
+import static junit.framework.Assert.fail;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
@@ -127,7 +131,46 @@ public class SelectAssetPresenterTest {
 
 
     // TODO: onCancelButtonPressed
-    // TODO: onNotInVehicleButtonClicked
-    // TODO: onVehicleListItemClicked
+        // TODO: skipping for now as Cancel button does not appear in interaction map - add tests or delete comment if this changes
+
+
+    /** Verify call to VehiclesInteractor#cleanSelectedVehicle. */
+    @Test
+    public void testOnNotInVehicleCleanSelectedVehicle() {
+        // given
+        when(mVehiclesInteractor.cleanSelectedVehicle()).thenReturn(Completable.complete());
+
+        // when
+        mSelectAssetPresenter.onNotInVehicleButtonClicked();
+
+        // then
+        verify(mVehiclesInteractor).cleanSelectedVehicle();
+    }
+
+    @Test
+    public void testOnNotInVehicleGoToMainScreen() {
+        // given
+        when(mVehiclesInteractor.cleanSelectedVehicle()).thenReturn(Completable.complete());
+
+        // when
+        mSelectAssetPresenter.onNotInVehicleButtonClicked();
+
+        // then
+        verify(mView).goToMainScreen();
+    }
+
+
+    @Test
+    public void testOnVehicleListItemClickedPairVehicle() {
+        // given
+        Vehicle fakeVehicle = new Vehicle();
+        when(mVehiclesInteractor.pairVehicle(any(Vehicle.class))).thenReturn(Observable.just(new ArrayList<ELDEvent>()));
+
+        // when
+        mSelectAssetPresenter.onVehicleListItemClicked(fakeVehicle);
+
+        // then
+        verify(mVehiclesInteractor).pairVehicle(eq(fakeVehicle));
+    }
 
 }
