@@ -17,6 +17,7 @@
     <color name="material_blue_A200">#ff448aff</color>
     <color name="cancel_btn_color">#FFDD7328</color>
     <color name="next_btn_color">#FF6CAC4A</color>
+    <color name="nasty_green">#7ac144</color>
 
     <!-- App Specific -->
     <color name="help_transparent_background">#99000000</color>
@@ -33,5 +34,9 @@
     <color name="graph_grid_paint_color">#999999</color>
     <color name="graph_header_paint_color">#555555</color>
     <color name="graph_bar_paint_color">#90C34D</color>
+
+    <color name="black">#2f2f2f</color>
+    <color name="greyish_brown">#484848</color>
+    <color name="brownish_grey">#6b6b6b</color>
 
 </resources>

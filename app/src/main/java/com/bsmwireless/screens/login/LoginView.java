@@ -12,8 +12,6 @@ public interface LoginView {
 
     void goToMainScreen();
 
-    void goToForgotPasswordScreen();
-
     void loadUserData(String name, String domain);
 
     void setLoginButtonEnabled(boolean enabled);
