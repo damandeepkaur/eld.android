@@ -23,17 +23,13 @@ import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for LoginPresenter
- *
  * <p>
- *     This currently imitates existing app.bsmuniversal.com.presentation.LoginPresenterTest.
- * </p>
- *
+ * This currently imitates existing app.bsmuniversal.com.presentation.LoginPresenterTest.
  * <p>
- *     This is to help learn the existing style conventions the team, as well as to
- *     try tests via Jenkins without interfering with the existing tests.
- *
- *     TODO: remove if/when necessary
- * </p>
+ * This is to help learn the existing style conventions the team, as well as to
+ * try tests via Jenkins without interfering with the existing tests.
+ * <p>
+ * TODO: remove if/when necessary
  */
 
 @RunWith(MockitoJUnitRunner.class)
@@ -118,7 +114,7 @@ public class LoginPresenterTest {
                 eq(User.DriverType.DRIVER))).thenReturn(Observable.just(false));
 
         // when
-        mLoginPresenter.onLoginButtonClicked(false);;
+        mLoginPresenter.onLoginButtonClicked(false);
 
         // then
         verify(mView).showErrorMessage(anyString());
@@ -140,14 +136,6 @@ public class LoginPresenterTest {
         // then
         verify(mView).goToMainScreen();
     }
-
-
-
-
-
-
-
-
 
 
 }

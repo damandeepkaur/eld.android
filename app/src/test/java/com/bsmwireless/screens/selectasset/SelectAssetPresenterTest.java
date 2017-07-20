@@ -44,7 +44,9 @@ public class SelectAssetPresenterTest {
 
     private List<Vehicle> vehicles;
 
-    /** Builds a vehicle for unit test purposes. Add fields if required. */
+    /**
+     * Builds a vehicle for unit test purposes. Add fields if required.
+     */
     private static Vehicle buildVehicle(int id, String name) {
         Vehicle v = new Vehicle();
         v.setId(id);
@@ -53,7 +55,9 @@ public class SelectAssetPresenterTest {
         return v;
     }
 
-    /** Build test vehicle list. */
+    /**
+     * Build test vehicle list.
+     */
     private static List<Vehicle> buildVehicleList() {
         List<Vehicle> result = new ArrayList<>();
         result.add(buildVehicle(1111, "abc"));
@@ -72,7 +76,7 @@ public class SelectAssetPresenterTest {
 
 
     // TODO: onSearchTextChanged
-        // TODO: unsure if < 3 error message is expected or placeholder, so skipping test - pls. add if needed
+    // TODO: unsure if < 3 error message is expected or placeholder, so skipping test - pls. add if needed
 
     @Test
     public void testOnSearchTextChangedLessThan3Chars() {
@@ -98,7 +102,9 @@ public class SelectAssetPresenterTest {
         verify(mView).showEmptyList();
     }
 
-    /** Verify behavior of non-empty search response. */
+    /**
+     * Verify behavior of non-empty search response.
+     */
     @Test
     public void testOnSearchTextChangedSuccess() {
         // given
@@ -112,7 +118,9 @@ public class SelectAssetPresenterTest {
         verify(mView).setVehicleList(eq(vehicles));
     }
 
-    /** Verify behavior of empty search response. */
+    /**
+     * Verify behavior of empty search response.
+     */
     @Test
     public void testOnSearchTextChangedUnsuccessful() {
         // given
@@ -129,10 +137,12 @@ public class SelectAssetPresenterTest {
 
 
     // TODO: onCancelButtonPressed
-        // TODO: skipping for now as Cancel button does not appear in interaction map - add tests or delete comment if this changes
+    // TODO: skipping for now as Cancel button does not appear in interaction map - add tests or delete comment if this changes
 
 
-    /** Verify call to VehiclesInteractor#cleanSelectedVehicle. */
+    /**
+     * Verify call to VehiclesInteractor#cleanSelectedVehicle.
+     */
     @Test
     public void testOnNotInVehicleCleanSelectedVehicle() {
         // given
@@ -157,7 +167,9 @@ public class SelectAssetPresenterTest {
         verify(mView).goToMainScreen();
     }
 
-
+    /**
+     * Verify pair vehicle.
+     */
     @Test
     public void testOnVehicleListItemClickedPairVehicle() {
         // given
@@ -169,6 +181,23 @@ public class SelectAssetPresenterTest {
 
         // then
         verify(mVehiclesInteractor).pairVehicle(eq(fakeVehicle));
+    }
+
+    /**
+     * Verify go-to main screen.
+     */
+    // TODO: I cannot tell if this behavior is currently a stub - pls. remove test if it is
+    @Test
+    public void testOnVehicleClickedGoToMain() {
+        // given
+        Vehicle fakeVehicle = new Vehicle();
+        when(mVehiclesInteractor.pairVehicle(any(Vehicle.class))).thenReturn(Observable.just(new ArrayList<>()));
+
+        // when
+        mSelectAssetPresenter.onVehicleListItemClicked(fakeVehicle);
+
+        // then
+        verify(mView).goToMainScreen();
     }
 
 }
