@@ -1,7 +1,6 @@
 package com.bsmwireless.screens.selectasset;
 
 import com.bsmwireless.domain.interactors.VehiclesInteractor;
-import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.Vehicle;
 
 import org.junit.Before;
@@ -19,7 +18,6 @@ import app.bsmuniversal.com.RxSchedulerRule;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 
-import static junit.framework.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -42,14 +40,14 @@ public class SelectAssetPresenterTest {
     @Mock
     VehiclesInteractor mVehiclesInteractor;
 
-    SelectAssetPresenter mSelectAssetPresenter;
+    private SelectAssetPresenter mSelectAssetPresenter;
 
     private List<Vehicle> vehicles;
 
     /** Builds a vehicle for unit test purposes. Add fields if required. */
     private static Vehicle buildVehicle(int id, String name) {
         Vehicle v = new Vehicle();
-        v.setId(Integer.valueOf(id));
+        v.setId(id);
         v.setName(name);
 
         return v;
@@ -119,7 +117,7 @@ public class SelectAssetPresenterTest {
     public void testOnSearchTextChangedUnsuccessful() {
         // given
         String searchText = "expect no results";
-        final List<Vehicle> emptyList = new ArrayList<Vehicle>();
+        final List<Vehicle> emptyList = new ArrayList<>();
         when(mVehiclesInteractor.searchVehicles(anyString())).thenReturn(Observable.just(emptyList));
 
         // when
@@ -164,7 +162,7 @@ public class SelectAssetPresenterTest {
     public void testOnVehicleListItemClickedPairVehicle() {
         // given
         Vehicle fakeVehicle = new Vehicle();
-        when(mVehiclesInteractor.pairVehicle(any(Vehicle.class))).thenReturn(Observable.just(new ArrayList<ELDEvent>()));
+        when(mVehiclesInteractor.pairVehicle(any(Vehicle.class))).thenReturn(Observable.just(new ArrayList<>()));
 
         // when
         mSelectAssetPresenter.onVehicleListItemClicked(fakeVehicle);
