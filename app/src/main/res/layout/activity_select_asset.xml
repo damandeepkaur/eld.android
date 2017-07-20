@@ -6,9 +6,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="@android:color/white"
     tools:context="com.bsmwireless.screens.selectasset.SelectAssetActivity">
 
     <android.support.design.widget.AppBarLayout
+        style="@style/ActionBarTheme"
         android:id="@+id/select_asset_app_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -17,12 +19,13 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:background="@color/primary">
+            android:background="@drawable/toolbar_gradient">
 
             <android.support.v7.widget.Toolbar
                 android:id="@+id/select_asset_toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
+                app:titleTextAppearance="@style/ActionBarTitleTextStyle"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Dark"/>
 
             <android.support.v7.widget.SearchView
@@ -34,7 +37,7 @@
                 app:iconifiedByDefault="false"
                 app:searchHintIcon="@null"
                 app:queryBackground="@null"
-                app:queryHint="@string/select_asset_search_hint" />
+                app:queryHint="@string/select_asset_search_hint"/>
 
         </LinearLayout>
 
@@ -45,7 +48,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/select_asset_app_bar"
-        android:layout_margin="@dimen/select_asset_default_margin"
+        android:layout_margin="@dimen/select_asset_item_padding"
+        android:textSize="@dimen/text_size_small"
+        android:textColor="@color/accent"
         android:text="@string/select_asset_previous_assets"/>
 
     <android.support.v7.widget.RecyclerView
@@ -60,22 +65,30 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_margin="@dimen/select_asset_default_margin"
+        android:layout_margin="@dimen/default_margin"
         android:orientation="horizontal"
         android:gravity="center">
         
-        <Button
+        <android.support.v7.widget.AppCompatButton
             android:id="@+id/select_asset_scan_qr_code_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginRight="@dimen/select_asset_default_margin"
-            android:text="@string/select_asset_scan_qr_code"/>
+            android:layout_marginRight="@dimen/default_margin"
+            android:padding="@dimen/default_margin"
+            android:text="@string/select_asset_scan_qr_code"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/text_size_small"
+            app:backgroundTint="@color/accent"/>
 
-        <Button
+        <android.support.v7.widget.AppCompatButton
             android:id="@+id/select_asset_not_in_vehicle_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/select_asset_not_in_vehicle"/>
+            android:padding="@dimen/default_margin"
+            android:text="@string/select_asset_not_in_vehicle"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/text_size_small"
+            app:backgroundTint="@color/accent"/>
         
     </LinearLayout>
 

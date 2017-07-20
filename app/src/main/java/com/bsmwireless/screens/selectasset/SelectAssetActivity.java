@@ -13,7 +13,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bsmwireless.common.App;
 import com.bsmwireless.common.Constants;
@@ -22,6 +21,7 @@ import com.bsmwireless.screens.barcode.BarcodeScannerActivity;
 import com.bsmwireless.screens.common.BaseActivity;
 import com.bsmwireless.screens.help.HelpActivity;
 import com.bsmwireless.screens.login.LoginActivity;
+import com.bsmwireless.screens.navigation.NavigationActivity;
 import com.bsmwireless.screens.selectasset.dagger.DaggerSelectAssetComponent;
 import com.bsmwireless.screens.selectasset.dagger.SelectAssetModule;
 import com.bsmwireless.widgets.common.RxSearchView;
@@ -90,6 +90,8 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setHomeAsUpIndicator(R.drawable.ic_arrow_back_green_24dp);
+            actionBar.setTitle(R.string.select_asset_title);
         }
 
         RxSearchView.queryTextChanges(mSearchView).debounce(Constants.DEBOUNCE_TIMEOUT, TimeUnit.MILLISECONDS)
@@ -212,7 +214,8 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
 
     @Override
     public void goToHomeScreen() {
-        Toast.makeText(this, "Go to main screen", Toast.LENGTH_SHORT).show();
+        startActivity(new Intent(this, NavigationActivity.class));
+        finish();
     }
 
     @Override

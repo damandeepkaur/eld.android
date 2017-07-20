@@ -4,6 +4,7 @@ import android.accounts.NetworkErrorException;
 
 import com.bsmwireless.common.utils.NetworkUtils;
 import com.bsmwireless.data.network.ServiceApi;
+import com.bsmwireless.data.network.authenticator.TokenManager;
 import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.data.storage.eldevents.ELDEventConverter;
@@ -17,7 +18,6 @@ import java.util.List;
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
-import io.reactivex.schedulers.Schedulers;
 
 public class ELDEventsInteractor {
     private ServiceApi mServiceApi;
@@ -49,7 +49,7 @@ public class ELDEventsInteractor {
 
     public Observable<ResponseMessage> postNewELDEvent(ELDEvent event) {
         if (NetworkUtils.isOnlineMode()) {
-            return mServiceApi.postNewELDEvent(event, mPreferencesManager.getSelectedBoxId())
+            return mServiceApi.postNewELDEvent(event)
                     .doOnError(throwable -> storeEvent(event, false));
         } else {
             storeEvent(event, false);
@@ -59,7 +59,7 @@ public class ELDEventsInteractor {
 
     public Observable<ResponseMessage> postNewELDEvents(List<ELDEvent> events) {
         if (NetworkUtils.isOnlineMode()) {
-            return mServiceApi.postNewELDEvents(events, mPreferencesManager.getSelectedBoxId())
+            return mServiceApi.postNewELDEvents(events)
                     .doOnError(throwable -> events.forEach(event -> storeEvent(event, false)));
         } else {
             storeEvents(events, false);

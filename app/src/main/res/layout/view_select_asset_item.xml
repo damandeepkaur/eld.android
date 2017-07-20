@@ -4,7 +4,7 @@
     android:id="@+id/select_asset_item"
     android:layout_width="match_parent"
     android:layout_height="@dimen/select_asset_item_height"
-    android:textSize="@dimen/select_asset_text_size"
+    android:textSize="@dimen/text_size"
     android:paddingLeft="@dimen/select_asset_item_padding"
-    android:drawablePadding="@dimen/select_asset_default_margin"
+    android:drawablePadding="@dimen/default_margin"
     android:gravity="center_vertical"/>

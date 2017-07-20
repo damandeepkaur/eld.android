@@ -14,8 +14,9 @@
         android:name="android.permission.AUTHENTICATE_ACCOUNTS"
         android:maxSdkVersion="22"/>
 
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
     <application
         android:name="com.bsmwireless.common.App"
@@ -28,7 +29,17 @@
         <activity
             android:name="com.bsmwireless.screens.login.LoginActivity"
             android:label="@string/app_name"
-            android:theme="@style/Theme.BsmAppWithBGFullScreen">
+            android:theme="@style/Theme.BsmAppWithBGFullScreen"/>
+
+        <activity
+            android:name="com.bsmwireless.screens.selectasset.SelectAssetActivity"
+            android:windowSoftInputMode="stateHidden|adjustPan"
+            android:theme="@style/AppTheme"/>
+
+        <activity
+            android:name="com.bsmwireless.screens.navigation.NavigationActivity"
+            android:theme="@style/AppTheme"
+            android:windowSoftInputMode="stateHidden|adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
@@ -36,27 +47,20 @@
         </activity>
 
         <activity
-            android:name="com.bsmwireless.screens.taketour.TakeTourActivity"
-            android:theme="@style/Theme.BsmApp"/>
-
-        <activity
-            android:name="com.bsmwireless.screens.selectasset.SelectAssetActivity"
-            android:windowSoftInputMode="stateHidden|adjustPan"/>
-
-        <activity
             android:name="com.bsmwireless.screens.help.HelpActivity"
             android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
 
-        <activity android:name="com.bsmwireless.screens.barcode.BarcodeScannerActivity"
-            android:theme="@style/Theme.BsmAppFullScreen" />
+        <activity
+            android:name="com.bsmwireless.screens.barcode.BarcodeScannerActivity"
+            android:theme="@style/Theme.BsmAppFullScreen"/>
 
         <service android:name="com.bsmwireless.data.network.authenticator.BsmAuthenticatorService">
             <intent-filter>
-                <action android:name="android.accounts.AccountAuthenticator" />
+                <action android:name="android.accounts.AccountAuthenticator"/>
             </intent-filter>
             <meta-data
                 android:name="android.accounts.AccountAuthenticator"
-                android:resource="@xml/authenticator" />
+                android:resource="@xml/authenticator"/>
         </service>
 
     </application>

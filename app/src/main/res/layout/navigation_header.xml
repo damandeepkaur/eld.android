@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/toolbar_gradient"
+    android:gravity="bottom"
+    android:orientation="horizontal"
+    android:paddingBottom="@dimen/navigation_header_bottom_padding"
+    android:paddingLeft="@dimen/navigation_header_left_padding"
+    android:paddingRight="@dimen/navigation_header_right_padding"
+    android:paddingTop="@dimen/navigation_header_top_padding"
+    android:theme="@style/ThemeOverlay.AppCompat.Dark">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:alpha="0.5"
+            android:lineSpacingExtra="6sp"
+            android:text="@string/driver"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/navigation_header_title_text_size"
+            android:textStyle="normal"/>
+
+        <TextView
+            android:id="@+id/driver_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:lineSpacingExtra="10sp"
+            android:textColor="@color/accent"
+            android:textSize="@dimen/navigation_header_title_text_size"
+            android:textStyle="normal"/>
+
+        <TextView
+            android:id="@+id/co_drivers_number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:alpha="0.5"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/navigation_header_num_value_text_size"
+            android:textStyle="normal"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:alpha="0.5"
+            android:lineSpacingExtra="6sp"
+            android:text="@string/asset"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/navigation_header_title_text_size"
+            android:textStyle="normal"/>
+
+        <TextView
+            android:id="@+id/box_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:lineSpacingExtra="10sp"
+            android:textColor="@color/accent"
+            android:textSize="@dimen/navigation_header_num_value_text_size"
+            android:textStyle="normal"/>
+
+        <TextView
+            android:id="@+id/assets_number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:alpha="0.5"
+            android:textColor="@android:color/white"
+            android:textSize="12sp"
+            android:textStyle="normal"/>
+    </LinearLayout>
+
+</LinearLayout>

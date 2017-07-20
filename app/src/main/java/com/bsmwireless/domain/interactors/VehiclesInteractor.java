@@ -48,10 +48,10 @@ public class VehiclesInteractor {
         return mServiceApi.searchVehicles(searchText);
     }
 
-    public void saveSelectedVehicle(Vehicle vehicle) {
+    public void saveVehicle(Vehicle vehicle) {
         mAppDatabase.vehicleDao().insertVehicle(VehicleConverter.toEntity(vehicle));
-        mPreferencesManager.setSelectedVehicleId(vehicle.getId());
-        mPreferencesManager.setSelectedBoxId(vehicle.getBoxId());
+        mPreferencesManager.setVehicleId(vehicle.getId());
+        mPreferencesManager.setBoxId(vehicle.getBoxId());
     }
 
     public void saveLastVehicle(int driverId, Integer vehicleId) {
@@ -74,9 +74,9 @@ public class VehiclesInteractor {
 
     public Completable cleanSelectedVehicle() {
         return Completable.fromAction(
-                () ->  {
-                    mPreferencesManager.setSelectedVehicleId(NOT_IN_VEHICLE_ID);
-                    mPreferencesManager.setSelectedBoxId(NOT_IN_VEHICLE_ID);
+                () -> {
+                    mPreferencesManager.setVehicleId(NOT_IN_VEHICLE_ID);
+                    mPreferencesManager.setBoxId(NOT_IN_VEHICLE_ID);
                 });
     }
 
@@ -102,7 +102,7 @@ public class VehiclesInteractor {
                     return mServiceApi.pairVehicle(event, vehicle.getBoxId());
                 })
                 .doOnNext(events -> {
-                    saveSelectedVehicle(vehicle);
+                    saveVehicle(vehicle);
                     saveLastVehicle(id, vehicle.getId());
                     mELDEventsInteractor.storeEvents(events, true);
                 });
@@ -112,5 +112,14 @@ public class VehiclesInteractor {
         return mAppDatabase.userDao().getUserLastVehicles(mUserInteractor.getDriverId())
                 .flatMap(userLastVehicles -> mAppDatabase.vehicleDao().getVehicles(ListConverter.toIntegerList(userLastVehicles.getIds())))
                 .flatMap(vehicleEntities -> Flowable.just(VehicleConverter.toVehicle(vehicleEntities)));
+    }
+
+    public int getBoxId() {
+        return mPreferencesManager.getBoxId();
+    }
+
+    public int getAssetsNumber() {
+        //TODO: implement getting assets number
+        return 1;
     }
 }

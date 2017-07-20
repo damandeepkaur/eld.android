@@ -1,8 +1,6 @@
 package com.bsmwireless.data.storage.configurations;
 
-import com.bsmwireless.data.storage.eldevents.ELDEventEntity;
 import com.bsmwireless.models.Configuration;
-import com.bsmwireless.models.ELDEvent;
 
 public class ConfigurationConverter {
     public static Configuration toModel(ConfigurationEntity entity) {

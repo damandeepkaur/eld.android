@@ -56,11 +56,10 @@ public interface ServiceApi {
      * Send ELD certify event; According doc section 4.5.1.4. It does same thing as dutyevents
      *
      * @param event driver status.
-     * @param boxId box identifier (required).
      * @return update driver status response {@link ResponseMessage}.
      */
     @POST("v1/app/driver/certify")
-    Observable<ResponseMessage> postNewELDEvent(@Body ELDEvent event, @Header("X-Box") int boxId);
+    Observable<ResponseMessage> postNewELDEvent(@Body ELDEvent event);
 
     /**
      * Update user profile and signature
@@ -76,17 +75,16 @@ public interface ServiceApi {
      * Send ELD driver duty status; According doc section 4.5.1.1; 4.5.1.2; 4.5.1.3; 4.5.1.4; 4.5.1.7; It sends a list of new records ordered by event time.
      *
      * @param statusList driver status list.
-     * @param boxId      box identifier (optional).
      * @return update driver status response {@link ResponseMessage}.
      */
     @POST("v1/app/driver/dutyevents")
-    Observable<ResponseMessage> postNewELDEvents(@Body List<ELDEvent> statusList, @Header("X-Box") int boxId);
+    Observable<ResponseMessage> postNewELDEvents(@Body List<ELDEvent> statusList);
 
     /**
      * Fetch processed driver records.
      *
      * @param startTime start time.
-     * @param endTime end time.
+     * @param endTime   end time.
      * @return List of unidentified or changed event records {@link ELDEvent}.
      */
     @GET("v1/sync/records/search/{start}/{end}")
@@ -104,24 +102,20 @@ public interface ServiceApi {
     /**
      * Inspection Categories from category Ids
      *
-     * @param boxId       id of the box paired with the vehicle.
      * @param categoryIds list of inspection category ids, comma separated.
      * @return Sync Inspection Items Response {@link SyncInspectionCategory}.
      */
     @GET("v1/sync/inspection_items/search/{categoryIds}")
-    Observable<List<SyncInspectionCategory>> getInspectionItemsByCategoryIds(@Header("X-Box") Integer boxId,
-                                                                             @Path("categoryIds") String categoryIds);
+    Observable<List<SyncInspectionCategory>> getInspectionItemsByCategoryIds(@Path("categoryIds") String categoryIds);
 
     /**
      * Inspection Categories for the box. It is used after driver selects a vehicle, which maps to a box
      *
-     * @param boxId      id of the box paired with the vehicle.
      * @param lastUpdate list of inspection category ids, comma separated.
      * @return Sync Inspection Items Response {@link SyncInspectionCategory}.
      */
     @GET("v1/sync/inspection_items/{lastupdate}")
-    Observable<List<SyncInspectionCategory>> getInspectionItemsByLastUpdate(@Header("X-Box") Integer boxId,
-                                                                            @Path("lastupdate") long lastUpdate);
+    Observable<List<SyncInspectionCategory>> getInspectionItemsByLastUpdate(@Path("lastupdate") long lastUpdate);
 
     /**
      * Sync Inspection Report.
@@ -134,14 +128,13 @@ public interface ServiceApi {
     @GET("v1/sync/inspections/report/{lastUpdate}/{isTrailer}/{beginDate}")
     Observable<InspectionReport> syncInspectionReport(@Path("lastUpdate") Long lastUpdate,
                                                       @Path("isTrailer") int isTrailer,
-                                                      @Path("beginDate") Long beginDate,
-                                                      @Header("X-Box") int boxId);
+                                                      @Path("beginDate") Long beginDate);
 
     /**
      * Get LogSheet header information list.
      *
      * @param startLogDay epoch unix time stamp, in miliseconds.
-     * @param endLogDay epoch unix time stamp, in miliseconds.
+     * @param endLogDay   epoch unix time stamp, in miliseconds.
      * @return LogSheet Response {@link LogSheetHeader}
      */
     @GET("v1/sync/logsheet/headers/{start}/{end}")
@@ -163,7 +156,7 @@ public interface ServiceApi {
      * Link the driver to the vehicle, fetch unidentified record for update, and carrier's change requests.
      *
      * @param status current driver status
-     * @param boxId id of the box paired with the vehicle.
+     * @param boxId  id of the box paired with the vehicle.
      * @return Pair Vehicle Response {@link ELDEvent}
      */
     @POST("v1/login/pair")
