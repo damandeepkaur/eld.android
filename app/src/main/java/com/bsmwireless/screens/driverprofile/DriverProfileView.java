@@ -4,6 +4,6 @@ import com.bsmwireless.data.storage.users.UserEntity;
 
 public interface DriverProfileView {
     void setUserInfo(UserEntity user);
-    void userUpdated();
-    void userUpdateError(Throwable error);
+    void updateUser();
+    void showError(Throwable error);
 }

@@ -8,13 +8,18 @@ import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import app.bsmuniversal.com.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 
-public class SignatureView extends LinearLayout {
+public class SignatureLayout extends LinearLayout {
+
+    private static final int ANIMATION_DURATION = 500;
 
     private View mRootView;
 
@@ -29,29 +34,32 @@ public class SignatureView extends LinearLayout {
     @BindView(R.id.control_buttons)
     LinearLayout mControlButtons;
 
-    private OnSaveListener mListener;
+    private OnSaveSignatureListener mListener;
 
-    public interface OnSaveListener {
-        void onSaveClicked(String data);
+    private List<Animation> mStartedAnimations;
+
+    public interface OnSaveSignatureListener {
+        void onSaveSignatureClicked(String data);
     }
 
-    public SignatureView(Context context) {
+    public SignatureLayout(Context context) {
         super(context);
         init(context);
     }
 
-    public SignatureView(Context context, AttributeSet attrs) {
+    public SignatureLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context);
     }
 
-    public SignatureView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public SignatureLayout(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init(context);
     }
 
     private void init(Context context) {
         mRootView = inflate(context, R.layout.signature_view, this);
+        mStartedAnimations = new ArrayList<>();
     }
 
     @Override
@@ -63,6 +71,9 @@ public class SignatureView extends LinearLayout {
     @Override
     protected void onDetachedFromWindow() {
         mUnbinder.unbind();
+        if (mStartedAnimations.size() > 0) {
+            mStartedAnimations.forEach(Animation::cancel);
+        }
         super.onDetachedFromWindow();
     }
 
@@ -80,7 +91,7 @@ public class SignatureView extends LinearLayout {
         showEditButton();
 
         if (mListener != null) {
-            mListener.onSaveClicked(mDriverSignView.getSignatureString());
+            mListener.onSaveSignatureClicked(mDriverSignView.getSignatureString());
         }
 
         mDriverSignView.setEditable(false);
@@ -99,13 +110,13 @@ public class SignatureView extends LinearLayout {
         return mDriverSignView.getSignatureString();
     }
 
-    public void setOnSaveListener(OnSaveListener listener) {
+    public void setOnSaveListener(OnSaveSignatureListener listener) {
         mListener = listener;
     }
 
     private void hideEditButton() {
         AlphaAnimation animation = new AlphaAnimation(1, 0);
-        animation.setDuration(500);
+        animation.setDuration(ANIMATION_DURATION);
         animation.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
@@ -115,6 +126,7 @@ public class SignatureView extends LinearLayout {
             @Override
             public void onAnimationEnd(Animation animation) {
                 mChangeButton.setVisibility(GONE);
+                mStartedAnimations.remove(animation);
             }
 
             @Override
@@ -123,11 +135,12 @@ public class SignatureView extends LinearLayout {
             }
         });
         mChangeButton.startAnimation(animation);
+        mStartedAnimations.add(animation);
     }
 
     private void showEditButton() {
         AlphaAnimation animation = new AlphaAnimation(0, 1);
-        animation.setDuration(500);
+        animation.setDuration(ANIMATION_DURATION);
         animation.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
@@ -136,7 +149,7 @@ public class SignatureView extends LinearLayout {
 
             @Override
             public void onAnimationEnd(Animation animation) {
-
+                mStartedAnimations.remove(animation);
             }
 
             @Override
@@ -145,11 +158,12 @@ public class SignatureView extends LinearLayout {
             }
         });
         mChangeButton.startAnimation(animation);
+        mStartedAnimations.add(animation);
     }
 
     private void hideControlButtons() {
         AlphaAnimation animation = new AlphaAnimation(1, 0);
-        animation.setDuration(500);
+        animation.setDuration(ANIMATION_DURATION);
         animation.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
@@ -159,6 +173,7 @@ public class SignatureView extends LinearLayout {
             @Override
             public void onAnimationEnd(Animation animation) {
                 mControlButtons.setVisibility(GONE);
+                mStartedAnimations.remove(animation);
             }
 
             @Override
@@ -167,11 +182,12 @@ public class SignatureView extends LinearLayout {
             }
         });
         mControlButtons.startAnimation(animation);
+        mStartedAnimations.add(animation);
     }
 
     private void showControlButtons() {
         AlphaAnimation animation = new AlphaAnimation(0, 1);
-        animation.setDuration(500);
+        animation.setDuration(ANIMATION_DURATION);
         animation.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
@@ -181,7 +197,7 @@ public class SignatureView extends LinearLayout {
 
             @Override
             public void onAnimationEnd(Animation animation) {
-
+                mStartedAnimations.remove(animation);
             }
 
             @Override
@@ -189,6 +205,8 @@ public class SignatureView extends LinearLayout {
 
             }
         });
+
         mControlButtons.startAnimation(animation);
+        mStartedAnimations.add(animation);
     }
 }

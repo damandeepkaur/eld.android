@@ -11,13 +11,10 @@ import com.bsmwireless.models.LoginModel;
 import com.bsmwireless.models.ResponseMessage;
 import com.bsmwireless.models.User;
 
-import java.util.List;
-
 import javax.inject.Inject;
 
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
-import io.reactivex.schedulers.Schedulers;
 
 public class LoginUserInteractor {
 
@@ -60,7 +57,10 @@ public class LoginUserInteractor {
     }
 
     public Observable<ResponseMessage> updateUser(User user) {
-        return mServiceApi.updateProfile(user);
+        return mServiceApi.updateProfile(user)
+                          .doOnNext(
+                                  responseMessage -> mAppDatabase.userDao().insertUser(UserConverter.toEntity(mPreferencesManager.getAccountName(), user))
+                          );
     }
 
     public String getUserName() {
@@ -72,7 +72,11 @@ public class LoginUserInteractor {
     }
 
     public Flowable<UserEntity> getUser() {
-        return mAppDatabase.userDao().getUserByAccountName(mPreferencesManager.getAccountName());
+        return mAppDatabase.userDao().getUserById(getDriverId());
     }
 
+    public Integer getDriverId() {
+        String id = mTokenManager.getDriver(mPreferencesManager.getAccountName());
+        return id == null || id.isEmpty() ? -1 : Integer.valueOf(id);
+    }
 }

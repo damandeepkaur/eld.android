@@ -4,6 +4,7 @@ import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.data.storage.users.UserConverter;
 import com.bsmwireless.data.storage.users.UserEntity;
 import com.bsmwireless.domain.interactors.LoginUserInteractor;
+import com.bsmwireless.models.User;
 
 import javax.inject.Inject;
 
@@ -18,6 +19,8 @@ public class DriverProfilePresenter {
     private LoginUserInteractor mLoginUserInteractor;
     private DriverProfileView mView;
     private CompositeDisposable mDisposables;
+
+    private UserEntity mUserEntity;
 
     @Inject
     public DriverProfilePresenter(DriverProfileView view, LoginUserInteractor loginUserInteractor) {
@@ -34,59 +37,60 @@ public class DriverProfilePresenter {
         Timber.d("DESTROYED");
     }
 
-    public void getUserInfo() {
+    public void onNeedUpdateUserInfo() {
         mDisposables.add(mLoginUserInteractor.getUser()
                                              .subscribeOn(Schedulers.io())
                                              .observeOn(AndroidSchedulers.mainThread())
-                                             .subscribe(userEntity -> mView.setUserInfo(userEntity),
-                                                        throwable -> Timber.e(throwable.getMessage())));
+                                             .subscribe(userEntity -> {
+                                                             mUserEntity = userEntity;
+                                                             mView.setUserInfo(mUserEntity);
+                                                        },
+                                                        throwable -> {
+                                                            Timber.e(throwable.getMessage());
+                                                            mView.showError(throwable);
+                                                        }));
     }
 
-    public void updateSignature(String signature) {
+    public void onSaveSignatureClicked(String signature) {
+        if (mUserEntity != null) {
+            User user = UserConverter.toUser(mUserEntity);
+            user.setSignature(signature);
+            updateUser(user);
+        } else {
+            mView.showError(new Exception());
+        }
+    }
+
+    public void onSaveCompanyClicked(String company) {
+        if (mUserEntity != null) {
+            User user = UserConverter.toUser(mUserEntity);
+            user.setOrganization(company);
+            updateUser(user);
+        } else {
+            mView.showError(new Exception());
+        }
+    }
+
+    public void onSaveHomeAddressClicked(String address) {
+        if (mUserEntity != null) {
+            User user = UserConverter.toUser(mUserEntity);
+            user.setAddress(address);
+            updateUser(user);
+        } else {
+            mView.showError(new Exception());
+        }
+    }
+
+    private void updateUser(User user) {
         mDisposables.add(
-                mLoginUserInteractor.getUser()
+                mLoginUserInteractor.updateUser(user)
                                     .subscribeOn(Schedulers.io())
-                                    .subscribe(userEntity -> {
-                                                    userEntity.setSignature(signature);
-                                                    updateUser(userEntity);
-                                                },
-                                                throwable -> Timber.e(throwable.getMessage()))
-        );
-    }
-
-    public void updateName(String name) {
-        mDisposables.add(
-                mLoginUserInteractor.getUser()
-                                    .subscribeOn(Schedulers.io())
-                                    .subscribe(userEntity -> {
-                                                userEntity.setAccountName(name);
-                                                updateUser(userEntity);
-                                            },
-                                            throwable -> Timber.e(throwable.getMessage()))
-        );
-    }
-
-    public void updateHomeAddress(String address) {
-        mDisposables.add(
-                mLoginUserInteractor.getUser()
-                                    .subscribeOn(Schedulers.io())
-                                    .subscribe(userEntity -> {
-                                                userEntity.setAddress(address);
-                                                updateUser(userEntity);
-                                            },
-                                            throwable -> Timber.e(throwable.getMessage()))
-        );
-    }
-
-    private void updateUser(UserEntity user) {
-        mDisposables.add(
-                mLoginUserInteractor.updateUser(UserConverter.toUser(user))
                                     .observeOn(AndroidSchedulers.mainThread())
-                                    .subscribe(responseMessage -> mView.userUpdated(),
-                                            throwable -> {
-                                                Timber.e(throwable.getMessage());
-                                                mView.userUpdateError(throwable);
-                                            })
+                                    .subscribe(responseMessage -> mView.updateUser(),
+                                                throwable -> {
+                                                    Timber.e(throwable.getMessage());
+                                                    mView.showError(throwable);
+                                                })
         );
     }
 }

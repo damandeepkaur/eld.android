@@ -13,7 +13,7 @@ import com.bsmwireless.data.storage.users.UserEntity;
 import com.bsmwireless.screens.common.BaseActivity;
 import com.bsmwireless.screens.driverprofile.dagger.DaggerDriverProfileComponent;
 import com.bsmwireless.screens.driverprofile.dagger.DriverProfileModule;
-import com.bsmwireless.widgets.signview.SignatureView;
+import com.bsmwireless.widgets.signview.SignatureLayout;
 
 import javax.inject.Inject;
 
@@ -22,7 +22,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
-public class DriverProfileActivity extends BaseActivity implements DriverProfileView, SignatureView.OnSaveListener {
+public class DriverProfileActivity extends BaseActivity implements DriverProfileView, SignatureLayout.OnSaveSignatureListener {
 
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
@@ -42,9 +42,6 @@ public class DriverProfileActivity extends BaseActivity implements DriverProfile
     @BindView(R.id.home_addr)
     EditText mAddressTextView;
 
-    @BindView(R.id.home_terminal)
-    EditText mTerminalTextView;
-
     @BindView(R.id.time_zone)
     EditText mTimeZoneTextView;
 
@@ -55,7 +52,7 @@ public class DriverProfileActivity extends BaseActivity implements DriverProfile
     EditText mCycleTextView;
 
     @BindView(R.id.signature_view)
-    SignatureView mSignatureView;
+    SignatureLayout mSignatureLayout;
 
     @Inject
     DriverProfilePresenter mPresenter;
@@ -73,19 +70,19 @@ public class DriverProfileActivity extends BaseActivity implements DriverProfile
 
         initToolbar();
 
-        mPresenter.getUserInfo();
+        mPresenter.onNeedUpdateUserInfo();
 
-        mSignatureView.setOnSaveListener(this);
+        mSignatureLayout.setOnSaveListener(this);
 
-        mNameTextView.setOnFocusChangeListener((v, hasFocus) -> {
-            if (!hasFocus && !mNameTextView.getText().toString().isEmpty()) {
-                mPresenter.updateName(mNameTextView.getText().toString());
+        mCompanyTextView.setOnFocusChangeListener((v, hasFocus) -> {
+            if (!hasFocus && !mCompanyTextView.getText().toString().isEmpty()) {
+                mPresenter.onSaveCompanyClicked(mCompanyTextView.getText().toString());
             }
         });
 
         mAddressTextView.setOnFocusChangeListener((v, hasFocus) -> {
             if (!hasFocus && !mAddressTextView.getText().toString().isEmpty()) {
-                mPresenter.updateHomeAddress(mAddressTextView.getText().toString());
+                mPresenter.onSaveHomeAddressClicked(mAddressTextView.getText().toString());
             }
         });
     }
@@ -123,26 +120,26 @@ public class DriverProfileActivity extends BaseActivity implements DriverProfile
         mCompanyTextView.setText(user.getOrganization());
         mLicenseTextView.setText(user.getLicense());
         mAddressTextView.setText(user.getAddress());
-        mTerminalTextView.setText(user.getOrgAddr());
         mTimeZoneTextView.setText(user.getTimezone());
-        mPasswordTextView.setText("******");
+        mPasswordTextView.setText(getString(R.string.driver_profile_password));
         mCycleTextView.setText(String.valueOf(user.getCycleCountry()));
-        mSignatureView.setImageData(user.getSignature());
+        mSignatureLayout.setImageData(user.getSignature());
     }
 
     @Override
-    public void userUpdated() {
+    public void updateUser() {
         Toast.makeText(this, getString(R.string.driver_profile_user_updated), Toast.LENGTH_SHORT).show();
+        mPresenter.onNeedUpdateUserInfo();
     }
 
     @Override
-    public void userUpdateError(Throwable error) {
+    public void showError(Throwable error) {
         Toast.makeText(this, error.getMessage(), Toast.LENGTH_SHORT).show();
     }
 
     @Override
-    public void onSaveClicked(String data) {
-        mPresenter.updateSignature(data);
+    public void onSaveSignatureClicked(String data) {
+        mPresenter.onSaveSignatureClicked(data);
     }
 
     private void initToolbar() {

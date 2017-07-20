@@ -8,10 +8,11 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/driver_profile_signature_height">
 
-        <com.bsmwireless.widgets.signview.DriverSignView android:id="@+id/driver_sign"
-                                                         android:layout_width="match_parent"
-                                                         android:layout_height="match_parent"
-                                                         android:layout_margin="@dimen/driver_profile_signature_margin"/>
+        <com.bsmwireless.widgets.signview.DriverSignView
+            android:id="@+id/driver_sign"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="@dimen/driver_profile_signature_margin"/>
 
         <Button android:id="@+id/change_button"
                 android:layout_width="@dimen/driver_profile_change_sign_button_size"

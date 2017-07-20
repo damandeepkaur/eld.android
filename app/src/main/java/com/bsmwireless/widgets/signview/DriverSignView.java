@@ -1,6 +1,7 @@
 package com.bsmwireless.widgets.signview;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -8,9 +9,11 @@ import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
+import android.graphics.PorterDuff;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewParent;
@@ -22,6 +25,10 @@ import app.bsmuniversal.com.R;
 
 
 public class DriverSignView extends View implements View.OnTouchListener {
+
+    private static final int LINE_WIDTH_DP = 12;
+    private static final int BORDER_WIDTH_DP = 2;
+    private static final int DOTTED_LINE_WIDTH_DP = 10;
 
     private Paint mPaint;
     private Paint mBorderPaint;
@@ -59,15 +66,16 @@ public class DriverSignView extends View implements View.OnTouchListener {
         mPaint.setAntiAlias(true);
         mPaint.setColor(Color.BLACK);
         mPaint.setStyle(Paint.Style.STROKE);
-        mPaint.setStrokeWidth(6);
+        mPaint.setStrokeWidth(convertPixelsToDp(LINE_WIDTH_DP, context));
         mPaint.setStrokeCap(Paint.Cap.ROUND);
         mPaint.setStrokeJoin(Paint.Join.ROUND);
+        mPaint.setFilterBitmap(true);
 
         mBorderPaint = new Paint();
         mBorderPaint.setAntiAlias(true);
         mBorderPaint.setColor(ContextCompat.getColor(context, R.color.signature_border));
         mBorderPaint.setStyle(Paint.Style.STROKE);
-        mBorderPaint.setStrokeWidth(1);
+        mBorderPaint.setStrokeWidth(convertPixelsToDp(BORDER_WIDTH_DP, context));
     }
 
     @Override
@@ -111,6 +119,8 @@ public class DriverSignView extends View implements View.OnTouchListener {
 
                 mPrevX = x;
                 mPrevY = y;
+
+                break;
             }
             case MotionEvent.ACTION_MOVE: {
                 mCurrentPath.quadTo(mPrevX, mPrevY, x, y);
@@ -119,12 +129,16 @@ public class DriverSignView extends View implements View.OnTouchListener {
 
                 mPrevX = x;
                 mPrevY = y;
+
+                break;
             }
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_POINTER_UP:
             case MotionEvent.ACTION_CANCEL: {
                 mCurrentPath.quadTo(mPrevX, mPrevY, x, y);
                 mDatas.add(new Point(-1, -1));
+
+                break;
             }
         }
 
@@ -151,19 +165,26 @@ public class DriverSignView extends View implements View.OnTouchListener {
             }
         }
 
-        String rtnSign = "";
+        StringBuilder rtnSign = new StringBuilder();
         for (int i = 1; i < mDatas.size(); i++) {
             if (mDatas.get(i - 1).x < 0) {
                 continue;
             }
 
             if (i > 1) {
-                rtnSign += ";" + (mDatas.get(i - 1).x - xShift) + "," + mDatas.get(i - 1).y + ";" + (mDatas.get(i).x - xShift) + "," + mDatas.get(i).y;
-            } else {
-                rtnSign += (mDatas.get(i - 1).x - xShift) + "," + mDatas.get(i - 1).y + ";" + (mDatas.get(i).x - xShift) + "," + mDatas.get(i).y;
+                rtnSign.append(";");
             }
+
+            rtnSign.append(mDatas.get(i - 1).x - xShift)
+                   .append(",")
+                   .append(mDatas.get(i - 1).y)
+                   .append(";")
+                   .append(mDatas.get(i).x - xShift)
+                   .append(",")
+                   .append(mDatas.get(i).y);
         }
-        return rtnSign;
+
+        return rtnSign.toString();
     }
 
     public void setSignatureString(String signature) {
@@ -197,30 +218,39 @@ public class DriverSignView extends View implements View.OnTouchListener {
     }
 
     public void clear() {
-        mBitmap.recycle();
-        mBitmap = null;
+        if (mBitmap != null) {
+            Canvas canvas = new Canvas(mBitmap);
+            canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+        }
         mDatas.clear();
         invalidate();
     }
 
     private void drawSignature() {
-        if (mBitmap != null) {
-            mBitmap.recycle();
+        if (mBitmap == null) {
+            mBitmap = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888);
         }
-        mBitmap = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888);
+
+        Canvas canvas = new Canvas(mBitmap);
+        canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+
         Path path = new Path();
+
         for (int i = 1; i < mDatas.size(); i++) {
             if (mDatas.get(i).x < 0 || mDatas.get(i).y < 0 || mDatas.get(i - 1).x < 0 || mDatas.get(i - 1).y < 0) {
-                Canvas canvas = new Canvas(mBitmap);
-                canvas.drawPath(path, mPaint);
                 path = new Path();
                 continue;
             }
+
+            path.moveTo(mDatas.get(i - 1).x, mDatas.get(i - 1).y);
             path.quadTo(mDatas.get(i - 1).x,
                     mDatas.get(i - 1).y,
                     mDatas.get(i).x,
                     mDatas.get(i).y);
+
+            canvas.drawPath(path, mPaint);
         }
+
         invalidate();
     }
 
@@ -231,10 +261,16 @@ public class DriverSignView extends View implements View.OnTouchListener {
         canvas.drawLine(mWidth, mHeight, mWidth, 0, mBorderPaint);
         canvas.drawLine(mWidth, mHeight, 0, mHeight, mBorderPaint);
 
-        mBorderPaint.setPathEffect(new DashPathEffect(new float[] { 10, 10 }, 0));
+        mBorderPaint.setPathEffect(new DashPathEffect(new float[] { convertPixelsToDp(DOTTED_LINE_WIDTH_DP, getContext()), convertPixelsToDp(DOTTED_LINE_WIDTH_DP, getContext()) }, 0));
         Path path = new Path();
         path.moveTo(0, 2 * mHeight / 3);
         path.quadTo(0, 2 * mHeight / 3, mWidth, 2 * mHeight / 3);
         canvas.drawPath(path, mBorderPaint);
+    }
+
+    private float convertPixelsToDp(float px, Context context){
+        Resources resources = context.getResources();
+        DisplayMetrics metrics = resources.getDisplayMetrics();
+        return px / ((float)metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
     }
 }
