@@ -1,5 +1,17 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>
 <resources>
+    <!-- Default colors -->
+    <color name="primary">#9E9E9E</color>
+    <color name="primary_dark">#616161</color>
+    <color name="primary_light">#F5F5F5</color>
+    <color name="accent">#7ac144</color>
+    <color name="primary_text">#212121</color>
+    <color name="secondary_text">#757575</color>
+    <color name="icons">#212121</color>
+    <color name="divider">#BDBDBD</color>
+
+    <color name="hint">#eeeeee</color>
+    <color name="hint_text">#606060</color>
 
     <!-- Temp Colors -->
     <color name="textcolor">#ff000000</color>

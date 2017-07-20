@@ -1,150 +1,101 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:background="@android:color/white"
-              android:orientation="vertical">
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.bsmwireless.screens.selectasset.SelectAssetActivity">
 
-    <include layout="@layout/toolbar"/>
-
-    <LinearLayout
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/select_asset_app_bar"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_gravity="top"
-        android:layout_weight="1"
-        android:gravity="top"
-        android:orientation="vertical">
+        android:layout_height="wrap_content">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/material_blue_500"
-            android:padding="@dimen/attach_margin">
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:background="@color/primary">
 
-            <LinearLayout
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/select_asset_toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Dark"/>
+
+            <android.support.v7.widget.SearchView
+                android:id="@+id/select_asset_search_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/search_bg"
-                android:orientation="horizontal">
+                android:layout_margin="@dimen/select_asset_search_margin"
+                android:background="@android:color/white"
+                app:iconifiedByDefault="false"
+                app:searchHintIcon="@null"
+                app:queryBackground="@null"
+                app:queryHint="@string/select_asset_search_hint" />
 
-                <EditText
-                    android:id="@+id/txt_search_veh_name"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_weight="1"
-                    android:background="@android:color/transparent"
-                    android:focusableInTouchMode="true"
-                    android:hint="@string/search"
-                    android:inputType="text|textNoSuggestions"
-                    android:paddingLeft="@dimen/attach_layout_margin"
-                    android:textColor="@color/textcolor"
-                    android:textColorHint="@color/textcolor"
-                    android:textCursorDrawable="@null"
-                    android:textSize="@dimen/asset_search"/>
-
-                <ImageView
-                    android:id="@+id/img_search"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginLeft="@dimen/attach_layout_margin"
-                    android:focusable="false"
-                    android:src="@drawable/searchicon"/>
-
-                <ImageButton
-                    android:id="@+id/select_options"
-                    android:layout_width="@dimen/attach_image_button"
-                    android:layout_height="@dimen/attach_image_button"
-                    android:layout_gravity="center_vertical"
-                    android:background="@android:color/transparent"
-                    android:focusable="false"
-                    android:padding="@dimen/attach_layout_margin"
-                    android:src="@drawable/arrow2_down"/>
-            </LinearLayout>
         </LinearLayout>
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/small_margin"
-            android:layout_marginTop="@dimen/small_margin"
-            android:background="@color/selectasset_recent"
-            android:padding="10dp"
-            android:text="@string/search_vehicle"
-            android:textColor="@color/drivemode_pink"
-            android:textSize="@dimen/asset_notin"/>
+    </android.support.design.widget.AppBarLayout>
 
-        <ListView
-            android:id="@+id/list_view_vehicles"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/attach_height"
-            android:layout_marginTop="@dimen/attach_button_width"
-            android:layout_weight="1"
-            android:divider="@color/listviewdivider"
-            android:dividerHeight="@dimen/attach_height"
-            android:listSelector="@drawable/list_selector"
-            android:textColor="@color/textcolor"/>
-    </LinearLayout>
+    <TextView
+        android:id="@+id/select_asset_previous_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/select_asset_app_bar"
+        android:layout_margin="@dimen/select_asset_default_margin"
+        android:text="@string/select_asset_previous_assets"/>
 
-    <LinearLayout
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/select_asset_last_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
+        android:layout_below="@+id/select_asset_previous_text"
+        android:layout_above="@+id/select_asset_buttons_layout"/>
+    
+    <LinearLayout
+        android:id="@+id/select_asset_buttons_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="@dimen/select_asset_default_margin"
+        android:orientation="horizontal"
         android:gravity="center">
-
-        <LinearLayout
-            android:id="@+id/not_in_vehicle_button"
-            android:layout_width="match_parent"
+        
+        <Button
+            android:id="@+id/select_asset_scan_qr_code_button"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="#FF5D5D"
-            android:clickable="true"
-            android:gravity="center"
-            android:padding="@dimen/generic_button_padding">
+            android:layout_marginRight="@dimen/select_asset_default_margin"
+            android:text="@string/select_asset_scan_qr_code"/>
 
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:focusable="false"
-                android:paddingRight="@dimen/small_margin"
-                android:src="@drawable/exclamation_big"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:focusable="false"
-                android:text="@string/not_in_vehicle"
-                android:textColor="@android:color/white"
-                android:textSize="@dimen/textview_small"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/cancel_button"
-            android:layout_width="match_parent"
+        <Button
+            android:id="@+id/select_asset_not_in_vehicle_button"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/small_margin"
-            android:layout_marginRight="@dimen/small_margin"
-            android:layout_weight="1"
-            android:background="@color/gray"
-            android:clickable="true"
-            android:gravity="center"
-            android:padding="@dimen/generic_button_padding">
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:focusable="false"
-                android:paddingRight="@dimen/small_margin"
-                android:src="@drawable/cancel_icon"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:focusable="false"
-                android:text="CANCEL"
-                android:textColor="@android:color/white"
-                android:textSize="@dimen/textview_small"/>
-        </LinearLayout>
+            android:text="@string/select_asset_not_in_vehicle"/>
+        
     </LinearLayout>
-</LinearLayout>
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/select_asset_search_card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/select_asset_app_bar"
+        android:layout_marginTop="@dimen/select_asset_card_top_margin"
+        android:layout_marginLeft="@dimen/select_asset_card_side_margin"
+        android:layout_marginRight="@dimen/select_asset_card_side_margin"
+        android:visibility="gone"
+        app:cardCornerRadius="0dp"
+        app:cardElevation="@dimen/select_asset_card_elevation">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/select_asset_search_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+    </android.support.v7.widget.CardView>
+
+</RelativeLayout>

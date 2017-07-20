@@ -5,17 +5,15 @@ import com.bsmwireless.data.network.authenticator.TokenManager;
 import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.data.storage.users.UserConverter;
+import com.bsmwireless.data.storage.users.UserLastVehiclesEntity;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.LoginModel;
 import com.bsmwireless.models.ResponseMessage;
 import com.bsmwireless.models.User;
 
-import java.util.List;
-
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
-import io.reactivex.schedulers.Schedulers;
 
 public class LoginUserInteractor {
 
@@ -48,7 +46,13 @@ public class LoginUserInteractor {
                     mPreferencesManager.setRememberUserEnabled(keepToken);
 
                     mTokenManager.setToken(accountName, name, domain, user.getAuth());
-                    mAppDatabase.userDao().insertUser(UserConverter.toEntity(accountName, user));
+
+                    UserLastVehiclesEntity lastVehicles = mAppDatabase.userDao().getUserLastVehiclesSync(user.getId());
+                    mAppDatabase.userDao().insertUser(UserConverter.toEntity(user));
+
+                    if (lastVehicles != null) {
+                        mAppDatabase.userDao().setUserLastVehicles(user.getId(), lastVehicles.getIds());
+                    }
                 })
                 .map(user -> user != null);
     }
@@ -69,4 +73,21 @@ public class LoginUserInteractor {
         return mTokenManager.getDomain(mPreferencesManager.getAccountName());
     }
 
+    public Integer getDriverId() {
+        String id = mTokenManager.getDriver(mPreferencesManager.getAccountName());
+        return id == null || id.isEmpty() ? -1 : Integer.valueOf(id);
+    }
+
+    public String getTimezone(int driverId) {
+        return mAppDatabase.userDao().getUserTimezoneSync(driverId).getTimezone();
+    }
+
+    public void clearToken() {
+        String account = mPreferencesManager.getAccountName();
+        if (mPreferencesManager.isRememberUserEnabled()) {
+            mTokenManager.clearToken(mTokenManager.getToken(account));
+        } else {
+            mTokenManager.removeAccount(account);
+        }
+    }
 }

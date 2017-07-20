@@ -16,20 +16,23 @@ public interface UserDao {
     Flowable<List<UserEntity>> getUsers();
 
     @Query("SELECT * FROM users WHERE id = :id LIMIT 1")
-    Flowable<UserEntity> getUserById(int id);
+    Flowable<UserEntity> getUser(int id);
+
+    @Query("SELECT last_vehicle_ids FROM users WHERE id = :id LIMIT 1")
+    Flowable<UserLastVehiclesEntity> getUserLastVehicles(int id);
+
+    @Query("SELECT last_vehicle_ids FROM users WHERE id = :id LIMIT 1")
+    UserLastVehiclesEntity getUserLastVehiclesSync(int id);
 
     @Query("SELECT timezone FROM users WHERE id = :id LIMIT 1")
-    UserEntity getTimezoneById(int id);
+    UserTimeZoneEntity getUserTimezoneSync(int id);
 
     @Query("DELETE FROM users WHERE id = :id")
-    int deleteUserById(int id);
-
-    @Query("SELECT * FROM users WHERE account_name = :name LIMIT 1")
-    Flowable<UserEntity> getUserByAccountName(String name);
-
-    @Query("DELETE FROM users WHERE account_name = :name")
-    int deleteUserByAccountName(String name);
+    int deleteUser(int id);
 
     @Insert(onConflict = REPLACE)
     long insertUser(UserEntity user);
+
+    @Query("UPDATE users SET last_vehicle_ids = :vehicles WHERE id = :id")
+    void setUserLastVehicles(int id, String vehicles);
 }

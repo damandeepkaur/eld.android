@@ -15,11 +15,14 @@ public interface VehicleDao {
     @Query("SELECT * FROM vehicles")
     Flowable<List<VehicleEntity>> getVehicles();
 
+    @Query("SELECT * FROM vehicles WHERE vehicles.id IN (:ids)")
+    Flowable<List<VehicleEntity>> getVehicles(List<Integer> ids);
+
     @Query("SELECT * FROM vehicles WHERE id = :id LIMIT 1")
-    Flowable<VehicleEntity> getVehicleById(int id);
+    Flowable<VehicleEntity> getVehicle(int id);
 
     @Query("DELETE FROM vehicles WHERE id = :id")
-    int deleteVehicleById(int id);
+    int deleteVehicle(int id);
 
     @Insert(onConflict = REPLACE)
     long insertVehicle(VehicleEntity vehicle);
