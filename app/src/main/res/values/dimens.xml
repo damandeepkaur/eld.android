@@ -15,6 +15,15 @@
 -->
 
 <resources>
+    <!-- Login Activity -->
+    <dimen name="login_button_margin_left">31dp</dimen>
+    <dimen name="login_button_margin_right">29dp</dimen>
+    <dimen name="relative_layout_padding">16dp</dimen>
+    <dimen name="generic_margin_top">16dp</dimen>
+    <dimen name="generic_margin_top_larger">24dp</dimen>
+    <dimen name="text_view_line_spacing_extra">8sp</dimen>
+
+    <!-- Navigation Drawer and Toolbar -->
     <dimen name="action_bar_height">80dp</dimen>
     <dimen name="navigation_header_right_padding">16dp</dimen>
     <dimen name="navigation_header_left_padding">16dp</dimen>

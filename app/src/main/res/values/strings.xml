@@ -25,6 +25,8 @@
     <string name="hos">HOS</string>
     <string name="inspections">INSPECTIONS</string>
 
+    <!-- Login Activity -->
+    <string name="login_lbl_rememberme">Remember me</string>
 
     <!-- START OLD STRINGS -->
     <string name="no_network">No Network Available</string>
@@ -115,10 +117,9 @@
     <string name="login_btn_takeatour">TAKE A TOUR</string>
     <string name="login_btn_login">LOGIN</string>
     <string name="login_btn_forgotpassword">FORGOT PASSWORD</string>
-    <string name="login_lbl_rememberme">REMEMBER ME</string>
-    <string name="login_txthint_domain">DOMAIN</string>
-    <string name="login_txthint_password">PASSWORD</string>
-    <string name="login_txthint_username">USERNAME</string>
+    <string name="login_txthint_domain">Company</string>
+    <string name="login_txthint_password">Password</string>
+    <string name="login_txthint_username">User Name</string>
     <string name="loginerror">Login error</string>
     <string name="login_success">Login success</string>
     <string name="login_comment">Successfully logged in as</string>
