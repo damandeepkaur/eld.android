@@ -128,7 +128,6 @@ public class DriverProfileActivity extends BaseActivity implements DriverProfile
 
     @Override
     public void updateUser() {
-        Toast.makeText(this, getString(R.string.driver_profile_user_updated), Toast.LENGTH_SHORT).show();
         mPresenter.onNeedUpdateUserInfo();
     }
 

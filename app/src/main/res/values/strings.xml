@@ -312,7 +312,6 @@
     <string name="driver_profile_menu_eld">ELD</string>
     <string name="driver_profile_menu_sign">Sign</string>
     <string name="driver_profile_menu_occupants">Occupants</string>
-    <string name="driver_profile_user_updated">User updated</string>
     <string name="driver_profile_password">******</string>
 
     <!-- Navigation drawer-->

@@ -51,6 +51,7 @@
         <item name="color">@color/nasty_green</item>
     </style>
 
+    <!-- START OLD STYLES -->
     <style name="Theme.Splash" parent="MyTheme.Base">
         <item name="android:windowBackground">@drawable/background</item>
         <item name="android:windowNoTitle">true</item>

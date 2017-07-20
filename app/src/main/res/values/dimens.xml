@@ -45,6 +45,7 @@
     <dimen name="forgot_password_layout">100dp</dimen>
     <dimen name="helper_text_size">24dp</dimen>
     <dimen name="helper_text_width">150dp</dimen>
+    <!-- END OLD DIMENS -->
 
     <!-- Graphview dimens -->
     <dimen name="graph_view_top_offset">40dp</dimen>

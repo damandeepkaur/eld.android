@@ -19,7 +19,7 @@ import butterknife.Unbinder;
 
 public class SignatureLayout extends LinearLayout {
 
-    private static final int ANIMATION_DURATION = 500;
+    private final int ANIMATION_DURATION = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
     private View mRootView;
 
