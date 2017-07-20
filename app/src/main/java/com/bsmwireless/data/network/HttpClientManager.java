@@ -41,14 +41,16 @@ public class HttpClientManager {
             String org = tokenManager.getOrg(accountName);
             String cluster = tokenManager.getCluster(accountName);
             String token = tokenManager.getToken(accountName);
+            int boxId = preferencesManager.getBoxId();
 
             if (token != null && org != null && cluster != null && driver != null) {
-                request = request.newBuilder()
+                Request.Builder builder = request.newBuilder()
                         .header("X-Driver", driver)
                         .header("X-Org", org)
                         .header("X-Cluster", cluster)
-                        .header("X-Token", token)
-                        .build();
+                        .header("X-Token", token);
+                if (boxId > 0) builder.header("X-Box", String.valueOf(boxId));
+                request = builder.build();
             }
 
             return chain.proceed(request);
