@@ -17,7 +17,6 @@ import com.bsmwireless.common.App;
 import com.bsmwireless.models.Vehicle;
 import com.bsmwireless.screens.barcode.BarcodeScannerActivity;
 import com.bsmwireless.screens.common.BaseActivity;
-import com.bsmwireless.screens.driverprofile.DriverProfileActivity;
 import com.bsmwireless.screens.help.HelpActivity;
 import com.bsmwireless.screens.selectasset.dagger.DaggerSelectAssetComponent;
 import com.bsmwireless.screens.selectasset.dagger.SelectAssetModule;
@@ -187,7 +186,6 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
     @Override
     public void goToMainScreen() {
         Toast.makeText(this, "Go to main screen", Toast.LENGTH_SHORT).show();
-        startActivity(new Intent(this, DriverProfileActivity.class));
     }
 
     @Override
