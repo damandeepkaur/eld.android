@@ -20,7 +20,6 @@ import com.bsmwireless.models.Vehicle;
 import com.bsmwireless.screens.barcode.BarcodeScannerActivity;
 import com.bsmwireless.screens.common.BaseActivity;
 import com.bsmwireless.screens.help.HelpActivity;
-import com.bsmwireless.screens.login.LoginActivity;
 import com.bsmwireless.screens.navigation.NavigationActivity;
 import com.bsmwireless.screens.selectasset.dagger.DaggerSelectAssetComponent;
 import com.bsmwireless.screens.selectasset.dagger.SelectAssetModule;
@@ -197,6 +196,7 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
 
     @Override
     public void setVehicleList(List<Vehicle> vehicles, String searchText) {
+        mSearchCardView.setVisibility(View.VISIBLE);
         mSearchAdapter.setSearchList(vehicles, searchText);
     }
 
@@ -233,12 +233,5 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
     @Override
     public void showEmptyLastListMessage() {
         mPreviousAssetsTextView.setText(R.string.select_asset_no_previous_assets);
-    }
-
-    @Override
-    public void onBackPressed() {
-        mPresenter.onBackPressed();
-        startActivity(new Intent(this, LoginActivity.class));
-        super.onBackPressed();
     }
 }

@@ -5,7 +5,6 @@ import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.data.storage.common.ListConverter;
-import com.bsmwireless.data.storage.users.UserLastVehiclesEntity;
 import com.bsmwireless.data.storage.vehicles.VehicleConverter;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.Vehicle;
@@ -55,8 +54,8 @@ public class VehiclesInteractor {
     }
 
     public void saveLastVehicle(int driverId, Integer vehicleId) {
-        UserLastVehiclesEntity lastVehicles = mAppDatabase.userDao().getUserLastVehiclesSync(driverId);
-        Iterator<Integer> iterator = ListConverter.toIntegerList(lastVehicles.getIds()).iterator();
+        String lastVehicles = mAppDatabase.userDao().getUserLastVehiclesSync(driverId);
+        Iterator<Integer> iterator = ListConverter.toIntegerList(lastVehicles).iterator();
 
         StringBuilder builder = new StringBuilder();
         builder.append(vehicleId);
@@ -110,7 +109,7 @@ public class VehiclesInteractor {
 
     public Flowable<List<Vehicle>> getLastVehicles() {
         return mAppDatabase.userDao().getUserLastVehicles(mUserInteractor.getDriverId())
-                .flatMap(userLastVehicles -> mAppDatabase.vehicleDao().getVehicles(ListConverter.toIntegerList(userLastVehicles.getIds())))
+                .flatMap(userLastVehicles -> mAppDatabase.vehicleDao().getVehicles(ListConverter.toIntegerList(userLastVehicles)))
                 .flatMap(vehicleEntities -> Flowable.just(VehicleConverter.toVehicle(vehicleEntities)));
     }
 

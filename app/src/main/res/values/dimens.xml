@@ -15,6 +15,7 @@
 -->
 
 <resources>
+    <dimen name="default_toolbar_padding">0dp</dimen>
     <dimen name="default_margin">16dp</dimen>
     <dimen name="text_size">16sp</dimen>
     <dimen name="text_size_small">14sp</dimen>

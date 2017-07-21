@@ -24,7 +24,8 @@
             <android.support.v7.widget.Toolbar
                 android:id="@+id/select_asset_toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
+                android:layout_height="wrap_content"
+                android:paddingTop="@dimen/default_toolbar_padding"
                 app:titleTextAppearance="@style/ActionBarTitleTextStyle"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Dark"/>
 

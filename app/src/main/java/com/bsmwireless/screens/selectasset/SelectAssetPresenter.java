@@ -85,10 +85,6 @@ public class SelectAssetPresenter {
         }
     }
 
-    public void onBackPressed() {
-        mUserInteractor.clearToken();
-    }
-
     public void onDestroy() {
         mDisposables.dispose();
 

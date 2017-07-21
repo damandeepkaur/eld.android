@@ -19,13 +19,13 @@ public interface UserDao {
     Flowable<UserEntity> getUser(int id);
 
     @Query("SELECT last_vehicle_ids FROM users WHERE id = :id LIMIT 1")
-    Flowable<UserLastVehiclesEntity> getUserLastVehicles(int id);
+    Flowable<String> getUserLastVehicles(int id);
 
     @Query("SELECT last_vehicle_ids FROM users WHERE id = :id LIMIT 1")
-    UserLastVehiclesEntity getUserLastVehiclesSync(int id);
+    String getUserLastVehiclesSync(int id);
 
     @Query("SELECT timezone FROM users WHERE id = :id LIMIT 1")
-    UserTimeZoneEntity getUserTimezoneSync(int id);
+    String getUserTimezoneSync(int id);
 
     @Query("DELETE FROM users WHERE id = :id")
     int deleteUser(int id);

@@ -5,7 +5,6 @@ import com.bsmwireless.data.network.authenticator.TokenManager;
 import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.data.storage.users.UserConverter;
-import com.bsmwireless.data.storage.users.UserLastVehiclesEntity;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.LoginModel;
 import com.bsmwireless.models.ResponseMessage;
@@ -52,11 +51,11 @@ public class LoginUserInteractor {
 
                     mTokenManager.setToken(accountName, name, domain, user.getAuth());
 
-                    UserLastVehiclesEntity lastVehicles = mAppDatabase.userDao().getUserLastVehiclesSync(user.getId());
+                    String lastVehicles = mAppDatabase.userDao().getUserLastVehiclesSync(user.getId());
                     mAppDatabase.userDao().insertUser(UserConverter.toEntity(user));
 
                     if (lastVehicles != null) {
-                        mAppDatabase.userDao().setUserLastVehicles(user.getId(), lastVehicles.getIds());
+                        mAppDatabase.userDao().setUserLastVehicles(user.getId(), lastVehicles);
                     }
                 })
                 .map(user -> user != null);
@@ -112,15 +111,6 @@ public class LoginUserInteractor {
     }
 
     public String getTimezone(int driverId) {
-        return mAppDatabase.userDao().getUserTimezoneSync(driverId).getTimezone();
-    }
-
-    public void clearToken() {
-        String account = mPreferencesManager.getAccountName();
-        if (mPreferencesManager.isRememberUserEnabled()) {
-            mTokenManager.clearToken(mTokenManager.getToken(account));
-        } else {
-            mTokenManager.removeAccount(account);
-        }
+        return mAppDatabase.userDao().getUserTimezoneSync(driverId);
     }
 }

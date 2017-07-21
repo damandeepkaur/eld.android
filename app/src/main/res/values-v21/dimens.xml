@@ -17,6 +17,8 @@
 <resources>
 
     <!--Select asset -->
+    <dimen name="default_toolbar_padding">24dp</dimen>
+
     <dimen name="select_asset_card_top_margin">-8dp</dimen>
     <dimen name="select_asset_card_side_margin">8dp</dimen>
 
