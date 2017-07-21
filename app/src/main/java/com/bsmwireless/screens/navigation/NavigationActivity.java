@@ -8,6 +8,7 @@ import android.support.design.widget.NavigationView;
 import android.support.design.widget.NavigationView.OnNavigationItemSelectedListener;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.animation.PathInterpolatorCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
@@ -33,6 +34,9 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
 public class NavigationActivity extends BaseActivity implements OnNavigationItemSelectedListener, NavigateView {
+
+    private static final int REQUEST_CODE_UPDATE_USER = 101;
+
     @BindView(R.id.navigation_drawer)
     DrawerLayout mDrawerLayout;
 
@@ -94,7 +98,7 @@ public class NavigationActivity extends BaseActivity implements OnNavigationItem
                 Toast.makeText(this, "Go to help screen", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.nav_driver_profile:
-                startActivity(new Intent(this, DriverProfileActivity.class));
+                startActivityForResult(new Intent(this, DriverProfileActivity.class), REQUEST_CODE_UPDATE_USER);
                 break;
             case R.id.nav_settings:
                 Toast.makeText(this, "Go to settings screen", Toast.LENGTH_SHORT).show();
@@ -204,5 +208,19 @@ public class NavigationActivity extends BaseActivity implements OnNavigationItem
         mPresenter.onDestroy();
         mHeaderViewHolder.unbind();
         super.onDestroy();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case REQUEST_CODE_UPDATE_USER: {
+                mPresenter.onUserUpdated(true);
+                break;
+            }
+            default: {
+                break;
+            }
+        }
     }
 }

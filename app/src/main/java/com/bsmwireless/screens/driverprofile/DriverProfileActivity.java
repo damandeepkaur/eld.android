@@ -1,6 +1,7 @@
 package com.bsmwireless.screens.driverprofile;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -9,8 +10,6 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.ScrollView;
 import android.widget.Toast;
 
 import com.bsmwireless.common.App;
@@ -91,12 +90,6 @@ public class DriverProfileActivity extends BaseActivity implements DriverProfile
 
         mSignatureLayout.setOnSaveListener(this);
 
-        mControlButtons.setOnFocusChangeListener((v, hasFocus) -> {
-            if (!hasFocus) {
-                hideControlButtons();
-            }
-        });
-
         mStartedAnimations = new ArrayList<>();
     }
 
@@ -115,6 +108,10 @@ public class DriverProfileActivity extends BaseActivity implements DriverProfile
                 break;
             case R.id.action_occupants:
                 break;
+            case android.R.id.home: {
+                onBackPressed();
+                break;
+            }
         }
         return super.onOptionsItemSelected(item);
     }
@@ -145,11 +142,6 @@ public class DriverProfileActivity extends BaseActivity implements DriverProfile
         mTimeZoneTextView.setText(user.getTimezone());
         mCycleTextView.setText(String.valueOf(user.getCycleCountry()));
         mSignatureLayout.setImageData(user.getSignature());
-    }
-
-    @Override
-    public void updateUser() {
-        mPresenter.onNeedUpdateUserInfo();
     }
 
     @Override

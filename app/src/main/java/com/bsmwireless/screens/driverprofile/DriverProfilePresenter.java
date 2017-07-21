@@ -3,7 +3,8 @@ package com.bsmwireless.screens.driverprofile;
 import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.data.storage.users.UserEntity;
 import com.bsmwireless.domain.interactors.LoginUserInteractor;
-import com.bsmwireless.models.User;
+
+import java.util.Calendar;
 
 import javax.inject.Inject;
 
@@ -71,7 +72,8 @@ public class DriverProfilePresenter {
     }
 
     private void updateUserInDB() {
-        mLoginUserInteractor.updateUser(mUserEntity)
+        mUserEntity.setLastModified(Calendar.getInstance().getTimeInMillis());
+        mLoginUserInteractor.updateDBUser(mUserEntity)
                             .subscribeOn(Schedulers.io())
                             .subscribe();
     }

@@ -59,7 +59,6 @@
         <activity android:name="com.bsmwireless.screens.driverprofile.DriverProfileActivity"
                   android:label="@string/driver_profile"
                   android:windowSoftInputMode="stateHidden"
-                  android:parentActivityName="com.bsmwireless.screens.navigation.NavigationActivity"
                   android:theme="@style/DriverProfileTheme"/>
 
         <service android:name="com.bsmwireless.data.network.authenticator.BsmAuthenticatorService">

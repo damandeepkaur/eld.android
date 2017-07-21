@@ -85,8 +85,12 @@ public class LoginUserInteractor {
                 });
     }
 
-    public Observable<Long> updateUser(UserEntity user) {
+    public Observable<Long> updateDBUser(UserEntity user) {
         return Observable.create(e -> e.onNext(mAppDatabase.userDao().insertUser(user)));
+    }
+
+    public Observable<ResponseMessage> updateUserOnServer(User user) {
+        return mServiceApi.updateProfile(user);
     }
 
     public String getUserName() {
