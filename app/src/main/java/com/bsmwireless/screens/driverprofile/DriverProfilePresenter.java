@@ -50,10 +50,9 @@ public class DriverProfilePresenter {
                                                         }));
     }
 
-    public void onSaveSignatureClicked(String signature, String password) {
+    public void onSaveSignatureClicked(String signature) {
         if (mUserEntity != null) {
             User user = getEmptyUser(mUserEntity);
-            user.setPassword(password);
             user.setSignature(signature);
             updateUserInDB(user);
         } else {
@@ -63,10 +62,9 @@ public class DriverProfilePresenter {
         mView.hideControlButtons();
     }
 
-    public void onSaveUserInfo(String address, String password) {
+    public void onSaveUserInfo(String address) {
         if (mUserEntity != null) {
             User user = getEmptyUser(mUserEntity);
-            user.setPassword(password);
             user.setAddress(address);
             updateUserInDB(user);
         } else {
