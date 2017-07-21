@@ -56,10 +56,12 @@ public class LoginActivity extends BaseActivity implements LoginView {
         mUnbinder = ButterKnife.bind(this);
         Intent intent = getIntent();
 
-        if (intent != null && intent.hasExtra(ARG_ACCOUNT_NAME) && intent.hasExtra(ARG_DOMAIN_NAME)) {
-            loadUserData(intent.getStringExtra(ARG_ACCOUNT_NAME), intent.getStringExtra(ARG_DOMAIN_NAME));
-        } else {
-            mPresenter.onLoadUserData();
+        if (loadUserDataEnabled()) {
+            if (intent != null && intent.hasExtra(ARG_ACCOUNT_NAME) && intent.hasExtra(ARG_DOMAIN_NAME)) {
+                loadUserData(intent.getStringExtra(ARG_ACCOUNT_NAME), intent.getStringExtra(ARG_DOMAIN_NAME));
+            } else {
+                mPresenter.onLoadUserData();
+            }
         }
     }
 
@@ -119,8 +121,7 @@ public class LoginActivity extends BaseActivity implements LoginView {
     }
 
     @Override
-    public void onBackPressed() {
-        mPresenter.onBackPressed();
-        super.onBackPressed();
+    public boolean loadUserDataEnabled() {
+        return mPresenter.loadUserDataEnabled();
     }
 }

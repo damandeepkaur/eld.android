@@ -15,6 +15,26 @@
 -->
 
 <resources>
+    <!-- Login Activity -->
+    <dimen name="login_button_margin_left">31dp</dimen>
+    <dimen name="login_button_margin_right">29dp</dimen>
+    <dimen name="relative_layout_padding">16dp</dimen>
+    <dimen name="generic_margin_top">16dp</dimen>
+    <dimen name="generic_margin_top_larger">24dp</dimen>
+    <dimen name="text_view_line_spacing_extra">8sp</dimen>
+
+    <!-- Navigation Drawer and Toolbar -->
+    <dimen name="action_bar_height">80dp</dimen>
+    <dimen name="navigation_header_right_padding">16dp</dimen>
+    <dimen name="navigation_header_left_padding">16dp</dimen>
+    <dimen name="navigation_header_bottom_padding">16dp</dimen>
+    <dimen name="navigation_header_vertical_spacing">16dp</dimen>
+    <dimen name="navigation_header_height">131dp</dimen>
+    <dimen name="navigation_header_top_padding">51dp</dimen>
+    <dimen name="navigation_header_title_text_size">14sp</dimen>
+    <dimen name="navigation_header_num_value_text_size">12sp</dimen>
+
+    <!-- START OLD DIMENS -->
     <dimen name="small_margin">5dp</dimen>
     <dimen name="textview_extrasmall">10sp</dimen>
     <dimen name="textview_smaller">12sp</dimen>
@@ -42,13 +62,8 @@
     <dimen name="NewProfile_layout">15dp</dimen>
     <dimen name="NewProfile_margin">60dp</dimen>
     <dimen name="forgot_password_layout">100dp</dimen>
-    <dimen name="text_view_line_spacing_extra">8sp</dimen>
-
-    <!-- HelperView -->
     <dimen name="helper_text_size">24dp</dimen>
     <dimen name="helper_text_width">150dp</dimen>
-
-    <!--Graphview dimens-->
     <dimen name="graph_view_top_offset">40dp</dimen>
     <dimen name="graph_view_left_offset">2dp</dimen>
     <dimen name="graph_view_right_offset">2dp</dimen>
@@ -59,11 +74,5 @@
     <dimen name="graph_timer_height">75dp</dimen>
     <dimen name="graph_timer_width">75dp</dimen>
     <dimen name="graph_total_padding">10dp</dimen>
-
-    <!-- Login Activity -->
-    <dimen name="login_button_margin_left">31dp</dimen>
-    <dimen name="login_button_margin_right">29dp</dimen>
-    <dimen name="relative_layout_padding">16dp</dimen>
-    <dimen name="generic_margin_top">16dp</dimen>
-    <dimen name="generic_margin_top_larger">24dp</dimen>
+    <!-- END OLD DIMENS -->
 </resources>

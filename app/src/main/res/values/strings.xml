@@ -1,6 +1,34 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">BSM Universal App</string>
+
+    <!-- Navigation drawer-->
+    <string name="nav_home">Home</string>
+    <string name="nav_inspector_view">Inspector View</string>
+    <string name="nav_help">Help</string>
+    <string name="nav_driver_profile">Driver Profile</string>
+    <string name="nav_settings">Settings</string>
+    <string name="nav_logout">Log Out</string>
+    <string name="driver">Driver</string>
+    <string name="asset">Asset</string>
+    <string name="box">Box</string>
+    <plurals name="co_drivers">
+        <item quantity="one">%1$d co-driver</item>
+        <item quantity="other">%1$d co-drivers</item>
+    </plurals>
+    <plurals name="assets">
+        <item quantity="one">%1$d asset</item>
+        <item quantity="other">%1$d assets</item>
+    </plurals>
+
+    <!-- Home screen-->
+    <string name="hos">HOS</string>
+    <string name="inspections">INSPECTIONS</string>
+
+    <!-- Login Activity -->
+    <string name="login_lbl_rememberme">Remember me</string>
+
+    <!-- START OLD STRINGS -->
     <string name="no_network">No Network Available</string>
     <string name="app_compatability">Note: Compatible with Android 4.0.3 - 6.0.1</string>
     <string name="str_pw">PASSWORD</string>
@@ -47,12 +75,8 @@
     <string name="str_coworker_name">Co-Worker Name</string>
     <string name="str_hos_listoftrips">LIST OF TRIPS</string>
     <string name="str_rescan">RE-SCAN</string>
-
-
     <string name="openDrawer">OPEN</string>
     <string name="closeDrawer">CLOSE</string>
-
-    <!-- MenuStrings -->
     <string name="menu_home">HOME</string>
     <string name="menu_inspec">FORMS</string>
     <string name="menu_hos">HOURS OF SERVICE</string>
@@ -63,10 +87,8 @@
     <string name="menu_coworkerlogin">CO-WORKER\n LOGIN</string>
     <string name="menu_coworkerlogout">CO-WORKER\n LOGOUT</string>
     <string name="menu_switchuser">SWITCH USERS</string>
-
     <string name="next">NEXT  &gt;</string>
     <string name="back">&lt;  BACK</string>
-    <!-- AddNewProfileView -->
     <string name="fullname">FULLNAME</string>
     <string name="email">EMAIL</string>
     <string name="phonenum">PHONE NUMBER</string>
@@ -75,8 +97,6 @@
     <string name="terminal">HOME TERMINAL</string>
     <string name="tzone">TIMEZONE</string>
     <string name="cycle">CYCLE</string>
-
-    <!--- GENERIC -->
     <string name="generic_cancel">CANCEL</string>
     <string name="app_name_orig">SENTINEL DRIVE</string>
     <string name="generic_scan">SCAN</string>
@@ -94,7 +114,6 @@
     <string name="str_posttripinspectionalert">Complete Post-trip Inspection</string>
     <string name="str_logout_action">Select An Action</string>
     <string name="str_logout_cancel">Cancel</string>
-    <!-- Login -->
     <string name="login_btn_takeatour">TAKE A TOUR</string>
     <string name="login_btn_login">LOGIN</string>
     <string name="login_btn_forgotpassword">FORGOT PASSWORD</string>
@@ -104,27 +123,20 @@
     <string name="loginerror">Login error</string>
     <string name="login_success">Login success</string>
     <string name="login_comment">Successfully logged in as</string>
-    <!-- FORGOT PASSWORD -->
     <string name="fp_txthint_authcode">AUTHORIZATION CODE</string>
     <string name="fp_txthint_newpass">NEW PASSWORD</string>
     <string name="fp_txthint_retypepass">RE-TYPE PASSWORD</string>
     <string name="fp_btn_resetpass">RESET PASSWORD</string>
     <string name="conform_password">CONFIRM PASSWORD</string>
     <string name="enter_password">ENTER PASSWORD</string>
-
-    <!-- ADD NEW PROFILE -->
     <string name="anp_txt_newhere">YOU ARE NEW HERE</string>
     <string name="anp_txt_getstarted">Let\'s get you started</string>
     <string name="profile">Profile</string>
     <string name="pus">Profile Updated Successfully</string>
-
-    <!-- SETUP FINISHED -->
     <string name="sf_txt_setupfinished">THE SETUP IS FINISHED</string>
     <string name="sf_txt_quicktour">TAKE A QUICK TOUR OF APP</string>
     <string name="sf_btn_taketour">TAKE A TOUR</string>
     <string name="sf_btn_skiptour">SKIP TOUR</string>
-
-    <!-- CATEGORY -->
     <string name="odometer">ODOMETER (KM):</string>
     <string name="attacment">ATTACHMENT:</string>
     <string name="vehcile">VEHICLE</string>
@@ -132,8 +144,6 @@
     <string name="header_attachment">ATTACHMENT</string>
     <string name="button_save">SAVE</string>
     <string name="button_clr_defects">CLEAR DEFECTS</string>
-
-    <!-- DASHBOARD-->
     <string name="db_btn_addpretrip">ADD PRE TRIP</string>
     <string name="db_btn_addposttrip">ADD POST TRIP</string>
     <string name="db_btn_addTrailePreTrip">ADD TRAILER PRE TRIP</string>
@@ -149,13 +159,8 @@
     <string name="db_unsigned_logsheet_dialog_title">Sign LogSheets</string>
     <string name="db_unsigned_logsheet_us_text">You have unsigned logsheets in past 7 days</string>
     <string name="db_unsigned_logsheet_ca_text">You have unsigned logsheets in past 14 days</string>
-    <!-- dashboard notification-->
     <string name="mostly_sunny">Mostly sunny</string>
-
-    <!-- driverstatus item and dropdown-->
     <string name="hod">HOD</string>
-
-    <!--ErrorMessages-->
     <string name="error_message">Please select all items to save</string>
     <string name="sign_error_message">Please Add Signature to profile to save the Inspection Forms</string>
     <string name="save_error">Save Error</string>
@@ -163,7 +168,6 @@
     <string name="error">error</string>
     <string name="error_msg">Error Message</string>
     <string name="logouterror">Logout error</string>
-    <!--HOS-->
     <string name="hos_txt_graph">GRAPH</string>
     <string name="hos_txt_events">EVENTS</string>
     <string name="hos_txt_logsheet">LOG SHEET</string>
@@ -176,9 +180,6 @@
     <string name="hos_txt_summary">SUMMARY</string>
     <string name="hos_txt_location">Location</string>
     <string name="hos_txt_total">TOTAL</string>
-
-
-    <!--SETTINGS-->
     <string name="str_tcp_com_title">TCP/IP Communication </string>
     <string name="str_bluetooth_title">Bluetooth </string>
     <string name="str_box_gps_title">Box GPS </string>
@@ -202,8 +203,6 @@
     <string name="str_network">Network</string>
     <string name="str_on">ON</string>
     <string name="str_off">OFF</string>
-
-    <!--Excemption-->
     <string name="str_exceptions">EXEMPTIONS: </string>
     <string name="str_24_cycle_reset">24 hrs cycle reset §395.1</string>
     <string name="str_oilfield_waiting_time">Oilfield waiting time §395.1</string>
@@ -215,8 +214,6 @@
     <string name="break_alert_q">Are you sure you like to take a 30 min break?</string>
     <string name="Yes">Yes</string>
     <string name="No">No</string>
-
-
     <string name="str_email_address">Email Address:</string>
     <string name="str_from">From:</string>
     <string name="str_to">To:</string>
@@ -224,32 +221,23 @@
     <string name="str_log_sheet">Log Sheet</string>
     <string name="str_pre_trip_insp">PreTrip Inspection</string>
     <string name="str_post_trip_insp">PostTrip Inspection</string>
-    <!-- calendarItem-->
     <string name="sunday">SUN</string>
     <string name="jan">JAN</string>
     <string name="comment">Please enter a comment</string>
     <string name="delete">DELETE</string>
-
-    <!-- hos_driving and hos_offduty and onduty and sleepingberth-->
     <string name="hours">HOURS</string>
     <string name="minutes">MINUTES</string>
     <string name="seconds">SECONDS</string>
-
     <string name="daily">daily</string>
     <string name="seven_days">7 days</string>
     <string name="eight_days">8 days</string>
     <string name="fourteen_days">14 days</string>
-
-
-    <!-- inspection list view fragment
-   -->
     <string name="add">Add</string>
-    <!-- select assets-->
     <string name="search_vehicle">Searched Vehicles</string>
     <string name="str_must_scan_barcode">Please scan barcode to select!</string>
     <string name="search">Search</string>
     <string name="not_in_vehicle">NOT IN VEHICLE</string>
-    <string name="asset">Select Asset</string>
+    <string name="select_asset">Select Asset</string>
     <string name="str_enter_asset_name">Enter Asset Name</string>
     <string name="found_barcode">Found Barcode:</string>
     <string name="scan_failed">Scan failed</string>
@@ -268,13 +256,10 @@
     <string name="signaturecomment">Please add your signature within the profile.</string>
     <string name="deleve">Delete Event</string>
     <string name="del">Are you sure you would like to delete this event?</string>
-
     <string name="str_messages">MESSAGES</string>
     <string name="deltrip">Delete Event</string>
     <string name="delconfirmation">Are you sure you would like to delete this trip?</string>
     <string name="inspection_type_alert">Choose an inspection type to add forms.</string>
-
-    <!-- Fuel Form-->
     <string name="fuel_form">NEW FUEL FORM</string>
     <string name="fuel_amount">FUEL AMOUNT</string>
     <string name="str_liters">Liters</string>
@@ -287,14 +272,10 @@
     <string name="str_gallary">Gallery</string>
     <string name="str_camara">Camera</string>
     <string name="str_help">help</string>
-
-    <!-- Drive Mode -->
     <string name="drivemode_drivetime">DRIVE TIME</string>
     <string name="drivemode_dutycycle">HOS CYCLE</string>
     <string name="drivemode_screen">SCREEN </string>
     <string name="drivemode_locked"> LOCKED</string>
-
-    <!--new-->
     <string name="str_attach_available">Attachments Available</string>
     <string name="str_today">TODAY</string>
     <string name="time_not_in_range">Selected time not within prev and next event!</string>
@@ -309,21 +290,13 @@
     <string name="alert_are_you_offduty">OffDuty</string>
     <string name="alert_are_you_driving">Driving</string>
     <string name="str_odo_title_kiewit">Engine Hours: </string>
-
-    <!-- coworker logout-->
     <string name="coworkerlogout_title">CO-WORKER LOGOUT</string>
-
-    <!-- switch driver -->
     <string name="switch_to_driver">Switch to Driver</string>
-
-    <!-- MessagesView -->
     <string name="str_txt_copied">Text was copied</string>
     <string name="canned_msg_1">I am on my way</string>
     <string name="canned_msg_2">Stuck in traffic</string>
     <string name="canned_msg_3">Unable to proceed</string>
     <string name="canned_msg_4">Truck broke down</string>
-
-    <!-- add new trailer-->
     <string name="str_description">Description</string>
     <string name="str_license">License Plate</string>
     <string name="str_license_location">License Plate Jurisdiction</string>
@@ -331,41 +304,25 @@
     <string name="str_weight">Weight</string>
     <string name="error_attachment">Add Attachment Error</string>
     <string name="error_msg_trailer">Must input all fields!</string>
-
-    <!-- Ignition off alert-->
     <string name="alert_title_Ign_Off">Ignition Off</string>
     <string name="alert_sub_Ign_Off">Do you want to go OFF DUTY?</string>
-
-
-    <!-- Settings Fixed mount -->
     <string name="str_select_vehicle">Do you want to select</string>
     <string name="str_fixed_mount_vehicle">Fixed mount vehicle : </string>
     <string name="msg_drive_vehicle">Are you sure you are going to drive vehicle</string>
     <string name="str_fixed_mount">Fixed mount</string>
     <string name="settings_saved">Settings saved</string>
     <string name="failed_to_save_settings">Failed to save settings</string>
-
-    <!-- Trailer Only Inspections-->
     <string name="str_Trailer">Trailer</string>
     <string name="str_VehicleLower">Vehicle</string>
     <string name="str_OdometerLower">Odometer</string>
     <string name="str_DriverLower">Driver</string>
-
     <string name="show_location_alert_title">Address</string>
     <string name="show_location_alert_msg">Please enter your current location</string>
-
     <string name="str_inspectorView">INSPECTOR VIEW</string>
-
-    <!-- Authenticator -->
     <string name="account_label">BSM Wireless</string>
-
-    <!--Graph view-->
     <string name="timer_default_time">00:00</string>
     <string name="timer_default_type">OFF DUTY</string>
     <string name="timer_hours_minutes">HOURS MINUTES</string>
     <string name="string_total">TOTAL</string>
-
-    <!-- Login Activity -->
-    <string name="login_lbl_rememberme">Remember me</string>
-
+    <!-- END OLD STRINGS -->
 </resources>

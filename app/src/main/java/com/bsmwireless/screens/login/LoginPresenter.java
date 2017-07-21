@@ -79,10 +79,7 @@ public class LoginPresenter {
         mView.loadUserData(mLoginUserInteractor.getUserName(), mLoginUserInteractor.getDomainName());
     }
 
-    public void onBackPressed() {
-        mDisposables.add(mLoginUserInteractor.removeAccount()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe());
+    public boolean loadUserDataEnabled() {
+        return mLoginUserInteractor.isRememberMeEnabled();
     }
 }

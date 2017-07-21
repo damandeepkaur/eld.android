@@ -28,23 +28,23 @@ public class PreferencesManager {
         return mPreferences.getString(KEY_ACCOUNT_NAME, null);
     }
 
-    public void setSelectedVehicleId(int vehicleId) {
+    public void setVehicleId(int vehicleId) {
         SharedPreferences.Editor editor = mPreferences.edit();
         editor.putInt(KEY_SELECTED_VEHICLE_ID, vehicleId);
         editor.apply();
     }
 
-    public int getSelectedVehicleId() {
+    public int getVehicleId() {
         return mPreferences.getInt(KEY_SELECTED_VEHICLE_ID, NOT_FOUND_VALUE);
     }
 
-    public void setSelectedBoxId(int boxId) {
+    public void setBoxId(int boxId) {
         SharedPreferences.Editor editor = mPreferences.edit();
         editor.putInt(KEY_SELECTED_BOX_ID, boxId);
         editor.apply();
     }
 
-    public int getSelectedBoxId() {
+    public int getBoxId() {
         return mPreferences.getInt(KEY_SELECTED_BOX_ID, NOT_FOUND_VALUE);
     }
 
@@ -59,8 +59,6 @@ public class PreferencesManager {
     }
 
     public void clearValues() {
-        SharedPreferences.Editor editor = mPreferences.edit();
-        editor.clear();
-        editor.apply();
+        mPreferences.edit().clear().apply();
     }
 }
