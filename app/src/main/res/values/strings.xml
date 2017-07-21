@@ -1,33 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">BSM Universal App</string>
-
-    <!-- Navigation drawer-->
-    <string name="nav_home">Home</string>
-    <string name="nav_inspector_view">Inspector View</string>
-    <string name="nav_help">Help</string>
-    <string name="nav_driver_profile">Driver Profile</string>
-    <string name="nav_settings">Settings</string>
-    <string name="nav_logout">Log Out</string>
-    <string name="driver">Driver</string>
-    <string name="asset">Asset</string>
-    <string name="box">Box</string>
-    <plurals name="co_drivers">
-        <item quantity="one">%1$d co-driver</item>
-        <item quantity="other">%1$d co-drivers</item>
-    </plurals>
-    <plurals name="assets">
-        <item quantity="one">%1$d asset</item>
-        <item quantity="other">%1$d assets</item>
-    </plurals>
-
-    <!-- Home screen-->
-    <string name="hos">HOS</string>
-    <string name="inspections">INSPECTIONS</string>
-
-    <!-- Login Activity -->
-    <string name="login_lbl_rememberme">Remember me</string>
-
     <!--Search asset-->
     <string name="select_asset_search_hint">Box ID, License Plate or Keyword</string>
     <string name="select_asset_previous_assets">Previous assets</string>
@@ -252,9 +224,7 @@
     <string name="scan_failed">Scan failed</string>
     <string name="scanner_top">Hold Camera to automatically take image</string>
     <string name="scanner_bottom">Avoid glare and shadows. Hold camera approximately 6 inches from QR code</string>
-    <string name="clear">Clear</string>
     <string name="forms">FORMS</string>
-    <string name="ok">OK</string>
     <string name="loading">loading...</string>
     <string name="success_message">SuccessMessage</string>
     <string name="form_saved">Form Saved Successfully</string>
@@ -335,4 +305,51 @@
     <string name="string_total">TOTAL</string>
     <string name="select_asset_title">Select Asset</string>
     <!-- END OLD STRINGS -->
+
+    <string name="app_name">BSM Universal App</string>
+
+    <!-- Driver Profile -->
+    <string name="driver_profile">Driver profile</string>
+    <string name="driver_profile_item_name">Name</string>
+    <string name="driver_profile_item_emp_id">Employee ID</string>
+    <string name="driver_profile_item_company">Company</string>
+    <string name="driver_profile_item_license">Driver license</string>
+    <string name="driver_profile_item_home_addr">Home address</string>
+    <string name="driver_profile_item_home_terminal">Home terminal</string>
+    <string name="driver_profile_item_time_zone">Time zone</string>
+    <string name="driver_profile_item_password">Password</string>
+    <string name="driver_profile_item_cycle">Cycle</string>
+    <string name="driver_profile_menu_eld">ELD</string>
+    <string name="driver_profile_menu_sign">Sign</string>
+    <string name="driver_profile_menu_occupants">Occupants</string>
+    <string name="driver_profile_password">******</string>
+
+    <!-- Navigation drawer-->
+    <string name="nav_home">Home</string>
+    <string name="nav_inspector_view">Inspector View</string>
+    <string name="nav_help">Help</string>
+    <string name="nav_driver_profile">Driver Profile</string>
+    <string name="nav_settings">Settings</string>
+    <string name="nav_logout">Log Out</string>
+    <string name="driver">Driver</string>
+    <string name="asset">Asset</string>
+    <string name="box">Box</string>
+    <plurals name="co_drivers">
+        <item quantity="one">%1$d co-driver</item>
+        <item quantity="other">%1$d co-drivers</item>
+    </plurals>
+    <plurals name="assets">
+        <item quantity="one">%1$d asset</item>
+        <item quantity="other">%1$d assets</item>
+    </plurals>
+
+    <!-- Home screen-->
+    <string name="hos">HOS</string>
+    <string name="inspections">INSPECTIONS</string>
+
+    <!-- Login Activity -->
+    <string name="login_lbl_rememberme">Remember me</string>
+
+    <string name="ok">Ok</string>
+    <string name="clear">Clear</string>
 </resources>

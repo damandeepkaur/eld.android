@@ -51,6 +51,8 @@ public class UserEntity {
     private Integer mCycleCountry;
     @ColumnInfo(name = "org_addr")
     private String mOrgAddr;
+    @ColumnInfo(name = "lastmodified")
+    private Long mLastModified;
     @ColumnInfo(name = "last_vehicle_ids")
     private String mLastVehicleIds;
 
@@ -228,6 +230,14 @@ public class UserEntity {
 
     public void setOrgAddr(String orgAddr) {
         mOrgAddr = orgAddr;
+    }
+
+    public Long getLastModified() {
+        return mLastModified;
+    }
+
+    public void setLastModified(Long lastModified) {
+        mLastModified = lastModified;
     }
 
     public String getLastVehicleIds() {

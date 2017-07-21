@@ -49,10 +49,14 @@
         <activity
             android:name="com.bsmwireless.screens.help.HelpActivity"
             android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
-
         <activity
             android:name="com.bsmwireless.screens.barcode.BarcodeScannerActivity"
             android:theme="@style/Theme.BsmAppFullScreen"/>
+
+        <activity android:name="com.bsmwireless.screens.driverprofile.DriverProfileActivity"
+                  android:label="@string/driver_profile"
+                  android:windowSoftInputMode="stateHidden"
+                  android:theme="@style/DriverProfileTheme"/>
 
         <service android:name="com.bsmwireless.data.network.authenticator.BsmAuthenticatorService">
             <intent-filter>

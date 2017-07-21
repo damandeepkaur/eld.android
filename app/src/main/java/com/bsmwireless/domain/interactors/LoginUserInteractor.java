@@ -14,7 +14,12 @@ import com.bsmwireless.models.User;
 import javax.inject.Inject;
 
 import io.reactivex.Flowable;
+import io.reactivex.FlowableEmitter;
+import io.reactivex.FlowableOnSubscribe;
 import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.annotations.NonNull;
 
 import static com.bsmwireless.models.ELDEvent.EventType.LOGIN_LOGOUT;
 
@@ -86,7 +91,11 @@ public class LoginUserInteractor {
                 });
     }
 
-    public Observable<ResponseMessage> updateUser(User user) {
+    public Observable<Long> updateDBUser(UserEntity user) {
+        return Observable.create(e -> e.onNext(mAppDatabase.userDao().insertUser(user)));
+    }
+
+    public Observable<ResponseMessage> updateUserOnServer(User user) {
         return mServiceApi.updateProfile(user);
     }
 
@@ -106,6 +115,10 @@ public class LoginUserInteractor {
 
     public String getDomainName() {
         return mTokenManager.getDomain(mPreferencesManager.getAccountName());
+    }
+
+    public Flowable<UserEntity> getUser() {
+        return mAppDatabase.userDao().getUser(getDriverId());
     }
 
     public boolean isLoginActive() {
