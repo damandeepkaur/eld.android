@@ -119,6 +119,6 @@ public class VehiclesInteractor {
 
     public int getAssetsNumber() {
         //TODO: implement getting assets number
-        return 1;
+        return mPreferencesManager.getBoxId() > 0 ? 1 : 0;
     }
 }

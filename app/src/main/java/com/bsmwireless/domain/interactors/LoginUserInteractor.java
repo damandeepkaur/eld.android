@@ -5,6 +5,7 @@ import com.bsmwireless.data.network.authenticator.TokenManager;
 import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.data.storage.users.UserConverter;
+import com.bsmwireless.data.storage.users.UserEntity;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.LoginModel;
 import com.bsmwireless.models.ResponseMessage;
@@ -12,6 +13,7 @@ import com.bsmwireless.models.User;
 
 import javax.inject.Inject;
 
+import io.reactivex.Flowable;
 import io.reactivex.Observable;
 
 import static com.bsmwireless.models.ELDEvent.EventType.LOGIN_LOGOUT;
@@ -90,6 +92,11 @@ public class LoginUserInteractor {
 
     public String getUserName() {
         return mTokenManager.getName(mPreferencesManager.getAccountName());
+    }
+
+    public Flowable<String> getFullName() {
+        return mAppDatabase.userDao().getUser(getDriverId())
+                .map(userEntity -> userEntity.getFirstName() + userEntity.getLastName());
     }
 
     public int getCoDriversNumber() {
