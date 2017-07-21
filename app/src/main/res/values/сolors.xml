@@ -3,7 +3,6 @@
     <color name="brownish_grey">#6b6b6b</color>
     <color name="greyish_brown">#484848</color>
     <color name="black">#2f2f2f</color>
-    <color name="nasty_green">#7ac144</color>
     <color name="status_bar_color">#33000000</color>
     <color name="primary">#e78a00</color>
     <color name="primary_dark">#d66c00</color>
@@ -12,6 +11,9 @@
     <color name="secondary_text">#8b000000</color>
     <color name="primary_light">#6b6b6b</color>
     <color name="light_gray">#fafafa</color>
+
+    <color name="hint">#eeeeee</color>
+    <color name="hint_text">#606060</color>
 
     <color name="help_transparent_background">#99000000</color>
     <color name="selectasset_recent">#f2f2f4</color>

@@ -2,29 +2,28 @@ package com.bsmwireless.screens.selectasset;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
+import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
+import android.support.v7.widget.CardView;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import com.bsmwireless.common.App;
+import com.bsmwireless.common.Constants;
 import com.bsmwireless.models.Vehicle;
 import com.bsmwireless.screens.barcode.BarcodeScannerActivity;
 import com.bsmwireless.screens.common.BaseActivity;
-import com.bsmwireless.screens.help.HelpActivity;
+import com.bsmwireless.screens.navigation.NavigationActivity;
 import com.bsmwireless.screens.selectasset.dagger.DaggerSelectAssetComponent;
 import com.bsmwireless.screens.selectasset.dagger.SelectAssetModule;
-import com.jakewharton.rxbinding2.widget.RxTextView;
-import com.bsmwireless.widgets.helpview.GravityDrawable;
-import com.bsmwireless.widgets.helpview.HelpView;
+import com.bsmwireless.widgets.common.RxSearchView;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -44,61 +43,95 @@ import static com.bsmwireless.screens.barcode.BarcodeScannerActivity.BARCODE_UUI
 public class SelectAssetActivity extends BaseActivity implements SelectAssetView {
 
     private static final int BARCODE_REQUEST_CODE = 101;
-    private static final int DEBOUNCE_TIMEOUT = 500;
 
-    @BindView(R.id.txt_search_veh_name)
-    EditText mSearchBox;
+    @BindView(R.id.select_asset_toolbar)
+    Toolbar mToolbar;
 
-    @BindView(R.id.list_view_vehicles)
-    ListView mVehiclesList;
+    @BindView(R.id.select_asset_search_view)
+    SearchView mSearchView;
 
-    @BindView(R.id.select_options)
-    View mSelectOptionsButton;
+    @BindView(R.id.select_asset_search_list)
+    RecyclerView mSearchRecyclerView;
 
-    @BindView(R.id.not_in_vehicle_button)
-    View mNotInVehicleButton;
+    @BindView(R.id.select_asset_last_list)
+    RecyclerView mLastRecyclerView;
 
-    View mScanView;
+    @BindView(R.id.select_asset_previous_text)
+    TextView mPreviousAssetsTextView;
+
+    @BindView(R.id.select_asset_search_card)
+    CardView mSearchCardView;
 
     @Inject
     SelectAssetPresenter mPresenter;
 
     private Unbinder mUnbinder;
 
-    private boolean mIsBarcodeResult;
+    private SelectAssetAdapter mSearchAdapter;
+    private SelectAssetAdapter mLastAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        DaggerSelectAssetComponent.builder().appComponent(App.getComponent())
-                .selectAssetModule(new SelectAssetModule(this)).build().inject(this);
+        DaggerSelectAssetComponent.builder().appComponent(App.getComponent()).selectAssetModule(new SelectAssetModule(this)).build().inject(this);
 
         setContentView(R.layout.activity_select_asset);
         mUnbinder = ButterKnife.bind(this);
 
-        Toolbar mActionBarToolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(mActionBarToolbar);
+        initView();
+    }
+
+    private void initView() {
+        setSupportActionBar(mToolbar);
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
-            actionBar.setDisplayShowTitleEnabled(false);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setHomeAsUpIndicator(R.drawable.ic_arrow_back_green_24dp);
+            actionBar.setTitle(R.string.select_asset_title);
         }
 
-        RxTextView.textChanges(mSearchBox).debounce(DEBOUNCE_TIMEOUT, TimeUnit.MILLISECONDS)
+        RxSearchView.queryTextChanges(mSearchView).debounce(Constants.DEBOUNCE_TIMEOUT, TimeUnit.MILLISECONDS)
                 .map(CharSequence::toString)
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(text -> {
-                    mPresenter.onSearchTextChanged(text);
-                    if (mIsBarcodeResult) mIsBarcodeResult = false;
-                });
+                .subscribe(text -> mPresenter.onSearchTextChanged(text));
+
+        //set search list
+        mSearchAdapter = new SelectAssetAdapter(view -> {
+            int position = mSearchRecyclerView.getChildAdapterPosition(view);
+            mPresenter.onVehicleListItemClicked(mSearchAdapter.getItem(position));
+        });
+
+        LinearLayoutManager searchManager = new LinearLayoutManager(this);
+        searchManager.setOrientation(LinearLayoutManager.VERTICAL);
+
+        mSearchRecyclerView.bringToFront();
+        mSearchRecyclerView.setHasFixedSize(true);
+        mSearchRecyclerView.setLayoutManager(searchManager);
+        mSearchRecyclerView.setAdapter(mSearchAdapter);
+
+        //set last list
+        mLastAdapter = new SelectAssetAdapter(view -> {
+            int position = mLastRecyclerView.getChildAdapterPosition(view);
+            mPresenter.onVehicleListItemClicked(mLastAdapter.getItem(position));
+        });
+
+        LinearLayoutManager lastManager = new LinearLayoutManager(this);
+        lastManager.setOrientation(LinearLayoutManager.VERTICAL);
+
+        mLastRecyclerView.setHasFixedSize(true);
+        mLastRecyclerView.setLayoutManager(lastManager);
+        mLastRecyclerView.setAdapter(mLastAdapter);
+
+        mPresenter.onViewCreated();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_select_asset, menu);
-
-        new Handler().post(() -> mScanView = findViewById(R.id.action_select_barcode_scan));
+        //TODO: wait for UI
+        //getMenuInflater().inflate(R.menu.menu_select_asset, menu);
+        //new Handler().post(() -> mScanView = findViewById(R.id.action_select_barcode_scan));
 
         return true;
     }
@@ -106,8 +139,12 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                break;
+
             case R.id.action_help:
-                Intent intent = new Intent(this, HelpActivity.class);
+                /*Intent intent = new Intent(this, HelpActivity.class);
 
                 //TODO: use corrected help widget with translated strings when UI is ready
                 ArrayList<HelpView.HelpModel> list = new ArrayList<>();
@@ -119,23 +156,21 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
 
                 intent.putExtra(HelpActivity.HELP_MODEL_EXTRA, list);
 
-                startActivity(intent);
+                startActivity(intent);*/
                 break;
-            case R.id.action_select_barcode_scan:
-                startActivityForResult(new Intent(this, BarcodeScannerActivity.class), BARCODE_REQUEST_CODE);
-                break;
+
             default:
                 break;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    @OnClick(R.id.cancel_button)
-    void onCancelButtonClicked() {
-        mPresenter.onCancelButtonPressed();
+    @OnClick(R.id.select_asset_scan_qr_code_button)
+    void onScanQRCodeClicked() {
+        startActivityForResult(new Intent(this, BarcodeScannerActivity.class), BARCODE_REQUEST_CODE);
     }
 
-    @OnClick(R.id.not_in_vehicle_button)
+    @OnClick(R.id.select_asset_not_in_vehicle_button)
     void onNotInVehicleClicked() {
         mPresenter.onNotInVehicleButtonClicked();
     }
@@ -154,42 +189,48 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
             String barcodeId = data.getStringExtra(BARCODE_UUID);
             String type = data.getStringExtra(BARCODE_TYPE);
             Timber.v(barcodeId + " type:" + type);
-            mIsBarcodeResult = true;
-            mSearchBox.setText(barcodeId);
+            mSearchView.setQuery(barcodeId, true);
         }
     }
 
     @Override
-    public void setVehicleList(List<Vehicle> vehicles) {
-        String[] vehiclesArray = new String[vehicles.size()];
-        int i = 0;
-        for (Vehicle vehicle : vehicles) {
-            vehiclesArray[i++] = vehicle.getName() + " [" + vehicle.getBoxId() + "]";
-        }
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
-                R.layout.sellect_asset_item, vehiclesArray);
-        mVehiclesList.setAdapter(adapter);
-        mVehiclesList.setOnItemClickListener((parent, view, position, id) -> {
-            Vehicle vehicle = vehicles.get(position);
-            mPresenter.onVehicleListItemClicked(vehicle);
-        });
-
-        mVehiclesList.setVisibility(View.VISIBLE);
+    public void setVehicleList(List<Vehicle> vehicles, String searchText) {
+        mSearchCardView.setVisibility(View.VISIBLE);
+        mSearchAdapter.setSearchList(vehicles, searchText);
     }
 
     @Override
-    public void showEmptyList() {
-        mVehiclesList.setVisibility(View.INVISIBLE);
+    public void setLastVehicleList(@Nullable List<Vehicle> vehicles) {
+        mPreviousAssetsTextView.setText(R.string.select_asset_previous_assets);
+        mLastAdapter.setSearchList(vehicles, null);
     }
 
     @Override
-    public void goToMainScreen() {
-        Toast.makeText(this, "Go to main screen", Toast.LENGTH_SHORT).show();
+    public void setEmptyList() {
+        mSearchCardView.setVisibility(View.GONE);
+        mSearchAdapter.setSearchList(null, null);
+    }
+
+    @Override
+    public void goToHomeScreen() {
+        startActivity(new Intent(this, NavigationActivity.class));
+        finish();
     }
 
     @Override
     public void showErrorMessage() {
-        Toast.makeText(this, "Search keyword must contain minimum 3 characters", Toast.LENGTH_LONG).show();
+        mSearchCardView.setVisibility(View.VISIBLE);
+        mSearchAdapter.setHint(getString(R.string.select_asset_characters));
+    }
+
+    @Override
+    public void showEmptyListMessage() {
+        mSearchCardView.setVisibility(View.VISIBLE);
+        mSearchAdapter.setHint(getString(R.string.select_asset_find_nothing));
+    }
+
+    @Override
+    public void showEmptyLastListMessage() {
+        mPreviousAssetsTextView.setText(R.string.select_asset_no_previous_assets);
     }
 }

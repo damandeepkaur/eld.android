@@ -1,18 +1,21 @@
 package com.bsmwireless.domain.interactors;
 
+import com.bsmwireless.common.Constants;
 import com.bsmwireless.data.network.ServiceApi;
-import com.bsmwireless.data.network.authenticator.TokenManager;
 import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.PreferencesManager;
+import com.bsmwireless.common.utils.ListConverter;
 import com.bsmwireless.data.storage.vehicles.VehicleConverter;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.Vehicle;
 
+import java.util.Iterator;
 import java.util.List;
 
 import javax.inject.Inject;
 
 import io.reactivex.Completable;
+import io.reactivex.Flowable;
 import io.reactivex.Observable;
 
 public class VehiclesInteractor {
@@ -20,8 +23,8 @@ public class VehiclesInteractor {
 
     private ServiceApi mServiceApi;
     private AppDatabase mAppDatabase;
-    private TokenManager mTokenManager;
     private PreferencesManager mPreferencesManager;
+    private LoginUserInteractor mUserInteractor;
     private BlackBoxInteractor mBlackBoxInteractor;
     private ELDEventsInteractor mELDEventsInteractor;
 
@@ -29,13 +32,13 @@ public class VehiclesInteractor {
     public VehiclesInteractor(ServiceApi serviceApi,
                               PreferencesManager preferencesManager,
                               AppDatabase appDatabase,
-                              TokenManager tokenManager,
+                              LoginUserInteractor userInteractor,
                               BlackBoxInteractor blackBoxInteractor,
                               ELDEventsInteractor eventsInteractor) {
         mServiceApi = serviceApi;
         mPreferencesManager = preferencesManager;
         mAppDatabase = appDatabase;
-        mTokenManager = tokenManager;
+        mUserInteractor = userInteractor;
         mBlackBoxInteractor = blackBoxInteractor;
         mELDEventsInteractor = eventsInteractor;
     }
@@ -50,6 +53,24 @@ public class VehiclesInteractor {
         mPreferencesManager.setBoxId(vehicle.getBoxId());
     }
 
+    public void saveLastVehicle(int driverId, Integer vehicleId) {
+        String lastVehicles = mAppDatabase.userDao().getUserLastVehiclesSync(driverId);
+        Iterator<Integer> iterator = ListConverter.toIntegerList(lastVehicles).iterator();
+
+        StringBuilder builder = new StringBuilder();
+        builder.append(vehicleId);
+        while (builder.length() <= Constants.MAX_LAST_VEHICLE && iterator.hasNext()) {
+            Integer next = iterator.next();
+
+            if (!next.equals(vehicleId)) {
+                builder.append(",");
+                builder.append(next);
+            }
+        }
+
+        mAppDatabase.userDao().setUserLastVehicles(driverId, builder.toString());
+    }
+
     public Completable cleanSelectedVehicle() {
         return Completable.fromAction(
                 () -> {
@@ -60,7 +81,7 @@ public class VehiclesInteractor {
 
     public Observable<List<ELDEvent>> pairVehicle(Vehicle vehicle) {
         ELDEvent event = new ELDEvent();
-        int id = getDriverId();
+        int id = mUserInteractor.getDriverId();
 
         //TODO: get real data for hos
         event.setEngineHours(50);
@@ -72,7 +93,7 @@ public class VehiclesInteractor {
 
         return mBlackBoxInteractor.getData()
                 .flatMap(blackBox -> {
-                    event.setTimezone(getTimezone(id));
+                    event.setTimezone(mUserInteractor.getTimezone(id));
                     event.setOdometer(blackBox.getOdometer());
                     event.setLat(blackBox.getLat());
                     event.setLng(blackBox.getLon());
@@ -81,17 +102,15 @@ public class VehiclesInteractor {
                 })
                 .doOnNext(events -> {
                     saveVehicle(vehicle);
+                    saveLastVehicle(id, vehicle.getId());
                     mELDEventsInteractor.storeEvents(events, true);
                 });
     }
 
-    public Integer getDriverId() {
-        String id = mTokenManager.getDriver(mPreferencesManager.getAccountName());
-        return id == null || id.isEmpty() ? -1 : Integer.valueOf(id);
-    }
-
-    public String getTimezone(int driverId) {
-        return mAppDatabase.userDao().getTimezoneById(driverId).getTimezone();
+    public Flowable<List<Vehicle>> getLastVehicles() {
+        return mAppDatabase.userDao().getUserLastVehicles(mUserInteractor.getDriverId())
+                .flatMap(userLastVehicles -> mAppDatabase.vehicleDao().getVehicles(ListConverter.toIntegerList(userLastVehicles)))
+                .flatMap(vehicleEntities -> Flowable.just(VehicleConverter.toVehicle(vehicleEntities)));
     }
 
     public int getBoxId() {
