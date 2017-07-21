@@ -65,7 +65,6 @@ public class LoginActivity extends BaseActivity implements LoginView {
 
     @Override
     protected void onDestroy() {
-        mPresenter.onExitUser();
         mPresenter.onDestroy();
         mUnbinder.unbind();
         super.onDestroy();
@@ -117,5 +116,11 @@ public class LoginActivity extends BaseActivity implements LoginView {
     @Override
     public void setLoginButtonEnabled(boolean enabled) {
         mLoginButton.setEnabled(enabled);
+    }
+
+    @Override
+    public void onBackPressed() {
+        mPresenter.onBackPressed();
+        super.onBackPressed();
     }
 }

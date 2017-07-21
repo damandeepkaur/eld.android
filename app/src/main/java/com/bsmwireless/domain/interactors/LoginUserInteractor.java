@@ -10,10 +10,9 @@ import com.bsmwireless.models.LoginModel;
 import com.bsmwireless.models.ResponseMessage;
 import com.bsmwireless.models.User;
 
-import java.util.List;
-
 import javax.inject.Inject;
 
+import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
 
@@ -43,7 +42,6 @@ public class LoginUserInteractor {
                 .doOnNext(user -> {
                     String accountName = mTokenManager.getAccountName(name, domain);
 
-                    //TODO if !keepToken remove account on exit and clear shared preferences
                     mPreferencesManager.setAccountName(accountName);
                     mPreferencesManager.setRememberUserEnabled(keepToken);
 
@@ -69,10 +67,15 @@ public class LoginUserInteractor {
         return mTokenManager.getDomain(mPreferencesManager.getAccountName());
     }
 
-    public void removeAccount() {
-        if (mPreferencesManager.isRememberUserEnabled())
-            return;
-        mAppDatabase.userDao().deleteUserByAccountName(mPreferencesManager.getAccountName());
-        mPreferencesManager.clearValues();
+    public Completable removeAccount() {
+        return Completable.fromAction(
+                () -> {
+                    if (mPreferencesManager.isRememberUserEnabled()) {
+                        return;
+                    }
+                    mAppDatabase.userDao().deleteUserByAccountName(mPreferencesManager.getAccountName());
+                    mPreferencesManager.clearValues();
+                });
     }
 }
+
