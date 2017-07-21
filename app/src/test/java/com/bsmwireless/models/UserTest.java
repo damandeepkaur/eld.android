@@ -20,5 +20,7 @@ public class UserTest {
         assertEquals(1, User.DriverType.CO_DRIVER.ordinal());
         assertEquals(2, User.DriverType.EXEMPT.ordinal());
         assertEquals(3, User.DriverType.CARRIER.ordinal());
+
+        // TODO: have original code refactored to not rely on ordinal
     }
 }
