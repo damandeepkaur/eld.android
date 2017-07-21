@@ -2,6 +2,9 @@ package com.bsmwireless.data.storage.vehicles;
 
 import com.bsmwireless.models.Vehicle;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class VehicleConverter {
 
     public static Vehicle toVehicle(VehicleEntity entity) {
@@ -38,4 +41,13 @@ public class VehicleConverter {
         return entity;
     }
 
+    public static List<Vehicle> toVehicle(List<VehicleEntity> entities) {
+        List<Vehicle> list = new ArrayList<>();
+
+        for (VehicleEntity entity : entities) {
+            list.add(toVehicle(entity));
+        }
+
+        return list;
+    }
 }

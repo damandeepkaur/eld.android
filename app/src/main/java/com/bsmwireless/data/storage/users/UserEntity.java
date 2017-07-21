@@ -7,10 +7,6 @@ import android.arch.persistence.room.PrimaryKey;
 @Entity(tableName = "users")
 public class UserEntity {
     @PrimaryKey
-    @ColumnInfo(name = "id")
-    private Integer mId;
-    @ColumnInfo(name = "account_name")
-    private String mAccountName;
     @ColumnInfo(name = "timezone")
     private String mTimezone;
     @ColumnInfo(name = "email")
@@ -55,14 +51,8 @@ public class UserEntity {
     private String mOrgAddr;
     @ColumnInfo(name = "lastmodified")
     private Long mLastModified;
-
-    public String getAccountName() {
-        return mAccountName;
-    }
-
-    public void setAccountName(String accountName) {
-        mAccountName = accountName;
-    }
+    @ColumnInfo(name = "last_vehicle_ids")
+    private String mLastVehicleIds;
 
     public Integer getId() {
         return mId;
@@ -246,5 +236,13 @@ public class UserEntity {
 
     public void setLastModified(Long lastModified) {
         mLastModified = lastModified;
+    }
+
+    public String getLastVehicleIds() {
+        return mLastVehicleIds;
+    }
+
+    public void setLastVehicleIds(String lastVehicleIds) {
+        mLastVehicleIds = lastVehicleIds;
     }
 }

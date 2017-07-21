@@ -1,5 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!--Search asset-->
+    <string name="select_asset_search_hint">Box ID, License Plate or Keyword</string>
+    <string name="select_asset_previous_assets">Previous assets</string>
+    <string name="select_asset_scan_qr_code">Scan QR-code</string>
+    <string name="select_asset_not_in_vehicle">Not in vehicle</string>
+    <string name="select_asset_no_previous_assets">No previous assets</string>
+    <string name="select_asset_find_nothing">Sorry we couldn\'t find anything</string>
+    <string name="select_asset_characters">Enter at least 3 characters</string>
+
     <!-- START OLD STRINGS -->
     <string name="no_network">No Network Available</string>
     <string name="app_compatability">Note: Compatible with Android 4.0.3 - 6.0.1</string>
@@ -294,6 +303,7 @@
     <string name="timer_default_type">OFF DUTY</string>
     <string name="timer_hours_minutes">HOURS MINUTES</string>
     <string name="string_total">TOTAL</string>
+    <string name="select_asset_title">Select Asset</string>
     <!-- END OLD STRINGS -->
 
     <string name="app_name">BSM Universal App</string>
