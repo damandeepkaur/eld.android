@@ -96,7 +96,7 @@ public class LoginUserInteractor {
 
     public Flowable<String> getFullName() {
         return mAppDatabase.userDao().getUser(getDriverId())
-                .map(userEntity -> userEntity.getFirstName() + userEntity.getLastName());
+                .map(userEntity -> userEntity.getFirstName() + " " + userEntity.getLastName());
     }
 
     public int getCoDriversNumber() {
