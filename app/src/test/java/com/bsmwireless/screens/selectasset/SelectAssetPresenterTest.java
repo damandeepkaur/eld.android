@@ -1,5 +1,6 @@
 package com.bsmwireless.screens.selectasset;
 
+import com.bsmwireless.domain.interactors.LoginUserInteractor;
 import com.bsmwireless.domain.interactors.VehiclesInteractor;
 import com.bsmwireless.models.Vehicle;
 
@@ -40,6 +41,9 @@ public class SelectAssetPresenterTest {
     @Mock
     VehiclesInteractor mVehiclesInteractor;
 
+    @Mock
+    LoginUserInteractor mLoginUserInteractor;
+
     private SelectAssetPresenter mSelectAssetPresenter;
 
     private List<Vehicle> vehicles;
@@ -69,14 +73,14 @@ public class SelectAssetPresenterTest {
     @Before
     public void before() throws Exception {
         MockitoAnnotations.initMocks(this);
-        mSelectAssetPresenter = new SelectAssetPresenter(mView, mVehiclesInteractor);
+        mSelectAssetPresenter = new SelectAssetPresenter(mView, mVehiclesInteractor, mLoginUserInteractor);
 
         vehicles = buildVehicleList();
     }
 
 
     // TODO: onSearchTextChanged
-    // TODO: unsure if < 3 error message is expected or placeholder, so skipping test - pls. add if needed
+        // TODO: unsure if < 3 error message is expected or placeholder - pls. remove if needed
 
     @Test
     public void testOnSearchTextChangedLessThan3Chars() {
@@ -87,7 +91,7 @@ public class SelectAssetPresenterTest {
         mSelectAssetPresenter.onSearchTextChanged(searchText);
 
         // then
-        verify(mView).showEmptyList();
+        verify(mView).showErrorMessage();
     }
 
     @Test
@@ -99,7 +103,7 @@ public class SelectAssetPresenterTest {
         mSelectAssetPresenter.onSearchTextChanged(searchText);
 
         // then
-        verify(mView).showEmptyList();
+        verify(mView).setEmptyList();
     }
 
     /**
@@ -115,7 +119,7 @@ public class SelectAssetPresenterTest {
         mSelectAssetPresenter.onSearchTextChanged(searchText);
 
         // then
-        verify(mView).setVehicleList(eq(vehicles));
+        verify(mView).setVehicleList(eq(vehicles), eq(searchText));
     }
 
     /**
@@ -132,7 +136,7 @@ public class SelectAssetPresenterTest {
         mSelectAssetPresenter.onSearchTextChanged(searchText);
 
         // then
-        verify(mView).showEmptyList();
+        verify(mView).showEmptyListMessage();
     }
 
 
@@ -164,7 +168,7 @@ public class SelectAssetPresenterTest {
         mSelectAssetPresenter.onNotInVehicleButtonClicked();
 
         // then
-        verify(mView).goToMainScreen();
+        verify(mView).goToHomeScreen();
     }
 
     /**
@@ -197,7 +201,7 @@ public class SelectAssetPresenterTest {
         mSelectAssetPresenter.onVehicleListItemClicked(fakeVehicle);
 
         // then
-        verify(mView).goToMainScreen();
+        verify(mView).goToHomeScreen();
     }
 
 }

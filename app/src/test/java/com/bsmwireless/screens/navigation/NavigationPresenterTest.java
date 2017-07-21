@@ -12,6 +12,7 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import app.bsmuniversal.com.RxSchedulerRule;
+import io.reactivex.Flowable;
 import io.reactivex.Observable;
 
 import static org.mockito.Matchers.anyString;
@@ -105,12 +106,13 @@ public class NavigationPresenterTest {
     @Test
     public void testOnViewCreatedSuccess() {
         // given
-        final String user = "testUser";
+        final String name = "userName";
+        final Flowable<String> userFlowable = Flowable.just(name);
         final int coDriver = 1; // note: business logic is incorrect as can have multiple co-drivers
                                 // TODO: add refactor task/story to JIRA after server-side API refactors to match correct business logic
         final int boxId = 1111;
         final int assetNumber = 2222;
-        when(mLoginUserInteractor.getUserName()).thenReturn(user);
+        when(mLoginUserInteractor.getFullName()).thenReturn(userFlowable);
         when(mLoginUserInteractor.getCoDriversNumber()).thenReturn(coDriver);
         when(mVehiclesInteractor.getBoxId()).thenReturn(boxId);
         when(mVehiclesInteractor.getAssetsNumber()).thenReturn(assetNumber);
@@ -121,7 +123,7 @@ public class NavigationPresenterTest {
         mNavigationPresenter.onViewCreated();
 
         // then
-        verify(mView).setDriverName(eq(user));
+        verify(mView).setDriverName(eq(name));
         verify(mView).setCoDriversNumber(eq(coDriver));
         verify(mView).setBoxId(eq(boxId));
         verify(mView).setAssetsNumber(eq(assetNumber));
