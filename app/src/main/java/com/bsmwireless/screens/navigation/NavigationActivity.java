@@ -164,7 +164,8 @@ public class NavigationActivity extends BaseActivity implements OnNavigationItem
 
     @Override
     public void setBoxId(int boxId) {
-        String boxString = getResources().getString(R.string.box) + " " + ((boxId > 0) ? boxId : "-");
+        String boxString = (boxId > 0) ? getResources().getString(R.string.box) + " " + boxId
+                : getResources().getString(R.string.select_asset_not_in_vehicle);
         mHeaderViewHolder.boxId.setText(boxString);
     }
 
