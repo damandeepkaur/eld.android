@@ -122,7 +122,7 @@ public class DriverProfileActivity extends BaseActivity implements DriverProfile
     @Override
     protected void onStop() {
         super.onStop();
-        mPresenter.onSaveUserInfo(mAddressTextView.getText().toString(), mPasswordTextView.getText().toString());
+        mPresenter.onSaveUserInfo(mAddressTextView.getText().toString());
     }
 
     @Override
@@ -215,7 +215,7 @@ public class DriverProfileActivity extends BaseActivity implements DriverProfile
 
     @OnClick(R.id.ok_button)
     void onSaveSignatureClicked() {
-        mPresenter.onSaveSignatureClicked(mSignatureLayout.getImageData(), mPasswordTextView.getText().toString());
+        mPresenter.onSaveSignatureClicked(mSignatureLayout.getImageData());
     }
 
     private void initToolbar() {
