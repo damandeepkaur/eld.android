@@ -115,15 +115,6 @@ public class LoginUserInteractor {
         return mAppDatabase.userDao().getTimezoneById(driverId).getTimezone();
     }
 
-    public Completable removeAccount() {
-        return Completable.fromAction(
-                () -> {
-                    if (mPreferencesManager.isRememberUserEnabled()) return;
-                    mAppDatabase.userDao().deleteUserByAccountName(mPreferencesManager.getAccountName());
-                    mPreferencesManager.clearValues();
-                });
-    }
-
     public boolean isRememberMeEnabled() {
         return mPreferencesManager.isRememberUserEnabled();
     }
