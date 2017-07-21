@@ -1,12 +1,10 @@
 package com.bsmwireless.screens.driverprofile;
 
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.EditText;
@@ -20,8 +18,6 @@ import com.bsmwireless.screens.driverprofile.dagger.DaggerDriverProfileComponent
 import com.bsmwireless.screens.driverprofile.dagger.DriverProfileModule;
 import com.bsmwireless.widgets.signview.SignatureLayout;
 
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.inject.Inject;
 
@@ -135,7 +131,7 @@ public class DriverProfileActivity extends BaseActivity implements DriverProfile
 
     @Override
     public void setUserInfo(UserEntity user) {
-        mNameTextView.setText(user.getAccountName());
+        mNameTextView.setText(user.getFirstName() + " " + user.getLastName());
         mEmployeeIDTextView.setText(String.valueOf(user.getId()));
         mCompanyTextView.setText(user.getOrganization());
         mLicenseTextView.setText(user.getLicense());

@@ -113,7 +113,7 @@ public class LoginUserInteractor {
     }
 
     public Flowable<UserEntity> getUser() {
-        return mAppDatabase.userDao().getUserById(getDriverId());
+        return mAppDatabase.userDao().getUser(getDriverId());
     }
 
     public boolean isLoginActive() {
