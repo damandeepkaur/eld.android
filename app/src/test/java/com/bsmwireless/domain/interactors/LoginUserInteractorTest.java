@@ -115,7 +115,7 @@ public class LoginUserInteractorTest {
         User user = makeFakeUser();
 
         // when
-        mLoginUserInteractor.updateUser(user);
+        mLoginUserInteractor.updateUserOnServer(user);
 
         // then
         verify(mServiceApi).updateProfile(user);
