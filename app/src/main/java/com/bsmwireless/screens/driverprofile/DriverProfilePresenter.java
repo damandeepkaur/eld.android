@@ -52,9 +52,8 @@ public class DriverProfilePresenter {
 
     public void onSaveSignatureClicked(String signature) {
         if (mUserEntity != null) {
-            User user = getEmptyUser(mUserEntity);
-            user.setSignature(signature);
-            updateUserInDB(user);
+            mUserEntity.setSignature(signature);
+            updateUserInDB();
         } else {
             mView.showError(new Exception());
         }
@@ -64,32 +63,16 @@ public class DriverProfilePresenter {
 
     public void onSaveUserInfo(String address) {
         if (mUserEntity != null) {
-            User user = getEmptyUser(mUserEntity);
-            user.setAddress(address);
-            updateUserInDB(user);
+            mUserEntity.setAddress(address);
+            updateUserInDB();
         } else {
             mView.showError(new Exception());
         }
     }
 
-    private void updateUserInDB(User user) {
-        mLoginUserInteractor.updateUser(user)
+    private void updateUserInDB() {
+        mLoginUserInteractor.updateUser(mUserEntity)
                             .subscribeOn(Schedulers.io())
                             .subscribe();
-    }
-
-    private User getEmptyUser(UserEntity userEntity) {
-        User user = new User();
-        user.setId(userEntity.getId());
-        user.setUsername(mLoginUserInteractor.getUserName());
-        user.setTimezone(userEntity.getTimezone());
-        user.setFirstName(userEntity.getFirstName());
-        user.setLastName(userEntity.getLastName());
-        user.setCycleCountry(userEntity.getCycleCountry());
-        user.setSignature(userEntity.getSignature());
-        user.setAddress(userEntity.getAddress());
-        user.setOrganization(userEntity.getOrganization());
-        user.setLicense(userEntity.getLicense());
-        return user;
     }
 }

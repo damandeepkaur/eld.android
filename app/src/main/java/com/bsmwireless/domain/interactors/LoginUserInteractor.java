@@ -85,8 +85,8 @@ public class LoginUserInteractor {
                 });
     }
 
-    public Observable<Long> updateUser(User user) {
-        return Observable.create(e -> e.onNext(mAppDatabase.userDao().insertUser(UserConverter.toEntity(mPreferencesManager.getAccountName(), user))));
+    public Observable<Long> updateUser(UserEntity user) {
+        return Observable.create(e -> e.onNext(mAppDatabase.userDao().insertUser(user)));
     }
 
     public String getUserName() {
