@@ -6,4 +6,6 @@ public interface DriverProfileView {
     void setUserInfo(UserEntity user);
     void updateUser();
     void showError(Throwable error);
+    void hideControlButtons();
+    void showControlButtons();
 }

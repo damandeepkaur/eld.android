@@ -5,7 +5,12 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.Toast;
 
 import com.bsmwireless.common.App;
@@ -15,12 +20,19 @@ import com.bsmwireless.screens.driverprofile.dagger.DaggerDriverProfileComponent
 import com.bsmwireless.screens.driverprofile.dagger.DriverProfileModule;
 import com.bsmwireless.widgets.signview.SignatureLayout;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.inject.Inject;
 
 import app.bsmuniversal.com.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import butterknife.Unbinder;
+
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
 
 public class DriverProfileActivity extends BaseActivity implements DriverProfileView, SignatureLayout.OnSaveSignatureListener {
 
@@ -54,10 +66,15 @@ public class DriverProfileActivity extends BaseActivity implements DriverProfile
     @BindView(R.id.signature_view)
     SignatureLayout mSignatureLayout;
 
+    @BindView(R.id.control_buttons)
+    LinearLayout mControlButtons;
+
     @Inject
     DriverProfilePresenter mPresenter;
 
     private Unbinder mUnbinder;
+
+    volatile private List<Animation> mStartedAnimations;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,17 +91,13 @@ public class DriverProfileActivity extends BaseActivity implements DriverProfile
 
         mSignatureLayout.setOnSaveListener(this);
 
-        mAddressTextView.setOnFocusChangeListener((v, hasFocus) -> {
-            if (!hasFocus && !mAddressTextView.getText().toString().isEmpty()) {
-                mPresenter.onSaveHomeAddressClicked(mAddressTextView.getText().toString());
+        mControlButtons.setOnFocusChangeListener((v, hasFocus) -> {
+            if (!hasFocus) {
+                hideControlButtons();
             }
         });
 
-        mPasswordTextView.setOnFocusChangeListener((v, hasFocus) -> {
-            if (hasFocus) {
-                mPasswordTextView.setText("");
-            }
-        });
+        mStartedAnimations = new ArrayList<>();
     }
 
     @Override
@@ -107,9 +120,18 @@ public class DriverProfileActivity extends BaseActivity implements DriverProfile
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+        mPresenter.onSaveUserInfo(mAddressTextView.getText().toString(), mPasswordTextView.getText().toString());
+    }
+
+    @Override
     protected void onDestroy() {
         mPresenter.onDestroy();
         mUnbinder.unbind();
+        if (mStartedAnimations.size() > 0) {
+            mStartedAnimations.forEach(Animation::cancel);
+        }
         super.onDestroy();
     }
 
@@ -121,7 +143,6 @@ public class DriverProfileActivity extends BaseActivity implements DriverProfile
         mLicenseTextView.setText(user.getLicense());
         mAddressTextView.setText(user.getAddress());
         mTimeZoneTextView.setText(user.getTimezone());
-        mPasswordTextView.setText(getString(R.string.driver_profile_password));
         mCycleTextView.setText(String.valueOf(user.getCycleCountry()));
         mSignatureLayout.setImageData(user.getSignature());
     }
@@ -137,8 +158,64 @@ public class DriverProfileActivity extends BaseActivity implements DriverProfile
     }
 
     @Override
-    public void onSaveSignatureClicked(String data) {
-        mPresenter.onSaveSignatureClicked(data);
+    public void onChangeClicked() {
+        showControlButtons();
+    }
+
+    @Override
+    public void hideControlButtons() {
+        Animation animation = AnimationUtils.loadAnimation(this, android.R.anim.slide_out_right);
+        animation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {}
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                mControlButtons.setVisibility(GONE);
+                mStartedAnimations.remove(animation);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {}
+        });
+
+        mControlButtons.startAnimation(animation);
+        mSignatureLayout.setEditable(false);
+        mStartedAnimations.add(animation);
+    }
+
+    @Override
+    public void showControlButtons() {
+        Animation animation = AnimationUtils.loadAnimation(this, android.R.anim.slide_in_left);
+        animation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+                mControlButtons.setVisibility(VISIBLE);
+                mControlButtons.requestFocus();
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                mStartedAnimations.remove(animation);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {}
+        });
+
+        mControlButtons.startAnimation(animation);
+        mSignatureLayout.setEditable(true);
+        mStartedAnimations.add(animation);
+    }
+
+    @OnClick(R.id.clear_button)
+    void onClearSignatureClicked() {
+        mSignatureLayout.clear();
+    }
+
+    @OnClick(R.id.ok_button)
+    void onSaveSignatureClicked() {
+        mPresenter.onSaveSignatureClicked(mSignatureLayout.getImageData(), mPasswordTextView.getText().toString());
     }
 
     private void initToolbar() {

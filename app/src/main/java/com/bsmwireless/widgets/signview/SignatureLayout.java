@@ -19,7 +19,7 @@ import butterknife.Unbinder;
 
 public class SignatureLayout extends LinearLayout {
 
-    private final int ANIMATION_DURATION = getResources().getInteger(android.R.integer.config_shortAnimTime);
+    public final int ANIMATION_DURATION = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
     private View mRootView;
 
@@ -31,15 +31,12 @@ public class SignatureLayout extends LinearLayout {
     @BindView(R.id.change_button)
     Button mChangeButton;
 
-    @BindView(R.id.control_buttons)
-    LinearLayout mControlButtons;
-
     private OnSaveSignatureListener mListener;
 
-    private List<Animation> mStartedAnimations;
+    volatile private List<Animation> mStartedAnimations;
 
     public interface OnSaveSignatureListener {
-        void onSaveSignatureClicked(String data);
+        void onChangeClicked();
     }
 
     public SignatureLayout(Context context) {
@@ -79,27 +76,7 @@ public class SignatureLayout extends LinearLayout {
 
     @OnClick(R.id.change_button)
     public void onChangeClicked() {
-        hideEditButton();
-        showControlButtons();
-
-        mDriverSignView.setEditable(true);
-    }
-
-    @OnClick(R.id.ok_button)
-    public void onSaveClicked() {
-        hideControlButtons();
-        showEditButton();
-
-        if (mListener != null) {
-            mListener.onSaveSignatureClicked(mDriverSignView.getSignatureString());
-        }
-
-        mDriverSignView.setEditable(false);
-    }
-
-    @OnClick(R.id.clear_button)
-    public void onClearClicked() {
-        mDriverSignView.clear();
+        mListener.onChangeClicked();
     }
 
     public void setImageData(String data) {
@@ -112,6 +89,23 @@ public class SignatureLayout extends LinearLayout {
 
     public void setOnSaveListener(OnSaveSignatureListener listener) {
         mListener = listener;
+    }
+
+    public void clear() {
+        mDriverSignView.clear();
+    }
+
+    public void setEditable(boolean isEditable) {
+        if (isEditable) {
+            hideEditButton();
+        } else {
+            showEditButton();
+        }
+        mDriverSignView.setEditable(isEditable);
+    }
+
+    public boolean isEditable() {
+        return mDriverSignView.isEditing();
     }
 
     private void hideEditButton() {
@@ -158,55 +152,6 @@ public class SignatureLayout extends LinearLayout {
             }
         });
         mChangeButton.startAnimation(animation);
-        mStartedAnimations.add(animation);
-    }
-
-    private void hideControlButtons() {
-        AlphaAnimation animation = new AlphaAnimation(1, 0);
-        animation.setDuration(ANIMATION_DURATION);
-        animation.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                mControlButtons.setVisibility(GONE);
-                mStartedAnimations.remove(animation);
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-
-            }
-        });
-        mControlButtons.startAnimation(animation);
-        mStartedAnimations.add(animation);
-    }
-
-    private void showControlButtons() {
-        AlphaAnimation animation = new AlphaAnimation(0, 1);
-        animation.setDuration(ANIMATION_DURATION);
-        animation.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-                mControlButtons.setVisibility(VISIBLE);
-                mControlButtons.requestFocus();
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                mStartedAnimations.remove(animation);
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-
-            }
-        });
-
-        mControlButtons.startAnimation(animation);
         mStartedAnimations.add(animation);
     }
 }

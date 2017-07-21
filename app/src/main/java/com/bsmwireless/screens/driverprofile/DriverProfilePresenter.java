@@ -1,7 +1,6 @@
 package com.bsmwireless.screens.driverprofile;
 
 import com.bsmwireless.common.dagger.ActivityScope;
-import com.bsmwireless.data.storage.users.UserConverter;
 import com.bsmwireless.data.storage.users.UserEntity;
 import com.bsmwireless.domain.interactors.LoginUserInteractor;
 import com.bsmwireless.models.User;
@@ -51,48 +50,48 @@ public class DriverProfilePresenter {
                                                         }));
     }
 
-    public void onSaveSignatureClicked(String signature) {
+    public void onSaveSignatureClicked(String signature, String password) {
         if (mUserEntity != null) {
             User user = getEmptyUser(mUserEntity);
+            user.setPassword(password);
             user.setSignature(signature);
-            updateUser(user);
+            updateUserInDB(user);
         } else {
             mView.showError(new Exception());
         }
+
+        mView.hideControlButtons();
     }
 
-    public void onSaveHomeAddressClicked(String address) {
+    public void onSaveUserInfo(String address, String password) {
         if (mUserEntity != null) {
             User user = getEmptyUser(mUserEntity);
+            user.setPassword(password);
             user.setAddress(address);
-            updateUser(user);
+            updateUserInDB(user);
         } else {
             mView.showError(new Exception());
         }
     }
 
-    private void updateUser(User user) {
-        mDisposables.add(
-                mLoginUserInteractor.updateUser(user)
-                                    .subscribeOn(Schedulers.io())
-                                    .observeOn(AndroidSchedulers.mainThread())
-                                    .subscribe(responseMessage -> mView.updateUser(),
-                                                throwable -> {
-                                                    Timber.e(throwable.getMessage());
-                                                    mView.showError(throwable);
-                                                })
-        );
+    private void updateUserInDB(User user) {
+        mLoginUserInteractor.updateUser(user)
+                            .subscribeOn(Schedulers.io())
+                            .subscribe();
     }
 
     private User getEmptyUser(UserEntity userEntity) {
         User user = new User();
         user.setId(userEntity.getId());
         user.setUsername(mLoginUserInteractor.getUserName());
-        user.setPassword("1234");
         user.setTimezone(userEntity.getTimezone());
         user.setFirstName(userEntity.getFirstName());
         user.setLastName(userEntity.getLastName());
         user.setCycleCountry(userEntity.getCycleCountry());
+        user.setSignature(userEntity.getSignature());
+        user.setAddress(userEntity.getAddress());
+        user.setOrganization(userEntity.getOrganization());
+        user.setLicense(userEntity.getLicense());
         return user;
     }
 }

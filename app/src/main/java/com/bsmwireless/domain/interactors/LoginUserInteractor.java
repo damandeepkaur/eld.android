@@ -14,7 +14,12 @@ import com.bsmwireless.models.User;
 import javax.inject.Inject;
 
 import io.reactivex.Flowable;
+import io.reactivex.FlowableEmitter;
+import io.reactivex.FlowableOnSubscribe;
 import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.annotations.NonNull;
 
 import static com.bsmwireless.models.ELDEvent.EventType.LOGIN_LOGOUT;
 
@@ -80,11 +85,8 @@ public class LoginUserInteractor {
                 });
     }
 
-    public Observable<ResponseMessage> updateUser(User user) {
-        return mServiceApi.updateProfile(user)
-                          .doOnNext(
-                                  responseMessage -> mAppDatabase.userDao().insertUser(UserConverter.toEntity(mPreferencesManager.getAccountName(), user))
-                          );
+    public Observable<Long> updateUser(User user) {
+        return Observable.create(e -> e.onNext(mAppDatabase.userDao().insertUser(UserConverter.toEntity(mPreferencesManager.getAccountName(), user))));
     }
 
     public String getUserName() {

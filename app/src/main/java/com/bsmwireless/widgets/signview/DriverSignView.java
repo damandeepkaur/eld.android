@@ -1,7 +1,6 @@
 package com.bsmwireless.widgets.signview;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -10,13 +9,16 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
 import android.graphics.PorterDuff;
+import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
-import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewParent;
+import android.view.animation.Animation;
+
+import com.bsmwireless.common.utils.ViewUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,8 +29,8 @@ import app.bsmuniversal.com.R;
 public class DriverSignView extends View implements View.OnTouchListener {
 
     private static final int LINE_WIDTH_DP = 12;
-    private static final int BORDER_WIDTH_DP = 2;
-    private static final int DOTTED_LINE_WIDTH_DP = 10;
+    private static final int BORDER_WIDTH_DP = 4;
+    private static final int DOTTED_LINE_WIDTH_DP = 20;
 
     private Paint mPaint;
     private Paint mBorderPaint;
@@ -45,6 +47,8 @@ public class DriverSignView extends View implements View.OnTouchListener {
     private List<Point> mDatas;
 
     private boolean mIsEditing;
+
+    private ParseDateAsyncTask mParseDateAsyncTask;
 
     public DriverSignView(Context context) {
         super(context);
@@ -66,7 +70,7 @@ public class DriverSignView extends View implements View.OnTouchListener {
         mPaint.setAntiAlias(true);
         mPaint.setColor(Color.BLACK);
         mPaint.setStyle(Paint.Style.STROKE);
-        mPaint.setStrokeWidth(convertPixelsToDp(LINE_WIDTH_DP, context));
+        mPaint.setStrokeWidth(ViewUtils.convertPixelsToDp(LINE_WIDTH_DP, context));
         mPaint.setStrokeCap(Paint.Cap.ROUND);
         mPaint.setStrokeJoin(Paint.Join.ROUND);
         mPaint.setFilterBitmap(true);
@@ -75,7 +79,7 @@ public class DriverSignView extends View implements View.OnTouchListener {
         mBorderPaint.setAntiAlias(true);
         mBorderPaint.setColor(ContextCompat.getColor(context, R.color.signature_border));
         mBorderPaint.setStyle(Paint.Style.STROKE);
-        mBorderPaint.setStrokeWidth(convertPixelsToDp(BORDER_WIDTH_DP, context));
+        mBorderPaint.setStrokeWidth(ViewUtils.convertPixelsToDp(BORDER_WIDTH_DP, context));
     }
 
     @Override
@@ -157,6 +161,14 @@ public class DriverSignView extends View implements View.OnTouchListener {
         return true;
     }
 
+    @Override
+    protected void onDetachedFromWindow() {
+        if (mParseDateAsyncTask != null && !mParseDateAsyncTask.isCancelled()) {
+            mParseDateAsyncTask.cancel(true);
+        }
+        super.onDetachedFromWindow();
+    }
+
     public String getSignatureString() {
         int xShift = Integer.MAX_VALUE;
         for (int i = 0; i < mDatas.size(); i++) {
@@ -188,33 +200,21 @@ public class DriverSignView extends View implements View.OnTouchListener {
     }
 
     public void setSignatureString(String signature) {
-        String[] signPoints = signature.split(";");
-
-        if (signPoints.length > 1) {
-            mDatas = new ArrayList<>();
-            String[] curPoint;
-            for (int i = 1; i < signPoints.length; i = i + 2) {
-                if (signPoints[i - 1].length() > 0) {
-                    curPoint = signPoints[i - 1].split(",");
-                    mDatas.add(new Point(Integer.parseInt(curPoint [0]), Integer.parseInt(curPoint [1])));
-                }
-                if (signPoints[i].length() > 0) {
-                    curPoint = signPoints [i].split(",");
-                    if (curPoint.length > 1) {
-                        mDatas.add(new Point(Integer.parseInt(curPoint[0]), Integer.parseInt(curPoint[1])));
-                    } else {
-                        mDatas.add(new Point(Integer.parseInt(curPoint[0]), 0));
-                    }
-                }
-            }
-            drawSignature();
+        if (mParseDateAsyncTask != null && !mParseDateAsyncTask.isCancelled()) {
+            mParseDateAsyncTask.cancel(true);
         }
+        mParseDateAsyncTask = new ParseDateAsyncTask();
+        mParseDateAsyncTask.execute(signature, this);
     }
 
     public void setEditable(boolean editable) {
         mIsEditing = editable;
         setOnTouchListener(mIsEditing ? this : null);
         invalidate();
+    }
+
+    public boolean isEditing() {
+        return mIsEditing;
     }
 
     public void clear() {
@@ -226,31 +226,12 @@ public class DriverSignView extends View implements View.OnTouchListener {
         invalidate();
     }
 
-    private void drawSignature() {
-        if (mBitmap == null) {
-            mBitmap = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888);
+    private void updateData(Bitmap bmp, List<Point> datas) {
+        if (mBitmap != null) {
+            mBitmap.recycle();
         }
-
-        Canvas canvas = new Canvas(mBitmap);
-        canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
-
-        Path path = new Path();
-
-        for (int i = 1; i < mDatas.size(); i++) {
-            if (mDatas.get(i).x < 0 || mDatas.get(i).y < 0 || mDatas.get(i - 1).x < 0 || mDatas.get(i - 1).y < 0) {
-                path = new Path();
-                continue;
-            }
-
-            path.moveTo(mDatas.get(i - 1).x, mDatas.get(i - 1).y);
-            path.quadTo(mDatas.get(i - 1).x,
-                    mDatas.get(i - 1).y,
-                    mDatas.get(i).x,
-                    mDatas.get(i).y);
-
-            canvas.drawPath(path, mPaint);
-        }
-
+        mBitmap = bmp;
+        mDatas = datas;
         invalidate();
     }
 
@@ -261,16 +242,88 @@ public class DriverSignView extends View implements View.OnTouchListener {
         canvas.drawLine(mWidth, mHeight, mWidth, 0, mBorderPaint);
         canvas.drawLine(mWidth, mHeight, 0, mHeight, mBorderPaint);
 
-        mBorderPaint.setPathEffect(new DashPathEffect(new float[] { convertPixelsToDp(DOTTED_LINE_WIDTH_DP, getContext()), convertPixelsToDp(DOTTED_LINE_WIDTH_DP, getContext()) }, 0));
+        mBorderPaint.setPathEffect(new DashPathEffect(new float[] { ViewUtils.convertPixelsToDp(DOTTED_LINE_WIDTH_DP, getContext()), ViewUtils.convertPixelsToDp(DOTTED_LINE_WIDTH_DP, getContext()) }, 0));
         Path path = new Path();
         path.moveTo(0, 2 * mHeight / 3);
         path.quadTo(0, 2 * mHeight / 3, mWidth, 2 * mHeight / 3);
         canvas.drawPath(path, mBorderPaint);
     }
 
-    private float convertPixelsToDp(float px, Context context){
-        Resources resources = context.getResources();
-        DisplayMetrics metrics = resources.getDisplayMetrics();
-        return px / ((float)metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
+    private static class ParseDateAsyncTask extends AsyncTask<Object, Object, Bitmap> {
+        private String mSign;
+        private DriverSignView mView;
+        private List<Point> mDatas;
+
+        @Override
+        protected Bitmap doInBackground(Object[] params) {
+            if (params.length == 2) {
+                mSign = (String) params[0];
+                mView = (DriverSignView) params[1];
+
+                mDatas = parseStringToPoints(mSign);
+                return drawSignature(mDatas);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap bitmap) {
+            super.onPostExecute(bitmap);
+            mView.updateData(bitmap, mDatas);
+        }
+
+        private List<Point> parseStringToPoints(String signature) {
+            String[] signPoints = signature.split(";");
+            List<Point> datas = new ArrayList<>();
+
+            if (signPoints.length > 1) {
+                datas = new ArrayList<>();
+                String[] curPoint;
+                for (int i = 1; i < signPoints.length && !isCancelled(); i = i + 2) {
+                    if (signPoints[i - 1].length() > 0) {
+                        curPoint = signPoints[i - 1].split(",");
+                        datas.add(new Point(Integer.parseInt(curPoint[0]), Integer
+                                .parseInt(curPoint[1])));
+                    }
+                    if (signPoints[i].length() > 0) {
+                        curPoint = signPoints[i].split(",");
+                        if (curPoint.length > 1) {
+                            datas.add(new Point(Integer.parseInt(curPoint[0]), Integer
+                                    .parseInt(curPoint[1])));
+                        } else {
+                            datas.add(new Point(Integer.parseInt(curPoint[0]), 0));
+                        }
+                    }
+                }
+            }
+
+            return datas;
+        }
+
+        private Bitmap drawSignature(List<Point> datas) {
+            Bitmap bitmap = Bitmap
+                    .createBitmap(mView.mWidth, mView.mHeight, Bitmap.Config.ARGB_8888);
+
+            Canvas canvas = new Canvas(bitmap);
+            canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+
+            Path path = new Path();
+
+            for (int i = 1; i < datas.size() && !isCancelled(); i++) {
+                if (datas.get(i).x < 0 || datas.get(i).y < 0 || datas.get(i - 1).x < 0 || datas.get(i - 1).y < 0) {
+                    canvas.drawPath(path, mView.mPaint);
+                    path = new Path();
+                    continue;
+                }
+
+                path.moveTo(datas.get(i - 1).x, datas.get(i - 1).y);
+                path.quadTo(datas.get(i - 1).x,
+                        datas.get(i - 1).y,
+                        datas.get(i).x,
+                        datas.get(i).y);
+            }
+
+            return bitmap;
+        }
     }
 }
