@@ -33,7 +33,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:lineSpacingExtra="10sp"
-            android:textColor="@color/nasty_green"
+            android:textColor="@color/accent"
             android:textSize="@dimen/navigation_header_title_text_size"
             android:textStyle="normal"/>
 
@@ -68,7 +68,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:lineSpacingExtra="10sp"
-            android:textColor="@color/nasty_green"
+            android:textColor="@color/accent"
             android:textSize="@dimen/navigation_header_num_value_text_size"
             android:textStyle="normal"/>
 

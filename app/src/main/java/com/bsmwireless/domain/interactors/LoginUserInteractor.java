@@ -50,7 +50,13 @@ public class LoginUserInteractor {
                     mPreferencesManager.setRememberUserEnabled(keepToken);
 
                     mTokenManager.setToken(accountName, name, domain, user.getAuth());
-                    mAppDatabase.userDao().insertUser(UserConverter.toEntity(accountName, user));
+
+                    String lastVehicles = mAppDatabase.userDao().getUserLastVehiclesSync(user.getId());
+                    mAppDatabase.userDao().insertUser(UserConverter.toEntity(user));
+
+                    if (lastVehicles != null) {
+                        mAppDatabase.userDao().setUserLastVehicles(user.getId(), lastVehicles);
+                    }
                 })
                 .map(user -> user != null);
     }
@@ -105,7 +111,6 @@ public class LoginUserInteractor {
     }
 
     public String getTimezone(int driverId) {
-        return mAppDatabase.userDao().getTimezoneById(driverId).getTimezone();
+        return mAppDatabase.userDao().getUserTimezoneSync(driverId);
     }
-
 }

@@ -36,12 +36,11 @@ public class UserConverter {
         return user;
     }
 
-    public static UserEntity toEntity(String accountName, User user) {
+    public static UserEntity toEntity(User user) {
         UserEntity entity = null;
 
         if (user != null) {
             entity = new UserEntity();
-            entity.setAccountName(accountName);
             entity.setId(user.getId());
             entity.setTimezone(user.getTimezone());
             entity.setEmail(user.getEmail());
