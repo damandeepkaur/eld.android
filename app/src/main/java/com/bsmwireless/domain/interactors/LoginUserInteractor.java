@@ -103,6 +103,11 @@ public class LoginUserInteractor {
         return mTokenManager.getName(mPreferencesManager.getAccountName());
     }
 
+    public Flowable<String> getFullName() {
+        return mAppDatabase.userDao().getUser(getDriverId())
+                .map(userEntity -> userEntity.getFirstName() + " " + userEntity.getLastName());
+    }
+
     public int getCoDriversNumber() {
         //TODO: implement getting co drivers number
         return 1;
