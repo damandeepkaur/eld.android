@@ -1,16 +1,35 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>
 <resources>
+    <!-- START OLD COLORS -->
+    <color name="textcolor">#ff000000</color>
+    <color name="listviewdivider">#D9D9D9</color>
+    <color name="secondaryforeground">#ffDB812E</color>
+    <color name="white">#ffffff</color>
+    <color name="lighter_gray">#EEEEEE</color>
+    <color name="gray">#CCCCCC</color>
+    <color name="drivemode_pink">#FF5D5D</color>
+    <color name="hoscycle_gray">#6B6B6B</color>
+    <color name="material_blue_500">#ff0849a5</color>
+    <color name="material_blue_700">#ff05397C</color>
+    <color name="material_blue_A200">#ff448aff</color>
+    <color name="cancel_btn_color">#FFDD7328</color>
+    <color name="next_btn_color">#FF6CAC4A</color>
+    <!-- END OLD COLORS -->
+
+    <!-- Colors schema -->
+    <color name="primary">@color/greyish_brown</color>
+    <color name="primary_dark">@color/black</color>
+    <color name="primary_light">@color/brownish_grey</color>
+    <color name="accent">@color/nasty_green</color>
+    <color name="primary_text">#de000000</color>
+    <color name="secondary_text">#8b000000</color>
+
     <color name="brownish_grey">#6b6b6b</color>
     <color name="greyish_brown">#484848</color>
     <color name="black">#2f2f2f</color>
     <color name="status_bar_color">#33000000</color>
-    <color name="primary">#e78a00</color>
-    <color name="primary_dark">#d66c00</color>
-    <color name="accent">#7ac144</color>
-    <color name="primary_text">#de000000</color>
-    <color name="secondary_text">#8b000000</color>
-    <color name="primary_light">#6b6b6b</color>
     <color name="light_gray">#fafafa</color>
+    <color name="nasty_green">#7ac144</color>
 
     <color name="hint">#eeeeee</color>
     <color name="hint_text">#606060</color>
@@ -28,21 +47,9 @@
     <color name="graph_header_paint_color">#555555</color>
     <color name="graph_bar_paint_color">#90C34D</color>
 
+    <!-- Driver profile -->
+    <color name="signature_background">#f5f5f5</color>
+    <color name="signature_border">#979797</color>
+    <color name="cancel_color">#ef5350</color>
 
-    <!-- START OLD COLORS -->
-    <color name="textcolor">#ff000000</color>
-    <color name="listviewdivider">#D9D9D9</color>
-    <color name="secondaryforeground">#ffDB812E</color>
-    <color name="white">#ffffff</color>
-    <color name="lighter_gray">#EEEEEE</color>
-    <color name="gray">#CCCCCC</color>
-    <color name="drivemode_pink">#FF5D5D</color>
-    <color name="hoscycle_gray">#6B6B6B</color>
-    <color name="material_blue_500">#ff0849a5</color>
-    <color name="material_blue_700">#ff05397C</color>
-    <color name="material_blue_A200">#ff448aff</color>
-    <color name="cancel_btn_color">#FFDD7328</color>
-    <color name="next_btn_color">#FF6CAC4A</color>
-    <!-- END OLD COLORS -->
 </resources>
-

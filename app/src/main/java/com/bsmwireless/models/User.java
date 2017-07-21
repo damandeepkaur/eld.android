@@ -23,6 +23,12 @@ public class User implements Parcelable {
     @SerializedName("id")
     @Expose
     private Integer mId;
+    @SerializedName("username")
+    @Expose
+    private String mUsername;
+    @SerializedName("password")
+    @Expose
+    private String mPassword;
     @SerializedName("timezone")
     @Expose
     private String mTimezone;
@@ -285,6 +291,22 @@ public class User implements Parcelable {
         mOrgAddr = orgAddr;
     }
 
+    public String getUsername() {
+        return mUsername;
+    }
+
+    public void setUsername(String username) {
+        mUsername = username;
+    }
+
+    public String getPassword() {
+        return mPassword;
+    }
+
+    public void setPassword(String password) {
+        mPassword = password;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -318,6 +340,8 @@ public class User implements Parcelable {
                 .append(mCaCycle, user.mCaCycle)
                 .append(mCycleCountry, user.mCycleCountry)
                 .append(mOrgAddr, user.mOrgAddr)
+                .append(mUsername, user.mUsername)
+                .append(mPassword, user.mPassword)
                 .isEquals();
     }
 
@@ -348,6 +372,8 @@ public class User implements Parcelable {
                 .append(mCaCycle)
                 .append(mCycleCountry)
                 .append(mOrgAddr)
+                .append(mUsername)
+                .append(mPassword)
                 .toHashCode();
     }
 
@@ -378,6 +404,8 @@ public class User implements Parcelable {
         sb.append(", mCaCycle=").append(mCaCycle);
         sb.append(", mCycleCountry=").append(mCycleCountry);
         sb.append(", mOrgAddr='").append(mOrgAddr).append('\'');
+        sb.append(", mUsername='").append(mUsername).append('\'');
+        sb.append(", mPassword='").append(mPassword).append('\'');
         sb.append('}');
         return sb.toString();
     }
@@ -390,6 +418,8 @@ public class User implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeValue(this.mId);
+        dest.writeString(this.mUsername);
+        dest.writeString(this.mPassword);
         dest.writeString(this.mTimezone);
         dest.writeString(this.mEmail);
         dest.writeString(this.mAddress);
@@ -420,6 +450,8 @@ public class User implements Parcelable {
 
     protected User(Parcel in) {
         this.mId = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.mUsername = in.readString();
+        this.mPassword = in.readString();
         this.mTimezone = in.readString();
         this.mEmail = in.readString();
         this.mAddress = in.readString();
