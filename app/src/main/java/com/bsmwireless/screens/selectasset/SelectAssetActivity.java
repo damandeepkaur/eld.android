@@ -19,7 +19,6 @@ import com.bsmwireless.common.Constants;
 import com.bsmwireless.models.Vehicle;
 import com.bsmwireless.screens.barcode.BarcodeScannerActivity;
 import com.bsmwireless.screens.common.BaseActivity;
-import com.bsmwireless.screens.help.HelpActivity;
 import com.bsmwireless.screens.navigation.NavigationActivity;
 import com.bsmwireless.screens.selectasset.dagger.DaggerSelectAssetComponent;
 import com.bsmwireless.screens.selectasset.dagger.SelectAssetModule;
@@ -125,7 +124,7 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
         mLastRecyclerView.setLayoutManager(lastManager);
         mLastRecyclerView.setAdapter(mLastAdapter);
 
-        mPresenter.onCreated();
+        mPresenter.onViewCreated();
     }
 
     @Override
@@ -145,10 +144,10 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
                 break;
 
             case R.id.action_help:
-                Intent intent = new Intent(this, HelpActivity.class);
+                /*Intent intent = new Intent(this, HelpActivity.class);
 
                 //TODO: use corrected help widget with translated strings when UI is ready
-                /*ArrayList<HelpView.HelpModel> list = new ArrayList<>();
+                ArrayList<HelpView.HelpModel> list = new ArrayList<>();
 
                 list.add(new HelpView.HelpModel(mSearchBox, "Or enter asset", HelpView.ArrowType.CLOCKWISE, HelpView.PositionType.TOP, GravityDrawable.GravityType.END));
                 list.add(new HelpView.HelpModel(mSelectOptionsButton, "Click to view options", HelpView.ArrowType.CLOCKWISE, HelpView.PositionType.TOP, GravityDrawable.GravityType.END));

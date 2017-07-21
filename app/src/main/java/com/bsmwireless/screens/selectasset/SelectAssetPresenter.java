@@ -29,7 +29,7 @@ public class SelectAssetPresenter {
         Timber.d("CREATED");
     }
 
-    public void onCreated() {
+    public void onViewCreated() {
         mDisposables.add(mVehiclesInteractor.getLastVehicles()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

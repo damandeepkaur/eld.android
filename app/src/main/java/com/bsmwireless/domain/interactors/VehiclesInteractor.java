@@ -4,7 +4,7 @@ import com.bsmwireless.common.Constants;
 import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.PreferencesManager;
-import com.bsmwireless.data.storage.common.ListConverter;
+import com.bsmwireless.common.utils.ListConverter;
 import com.bsmwireless.data.storage.vehicles.VehicleConverter;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.Vehicle;

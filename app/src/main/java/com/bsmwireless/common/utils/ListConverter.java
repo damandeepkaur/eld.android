@@ -1,4 +1,4 @@
-package com.bsmwireless.data.storage.common;
+package com.bsmwireless.common.utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
