@@ -70,9 +70,8 @@ public class LoginUserInteractor {
     public Completable removeAccount() {
         return Completable.fromAction(
                 () -> {
-                    if (mPreferencesManager.isRememberUserEnabled()) {
+                    if (mPreferencesManager.isRememberUserEnabled())
                         return;
-                    }
                     mAppDatabase.userDao().deleteUserByAccountName(mPreferencesManager.getAccountName());
                     mPreferencesManager.clearValues();
                 });
