@@ -7,8 +7,6 @@ import android.arch.persistence.room.PrimaryKey;
 @Entity(tableName = "users")
 public class UserEntity {
     @PrimaryKey
-    @ColumnInfo(name = "account_name")
-    private String mAccountName;
     @ColumnInfo(name = "id")
     private Integer mId;
     @ColumnInfo(name = "timezone")
@@ -27,14 +25,14 @@ public class UserEntity {
     private String mLicense;
     @ColumnInfo(name = "signature")
     private String mSignature;
+    @ColumnInfo(name = "exempt")
+    private Boolean mExempt;
     @ColumnInfo(name = "updated")
     private Boolean mUpdated;
     @ColumnInfo(name = "organization")
     private String mOrganization;
     @ColumnInfo(name = "sync_time")
     private Long mSyncTime;
-    @ColumnInfo(name = "is_supervisor")
-    private Boolean mIsSupervisor;
     @ColumnInfo(name = "first_name")
     private String mFirstName;
     @ColumnInfo(name = "mid_name")
@@ -53,14 +51,10 @@ public class UserEntity {
     private Integer mCycleCountry;
     @ColumnInfo(name = "org_addr")
     private String mOrgAddr;
-
-    public String getAccountName() {
-        return mAccountName;
-    }
-
-    public void setAccountName(String accountName) {
-        mAccountName = accountName;
-    }
+    @ColumnInfo(name = "lastmodified")
+    private Long mLastModified;
+    @ColumnInfo(name = "last_vehicle_ids")
+    private String mLastVehicleIds;
 
     public Integer getId() {
         return mId;
@@ -134,6 +128,14 @@ public class UserEntity {
         mSignature = signature;
     }
 
+    public Boolean getExempt() {
+        return mExempt;
+    }
+
+    public void setExempt(Boolean exempt) {
+        this.mExempt = exempt;
+    }
+
     public Boolean getUpdated() {
         return mUpdated;
     }
@@ -156,14 +158,6 @@ public class UserEntity {
 
     public void setSyncTime(Long syncTime) {
         mSyncTime = syncTime;
-    }
-
-    public Boolean getIsSupervisor() {
-        return mIsSupervisor;
-    }
-
-    public void setIsSupervisor(Boolean supervisor) {
-        mIsSupervisor = supervisor;
     }
 
     public String getFirstName() {
@@ -236,5 +230,21 @@ public class UserEntity {
 
     public void setOrgAddr(String orgAddr) {
         mOrgAddr = orgAddr;
+    }
+
+    public Long getLastModified() {
+        return mLastModified;
+    }
+
+    public void setLastModified(Long lastModified) {
+        mLastModified = lastModified;
+    }
+
+    public String getLastVehicleIds() {
+        return mLastVehicleIds;
+    }
+
+    public void setLastVehicleIds(String lastVehicleIds) {
+        mLastVehicleIds = lastVehicleIds;
     }
 }

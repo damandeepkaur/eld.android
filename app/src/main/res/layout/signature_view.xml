@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+    <com.bsmwireless.widgets.signview.DriverSignView
+        android:id="@+id/driver_sign"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="@dimen/driver_profile_signature_margin"/>
+
+    <Button android:id="@+id/change_button"
+            android:layout_width="@dimen/driver_profile_change_sign_button_size"
+            android:layout_height="@dimen/driver_profile_change_sign_button_size"
+            android:layout_margin="@dimen/driver_profile_item_margin"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:background="@drawable/ic_create_green_24dp"/>
+
+</RelativeLayout>

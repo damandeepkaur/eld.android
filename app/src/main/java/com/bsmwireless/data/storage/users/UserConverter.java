@@ -17,10 +17,10 @@ public class UserConverter {
             user.setCountry(entity.getCountry());
             user.setLicense(entity.getLicense());
             user.setSignature(entity.getSignature());
+            user.setExempt(entity.getExempt());
             user.setUpdated(entity.getUpdated());
             user.setOrganization(entity.getOrganization());
             user.setSyncTime(entity.getSyncTime());
-            user.setSupervisor(entity.getIsSupervisor());
             user.setFirstName(entity.getFirstName());
             user.setMidName(entity.getMidName());
             user.setLastName(entity.getLastName());
@@ -36,12 +36,11 @@ public class UserConverter {
         return user;
     }
 
-    public static UserEntity toEntity(String accountName, User user) {
+    public static UserEntity toEntity(User user) {
         UserEntity entity = null;
 
         if (user != null) {
             entity = new UserEntity();
-            entity.setAccountName(accountName);
             entity.setId(user.getId());
             entity.setTimezone(user.getTimezone());
             entity.setEmail(user.getEmail());
@@ -51,10 +50,10 @@ public class UserConverter {
             entity.setCountry(user.getCountry());
             entity.setLicense(user.getLicense());
             entity.setSignature(user.getSignature());
+            entity.setExempt(user.getExempt());
             entity.setUpdated(user.getUpdated());
             entity.setOrganization(user.getOrganization());
             entity.setSyncTime(user.getSyncTime());
-            entity.setIsSupervisor(user.getSupervisor());
             entity.setFirstName(user.getFirstName());
             entity.setMidName(user.getMidName());
             entity.setLastName(user.getLastName());

@@ -16,4 +16,5 @@ public interface LoginView {
 
     void setLoginButtonEnabled(boolean enabled);
 
+    boolean loadUserDataEnabled();
 }

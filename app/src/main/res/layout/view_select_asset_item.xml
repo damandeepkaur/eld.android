@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/select_asset_item"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/select_asset_item_height"
+    android:textSize="@dimen/text_size"
+    android:paddingLeft="@dimen/select_asset_item_padding"
+    android:drawablePadding="@dimen/default_margin"
+    android:gravity="center_vertical"/>

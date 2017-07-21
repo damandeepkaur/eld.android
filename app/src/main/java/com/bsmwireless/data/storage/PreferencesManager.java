@@ -57,4 +57,8 @@ public class PreferencesManager {
     public boolean isRememberUserEnabled() {
         return mPreferences.getBoolean(KEY_REMEMBER_USER_ENABLED, false);
     }
+
+    public void clearValues() {
+        mPreferences.edit().clear().apply();
+    }
 }

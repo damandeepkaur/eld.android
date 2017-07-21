@@ -5,6 +5,7 @@ import com.bsmwireless.data.network.authenticator.TokenManager;
 import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.data.storage.users.UserConverter;
+import com.bsmwireless.data.storage.users.UserEntity;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.LoginModel;
 import com.bsmwireless.models.ResponseMessage;
@@ -12,7 +13,13 @@ import com.bsmwireless.models.User;
 
 import javax.inject.Inject;
 
+import io.reactivex.Flowable;
+import io.reactivex.FlowableEmitter;
+import io.reactivex.FlowableOnSubscribe;
 import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.annotations.NonNull;
 
 import static com.bsmwireless.models.ELDEvent.EventType.LOGIN_LOGOUT;
 
@@ -45,12 +52,17 @@ public class LoginUserInteractor {
                 .doOnNext(user -> {
                     String accountName = mTokenManager.getAccountName(name, domain);
 
-                    //TODO if !keepToken remove account on exit and clear shared preferences
                     mPreferencesManager.setAccountName(accountName);
                     mPreferencesManager.setRememberUserEnabled(keepToken);
 
                     mTokenManager.setToken(accountName, name, domain, user.getAuth());
-                    mAppDatabase.userDao().insertUser(UserConverter.toEntity(accountName, user));
+
+                    String lastVehicles = mAppDatabase.userDao().getUserLastVehiclesSync(user.getId());
+                    mAppDatabase.userDao().insertUser(UserConverter.toEntity(user));
+
+                    if (lastVehicles != null) {
+                        mAppDatabase.userDao().setUserLastVehicles(user.getId(), lastVehicles);
+                    }
                 })
                 .map(user -> user != null);
     }
@@ -74,16 +86,32 @@ public class LoginUserInteractor {
                     logoutEvent.setLng(blackBox.getLon());
 
                     return mServiceApi.logout(logoutEvent)
+                            .doOnNext(responseMessage -> {
+                                if (mPreferencesManager.isRememberUserEnabled()) return;
+
+                                mPreferencesManager.clearValues();
+                                mAppDatabase.userDao().deleteUser(getDriverId());
+
+                            })
                             .map(responseMessage -> responseMessage.getMessage().equals("ACK"));
                 });
     }
 
-    public Observable<ResponseMessage> updateUser(User user) {
+    public Observable<Long> updateDBUser(UserEntity user) {
+        return Observable.create(e -> e.onNext(mAppDatabase.userDao().insertUser(user)));
+    }
+
+    public Observable<ResponseMessage> updateUserOnServer(User user) {
         return mServiceApi.updateProfile(user);
     }
 
     public String getUserName() {
         return mTokenManager.getName(mPreferencesManager.getAccountName());
+    }
+
+    public Flowable<String> getFullName() {
+        return mAppDatabase.userDao().getUser(getDriverId())
+                .map(userEntity -> userEntity.getFirstName() + " " + userEntity.getLastName());
     }
 
     public int getCoDriversNumber() {
@@ -93,6 +121,10 @@ public class LoginUserInteractor {
 
     public String getDomainName() {
         return mTokenManager.getDomain(mPreferencesManager.getAccountName());
+    }
+
+    public Flowable<UserEntity> getUser() {
+        return mAppDatabase.userDao().getUser(getDriverId());
     }
 
     public boolean isLoginActive() {
@@ -105,7 +137,11 @@ public class LoginUserInteractor {
     }
 
     public String getTimezone(int driverId) {
-        return mAppDatabase.userDao().getTimezoneById(driverId).getTimezone();
+        return mAppDatabase.userDao().getUserTimezoneSync(driverId);
     }
 
+    public boolean isRememberMeEnabled() {
+        return mPreferencesManager.isRememberUserEnabled();
+    }
 }
+

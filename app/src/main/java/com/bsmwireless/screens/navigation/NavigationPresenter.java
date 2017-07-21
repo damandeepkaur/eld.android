@@ -1,8 +1,9 @@
 package com.bsmwireless.screens.navigation;
 
-
+import com.bsmwireless.data.storage.users.UserEntity;
 import com.bsmwireless.domain.interactors.LoginUserInteractor;
 import com.bsmwireless.domain.interactors.VehiclesInteractor;
+import com.bsmwireless.models.User;
 
 import javax.inject.Inject;
 
@@ -57,10 +58,44 @@ public class NavigationPresenter {
         if (!mLoginUserInteractor.isLoginActive()) {
             mView.goToLoginScreen();
         } else {
-            mView.setDriverName(mLoginUserInteractor.getUserName());
+            mDisposables.add(mLoginUserInteractor.getFullName()
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(name -> mView.setDriverName(name)));
             mView.setCoDriversNumber(mLoginUserInteractor.getCoDriversNumber());
             mView.setBoxId(mVehiclesInteractor.getBoxId());
             mView.setAssetsNumber(mVehiclesInteractor.getAssetsNumber());
         }
+    }
+
+    public void onUserUpdated() {
+        Disposable disposable = mLoginUserInteractor.getUser()
+                .subscribeOn(Schedulers.io())
+                .subscribe(userEntity -> {
+                    mLoginUserInteractor.updateUserOnServer(getUpdatedUser(userEntity))
+                                        .subscribeOn(Schedulers.io())
+                                        .subscribe();
+                }, throwable -> {
+                    Timber.e("LoginUser error: %s", throwable.toString());
+                });
+        mDisposables.add(disposable);
+    }
+
+    // TODO: change server logic
+    private User getUpdatedUser(UserEntity userEntity) {
+        User user = new User();
+
+        user.setId(userEntity.getId());
+        user.setUsername(mLoginUserInteractor.getUserName());
+        // TODO: password stub
+        user.setPassword("1234");
+        user.setTimezone(userEntity.getTimezone());
+        user.setFirstName(userEntity.getFirstName());
+        user.setLastName(userEntity.getLastName());
+        user.setCycleCountry(userEntity.getCycleCountry());
+        user.setSignature(userEntity.getSignature());
+        user.setAddress(userEntity.getAddress());
+
+        return user;
     }
 }

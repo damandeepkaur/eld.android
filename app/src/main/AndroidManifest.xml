@@ -20,6 +20,7 @@
 
     <application
         android:name="com.bsmwireless.common.App"
+        android:allowBackup="false"
         android:icon="@drawable/icon"
         android:label="@string/app_name"
         android:roundIcon="@drawable/icon"
@@ -31,13 +32,9 @@
             android:theme="@style/Theme.BsmAppWithBGFullScreen"/>
 
         <activity
-            android:name="com.bsmwireless.screens.taketour.TakeTourActivity"
-            android:theme="@style/Theme.BsmApp"/>
-
-        <activity
             android:name="com.bsmwireless.screens.selectasset.SelectAssetActivity"
-            android:theme="@style/Theme.BsmApp"
-            android:windowSoftInputMode="stateHidden|adjustResize"/>
+            android:windowSoftInputMode="stateHidden|adjustPan"
+            android:theme="@style/AppTheme"/>
 
         <activity
             android:name="com.bsmwireless.screens.navigation.NavigationActivity"
@@ -52,10 +49,14 @@
         <activity
             android:name="com.bsmwireless.screens.help.HelpActivity"
             android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
-
         <activity
             android:name="com.bsmwireless.screens.barcode.BarcodeScannerActivity"
             android:theme="@style/Theme.BsmAppFullScreen"/>
+
+        <activity android:name="com.bsmwireless.screens.driverprofile.DriverProfileActivity"
+                  android:label="@string/driver_profile"
+                  android:windowSoftInputMode="stateHidden"
+                  android:theme="@style/DriverProfileTheme"/>
 
         <service android:name="com.bsmwireless.data.network.authenticator.BsmAuthenticatorService">
             <intent-filter>
