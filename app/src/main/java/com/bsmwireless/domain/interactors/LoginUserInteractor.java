@@ -52,7 +52,6 @@ public class LoginUserInteractor {
                 .doOnNext(user -> {
                     String accountName = mTokenManager.getAccountName(name, domain);
 
-                    //TODO if !keepToken remove account on exit and clear shared preferences
                     mPreferencesManager.setAccountName(accountName);
                     mPreferencesManager.setRememberUserEnabled(keepToken);
 
@@ -87,6 +86,13 @@ public class LoginUserInteractor {
                     logoutEvent.setLng(blackBox.getLon());
 
                     return mServiceApi.logout(logoutEvent)
+                            .doOnNext(responseMessage -> {
+                                if (mPreferencesManager.isRememberUserEnabled()) return;
+
+                                mPreferencesManager.clearValues();
+                                mAppDatabase.userDao().deleteUser(getDriverId());
+
+                            })
                             .map(responseMessage -> responseMessage.getMessage().equals("ACK"));
                 });
     }
@@ -133,4 +139,9 @@ public class LoginUserInteractor {
     public String getTimezone(int driverId) {
         return mAppDatabase.userDao().getUserTimezoneSync(driverId);
     }
+
+    public boolean isRememberMeEnabled() {
+        return mPreferencesManager.isRememberUserEnabled();
+    }
 }
+

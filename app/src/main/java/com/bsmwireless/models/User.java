@@ -53,6 +53,9 @@ public class User implements Parcelable {
     @SerializedName("signature")
     @Expose
     private String mSignature;
+    @SerializedName("exempt")
+    @Expose
+    private Boolean mExempt;
     @SerializedName("updated")
     @Expose
     private Boolean mUpdated;
@@ -68,9 +71,6 @@ public class User implements Parcelable {
     @SerializedName("auth")
     @Expose
     private Auth mAuth;
-    @SerializedName("isSupervisor")
-    @Expose
-    private Boolean mIsSupervisor;
     @SerializedName("firstName")
     @Expose
     private String mFirstName;
@@ -171,6 +171,14 @@ public class User implements Parcelable {
         mSignature = signature;
     }
 
+    public Boolean getExempt() {
+        return mExempt;
+    }
+
+    public void setExempt(Boolean exempt) {
+        this.mExempt = exempt;
+    }
+
     public Boolean getUpdated() {
         return mUpdated;
     }
@@ -209,14 +217,6 @@ public class User implements Parcelable {
 
     public void setAuth(Auth auth) {
         mAuth = auth;
-    }
-
-    public Boolean getSupervisor() {
-        return mIsSupervisor;
-    }
-
-    public void setSupervisor(Boolean supervisor) {
-        mIsSupervisor = supervisor;
     }
 
     public String getFirstName() {
@@ -325,12 +325,12 @@ public class User implements Parcelable {
                 .append(mCountry, user.mCountry)
                 .append(mLicense, user.mLicense)
                 .append(mSignature, user.mSignature)
+                .append(mExempt, user.mExempt)
                 .append(mUpdated, user.mUpdated)
                 .append(mOrganization, user.mOrganization)
                 .append(mConfigurations, user.mConfigurations)
                 .append(mSyncTime, user.mSyncTime)
                 .append(mAuth, user.mAuth)
-                .append(mIsSupervisor, user.mIsSupervisor)
                 .append(mFirstName, user.mFirstName)
                 .append(mMidName, user.mMidName)
                 .append(mLastName, user.mLastName)
@@ -357,12 +357,12 @@ public class User implements Parcelable {
                 .append(mCountry)
                 .append(mLicense)
                 .append(mSignature)
+                .append(mExempt)
                 .append(mUpdated)
                 .append(mOrganization)
                 .append(mConfigurations)
                 .append(mSyncTime)
                 .append(mAuth)
-                .append(mIsSupervisor)
                 .append(mFirstName)
                 .append(mMidName)
                 .append(mLastName)
@@ -389,12 +389,12 @@ public class User implements Parcelable {
         sb.append(", mCountry='").append(mCountry).append('\'');
         sb.append(", mLicense='").append(mLicense).append('\'');
         sb.append(", mSignature='").append(mSignature).append('\'');
+        sb.append(", mExempt='").append(mExempt).append('\'');
         sb.append(", mUpdated=").append(mUpdated);
         sb.append(", mOrganization='").append(mOrganization).append('\'');
         sb.append(", mConfigurations=").append(mConfigurations);
         sb.append(", mSyncTime=").append(mSyncTime);
         sb.append(", mAuth=").append(mAuth);
-        sb.append(", mIsSupervisor=").append(mIsSupervisor);
         sb.append(", mFirstName='").append(mFirstName).append('\'');
         sb.append(", mMidName='").append(mMidName).append('\'');
         sb.append(", mLastName='").append(mLastName).append('\'');
@@ -428,12 +428,12 @@ public class User implements Parcelable {
         dest.writeString(this.mCountry);
         dest.writeString(this.mLicense);
         dest.writeString(this.mSignature);
+        dest.writeByte((byte) (this.mExempt ? 1 : 0));
         dest.writeValue(this.mUpdated);
         dest.writeString(this.mOrganization);
         dest.writeTypedList(this.mConfigurations);
         dest.writeValue(this.mSyncTime);
         dest.writeParcelable(this.mAuth, flags);
-        dest.writeValue(this.mIsSupervisor);
         dest.writeString(this.mFirstName);
         dest.writeString(this.mMidName);
         dest.writeString(this.mLastName);
@@ -460,12 +460,12 @@ public class User implements Parcelable {
         this.mCountry = in.readString();
         this.mLicense = in.readString();
         this.mSignature = in.readString();
+        this.mExempt = in.readByte() != 0;
         this.mUpdated = (Boolean) in.readValue(Boolean.class.getClassLoader());
         this.mOrganization = in.readString();
         this.mConfigurations = in.createTypedArrayList(Configuration.CREATOR);
         this.mSyncTime = (Long) in.readValue(Long.class.getClassLoader());
         this.mAuth = in.readParcelable(Auth.class.getClassLoader());
-        this.mIsSupervisor = (Boolean) in.readValue(Boolean.class.getClassLoader());
         this.mFirstName = in.readString();
         this.mMidName = in.readString();
         this.mLastName = in.readString();

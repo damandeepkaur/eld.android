@@ -17,10 +17,10 @@ public class UserConverter {
             user.setCountry(entity.getCountry());
             user.setLicense(entity.getLicense());
             user.setSignature(entity.getSignature());
+            user.setExempt(entity.getExempt());
             user.setUpdated(entity.getUpdated());
             user.setOrganization(entity.getOrganization());
             user.setSyncTime(entity.getSyncTime());
-            user.setSupervisor(entity.getIsSupervisor());
             user.setFirstName(entity.getFirstName());
             user.setMidName(entity.getMidName());
             user.setLastName(entity.getLastName());
@@ -50,10 +50,10 @@ public class UserConverter {
             entity.setCountry(user.getCountry());
             entity.setLicense(user.getLicense());
             entity.setSignature(user.getSignature());
+            entity.setExempt(user.getExempt());
             entity.setUpdated(user.getUpdated());
             entity.setOrganization(user.getOrganization());
             entity.setSyncTime(user.getSyncTime());
-            entity.setIsSupervisor(user.getSupervisor());
             entity.setFirstName(user.getFirstName());
             entity.setMidName(user.getMidName());
             entity.setLastName(user.getLastName());
