@@ -58,7 +58,10 @@ public class NavigationPresenter {
         if (!mLoginUserInteractor.isLoginActive()) {
             mView.goToLoginScreen();
         } else {
-            mDisposables.add(mLoginUserInteractor.getFullName().subscribe(name -> mView.setDriverName(name)));
+            mDisposables.add(mLoginUserInteractor.getFullName()
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(name -> mView.setDriverName(name)));
             mView.setCoDriversNumber(mLoginUserInteractor.getCoDriversNumber());
             mView.setBoxId(mVehiclesInteractor.getBoxId());
             mView.setAssetsNumber(mVehiclesInteractor.getAssetsNumber());

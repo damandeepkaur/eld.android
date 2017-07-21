@@ -39,16 +39,16 @@ public class DriverProfilePresenter {
 
     public void onNeedUpdateUserInfo() {
         mDisposables.add(mLoginUserInteractor.getUser()
-                                             .subscribeOn(Schedulers.io())
-                                             .observeOn(AndroidSchedulers.mainThread())
-                                             .subscribe(userEntity -> {
-                                                             mUserEntity = userEntity;
-                                                             mView.setUserInfo(mUserEntity);
-                                                        },
-                                                        throwable -> {
-                                                            Timber.e(throwable.getMessage());
-                                                            mView.showError(throwable);
-                                                        }));
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(userEntity -> {
+                            mUserEntity = userEntity;
+                            mView.setUserInfo(mUserEntity);
+                        },
+                        throwable -> {
+                            Timber.e(throwable.getMessage());
+                            mView.showError(throwable);
+                        }));
     }
 
     public void onSaveSignatureClicked(String signature) {
@@ -74,7 +74,7 @@ public class DriverProfilePresenter {
     private void updateUserInDB() {
         mUserEntity.setLastModified(Calendar.getInstance().getTimeInMillis());
         mLoginUserInteractor.updateDBUser(mUserEntity)
-                            .subscribeOn(Schedulers.io())
-                            .subscribe();
+                .subscribeOn(Schedulers.io())
+                .subscribe();
     }
 }
