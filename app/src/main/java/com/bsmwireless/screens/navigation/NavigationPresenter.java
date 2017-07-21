@@ -65,25 +65,23 @@ public class NavigationPresenter {
         }
     }
 
-    public void onUserUpdated(boolean isUserUpdated) {
-        if (isUserUpdated) {
-            Disposable disposable = mLoginUserInteractor.getUser()
-                    .subscribeOn(Schedulers.io())
-                    .subscribe(userEntity -> {
-                        mLoginUserInteractor.updateUserOnServer(getUpdatedUser(userEntity))
-                                            .subscribeOn(Schedulers.io())
-                                            .subscribe();
-                    }, throwable -> {
-                        Timber.e("LoginUser error: %s", throwable.toString());
-                    });
-            mDisposables.add(disposable);
-        }
+    public void onUserUpdated() {
+        Disposable disposable = mLoginUserInteractor.getUser()
+                .subscribeOn(Schedulers.io())
+                .subscribe(userEntity -> {
+                    mLoginUserInteractor.updateUserOnServer(getUpdatedUser(userEntity))
+                                        .subscribeOn(Schedulers.io())
+                                        .subscribe();
+                }, throwable -> {
+                    Timber.e("LoginUser error: %s", throwable.toString());
+                });
+        mDisposables.add(disposable);
     }
 
     // TODO: change server logic
     private User getUpdatedUser(UserEntity userEntity) {
         User user = new User();
-        
+
         user.setId(userEntity.getId());
         user.setUsername(mLoginUserInteractor.getUserName());
         // TODO: password stub

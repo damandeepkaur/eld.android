@@ -7,10 +7,10 @@ import android.arch.persistence.room.PrimaryKey;
 @Entity(tableName = "users")
 public class UserEntity {
     @PrimaryKey
-    @ColumnInfo(name = "account_name")
-    private String mAccountName;
     @ColumnInfo(name = "id")
     private Integer mId;
+    @ColumnInfo(name = "account_name")
+    private String mAccountName;
     @ColumnInfo(name = "timezone")
     private String mTimezone;
     @ColumnInfo(name = "email")

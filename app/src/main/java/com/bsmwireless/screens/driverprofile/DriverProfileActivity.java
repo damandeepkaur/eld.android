@@ -6,6 +6,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.EditText;
@@ -73,8 +74,6 @@ public class DriverProfileActivity extends BaseActivity implements DriverProfile
 
     private Unbinder mUnbinder;
 
-    volatile private List<Animation> mStartedAnimations;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,9 +87,13 @@ public class DriverProfileActivity extends BaseActivity implements DriverProfile
 
         mPresenter.onNeedUpdateUserInfo();
 
-        mSignatureLayout.setOnSaveListener(this);
+        mControlButtons.setOnFocusChangeListener((v, hasFocus) -> {
+            if (!hasFocus) {
+                hideControlButtons();
+            }
+        });
 
-        mStartedAnimations = new ArrayList<>();
+        mSignatureLayout.setOnSaveListener(this);
     }
 
     @Override
@@ -125,10 +128,8 @@ public class DriverProfileActivity extends BaseActivity implements DriverProfile
     @Override
     protected void onDestroy() {
         mPresenter.onDestroy();
+        mControlButtons.clearAnimation();
         mUnbinder.unbind();
-        if (mStartedAnimations.size() > 0) {
-            mStartedAnimations.forEach(Animation::cancel);
-        }
         super.onDestroy();
     }
 
@@ -156,48 +157,51 @@ public class DriverProfileActivity extends BaseActivity implements DriverProfile
 
     @Override
     public void hideControlButtons() {
-        Animation animation = AnimationUtils.loadAnimation(this, android.R.anim.slide_out_right);
-        animation.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {}
+        if (mControlButtons.getVisibility() == VISIBLE) {
+            Animation animation = AnimationUtils.loadAnimation(this, android.R.anim.slide_out_right);
+            animation.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+                }
 
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                mControlButtons.setVisibility(GONE);
-                mStartedAnimations.remove(animation);
-            }
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    mControlButtons.setVisibility(GONE);
+                }
 
-            @Override
-            public void onAnimationRepeat(Animation animation) {}
-        });
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+                }
+            });
 
-        mControlButtons.startAnimation(animation);
-        mSignatureLayout.setEditable(false);
-        mStartedAnimations.add(animation);
+            mControlButtons.startAnimation(animation);
+            mSignatureLayout.setEditable(false);
+        }
     }
 
     @Override
     public void showControlButtons() {
-        Animation animation = AnimationUtils.loadAnimation(this, android.R.anim.slide_in_left);
-        animation.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-                mControlButtons.setVisibility(VISIBLE);
-                mControlButtons.requestFocus();
-            }
+        if (mControlButtons.getVisibility() != VISIBLE) {
+            Animation animation = AnimationUtils.loadAnimation(this, android.R.anim.slide_in_left);
+            animation.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+                    mControlButtons.setVisibility(VISIBLE);
+                    mControlButtons.requestFocus();
+                }
 
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                mStartedAnimations.remove(animation);
-            }
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                }
 
-            @Override
-            public void onAnimationRepeat(Animation animation) {}
-        });
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+                }
+            });
 
-        mControlButtons.startAnimation(animation);
-        mSignatureLayout.setEditable(true);
-        mStartedAnimations.add(animation);
+            mControlButtons.startAnimation(animation);
+            mSignatureLayout.setEditable(true);
+        }
     }
 
     @OnClick(R.id.clear_button)

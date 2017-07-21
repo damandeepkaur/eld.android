@@ -33,8 +33,6 @@ public class SignatureLayout extends LinearLayout {
 
     private OnSaveSignatureListener mListener;
 
-    volatile private List<Animation> mStartedAnimations;
-
     public interface OnSaveSignatureListener {
         void onChangeClicked();
     }
@@ -56,7 +54,6 @@ public class SignatureLayout extends LinearLayout {
 
     private void init(Context context) {
         mRootView = inflate(context, R.layout.signature_view, this);
-        mStartedAnimations = new ArrayList<>();
     }
 
     @Override
@@ -67,10 +64,8 @@ public class SignatureLayout extends LinearLayout {
 
     @Override
     protected void onDetachedFromWindow() {
+        mChangeButton.clearAnimation();
         mUnbinder.unbind();
-        if (mStartedAnimations.size() > 0) {
-            mStartedAnimations.forEach(Animation::cancel);
-        }
         super.onDetachedFromWindow();
     }
 
@@ -113,23 +108,17 @@ public class SignatureLayout extends LinearLayout {
         animation.setDuration(ANIMATION_DURATION);
         animation.setAnimationListener(new Animation.AnimationListener() {
             @Override
-            public void onAnimationStart(Animation animation) {
-
-            }
+            public void onAnimationStart(Animation animation) {}
 
             @Override
             public void onAnimationEnd(Animation animation) {
                 mChangeButton.setVisibility(GONE);
-                mStartedAnimations.remove(animation);
             }
 
             @Override
-            public void onAnimationRepeat(Animation animation) {
-
-            }
+            public void onAnimationRepeat(Animation animation) {}
         });
         mChangeButton.startAnimation(animation);
-        mStartedAnimations.add(animation);
     }
 
     private void showEditButton() {
@@ -142,16 +131,11 @@ public class SignatureLayout extends LinearLayout {
             }
 
             @Override
-            public void onAnimationEnd(Animation animation) {
-                mStartedAnimations.remove(animation);
-            }
+            public void onAnimationEnd(Animation animation) {}
 
             @Override
-            public void onAnimationRepeat(Animation animation) {
-
-            }
+            public void onAnimationRepeat(Animation animation) {}
         });
         mChangeButton.startAnimation(animation);
-        mStartedAnimations.add(animation);
     }
 }

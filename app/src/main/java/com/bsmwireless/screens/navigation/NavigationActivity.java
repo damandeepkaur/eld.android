@@ -215,7 +215,7 @@ public class NavigationActivity extends BaseActivity implements OnNavigationItem
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
             case REQUEST_CODE_UPDATE_USER: {
-                mPresenter.onUserUpdated(true);
+                mPresenter.onUserUpdated();
                 break;
             }
             default: {
