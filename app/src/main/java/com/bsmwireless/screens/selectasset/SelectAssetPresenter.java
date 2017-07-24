@@ -16,14 +16,12 @@ import timber.log.Timber;
 public class SelectAssetPresenter {
     private SelectAssetView mView;
     private VehiclesInteractor mVehiclesInteractor;
-    private LoginUserInteractor mUserInteractor;
     private CompositeDisposable mDisposables;
 
     @Inject
     public SelectAssetPresenter(SelectAssetView view, VehiclesInteractor vehiclesInteractor, LoginUserInteractor userInteractor) {
         mView = view;
         mVehiclesInteractor = vehiclesInteractor;
-        mUserInteractor = userInteractor;
         mDisposables = new CompositeDisposable();
 
         Timber.d("CREATED");
@@ -49,7 +47,7 @@ public class SelectAssetPresenter {
         if (searchText.isEmpty()){
             mView.setEmptyList();
         } else if (searchText.length() < 3) {
-            mView.showErrorMessage();
+            mView.showSearchErrorMessage();
         } else {
             mDisposables.add(mVehiclesInteractor.searchVehicles(searchText)
                     .subscribeOn(Schedulers.io())
@@ -62,7 +60,10 @@ public class SelectAssetPresenter {
                                     mView.showEmptyListMessage();
                                 }
                             },
-                            Timber::e
+                            error -> {
+                                Timber.e("SelectAsset error: %s", error);
+                                mView.showErrorMessage("Exception:" + error.toString());
+                            }
                     ));
         }
     }
@@ -80,8 +81,13 @@ public class SelectAssetPresenter {
             mDisposables.add(mVehiclesInteractor.pairVehicle(vehicle)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(events -> mView.goToHomeScreen(),
-                            Timber::e));
+                    .subscribe(events -> {
+                                mView.goToHomeScreen();
+                            },
+                            error -> {
+                                Timber.e("SelectAsset error: %s", error);
+                                mView.showErrorMessage("Exception:" + error.toString());
+                            }));
         }
     }
 

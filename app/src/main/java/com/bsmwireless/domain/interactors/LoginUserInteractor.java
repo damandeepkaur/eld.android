@@ -87,11 +87,13 @@ public class LoginUserInteractor {
 
                     return mServiceApi.logout(logoutEvent)
                             .doOnNext(responseMessage -> {
-                                if (mPreferencesManager.isRememberUserEnabled()) return;
-
-                                mPreferencesManager.clearValues();
-                                mAppDatabase.userDao().deleteUser(getDriverId());
-
+                                if (!mPreferencesManager.isRememberUserEnabled()) {
+                                    mPreferencesManager.clearValues();
+                                    mAppDatabase.userDao().deleteUser(getDriverId());
+                                    mTokenManager.removeAccount(mPreferencesManager.getAccountName());
+                                } else {
+                                    mTokenManager.clearToken(mTokenManager.getToken(mPreferencesManager.getAccountName()));
+                                }
                             })
                             .map(responseMessage -> responseMessage.getMessage().equals("ACK"));
                 });

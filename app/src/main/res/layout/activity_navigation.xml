@@ -40,7 +40,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:fitsSystemWindows="true"
+        android:fitsSystemWindows="false"
         android:background="@color/light_gray"
         app:itemTextColor="@color/menu_item_color"
         app:itemIconTint="@color/menu_item_color"

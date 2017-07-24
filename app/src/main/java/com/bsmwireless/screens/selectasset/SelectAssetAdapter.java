@@ -136,7 +136,10 @@ class SelectAssetAdapter extends RecyclerView.Adapter<SelectAssetAdapter.Holder>
             if (searchWord != null) {
                 int start = text.indexOf(searchWord);
                 int end = start + searchWord.length();
-                spannable.setSpan(new StyleSpan(android.graphics.Typeface.BOLD), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+                if (start > 0 && end < text.length()) {
+                    spannable.setSpan(new StyleSpan(android.graphics.Typeface.BOLD), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                }
             }
 
             mTextView.setText(spannable);
