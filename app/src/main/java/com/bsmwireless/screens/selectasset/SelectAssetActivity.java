@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -218,7 +219,7 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
     }
 
     @Override
-    public void showErrorMessage() {
+    public void showSearchErrorMessage() {
         mSearchCardView.setVisibility(View.VISIBLE);
         mSearchAdapter.setHint(getString(R.string.select_asset_characters));
     }
@@ -232,5 +233,16 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
     @Override
     public void showEmptyLastListMessage() {
         mPreviousAssetsTextView.setText(R.string.select_asset_no_previous_assets);
+    }
+
+    @Override
+    public void showErrorMessage(String message) {
+        AlertDialog.Builder builder;
+        builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.select_asset_error);
+        builder.setMessage(message);
+        builder.setCancelable(false);
+        builder.setPositiveButton(R.string.ok, null);
+        builder.show();
     }
 }

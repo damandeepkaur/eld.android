@@ -71,7 +71,7 @@
             android:lineSpacingExtra="10sp"
             android:textAllCaps="true"
             android:textColor="@color/accent"
-            android:textSize="@dimen/navigation_header_num_value_text_size"
+            android:textSize="@dimen/navigation_header_title_text_size"
             android:textStyle="normal"/>
 
         <TextView

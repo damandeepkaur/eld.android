@@ -156,11 +156,10 @@ public interface ServiceApi {
      * Link the driver to the vehicle, fetch unidentified record for update, and carrier's change requests.
      *
      * @param status current driver status
-     * @param boxId  id of the box paired with the vehicle.
      * @return Pair Vehicle Response {@link ELDEvent}
      */
     @POST("v1/login/pair")
-    Observable<List<ELDEvent>> pairVehicle(@Body ELDEvent status, @Header("X-Box") int boxId);
+    Observable<List<ELDEvent>> pairVehicle(@Body ELDEvent status);
 
     /**
      * Login request Vehicle.

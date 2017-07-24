@@ -57,6 +57,8 @@ public class LoginActivity extends BaseActivity implements LoginView {
         Intent intent = getIntent();
 
         if (loadUserDataEnabled()) {
+            mSwitchButton.setChecked(true);
+
             if (intent != null && intent.hasExtra(ARG_ACCOUNT_NAME) && intent.hasExtra(ARG_DOMAIN_NAME)) {
                 loadUserData(intent.getStringExtra(ARG_ACCOUNT_NAME), intent.getStringExtra(ARG_DOMAIN_NAME));
             } else {
