@@ -1,6 +1,7 @@
 package com.bsmwireless.domain.interactors;
 
 import com.bsmwireless.common.Constants;
+import com.bsmwireless.data.network.Connection.ConnectionManager;
 import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.PreferencesManager;
@@ -17,6 +18,9 @@ import javax.inject.Inject;
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
+import io.reactivex.schedulers.Schedulers;
+import io.reactivex.subjects.Subject;
+import timber.log.Timber;
 
 public class VehiclesInteractor {
     private static final int NOT_IN_VEHICLE_ID = -1;
@@ -27,20 +31,31 @@ public class VehiclesInteractor {
     private LoginUserInteractor mUserInteractor;
     private BlackBoxInteractor mBlackBoxInteractor;
     private ELDEventsInteractor mELDEventsInteractor;
-
+    private ConnectionManager mConnectionManager;
+    private Subject<ConnectionManager.ConnectionState> mConnectionStatusSubject;
     @Inject
     public VehiclesInteractor(ServiceApi serviceApi,
                               PreferencesManager preferencesManager,
                               AppDatabase appDatabase,
                               LoginUserInteractor userInteractor,
                               BlackBoxInteractor blackBoxInteractor,
-                              ELDEventsInteractor eventsInteractor) {
+                              BlackBoxInteractor fblackBoxInteractor,
+                              ELDEventsInteractor eventsInteractor,
+                              ConnectionManager connectionManager) {
         mServiceApi = serviceApi;
         mPreferencesManager = preferencesManager;
         mAppDatabase = appDatabase;
         mUserInteractor = userInteractor;
         mBlackBoxInteractor = blackBoxInteractor;
         mELDEventsInteractor = eventsInteractor;
+        mConnectionManager = connectionManager;
+
+        mConnectionStatusSubject= mConnectionManager.getConnectionStateObservable();
+        mConnectionStatusSubject
+                .observeOn(Schedulers.io())
+                .subscribe( state ->{
+                    Timber.e("OnState Change :" + state);
+                } );
     }
 
     public Observable<List<Vehicle>> searchVehicles(String searchText) {
@@ -102,6 +117,7 @@ public class VehiclesInteractor {
                 })
                 .doOnNext(events -> {
                     saveVehicle(vehicle);
+                    mConnectionManager.connect(vehicle);
                     saveLastVehicle(id, vehicle.getId());
                     mELDEventsInteractor.storeEvents(events, true);
                 });
