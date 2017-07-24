@@ -17,6 +17,7 @@ import java.util.List;
 
 import app.bsmuniversal.com.RxSchedulerRule;
 import io.reactivex.Completable;
+import io.reactivex.Flowable;
 import io.reactivex.Observable;
 
 import static org.mockito.Matchers.any;
@@ -46,7 +47,7 @@ public class SelectAssetPresenterTest {
 
     private SelectAssetPresenter mSelectAssetPresenter;
 
-    private List<Vehicle> vehicles;
+    private List<Vehicle> mVehicles;
 
     /**
      * Builds a vehicle for unit test purposes. Add fields if required.
@@ -75,12 +76,48 @@ public class SelectAssetPresenterTest {
         MockitoAnnotations.initMocks(this);
         mSelectAssetPresenter = new SelectAssetPresenter(mView, mVehiclesInteractor, mLoginUserInteractor);
 
-        vehicles = buildVehicleList();
+        mVehicles = buildVehicleList();
     }
 
+    /** Verify rx setting of last vehicle list */
+    @Test
+    public void testOnViewCreatedSetLastVehicleList() {
+        // given
+        List<Vehicle> testVehicleList = buildVehicleList();
+        when(mVehiclesInteractor.getLastVehicles()).thenReturn(Flowable.just(testVehicleList));
 
-    // TODO: onSearchTextChanged
-        // TODO: unsure if < 3 error message is expected or placeholder - pls. remove if needed
+        // when
+        mSelectAssetPresenter.onViewCreated();
+
+        // then
+        verify(mView).setLastVehicleList(eq(testVehicleList));
+    }
+
+    @Test
+    public void testOnViewCreatedSetEmptyLastList() {
+        // given
+        List<Vehicle> testVehicleList = new ArrayList<>();
+        when(mVehiclesInteractor.getLastVehicles()).thenReturn(Flowable.just(testVehicleList));
+
+        // when
+        mSelectAssetPresenter.onViewCreated();
+
+        // then
+        verify(mView).showEmptyLastListMessage();
+    }
+
+    @Test
+    public void testOnViewCreatedEmptyLastList() {
+        // given
+        List<Vehicle> emptyVehicleList = new ArrayList<>();
+        when(mVehiclesInteractor.getLastVehicles()).thenReturn(Flowable.just(emptyVehicleList));
+
+        // when
+        mSelectAssetPresenter.onViewCreated();
+
+        // then
+        verify(mView).showEmptyLastListMessage();
+    }
 
     @Test
     public void testOnSearchTextChangedLessThan3Chars() {
@@ -91,7 +128,7 @@ public class SelectAssetPresenterTest {
         mSelectAssetPresenter.onSearchTextChanged(searchText);
 
         // then
-        verify(mView).showErrorMessage();
+        verify(mView).showSearchErrorMessage();
     }
 
     @Test
@@ -113,13 +150,13 @@ public class SelectAssetPresenterTest {
     public void testOnSearchTextChangedSuccess() {
         // given
         String searchText = "abc";
-        when(mVehiclesInteractor.searchVehicles(eq("abc"))).thenReturn(Observable.just(vehicles));
+        when(mVehiclesInteractor.searchVehicles(eq("abc"))).thenReturn(Observable.just(mVehicles));
 
         // when
         mSelectAssetPresenter.onSearchTextChanged(searchText);
 
         // then
-        verify(mView).setVehicleList(eq(vehicles), eq(searchText));
+        verify(mView).setVehicleList(eq(mVehicles), eq(searchText));
     }
 
     /**
@@ -139,16 +176,11 @@ public class SelectAssetPresenterTest {
         verify(mView).showEmptyListMessage();
     }
 
-
-    // TODO: onCancelButtonPressed
-    // TODO: skipping for now as Cancel button does not appear in interaction map - add tests or delete comment if this changes
-
-
     /**
      * Verify call to VehiclesInteractor#cleanSelectedVehicle.
      */
     @Test
-    public void testOnNotInVehicleCleanSelectedVehicle() {
+    public void testOnNotInVehicleButtonClicked() {
         // given
         when(mVehiclesInteractor.cleanSelectedVehicle()).thenReturn(Completable.complete());
 
@@ -157,17 +189,6 @@ public class SelectAssetPresenterTest {
 
         // then
         verify(mVehiclesInteractor).cleanSelectedVehicle();
-    }
-
-    @Test
-    public void testOnNotInVehicleGoToMainScreen() {
-        // given
-        when(mVehiclesInteractor.cleanSelectedVehicle()).thenReturn(Completable.complete());
-
-        // when
-        mSelectAssetPresenter.onNotInVehicleButtonClicked();
-
-        // then
         verify(mView).goToHomeScreen();
     }
 
@@ -187,12 +208,8 @@ public class SelectAssetPresenterTest {
         verify(mVehiclesInteractor).pairVehicle(eq(fakeVehicle));
     }
 
-    /**
-     * Verify go-to main screen.
-     */
-    // TODO: I cannot tell if this behavior is currently a stub - pls. remove test if it is
     @Test
-    public void testOnVehicleClickedGoToMain() {
+    public void testOnVehicleClickedGoToHome() {
         // given
         Vehicle fakeVehicle = new Vehicle();
         when(mVehiclesInteractor.pairVehicle(any(Vehicle.class))).thenReturn(Observable.just(new ArrayList<>()));
