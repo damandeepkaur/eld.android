@@ -52,19 +52,26 @@ public class Device implements DeviceInterface {
         try {
 
             InputStream iStream = getInputStream();
-            if (iStream != null) {
-                iStream.close();
-            }
             OutputStream oStream = getOutputStream();
+            if (iStream != null) {
+                try {
+                    iStream.close();
+                }catch(IOException e){ Timber.e("Exception in InputStream:" ,e);}
+            }
+
             if (oStream != null) {
-                oStream.close();
+                try {
+                    oStream.close();
+                }catch(IOException e){Timber.e("Exception in OutputStream:" ,e);}
             }
 
             if (mSocket!=null)
             {
+                try{
                 mSocket.close();
+                }catch(IOException e){ Timber.e("Exception in Socket close:" ,e);}
             }
-
+            mSocket =null;
         }
         catch(Exception e)
         {
@@ -76,11 +83,11 @@ public class Device implements DeviceInterface {
 
     @Override
     public InputStream getInputStream() throws IOException {
-        return mSocket.getInputStream();
+        return mSocket!=null?mSocket.getInputStream():null;
     }
 
     @Override
     public OutputStream getOutputStream() throws IOException {
-        return mSocket.getOutputStream();
+        return mSocket!=null?mSocket.getOutputStream():null;
     }
 }

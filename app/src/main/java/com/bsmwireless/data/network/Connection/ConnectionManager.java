@@ -59,7 +59,7 @@ public class ConnectionManager implements ConnectionInterface {
 
         mVehicle= vehicle;
         device = new Device();
-        mConnectionstatus = ConnectionState.Ready;
+        setConnectionstatus(ConnectionState.Ready);
 
         try {
 
@@ -121,7 +121,7 @@ public class ConnectionManager implements ConnectionInterface {
     {
 
         byte[] response = readResponse();
-        if ( getResponseLength(response) > 0) {
+        if (response!=null && getResponseLength(response) > 0) {
             processStatusResponse(response);
         }
     }
@@ -139,7 +139,7 @@ public class ConnectionManager implements ConnectionInterface {
                 setConnectionstatus(ConnectionState.Connecting);
                 break;
             }
-            else if ( getResponseLength(response) > 0){
+            else if (response!=null && getResponseLength(response) > 0){
                 readSubscription = true;
                 processSubscriptionResponse(response);
             }
@@ -163,7 +163,7 @@ public class ConnectionManager implements ConnectionInterface {
                 InputStream input = device.getInputStream();
                 byte[] response = new byte[1544];
                 int total = 0;
-                int available = input.available();
+                int available = input!=null?input.available():0;
                 while (input.available() >0) {
 
                     byte[] buf = new byte[input.available()];
@@ -177,7 +177,8 @@ public class ConnectionManager implements ConnectionInterface {
 
             }
             else
-            { setConnectionstatus(ConnectionState.Ready);}
+            { if (device.isConnected())
+                setConnectionstatus(ConnectionState.Ready);}
         }
         catch (Exception e)
         {

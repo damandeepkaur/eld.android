@@ -117,7 +117,7 @@ public class VehiclesInteractor {
                 })
                 .doOnNext(events -> {
                     saveVehicle(vehicle);
-                    mConnectionManager.connect(vehicle);
+                    mBlackBoxInteractor.connectVehicle(vehicle);
                     saveLastVehicle(id, vehicle.getId());
                     mELDEventsInteractor.storeEvents(events, true);
                 });

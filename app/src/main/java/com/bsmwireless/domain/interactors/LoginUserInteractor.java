@@ -91,6 +91,7 @@ public class LoginUserInteractor {
 
                                 mPreferencesManager.clearValues();
                                 mAppDatabase.userDao().deleteUser(getDriverId());
+                                mBlackBoxInteractor.disconnectVehicle();
 
                             })
                             .map(responseMessage -> responseMessage.getMessage().equals("ACK"));
