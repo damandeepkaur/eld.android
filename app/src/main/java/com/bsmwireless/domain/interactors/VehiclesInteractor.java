@@ -107,6 +107,10 @@ public class VehiclesInteractor {
         event.setBoxId(vehicle.getBoxId());
 
         return mBlackBoxInteractor.getData()
+                .doOnNext(blackBox -> {
+                    saveVehicle(vehicle);
+                    saveLastVehicle(id, vehicle.getId());
+                })
                 .flatMap(blackBox -> {
                     event.setTimezone(mUserInteractor.getTimezone(id));
                     event.setOdometer(blackBox.getOdometer());
@@ -116,9 +120,7 @@ public class VehiclesInteractor {
                     return mServiceApi.pairVehicle(event, vehicle.getBoxId());
                 })
                 .doOnNext(events -> {
-                    saveVehicle(vehicle);
                     mBlackBoxInteractor.connectVehicle(vehicle);
-                    saveLastVehicle(id, vehicle.getId());
                     mELDEventsInteractor.storeEvents(events, true);
                 });
     }
