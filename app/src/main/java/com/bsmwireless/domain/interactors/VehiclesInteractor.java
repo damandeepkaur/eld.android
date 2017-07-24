@@ -117,12 +117,13 @@ public class VehiclesInteractor {
                     event.setLat(blackBox.getLat());
                     event.setLng(blackBox.getLon());
 
-                    return mServiceApi.pairVehicle(event, vehicle.getBoxId());
+                    return mServiceApi.pairVehicle(event);
                 })
                 .doOnNext(events -> {
                     mBlackBoxInteractor.connectVehicle(vehicle);
                     mELDEventsInteractor.storeEvents(events, true);
-                });
+                })
+                .doOnError(error -> cleanSelectedVehicle().blockingAwait());
     }
 
     public Flowable<List<Vehicle>> getLastVehicles() {
