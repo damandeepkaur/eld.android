@@ -93,6 +93,18 @@ public class SelectAssetPresenterTest {
         verify(mView).setLastVehicleList(eq(testVehicleList));
     }
 
+    @Test
+    public void testOnViewCreatedSetEmptyLastList() {
+        // given
+        List<Vehicle> testVehicleList = new ArrayList<>();
+        when(mVehiclesInteractor.getLastVehicles()).thenReturn(Flowable.just(testVehicleList));
+
+        // when
+        mSelectAssetPresenter.onViewCreated();
+
+        // then
+        verify(mView).showEmptyLastListMessage();
+    }
 
     @Test
     public void testOnViewCreatedEmptyLastList() {
@@ -116,7 +128,7 @@ public class SelectAssetPresenterTest {
         mSelectAssetPresenter.onSearchTextChanged(searchText);
 
         // then
-        verify(mView).showErrorMessage();
+        verify(mView).showSearchErrorMessage();
     }
 
     @Test
@@ -168,7 +180,7 @@ public class SelectAssetPresenterTest {
      * Verify call to VehiclesInteractor#cleanSelectedVehicle.
      */
     @Test
-    public void testOnNotInVehicleCleanSelectedVehicle() {
+    public void testOnNotInVehicleButtonClicked() {
         // given
         when(mVehiclesInteractor.cleanSelectedVehicle()).thenReturn(Completable.complete());
 
@@ -177,17 +189,6 @@ public class SelectAssetPresenterTest {
 
         // then
         verify(mVehiclesInteractor).cleanSelectedVehicle();
-    }
-
-    @Test
-    public void testOnNotInVehicleGoToHomeScreen() {
-        // given
-        when(mVehiclesInteractor.cleanSelectedVehicle()).thenReturn(Completable.complete());
-
-        // when
-        mSelectAssetPresenter.onNotInVehicleButtonClicked();
-
-        // then
         verify(mView).goToHomeScreen();
     }
 
