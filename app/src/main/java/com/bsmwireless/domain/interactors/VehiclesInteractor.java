@@ -92,19 +92,22 @@ public class VehiclesInteractor {
         event.setBoxId(vehicle.getBoxId());
 
         return mBlackBoxInteractor.getData()
+                .doOnNext(blackBox -> {
+                    saveVehicle(vehicle);
+                    saveLastVehicle(id, vehicle.getId());
+                })
                 .flatMap(blackBox -> {
                     event.setTimezone(mUserInteractor.getTimezone(id));
                     event.setOdometer(blackBox.getOdometer());
                     event.setLat(blackBox.getLat());
                     event.setLng(blackBox.getLon());
 
-                    return mServiceApi.pairVehicle(event, vehicle.getBoxId());
+                    return mServiceApi.pairVehicle(event);
                 })
                 .doOnNext(events -> {
-                    saveVehicle(vehicle);
-                    saveLastVehicle(id, vehicle.getId());
                     mELDEventsInteractor.storeEvents(events, true);
-                });
+                })
+                .doOnError(error -> cleanSelectedVehicle().blockingAwait());
     }
 
     public Flowable<List<Vehicle>> getLastVehicles() {

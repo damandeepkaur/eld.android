@@ -8,6 +8,7 @@
     <string name="select_asset_no_previous_assets">No previous assets</string>
     <string name="select_asset_find_nothing">Sorry we couldn\'t find anything</string>
     <string name="select_asset_characters">Enter at least 3 characters</string>
+    <string name="select_asset_error">Select asset error</string>
 
     <!-- START OLD STRINGS -->
     <string name="no_network">No Network Available</string>

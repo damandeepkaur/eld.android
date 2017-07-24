@@ -16,7 +16,9 @@ public interface SelectAssetView {
 
     void goToHomeScreen();
 
-    void showErrorMessage();
+    void showErrorMessage(String message);
+
+    void showSearchErrorMessage();
 
     void showEmptyListMessage();
 

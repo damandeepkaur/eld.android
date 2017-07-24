@@ -8,7 +8,6 @@ import android.support.design.widget.NavigationView;
 import android.support.design.widget.NavigationView.OnNavigationItemSelectedListener;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.animation.PathInterpolatorCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
@@ -52,6 +51,8 @@ public class NavigationActivity extends BaseActivity implements OnNavigationItem
     private ActionBarDrawerToggle mDrawerToggle;
     private HeaderViewHolder mHeaderViewHolder;
 
+    private Unbinder mUnbinder;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,7 +61,7 @@ public class NavigationActivity extends BaseActivity implements OnNavigationItem
                 .navigationModule(new NavigationModule(this)).build().inject(this);
 
         setContentView(R.layout.activity_navigation);
-        ButterKnife.bind(this);
+        mUnbinder = ButterKnife.bind(this);
         open(new HomeFragment(), false);
         initNavigation();
 
@@ -208,6 +209,7 @@ public class NavigationActivity extends BaseActivity implements OnNavigationItem
     protected void onDestroy() {
         mPresenter.onDestroy();
         mHeaderViewHolder.unbind();
+        mUnbinder.unbind();
         super.onDestroy();
     }
 
