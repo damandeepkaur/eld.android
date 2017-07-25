@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.preference.PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <android.support.v7.preference.SwitchPreferenceCompat
+        android:defaultValue="false"
+        android:key="pref_box_gps"
+        android:title="@string/settings_box_gps_title"/>
+
+    <android.support.v7.preference.SwitchPreferenceCompat
+        android:defaultValue="false"
+        android:key="pref_fixed_amount"
+        android:title="@string/settings_fixed_mount_title"/>
+
+    <Preference
+        android:key="pref_odometer_units"
+        android:summary="km"
+        android:title="@string/settings_odometer_units"/>
+
+</android.support.v7.preference.PreferenceScreen>
