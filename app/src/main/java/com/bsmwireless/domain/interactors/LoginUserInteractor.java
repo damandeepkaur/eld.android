@@ -14,12 +14,7 @@ import com.bsmwireless.models.User;
 import javax.inject.Inject;
 
 import io.reactivex.Flowable;
-import io.reactivex.FlowableEmitter;
-import io.reactivex.FlowableOnSubscribe;
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.annotations.NonNull;
 
 import static com.bsmwireless.models.ELDEvent.EventType.LOGIN_LOGOUT;
 
@@ -87,11 +82,13 @@ public class LoginUserInteractor {
 
                     return mServiceApi.logout(logoutEvent)
                             .doOnNext(responseMessage -> {
-                                if (mPreferencesManager.isRememberUserEnabled()) return;
-
-                                mPreferencesManager.clearValues();
-                                mAppDatabase.userDao().deleteUser(getDriverId());
-
+                                if (!mPreferencesManager.isRememberUserEnabled()) {
+                                    mAppDatabase.userDao().deleteUser(getDriverId());
+                                    mTokenManager.removeAccount(mPreferencesManager.getAccountName());
+                                    mPreferencesManager.clearValues();
+                                } else {
+                                    mTokenManager.clearToken(mTokenManager.getToken(mPreferencesManager.getAccountName()));
+                                }
                             })
                             .map(responseMessage -> responseMessage.getMessage().equals("ACK"));
                 });

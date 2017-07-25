@@ -98,7 +98,7 @@ public class TokenManager {
     public String getAccountName(String user, String domain) {
         String accountName = user + ":" + domain;
         try {
-            accountName = Base64.encodeToString(accountName.getBytes("UTF-8"), Base64.DEFAULT);
+            accountName = Base64.encodeToString(accountName.getBytes("UTF-8"), Base64.DEFAULT).trim();
         } catch (Exception e) {
             Timber.e(e, "Account name encoding failed");
         }
