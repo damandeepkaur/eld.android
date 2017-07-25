@@ -9,9 +9,11 @@ import android.support.design.widget.NavigationView.OnNavigationItemSelectedList
 import android.support.design.widget.TabLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
-import android.support.v4.widget.DrawerLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
@@ -56,7 +58,7 @@ public class NavigationActivity extends BaseMenuActivity implements OnNavigation
     @Inject
     NavigationPresenter mPresenter;
 
-    private ActionBarDrawerToggle mDrawerToggle;
+    private SmoothActionBarDrawerToggle mDrawerToggle;
     private HeaderViewHolder mHeaderViewHolder;
 
     @Override
@@ -111,7 +113,7 @@ public class NavigationActivity extends BaseMenuActivity implements OnNavigation
                 Toast.makeText(this, "Go to help screen", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.nav_driver_profile:
-                startActivityForResult(new Intent(this, DriverProfileActivity.class), REQUEST_CODE_UPDATE_USER);
+                mDrawerToggle.runWhenIdle(() -> startActivityForResult(new Intent(this, DriverProfileActivity.class), REQUEST_CODE_UPDATE_USER));
                 break;
             case R.id.nav_settings:
                 Toast.makeText(this, "Go to settings screen", Toast.LENGTH_SHORT).show();
@@ -138,7 +140,7 @@ public class NavigationActivity extends BaseMenuActivity implements OnNavigation
             actionBar.setTitle(R.string.menu_home);
         }
 
-        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, mToolbar, 0, 0);
+        mDrawerToggle = new SmoothActionBarDrawerToggle(this, mDrawerLayout, mToolbar, 0, 0);
         mDrawerLayout.addDrawerListener(mDrawerToggle);
 
         mDrawerToggle.syncState();
@@ -244,6 +246,28 @@ public class NavigationActivity extends BaseMenuActivity implements OnNavigation
             default: {
                 break;
             }
+        }
+    }
+
+    private class SmoothActionBarDrawerToggle extends ActionBarDrawerToggle {
+
+        private Runnable mRunnable;
+
+        public SmoothActionBarDrawerToggle(AppCompatActivity activity, DrawerLayout drawerLayout, Toolbar toolbar, int openDrawerContentDescRes, int closeDrawerContentDescRes) {
+            super(activity, drawerLayout, toolbar, openDrawerContentDescRes, closeDrawerContentDescRes);
+        }
+
+        @Override
+        public void onDrawerStateChanged(int newState) {
+            super.onDrawerStateChanged(newState);
+            if (mRunnable != null && newState == DrawerLayout.STATE_IDLE) {
+                mRunnable.run();
+                mRunnable = null;
+            }
+        }
+
+        public void runWhenIdle(Runnable runnable) {
+            this.mRunnable = runnable;
         }
     }
 }

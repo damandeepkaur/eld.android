@@ -86,9 +86,6 @@ public class NavigationPresenter {
         User user = new User();
 
         user.setId(userEntity.getId());
-        user.setUsername(mLoginUserInteractor.getUserName());
-        // TODO: password stub
-        user.setPassword("1234");
         user.setTimezone(userEntity.getTimezone());
         user.setFirstName(userEntity.getFirstName());
         user.setLastName(userEntity.getLastName());

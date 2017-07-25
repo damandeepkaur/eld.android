@@ -32,6 +32,7 @@
     <color name="status_bar_color">#33000000</color>
     <color name="light_gray">#fafafa</color>
     <color name="nasty_green">#7ac144</color>
+    <color name="coral">#d7494e</color>
 
     <color name="hint">#eeeeee</color>
     <color name="hint_text">#606060</color>
@@ -52,6 +53,6 @@
     <!-- Driver profile -->
     <color name="signature_background">#f5f5f5</color>
     <color name="signature_border">#979797</color>
-    <color name="cancel_color">#ef5350</color>
+    <color name="cancel_color">@color/coral</color>
 
 </resources>
