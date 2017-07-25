@@ -34,7 +34,6 @@ import app.bsmuniversal.com.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import butterknife.Unbinder;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import timber.log.Timber;
 
@@ -76,7 +75,7 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
         DaggerSelectAssetComponent.builder().appComponent(App.getComponent()).selectAssetModule(new SelectAssetModule(this)).build().inject(this);
 
         setContentView(R.layout.activity_select_asset);
-        mActivityHolder = ButterKnife.bind(this);
+        mUnbinder = ButterKnife.bind(this);
 
         initView();
     }

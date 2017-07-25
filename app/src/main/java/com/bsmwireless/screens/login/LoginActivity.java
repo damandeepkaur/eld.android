@@ -19,7 +19,6 @@ import app.bsmuniversal.com.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import butterknife.Unbinder;
 
 
 public class LoginActivity extends BaseActivity implements LoginView {
@@ -51,7 +50,7 @@ public class LoginActivity extends BaseActivity implements LoginView {
         DaggerLoginComponent.builder().appComponent(App.getComponent()).loginModule(new LoginModule(this)).build().inject(this);
 
         setContentView(R.layout.activity_login);
-        mActivityHolder = ButterKnife.bind(this);
+        mUnbinder = ButterKnife.bind(this);
         Intent intent = getIntent();
 
         if (loadUserDataEnabled()) {

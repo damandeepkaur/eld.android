@@ -71,7 +71,7 @@ public class DriverProfileActivity extends BaseMenuActivity implements DriverPro
         DaggerDriverProfileComponent.builder().appComponent(App.getComponent()).driverProfileModule(new DriverProfileModule(this)).build().inject(this);
 
         setContentView(R.layout.activity_driver_profile);
-        mActivityHolder = ButterKnife.bind(this);
+        mUnbinder = ButterKnife.bind(this);
 
         initToolbar();
 

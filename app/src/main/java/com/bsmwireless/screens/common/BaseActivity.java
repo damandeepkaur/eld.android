@@ -5,12 +5,12 @@ import android.support.v7.app.AppCompatActivity;
 import butterknife.Unbinder;
 
 public abstract class BaseActivity extends AppCompatActivity {
-    protected Unbinder mActivityHolder;
+    protected Unbinder mUnbinder;
 
     @Override
     protected void onDestroy() {
-        if (mActivityHolder != null) {
-            mActivityHolder.unbind();
+        if (mUnbinder != null) {
+            mUnbinder.unbind();
         }
 
         super.onDestroy();

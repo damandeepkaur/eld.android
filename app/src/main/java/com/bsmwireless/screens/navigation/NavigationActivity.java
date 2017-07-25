@@ -67,7 +67,7 @@ public class NavigationActivity extends BaseMenuActivity implements OnNavigation
                 .navigationModule(new NavigationModule(this)).build().inject(this);
 
         setContentView(R.layout.activity_navigation);
-        mActivityHolder = ButterKnife.bind(this);
+        mUnbinder = ButterKnife.bind(this);
 
         //TODO: waiting for UI
         //open(new HomeFragment(), false);
