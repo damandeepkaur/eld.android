@@ -10,22 +10,17 @@ import com.bsmwireless.screens.common.BaseActivity;
 
 import app.bsmuniversal.com.R;
 import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.Unbinder;
 
 public class SettingsActivity extends BaseActivity {
 
     @BindView(R.id.settings_toolbar)
     Toolbar mToolbar;
 
-    private Unbinder mUnbinder;
-
     @Override
     protected void onCreate(Bundle onSavedInstanceState) {
         super.onCreate(onSavedInstanceState);
 
         setContentView(R.layout.activity_settings);
-        mUnbinder = ButterKnife.bind(this);
 
         initView();
     }
@@ -66,11 +61,5 @@ public class SettingsActivity extends BaseActivity {
             }
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void onDestroy() {
-        mUnbinder.unbind();
-        super.onDestroy();
     }
 }

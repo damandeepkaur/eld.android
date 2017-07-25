@@ -26,7 +26,6 @@ public class SettingsFragment extends PreferenceFragmentCompat
         super.onCreate(savedInstanceState);
 
         DaggerSettingsComponent.builder().appComponent(App.getComponent()).settingsModule(new SettingsModule(this)).build().inject(this);
-
         mPresenter.registerOnSharedPreferenceChangeListener(this);
     }
 
