@@ -66,8 +66,6 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
     @Inject
     SelectAssetPresenter mPresenter;
 
-    private Unbinder mUnbinder;
-
     private SelectAssetAdapter mSearchAdapter;
     private SelectAssetAdapter mLastAdapter;
 
@@ -78,7 +76,7 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
         DaggerSelectAssetComponent.builder().appComponent(App.getComponent()).selectAssetModule(new SelectAssetModule(this)).build().inject(this);
 
         setContentView(R.layout.activity_select_asset);
-        mUnbinder = ButterKnife.bind(this);
+        mActivityHolder = ButterKnife.bind(this);
 
         initView();
     }
@@ -178,7 +176,6 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
 
     @Override
     protected void onDestroy() {
-        mUnbinder.unbind();
         mPresenter.onDestroy();
         super.onDestroy();
     }

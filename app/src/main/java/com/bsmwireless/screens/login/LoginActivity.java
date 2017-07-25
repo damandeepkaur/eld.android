@@ -44,8 +44,6 @@ public class LoginActivity extends BaseActivity implements LoginView {
     @Inject
     LoginPresenter mPresenter;
 
-    private Unbinder mUnbinder;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,7 +51,7 @@ public class LoginActivity extends BaseActivity implements LoginView {
         DaggerLoginComponent.builder().appComponent(App.getComponent()).loginModule(new LoginModule(this)).build().inject(this);
 
         setContentView(R.layout.activity_login);
-        mUnbinder = ButterKnife.bind(this);
+        mActivityHolder = ButterKnife.bind(this);
         Intent intent = getIntent();
 
         if (loadUserDataEnabled()) {
@@ -70,7 +68,6 @@ public class LoginActivity extends BaseActivity implements LoginView {
     @Override
     protected void onDestroy() {
         mPresenter.onDestroy();
-        mUnbinder.unbind();
         super.onDestroy();
     }
 

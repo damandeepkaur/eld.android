@@ -24,6 +24,8 @@
     <color name="primary_text">#de000000</color>
     <color name="secondary_text">#8b000000</color>
 
+    <color name="accent_transparent">#967ac144</color>
+
     <color name="brownish_grey">#6b6b6b</color>
     <color name="greyish_brown">#484848</color>
     <color name="black">#2f2f2f</color>
