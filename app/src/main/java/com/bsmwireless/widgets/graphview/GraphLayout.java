@@ -68,7 +68,7 @@ public class GraphLayout extends LinearLayout {
     }
 
     private void init(Context context) {
-        mRootView = inflate(context, R.layout.hos_view, this);
+        mRootView = inflate(context, R.layout.eld_graph, this);
     }
 
     @Override
