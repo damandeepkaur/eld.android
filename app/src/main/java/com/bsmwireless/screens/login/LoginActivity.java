@@ -19,7 +19,6 @@ import app.bsmuniversal.com.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import butterknife.Unbinder;
 
 
 public class LoginActivity extends BaseActivity implements LoginView {
@@ -43,8 +42,6 @@ public class LoginActivity extends BaseActivity implements LoginView {
 
     @Inject
     LoginPresenter mPresenter;
-
-    private Unbinder mUnbinder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,7 +67,6 @@ public class LoginActivity extends BaseActivity implements LoginView {
     @Override
     protected void onDestroy() {
         mPresenter.onDestroy();
-        mUnbinder.unbind();
         super.onDestroy();
     }
 

@@ -19,7 +19,7 @@ public interface UserDao {
     Flowable<UserEntity> getUser(int id);
 
     @Query("SELECT last_vehicle_ids FROM users WHERE id = :id LIMIT 1")
-    Flowable<String> getUserLastVehicles(int id);
+    Flowable<String[]> getUserLastVehicles(int id);
 
     @Query("SELECT last_vehicle_ids FROM users WHERE id = :id LIMIT 1")
     String getUserLastVehiclesSync(int id);
