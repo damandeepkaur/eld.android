@@ -11,9 +11,9 @@
         android:layout_height="match_parent">
 
         <android.support.design.widget.AppBarLayout
-            android:id="@+id/appBarLayout"
+            android:id="@+id/navigation_app_bar_layout"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/action_bar_height"
+            android:layout_height="wrap_content"
             android:background="@drawable/toolbar_gradient"
             android:gravity="bottom"
             android:theme="@style/ActionBarTheme">
@@ -21,17 +21,23 @@
             <android.support.v7.widget.Toolbar
                 android:id="@+id/navigation_toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
+                android:layout_height="wrap_content"
+                android:paddingTop="@dimen/default_toolbar_padding"
                 app:titleTextAppearance="@style/ActionBarTitleTextStyle"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-                app:layout_scrollFlags="scroll|enterAlways|snap"/>
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
+
+            <android.support.design.widget.TabLayout
+                android:id="@+id/navigation_tab_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
 
         </android.support.design.widget.AppBarLayout>
 
-        <FrameLayout
-            android:id="@+id/navigation_content"
+        <android.support.v4.view.ViewPager
+            android:id="@+id/navigation_view_pager"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
     </android.support.design.widget.CoordinatorLayout>
 

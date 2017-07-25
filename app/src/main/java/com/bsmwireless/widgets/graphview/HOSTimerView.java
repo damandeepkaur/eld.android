@@ -7,6 +7,7 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.RelativeLayout;
 
+import com.bsmwireless.widgets.alerts.DutyType;
 import com.bsmwireless.widgets.common.FontTextView;
 
 import app.bsmuniversal.com.R;
@@ -55,9 +56,9 @@ public class HOSTimerView extends RelativeLayout {
             mType = typedArray.getInteger(R.styleable.HOSTimerView_duty, 0);
             mShowHeader = typedArray.getBoolean(R.styleable.HOSTimerView_showHeader, true);
 
-            mRootView.setBackgroundColor(ContextCompat.getColor(getContext(), DutyType.getTypeColorById(mType)));
+            mRootView.setBackgroundColor(ContextCompat.getColor(getContext(), DutyType.getColorById(mType)));
 
-            mTypeTV.setText(getResources().getString(DutyType.getTypeNameResById(mType)));
+            mTypeTV.setText(getResources().getString(DutyType.getNameById(mType)));
             mTypeTV.setVisibility(mShowHeader ? VISIBLE : GONE);
         } finally {
             typedArray.recycle();
