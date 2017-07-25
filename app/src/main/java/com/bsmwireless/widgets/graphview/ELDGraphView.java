@@ -11,6 +11,7 @@ import com.bsmwireless.common.App;
 import com.bsmwireless.common.utils.ViewUtils;
 import com.bsmwireless.data.storage.FontCache;
 import com.bsmwireless.models.ELDEvent;
+import com.bsmwireless.widgets.alerts.DutyType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -169,7 +170,7 @@ public class ELDGraphView extends View {
 
         float gridUnit = mGraphWidth / (mHoursCount * 60);
 
-        int firstTypeId = DutyType.values()[0].getTypeId();
+        int firstTypeId = DutyType.values()[0].getId();
 
         float x1, x2, y1, y2;
         x1 = mGraphLeft;
@@ -187,7 +188,7 @@ public class ELDGraphView extends View {
             x2 = x1 + timeStamp * gridUnit;
             y2 = mGraphTop + (event.getEventType() - firstTypeId) * mSegmentHeight + mSegmentHeight / 2;
 
-            mBarPaint.setColor(ContextCompat.getColor(getContext(), DutyType.getTypeColorById(event.getEventType())));
+            mBarPaint.setColor(ContextCompat.getColor(getContext(), DutyType.getColorById(event.getEventType())));
             mBarPaint.setStrokeWidth(ViewUtils.convertDpToPixels(LINE_WIDTH_DP, getContext()));
 
             canvas.drawLine(x1, y1, x2, y1, mBarPaint);
