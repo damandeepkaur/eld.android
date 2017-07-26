@@ -10,11 +10,11 @@ public interface LoginView {
 
     void showErrorMessage(String msg);
 
-    void goToMainScreen();
+    void goToSelectAssetScreen();
+
+    void goToNavigationScreen();
 
     void loadUserData(String name, String domain);
 
     void setLoginButtonEnabled(boolean enabled);
-
-    boolean loadUserDataEnabled();
 }
