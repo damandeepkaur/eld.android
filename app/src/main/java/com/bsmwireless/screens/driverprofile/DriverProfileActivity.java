@@ -1,12 +1,12 @@
 package com.bsmwireless.screens.driverprofile;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
+import android.view.View;
 import android.widget.EditText;
-import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.Toast;
 
 import com.bsmwireless.common.App;
@@ -15,16 +15,16 @@ import com.bsmwireless.screens.common.BaseMenuActivity;
 import com.bsmwireless.screens.driverprofile.dagger.DaggerDriverProfileComponent;
 import com.bsmwireless.screens.driverprofile.dagger.DriverProfileModule;
 import com.bsmwireless.widgets.signview.SignatureLayout;
+import com.bsmwireless.widgets.snackbar.SnackBarLayout;
 
 import javax.inject.Inject;
 
 import app.bsmuniversal.com.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 
-import static android.view.View.GONE;
-import static android.view.View.VISIBLE;
+import static android.support.design.widget.BottomSheetBehavior.STATE_EXPANDED;
+import static android.support.design.widget.BottomSheetBehavior.STATE_HIDDEN;
 
 public class DriverProfileActivity extends BaseMenuActivity implements DriverProfileView, SignatureLayout.OnSaveSignatureListener {
 
@@ -49,8 +49,9 @@ public class DriverProfileActivity extends BaseMenuActivity implements DriverPro
     @BindView(R.id.time_zone)
     EditText mTimeZoneTextView;
 
-    @BindView(R.id.password)
-    EditText mPasswordTextView;
+     // TODO: Password change not implemented on server side.
+     /*@BindView(R.id.password)
+     EditText mPasswordTextView;*/
 
     @BindView(R.id.cycle)
     EditText mCycleTextView;
@@ -58,8 +59,11 @@ public class DriverProfileActivity extends BaseMenuActivity implements DriverPro
     @BindView(R.id.signature_view)
     SignatureLayout mSignatureLayout;
 
-    @BindView(R.id.control_buttons)
-    LinearLayout mControlButtons;
+    @BindView(R.id.scroll_view)
+    ScrollView mScrollView;
+
+    @BindView(R.id.snackbar)
+    SnackBarLayout mSnackBarLayout;
 
     @Inject
     DriverProfilePresenter mPresenter;
@@ -74,12 +78,13 @@ public class DriverProfileActivity extends BaseMenuActivity implements DriverPro
         mUnbinder = ButterKnife.bind(this);
 
         initToolbar();
+        initSnackbar();
 
         mPresenter.onNeedUpdateUserInfo();
 
-        mControlButtons.setOnFocusChangeListener((v, hasFocus) -> {
+        mSnackBarLayout.setOnFocusChangeListener((v, hasFocus) -> {
             if (!hasFocus) {
-                hideControlButtons();
+                mSnackBarLayout.hideSnackbar();
             }
         });
 
@@ -95,7 +100,6 @@ public class DriverProfileActivity extends BaseMenuActivity implements DriverPro
     @Override
     protected void onDestroy() {
         mPresenter.onDestroy();
-        mControlButtons.clearAnimation();
         super.onDestroy();
     }
 
@@ -108,6 +112,7 @@ public class DriverProfileActivity extends BaseMenuActivity implements DriverPro
         mAddressTextView.setText(user.getAddress());
         mTimeZoneTextView.setText(user.getTimezone());
         mCycleTextView.setText(String.valueOf(user.getCycleCountry()));
+
         mSignatureLayout.setImageData(user.getSignature());
     }
 
@@ -123,61 +128,12 @@ public class DriverProfileActivity extends BaseMenuActivity implements DriverPro
 
     @Override
     public void hideControlButtons() {
-        if (mControlButtons.getVisibility() == VISIBLE) {
-            Animation animation = AnimationUtils.loadAnimation(this, android.R.anim.slide_out_right);
-            animation.setAnimationListener(new Animation.AnimationListener() {
-                @Override
-                public void onAnimationStart(Animation animation) {
-                }
-
-                @Override
-                public void onAnimationEnd(Animation animation) {
-                    mControlButtons.setVisibility(GONE);
-                }
-
-                @Override
-                public void onAnimationRepeat(Animation animation) {
-                }
-            });
-
-            mControlButtons.startAnimation(animation);
-            mSignatureLayout.setEditable(false);
-        }
+        mSnackBarLayout.hideSnackbar();
     }
 
     @Override
     public void showControlButtons() {
-        if (mControlButtons.getVisibility() != VISIBLE) {
-            Animation animation = AnimationUtils.loadAnimation(this, android.R.anim.slide_in_left);
-            animation.setAnimationListener(new Animation.AnimationListener() {
-                @Override
-                public void onAnimationStart(Animation animation) {
-                    mControlButtons.setVisibility(VISIBLE);
-                    mControlButtons.requestFocus();
-                }
-
-                @Override
-                public void onAnimationEnd(Animation animation) {
-                }
-
-                @Override
-                public void onAnimationRepeat(Animation animation) {
-                }
-            });
-
-            mControlButtons.startAnimation(animation);
-            mSignatureLayout.setEditable(true);
-        }
-    }
-
-    @OnClick(R.id.clear_button)
-    void onClearSignatureClicked() {
-        mSignatureLayout.clear();
-    }
-
-    @OnClick(R.id.ok_button)
-    void onSaveSignatureClicked() {
-        mPresenter.onSaveSignatureClicked(mSignatureLayout.getImageData());
+        mSnackBarLayout.showSnackbar();
     }
 
     private void initToolbar() {
@@ -187,5 +143,33 @@ public class DriverProfileActivity extends BaseMenuActivity implements DriverPro
             actionBar.setDisplayShowTitleEnabled(true);
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+    }
+
+    private void initSnackbar() {
+        mSnackBarLayout.needNegative(true)
+                       .needPositive(true)
+                       .setPositiveLabel(getString(R.string.ok))
+                       .setNegativeLabel(getString(R.string.clear))
+                       .setPositiveOnClickListener(v -> mPresenter.onSaveSignatureClicked(mSignatureLayout.getImageData()))
+                       .setNegativeOnClickListener(v -> mSignatureLayout.clear())
+                       .setOnStateChangedListener(new SnackBarLayout.SnackbarStateListener() {
+                            @Override
+                            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                                switch (newState) {
+                                    case STATE_HIDDEN: {
+                                        mSignatureLayout.setEditable(false);
+                                        mPresenter.onNeedUpdateUserInfo();
+                                        break;
+                                    }
+                                    case STATE_EXPANDED: {
+                                        mSignatureLayout.setEditable(true);
+                                        break;
+                                    }
+                                    default: {
+                                        break;
+                                    }
+                                }
+                            }
+                       });
     }
 }
