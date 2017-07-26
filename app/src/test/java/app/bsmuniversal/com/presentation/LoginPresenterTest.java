@@ -106,6 +106,6 @@ public class LoginPresenterTest {
         mLoginPresenter.onLoginButtonClicked(false);
 
         //then
-        verify(mView).goToMainScreen();
+        verify(mView).goToSelectAssetScreen();
     }
 }
