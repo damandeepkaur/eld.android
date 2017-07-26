@@ -49,6 +49,7 @@ public class LoginUserInteractor {
 
                     mPreferencesManager.setAccountName(accountName);
                     mPreferencesManager.setRememberUserEnabled(keepToken);
+                    mPreferencesManager.setShowHomeScreenEnabled(true);
 
                     mTokenManager.setToken(accountName, name, domain, user.getAuth());
 
@@ -125,7 +126,7 @@ public class LoginUserInteractor {
     }
 
     public boolean isLoginActive() {
-        return mTokenManager.getToken(mPreferencesManager.getAccountName()) != null;
+        return mPreferencesManager.isShowHomeScreenEnabled() && mTokenManager.getToken(mPreferencesManager.getAccountName()) != null;
     }
 
     public Integer getDriverId() {
