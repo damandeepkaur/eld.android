@@ -9,6 +9,7 @@ import android.widget.RelativeLayout;
 
 import com.bsmwireless.common.App;
 import com.bsmwireless.data.storage.FontCache;
+import com.bsmwireless.widgets.alerts.DutyType;
 import com.bsmwireless.widgets.common.VerticalTextView;
 
 import javax.inject.Inject;
@@ -60,9 +61,9 @@ public class HOSGraphLabelView extends RelativeLayout {
             mType = typedArray.getInteger(R.styleable.HOSGraphLabelView_duty, 0);
             mShowLabel = typedArray.getBoolean(R.styleable.HOSGraphLabelView_showLabel, true);
 
-            mRootView.setBackgroundColor(ContextCompat.getColor(getContext(), DutyType.getTypeColorById(mType)));
+            mRootView.setBackgroundColor(ContextCompat.getColor(getContext(), DutyType.getColorById(mType)));
 
-            mLabelTV.setText(getResources().getString(DutyType.getTypeNameResById(mType)));
+            mLabelTV.setText(getResources().getString(DutyType.getNameById(mType)));
             mLabelTV.setVisibility(mShowLabel ? VISIBLE : GONE);
         } finally {
             typedArray.recycle();

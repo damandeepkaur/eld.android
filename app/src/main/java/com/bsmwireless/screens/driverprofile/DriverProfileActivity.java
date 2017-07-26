@@ -3,8 +3,6 @@ package com.bsmwireless.screens.driverprofile;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.EditText;
@@ -13,11 +11,10 @@ import android.widget.Toast;
 
 import com.bsmwireless.common.App;
 import com.bsmwireless.data.storage.users.UserEntity;
-import com.bsmwireless.screens.common.BaseActivity;
+import com.bsmwireless.screens.common.BaseMenuActivity;
 import com.bsmwireless.screens.driverprofile.dagger.DaggerDriverProfileComponent;
 import com.bsmwireless.screens.driverprofile.dagger.DriverProfileModule;
 import com.bsmwireless.widgets.signview.SignatureLayout;
-
 
 import javax.inject.Inject;
 
@@ -25,12 +22,11 @@ import app.bsmuniversal.com.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import butterknife.Unbinder;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
-public class DriverProfileActivity extends BaseActivity implements DriverProfileView, SignatureLayout.OnSaveSignatureListener {
+public class DriverProfileActivity extends BaseMenuActivity implements DriverProfileView, SignatureLayout.OnSaveSignatureListener {
 
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
@@ -68,8 +64,6 @@ public class DriverProfileActivity extends BaseActivity implements DriverProfile
     @Inject
     DriverProfilePresenter mPresenter;
 
-    private Unbinder mUnbinder;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -93,29 +87,6 @@ public class DriverProfileActivity extends BaseActivity implements DriverProfile
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_driver_profile, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_eld:
-                break;
-            case R.id.action_sign:
-                break;
-            case R.id.action_occupants:
-                break;
-            case android.R.id.home: {
-                onBackPressed();
-                break;
-            }
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
     protected void onStop() {
         super.onStop();
         mPresenter.onSaveUserInfo(mAddressTextView.getText().toString());
@@ -125,7 +96,6 @@ public class DriverProfileActivity extends BaseActivity implements DriverProfile
     protected void onDestroy() {
         mPresenter.onDestroy();
         mControlButtons.clearAnimation();
-        mUnbinder.unbind();
         super.onDestroy();
     }
 
