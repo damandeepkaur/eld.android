@@ -85,6 +85,7 @@ public class SelectAssetPresenterTest {
         // given
         List<Vehicle> testVehicleList = buildVehicleList();
         when(mVehiclesInteractor.getLastVehicles()).thenReturn(Flowable.just(testVehicleList));
+        when(mVehiclesInteractor.cleanSelectedVehicle()).thenReturn(Completable.complete());
 
         // when
         mSelectAssetPresenter.onViewCreated();
@@ -98,6 +99,7 @@ public class SelectAssetPresenterTest {
         // given
         List<Vehicle> testVehicleList = new ArrayList<>();
         when(mVehiclesInteractor.getLastVehicles()).thenReturn(Flowable.just(testVehicleList));
+        when(mVehiclesInteractor.cleanSelectedVehicle()).thenReturn(Completable.complete());
 
         // when
         mSelectAssetPresenter.onViewCreated();
@@ -111,6 +113,7 @@ public class SelectAssetPresenterTest {
         // given
         List<Vehicle> emptyVehicleList = new ArrayList<>();
         when(mVehiclesInteractor.getLastVehicles()).thenReturn(Flowable.just(emptyVehicleList));
+        when(mVehiclesInteractor.cleanSelectedVehicle()).thenReturn(Completable.complete());
 
         // when
         mSelectAssetPresenter.onViewCreated();

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <View android:id="@+id/shadow"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/driver_profile_shadow_size"
+        android:background="@drawable/drop_shadow" />
+
+    <LinearLayout android:layout_width="match_parent"
+                  android:layout_height="?attr/actionBarSize"
+                  android:orientation="horizontal"
+                  android:background="@android:color/white"
+                  android:gravity="end">
+        <Button android:id="@+id/negative_action"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="@android:color/transparent"
+                android:theme="@style/Widget.AppCompat.Button.Borderless"
+                android:textColor="@color/cancel_color"
+                android:textSize="@dimen/driver_profile_item_value_text_size"
+                android:textStyle="normal"
+                android:letterSpacing="@dimen/driver_profile_button_letter_spacing"
+                android:text="@string/clear"
+                android:visibility="gone"/>
+        <Button android:id="@+id/positive_action"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="@android:color/transparent"
+                android:textSize="@dimen/driver_profile_item_value_text_size"
+                android:textStyle="normal"
+                android:textColor="@color/nasty_green"
+                android:letterSpacing="@dimen/driver_profile_button_letter_spacing"
+                android:text="@string/ok"
+                android:visibility="gone"/>
+    </LinearLayout>
+
+</merge>

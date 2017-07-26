@@ -27,6 +27,14 @@ public class LoginPresenter {
         Timber.d("CREATED");
     }
 
+    public void onViewCreated() {
+        if (mLoginUserInteractor.isLoginActive()) {
+            mView.goToNavigationScreen();
+        } else if (mLoginUserInteractor.isRememberMeEnabled()) {
+            mView.loadUserData(mLoginUserInteractor.getUserName(), mLoginUserInteractor.getDomainName());
+        }
+    }
+
     public void onLoginButtonClicked(boolean keepToken) {
         Timber.d("onLoginButtonClicked()");
 
@@ -54,7 +62,7 @@ public class LoginPresenter {
                             Timber.i("LoginUser status = %b", status);
 
                             if (status) {
-                                mView.goToMainScreen();
+                                mView.goToSelectAssetScreen();
                             } else {
                                 mView.showErrorMessage("Login failed");
                                 mView.setLoginButtonEnabled(true);
@@ -73,13 +81,5 @@ public class LoginPresenter {
         mDisposables.dispose();
 
         Timber.d("DESTROYED");
-    }
-
-    public void onLoadUserData() {
-        mView.loadUserData(mLoginUserInteractor.getUserName(), mLoginUserInteractor.getDomainName());
-    }
-
-    public boolean loadUserDataEnabled() {
-        return mLoginUserInteractor.isRememberMeEnabled();
     }
 }

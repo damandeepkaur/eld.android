@@ -9,6 +9,7 @@ import android.widget.EditText;
 
 import com.bsmwireless.common.App;
 import com.bsmwireless.screens.common.BaseActivity;
+import com.bsmwireless.screens.navigation.NavigationActivity;
 import com.bsmwireless.screens.selectasset.SelectAssetActivity;
 import com.bsmwireless.screens.login.dagger.DaggerLoginComponent;
 import com.bsmwireless.screens.login.dagger.LoginModule;
@@ -51,17 +52,8 @@ public class LoginActivity extends BaseActivity implements LoginView {
 
         setContentView(R.layout.activity_login);
         mUnbinder = ButterKnife.bind(this);
-        Intent intent = getIntent();
 
-        if (loadUserDataEnabled()) {
-            mSwitchButton.setChecked(true);
-
-            if (intent != null && intent.hasExtra(ARG_ACCOUNT_NAME) && intent.hasExtra(ARG_DOMAIN_NAME)) {
-                loadUserData(intent.getStringExtra(ARG_ACCOUNT_NAME), intent.getStringExtra(ARG_DOMAIN_NAME));
-            } else {
-                mPresenter.onLoadUserData();
-            }
-        }
+        mPresenter.onViewCreated();
     }
 
     @Override
@@ -102,13 +94,21 @@ public class LoginActivity extends BaseActivity implements LoginView {
     }
 
     @Override
-    public void goToMainScreen() {
+    public void goToSelectAssetScreen() {
         startActivity(new Intent(this, SelectAssetActivity.class));
         finish();
     }
 
     @Override
+    public void goToNavigationScreen() {
+        startActivity(new Intent(this, NavigationActivity.class));
+        finish();
+    }
+
+    @Override
     public void loadUserData(String name, String domain) {
+        mSwitchButton.setChecked(true);
+
         mUserName.setText(name);
         mDomain.setText(domain);
     }
@@ -116,10 +116,5 @@ public class LoginActivity extends BaseActivity implements LoginView {
     @Override
     public void setLoginButtonEnabled(boolean enabled) {
         mLoginButton.setEnabled(enabled);
-    }
-
-    @Override
-    public boolean loadUserDataEnabled() {
-        return mPresenter.loadUserDataEnabled();
     }
 }
