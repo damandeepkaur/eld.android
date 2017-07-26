@@ -1,10 +1,8 @@
-package app.bsmuniversal.com.presentation;
+package com.bsmwireless.screens.login;
 
 
 import com.bsmwireless.domain.interactors.LoginUserInteractor;
 import com.bsmwireless.models.User;
-import com.bsmwireless.screens.login.LoginPresenter;
-import com.bsmwireless.screens.login.LoginView;
 
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -40,7 +38,7 @@ public class LoginPresenterTest {
     @Mock
     LoginUserInteractor mLoginUserInteractor;
 
-    LoginPresenter mLoginPresenter;
+    private LoginPresenter mLoginPresenter;
 
     @Before
     public void before() throws Exception {
