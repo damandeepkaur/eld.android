@@ -2,12 +2,14 @@ package com.bsmwireless.screens.settings;
 
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
+import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.bsmwireless.common.App;
 import com.bsmwireless.screens.common.BaseActivity;
+import com.bsmwireless.screens.common.BaseMenuActivity;
 import com.bsmwireless.screens.settings.dagger.DaggerSettingsComponent;
 import com.bsmwireless.screens.settings.dagger.SettingsModule;
 
@@ -18,15 +20,21 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
-public class SettingsActivity extends BaseActivity implements SettingsView {
+public class SettingsActivity extends BaseMenuActivity implements SettingsView {
 
     @BindView(R.id.settings_toolbar)
     Toolbar mToolbar;
 
+    @BindView(R.id.boxGPSSwitch)
+    SwitchCompat boxGPSSwitch;
+
+    @BindView(R.id.fixedAmountSwitch)
+    SwitchCompat fixedAmountSwitch;
+
     @Inject
     SettingsPresenter mPresenter;
 
-    private Unbinder mUnbinder;
+    protected Unbinder mUnbinder;
 
     @Override
     protected void onCreate(Bundle onSavedInstanceState) {
@@ -49,34 +57,26 @@ public class SettingsActivity extends BaseActivity implements SettingsView {
             actionBar.setHomeAsUpIndicator(R.drawable.ic_arrow_back_green_24dp);
             actionBar.setTitle(R.string.settings_title);
         }
-    }
 
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_driver_profile, menu);
-        return true;
+        mPresenter.setBoxGPSSwitch();
+        mPresenter.setFixedAmountSwitch();
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_eld:
-                break;
-            case R.id.action_sign:
-                break;
-            case R.id.action_occupants:
-                break;
-            case android.R.id.home: {
-                onBackPressed();
-                break;
-            }
-        }
-        return super.onOptionsItemSelected(item);
+    public void setBoxGPSSwitchEnabled(boolean isEnabled) {
+        boxGPSSwitch.setChecked(isEnabled);
+    }
+
+    @Override
+    public void setFixedAmountSwitchEnabled(boolean isEnabled) {
+        fixedAmountSwitch.setChecked(isEnabled);
     }
 
     @Override
     protected void onDestroy() {
+        mPresenter.onBoxGPSSwitchChecked(boxGPSSwitch.isChecked());
+        mPresenter.onFixedAmountSwitchChecked(fixedAmountSwitch.isChecked());
+
         mUnbinder.unbind();
         mPresenter.onDestroy();
         super.onDestroy();
