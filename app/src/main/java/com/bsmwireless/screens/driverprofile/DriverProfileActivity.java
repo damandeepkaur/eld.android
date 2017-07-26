@@ -1,6 +1,5 @@
 package com.bsmwireless.screens.driverprofile;
 
-import android.graphics.Point;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
@@ -17,8 +16,6 @@ import com.bsmwireless.screens.driverprofile.dagger.DaggerDriverProfileComponent
 import com.bsmwireless.screens.driverprofile.dagger.DriverProfileModule;
 import com.bsmwireless.widgets.signview.SignatureLayout;
 import com.bsmwireless.widgets.snackbar.SnackBarLayout;
-
-import java.util.List;
 
 import javax.inject.Inject;
 
@@ -52,8 +49,9 @@ public class DriverProfileActivity extends BaseMenuActivity implements DriverPro
     @BindView(R.id.time_zone)
     EditText mTimeZoneTextView;
 
-    @BindView(R.id.password)
-    EditText mPasswordTextView;
+     // TODO: Password change not implemented on server side.
+     /*@BindView(R.id.password)
+     EditText mPasswordTextView;*/
 
     @BindView(R.id.cycle)
     EditText mCycleTextView;

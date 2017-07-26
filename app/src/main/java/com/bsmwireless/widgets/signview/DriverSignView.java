@@ -183,9 +183,11 @@ public class DriverSignView extends View implements View.OnTouchListener {
     }
 
     public void setSignature(String signature) {
-        mData = DriverSignView.stringToPoints(signature);
-        mIsDataWasSetted = true;
-        invalidate();
+        if (signature != null) {
+            mData = DriverSignView.stringToPoints(signature);
+            mIsDataWasSetted = true;
+            invalidate();
+        }
     }
 
     public void setEditable(boolean editable) {
@@ -258,7 +260,7 @@ public class DriverSignView extends View implements View.OnTouchListener {
                 }
                 mBitmap = bmp;
                 invalidate();
-            });
+            }, Throwable::printStackTrace);
         mDisposables.add(disposable);
     }
 
@@ -269,20 +271,10 @@ public class DriverSignView extends View implements View.OnTouchListener {
         if (signPoints.length > 1) {
             data = new ArrayList<>();
             String[] curPoint;
-            for (int i = 1; i < signPoints.length; i = i + 2) {
-                if (signPoints[i - 1].length() > 0) {
-                    curPoint = signPoints[i - 1].split(",");
-                    data.add(new Point(Integer.parseInt(curPoint[0]), Integer
-                            .parseInt(curPoint[1])));
-                }
+            for (int i = 0; i < signPoints.length; i++) {
                 if (signPoints[i].length() > 0) {
                     curPoint = signPoints[i].split(",");
-                    if (curPoint.length > 1) {
-                        data.add(new Point(Integer.parseInt(curPoint[0]), Integer
-                                .parseInt(curPoint[1])));
-                    } else {
-                        data.add(new Point(Integer.parseInt(curPoint[0]), 0));
-                    }
+                    data.add(new Point(Integer.parseInt(curPoint[0]), Integer.parseInt(curPoint[1])));
                 }
             }
         }
@@ -299,20 +291,12 @@ public class DriverSignView extends View implements View.OnTouchListener {
         }
 
         StringBuilder rtnSign = new StringBuilder();
-        for (int i = 1; i < data.size(); i++) {
-            if (data.get(i - 1).x < 0) {
-                continue;
-            }
-
-            if (i > 1) {
+        for (int i = 0; i < data.size(); i++) {
+            if (i > 0) {
                 rtnSign.append(";");
             }
 
-            rtnSign.append(data.get(i - 1).x - xShift)
-                   .append(",")
-                   .append(data.get(i - 1).y)
-                   .append(";")
-                   .append(data.get(i).x - xShift)
+            rtnSign.append(data.get(i).x - xShift)
                    .append(",")
                    .append(data.get(i).y);
         }
