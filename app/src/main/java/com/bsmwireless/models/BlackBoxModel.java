@@ -8,6 +8,7 @@ public class BlackBoxModel {
     private int mOdometer;
     private double mLat;
     private double mLon;
+    private int mEngineHours;
 
     public int getOdometer() {
         return mOdometer;
@@ -33,6 +34,14 @@ public class BlackBoxModel {
         mLon = lon;
     }
 
+    public int getEngineHours() {
+        return mEngineHours;
+    }
+
+    public void setEngineHours(int engineHours) {
+        mEngineHours = engineHours;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -45,6 +54,7 @@ public class BlackBoxModel {
                 .append(mOdometer, that.mOdometer)
                 .append(mLat, that.mLat)
                 .append(mLon, that.mLon)
+                .append(mEngineHours, that.mEngineHours)
                 .isEquals();
     }
 
@@ -54,6 +64,7 @@ public class BlackBoxModel {
                 .append(mOdometer)
                 .append(mLat)
                 .append(mLon)
+                .append(mEngineHours)
                 .toHashCode();
     }
 
@@ -63,6 +74,7 @@ public class BlackBoxModel {
         sb.append("mOdometer=").append(mOdometer);
         sb.append(", mLat=").append(mLat);
         sb.append(", mLon=").append(mLon);
+        sb.append(", mEngineHours=").append(mEngineHours);
         sb.append('}');
         return sb.toString();
     }

@@ -70,12 +70,12 @@ public class LoginUserInteractor {
         logoutEvent.setEventTime(System.currentTimeMillis());
         logoutEvent.setMobileTime(System.currentTimeMillis());
         logoutEvent.setDriverId(getDriverId());
-        //TODO: get real data for hos
-        logoutEvent.setEngineHours(50);
+        logoutEvent.setBoxId(mPreferencesManager.getBoxId());
 
         return mBlackBoxInteractor.getData()
                 .flatMap(blackBox -> {
                     logoutEvent.setTimezone(getTimezone(driverId));
+                    logoutEvent.setEngineHours(blackBox.getEngineHours());
                     logoutEvent.setOdometer(blackBox.getOdometer());
                     logoutEvent.setLat(blackBox.getLat());
                     logoutEvent.setLng(blackBox.getLon());
