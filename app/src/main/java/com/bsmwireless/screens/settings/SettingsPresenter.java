@@ -27,17 +27,11 @@ public class SettingsPresenter {
     }
 
     public void onBoxGPSSwitchChecked(boolean isBoxGPSEnabled) {
-        mDisposables.add(mSettingsInteractor.saveBoxGPSEnabled(isBoxGPSEnabled)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe());
+        mSettingsInteractor.saveBoxGPSEnabled(isBoxGPSEnabled);
     }
 
     public void onFixedAmountSwitchChecked(boolean isFixedAmountEnabled) {
-        mDisposables.add(mSettingsInteractor.saveFixedAmountEnabled(isFixedAmountEnabled)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe());
+        mSettingsInteractor.saveFixedAmountEnabled(isFixedAmountEnabled);
     }
 
     public void setBoxGPSSwitch() {

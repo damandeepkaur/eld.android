@@ -40,7 +40,7 @@
         android:textStyle="normal"/>
 
     <android.support.v7.widget.SwitchCompat
-        android:id="@+id/boxGPSSwitch"
+        android:id="@+id/box_gps_switch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
@@ -73,7 +73,7 @@
         android:textStyle="normal"/>
 
     <android.support.v7.widget.SwitchCompat
-        android:id="@+id/fixedAmountSwitch"
+        android:id="@+id/fixed_amount_switch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"

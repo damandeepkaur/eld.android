@@ -18,14 +18,12 @@ public class SettingsInteractor {
         mPreferencesManager = preferencesManager;
     }
 
-    public Completable saveBoxGPSEnabled(boolean boxGPSEnabled) {
-        return Completable.fromAction(
-                () -> mPreferencesManager.setBoxGPSEnabled(boxGPSEnabled));
+    public void saveBoxGPSEnabled(boolean boxGPSEnabled) {
+        mPreferencesManager.setBoxGPSEnabled(boxGPSEnabled);
     }
 
-    public Completable saveFixedAmountEnabled(boolean fixedAmount) {
-        return Completable.fromAction(
-                () -> mPreferencesManager.setFixedAmountEnabled(fixedAmount));
+    public void saveFixedAmountEnabled(boolean fixedAmount) {
+        mPreferencesManager.setFixedAmountEnabled(fixedAmount);
     }
 
     public boolean isBoxGPSEnabled() {

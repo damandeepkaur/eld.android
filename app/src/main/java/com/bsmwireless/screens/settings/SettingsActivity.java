@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -25,16 +26,14 @@ public class SettingsActivity extends BaseMenuActivity implements SettingsView {
     @BindView(R.id.settings_toolbar)
     Toolbar mToolbar;
 
-    @BindView(R.id.boxGPSSwitch)
+    @BindView(R.id.box_gps_switch)
     SwitchCompat boxGPSSwitch;
 
-    @BindView(R.id.fixedAmountSwitch)
+    @BindView(R.id.fixed_amount_switch)
     SwitchCompat fixedAmountSwitch;
 
     @Inject
     SettingsPresenter mPresenter;
-
-    protected Unbinder mUnbinder;
 
     @Override
     protected void onCreate(Bundle onSavedInstanceState) {
@@ -73,11 +72,14 @@ public class SettingsActivity extends BaseMenuActivity implements SettingsView {
     }
 
     @Override
-    protected void onDestroy() {
+    public void onStop() {
+        super.onStop();
         mPresenter.onBoxGPSSwitchChecked(boxGPSSwitch.isChecked());
         mPresenter.onFixedAmountSwitchChecked(fixedAmountSwitch.isChecked());
+    }
 
-        mUnbinder.unbind();
+    @Override
+    protected void onDestroy() {
         mPresenter.onDestroy();
         super.onDestroy();
     }
