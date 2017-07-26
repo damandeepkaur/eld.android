@@ -102,18 +102,6 @@ public class NavigationPresenterTest {
     }
 
     @Test
-    public void testOnViewCreatedInactiveLogin() {
-        // given
-        when(mLoginUserInteractor.isLoginActive()).thenReturn(false);
-
-        // when
-        mNavigationPresenter.onViewCreated();
-
-        // then
-        verify(mView).goToLoginScreen(); // possibly stub behavior?
-    }
-
-    @Test
     public void testOnViewCreatedSuccess() {
         // given
         final String name = "userName";
@@ -160,6 +148,8 @@ public class NavigationPresenterTest {
     }
 
     // TODO: add test for LoginUserInteractor#updateUserOnServer failure when control path implemented
+
+
     // TODO: add test for LoginUserInteractor#updateUserOnServer error when user-observable workflow complete
     // TODO: add tests for getUpdatedUser if/when it becomes testable
 
