@@ -22,6 +22,9 @@ public class App extends Application {
         super.onCreate();
         mComponent = buildComponent();
 
+        //We shouldn't show home screen if app process was killed
+        mComponent.prefsManager().setShowHomeScreenEnabled(false);
+
         Timber.plant(BuildConfig.USE_LOG ? new Timber.DebugTree() : new ReleaseTree());
     }
 

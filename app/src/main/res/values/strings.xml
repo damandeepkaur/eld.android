@@ -338,7 +338,8 @@
     <string name="driver_profile_menu_eld">ELD</string>
     <string name="driver_profile_menu_sign">Sign</string>
     <string name="driver_profile_menu_occupants">Occupants</string>
-    <string name="driver_profile_password">******</string>
+    <string name="driver_profile_signature_error">Signature size too large. It will be cropped.</string>
+    <string name="driver_profile_user_error">Invalid user.</string>
 
     <!-- Navigation drawer-->
     <string name="nav_home">Home</string>
