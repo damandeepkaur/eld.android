@@ -7,8 +7,10 @@ public class PreferencesManager {
     private static final String KEY_SELECTED_VEHICLE_ID = "selected_vehicle_id";
     private static final String KEY_SELECTED_BOX_ID = "selected_box_id";
     private static final String KEY_REMEMBER_USER_ENABLED = "keep_user_enabled";
+    private static final String KEY_SHOW_HOME_SCREEN_ENABLED = "show_home_screen_enabled";
     private static final String KEY_BOX_GPS_ENABLED = "keep_box_gps_enabled";
     private static final String KEY_FIXED_AMOUNT_ENABLED = "keep_fixed_amount_enabled";
+
 
     public static final int NOT_FOUND_VALUE = -1;
 
@@ -58,6 +60,16 @@ public class PreferencesManager {
 
     public boolean isRememberUserEnabled() {
         return mPreferences.getBoolean(KEY_REMEMBER_USER_ENABLED, true);
+    }
+
+    public void setShowHomeScreenEnabled(boolean showHomeScreen) {
+        SharedPreferences.Editor editor = mPreferences.edit();
+        editor.putBoolean(KEY_SHOW_HOME_SCREEN_ENABLED, showHomeScreen);
+        editor.apply();
+    }
+
+    public boolean isShowHomeScreenEnabled() {
+        return mPreferences.getBoolean(KEY_SHOW_HOME_SCREEN_ENABLED, false);
     }
 
     public void clearValues() {
