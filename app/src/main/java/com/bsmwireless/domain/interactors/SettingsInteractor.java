@@ -5,8 +5,6 @@ import com.bsmwireless.data.storage.PreferencesManager;
 
 import javax.inject.Inject;
 
-import io.reactivex.Completable;
-
 public class SettingsInteractor {
 
     private AppDatabase mAppDatabase;
