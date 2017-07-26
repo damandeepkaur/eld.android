@@ -1,9 +1,6 @@
 package com.bsmwireless.data.storage;
 
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
-
-import com.bsmwireless.common.App;
 
 public class PreferencesManager {
     private static final String KEY_ACCOUNT_NAME = "account_name";
@@ -11,12 +8,7 @@ public class PreferencesManager {
     private static final String KEY_SELECTED_BOX_ID = "selected_box_id";
     private static final String KEY_REMEMBER_USER_ENABLED = "keep_user_enabled";
 
-    private static final String PREF_BOX_GPS = "pref_box_gps";
-    private static final String PREF_FIXED_AMOUNT = "pref_fixed_amount";
-    private static final String PREF_ODOMETER_UNITS = "pref_odometer_units";
-
     public static final int NOT_FOUND_VALUE = -1;
-    public static final String NOT_FOUND_PREF_VALUE = "";
 
     private SharedPreferences mPreferences;
 
@@ -68,41 +60,5 @@ public class PreferencesManager {
 
     public void clearValues() {
         mPreferences.edit().clear().apply();
-    }
-
-    /**
-     * Helper method to register a preferences listener.
-     *
-     * @param listener Listener to register.
-     */
-    public void registerOnSharedPreferenceChangeListener(SharedPreferences.OnSharedPreferenceChangeListener listener) {
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(App.getComponent().context());
-        sp.registerOnSharedPreferenceChangeListener(listener);
-    }
-
-    /**
-     * Helper method to un-register a preferences listener typically registered with
-     * registerOnSharedPreferenceChangeListener method.
-     *
-     * @param listener Listener to un-register.
-     */
-    public void unRegisterOnSharedPreferenceChangeListener(SharedPreferences.OnSharedPreferenceChangeListener listener) {
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(App.getComponent().context());
-        sp.unregisterOnSharedPreferenceChangeListener(listener);
-    }
-
-    public String getPrefBoxGPS() {
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(App.getComponent().context());
-        return sharedPref.getString(PREF_BOX_GPS, NOT_FOUND_PREF_VALUE);
-    }
-
-    public String getPrefFixedAmount() {
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(App.getComponent().context());
-        return sharedPref.getString(PREF_FIXED_AMOUNT, NOT_FOUND_PREF_VALUE);
-    }
-
-    public String getPrefOdometerUnits() {
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(App.getComponent().context());
-        return sharedPref.getString(PREF_ODOMETER_UNITS, NOT_FOUND_PREF_VALUE);
     }
 }

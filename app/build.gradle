@@ -164,6 +164,4 @@ dependencies {
     compile 'com.jakewharton.timber:timber:4.5.1'
 
     compile 'org.apache.commons:commons-lang3:3.5'
-
-    compile 'com.android.support:preference-v14:25.3.1'
 }

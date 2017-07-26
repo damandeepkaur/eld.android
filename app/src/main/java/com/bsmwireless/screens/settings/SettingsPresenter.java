@@ -1,8 +1,5 @@
 package com.bsmwireless.screens.settings;
 
-
-import android.content.SharedPreferences;
-
 import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.domain.interactors.SettingsInteractor;
 
@@ -28,20 +25,6 @@ public class SettingsPresenter {
         mDisposables = new CompositeDisposable();
 
         Timber.d("CREATED");
-    }
-
-    public void registerOnSharedPreferenceChangeListener(SharedPreferences.OnSharedPreferenceChangeListener listener) {
-        mDisposables.add(mSettingsInteractor.registerOnSharedPreferenceChangeListener(listener)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe());
-    }
-
-    public void unRegisterOnSharedPreferenceChangeListener(SharedPreferences.OnSharedPreferenceChangeListener listener) {
-        mDisposables.add(mSettingsInteractor.unRegisterOnSharedPreferenceChangeListener(listener)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe());
     }
 
     public void onDestroy() {

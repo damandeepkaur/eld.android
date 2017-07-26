@@ -6,21 +6,36 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.bsmwireless.common.App;
 import com.bsmwireless.screens.common.BaseActivity;
+import com.bsmwireless.screens.settings.dagger.DaggerSettingsComponent;
+import com.bsmwireless.screens.settings.dagger.SettingsModule;
+
+import javax.inject.Inject;
 
 import app.bsmuniversal.com.R;
 import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
 
-public class SettingsActivity extends BaseActivity {
+public class SettingsActivity extends BaseActivity implements SettingsView {
 
     @BindView(R.id.settings_toolbar)
     Toolbar mToolbar;
+
+    @Inject
+    SettingsPresenter mPresenter;
+
+    private Unbinder mUnbinder;
 
     @Override
     protected void onCreate(Bundle onSavedInstanceState) {
         super.onCreate(onSavedInstanceState);
 
+        DaggerSettingsComponent.builder().appComponent(App.getComponent()).settingsModule(new SettingsModule(this)).build().inject(this);
+
         setContentView(R.layout.activity_settings);
+        mUnbinder = ButterKnife.bind(this);
 
         initView();
     }
@@ -34,9 +49,6 @@ public class SettingsActivity extends BaseActivity {
             actionBar.setHomeAsUpIndicator(R.drawable.ic_arrow_back_green_24dp);
             actionBar.setTitle(R.string.settings_title);
         }
-
-        getSupportFragmentManager().beginTransaction()
-                .add(R.id.preference_holder, new SettingsFragment()).commit();
     }
 
 
@@ -61,5 +73,12 @@ public class SettingsActivity extends BaseActivity {
             }
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onDestroy() {
+        mUnbinder.unbind();
+        mPresenter.onDestroy();
+        super.onDestroy();
     }
 }

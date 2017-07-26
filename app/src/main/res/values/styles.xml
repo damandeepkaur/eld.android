@@ -11,10 +11,6 @@
         <item name="colorControlActivated">@color/accent</item>
     </style>
 
-    <style name="AppTheme.Preference">
-        <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
-    </style>
-
     <style name="AppTheme.NoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="windowActionBar">false</item>
     </style>

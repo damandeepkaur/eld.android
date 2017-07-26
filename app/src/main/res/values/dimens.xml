@@ -103,4 +103,8 @@
     <dimen name="driver_profile_signature_margin">15dp</dimen>
     <dimen name="driver_profile_shadow_size">4dp</dimen>
     <item format="float" name="driver_profile_button_letter_spacing" type="dimen">0.26</item>
+
+    <!-- Settings Activity -->
+    <dimen name="divider_height">1dp</dimen>
+
 </resources>
