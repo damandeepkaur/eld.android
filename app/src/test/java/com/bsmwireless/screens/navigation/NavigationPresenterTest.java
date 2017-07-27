@@ -88,6 +88,8 @@ public class NavigationPresenterTest {
         mNavigationPresenter.onLogoutItemSelected();
 
         // then
+
+        // TODO: update expected logout logic when offline-mode is implemented
         verify(mView).showErrorMessage(anyString());    // TODO: change to check string resource when no longer hard-coded
 
         verify(mView, never()).goToLoginScreen();   // redundant for now, but want to enforce no
