@@ -3,12 +3,7 @@ package com.bsmwireless.common.utils;
 import android.app.Activity;
 import android.view.View;
 import android.view.Window;
-import android.view.animation.Animation;
-import android.view.animation.Transformation;
 
-/**
- * Created by pavel on 9/24/15.
- */
 public class UiVisibilityHelper {
 
     public final static int NO_STATUS_BAR =
@@ -30,49 +25,5 @@ public class UiVisibilityHelper {
         if (window != null) {
             window.getDecorView().setSystemUiVisibility(visibility);
         }
-    }
-
-    public static void expand(final View view, final int targetHeight) {
-        view.getLayoutParams().height = 1;
-        view.setVisibility(View.VISIBLE);
-        Animation animation = new Animation() {
-            @Override
-            protected void applyTransformation(float interpolatedTime, Transformation t) {
-                view.getLayoutParams().height = (int)(targetHeight * interpolatedTime);
-                view.requestLayout();
-            }
-
-            @Override
-            public boolean willChangeBounds() {
-                return true;
-            }
-        };
-
-        animation.setDuration(400);
-        view.startAnimation(animation);
-    }
-
-    public static void collapse(final View view) {
-        final int initialHeight = view.getMeasuredHeight();
-
-        Animation animation = new Animation() {
-            @Override
-            protected void applyTransformation(float interpolatedTime, Transformation t) {
-                if(interpolatedTime == 1){
-                    view.setVisibility(View.GONE);
-                }else{
-                    view.getLayoutParams().height = initialHeight - (int)(initialHeight * interpolatedTime);
-                    view.requestLayout();
-                }
-            }
-
-            @Override
-            public boolean willChangeBounds() {
-                return true;
-            }
-        };
-
-        animation.setDuration(400);
-        view.startAnimation(animation);
     }
 }
