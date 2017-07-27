@@ -85,6 +85,7 @@ public class SelectAssetPresenterTest {
         // given
         List<Vehicle> testVehicleList = buildVehicleList();
         when(mVehiclesInteractor.getLastVehicles()).thenReturn(Flowable.just(testVehicleList));
+        when(mVehiclesInteractor.cleanSelectedVehicle()).thenReturn(Completable.complete());
 
         // when
         mSelectAssetPresenter.onViewCreated();
@@ -98,6 +99,7 @@ public class SelectAssetPresenterTest {
         // given
         List<Vehicle> testVehicleList = new ArrayList<>();
         when(mVehiclesInteractor.getLastVehicles()).thenReturn(Flowable.just(testVehicleList));
+        when(mVehiclesInteractor.cleanSelectedVehicle()).thenReturn(Completable.complete());
 
         // when
         mSelectAssetPresenter.onViewCreated();
@@ -111,6 +113,7 @@ public class SelectAssetPresenterTest {
         // given
         List<Vehicle> emptyVehicleList = new ArrayList<>();
         when(mVehiclesInteractor.getLastVehicles()).thenReturn(Flowable.just(emptyVehicleList));
+        when(mVehiclesInteractor.cleanSelectedVehicle()).thenReturn(Completable.complete());
 
         // when
         mSelectAssetPresenter.onViewCreated();
@@ -192,11 +195,8 @@ public class SelectAssetPresenterTest {
         verify(mView).goToHomeScreen();
     }
 
-    /**
-     * Verify pair vehicle.
-     */
     @Test
-    public void testOnVehicleListItemClickedPairVehicle() {
+    public void testOnVehicleListItemClicked() {
         // given
         Vehicle fakeVehicle = new Vehicle();
         when(mVehiclesInteractor.pairVehicle(any(Vehicle.class))).thenReturn(Observable.just(new ArrayList<>()));
@@ -206,18 +206,6 @@ public class SelectAssetPresenterTest {
 
         // then
         verify(mVehiclesInteractor).pairVehicle(eq(fakeVehicle));
-    }
-
-    @Test
-    public void testOnVehicleClickedGoToHome() {
-        // given
-        Vehicle fakeVehicle = new Vehicle();
-        when(mVehiclesInteractor.pairVehicle(any(Vehicle.class))).thenReturn(Observable.just(new ArrayList<>()));
-
-        // when
-        mSelectAssetPresenter.onVehicleListItemClicked(fakeVehicle);
-
-        // then
         verify(mView).goToHomeScreen();
     }
 

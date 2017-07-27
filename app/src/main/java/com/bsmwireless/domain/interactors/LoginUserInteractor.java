@@ -14,12 +14,7 @@ import com.bsmwireless.models.User;
 import javax.inject.Inject;
 
 import io.reactivex.Flowable;
-import io.reactivex.FlowableEmitter;
-import io.reactivex.FlowableOnSubscribe;
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.annotations.NonNull;
 
 import static com.bsmwireless.models.ELDEvent.EventType.LOGIN_LOGOUT;
 
@@ -54,6 +49,7 @@ public class LoginUserInteractor {
 
                     mPreferencesManager.setAccountName(accountName);
                     mPreferencesManager.setRememberUserEnabled(keepToken);
+                    mPreferencesManager.setShowHomeScreenEnabled(true);
 
                     mTokenManager.setToken(accountName, name, domain, user.getAuth());
 
@@ -88,9 +84,9 @@ public class LoginUserInteractor {
                     return mServiceApi.logout(logoutEvent)
                             .doOnNext(responseMessage -> {
                                 if (!mPreferencesManager.isRememberUserEnabled()) {
-                                    mPreferencesManager.clearValues();
                                     mAppDatabase.userDao().deleteUser(getDriverId());
                                     mTokenManager.removeAccount(mPreferencesManager.getAccountName());
+                                    mPreferencesManager.clearValues();
                                 } else {
                                     mTokenManager.clearToken(mTokenManager.getToken(mPreferencesManager.getAccountName()));
                                 }
@@ -130,7 +126,7 @@ public class LoginUserInteractor {
     }
 
     public boolean isLoginActive() {
-        return mTokenManager.getToken(mPreferencesManager.getAccountName()) != null;
+        return mPreferencesManager.isShowHomeScreenEnabled() && mTokenManager.getToken(mPreferencesManager.getAccountName()) != null;
     }
 
     public Integer getDriverId() {

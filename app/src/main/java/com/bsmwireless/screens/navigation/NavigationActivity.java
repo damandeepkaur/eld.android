@@ -6,10 +6,13 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.NavigationView.OnNavigationItemSelectedListener;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
+import android.support.design.widget.TabLayout;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,10 +20,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bsmwireless.common.App;
-import com.bsmwireless.screens.common.BaseActivity;
-import com.bsmwireless.screens.common.BaseFragment;
+import com.bsmwireless.screens.common.BaseMenuActivity;
 import com.bsmwireless.screens.driverprofile.DriverProfileActivity;
-import com.bsmwireless.screens.home.HomeFragment;
 import com.bsmwireless.screens.login.LoginActivity;
 import com.bsmwireless.screens.navigation.dagger.DaggerNavigationComponent;
 import com.bsmwireless.screens.navigation.dagger.NavigationModule;
@@ -32,7 +33,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
-public class NavigationActivity extends BaseActivity implements OnNavigationItemSelectedListener, NavigateView {
+public class NavigationActivity extends BaseMenuActivity implements OnNavigationItemSelectedListener, NavigateView {
 
     private static final int REQUEST_CODE_UPDATE_USER = 101;
 
@@ -45,13 +46,19 @@ public class NavigationActivity extends BaseActivity implements OnNavigationItem
     @BindView(R.id.navigation_toolbar)
     Toolbar mToolbar;
 
+    @BindView(R.id.navigation_tab_layout)
+    TabLayout mTabLayout;
+
+    @BindView(R.id.navigation_view_pager)
+    ViewPager mViewPager;
+
+    private NavigationAdapter mPagerAdapter;
+
     @Inject
     NavigationPresenter mPresenter;
 
-    private ActionBarDrawerToggle mDrawerToggle;
+    private SmoothActionBarDrawerToggle mDrawerToggle;
     private HeaderViewHolder mHeaderViewHolder;
-
-    private Unbinder mUnbinder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +69,10 @@ public class NavigationActivity extends BaseActivity implements OnNavigationItem
 
         setContentView(R.layout.activity_navigation);
         mUnbinder = ButterKnife.bind(this);
-        open(new HomeFragment(), false);
+
+        //TODO: waiting for UI
+        //open(new HomeFragment(), false);
+
         initNavigation();
 
         mPresenter.onViewCreated();
@@ -84,13 +94,16 @@ public class NavigationActivity extends BaseActivity implements OnNavigationItem
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.nav_home:
-                Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.navigation_content);
+                mViewPager.setCurrentItem(0, true);
+
+                //TODO: waiting for UI
+                /*Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.navigation_content);
                 if (fragment == null) {
                     fragment = new HomeFragment();
                 } else if (fragment instanceof HomeFragment) {
                     break;
                 }
-                open((BaseFragment) fragment, false);
+                open((BaseFragment) fragment, false);*/
                 break;
             case R.id.nav_inspector_view:
                 Toast.makeText(this, "Go to inspector screen", Toast.LENGTH_SHORT).show();
@@ -99,7 +112,7 @@ public class NavigationActivity extends BaseActivity implements OnNavigationItem
                 Toast.makeText(this, "Go to help screen", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.nav_driver_profile:
-                startActivityForResult(new Intent(this, DriverProfileActivity.class), REQUEST_CODE_UPDATE_USER);
+                mDrawerToggle.runWhenIdle(() -> startActivityForResult(new Intent(this, DriverProfileActivity.class), REQUEST_CODE_UPDATE_USER));
                 break;
             case R.id.nav_settings:
                 Toast.makeText(this, "Go to settings screen", Toast.LENGTH_SHORT).show();
@@ -118,11 +131,15 @@ public class NavigationActivity extends BaseActivity implements OnNavigationItem
     private void initNavigation() {
         mNavigationView.setNavigationItemSelectedListener(this);
         setSupportActionBar(mToolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
-        getSupportActionBar().setTitle(R.string.menu_home);
 
-        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, mToolbar, 0, 0);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setHomeButtonEnabled(true);
+            actionBar.setTitle(R.string.menu_home);
+        }
+
+        mDrawerToggle = new SmoothActionBarDrawerToggle(this, mDrawerLayout, mToolbar, 0, 0);
         mDrawerLayout.addDrawerListener(mDrawerToggle);
 
         mDrawerToggle.syncState();
@@ -130,11 +147,16 @@ public class NavigationActivity extends BaseActivity implements OnNavigationItem
         View header = mNavigationView.getHeaderView(0);
         mHeaderViewHolder = new HeaderViewHolder(header);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        mPagerAdapter = new NavigationAdapter(getApplicationContext(), getSupportFragmentManager());
+        mViewPager.setAdapter(mPagerAdapter);
+        mViewPager.setOffscreenPageLimit(2);
+
+        mTabLayout.setupWithViewPager(mViewPager);
+        mTabLayout.setTabTextColors(ContextCompat.getColor(this, R.color.accent_transparent), ContextCompat.getColor(this, R.color.accent));
     }
 
-    public void open(BaseFragment fragment, boolean useBackStack) {
+    //TODO: waiting for UI
+    /*public void open(BaseFragment fragment, boolean useBackStack) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
         if (useBackStack) {
@@ -142,7 +164,7 @@ public class NavigationActivity extends BaseActivity implements OnNavigationItem
         }
 
         transaction.replace(R.id.navigation_content, fragment).commit();
-    }
+    }*/
 
     @Override
     public void goToLoginScreen() {
@@ -209,7 +231,6 @@ public class NavigationActivity extends BaseActivity implements OnNavigationItem
     protected void onDestroy() {
         mPresenter.onDestroy();
         mHeaderViewHolder.unbind();
-        mUnbinder.unbind();
         super.onDestroy();
     }
 
@@ -224,6 +245,28 @@ public class NavigationActivity extends BaseActivity implements OnNavigationItem
             default: {
                 break;
             }
+        }
+    }
+
+    private class SmoothActionBarDrawerToggle extends ActionBarDrawerToggle {
+
+        private Runnable mRunnable;
+
+        public SmoothActionBarDrawerToggle(AppCompatActivity activity, DrawerLayout drawerLayout, Toolbar toolbar, int openDrawerContentDescRes, int closeDrawerContentDescRes) {
+            super(activity, drawerLayout, toolbar, openDrawerContentDescRes, closeDrawerContentDescRes);
+        }
+
+        @Override
+        public void onDrawerStateChanged(int newState) {
+            super.onDrawerStateChanged(newState);
+            if (mRunnable != null && newState == DrawerLayout.STATE_IDLE) {
+                mRunnable.run();
+                mRunnable = null;
+            }
+        }
+
+        public void runWhenIdle(Runnable runnable) {
+            this.mRunnable = runnable;
         }
     }
 }

@@ -9,6 +9,7 @@ import com.bsmwireless.data.storage.vehicles.VehicleConverter;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.Vehicle;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -59,12 +60,15 @@ public class VehiclesInteractor {
 
         StringBuilder builder = new StringBuilder();
         builder.append(vehicleId);
-        while (builder.length() <= Constants.MAX_LAST_VEHICLE && iterator.hasNext()) {
+
+        int count = 1;
+        while (count < Constants.MAX_LAST_VEHICLE && iterator.hasNext()) {
             Integer next = iterator.next();
 
             if (!next.equals(vehicleId)) {
                 builder.append(",");
                 builder.append(next);
+                count ++;
             }
         }
 
@@ -92,10 +96,7 @@ public class VehiclesInteractor {
         event.setBoxId(vehicle.getBoxId());
 
         return mBlackBoxInteractor.getData()
-                .doOnNext(blackBox -> {
-                    saveVehicle(vehicle);
-                    saveLastVehicle(id, vehicle.getId());
-                })
+                .doOnNext(blackBox -> saveVehicle(vehicle))
                 .flatMap(blackBox -> {
                     event.setTimezone(mUserInteractor.getTimezone(id));
                     event.setOdometer(blackBox.getOdometer());
@@ -105,6 +106,7 @@ public class VehiclesInteractor {
                     return mServiceApi.pairVehicle(event);
                 })
                 .doOnNext(events -> {
+                    saveLastVehicle(id, vehicle.getId());
                     mELDEventsInteractor.storeEvents(events, true);
                 })
                 .doOnError(error -> cleanSelectedVehicle().blockingAwait());
@@ -112,7 +114,7 @@ public class VehiclesInteractor {
 
     public Flowable<List<Vehicle>> getLastVehicles() {
         return mAppDatabase.userDao().getUserLastVehicles(mUserInteractor.getDriverId())
-                .flatMap(userLastVehicles -> mAppDatabase.vehicleDao().getVehicles(ListConverter.toIntegerList(userLastVehicles)))
+                .flatMap(userLastVehicles -> mAppDatabase.vehicleDao().getVehicles(ListConverter.toIntegerList(userLastVehicles.length == 0 ? "" : userLastVehicles[0])))
                 .flatMap(vehicleEntities -> Flowable.just(VehicleConverter.toVehicle(vehicleEntities)));
     }
 

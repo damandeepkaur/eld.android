@@ -29,7 +29,12 @@
         <activity
             android:name="com.bsmwireless.screens.login.LoginActivity"
             android:label="@string/app_name"
-            android:theme="@style/Theme.BsmAppWithBGFullScreen"/>
+            android:theme="@style/Theme.BsmAppWithBGFullScreen">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
 
         <activity
             android:name="com.bsmwireless.screens.selectasset.SelectAssetActivity"
@@ -40,10 +45,6 @@
             android:name="com.bsmwireless.screens.navigation.NavigationActivity"
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="stateHidden|adjustResize">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
         </activity>
 
         <activity

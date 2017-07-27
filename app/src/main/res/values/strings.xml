@@ -10,6 +10,21 @@
     <string name="select_asset_characters">Enter at least 3 characters</string>
     <string name="select_asset_error">Select asset error</string>
 
+    <!--Alerts-->
+    <string name="eld_green">Green notification</string>
+    <string name="eld_orange">Orange notification</string>
+    <string name="eld_red">Red notification</string>
+
+    <string name="occupancy_0">Single driver</string>
+    <string name="occupancy_1">Main driver and co-driver</string>
+    <string name="occupancy_2">Main driver and 2 co-drivers</string>
+    <string name="occupancy_3">Main driver and 3 co-drivers</string>
+
+    <!--Navigation-->
+    <string name="navigation_dashboard">Dashboard</string>
+    <string name="navigation_logs">Logs</string>
+    <string name="navigation_multi_day">Multi-day</string>
+
     <!-- START OLD STRINGS -->
     <string name="no_network">No Network Available</string>
     <string name="app_compatability">Note: Compatible with Android 4.0.3 - 6.0.1</string>
@@ -323,7 +338,8 @@
     <string name="driver_profile_menu_eld">ELD</string>
     <string name="driver_profile_menu_sign">Sign</string>
     <string name="driver_profile_menu_occupants">Occupants</string>
-    <string name="driver_profile_password">******</string>
+    <string name="driver_profile_signature_error">Signature size too large. It will be cropped.</string>
+    <string name="driver_profile_user_error">Invalid user.</string>
 
     <!-- Navigation drawer-->
     <string name="nav_home">Home</string>
