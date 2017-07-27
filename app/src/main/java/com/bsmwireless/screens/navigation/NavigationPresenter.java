@@ -55,29 +55,24 @@ public class NavigationPresenter {
     }
 
     public void onViewCreated() {
-        if (!mLoginUserInteractor.isLoginActive()) {
-            mView.goToLoginScreen();
-        } else {
-            mDisposables.add(mLoginUserInteractor.getFullName()
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(name -> mView.setDriverName(name)));
-            mView.setCoDriversNumber(mLoginUserInteractor.getCoDriversNumber());
-            mView.setBoxId(mVehiclesInteractor.getBoxId());
-            mView.setAssetsNumber(mVehiclesInteractor.getAssetsNumber());
-        }
+        mDisposables.add(mLoginUserInteractor.getFullName()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(name -> mView.setDriverName(name)));
+        mView.setCoDriversNumber(mLoginUserInteractor.getCoDriversNumber());
+        mView.setBoxId(mVehiclesInteractor.getBoxId());
+        mView.setAssetsNumber(mVehiclesInteractor.getAssetsNumber());
     }
 
     public void onUserUpdated() {
         Disposable disposable = mLoginUserInteractor.getUser()
                 .subscribeOn(Schedulers.io())
-                .subscribe(userEntity -> {
-                    mLoginUserInteractor.updateUserOnServer(getUpdatedUser(userEntity))
-                                        .subscribeOn(Schedulers.io())
-                                        .subscribe();
-                }, throwable -> {
-                    Timber.e("LoginUser error: %s", throwable.toString());
-                });
+                .subscribe(
+                        userEntity -> mLoginUserInteractor.updateUserOnServer(getUpdatedUser(userEntity))
+                                    .subscribeOn(Schedulers.io())
+                                    .subscribe(),
+                        throwable -> Timber.e("LoginUser error: %s", throwable.toString())
+                );
         mDisposables.add(disposable);
     }
 
@@ -86,9 +81,6 @@ public class NavigationPresenter {
         User user = new User();
 
         user.setId(userEntity.getId());
-        user.setUsername(mLoginUserInteractor.getUserName());
-        // TODO: password stub
-        user.setPassword("1234");
         user.setTimezone(userEntity.getTimezone());
         user.setFirstName(userEntity.getFirstName());
         user.setLastName(userEntity.getLastName());

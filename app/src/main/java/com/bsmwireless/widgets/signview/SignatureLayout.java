@@ -8,9 +8,6 @@ import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import app.bsmuniversal.com.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -75,11 +72,11 @@ public class SignatureLayout extends LinearLayout {
     }
 
     public void setImageData(String data) {
-        mDriverSignView.setSignatureString(data);
+        mDriverSignView.setSignature(data);
     }
 
     public String getImageData() {
-        return mDriverSignView.getSignatureString();
+        return mDriverSignView.getSignature();
     }
 
     public void setOnSaveListener(OnSaveSignatureListener listener) {

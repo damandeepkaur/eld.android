@@ -13,6 +13,6 @@ public class ViewUtils {
 
     public static float convertDpToPixels(int dp, Context context) {
         DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
-        return Math.round(dp * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT));
+        return dp * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT);
     }
 }
