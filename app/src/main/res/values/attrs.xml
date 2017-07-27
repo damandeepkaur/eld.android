@@ -8,13 +8,6 @@
         <enum name="topToBottom" value="3" />
     </attr>
 
-    <attr name="duty" format="enum">
-        <enum name="off_duty" value="101"/>
-        <enum name="sleeper_berth" value="102"/>
-        <enum name="driving" value="103"/>
-        <enum name="on_duty" value="104"/>
-    </attr>
-
     <declare-styleable name="customfont">
         <attr name="textformat" format="string"/>
     </declare-styleable>
@@ -38,15 +31,6 @@
         </attr>
     </declare-styleable>
 
-    <declare-styleable name="HOSTimerView">
-        <attr name="duty"/>
-        <attr name="showHeader" format="boolean"/>
-    </declare-styleable>
-
-    <declare-styleable name="HOSGraphLabelView">
-        <attr name="duty"/>
-        <attr name="showLabel" format="boolean"/>
-    </declare-styleable>
 
     <declare-styleable name="CalendarLayout">
         <attr name="daysCount" format="integer"/>
