@@ -52,7 +52,7 @@
             android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
         <activity
             android:name="com.bsmwireless.screens.barcode.BarcodeScannerActivity"
-            android:theme="@style/Theme.BsmAppFullScreen"/>
+            android:theme="@style/AppTheme.Transparent"/>
 
         <activity android:name="com.bsmwireless.screens.driverprofile.DriverProfileActivity"
                   android:label="@string/driver_profile"

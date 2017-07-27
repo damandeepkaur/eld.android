@@ -25,7 +25,7 @@ public class BarcodeScannerFragment extends BaseFragment {
         if (context instanceof ZXingScannerView.ResultHandler) {
             mHandler = (ZXingScannerView.ResultHandler) context;
         } else {
-            throw new RuntimeException(context.toString() + " must ZXingScannerView.ResultHandler");
+            throw new RuntimeException(context.toString() + " must implement ZXingScannerView.ResultHandler");
         }
     }
 
@@ -43,14 +43,24 @@ public class BarcodeScannerFragment extends BaseFragment {
     @Override
     public void onStart() {
         super.onStart();
-        mScannerView.setResultHandler(mHandler);
         mScannerView.startCamera();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mScannerView.resumeCameraPreview(mHandler);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mScannerView.stopCameraPreview();
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        mScannerView.setResultHandler(null);
         mScannerView.stopCamera();
     }
 }
