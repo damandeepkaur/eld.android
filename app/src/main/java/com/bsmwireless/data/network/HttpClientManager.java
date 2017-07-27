@@ -48,8 +48,8 @@ public class HttpClientManager {
                         .header("X-Driver", driver)
                         .header("X-Org", org)
                         .header("X-Cluster", cluster)
-                        .header("X-Token", token);
-                if (boxId > 0) builder.header("X-Box", String.valueOf(boxId));
+                        .header("X-Token", token)
+                        .header("X-Box", String.valueOf(boxId));
                 request = builder.build();
             }
 
