@@ -58,7 +58,6 @@ public class NavigationPresenterTest {
     public void before() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-
         mNavigationPresenter = new NavigationPresenter(mView, mLoginUserInteractor, mVehiclesInteractor);
     }
 
@@ -90,7 +89,6 @@ public class NavigationPresenterTest {
 
         // then
 
-
         // TODO: update expected logout logic when offline-mode is implemented
         verify(mView).showErrorMessage(anyString());    // TODO: change to check string resource when no longer hard-coded
 
@@ -117,7 +115,6 @@ public class NavigationPresenterTest {
         // given
         final String name = "userName";
         final Flowable<String> userFlowable = Flowable.just(name);
-
 
         final int coDriver = 1; // note: business logic is incorrect as can have multiple co-drivers
         // TODO: add refactor task/story to JIRA after server-side API refactors to match correct business logic
