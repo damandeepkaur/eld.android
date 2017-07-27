@@ -3,6 +3,7 @@ package com.bsmwireless.screens.driverprofile;
 import android.content.Context;
 
 import com.bsmwireless.common.dagger.ActivityScope;
+import com.bsmwireless.data.storage.users.UserConverter;
 import com.bsmwireless.data.storage.users.UserEntity;
 import com.bsmwireless.domain.interactors.LoginUserInteractor;
 
@@ -78,7 +79,7 @@ public class DriverProfilePresenter {
     public void onSaveUserInfo(String address) {
         if (mUserEntity != null) {
             mUserEntity.setAddress(address);
-            updateUserInDB();
+            mView.setResults(UserConverter.toUser(mUserEntity));
         } else {
             mView.showError(new Exception(mContext.getResources().getString(R.string.driver_profile_user_error)));
         }

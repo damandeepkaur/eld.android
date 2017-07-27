@@ -1,5 +1,6 @@
 package com.bsmwireless.screens.navigation;
 
+import com.bsmwireless.data.storage.users.UserConverter;
 import com.bsmwireless.data.storage.users.UserEntity;
 import com.bsmwireless.domain.interactors.LoginUserInteractor;
 import com.bsmwireless.domain.interactors.VehiclesInteractor;
@@ -64,20 +65,19 @@ public class NavigationPresenter {
         mView.setAssetsNumber(mVehiclesInteractor.getAssetsNumber());
     }
 
-    public void onUserUpdated() {
-        Disposable disposable = mLoginUserInteractor.getUser()
-                .subscribeOn(Schedulers.io())
-                .subscribe(
-                        userEntity -> mLoginUserInteractor.updateUserOnServer(getUpdatedUser(userEntity))
-                                    .subscribeOn(Schedulers.io())
-                                    .subscribe(),
-                        throwable -> Timber.e("LoginUser error: %s", throwable.toString())
-                );
-        mDisposables.add(disposable);
+    public void onUserUpdated(User user) {
+        if (user != null) {
+            mDisposables.add(mLoginUserInteractor.updateDBUser(UserConverter.toEntity(user))
+                                                 .subscribeOn(Schedulers.io())
+                                                 .subscribe());
+            mDisposables.add(mLoginUserInteractor.updateUserOnServer(getUpdatedUser(user))
+                                                 .subscribeOn(Schedulers.io())
+                                                 .subscribe());
+        }
     }
 
     // TODO: change server logic
-    private User getUpdatedUser(UserEntity userEntity) {
+    private User getUpdatedUser(User userEntity) {
         User user = new User();
 
         user.setId(userEntity.getId());

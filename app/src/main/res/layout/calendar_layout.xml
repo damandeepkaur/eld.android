@@ -7,21 +7,19 @@
     <Button android:id="@+id/left"
         android:layout_width="24dp"
         android:layout_height="24dp"
-        android:layout_weight="0.05"
-        android:background="@drawable/ic_keyboard_arrow_left_24dp"
+        android:background="@drawable/calendar_left_button"
         android:layout_gravity="center_vertical"/>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_view"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="0.9"/>
+        android:layout_weight="1"/>
 
     <Button android:id="@+id/right"
         android:layout_width="24dp"
         android:layout_height="24dp"
-        android:layout_weight="0.05"
-        android:background="@drawable/ic_keyboard_arrow_right_24dp"
+        android:background="@drawable/calendar_right_button"
         android:layout_gravity="center_vertical"/>
 
 </LinearLayout>

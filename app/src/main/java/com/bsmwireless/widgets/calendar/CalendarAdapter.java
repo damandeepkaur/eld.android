@@ -1,6 +1,7 @@
 package com.bsmwireless.widgets.calendar;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -22,7 +23,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.ViewHo
 
     private OnItemSelectListener mListener;
 
-    private int mSelectedPosition = -1;
+    private int mSelectedPosition = 0;
 
     public interface OnItemSelectListener {
         void onItemSelected(CalendarItem log);
@@ -47,25 +48,34 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.ViewHo
         holder.mDayOfWeekTV.setText(item.getDayOfWeek().substring(0, 3).toUpperCase());
         holder.itemView.setSelected(mSelectedPosition == position);
 
-        if (item.getAssociatedLog() != null) {
-            holder.itemView.setOnClickListener(v -> {
-                if (mSelectedPosition != position) {
-                    int prevSelected = mSelectedPosition;
-                    mSelectedPosition = position;
-                    holder.itemView.setSelected(true);
-                    notifyItemChanged(prevSelected);
-                }
+        holder.itemView.setOnClickListener(v -> {
+            if (mSelectedPosition != position) {
+                int prevSelected = mSelectedPosition;
+                mSelectedPosition = position;
+                holder.itemView.setSelected(true);
+                notifyItemChanged(prevSelected);
+            }
 
-                if (mListener != null) {
-                    mListener.onItemSelected(item);
-                }
-            });
-            holder.mDayOfMonthTV.setTextColor(ContextCompat.getColor(mContext, android.R.color.black));
+            if (mListener != null) {
+                mListener.onItemSelected(item);
+            }
+        });
+
+        LogSheetHeader associatedLog = item.getAssociatedLog();
+
+        if (associatedLog != null) {
+            if (associatedLog.getSigned()) {
+                holder.mDayOfMonthTV.setTextColor(ContextCompat.getColor(mContext, R.color.nasty_green));
+                holder.mDayOfMonthTV.setTypeface(null, Typeface.BOLD);
+            } else {
+                holder.mDayOfMonthTV.setTextColor(ContextCompat.getColor(mContext, android.R.color.black));
+                holder.mDayOfMonthTV.setTypeface(null, Typeface.NORMAL);
+            }
             holder.mDayOfWeekTV.setTextColor(ContextCompat.getColor(mContext, R.color.secondary_text));
         } else {
-            holder.itemView.setOnClickListener(null);
             holder.mDayOfMonthTV.setTextColor(ContextCompat.getColor(mContext, R.color.disabled_calendar_item_day));
             holder.mDayOfWeekTV.setTextColor(ContextCompat.getColor(mContext, R.color.disabled_calendar_item_week));
+            holder.mDayOfMonthTV.setTypeface(null, Typeface.NORMAL);
         }
     }
 

@@ -1,5 +1,6 @@
 package com.bsmwireless.screens.driverprofile;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
@@ -11,6 +12,7 @@ import android.widget.Toast;
 
 import com.bsmwireless.common.App;
 import com.bsmwireless.data.storage.users.UserEntity;
+import com.bsmwireless.models.User;
 import com.bsmwireless.screens.common.BaseMenuActivity;
 import com.bsmwireless.screens.driverprofile.dagger.DaggerDriverProfileComponent;
 import com.bsmwireless.screens.driverprofile.dagger.DriverProfileModule;
@@ -27,6 +29,8 @@ import static android.support.design.widget.BottomSheetBehavior.STATE_EXPANDED;
 import static android.support.design.widget.BottomSheetBehavior.STATE_HIDDEN;
 
 public class DriverProfileActivity extends BaseMenuActivity implements DriverProfileView, SignatureLayout.OnSaveSignatureListener {
+
+    public static final String EXTRA_USER = "user";
 
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
@@ -92,9 +96,9 @@ public class DriverProfileActivity extends BaseMenuActivity implements DriverPro
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    public void onBackPressed() {
         mPresenter.onSaveUserInfo(mAddressTextView.getText().toString());
+        super.onBackPressed();
     }
 
     @Override
@@ -134,6 +138,13 @@ public class DriverProfileActivity extends BaseMenuActivity implements DriverPro
     @Override
     public void showControlButtons() {
         mSnackBarLayout.showSnackbar();
+    }
+
+    @Override
+    public void setResults(User user) {
+        Intent resultIntent = new Intent();
+        resultIntent.putExtra(EXTRA_USER, user);
+        setResult(RESULT_OK, resultIntent);
     }
 
     private void initToolbar() {

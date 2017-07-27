@@ -74,6 +74,21 @@ public class CalendarLayout extends LinearLayout {
         mAdapter = new CalendarAdapter(getContext(), getItems());
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setHasFixedSize(true);
+        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                    LinearLayoutManager layoutManager = (LinearLayoutManager) mRecyclerView.getLayoutManager();
+                    int firstPosition = layoutManager.findFirstVisibleItemPosition();
+                    int lastPosition = layoutManager.findLastVisibleItemPosition();
+                    mRightButton.setEnabled(firstPosition != 0);
+                    mLeftButton.setEnabled(lastPosition != (mAdapter.getItemCount() - 1));
+                }
+            }
+        });
+        mRecyclerView.smoothScrollToPosition(0);
+        mRightButton.setEnabled(false);
     }
 
     @Override
@@ -104,10 +119,6 @@ public class CalendarLayout extends LinearLayout {
         if (mAdapter != null) {
             mAdapter.updateLogs(logs);
         }
-    }
-
-    public void setDaysCount(int daysCount) {
-        mDaysCount = daysCount;
     }
 
     private List<CalendarItem> getItems() {
