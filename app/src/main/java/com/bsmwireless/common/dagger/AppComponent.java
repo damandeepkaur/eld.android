@@ -28,5 +28,5 @@ public interface AppComponent {
 
     void inject(FontTextView fontTextView);
 
-    void inject(ELDGraphView ELDGraphView);
+    void inject(ELDGraphView eldGraphView);
 }
