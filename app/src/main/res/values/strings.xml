@@ -338,7 +338,8 @@
     <string name="driver_profile_menu_eld">ELD</string>
     <string name="driver_profile_menu_sign">Sign</string>
     <string name="driver_profile_menu_occupants">Occupants</string>
-    <string name="driver_profile_password">******</string>
+    <string name="driver_profile_signature_error">Signature size too large. It will be cropped.</string>
+    <string name="driver_profile_user_error">Invalid user.</string>
 
     <!-- Navigation drawer-->
     <string name="nav_home">Home</string>
@@ -365,6 +366,13 @@
 
     <!-- Login Activity -->
     <string name="login_lbl_rememberme">Remember me</string>
+
+    <!-- Graph view -->
+    <string name="default_time">00:00</string>
+    <string name="offduty_label">OFF</string>
+    <string name="sleepingberth_label">S</string>
+    <string name="driving_label">DR</string>
+    <string name="onduty_label">ON</string>
 
     <string name="ok">Ok</string>
     <string name="clear">Clear</string>
