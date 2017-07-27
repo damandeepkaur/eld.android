@@ -93,7 +93,8 @@ public class NavigationPresenterTest {
         verify(mView).showErrorMessage(anyString());    // TODO: change to check string resource when no longer hard-coded
 
         verify(mView, never()).goToLoginScreen();   // redundant for now, but want to enforce no
-                                                    // future transition to login on failure
+                                                    // future transition to login on failure (online mode)
+
     }
 
     @Test
