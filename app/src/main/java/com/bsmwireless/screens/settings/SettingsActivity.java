@@ -4,12 +4,8 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 
 import com.bsmwireless.common.App;
-import com.bsmwireless.screens.common.BaseActivity;
 import com.bsmwireless.screens.common.BaseMenuActivity;
 import com.bsmwireless.screens.settings.dagger.DaggerSettingsComponent;
 import com.bsmwireless.screens.settings.dagger.SettingsModule;
