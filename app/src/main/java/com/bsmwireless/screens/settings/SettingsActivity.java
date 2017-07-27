@@ -23,10 +23,10 @@ public class SettingsActivity extends BaseMenuActivity implements SettingsView {
     Toolbar mToolbar;
 
     @BindView(R.id.box_gps_switch)
-    SwitchCompat boxGPSSwitch;
+    SwitchCompat mBoxGPSSwitch;
 
     @BindView(R.id.fixed_amount_switch)
-    SwitchCompat fixedAmountSwitch;
+    SwitchCompat mFixedAmountSwitch;
 
     @Inject
     SettingsPresenter mPresenter;
@@ -58,19 +58,19 @@ public class SettingsActivity extends BaseMenuActivity implements SettingsView {
 
     @Override
     public void setBoxGPSSwitchEnabled(boolean isEnabled) {
-        boxGPSSwitch.setChecked(isEnabled);
+        mBoxGPSSwitch.setChecked(isEnabled);
     }
 
     @Override
     public void setFixedAmountSwitchEnabled(boolean isEnabled) {
-        fixedAmountSwitch.setChecked(isEnabled);
+        mFixedAmountSwitch.setChecked(isEnabled);
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        mPresenter.onBoxGPSSwitchChecked(boxGPSSwitch.isChecked());
-        mPresenter.onFixedAmountSwitchChecked(fixedAmountSwitch.isChecked());
+        mPresenter.onBoxGPSSwitchChecked(mBoxGPSSwitch.isChecked());
+        mPresenter.onFixedAmountSwitchChecked(mFixedAmountSwitch.isChecked());
     }
 
     @Override

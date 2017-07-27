@@ -116,7 +116,7 @@ public class NavigationActivity extends BaseMenuActivity implements OnNavigation
                 mDrawerToggle.runWhenIdle(() -> startActivityForResult(new Intent(this, DriverProfileActivity.class), REQUEST_CODE_UPDATE_USER));
                 break;
             case R.id.nav_settings:
-                startActivity(new Intent(this, SettingsActivity.class));
+                mDrawerToggle.runWhenIdle(() -> startActivity(new Intent(this, SettingsActivity.class)));
                 break;
             case R.id.nav_logout:
                 mPresenter.onLogoutItemSelected();

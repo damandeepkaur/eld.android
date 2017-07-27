@@ -55,7 +55,7 @@
         android:layout_height="@dimen/divider_height"
         android:layout_marginTop="@dimen/default_margin"
         android:layout_below="@id/lbl_box_gps"
-        android:background="@color/divider_color"/>
+        android:background="?android:attr/listDivider"/>
 
     <TextView
         android:id="@+id/lbl_fixed_amount"
@@ -88,7 +88,7 @@
         android:layout_height="@dimen/divider_height"
         android:layout_marginTop="@dimen/default_margin"
         android:layout_below="@id/lbl_fixed_amount"
-        android:background="@color/divider_color"/>
+        android:background="?android:attr/listDivider"/>
 
     <TextView
         android:id="@+id/lbl_odometer_units"
