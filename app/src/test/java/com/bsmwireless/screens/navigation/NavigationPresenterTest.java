@@ -168,7 +168,7 @@ public class NavigationPresenterTest {
     public void testGetUpdatedUser() {
         // given
         final int id = 123;
-        final String timezone = "UTC+3";
+        final String timezone = "America/New_York"; // should be valid Java timezone string
         final String firstName = "First";
         final String lastName = "Last";
         final int cycleCountry = 1;
