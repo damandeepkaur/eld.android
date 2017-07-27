@@ -22,6 +22,9 @@ import app.bsmuniversal.com.R;
 
 public class ELDGraphView extends View {
 
+    private final static int SEC_IN_MIN = 60;
+    private final static int MS_IN_SEC = 1000;
+
     private final int GRID_WIDTH_DP = 1;
     private final int LINE_WIDTH_DP = 3;
 
@@ -104,7 +107,7 @@ public class ELDGraphView extends View {
         mLeftOffset = getResources().getDimensionPixelSize(R.dimen.graph_view_left_offset);
         mRightOffset = getResources().getDimensionPixelSize(R.dimen.graph_view_right_offset);
         mBottomOffset = getResources().getDimensionPixelSize(R.dimen.graph_view_bottom_offset);
-        mTextSize = getResources().getDimension(R.dimen.text_size_extra_smaller);
+        mTextSize = getResources().getDimension(R.dimen.text_size_smallest);
 
         mGridPaint = new Paint();
         mGridPaint.setAntiAlias(true);
@@ -117,7 +120,6 @@ public class ELDGraphView extends View {
         mHeaderPaint.setDither(true);
         mHeaderPaint.setColor(ContextCompat.getColor(getContext(), R.color.graph_header_paint_color));
         mHeaderPaint.setSubpixelText(true);
-        mHeaderPaint.setTypeface(mFontCache.get(FontCache.SANS_SERIF));
         mHeaderPaint.setTextSize(mTextSize);
         mHeaderPaint.setFakeBoldText(true);
 
@@ -168,7 +170,7 @@ public class ELDGraphView extends View {
             return;
         }
 
-        float gridUnit = mGraphWidth / (mHoursCount * 60);
+        float gridUnit = mGraphWidth / (mHoursCount * SEC_IN_MIN);
 
         int firstTypeId = DutyType.values()[0].getId();
 
@@ -183,7 +185,7 @@ public class ELDGraphView extends View {
             Long logDate = event.getEventTime();
             Long prevLogDate = prevEvent.getEventTime();
 
-            long timeStamp = (logDate - prevLogDate) / (60 * 1000);
+            long timeStamp = (logDate - prevLogDate) / (SEC_IN_MIN * MS_IN_SEC);
 
             x2 = x1 + timeStamp * gridUnit;
             y2 = mGraphTop + (event.getEventType() - firstTypeId) * mSegmentHeight + mSegmentHeight / 2;

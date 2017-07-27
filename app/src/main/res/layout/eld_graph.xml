@@ -7,11 +7,10 @@
     android:orientation="horizontal">
 
     <LinearLayout
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_marginTop="@dimen/graph_view_top_offset"
         android:layout_marginBottom="@dimen/graph_view_bottom_offset"
-        android:layout_weight="0.1"
         android:orientation="vertical">
 
         <com.bsmwireless.widgets.common.FontTextView
@@ -68,15 +67,14 @@
         android:id="@+id/hos_graph"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="0.8"/>
+        android:layout_weight="1"/>
 
     <LinearLayout
         android:id="@+id/type_layout"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_marginTop="@dimen/graph_view_top_offset"
         android:layout_marginBottom="@dimen/graph_view_bottom_offset"
-        android:layout_weight="0.1"
         android:orientation="vertical">
 
         <com.bsmwireless.widgets.common.FontTextView
