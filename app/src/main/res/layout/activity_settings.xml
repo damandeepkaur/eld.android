@@ -50,7 +50,7 @@
         android:layout_marginTop="@dimen/default_margin"/>
 
     <View
-        android:id="@+id/firstDivider"
+        android:id="@+id/first_divider"
         android:layout_width="match_parent"
         android:layout_height="@dimen/divider_height"
         android:layout_marginTop="@dimen/default_margin"
@@ -63,7 +63,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_below="@id/firstDivider"
+        android:layout_below="@id/first_divider"
         android:layout_marginLeft="@dimen/default_margin"
         android:layout_marginTop="@dimen/default_margin"
         android:lineSpacingExtra="@dimen/text_view_line_spacing_extra"
@@ -78,12 +78,12 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:layout_below="@id/firstDivider"
+        android:layout_below="@id/first_divider"
         android:layout_marginEnd="@dimen/default_margin"
         android:layout_marginTop="@dimen/default_margin"/>
 
     <View
-        android:id="@+id/secondDivider"
+        android:id="@+id/second_divider"
         android:layout_width="match_parent"
         android:layout_height="@dimen/divider_height"
         android:layout_marginTop="@dimen/default_margin"
@@ -96,7 +96,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_below="@id/secondDivider"
+        android:layout_below="@id/second_divider"
         android:layout_marginLeft="@dimen/default_margin"
         android:layout_marginTop="@dimen/default_margin"
         android:lineSpacingExtra="@dimen/text_view_line_spacing_extra"

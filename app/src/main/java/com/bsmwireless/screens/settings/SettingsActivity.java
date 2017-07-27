@@ -53,8 +53,7 @@ public class SettingsActivity extends BaseMenuActivity implements SettingsView {
             actionBar.setTitle(R.string.settings_title);
         }
 
-        mPresenter.setBoxGPSSwitch();
-        mPresenter.setFixedAmountSwitch();
+        mPresenter.onViewCreated();
     }
 
     @Override

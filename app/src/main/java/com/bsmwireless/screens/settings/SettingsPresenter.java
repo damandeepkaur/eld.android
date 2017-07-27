@@ -24,20 +24,17 @@ public class SettingsPresenter {
         Timber.d("CREATED");
     }
 
+    public void onViewCreated() {
+        mView.setBoxGPSSwitchEnabled(mSettingsInteractor.isBoxGPSEnabled());
+        mView.setFixedAmountSwitchEnabled(mSettingsInteractor.isFixedAmountEnabled());
+    }
+
     public void onBoxGPSSwitchChecked(boolean isBoxGPSEnabled) {
         mSettingsInteractor.saveBoxGPSEnabled(isBoxGPSEnabled);
     }
 
     public void onFixedAmountSwitchChecked(boolean isFixedAmountEnabled) {
         mSettingsInteractor.saveFixedAmountEnabled(isFixedAmountEnabled);
-    }
-
-    public void setBoxGPSSwitch() {
-        mView.setBoxGPSSwitchEnabled(mSettingsInteractor.isBoxGPSEnabled());
-    }
-
-    public void setFixedAmountSwitch() {
-        mView.setFixedAmountSwitchEnabled(mSettingsInteractor.isFixedAmountEnabled());
     }
 
     public void onDestroy() {
