@@ -31,5 +31,10 @@
         </attr>
     </declare-styleable>
 
+
+    <declare-styleable name="CalendarLayout">
+        <attr name="daysCount" format="integer"/>
+    </declare-styleable>
+
 </resources>
 

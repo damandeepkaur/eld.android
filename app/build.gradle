@@ -8,8 +8,8 @@ android {
         applicationId "app.bsmuniversal.com"
         minSdkVersion 19
         targetSdkVersion 25
-        versionCode 22
-        versionName "1.0.21"
+        versionCode 23
+        versionName "1.0.22"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         javaCompileOptions {

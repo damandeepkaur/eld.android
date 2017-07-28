@@ -11,10 +11,15 @@ import com.bsmwireless.models.LoginModel;
 import com.bsmwireless.models.ResponseMessage;
 import com.bsmwireless.models.User;
 
+import java.util.Calendar;
+
 import javax.inject.Inject;
 
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.annotations.NonNull;
 
 import static com.bsmwireless.models.ELDEvent.EventType.LOGIN_LOGOUT;
 
@@ -54,13 +59,23 @@ public class LoginUserInteractor {
                     mTokenManager.setToken(accountName, name, domain, user.getAuth());
 
                     String lastVehicles = mAppDatabase.userDao().getUserLastVehiclesSync(user.getId());
-                    mAppDatabase.userDao().insertUser(UserConverter.toEntity(user));
 
                     if (lastVehicles != null) {
                         mAppDatabase.userDao().setUserLastVehicles(user.getId(), lastVehicles);
                     }
                 })
-                .map(user -> user != null);
+                  .flatMap(user -> {
+                      UserEntity userEntity = mAppDatabase.userDao().getUserSync(user.getId());
+                      if (userEntity != null) {
+                          Long lastModified = userEntity.getLastModified();
+                          if (lastModified != null && lastModified > user.getSyncTime()) {
+                              return mServiceApi.updateProfile(getUpdatedUser(userEntity))
+                                                .map(responseMessage -> responseMessage.getMessage().equals("ACK"));
+                          }
+                      }
+                      return Observable.create((ObservableOnSubscribe<Long>) e -> e.onNext(mAppDatabase.userDao().insertUser(UserConverter.toEntity(user))))
+                                       .map(userID -> userID > 0);
+                  });
     }
 
     public Observable<Boolean> logoutUser() {
@@ -95,12 +110,22 @@ public class LoginUserInteractor {
                 });
     }
 
-    public Observable<Long> updateDBUser(UserEntity user) {
-        return Observable.create(e -> e.onNext(mAppDatabase.userDao().insertUser(user)));
-    }
-
-    public Observable<ResponseMessage> updateUserOnServer(User user) {
-        return mServiceApi.updateProfile(user);
+    public Observable<Boolean> updateUser(User user) {
+        UserEntity userEntity = UserConverter.toEntity(user);
+        return Observable.create((ObservableOnSubscribe<Long>) e -> {
+                                    userEntity.setLastModified(Calendar.getInstance().getTimeInMillis());
+                                    e.onNext(mAppDatabase.userDao().insertUser(userEntity));
+                         })
+                         .map(userId -> userId > 0)
+                         .flatMap(userInserted -> {
+                             if (userInserted) {
+                                 return mServiceApi.updateProfile(getUpdatedUser(userEntity));
+                             }
+                             ResponseMessage responseMessage = new ResponseMessage();
+                             responseMessage.setMessage("");
+                             return Observable.just(responseMessage);
+                         })
+                         .map(responseMessage -> responseMessage.getMessage().equals("ACK"));
     }
 
     public String getUserName() {
@@ -140,6 +165,21 @@ public class LoginUserInteractor {
 
     public boolean isRememberMeEnabled() {
         return mPreferencesManager.isRememberUserEnabled();
+    }
+
+    // TODO: change server logic
+    private User getUpdatedUser(UserEntity userEntity) {
+        User user = new User();
+
+        user.setId(userEntity.getId());
+        user.setTimezone(userEntity.getTimezone());
+        user.setFirstName(userEntity.getFirstName());
+        user.setLastName(userEntity.getLastName());
+        user.setCycleCountry(userEntity.getCycleCountry());
+        user.setSignature(userEntity.getSignature());
+        user.setAddress(userEntity.getAddress());
+
+        return user;
     }
 }
 
