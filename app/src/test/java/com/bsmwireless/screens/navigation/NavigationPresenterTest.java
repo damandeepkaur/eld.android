@@ -1,12 +1,9 @@
 package com.bsmwireless.screens.navigation;
 
-import com.bsmwireless.data.storage.users.UserEntity;
 import com.bsmwireless.domain.interactors.LoginUserInteractor;
 import com.bsmwireless.domain.interactors.VehiclesInteractor;
-import com.bsmwireless.models.ResponseMessage;
 import com.bsmwireless.models.User;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -15,15 +12,10 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
 import app.bsmuniversal.com.RxSchedulerRule;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.TestCase.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -145,85 +137,39 @@ public class NavigationPresenterTest {
     @Test
     public void testOnUserUpdated() {
         // given
-        UserEntity fakeUserEntity = new UserEntity();
-        ResponseMessage fakeSuccessfulResponseMessage = new ResponseMessage();
-
-        when(mLoginUserInteractor.getUser()).thenReturn(Flowable.just(fakeUserEntity));
-        when(mLoginUserInteractor.updateUserOnServer(any(User.class))).thenReturn(Observable.just(fakeSuccessfulResponseMessage));
+        User user = new User();
+        when(mLoginUserInteractor.updateUser(any(User.class))).thenReturn(Observable.just(true)); // prevent null pointer exception
 
         // when
-        mNavigationPresenter.onUserUpdated();
+        mNavigationPresenter.onUserUpdated(user);
 
         // then
-        verify(mLoginUserInteractor).getUser();
-        verify(mLoginUserInteractor).updateUserOnServer(any(User.class)); // TODO: constrain test further once NavigationPresenter#getUpdatedUser is no longer a stub
+        verify(mLoginUserInteractor).updateUser(eq(user));
     }
 
-    /**
-     * Test getUpdatedUser.
-     *
-     * TODO: update test when function is redone - current code might be temporary
-     *
-     * Note that the method's logic is testable, although the access is private. Pls. remove test if
-     * this implementation is temporary or not meant to be tested.
-     */
     @Test
-    public void testGetUpdatedUser() {
+    public void testOnUserUpdatedNullUser() {
         // given
-        final int id = 123;
-        final String timezone = "America/New_York"; // should be valid Java timezone string
-        final String firstName = "First";
-        final String lastName = "Last";
-        final int cycleCountry = 1;
-        final String signature = "51,377;89,310;89,310;111,281;111,281;130,265;-544,-1";
-        final String address = "123 Test Ave";
-
-        boolean isReflectionSuccess = true;
-        User user = null;
-
-        UserEntity testUser = new UserEntity();
-        testUser.setId(id);
-        testUser.setTimezone(timezone);
-        testUser.setFirstName(firstName);
-        testUser.setLastName(lastName);
-        testUser.setCycleCountry(cycleCountry);
-        testUser.setSignature(signature);
-        testUser.setAddress(address);
-
-        Method getUpdatedUser = null;
-        try {
-            getUpdatedUser = NavigationPresenter.class.getDeclaredMethod("getUpdatedUser", UserEntity.class);
-            getUpdatedUser.setAccessible(true);
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace(); // give clues in CI log
-            isReflectionSuccess = false;
-        }
-
+        // n/a
 
         // when
-        try {
-            Object value = getUpdatedUser.invoke(mNavigationPresenter, testUser);
-            user = (User)value;
-        } catch (IllegalAccessException | InvocationTargetException | NullPointerException e) {
-            e.printStackTrace(); // give clues in CI log
-            isReflectionSuccess = false;
-        }
-
+        mNavigationPresenter.onUserUpdated(null);
 
         // then
-        assertTrue(isReflectionSuccess);
-
-        if(user != null) {
-            assertEquals(testUser.getId(), user.getId());
-            assertEquals(testUser.getTimezone(), user.getTimezone());
-            assertEquals(testUser.getFirstName(), user.getFirstName());
-            assertEquals(testUser.getLastName(), user.getLastName());
-            assertEquals(testUser.getCycleCountry(), user.getCycleCountry());
-            assertEquals(testUser.getSignature(), user.getSignature());
-            assertEquals(testUser.getAddress(), user.getAddress());
-        } else {
-            Assert.fail("Error when invoking getUpdatedUser. Please update function or test.");
-        }
+        verify(mLoginUserInteractor, never()).updateUser(any(User.class));
     }
 
+    @Test
+    public void testOnUserUpdatedError() {
+        // given
+        User user = new User();
+        String error = "sorry, it didn't work";
+        when(mLoginUserInteractor.updateUser(any(User.class))).thenReturn(Observable.error(new RuntimeException(error)));
+
+        // when
+        mNavigationPresenter.onUserUpdated(user);
+
+        // then
+        verify(mView).showErrorMessage(eq(error));
+    }
 }
