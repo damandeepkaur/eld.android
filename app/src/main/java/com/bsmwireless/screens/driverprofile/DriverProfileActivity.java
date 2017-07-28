@@ -169,7 +169,6 @@ public class DriverProfileActivity extends BaseMenuActivity implements DriverPro
                                 switch (newState) {
                                     case STATE_HIDDEN: {
                                         mSignatureLayout.setEditable(false);
-                                        mPresenter.onNeedUpdateUserInfo();
                                         break;
                                     }
                                     case STATE_EXPANDED: {

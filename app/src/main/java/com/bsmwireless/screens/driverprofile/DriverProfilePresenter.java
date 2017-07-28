@@ -66,9 +66,7 @@ public class DriverProfilePresenter {
                 signature = cropSignature(signature);
                 mView.showError(new Exception(mContext.getResources().getString(R.string.driver_profile_signature_error)));
             }
-
             mUserEntity.setSignature(signature);
-            updateUserInDB();
         } else {
             mView.showError(new Exception(mContext.getResources().getString(R.string.driver_profile_user_error)));
         }
@@ -83,13 +81,6 @@ public class DriverProfilePresenter {
         } else {
             mView.showError(new Exception(mContext.getResources().getString(R.string.driver_profile_user_error)));
         }
-    }
-
-    private void updateUserInDB() {
-        mUserEntity.setLastModified(Calendar.getInstance().getTimeInMillis());
-        mLoginUserInteractor.updateDBUser(mUserEntity)
-                .subscribeOn(Schedulers.io())
-                .subscribe();
     }
 
     private String cropSignature(String signature) {

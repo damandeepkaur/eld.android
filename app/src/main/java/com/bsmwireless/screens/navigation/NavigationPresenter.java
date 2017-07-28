@@ -1,7 +1,6 @@
 package com.bsmwireless.screens.navigation;
 
 import com.bsmwireless.data.storage.users.UserConverter;
-import com.bsmwireless.data.storage.users.UserEntity;
 import com.bsmwireless.domain.interactors.LoginUserInteractor;
 import com.bsmwireless.domain.interactors.VehiclesInteractor;
 import com.bsmwireless.models.User;
@@ -67,27 +66,11 @@ public class NavigationPresenter {
 
     public void onUserUpdated(User user) {
         if (user != null) {
-            mDisposables.add(mLoginUserInteractor.updateDBUser(UserConverter.toEntity(user))
+            mDisposables.add(mLoginUserInteractor.updateUser(UserConverter.toEntity(user))
                                                  .subscribeOn(Schedulers.io())
-                                                 .subscribe());
-            mDisposables.add(mLoginUserInteractor.updateUserOnServer(getUpdatedUser(user))
-                                                 .subscribeOn(Schedulers.io())
-                                                 .subscribe());
+                                                 .observeOn(AndroidSchedulers.mainThread())
+                                                 .subscribe(userUpdated -> {},
+                                                            throwable -> mView.showErrorMessage(throwable.getMessage())));
         }
-    }
-
-    // TODO: change server logic
-    private User getUpdatedUser(User userEntity) {
-        User user = new User();
-
-        user.setId(userEntity.getId());
-        user.setTimezone(userEntity.getTimezone());
-        user.setFirstName(userEntity.getFirstName());
-        user.setLastName(userEntity.getLastName());
-        user.setCycleCountry(userEntity.getCycleCountry());
-        user.setSignature(userEntity.getSignature());
-        user.setAddress(userEntity.getAddress());
-
-        return user;
     }
 }
