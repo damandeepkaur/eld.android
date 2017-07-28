@@ -25,6 +25,7 @@ import com.bsmwireless.screens.driverprofile.DriverProfileActivity;
 import com.bsmwireless.screens.login.LoginActivity;
 import com.bsmwireless.screens.navigation.dagger.DaggerNavigationComponent;
 import com.bsmwireless.screens.navigation.dagger.NavigationModule;
+import com.bsmwireless.screens.settings.SettingsActivity;
 
 import javax.inject.Inject;
 
@@ -115,7 +116,7 @@ public class NavigationActivity extends BaseMenuActivity implements OnNavigation
                 mDrawerToggle.runWhenIdle(() -> startActivityForResult(new Intent(this, DriverProfileActivity.class), REQUEST_CODE_UPDATE_USER));
                 break;
             case R.id.nav_settings:
-                Toast.makeText(this, "Go to settings screen", Toast.LENGTH_SHORT).show();
+                mDrawerToggle.runWhenIdle(() -> startActivity(new Intent(this, SettingsActivity.class)));
                 break;
             case R.id.nav_logout:
                 mPresenter.onLogoutItemSelected();

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical"
+    tools:context="com.bsmwireless.screens.settings.SettingsActivity">
+
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/settings_app_bar"
+        style="@style/ActionBarTheme"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/settings_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/default_toolbar_padding"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Dark"
+            app:titleTextAppearance="@style/ActionBarTitleTextStyle"/>
+    </android.support.design.widget.AppBarLayout>
+
+    <TextView
+        android:id="@+id/lbl_box_gps"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@id/settings_app_bar"
+        android:layout_marginLeft="@dimen/default_margin"
+        android:layout_marginTop="@dimen/default_margin"
+        android:lineSpacingExtra="@dimen/text_view_line_spacing_extra"
+        android:text="@string/settings_box_gps_title"
+        android:textColor="@color/primary_text"
+        android:textSize="@dimen/text_size"
+        android:textStyle="normal"/>
+
+    <android.support.v7.widget.SwitchCompat
+        android:id="@+id/box_gps_switch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/settings_app_bar"
+        android:layout_marginEnd="@dimen/default_margin"
+        android:layout_marginTop="@dimen/default_margin"/>
+
+    <View
+        android:id="@+id/first_divider"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/divider_height"
+        android:layout_marginTop="@dimen/default_margin"
+        android:layout_below="@id/lbl_box_gps"
+        android:background="?android:attr/listDivider"/>
+
+    <TextView
+        android:id="@+id/lbl_fixed_amount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@id/first_divider"
+        android:layout_marginLeft="@dimen/default_margin"
+        android:layout_marginTop="@dimen/default_margin"
+        android:lineSpacingExtra="@dimen/text_view_line_spacing_extra"
+        android:text="@string/settings_fixed_mount_title"
+        android:textColor="@color/primary_text"
+        android:textSize="@dimen/text_size"
+        android:textStyle="normal"/>
+
+    <android.support.v7.widget.SwitchCompat
+        android:id="@+id/fixed_amount_switch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/first_divider"
+        android:layout_marginEnd="@dimen/default_margin"
+        android:layout_marginTop="@dimen/default_margin"/>
+
+    <View
+        android:id="@+id/second_divider"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/divider_height"
+        android:layout_marginTop="@dimen/default_margin"
+        android:layout_below="@id/lbl_fixed_amount"
+        android:background="?android:attr/listDivider"/>
+
+    <TextView
+        android:id="@+id/lbl_odometer_units"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@id/second_divider"
+        android:layout_marginLeft="@dimen/default_margin"
+        android:layout_marginTop="@dimen/default_margin"
+        android:lineSpacingExtra="@dimen/text_view_line_spacing_extra"
+        android:text="@string/settings_odometer_units"
+        android:textColor="@color/primary_text"
+        android:textSize="@dimen/text_size"
+        android:textStyle="normal"/>
+
+</RelativeLayout>

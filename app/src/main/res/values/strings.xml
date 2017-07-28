@@ -379,4 +379,12 @@
 
     <string name="ok">Ok</string>
     <string name="clear">Clear</string>
+
+    <!-- Settings Activity -->
+    <string name="settings">Settings</string>
+    <string name="settings_title">Settings</string>
+    <string name="settings_box_gps_title">Box GPS</string>
+    <string name="settings_fixed_mount_title">Fixed mount</string>
+    <string name="settings_odometer_units">Odometer units</string>
+
 </resources>
