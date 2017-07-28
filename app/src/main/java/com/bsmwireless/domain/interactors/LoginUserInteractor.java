@@ -110,15 +110,16 @@ public class LoginUserInteractor {
                 });
     }
 
-    public Observable<Boolean> updateUser(UserEntity user) {
+    public Observable<Boolean> updateUser(User user) {
+        UserEntity userEntity = UserConverter.toEntity(user);
         return Observable.create((ObservableOnSubscribe<Long>) e -> {
-                                    user.setLastModified(Calendar.getInstance().getTimeInMillis());
-                                    e.onNext(mAppDatabase.userDao().insertUser(user));
+                                    userEntity.setLastModified(Calendar.getInstance().getTimeInMillis());
+                                    e.onNext(mAppDatabase.userDao().insertUser(userEntity));
                          })
                          .map(userId -> userId > 0)
                          .flatMap(userInserted -> {
                              if (userInserted) {
-                                 return mServiceApi.updateProfile(getUpdatedUser(user));
+                                 return mServiceApi.updateProfile(getUpdatedUser(userEntity));
                              }
                              ResponseMessage responseMessage = new ResponseMessage();
                              responseMessage.setMessage("");
