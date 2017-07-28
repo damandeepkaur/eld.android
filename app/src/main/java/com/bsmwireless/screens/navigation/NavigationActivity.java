@@ -20,11 +20,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bsmwireless.common.App;
+import com.bsmwireless.models.User;
 import com.bsmwireless.screens.common.BaseMenuActivity;
 import com.bsmwireless.screens.driverprofile.DriverProfileActivity;
 import com.bsmwireless.screens.login.LoginActivity;
 import com.bsmwireless.screens.navigation.dagger.DaggerNavigationComponent;
 import com.bsmwireless.screens.navigation.dagger.NavigationModule;
+import com.bsmwireless.screens.settings.SettingsActivity;
 
 import javax.inject.Inject;
 
@@ -32,6 +34,8 @@ import app.bsmuniversal.com.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+
+import static com.bsmwireless.screens.driverprofile.DriverProfileActivity.EXTRA_USER;
 
 public class NavigationActivity extends BaseMenuActivity implements OnNavigationItemSelectedListener, NavigateView {
 
@@ -115,7 +119,7 @@ public class NavigationActivity extends BaseMenuActivity implements OnNavigation
                 mDrawerToggle.runWhenIdle(() -> startActivityForResult(new Intent(this, DriverProfileActivity.class), REQUEST_CODE_UPDATE_USER));
                 break;
             case R.id.nav_settings:
-                Toast.makeText(this, "Go to settings screen", Toast.LENGTH_SHORT).show();
+                mDrawerToggle.runWhenIdle(() -> startActivity(new Intent(this, SettingsActivity.class)));
                 break;
             case R.id.nav_logout:
                 mPresenter.onLogoutItemSelected();
@@ -239,7 +243,10 @@ public class NavigationActivity extends BaseMenuActivity implements OnNavigation
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
             case REQUEST_CODE_UPDATE_USER: {
-                mPresenter.onUserUpdated();
+                if (data != null && data.hasExtra(EXTRA_USER)) {
+                    User user = data.getParcelableExtra(EXTRA_USER);
+                    mPresenter.onUserUpdated(user);
+                }
                 break;
             }
             default: {

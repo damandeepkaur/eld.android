@@ -25,6 +25,9 @@
     <string name="navigation_logs">Logs</string>
     <string name="navigation_multi_day">Multi-day</string>
 
+    <!--Barcode Scanner-->
+    <string name="barcode_scanner_error">Camera permission is necessary for barcode scanning</string>
+
     <!-- START OLD STRINGS -->
     <string name="no_network">No Network Available</string>
     <string name="app_compatability">Note: Compatible with Android 4.0.3 - 6.0.1</string>
@@ -376,4 +379,12 @@
 
     <string name="ok">Ok</string>
     <string name="clear">Clear</string>
+
+    <!-- Settings Activity -->
+    <string name="settings">Settings</string>
+    <string name="settings_title">Settings</string>
+    <string name="settings_box_gps_title">Box GPS</string>
+    <string name="settings_fixed_mount_title">Fixed mount</string>
+    <string name="settings_odometer_units">Odometer units</string>
+
 </resources>
