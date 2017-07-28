@@ -2,7 +2,6 @@ package com.bsmwireless.screens.navigation;
 
 import com.bsmwireless.domain.interactors.LoginUserInteractor;
 import com.bsmwireless.domain.interactors.VehiclesInteractor;
-import com.bsmwireless.models.ResponseMessage;
 import com.bsmwireless.models.User;
 
 import org.junit.Before;
@@ -139,7 +138,6 @@ public class NavigationPresenterTest {
     public void testOnUserUpdated() {
         // given
         User user = new User();
-        ResponseMessage fakeSuccessfulResponseMessage = new ResponseMessage();
         when(mLoginUserInteractor.updateUser(any(User.class))).thenReturn(Observable.just(true)); // prevent null pointer exception
 
         // when
