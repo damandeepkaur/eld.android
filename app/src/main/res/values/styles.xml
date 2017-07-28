@@ -15,6 +15,15 @@
         <item name="windowActionBar">false</item>
     </style>
 
+    <style name="AppTheme.Transparent" parent="AppTheme.NoActionBar">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:windowFullscreen">true</item>
+    </style>
+
     <style name="ActionBarTheme" parent="style/ThemeOverlay.AppCompat.Dark.ActionBar">
         <item name="android:homeAsUpIndicator">@drawable/ic_arrow_back_green_24dp</item>
         <item name="colorControlNormal">@color/nasty_green</item>

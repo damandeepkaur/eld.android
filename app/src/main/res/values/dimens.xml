@@ -104,4 +104,8 @@
     <!-- Calendar widget -->
     <dimen name="calendar_item_width">45dp</dimen>
     <dimen name="calendar_item_height">85dp</dimen>
+
+    <!-- Settings Activity -->
+    <dimen name="divider_height">1dp</dimen>
+
 </resources>
