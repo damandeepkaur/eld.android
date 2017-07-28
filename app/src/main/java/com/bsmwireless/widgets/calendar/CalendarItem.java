@@ -21,22 +21,30 @@ public class CalendarItem {
     private LogSheetHeader mAssociatedLog;
     private Long mDate;
 
+    private String mMonth;
+    private String mDay;
+    private String mDayOfWeek;
+
     public CalendarItem(Long date, LogSheetHeader log) {
         mAssociatedLog = log;
         mDate = date;
         mCalendar.setTime(new Date(mDate));
+
+        mDay = String.valueOf(mCalendar.get(Calendar.DAY_OF_MONTH));
+        mMonth = mMonthFormat.format(mCalendar.getTime());
+        mDayOfWeek = mDayFormat.format(mCalendar.getTime()).substring(0, 3).toUpperCase();
     }
 
     public String getMonth() {
-        return mMonthFormat.format(mCalendar.getTime());
+        return mMonth;
     }
 
-    public int getDay() {
-        return mCalendar.get(Calendar.DAY_OF_MONTH);
+    public String getDay() {
+        return mDay;
     }
 
     public String getDayOfWeek() {
-        return mDayFormat.format(mCalendar.getTime());
+        return mDayOfWeek;
     }
 
     public Long getDate() {

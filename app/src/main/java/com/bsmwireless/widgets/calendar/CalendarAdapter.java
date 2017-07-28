@@ -23,17 +23,14 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.ViewHo
 
     private List<CalendarItem> mItems;
 
-    private OnItemSelectListener mListener;
-
     private int mSelectedPosition = 0;
 
-    public interface OnItemSelectListener {
-        void onItemSelected(CalendarItem log);
-    }
+    private View.OnClickListener mOnClickListener;
 
-    public CalendarAdapter(Context context, List<CalendarItem> items) {
+    public CalendarAdapter(Context context, List<CalendarItem> items, View.OnClickListener onClickListener) {
         mItems = items;
         mContext = context;
+        mOnClickListener = onClickListener;
     }
 
     @Override
@@ -46,22 +43,11 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.ViewHo
     public void onBindViewHolder(CalendarAdapter.ViewHolder holder, int position) {
         CalendarItem item = mItems.get(position);
 
-        holder.mDayOfMonthTV.setText(String.valueOf(item.getDay()));
-        holder.mDayOfWeekTV.setText(item.getDayOfWeek().substring(0, 3).toUpperCase());
+        holder.mDayOfMonthTV.setText(item.getDay());
+        holder.mDayOfWeekTV.setText(item.getDayOfWeek());
         holder.itemView.setSelected(mSelectedPosition == position);
 
-        holder.itemView.setOnClickListener(v -> {
-            if (mSelectedPosition != position) {
-                int prevSelected = mSelectedPosition;
-                mSelectedPosition = position;
-                holder.itemView.setSelected(true);
-                notifyItemChanged(prevSelected);
-            }
-
-            if (mListener != null) {
-                mListener.onItemSelected(item);
-            }
-        });
+        holder.itemView.setOnClickListener(mOnClickListener);
 
         LogSheetHeader associatedLog = item.getAssociatedLog();
 
@@ -86,8 +72,13 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.ViewHo
         return mItems != null ? mItems.size() : 0;
     }
 
-    public void setOnItemSelectedListener(OnItemSelectListener listener) {
-        mListener = listener;
+    public void setSelectedItem(int position) {
+        if (mSelectedPosition != position) {
+            int prevPosition = mSelectedPosition;
+            mSelectedPosition = position;
+            notifyItemChanged(prevPosition);
+            notifyItemChanged(mSelectedPosition);
+        }
     }
 
     public void updateLogs(List<LogSheetHeader> logs) {
@@ -99,6 +90,10 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.ViewHo
             }
         }
         notifyDataSetChanged();
+    }
+
+    public CalendarItem getItemByPosition(int position) {
+        return mItems != null && position < mItems.size() ? mItems.get(position) : null;
     }
 
     private CalendarItem findItemByDate(Long date) {

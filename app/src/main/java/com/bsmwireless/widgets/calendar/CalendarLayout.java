@@ -23,7 +23,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 
-public class CalendarLayout extends LinearLayout {
+public class CalendarLayout extends LinearLayout implements View.OnClickListener{
 
     private static final int DEFAULT_DAYS_COUNT = 30;
 
@@ -37,12 +37,18 @@ public class CalendarLayout extends LinearLayout {
 
     private LinearLayoutManager mLayoutManager;
 
+    private OnItemSelectListener mListener;
+
     @BindView(R.id.recycler_view)
     RecyclerView mRecyclerView;
     @BindView(R.id.left)
     Button mLeftButton;
     @BindView(R.id.right)
     Button mRightButton;
+
+    public interface OnItemSelectListener {
+        void onItemSelected(CalendarItem log);
+    }
 
     public CalendarLayout(Context context) {
         super(context);
@@ -74,7 +80,7 @@ public class CalendarLayout extends LinearLayout {
 
         mLayoutManager = new LinearLayoutManager(getContext(), HORIZONTAL, true);
         mRecyclerView.setLayoutManager(mLayoutManager);
-        mAdapter = new CalendarAdapter(getContext(), getItems());
+        mAdapter = new CalendarAdapter(getContext(), getItems(), this);
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -99,6 +105,16 @@ public class CalendarLayout extends LinearLayout {
         super.onDetachedFromWindow();
     }
 
+    @Override
+    public void onClick(View v) {
+        int position = mRecyclerView.getChildAdapterPosition(v);
+        mAdapter.setSelectedItem(position);
+        if (mListener != null) {
+            CalendarItem item = mAdapter.getItemByPosition(position);
+            mListener.onItemSelected(item);
+        }
+    }
+
     @OnClick(R.id.left)
     void onLeftClicked() {
         int firstPosition = mLayoutManager.findFirstVisibleItemPosition();
@@ -119,6 +135,10 @@ public class CalendarLayout extends LinearLayout {
         if (mAdapter != null) {
             mAdapter.updateLogs(logs);
         }
+    }
+
+    public void setOnItemSelectedListener(OnItemSelectListener listener) {
+        mListener = listener;
     }
 
     private List<CalendarItem> getItems() {
