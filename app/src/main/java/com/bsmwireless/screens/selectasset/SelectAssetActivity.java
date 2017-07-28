@@ -186,7 +186,7 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
             String barcodeId = data.getStringExtra(BARCODE_UUID);
             String type = data.getStringExtra(BARCODE_TYPE);
             Timber.v(barcodeId + " type:" + type);
-            mSearchView.setQuery(barcodeId, true);
+            mSearchView.setQuery(barcodeId, false);
         }
     }
 
