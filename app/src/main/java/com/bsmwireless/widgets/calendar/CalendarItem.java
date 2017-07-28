@@ -13,6 +13,9 @@ public class CalendarItem {
 
     public static final int ONE_DAY_MS = 24 * 60 * 60 * 1000;
 
+    private static final SimpleDateFormat mMonthFormat = new SimpleDateFormat("MMMM", Locale.US);
+    private static final SimpleDateFormat mDayFormat = new SimpleDateFormat("EEEE", Locale.US);
+
     private Calendar mCalendar = Calendar.getInstance();
 
     private LogSheetHeader mAssociatedLog;
@@ -25,8 +28,7 @@ public class CalendarItem {
     }
 
     public String getMonth() {
-        SimpleDateFormat monthFormat = new SimpleDateFormat("MMMM", Locale.US);
-        return monthFormat.format(mCalendar.getTime());
+        return mMonthFormat.format(mCalendar.getTime());
     }
 
     public int getDay() {
@@ -34,8 +36,7 @@ public class CalendarItem {
     }
 
     public String getDayOfWeek() {
-        SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE", Locale.US);
-        return dayFormat.format(mCalendar.getTime());
+        return mDayFormat.format(mCalendar.getTime());
     }
 
     public Long getDate() {
@@ -51,7 +52,7 @@ public class CalendarItem {
         mAssociatedLog = log;
     }
 
-    public boolean isDateValid(Long date) {
+    public boolean isCurrentDay(Long date) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(new Date(date));
         return calendar.get(Calendar.DAY_OF_YEAR) == mCalendar.get(Calendar.DAY_OF_YEAR);

@@ -35,6 +35,8 @@ public class CalendarLayout extends LinearLayout {
 
     private int mDaysCount;
 
+    private LinearLayoutManager mLayoutManager;
+
     @BindView(R.id.recycler_view)
     RecyclerView mRecyclerView;
     @BindView(R.id.left)
@@ -70,7 +72,8 @@ public class CalendarLayout extends LinearLayout {
         super.onFinishInflate();
         mUnbinder = ButterKnife.bind(this, mRootView);
 
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), HORIZONTAL, true));
+        mLayoutManager = new LinearLayoutManager(getContext(), HORIZONTAL, true);
+        mRecyclerView.setLayoutManager(mLayoutManager);
         mAdapter = new CalendarAdapter(getContext(), getItems());
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setHasFixedSize(true);
@@ -79,9 +82,8 @@ public class CalendarLayout extends LinearLayout {
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
                 if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                    LinearLayoutManager layoutManager = (LinearLayoutManager) mRecyclerView.getLayoutManager();
-                    int firstPosition = layoutManager.findFirstVisibleItemPosition();
-                    int lastPosition = layoutManager.findLastVisibleItemPosition();
+                    int firstPosition = mLayoutManager.findFirstVisibleItemPosition();
+                    int lastPosition = mLayoutManager.findLastVisibleItemPosition();
                     mRightButton.setEnabled(firstPosition != 0);
                     mLeftButton.setEnabled(lastPosition != (mAdapter.getItemCount() - 1));
                 }
@@ -99,18 +101,16 @@ public class CalendarLayout extends LinearLayout {
 
     @OnClick(R.id.left)
     void onLeftClicked() {
-        LinearLayoutManager layoutManager = (LinearLayoutManager) mRecyclerView.getLayoutManager();
-        int firstPosition = layoutManager.findFirstVisibleItemPosition();
-        int lastPosition = layoutManager.findLastVisibleItemPosition();
+        int firstPosition = mLayoutManager.findFirstVisibleItemPosition();
+        int lastPosition = mLayoutManager.findLastVisibleItemPosition();
         int newPosition = lastPosition + (lastPosition - firstPosition) - 1;
         mRecyclerView.smoothScrollToPosition(newPosition < mAdapter.getItemCount() ? newPosition : mAdapter.getItemCount() - 1);
     }
 
     @OnClick(R.id.right)
     void onRightClicked() {
-        LinearLayoutManager layoutManager = (LinearLayoutManager) mRecyclerView.getLayoutManager();
-        int firstPosition = layoutManager.findFirstVisibleItemPosition();
-        int lastPosition = layoutManager.findLastVisibleItemPosition();
+        int firstPosition = mLayoutManager.findFirstVisibleItemPosition();
+        int lastPosition = mLayoutManager.findLastVisibleItemPosition();
         int newPosition = firstPosition - (lastPosition - firstPosition) + 1;
         mRecyclerView.smoothScrollToPosition(newPosition > 0 ? newPosition : 0);
     }
@@ -125,7 +125,8 @@ public class CalendarLayout extends LinearLayout {
         Calendar calendar = Calendar.getInstance();
         List<CalendarItem> logs = new ArrayList<>();
         long dayMS = CalendarItem.ONE_DAY_MS;
-        for (int i = 0; i < (mDaysCount > 0 ? mDaysCount : DEFAULT_DAYS_COUNT); i++) {
+        int itemsCount = mDaysCount > 0 ? mDaysCount : DEFAULT_DAYS_COUNT;
+        for (int i = 0; i < itemsCount; i++) {
             Long time = calendar.getTime().getTime();
             CalendarItem item = new CalendarItem(time, null);
             logs.add(item);

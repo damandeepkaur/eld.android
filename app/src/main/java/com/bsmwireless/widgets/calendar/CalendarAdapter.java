@@ -14,6 +14,8 @@ import com.bsmwireless.models.LogSheetHeader;
 import java.util.List;
 
 import app.bsmuniversal.com.R;
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.ViewHolder> {
 
@@ -81,7 +83,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.ViewHo
 
     @Override
     public int getItemCount() {
-        return mItems.size();
+        return mItems != null ? mItems.size() : 0;
     }
 
     public void setOnItemSelectedListener(OnItemSelectListener listener) {
@@ -102,7 +104,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.ViewHo
     private CalendarItem findItemByDate(Long date) {
         for (CalendarItem item:
              mItems) {
-            if (item.isDateValid(date)) {
+            if (item.isCurrentDay(date)) {
                 return item;
             }
         }
@@ -111,13 +113,14 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.ViewHo
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
-        private TextView mDayOfWeekTV;
-        private TextView mDayOfMonthTV;
+        @BindView(R.id.day_of_week)
+        TextView mDayOfWeekTV;
+        @BindView(R.id.day_of_month)
+        TextView mDayOfMonthTV;
 
         public ViewHolder(View itemView) {
             super(itemView);
-            mDayOfWeekTV = (TextView) itemView.findViewById(R.id.day_of_week);
-            mDayOfMonthTV = (TextView) itemView.findViewById(R.id.day_of_month);
+            ButterKnife.bind(this, itemView);
         }
     }
 }
