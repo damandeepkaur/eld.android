@@ -1,4 +1,4 @@
-package com.bsmwireless.widgets.graphview;
+package com.bsmwireless.widgets.logs.graphview;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -17,11 +17,6 @@ import butterknife.Unbinder;
 
 public class GraphLayout extends LinearLayout {
 
-    private Unbinder mUnbinder;
-
-    private View mRootView;
-
-    @BindView(R.id.hos_graph)
     ELDGraphView mELDGraphView;
     @BindView(R.id.time_on)
     FontTextView mHOSTimerOnDuty;
@@ -31,6 +26,10 @@ public class GraphLayout extends LinearLayout {
     FontTextView mHOSTimerSleeperBerth;
     @BindView(R.id.time_dr)
     FontTextView mHOSTimerDriving;
+
+    private Unbinder mUnbinder;
+    private View mRootView;
+    private List<ELDEvent> mLogs;
 
     public GraphLayout(Context context) {
         super(context);
@@ -47,8 +46,11 @@ public class GraphLayout extends LinearLayout {
         init(context);
     }
 
-    public void updateGraph(List<ELDEvent> logs) {
-        mELDGraphView.setLogs(logs);
+    public void setELDEvents(List<ELDEvent> logs) {
+        mLogs = logs;
+        if (mELDGraphView != null) {
+            mELDGraphView.setLogs(logs);
+        }
     }
 
     public void setHOSTimerOnDuty(String time) {
@@ -69,17 +71,18 @@ public class GraphLayout extends LinearLayout {
 
     private void init(Context context) {
         mRootView = inflate(context, R.layout.eld_graph, this);
+        mELDGraphView = (ELDGraphView) mRootView.findViewById(R.id.hos_graph);
     }
 
     @Override
-    protected void onFinishInflate() {
-        super.onFinishInflate();
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
         mUnbinder = ButterKnife.bind(this, mRootView);
     }
 
     @Override
     protected void onDetachedFromWindow() {
-        mUnbinder.unbind();
         super.onDetachedFromWindow();
+        mUnbinder.unbind();
     }
 }

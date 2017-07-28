@@ -108,4 +108,8 @@
     <!-- Settings Activity -->
     <dimen name="divider_height">1dp</dimen>
 
+    <!--Logs-->
+    <dimen name="bottom_bar_button_left_padding">36dp</dimen>
+    <dimen name="bottom_bar_button_right_padding">36dp</dimen>
+
 </resources>

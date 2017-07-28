@@ -1,4 +1,4 @@
-package com.bsmwireless.widgets.calendar;
+package com.bsmwireless.widgets.logs.calendar;
 
 import android.content.Context;
 import android.graphics.Typeface;
@@ -52,7 +52,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.ViewHo
         LogSheetHeader associatedLog = item.getAssociatedLog();
 
         if (associatedLog != null) {
-            if (associatedLog.getSigned()) {
+            if (associatedLog.getSigned() != null && associatedLog.getSigned()) {
                 holder.mDayOfMonthTV.setTextColor(ContextCompat.getColor(mContext, R.color.nasty_green));
                 holder.mDayOfMonthTV.setTypeface(null, Typeface.BOLD);
             } else {
@@ -82,14 +82,15 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.ViewHo
     }
 
     public void updateLogs(List<LogSheetHeader> logs) {
-        for (LogSheetHeader log:
-             logs) {
-            CalendarItem item = findItemByDate(log.getLogDay());
-            if (item != null) {
-                item.setAssociatedLog(log);
+        if (logs != null) {
+            for (LogSheetHeader log : logs) {
+                CalendarItem item = findItemByDate(log.getLogDay());
+                if (item != null) {
+                    item.setAssociatedLog(log);
+                }
             }
+            notifyDataSetChanged();
         }
-        notifyDataSetChanged();
     }
 
     public CalendarItem getItemByPosition(int position) {
@@ -97,8 +98,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.ViewHo
     }
 
     private CalendarItem findItemByDate(Long date) {
-        for (CalendarItem item:
-             mItems) {
+        for (CalendarItem item : mItems) {
             if (item.isCurrentDay(date)) {
                 return item;
             }
