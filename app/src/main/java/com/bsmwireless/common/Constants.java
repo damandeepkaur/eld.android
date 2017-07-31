@@ -13,4 +13,5 @@ public interface Constants {
 
     String WIFI_GATEWAY_IP="192.168.1.1";
     int WIFI_REMOTE_PORT=2880;
+    int STATUS_UPDATE_RATE_SECS=10;
 }

@@ -1,6 +1,6 @@
-package com.bsmwireless.data.network.Connection.Response;
+package com.bsmwireless.data.network.connection.response;
 
-import com.bsmwireless.data.network.Connection.ConnectionUtils;
+import com.bsmwireless.data.network.connection.ConnectionUtils;
 import com.bsmwireless.models.BlackBoxModel;
 
 import java.util.Calendar;
@@ -10,10 +10,10 @@ import java.util.TimeZone;
 import timber.log.Timber;
 
 /**
- * Created by hsudhagar on 2017-07-21.
+ *  Processor for vehicle status response , to process the box data
  */
 
-public class VehicleStatusResponseProcessor extends ResponseProcessor {
+public class VehicleStatusProcessor extends ResponseProcessor {
 
 
     public ResponseProcessor parse(byte[] data) {
@@ -22,21 +22,17 @@ public class VehicleStatusResponseProcessor extends ResponseProcessor {
             if (!parseHeader(data)) return null;
             BlackBoxModel boxData= this.getBoxData();
             int index = 11;
-            byte msg = data[11];
+            byte msg = data[index];
             this.setResponseType(ResponseType.valueOf((char) msg));
             index++;
             //boxID 12 to 15
-            long boxId = data[index];
-            index++;
-            boxId |= (int)((data[index] & 0XFF) << 8);
-            index++;
-            boxId |= (int)((data[index] & 0XFF) << 16);
-            index++;
-            Timber.i("boxid received from box:" +  boxId);
+            long boxId = ConnectionUtils.byteToUnsignedInt(new byte[]{ data[index],  data[index+1],  data[index+2], data[index+3]});
+            index +=4;
+
             boxData.setBoxId(boxId);
-            index++;
+
             //sequence number 16 and 17
-            boxData.setSequenceNum(ConnectionUtils.byteToUnsignedInt(data[index], data[index+1]));
+            boxData.setSequenceNum(ConnectionUtils.byteToUnsignedInt(new byte[]{data[index], data[index+1]}));
             index += 2;
 
             //Event Time
@@ -59,8 +55,12 @@ public class VehicleStatusResponseProcessor extends ResponseProcessor {
             String s = cal.getTime().toString();
 
             //TODO: process sensor state
-
-            index=30;
+            // sensor state 24-26 3 byte
+            int sensorState = ConnectionUtils.byteToUnsignedInt(new byte[]{data[index], data[index+1], data[index+2]});
+            // sensor change mask 27-29 3 byte
+            index +=3;
+            int sensorMask = ConnectionUtils.byteToUnsignedInt(new byte[]{data[index], data[index+1], data[index+2]});
+            index +=3;
             //latitude at 30-33
             byte[] latArr = new byte[4];
             System.arraycopy(data,index,latArr,0,4);
@@ -76,7 +76,7 @@ public class VehicleStatusResponseProcessor extends ResponseProcessor {
             Timber.i("Longitude received from box:" +  lon);
             index = index+4;
             //Heading at 38-39
-            boxData.setHeading(ConnectionUtils.byteToUnsignedInt(data[index], data[index+1]));
+            boxData.setHeading(ConnectionUtils.byteToUnsignedInt(new byte[]{data[index], data[index+1]}));
             index += 2;
             index+=2;
             int speed = (int)(data[index] & 0XFF);
@@ -88,19 +88,18 @@ public class VehicleStatusResponseProcessor extends ResponseProcessor {
             Timber.i("Odometer received from box:" +  boxData.getOdometer());
             index = index+4;
 
-            //Total Engine Run time in seconds
+            //Total Engine Run time in seconds 45 to 48
             byte[] TERTArr = new byte[4];
             System.arraycopy(data,index,TERTArr,0,4);
             boxData.setTERT(ConnectionUtils.byteToUnsignedInt(TERTArr));
             Timber.i("TERT received from box:" +  boxData.getTERT());
             index = index+4;
-
-
             // TD Messages in queue
             boxData.setTDMsgQueue ( (int)(data[index] & 0XFF));
             return this;
+
         } catch (Exception e) {
-;
+
             Timber.e("Exception in handling ack handler", e);
         }
         return null;

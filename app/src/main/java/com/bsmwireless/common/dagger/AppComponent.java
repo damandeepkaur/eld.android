@@ -2,7 +2,7 @@ package com.bsmwireless.common.dagger;
 
 import android.content.Context;
 
-import com.bsmwireless.data.network.Connection.ConnectionManager;
+import com.bsmwireless.data.network.connection.ConnectionManager;
 import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.network.authenticator.TokenManager;
 import com.bsmwireless.data.storage.AppDatabase;

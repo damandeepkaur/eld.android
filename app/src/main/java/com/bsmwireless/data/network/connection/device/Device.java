@@ -1,16 +1,14 @@
-package com.bsmwireless.data.network.Connection;
-
-import com.bsmwireless.models.Vehicle;
+package com.bsmwireless.data.network.connection.device;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-
 /**
- * Created by hsudhagar on 2017-07-23.
+ *  Interface to connect to the Device, it can be WIFI or Serial
  */
 
-public interface DeviceInterface {
+
+public interface Device {
 
     public boolean connect();
     public void disconnect();

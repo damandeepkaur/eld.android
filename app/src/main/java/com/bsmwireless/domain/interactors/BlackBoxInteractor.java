@@ -1,18 +1,14 @@
 package com.bsmwireless.domain.interactors;
 
-import com.bsmwireless.data.network.Connection.ConnectionManager;
+import com.bsmwireless.data.network.connection.ConnectionManager;
 import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.models.BlackBoxModel;
 import com.bsmwireless.models.Vehicle;
 
-import java.util.List;
-
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
-import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.Subject;
-import timber.log.Timber;
 
 //TODO: return real data
 public class BlackBoxInteractor {

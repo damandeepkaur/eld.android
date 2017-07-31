@@ -1,7 +1,7 @@
 package com.bsmwireless.domain.interactors;
 
 import com.bsmwireless.common.Constants;
-import com.bsmwireless.data.network.Connection.ConnectionManager;
+import com.bsmwireless.data.network.connection.ConnectionManager;
 import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.PreferencesManager;
@@ -10,7 +10,6 @@ import com.bsmwireless.data.storage.vehicles.VehicleConverter;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.Vehicle;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 

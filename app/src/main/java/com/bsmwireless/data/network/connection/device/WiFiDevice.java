@@ -1,8 +1,7 @@
-package com.bsmwireless.data.network.Connection;
+package com.bsmwireless.data.network.connection.device;
 
 
 import com.bsmwireless.common.Constants;
-import com.bsmwireless.models.Vehicle;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,10 +12,10 @@ import java.net.Socket;
 import timber.log.Timber;
 
 /**
- * Created by hsudhagar on 2017-07-23.
+ *  Communication through WiFi in the Device.
  */
 
-public class Device implements DeviceInterface {
+public class WiFiDevice implements Device {
 
     private String mConnectionString =Constants.WIFI_GATEWAY_IP;
     private int mPort = Constants.WIFI_REMOTE_PORT;
