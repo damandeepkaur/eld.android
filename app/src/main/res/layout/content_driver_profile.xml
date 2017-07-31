@@ -5,7 +5,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@android:color/white"
-            local:layout_behavior="@string/appbar_scrolling_view_behavior">
+            local:layout_behavior="com.bsmwireless.widgets.snackbar.SnackBarBehavior">
 
     <LinearLayout android:layout_width="match_parent"
                   android:layout_height="wrap_content"
@@ -176,7 +176,6 @@
             android:id="@+id/signature_view"
             android:layout_width="match_parent"
             android:layout_height="@dimen/driver_profile_signature_height"
-            android:layout_marginBottom="?attr/actionBarSize"
             android:background="@color/signature_background"/>
 
     </LinearLayout>
