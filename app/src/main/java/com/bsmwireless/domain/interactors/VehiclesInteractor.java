@@ -32,7 +32,7 @@ public class VehiclesInteractor {
     private BlackBoxInteractor mBlackBoxInteractor;
     private ELDEventsInteractor mELDEventsInteractor;
     private ConnectionManager mConnectionManager;
-    private Subject<ConnectionManager.ConnectionState> mConnectionStatusSubject;
+    private Subject<ConnectionManager.ConnectionStatus> mConnectionStatusSubject;
     @Inject
     public VehiclesInteractor(ServiceApi serviceApi,
                               PreferencesManager preferencesManager,

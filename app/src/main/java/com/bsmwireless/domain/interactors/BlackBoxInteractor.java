@@ -50,7 +50,7 @@ public class BlackBoxInteractor {
     {
         mConnectionManager.disconnect();
     }
-    public Subject<ConnectionManager.ConnectionState> getConnectionState() {
+    public Subject<ConnectionManager.ConnectionStatus> getConnectionState() {
 
         return mConnectionManager.getConnectionStateObservable();
     }
