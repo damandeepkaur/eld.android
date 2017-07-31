@@ -1,52 +1,24 @@
-package com.bsmwireless.data.network.Connection.Response;
+package com.bsmwireless.data.network.connection.response;
 
-import com.bsmwireless.data.network.Connection.ConnectionUtils;
+import com.bsmwireless.data.network.connection.ConnectionUtils;
 import com.bsmwireless.models.BlackBoxModel;
-import com.bsmwireless.widgets.graphview.DutyType;
-
-import java.util.Date;
 
 /**
- * Created by hsudhagar on 2017-07-20.
+ *  Abstracted the Response processor with definitions  and  common parser
  */
 
 public abstract class ResponseProcessor {
-
-
-
     private ResponseType mResponseType;
     private int mCheckSum;
     private int mLength;
     private int mSequenceId;
     private String mVinNumber;
-
     private NackReasonCode mErrReasonCode;
-
     private BlackBoxModel mBoxData = new BlackBoxModel();
+    private StatusType responseStatus;
+    private String errMsg;
 
-   /* //Vehicle status Information
-    public int odometer;
-    public DutyType driverStatus;
-    public Date evenTimeUTC;
-    public long boxId;
-
-
-    public int sequenceNum;
-
-    public int TERT; // Total Engine Run time in seconds
-
-    //TD Messages in Queue
-    //Up to 250 pending messages (255 = queue size larger than 250). 
-    public int TDMsgQueue;
-
-    //Speed in kilometer per hour
-    public int speed;
-
-    public int heading;
-
-    public double lat;
-    public double lon;
-*/
+    public enum StatusType{ Success, Failed};
     public enum ResponseType{
         Ack('a'),
         NAck('n'),
@@ -69,28 +41,29 @@ public abstract class ResponseProcessor {
         {
 
 
-                switch(type)
-                {
-                    case 'A':
-                        return Ack;
-                    case 'n':
-                        return NAck;
-                    case 'S':
-                    case 'D': //TODO: to test with legacy, need to be removed
-                        return StatusUpdate;
-                    case 'I':
-                        return IgnitionOn;
-                    case 'i':
-                        return IgnitionOff;
-                    case 'G':
-                        return Moving;
-                    case 'g':
-                        return Stopped;
-                    case 'E':
-                        return SensorChange;
+            switch(type)
+            {
+                case 'A'://TODO: to test with legacy, need to be removed
+                case 'a':
+                    return Ack;
+                case 'n':
+                    return NAck;
+                case 'S':
+                case 'D': //TODO: to test with legacy, need to be removed
+                    return StatusUpdate;
+                case 'I':
+                    return IgnitionOn;
+                case 'i':
+                    return IgnitionOff;
+                case 'G':
+                    return Moving;
+                case 'g':
+                    return Stopped;
+                case 'E':
+                    return SensorChange;
 
-                }
-                return  null;
+            }
+            return  null;
 
         }
 
@@ -127,19 +100,19 @@ public abstract class ResponseProcessor {
         }
     };
 
-    public ResponseType getResponseType() {    return mResponseType; }
+    public ResponseType getResponseType() { return mResponseType; }
 
     public void setResponseType(ResponseType responseType) { this.mResponseType = responseType;  }
 
-    public int getCheckSum() {    return mCheckSum;   }
+    public int getCheckSum() { return mCheckSum;   }
 
     public void setCheckSum(int checkSum) { this.mCheckSum =checkSum;  }
 
-    public int getLength() {  return mLength;  }
+    public int getLength() { return mLength;  }
 
-    public void setLength(int length) {  this.mLength =length;  }
+    public void setLength(int length) { this.mLength =length;  }
 
-    public int getSequenceId() {     return mSequenceId;  }
+    public int getSequenceId() { return mSequenceId;  }
 
     public void setSequenceId(int sequenceId) { this.mSequenceId = sequenceId;  }
 
@@ -149,28 +122,29 @@ public abstract class ResponseProcessor {
 
     public NackReasonCode getErrReasonCode() { return mErrReasonCode;   }
 
-    public void setErrReasonCode(NackReasonCode errReasonCode) {   this.mErrReasonCode = errReasonCode;    }
+    public void setErrReasonCode(NackReasonCode errReasonCode) { this.mErrReasonCode = errReasonCode;    }
 
-    public BlackBoxModel getBoxData() {  return mBoxData;  }
+    public BlackBoxModel getBoxData() { return mBoxData;  }
 
-    public void setBoxData(BlackBoxModel boxData) {   this.mBoxData = boxData;  }
-
-    public boolean parseHeader(byte[] data)
-    {
-        // validate header acccording to the protocol defintion
-
+    public void setBoxData(BlackBoxModel boxData) { this.mBoxData = boxData;  }
+    /*
+     *  validate header according to the protocol defintion
+     */
+    public boolean parseHeader(byte[] data) {
+        int indx=0;
         // Header starts with five @
-        for (int i=0;i<5;i++)
-             if ((char)data[i] !='@') return false;
+        for (indx=0;indx<5;indx++) {
+            if ((char) data[indx] != '@') return false;
+        }
+        //if (data[indx++] != (byte) Constants.DEVICE_TYPE.charAt(0)) return false;
+        byte receivedByte = data[5];
+        if (data[indx++] != receivedByte) return false;
 
-        //Device type - need to change for the new protocol
-        if (data[5] != (byte)0x0A) return false;
+        if (data[indx++] != (byte)0xFF && data[indx++] != (byte)0xFF)  return false;
 
-        if (data[6] != (byte)0xFF && data[7] != (byte)0xFF)  return false;
+        this.mCheckSum = data[indx++] & 0xFF;
 
-        this.mCheckSum = data[8] & 0xFF;
-
-        this.mLength= ConnectionUtils.byteToUnsignedInt(data[9] , data[10]);// length -> 2 bytes
+        this.mLength= ConnectionUtils.byteToUnsignedInt(data[indx++] , data[indx++]);// length -> 2 bytes
 
         return true;
 

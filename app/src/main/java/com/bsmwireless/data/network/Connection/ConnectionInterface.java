@@ -1,15 +1,17 @@
-package com.bsmwireless.data.network.Connection;
+package com.bsmwireless.data.network.connection;
 
 
+import com.bsmwireless.data.network.connection.device.Device;
 import com.bsmwireless.models.Vehicle;
 
 /**
- * Created by hsudhagar on 2017-07-17.
+ *  Common Interface for connection with the box
  */
 
 public interface ConnectionInterface {
 
-    public void connect(Vehicle vehicle);
-    public void disconnect();
-    public boolean isConnected();
+    void setDevice(Device device);
+    void connect(Vehicle vehicle);
+    void disconnect();
+    boolean isConnected();
 }

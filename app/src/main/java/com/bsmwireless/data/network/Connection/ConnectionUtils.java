@@ -1,19 +1,23 @@
-package com.bsmwireless.data.network.Connection;
+package com.bsmwireless.data.network.connection;
 
-import com.bsmwireless.widgets.graphview.DutyType;
-
-import java.math.BigDecimal;
+import com.bsmwireless.common.Constants;
+import com.bsmwireless.widgets.alerts.DutyType;
 
 /**
- * Created by hsudhagar on 2017-07-20.
+ *  Utility function to generate request and process the response
  */
 
 public class ConnectionUtils {
 
+    byte START_MESSAGE_INDICATOR = (byte)'@';
+    byte START_PACKET_INDICATOR = (byte) 0xFF;
+    byte DEVICE_TYPE = (byte) Constants.DEVICE_TYPE.charAt(0);  // Representing 'A' for the device type Android
+
+
     public static byte[] intToByte(int value, int size)
     {
         byte[] byteValue = new byte[size];
-        for(int i=0; i<byteValue.length-1;i++)
+        for(int i=0; i<size-1;i++)
         {
             byteValue[i] = (byte)(value );
             value>>=8;
@@ -21,18 +25,21 @@ public class ConnectionUtils {
         return byteValue;
     }
 
+    public static int byteToUnsignedInt(byte[] byteArr)
+    {
+        int value=0;
+
+        for(int i=0; i<byteArr.length-1;i++)
+        {
+            value |=( byteArr[i]& 0XFF) <<8*i;
+        }
+        return value;
+    }
+
     public static int byteToUnsignedInt(byte b1, byte b2)
     {
         return (b2 & 0XFF) <<8 | (b1 &0XFF);
-
-
     }
-    public static int byteToUnsignedInt(byte[] byteArr)
-    {
-        return (int) (byteArr[3] & 0XFF) <<24 | (byteArr[3] & 0XFF) <<16 | (byteArr[1] & 0XFF) <<8 | (byteArr[0] &0XFF);
-
-    }
-
 
     public static final byte checkSum(byte[] bytes, int indx)
     {
@@ -57,8 +64,9 @@ public class ConnectionUtils {
 
         }
 
-       return null;
+        throw new IllegalArgumentException();
     }
+
 
 
 }
