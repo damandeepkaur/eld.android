@@ -29,17 +29,7 @@
         <activity
             android:name="com.bsmwireless.screens.login.LoginActivity"
             android:label="@string/app_name"
-            android:theme="@style/Theme.BsmAppWithBGFullScreen"/>
-
-        <activity
-            android:name="com.bsmwireless.screens.selectasset.SelectAssetActivity"
-            android:windowSoftInputMode="stateHidden|adjustPan"
-            android:theme="@style/AppTheme"/>
-
-        <activity
-            android:name="com.bsmwireless.screens.navigation.NavigationActivity"
-            android:theme="@style/AppTheme"
-            android:windowSoftInputMode="stateHidden|adjustResize">
+            android:theme="@style/Theme.BsmAppWithBGFullScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
@@ -47,16 +37,33 @@
         </activity>
 
         <activity
+            android:name="com.bsmwireless.screens.selectasset.SelectAssetActivity"
+            android:theme="@style/AppTheme"
+            android:windowSoftInputMode="stateHidden|adjustPan"/>
+
+        <activity
+            android:name="com.bsmwireless.screens.navigation.NavigationActivity"
+            android:theme="@style/AppTheme"
+            android:windowSoftInputMode="stateHidden|adjustResize">
+        </activity>
+
+        <activity
             android:name="com.bsmwireless.screens.help.HelpActivity"
             android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
         <activity
             android:name="com.bsmwireless.screens.barcode.BarcodeScannerActivity"
-            android:theme="@style/Theme.BsmAppFullScreen"/>
+            android:theme="@style/AppTheme.Transparent"/>
 
-        <activity android:name="com.bsmwireless.screens.driverprofile.DriverProfileActivity"
-                  android:label="@string/driver_profile"
-                  android:windowSoftInputMode="stateHidden"
-                  android:theme="@style/DriverProfileTheme"/>
+        <activity
+            android:name="com.bsmwireless.screens.driverprofile.DriverProfileActivity"
+            android:label="@string/driver_profile"
+            android:theme="@style/DriverProfileTheme"
+            android:windowSoftInputMode="stateHidden"/>
+
+        <activity
+            android:name="com.bsmwireless.screens.settings.SettingsActivity"
+            android:theme="@style/AppTheme"
+            android:windowSoftInputMode="stateAlwaysHidden"/>
 
         <service android:name="com.bsmwireless.data.network.authenticator.BsmAuthenticatorService">
             <intent-filter>

@@ -34,7 +34,6 @@ import app.bsmuniversal.com.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import butterknife.Unbinder;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import timber.log.Timber;
 
@@ -65,8 +64,6 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
 
     @Inject
     SelectAssetPresenter mPresenter;
-
-    private Unbinder mUnbinder;
 
     private SelectAssetAdapter mSearchAdapter;
     private SelectAssetAdapter mLastAdapter;
@@ -178,7 +175,6 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
 
     @Override
     protected void onDestroy() {
-        mUnbinder.unbind();
         mPresenter.onDestroy();
         super.onDestroy();
     }
@@ -190,7 +186,7 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
             String barcodeId = data.getStringExtra(BARCODE_UUID);
             String type = data.getStringExtra(BARCODE_TYPE);
             Timber.v(barcodeId + " type:" + type);
-            mSearchView.setQuery(barcodeId, true);
+            mSearchView.setQuery(barcodeId, false);
         }
     }
 

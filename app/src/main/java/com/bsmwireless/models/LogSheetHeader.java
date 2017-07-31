@@ -44,6 +44,9 @@ public class LogSheetHeader implements Parcelable {
     @SerializedName("additions")
     @Expose
     private String mAdditions;
+    @SerializedName("signed")
+    @Expose
+    private Boolean mSigned;
 
     public LogSheetHeader() {}
 
@@ -59,6 +62,7 @@ public class LogSheetHeader implements Parcelable {
         this.mComment = in.readString();
         this.mDutyCycle = in.readString();
         this.mAdditions = in.readString();
+        this.mSigned = in.readByte() != 0;
     }
 
     public Integer getDriverId() {
@@ -149,6 +153,14 @@ public class LogSheetHeader implements Parcelable {
         this.mAdditions = additions;
     }
 
+    public Boolean getSigned() {
+        return mSigned;
+    }
+
+    public void setSigned(Boolean signed) {
+        mSigned = signed;
+    }
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("LogSheetHeader{");
@@ -163,6 +175,7 @@ public class LogSheetHeader implements Parcelable {
         sb.append(", mComment=").append(mComment);
         sb.append(", mDutyCycle=").append(mDutyCycle);
         sb.append(", mAdditions=").append(mAdditions);
+        sb.append(", mSigned=").append(mSigned);
         sb.append('}');
         return sb.toString();
     }
@@ -180,6 +193,7 @@ public class LogSheetHeader implements Parcelable {
                 .append(mComment)
                 .append(mDutyCycle)
                 .append(mAdditions)
+                .append(mSigned)
                 .toHashCode();
     }
 
@@ -206,6 +220,7 @@ public class LogSheetHeader implements Parcelable {
                 .append(mComment, rhs.mComment)
                 .append(mDutyCycle, rhs.mDutyCycle)
                 .append(mAdditions, rhs.mAdditions)
+                .append(mSigned, rhs.mSigned)
                 .isEquals();
     }
 
@@ -234,6 +249,7 @@ public class LogSheetHeader implements Parcelable {
         dest.writeString(this.mComment);
         dest.writeString(this.mDutyCycle);
         dest.writeString(this.mAdditions);
+        dest.writeByte((byte) (mSigned ? 1 : 0));
     }
 
     @Override

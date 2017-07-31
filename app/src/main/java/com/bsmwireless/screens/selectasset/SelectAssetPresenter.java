@@ -28,7 +28,8 @@ public class SelectAssetPresenter {
     }
 
     public void onViewCreated() {
-        mDisposables.add(mVehiclesInteractor.getLastVehicles()
+        mDisposables.add(mVehiclesInteractor.cleanSelectedVehicle()
+                .andThen(mVehiclesInteractor.getLastVehicles())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(vehicles -> {

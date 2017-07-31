@@ -11,11 +11,11 @@ import com.bsmwireless.models.LoginModel;
 import com.bsmwireless.models.ResponseMessage;
 import com.bsmwireless.models.User;
 
+import java.util.Calendar;
+
 import javax.inject.Inject;
 
 import io.reactivex.Flowable;
-import io.reactivex.FlowableEmitter;
-import io.reactivex.FlowableOnSubscribe;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
@@ -54,17 +54,28 @@ public class LoginUserInteractor {
 
                     mPreferencesManager.setAccountName(accountName);
                     mPreferencesManager.setRememberUserEnabled(keepToken);
+                    mPreferencesManager.setShowHomeScreenEnabled(true);
 
                     mTokenManager.setToken(accountName, name, domain, user.getAuth());
 
                     String lastVehicles = mAppDatabase.userDao().getUserLastVehiclesSync(user.getId());
-                    mAppDatabase.userDao().insertUser(UserConverter.toEntity(user));
 
                     if (lastVehicles != null) {
                         mAppDatabase.userDao().setUserLastVehicles(user.getId(), lastVehicles);
                     }
                 })
-                .map(user -> user != null);
+                  .flatMap(user -> {
+                      UserEntity userEntity = mAppDatabase.userDao().getUserSync(user.getId());
+                      if (userEntity != null) {
+                          Long lastModified = userEntity.getLastModified();
+                          if (lastModified != null && lastModified > user.getSyncTime()) {
+                              return mServiceApi.updateProfile(getUpdatedUser(userEntity))
+                                                .map(responseMessage -> responseMessage.getMessage().equals("ACK"));
+                          }
+                      }
+                      return Observable.create((ObservableOnSubscribe<Long>) e -> e.onNext(mAppDatabase.userDao().insertUser(UserConverter.toEntity(user))))
+                                       .map(userID -> userID > 0);
+                  });
     }
 
     public Observable<Boolean> logoutUser() {
@@ -75,12 +86,12 @@ public class LoginUserInteractor {
         logoutEvent.setEventTime(System.currentTimeMillis());
         logoutEvent.setMobileTime(System.currentTimeMillis());
         logoutEvent.setDriverId(getDriverId());
-        //TODO: get real data for hos
-        logoutEvent.setEngineHours(50);
+        logoutEvent.setBoxId(mPreferencesManager.getBoxId());
 
         return mBlackBoxInteractor.getData()
                 .flatMap(blackBox -> {
                     logoutEvent.setTimezone(getTimezone(driverId));
+                    logoutEvent.setEngineHours(blackBox.getEngineHours());
                     logoutEvent.setOdometer(blackBox.getOdometer());
                     logoutEvent.setLat(blackBox.getLat());
                     logoutEvent.setLng(blackBox.getLon());
@@ -88,9 +99,9 @@ public class LoginUserInteractor {
                     return mServiceApi.logout(logoutEvent)
                             .doOnNext(responseMessage -> {
                                 if (!mPreferencesManager.isRememberUserEnabled()) {
-                                    mPreferencesManager.clearValues();
                                     mAppDatabase.userDao().deleteUser(getDriverId());
                                     mTokenManager.removeAccount(mPreferencesManager.getAccountName());
+                                    mPreferencesManager.clearValues();
                                 } else {
                                     mTokenManager.clearToken(mTokenManager.getToken(mPreferencesManager.getAccountName()));
                                 }
@@ -100,12 +111,22 @@ public class LoginUserInteractor {
                 });
     }
 
-    public Observable<Long> updateDBUser(UserEntity user) {
-        return Observable.create(e -> e.onNext(mAppDatabase.userDao().insertUser(user)));
-    }
-
-    public Observable<ResponseMessage> updateUserOnServer(User user) {
-        return mServiceApi.updateProfile(user);
+    public Observable<Boolean> updateUser(User user) {
+        UserEntity userEntity = UserConverter.toEntity(user);
+        return Observable.create((ObservableOnSubscribe<Long>) e -> {
+                                    userEntity.setLastModified(Calendar.getInstance().getTimeInMillis());
+                                    e.onNext(mAppDatabase.userDao().insertUser(userEntity));
+                         })
+                         .map(userId -> userId > 0)
+                         .flatMap(userInserted -> {
+                             if (userInserted) {
+                                 return mServiceApi.updateProfile(getUpdatedUser(userEntity));
+                             }
+                             ResponseMessage responseMessage = new ResponseMessage();
+                             responseMessage.setMessage("");
+                             return Observable.just(responseMessage);
+                         })
+                         .map(responseMessage -> responseMessage.getMessage().equals("ACK"));
     }
 
     public String getUserName() {
@@ -131,7 +152,7 @@ public class LoginUserInteractor {
     }
 
     public boolean isLoginActive() {
-        return mTokenManager.getToken(mPreferencesManager.getAccountName()) != null;
+        return mPreferencesManager.isShowHomeScreenEnabled() && mTokenManager.getToken(mPreferencesManager.getAccountName()) != null;
     }
 
     public Integer getDriverId() {
@@ -145,6 +166,21 @@ public class LoginUserInteractor {
 
     public boolean isRememberMeEnabled() {
         return mPreferencesManager.isRememberUserEnabled();
+    }
+
+    // TODO: change server logic
+    private User getUpdatedUser(UserEntity userEntity) {
+        User user = new User();
+
+        user.setId(userEntity.getId());
+        user.setTimezone(userEntity.getTimezone());
+        user.setFirstName(userEntity.getFirstName());
+        user.setLastName(userEntity.getLastName());
+        user.setCycleCountry(userEntity.getCycleCountry());
+        user.setSignature(userEntity.getSignature());
+        user.setAddress(userEntity.getAddress());
+
+        return user;
     }
 }
 

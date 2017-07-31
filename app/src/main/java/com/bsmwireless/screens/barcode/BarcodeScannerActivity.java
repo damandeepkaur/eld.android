@@ -1,30 +1,49 @@
 package com.bsmwireless.screens.barcode;
 
+import android.Manifest;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.FragmentTransaction;
+import android.widget.Toast;
 
-import com.bsmwireless.screens.common.BaseActivity;
 import com.bsmwireless.screens.common.BaseFragment;
+import com.bsmwireless.screens.common.BasePermissionActivity;
 import com.google.zxing.Result;
 
 import app.bsmuniversal.com.R;
+import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
-public class BarcodeScannerActivity extends BaseActivity implements BarcodeResultHandler {
+public class BarcodeScannerActivity extends BasePermissionActivity implements ZXingScannerView.ResultHandler {
 
     private static final String TAG = BarcodeScannerActivity.class.getSimpleName();
 
     public static final String BARCODE_UUID = "barcode_uuid";
     public static final String BARCODE_TYPE = "barcode_type";
 
-    BarcodeScannerFragment mBarcodeScannerFragment = new BarcodeScannerFragment();
+    private BarcodeScannerFragment mBarcodeScannerFragment = null;
+
+    @Override
+    protected String[] getDesiredPermissions() {
+        return new String[] { Manifest.permission.CAMERA };
+    }
+
+    @Override
+    protected void onPermissionDenied() {
+        Toast.makeText(this, R.string.barcode_scanner_error, Toast.LENGTH_SHORT).show();
+
+        setResult(RESULT_CANCELED);
+        finish();
+    }
+
+    @Override
+    protected void onPermissionGranted() {
+        mBarcodeScannerFragment = new BarcodeScannerFragment();
+        open(mBarcodeScannerFragment);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_barcode_scanner);
-
-        open(mBarcodeScannerFragment, false);
     }
 
     @Override
@@ -36,20 +55,10 @@ public class BarcodeScannerActivity extends BaseActivity implements BarcodeResul
         finish();
     }
 
-    @Override
-    public void onFinish() {
-        setResult(RESULT_CANCELED);
-        finish();
-    }
-
-    public void open(BaseFragment fragment, boolean useBackStack) {
-        //TODO: check for current and doesn't replace the same fragment
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-
-        if (useBackStack) {
-            transaction.addToBackStack(null);
-        }
-
-        transaction.replace(R.id.barcode_content, fragment).commit();
+    public void open(BaseFragment fragment) {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.barcode_content, fragment)
+                .commit();
     }
 }

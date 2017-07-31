@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:local="http://schemas.android.com/apk/res-auto">
+
+    <item android:id="@+id/action_eld"
+          android:icon="@drawable/ic_eld_selector"
+          android:title="@string/driver_profile_menu_eld"
+          local:showAsAction="always" />
+
+    <item android:id="@+id/action_duty"
+          android:icon="@drawable/ic_duty_status_selector"
+          android:title="@string/driver_profile_menu_sign"
+          local:showAsAction="always" />
+
+    <item android:id="@+id/action_occupancy"
+          android:icon="@drawable/ic_occupants_selector"
+          android:title="@string/driver_profile_menu_occupants"
+          local:showAsAction="always" />
+</menu>

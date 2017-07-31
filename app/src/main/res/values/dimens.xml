@@ -58,20 +58,17 @@
     <dimen name="default_margin">16dp</dimen>
     <dimen name="text_size">16sp</dimen>
     <dimen name="text_size_small">14sp</dimen>
+    <dimen name="text_size_extra_small">12sp</dimen>
+    <dimen name="text_size_smallest">8sp</dimen>
     <dimen name="text_size_large">20sp</dimen>
     <dimen name="text_size_spacing">8sp</dimen>
 
     <!-- Graphview dimens -->
-    <dimen name="graph_view_top_offset">40dp</dimen>
-    <dimen name="graph_view_left_offset">2dp</dimen>
-    <dimen name="graph_view_right_offset">2dp</dimen>
-    <dimen name="graph_view_bottom_offset">4dp</dimen>
-    <dimen name="graph_height">300dp</dimen>
-    <dimen name="graph_label_width">10dp</dimen>
-    <dimen name="graph_label_width_horizontal">30dp</dimen>
-    <dimen name="graph_timer_height">75dp</dimen>
-    <dimen name="graph_timer_width">75dp</dimen>
-    <dimen name="graph_total_padding">10dp</dimen>
+    <dimen name="graph_view_top_offset">20dp</dimen>
+    <dimen name="graph_view_left_offset">8dp</dimen>
+    <dimen name="graph_view_right_offset">8dp</dimen>
+    <dimen name="graph_view_bottom_offset">20dp</dimen>
+    <dimen name="graph_height">200dp</dimen>
 
     <!-- Login Activity -->
     <dimen name="login_button_margin_left">31dp</dimen>
@@ -103,4 +100,12 @@
     <dimen name="driver_profile_signature_margin">15dp</dimen>
     <dimen name="driver_profile_shadow_size">4dp</dimen>
     <item format="float" name="driver_profile_button_letter_spacing" type="dimen">0.26</item>
+
+    <!-- Calendar widget -->
+    <dimen name="calendar_item_width">45dp</dimen>
+    <dimen name="calendar_item_height">85dp</dimen>
+
+    <!-- Settings Activity -->
+    <dimen name="divider_height">1dp</dimen>
+
 </resources>

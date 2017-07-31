@@ -4,22 +4,22 @@ import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
 
-import java.util.List;
-
 import io.reactivex.Flowable;
+import io.reactivex.Observable;
 
 import static android.arch.persistence.room.OnConflictStrategy.REPLACE;
 
 @Dao
 public interface UserDao {
-    @Query("SELECT * FROM users")
-    Flowable<List<UserEntity>> getUsers();
 
     @Query("SELECT * FROM users WHERE id = :id LIMIT 1")
     Flowable<UserEntity> getUser(int id);
 
+    @Query("SELECT * FROM users WHERE id = :id LIMIT 1")
+    UserEntity getUserSync(int id);
+
     @Query("SELECT last_vehicle_ids FROM users WHERE id = :id LIMIT 1")
-    Flowable<String> getUserLastVehicles(int id);
+    Flowable<String[]> getUserLastVehicles(int id);
 
     @Query("SELECT last_vehicle_ids FROM users WHERE id = :id LIMIT 1")
     String getUserLastVehiclesSync(int id);

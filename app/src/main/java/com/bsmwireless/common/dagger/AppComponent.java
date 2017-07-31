@@ -8,8 +8,7 @@ import com.bsmwireless.data.network.authenticator.TokenManager;
 import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.widgets.common.FontTextView;
-import com.bsmwireless.widgets.graphview.HOSGraphLabelView;
-import com.bsmwireless.widgets.graphview.HOSGraphView;
+import com.bsmwireless.widgets.graphview.ELDGraphView;
 
 import javax.inject.Singleton;
 
@@ -32,7 +31,5 @@ public interface AppComponent {
 
     void inject(FontTextView fontTextView);
 
-    void inject(HOSGraphView hosGraphView);
-
-    void inject(HOSGraphLabelView hosGraphLabelView);
+    void inject(ELDGraphView eldGraphView);
 }

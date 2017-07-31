@@ -10,6 +10,24 @@
     <string name="select_asset_characters">Enter at least 3 characters</string>
     <string name="select_asset_error">Select asset error</string>
 
+    <!--Alerts-->
+    <string name="eld_green">Green notification</string>
+    <string name="eld_orange">Orange notification</string>
+    <string name="eld_red">Red notification</string>
+
+    <string name="occupancy_0">Single driver</string>
+    <string name="occupancy_1">Main driver and co-driver</string>
+    <string name="occupancy_2">Main driver and 2 co-drivers</string>
+    <string name="occupancy_3">Main driver and 3 co-drivers</string>
+
+    <!--Navigation-->
+    <string name="navigation_dashboard">Dashboard</string>
+    <string name="navigation_logs">Logs</string>
+    <string name="navigation_multi_day">Multi-day</string>
+
+    <!--Barcode Scanner-->
+    <string name="barcode_scanner_error">Camera permission is necessary for barcode scanning</string>
+
     <!-- START OLD STRINGS -->
     <string name="no_network">No Network Available</string>
     <string name="app_compatability">Note: Compatible with Android 4.0.3 - 6.0.1</string>
@@ -323,7 +341,8 @@
     <string name="driver_profile_menu_eld">ELD</string>
     <string name="driver_profile_menu_sign">Sign</string>
     <string name="driver_profile_menu_occupants">Occupants</string>
-    <string name="driver_profile_password">******</string>
+    <string name="driver_profile_signature_error">Signature size too large. It will be cropped.</string>
+    <string name="driver_profile_user_error">Invalid user.</string>
 
     <!-- Navigation drawer-->
     <string name="nav_home">Home</string>
@@ -351,6 +370,21 @@
     <!-- Login Activity -->
     <string name="login_lbl_rememberme">Remember me</string>
 
+    <!-- Graph view -->
+    <string name="default_time">00:00</string>
+    <string name="offduty_label">OFF</string>
+    <string name="sleepingberth_label">S</string>
+    <string name="driving_label">DR</string>
+    <string name="onduty_label">ON</string>
+
     <string name="ok">Ok</string>
     <string name="clear">Clear</string>
+
+    <!-- Settings Activity -->
+    <string name="settings">Settings</string>
+    <string name="settings_title">Settings</string>
+    <string name="settings_box_gps_title">Box GPS</string>
+    <string name="settings_fixed_mount_title">Fixed mount</string>
+    <string name="settings_odometer_units">Odometer units</string>
+
 </resources>

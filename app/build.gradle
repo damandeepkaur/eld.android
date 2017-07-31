@@ -6,10 +6,10 @@ android {
     buildToolsVersion "25.0.2"
     defaultConfig {
         applicationId "app.bsmuniversal.com"
-        minSdkVersion 14
+        minSdkVersion 19
         targetSdkVersion 25
-        versionCode 18
-        versionName "1.0.17"
+        versionCode 23
+        versionName "1.0.22"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         javaCompileOptions {
@@ -159,7 +159,7 @@ dependencies {
     compile 'com.jakewharton:butterknife:8.6.0'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.6.0'
 
-    compile 'me.dm7.barcodescanner:zxing:1.9.3'
+    compile 'me.dm7.barcodescanner:zxing:1.9.4'
 
     compile 'com.jakewharton.timber:timber:4.5.1'
 
