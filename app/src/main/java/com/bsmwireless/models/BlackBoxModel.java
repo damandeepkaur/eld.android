@@ -1,6 +1,6 @@
 package com.bsmwireless.models;
 
-import com.bsmwireless.widgets.graphview.DutyType;
+import com.bsmwireless.widgets.alerts.DutyType;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -21,6 +21,7 @@ public class BlackBoxModel {
     public long mBoxId;
     public int mTDMsgQueue;
 
+    private int mEngineHours;
 
     public int getOdometer() {
         return mOdometer;
@@ -44,6 +45,14 @@ public class BlackBoxModel {
 
     public void setLon(double lon) {
         mLon = lon;
+    }
+
+    public int getEngineHours() {
+        return mEngineHours;
+    }
+
+    public void setEngineHours(int engineHours) {
+        mEngineHours = engineHours;
     }
 
     public int getSpeed() { return mSpeed;   }
@@ -91,6 +100,7 @@ public class BlackBoxModel {
                 .append(mOdometer, that.mOdometer)
                 .append(mLat, that.mLat)
                 .append(mLon, that.mLon)
+                .append(mEngineHours, that.mEngineHours)
                 .append(mSpeed, that.mSpeed)
                 .append(mHeading, that.mLon)
                 .append(mTERT, that.mTERT)
@@ -108,6 +118,7 @@ public class BlackBoxModel {
                 .append(mOdometer)
                 .append(mLat)
                 .append(mLon)
+                .append(mEngineHours)
                 .append(mLon)
                 .append(mSpeed)
                 .append(mHeading)
@@ -126,6 +137,7 @@ public class BlackBoxModel {
         sb.append("mOdometer=").append(mOdometer);
         sb.append(", mLat=").append(mLat);
         sb.append(", mLon=").append(mLon);
+        sb.append(", mEngineHours=").append(mEngineHours);
         sb.append(", mSpeed=").append(mSpeed);
         sb.append(", mHeading=").append(mHeading);
         sb.append(", mTERT=").append(mTERT);
