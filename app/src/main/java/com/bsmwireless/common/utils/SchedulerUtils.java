@@ -25,7 +25,7 @@ public class SchedulerUtils {
 
     public static int mJobId = 0;
 
-    public static final int AUTO_LOGOUT_TRIGGER_DURATION = 15;
+    public static final int AUTO_LOGOUT_TRIGGER_DURATION = 60;
 
     private static PendingIntent mPendingIntent;
 
@@ -42,7 +42,7 @@ public class SchedulerUtils {
         mPendingIntent = PendingIntent.getBroadcast(App.getComponent().context(), 0, intent, 0);
         AlarmManager alarmManager = (AlarmManager) App.getComponent().context().getSystemService(Context.ALARM_SERVICE);
         alarmManager.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                SystemClock.elapsedRealtime() + TimeUnit.SECONDS.toMillis(AUTO_LOGOUT_TRIGGER_DURATION), mPendingIntent);
+                SystemClock.elapsedRealtime() + TimeUnit.MINUTES.toMillis(AUTO_LOGOUT_TRIGGER_DURATION), mPendingIntent);
     }
 
 
@@ -76,7 +76,7 @@ public class SchedulerUtils {
         JobInfo.Builder builder = new JobInfo.Builder(mJobId++,
                 new ComponentName(App.getComponent().context(), AutoLogoutJobService.class))
                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
-                .setOverrideDeadline(TimeUnit.SECONDS.toMillis(AUTO_LOGOUT_TRIGGER_DURATION))
+                .setOverrideDeadline(TimeUnit.MINUTES.toMillis(AUTO_LOGOUT_TRIGGER_DURATION))
                 .setPersisted(true)
                 .setRequiresDeviceIdle(true);
 
