@@ -329,20 +329,26 @@
 
     <!-- Driver Profile -->
     <string name="driver_profile">Driver profile</string>
-    <string name="driver_profile_item_name">Name</string>
+    <string name="driver_settings">Driver settings</string>
+    <string name="driver_profile_item_name">First Name &amp; Last Name</string>
     <string name="driver_profile_item_emp_id">Employee ID</string>
     <string name="driver_profile_item_company">Company</string>
     <string name="driver_profile_item_license">Driver license</string>
-    <string name="driver_profile_item_home_addr">Home address</string>
-    <string name="driver_profile_item_home_terminal">Home terminal</string>
+    <string name="driver_profile_item_home_addr">Home Terminal Address</string>
+    <string name="driver_profile_item_home_terminal">Home Terminal Name</string>
     <string name="driver_profile_item_time_zone">Time zone</string>
     <string name="driver_profile_item_password">Password</string>
-    <string name="driver_profile_item_cycle">Cycle</string>
+    <string name="driver_profile_item_cycle">HOS Cycle</string>
     <string name="driver_profile_menu_eld">ELD</string>
     <string name="driver_profile_menu_sign">Sign</string>
     <string name="driver_profile_menu_occupants">Occupants</string>
     <string name="driver_profile_signature_error">Signature size too large. It will be cropped.</string>
     <string name="driver_profile_user_error">Invalid user.</string>
+    <string name="driver_profile_item_eld_toggle">ELD toggle</string>
+    <string name="driver_profile_item_configured_for">Configured for</string>
+    <string name="driver_profile_item_carrier_name">Carrier Name</string>
+    <string name="driver_profile_item_terminal_time_zone">Home Terminal Time Zone</string>
+    <string name="driver_profile_item_role">Role</string>
 
     <!-- Navigation drawer-->
     <string name="nav_home">Home</string>

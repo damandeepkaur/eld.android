@@ -3,10 +3,12 @@ package com.bsmwireless.screens.driverprofile;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.ActionBar;
+import android.support.v7.widget.AppCompatSpinner;
+import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ScrollView;
 import android.widget.Toast;
 
@@ -18,6 +20,8 @@ import com.bsmwireless.screens.driverprofile.dagger.DaggerDriverProfileComponent
 import com.bsmwireless.screens.driverprofile.dagger.DriverProfileModule;
 import com.bsmwireless.widgets.signview.SignatureLayout;
 import com.bsmwireless.widgets.snackbar.SnackBarLayout;
+
+import java.util.TimeZone;
 
 import javax.inject.Inject;
 
@@ -36,29 +40,37 @@ public class DriverProfileActivity extends BaseMenuActivity implements DriverPro
     Toolbar mToolbar;
 
     @BindView(R.id.name)
-    EditText mNameTextView;
+    TextInputEditText mNameTextView;
 
     @BindView(R.id.emp_id)
-    EditText mEmployeeIDTextView;
-
-    @BindView(R.id.company)
-    EditText mCompanyTextView;
+    TextInputEditText mEmployeeIDTextView;
 
     @BindView(R.id.license)
-    EditText mLicenseTextView;
+    TextInputEditText mLicenseTextView;
 
-    @BindView(R.id.home_addr)
-    EditText mAddressTextView;
+    @BindView(R.id.password)
+    TextInputEditText mPasswordTextView;
 
-    @BindView(R.id.time_zone)
-    EditText mTimeZoneTextView;
+    @BindView(R.id.role)
+    TextInputEditText mRole;
 
-     // TODO: Password change not implemented on server side.
-     /*@BindView(R.id.password)
-     EditText mPasswordTextView;*/
+    @BindView(R.id.hos_cycle_spinner)
+    AppCompatSpinner mHOSCycle;
 
-    @BindView(R.id.cycle)
-    EditText mCycleTextView;
+    @BindView(R.id.eld_toggle)
+    SwitchCompat mELDToggle;
+
+    @BindView(R.id.carrier_name)
+    TextInputEditText mCarrierName;
+
+    @BindView(R.id.terminal_name)
+    TextInputEditText mTerminalName;
+
+    @BindView(R.id.terminal_address)
+    TextInputEditText mTerminalAddress;
+
+    @BindView(R.id.home_terminal_time_zone)
+    TextInputEditText mHomeTerminalTimeZone;
 
     @BindView(R.id.signature_view)
     SignatureLayout mSignatureLayout;
@@ -97,7 +109,7 @@ public class DriverProfileActivity extends BaseMenuActivity implements DriverPro
 
     @Override
     public void onBackPressed() {
-        mPresenter.onSaveUserInfo(mAddressTextView.getText().toString());
+        //mPresenter.onSaveUserInfo(mAddressTextView.getText().toString());
         super.onBackPressed();
     }
 
@@ -111,11 +123,14 @@ public class DriverProfileActivity extends BaseMenuActivity implements DriverPro
     public void setUserInfo(UserEntity user) {
         mNameTextView.setText(user.getFirstName() + " " + user.getLastName());
         mEmployeeIDTextView.setText(String.valueOf(user.getId()));
-        mCompanyTextView.setText(user.getOrganization());
         mLicenseTextView.setText(user.getLicense());
-        mAddressTextView.setText(user.getAddress());
-        mTimeZoneTextView.setText(user.getTimezone());
-        mCycleTextView.setText(String.valueOf(user.getCycleCountry()));
+        mELDToggle.setChecked(user.getExempt());
+        mCarrierName.setText(user.getOrganization());
+        mTerminalName.setText(user.getOrganization());
+        mTerminalAddress.setText(user.getOrgAddr());
+
+        TimeZone timeZone = TimeZone.getTimeZone(user.getTimezone());
+        mHomeTerminalTimeZone.setText(timeZone.getDisplayName());
 
         mSignatureLayout.setImageData(user.getSignature());
     }

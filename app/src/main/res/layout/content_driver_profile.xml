@@ -21,16 +21,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/driver_profile_item_name"
-                android:theme="@style/DriverProfileEditViewStyle"
-                android:enabled="false"
-                android:focusable="false"
-                android:textColor="@drawable/disabled_edit_text_color"/>
+                style="@style/DriverProfileEditViewStyle.Disabled"/>
 
         </android.support.design.widget.TextInputLayout>
-
-        <View android:layout_width="match_parent"
-              android:layout_height="1dp"
-              android:background="?android:attr/listDivider"/>
 
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
@@ -42,37 +35,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/driver_profile_item_emp_id"
-                android:theme="@style/DriverProfileEditViewStyle"
-                android:enabled="false"
-                android:focusable="false"
-                android:textColor="@drawable/disabled_edit_text_color"/>
+                style="@style/DriverProfileEditViewStyle.Disabled"/>
 
         </android.support.design.widget.TextInputLayout>
-
-        <View android:layout_width="match_parent"
-              android:layout_height="1dp"
-              android:background="?android:attr/listDivider"/>
-
-        <android.support.design.widget.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/driver_profile_item_margin">
-
-            <android.support.design.widget.TextInputEditText
-                android:id="@+id/company"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/driver_profile_item_company"
-                android:theme="@style/DriverProfileEditViewStyle"
-                android:enabled="false"
-                android:focusable="false"
-                android:textColor="@drawable/disabled_edit_text_color"/>
-
-        </android.support.design.widget.TextInputLayout>
-
-        <View android:layout_width="match_parent"
-              android:layout_height="1dp"
-              android:background="?android:attr/listDivider"/>
 
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
@@ -84,59 +49,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/driver_profile_item_license"
-                android:theme="@style/DriverProfileEditViewStyle"
-                android:enabled="false"
-                android:focusable="false"
-                android:textColor="@drawable/disabled_edit_text_color"/>
+                style="@style/DriverProfileEditViewStyle.Disabled"/>
 
         </android.support.design.widget.TextInputLayout>
-
-        <View android:layout_width="match_parent"
-              android:layout_height="1dp"
-              android:background="?android:attr/listDivider"/>
 
         <android.support.design.widget.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/driver_profile_item_margin">
-
-            <android.support.design.widget.TextInputEditText
-                android:id="@+id/home_addr"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/driver_profile_item_home_addr"
-                android:theme="@style/DriverProfileEditViewStyle"
-                android:imeOptions="actionDone"/>
-
-        </android.support.design.widget.TextInputLayout>
-
-        <View android:layout_width="match_parent"
-              android:layout_height="1dp"
-              android:background="?android:attr/listDivider"/>
-
-        <android.support.design.widget.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/driver_profile_item_margin">
-
-            <android.support.design.widget.TextInputEditText
-                android:id="@+id/time_zone"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/driver_profile_item_time_zone"
-                android:theme="@style/DriverProfileEditViewStyle"
-                android:enabled="false"
-                android:focusable="false"
-                android:textColor="@drawable/disabled_edit_text_color"/>
-
-        </android.support.design.widget.TextInputLayout>
-
-        <View android:layout_width="match_parent"
-              android:layout_height="1dp"
-              android:background="?android:attr/listDivider"/>
-
-        <!-- TODO: Password change not implemented on server side. -->
-        <!--<android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/driver_profile_item_margin"
@@ -152,9 +69,57 @@
 
         </android.support.design.widget.TextInputLayout>
 
-        <View android:layout_width="match_parent"
-              android:layout_height="1dp"
-              android:background="?android:attr/listDivider"/>-->
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/driver_profile_item_margin">
+
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/role"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/driver_profile_item_role"
+                style="@style/DriverProfileEditViewStyle.Disabled"
+                android:text="Driver"/>
+
+        </android.support.design.widget.TextInputLayout>
+
+        <TextView android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/driver_profile_item_margin"
+            android:textSize="14sp"
+            android:fontFamily="sans-serif-medium"
+            android:textStyle="normal"
+            android:textColor="@color/black_54"
+            android:text="@string/driver_settings"/>
+
+        <LinearLayout android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/driver_profile_item_margin"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/driver_profile_item_cycle"
+                style="@style/SpinnerLabel" />
+
+            <android.support.v7.widget.AppCompatSpinner
+                android:id="@+id/hos_cycle_spinner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:theme="@style/DriverProfileEditViewStyle"
+                style="@style/Widget.AppCompat.Spinner.Underlined"/>
+
+        </LinearLayout>
+
+        <android.support.v7.widget.SwitchCompat
+            android:id="@+id/eld_toggle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/driver_profile_item_margin"
+            android:theme="@style/DriverProfileEditViewStyle"
+            android:text="@string/driver_profile_item_eld_toggle"/>
 
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
@@ -162,14 +127,68 @@
             android:layout_margin="@dimen/driver_profile_item_margin">
 
             <android.support.design.widget.TextInputEditText
-                android:id="@+id/cycle"
+                android:id="@+id/configured_for"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/driver_profile_item_cycle"
-                android:theme="@style/DriverProfileEditViewStyle"
-                android:enabled="false"
-                android:focusable="false"
-                android:textColor="@drawable/disabled_edit_text_color"/>
+                android:hint="@string/driver_profile_item_configured_for"
+                style="@style/DriverProfileEditViewStyle.Disabled"
+                android:text="Yard Move &amp; Personal Use"/>
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/driver_profile_item_margin">
+
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/carrier_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/driver_profile_item_carrier_name"
+                android:theme="@style/DriverProfileEditViewStyle"/>
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/driver_profile_item_margin">
+
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/terminal_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/driver_profile_item_home_terminal"
+                android:theme="@style/DriverProfileEditViewStyle"/>
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/driver_profile_item_margin">
+
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/terminal_address"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/driver_profile_item_home_addr"
+                android:theme="@style/DriverProfileEditViewStyle"/>
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/driver_profile_item_margin">
+
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/home_terminal_time_zone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/driver_profile_item_terminal_time_zone"
+                style="@style/DriverProfileEditViewStyle.Disabled"/>
 
         </android.support.design.widget.TextInputLayout>
 
@@ -177,7 +196,6 @@
             android:id="@+id/signature_view"
             android:layout_width="match_parent"
             android:layout_height="@dimen/driver_profile_signature_height"
-            android:layout_marginBottom="?attr/actionBarSize"
             android:background="@color/signature_background"/>
 
     </LinearLayout>

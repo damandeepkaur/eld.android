@@ -9,6 +9,8 @@
         <item name="android:windowContentOverlay">@null</item>
         <item name="colorControlHighlight">@android:color/transparent</item>
         <item name="colorControlActivated">@color/accent</item>
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowTranslucentNavigation">true</item>
     </style>
 
     <style name="AppTheme.NoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
@@ -48,6 +50,13 @@
         <item name="android:maxLines">1</item>
     </style>
 
+    <style name="DriverProfileEditViewStyle.Disabled" parent="DriverProfileEditViewStyle">
+        <item name="android:enabled">false</item>
+        <item name="android:focusable">false</item>
+        <item name="android:textColor">@drawable/disabled_edit_text_color</item>
+        <item name="backgroundTint">@android:color/transparent</item>
+    </style>
+
     <style name="TextAppearance.TextInputLayout.Green" parent="@android:style/TextAppearance">
         <item name="android:textColor">@color/accent</item>
         <item name="android:textSize">@dimen/text_size_small</item>
@@ -56,6 +65,12 @@
     <style name="DrawerArrowStyle" parent="@style/Widget.AppCompat.DrawerArrowToggle">
         <item name="spinBars">true</item>
         <item name="color">@color/nasty_green</item>
+    </style>
+
+    <style name="SpinnerLabel" parent="TextAppearance.AppCompat.Caption">
+        <item name="android:paddingBottom">@dimen/spinner_label_spacing</item>
+        <item name="android:paddingLeft">@dimen/spinner_label_spacing</item>
+        <item name="android:paddingRight">@dimen/spinner_label_spacing</item>
     </style>
 
     <!-- START OLD STYLES -->
