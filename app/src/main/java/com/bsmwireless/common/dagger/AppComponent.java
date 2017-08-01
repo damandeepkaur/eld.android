@@ -6,6 +6,8 @@ import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.network.authenticator.TokenManager;
 import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.PreferencesManager;
+import com.bsmwireless.schedulers.jobscheduler.AutoLogoutJobService;
+import com.bsmwireless.schedulers.alarmmanager.AutoLogoutService;
 import com.bsmwireless.widgets.common.FontTextView;
 import com.bsmwireless.widgets.graphview.ELDGraphView;
 
@@ -29,4 +31,8 @@ public interface AppComponent {
     void inject(FontTextView fontTextView);
 
     void inject(ELDGraphView eldGraphView);
+
+    void inject(AutoLogoutJobService autoLogoutJobService);
+
+    void inject(AutoLogoutService autoLogoutService);
 }

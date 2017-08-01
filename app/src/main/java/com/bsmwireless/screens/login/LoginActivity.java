@@ -8,6 +8,7 @@ import android.support.v7.widget.SwitchCompat;
 import android.widget.EditText;
 
 import com.bsmwireless.common.App;
+import com.bsmwireless.common.utils.SchedulerUtils;
 import com.bsmwireless.screens.common.BaseActivity;
 import com.bsmwireless.screens.navigation.NavigationActivity;
 import com.bsmwireless.screens.selectasset.SelectAssetActivity;
@@ -48,7 +49,9 @@ public class LoginActivity extends BaseActivity implements LoginView {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
         DaggerLoginComponent.builder().appComponent(App.getComponent()).loginModule(new LoginModule(this)).build().inject(this);
+        SchedulerUtils.schedule();
 
         setContentView(R.layout.activity_login);
         mUnbinder = ButterKnife.bind(this);

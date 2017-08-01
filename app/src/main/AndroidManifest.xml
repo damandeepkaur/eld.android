@@ -17,6 +17,8 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.CAMERA"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 
     <application
         android:name="com.bsmwireless.common.App"
@@ -38,8 +40,8 @@
 
         <activity
             android:name="com.bsmwireless.screens.selectasset.SelectAssetActivity"
-            android:windowSoftInputMode="stateHidden|adjustPan"
-            android:theme="@style/AppTheme"/>
+            android:theme="@style/AppTheme"
+            android:windowSoftInputMode="stateHidden|adjustPan"/>
 
         <activity
             android:name="com.bsmwireless.screens.navigation.NavigationActivity"
@@ -54,10 +56,11 @@
             android:name="com.bsmwireless.screens.barcode.BarcodeScannerActivity"
             android:theme="@style/Theme.BsmAppFullScreen"/>
 
-        <activity android:name="com.bsmwireless.screens.driverprofile.DriverProfileActivity"
-                  android:label="@string/driver_profile"
-                  android:windowSoftInputMode="stateHidden"
-                  android:theme="@style/DriverProfileTheme"/>
+        <activity
+            android:name="com.bsmwireless.screens.driverprofile.DriverProfileActivity"
+            android:label="@string/driver_profile"
+            android:theme="@style/DriverProfileTheme"
+            android:windowSoftInputMode="stateHidden"/>
 
         <service android:name="com.bsmwireless.data.network.authenticator.BsmAuthenticatorService">
             <intent-filter>
@@ -67,6 +70,23 @@
                 android:name="android.accounts.AccountAuthenticator"
                 android:resource="@xml/authenticator"/>
         </service>
+
+        <service
+            android:name="com.bsmwireless.schedulers.jobscheduler.AutoLogoutJobService"
+            android:exported="false"
+            android:permission="android.permission.BIND_JOB_SERVICE"/>
+
+        <service android:name="com.bsmwireless.schedulers.alarmmanager.AutoLogoutService"/>
+
+        <receiver android:name="com.bsmwireless.schedulers.alarmmanager.AlarmReceiver"/>
+
+        <receiver
+            android:name="com.bsmwireless.schedulers.alarmmanager.AlarmBootReceiver"
+            android:enabled="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"></action>
+            </intent-filter>
+        </receiver>
 
     </application>
 
