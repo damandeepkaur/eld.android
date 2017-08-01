@@ -87,6 +87,7 @@ public class LoginUserInteractor {
         logoutEvent.setMobileTime(System.currentTimeMillis());
         logoutEvent.setDriverId(getDriverId());
         logoutEvent.setBoxId(mPreferencesManager.getBoxId());
+        logoutEvent.setVehicleId(mPreferencesManager.getVehicleId());
 
         return mBlackBoxInteractor.getData()
                 .flatMap(blackBox -> {
