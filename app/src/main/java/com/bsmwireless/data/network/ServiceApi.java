@@ -12,6 +12,7 @@ import com.bsmwireless.models.Location;
 import com.bsmwireless.models.LogSheetHeader;
 import com.bsmwireless.models.LoginModel;
 import com.bsmwireless.models.NewRule;
+import com.bsmwireless.models.PasswordModel;
 import com.bsmwireless.models.Registry;
 import com.bsmwireless.models.RegistryInformation;
 import com.bsmwireless.models.Report;
@@ -98,6 +99,15 @@ public interface ServiceApi {
      */
     @PUT("v1/sync/records/update")
     Observable<ResponseMessage> updateELDEvents(@Body List<ELDEvent> events);
+
+    /**
+     * Update driver password
+     *
+     * @param passwordModel new password information.
+     * @return update driver password response {@link ResponseMessage}.
+     */
+    @PUT("v1/app/driver/pswd")
+    Observable<ResponseMessage> updateDriverPassword(@Body PasswordModel passwordModel);
 
     /**
      * Inspection Categories from category Ids
