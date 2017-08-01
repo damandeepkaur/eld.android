@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="@dimen/calendar_item_width"
+                android:layout_height="@dimen/calendar_item_height"
+                android:background="@drawable/calendar_item_bg">
+
+    <LinearLayout android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true">
+
+        <TextView
+            android:id="@+id/day_of_week"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/text_size_extra_small"
+            android:textStyle="normal"
+            android:textColor="@color/secondary_text"
+            android:lineSpacingExtra="@dimen/text_size_spacing"
+            android:gravity="center"
+            android:layout_gravity="center"/>
+
+        <TextView
+            android:id="@+id/day_of_month"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/text_size_large"
+            android:textStyle="normal"
+            android:textColor="@android:color/black"
+            android:lineSpacingExtra="@dimen/text_size_spacing"
+            android:gravity="center"
+            android:layout_gravity="center"/>
+
+    </LinearLayout>
+
+</RelativeLayout>

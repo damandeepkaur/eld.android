@@ -1,6 +1,6 @@
 package com.bsmwireless.screens.navigation;
 
-import com.bsmwireless.data.storage.users.UserEntity;
+import com.bsmwireless.data.storage.users.UserConverter;
 import com.bsmwireless.domain.interactors.LoginUserInteractor;
 import com.bsmwireless.domain.interactors.VehiclesInteractor;
 import com.bsmwireless.models.User;
@@ -64,30 +64,13 @@ public class NavigationPresenter {
         mView.setAssetsNumber(mVehiclesInteractor.getAssetsNumber());
     }
 
-    public void onUserUpdated() {
-        Disposable disposable = mLoginUserInteractor.getUser()
-                .subscribeOn(Schedulers.io())
-                .subscribe(
-                        userEntity -> mLoginUserInteractor.updateUserOnServer(getUpdatedUser(userEntity))
-                                    .subscribeOn(Schedulers.io())
-                                    .subscribe(),
-                        throwable -> Timber.e("LoginUser error: %s", throwable.toString())
-                );
-        mDisposables.add(disposable);
-    }
-
-    // TODO: change server logic
-    private User getUpdatedUser(UserEntity userEntity) {
-        User user = new User();
-
-        user.setId(userEntity.getId());
-        user.setTimezone(userEntity.getTimezone());
-        user.setFirstName(userEntity.getFirstName());
-        user.setLastName(userEntity.getLastName());
-        user.setCycleCountry(userEntity.getCycleCountry());
-        user.setSignature(userEntity.getSignature());
-        user.setAddress(userEntity.getAddress());
-
-        return user;
+    public void onUserUpdated(User user) {
+        if (user != null) {
+            mDisposables.add(mLoginUserInteractor.updateUser(user)
+                                                 .subscribeOn(Schedulers.io())
+                                                 .observeOn(AndroidSchedulers.mainThread())
+                                                 .subscribe(userUpdated -> {},
+                                                            throwable -> mView.showErrorMessage(throwable.getMessage())));
+        }
     }
 }

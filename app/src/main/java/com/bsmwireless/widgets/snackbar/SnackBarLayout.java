@@ -1,7 +1,6 @@
 package com.bsmwireless.widgets.snackbar;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
 import android.util.AttributeSet;
@@ -48,7 +47,6 @@ public class SnackBarLayout extends LinearLayout {
         mRootView = inflate(context, R.layout.snackbar_layout, this);
         setFocusableInTouchMode(true);
         setFocusable(true);
-        setOrientation(VERTICAL);
     }
 
     @Override
@@ -63,21 +61,7 @@ public class SnackBarLayout extends LinearLayout {
         mBottomSheet = BottomSheetBehavior.from(this);
         mBottomSheet.setHideable(true);
         mBottomSheet.setState(BottomSheetBehavior.STATE_HIDDEN);
-        mBottomSheet.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
-            @Override
-            public void onStateChanged(@NonNull View bottomSheet, int newState) {
-                if (mListener != null) {
-                    mListener.onStateChanged(bottomSheet, newState);
-                }
-            }
-
-            @Override
-            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-                if (mListener != null) {
-                    mListener.onSlide(bottomSheet, slideOffset);
-                }
-            }
-        });
+        mBottomSheet.setBottomSheetCallback(mListener);
     }
 
     @Override
@@ -98,51 +82,22 @@ public class SnackBarLayout extends LinearLayout {
         return this;
     }
 
-    public SnackBarLayout setPositiveOnClickListener(OnClickListener listener) {
+    public SnackBarLayout setPositiveLabel(String label, OnClickListener listener) {
+        mPosAction.setText(label);
+        mPosAction.setVisibility(View.VISIBLE);
         mPosAction.setOnClickListener(listener);
         return this;
     }
 
-    public SnackBarLayout setNegativeOnClickListener(OnClickListener listener) {
+    public SnackBarLayout setNegativeLabel(String label, OnClickListener listener) {
+        mNegativeAction.setText(label);
+        mNegativeAction.setVisibility(VISIBLE);
         mNegativeAction.setOnClickListener(listener);
         return this;
     }
 
-    public SnackBarLayout setPositiveLabel(String label) {
-        mPosAction.setText(label);
+    public SnackBarLayout setBottomSheetCallback(BottomSheetBehavior.BottomSheetCallback callback) {
+        mListener = callback;
         return this;
-    }
-
-    public SnackBarLayout setNegativeLabel(String label) {
-        mNegativeAction.setText(label);
-        return this;
-    }
-
-    public SnackBarLayout needPositive(boolean need) {
-        mPosAction.setVisibility(need ? VISIBLE : GONE);
-        return this;
-    }
-
-    public SnackBarLayout needNegative(boolean need) {
-        mNegativeAction.setVisibility(need ? VISIBLE : GONE);
-        return this;
-    }
-
-    public SnackBarLayout setOnStateChangedListener(SnackbarStateListener listener) {
-        mListener = listener;
-        return this;
-    }
-
-    public static class SnackbarStateListener extends BottomSheetBehavior.BottomSheetCallback {
-
-        @Override
-        public void onStateChanged(@NonNull View bottomSheet, int newState) {
-
-        }
-
-        @Override
-        public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-
-        }
     }
 }

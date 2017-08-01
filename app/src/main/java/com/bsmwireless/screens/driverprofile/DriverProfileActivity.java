@@ -1,7 +1,9 @@
 package com.bsmwireless.screens.driverprofile;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -11,6 +13,7 @@ import android.widget.Toast;
 
 import com.bsmwireless.common.App;
 import com.bsmwireless.data.storage.users.UserEntity;
+import com.bsmwireless.models.User;
 import com.bsmwireless.screens.common.BaseMenuActivity;
 import com.bsmwireless.screens.driverprofile.dagger.DaggerDriverProfileComponent;
 import com.bsmwireless.screens.driverprofile.dagger.DriverProfileModule;
@@ -27,6 +30,8 @@ import static android.support.design.widget.BottomSheetBehavior.STATE_EXPANDED;
 import static android.support.design.widget.BottomSheetBehavior.STATE_HIDDEN;
 
 public class DriverProfileActivity extends BaseMenuActivity implements DriverProfileView, SignatureLayout.OnSaveSignatureListener {
+
+    public static final String EXTRA_USER = "user";
 
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
@@ -92,9 +97,9 @@ public class DriverProfileActivity extends BaseMenuActivity implements DriverPro
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    public void onBackPressed() {
         mPresenter.onSaveUserInfo(mAddressTextView.getText().toString());
+        super.onBackPressed();
     }
 
     @Override
@@ -136,6 +141,13 @@ public class DriverProfileActivity extends BaseMenuActivity implements DriverPro
         mSnackBarLayout.showSnackbar();
     }
 
+    @Override
+    public void setResults(User user) {
+        Intent resultIntent = new Intent();
+        resultIntent.putExtra(EXTRA_USER, user);
+        setResult(RESULT_OK, resultIntent);
+    }
+
     private void initToolbar() {
         setSupportActionBar(mToolbar);
         ActionBar actionBar = getSupportActionBar();
@@ -146,19 +158,14 @@ public class DriverProfileActivity extends BaseMenuActivity implements DriverPro
     }
 
     private void initSnackbar() {
-        mSnackBarLayout.needNegative(true)
-                       .needPositive(true)
-                       .setPositiveLabel(getString(R.string.ok))
-                       .setNegativeLabel(getString(R.string.clear))
-                       .setPositiveOnClickListener(v -> mPresenter.onSaveSignatureClicked(mSignatureLayout.getImageData()))
-                       .setNegativeOnClickListener(v -> mSignatureLayout.clear())
-                       .setOnStateChangedListener(new SnackBarLayout.SnackbarStateListener() {
+        mSnackBarLayout.setPositiveLabel(getString(R.string.ok), v -> mPresenter.onSaveSignatureClicked(mSignatureLayout.getImageData()))
+                       .setNegativeLabel(getString(R.string.clear), v -> mSignatureLayout.clear())
+                       .setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
                             @Override
                             public void onStateChanged(@NonNull View bottomSheet, int newState) {
                                 switch (newState) {
                                     case STATE_HIDDEN: {
                                         mSignatureLayout.setEditable(false);
-                                        mPresenter.onNeedUpdateUserInfo();
                                         break;
                                     }
                                     case STATE_EXPANDED: {
@@ -170,6 +177,11 @@ public class DriverProfileActivity extends BaseMenuActivity implements DriverPro
                                     }
                                 }
                             }
+
+                           @Override
+                           public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+
+                           }
                        });
     }
 }
