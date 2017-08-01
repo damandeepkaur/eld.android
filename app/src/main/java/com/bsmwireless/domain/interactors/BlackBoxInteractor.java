@@ -17,11 +17,9 @@ public class BlackBoxInteractor {
     private PreferencesManager mPreferencesManager;
 
     @Inject
-    public BlackBoxInteractor(ConnectionManager connectionManager) {
-        mConnectionManager = connectionManager;
-    }
-    public BlackBoxInteractor(PreferencesManager preferencesManager) {
+    public BlackBoxInteractor(PreferencesManager preferencesManager, ConnectionManager connectionManager) {
         mPreferencesManager = preferencesManager;
+        mConnectionManager = connectionManager;
     }
 
     public Observable<BlackBoxModel> getData() {
