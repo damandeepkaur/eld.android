@@ -20,6 +20,8 @@ public class App extends Application {
     private static AppComponent mComponent;
     private WeakReference<Activity> mCurrentActivity;
 
+    private static final int ACTIVITY_LIFECYCLE_DURATION = 500;
+
     private boolean mIsInBackground = false;
 
     public static AppComponent getComponent() {
@@ -73,7 +75,7 @@ public class App extends Application {
                     mIsInBackground = true;
                     onAppGoesBackground();
                 }
-            }, 500);
+            }, ACTIVITY_LIFECYCLE_DURATION);
         }
 
         @Override

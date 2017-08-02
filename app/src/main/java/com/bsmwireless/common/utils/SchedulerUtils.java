@@ -72,7 +72,7 @@ public class SchedulerUtils {
     }
 
     @TargetApi(21)
-    private static void scheduleExactJobScheduler() {
+    public static void scheduleExactJobScheduler() {
         JobInfo.Builder builder = new JobInfo.Builder(mJobId++,
                 new ComponentName(App.getComponent().context(), AutoLogoutJobService.class))
                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
@@ -91,7 +91,7 @@ public class SchedulerUtils {
     }
 
     @TargetApi(21)
-    private static void cancelJob() {
+    public static void cancelJob() {
         JobScheduler jobScheduler = (JobScheduler) App.getComponent().context().getSystemService(Context.JOB_SCHEDULER_SERVICE);
         List<JobInfo> allPendingJobs = jobScheduler.getAllPendingJobs();
         if (allPendingJobs.size() > 0) {
