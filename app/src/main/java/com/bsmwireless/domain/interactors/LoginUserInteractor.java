@@ -18,9 +18,7 @@ import javax.inject.Inject;
 
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.annotations.NonNull;
 
 import static com.bsmwireless.models.ELDEvent.EventType.LOGIN_LOGOUT;
 
@@ -195,7 +193,7 @@ public class LoginUserInteractor {
         passwordModel.setId(getDriverId());
         passwordModel.setUsername(getUserName());
         passwordModel.setPassword(oldPassword);
-        passwordModel.setNewpswd(newPassword);
+        passwordModel.setNewPswd(newPassword);
 
         return passwordModel;
     }

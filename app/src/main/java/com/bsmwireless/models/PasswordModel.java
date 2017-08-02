@@ -12,16 +12,16 @@ public class PasswordModel implements Parcelable
 
     @SerializedName("id")
     @Expose
-    private Integer id;
+    private Integer mId;
     @SerializedName("username")
     @Expose
-    private String username;
+    private String mUsername;
     @SerializedName("password")
     @Expose
-    private String password;
+    private String mPassword;
     @SerializedName("newpswd")
     @Expose
-    private String newpswd;
+    private String mNewPswd;
 
     public final static Parcelable.Creator<PasswordModel> CREATOR = new Creator<PasswordModel>() {
 
@@ -30,10 +30,10 @@ public class PasswordModel implements Parcelable
         })
         public PasswordModel createFromParcel(Parcel in) {
             PasswordModel instance = new PasswordModel();
-            instance.id = ((Integer) in.readValue((Integer.class.getClassLoader())));
-            instance.username = ((String) in.readValue((String.class.getClassLoader())));
-            instance.password = ((String) in.readValue((String.class.getClassLoader())));
-            instance.newpswd = ((String) in.readValue((String.class.getClassLoader())));
+            instance.mId = ((Integer) in.readValue((Integer.class.getClassLoader())));
+            instance.mUsername = ((String) in.readValue((String.class.getClassLoader())));
+            instance.mPassword = ((String) in.readValue((String.class.getClassLoader())));
+            instance.mNewPswd = ((String) in.readValue((String.class.getClassLoader())));
             return instance;
         }
 
@@ -44,54 +44,54 @@ public class PasswordModel implements Parcelable
     };
 
     public Integer getId() {
-        return id;
+        return mId;
     }
 
     public void setId(Integer id) {
-        this.id = id;
+        this.mId = id;
     }
 
     public String getUsername() {
-        return username;
+        return mUsername;
     }
 
     public void setUsername(String username) {
-        this.username = username;
+        this.mUsername = username;
     }
 
     public String getPassword() {
-        return password;
+        return mPassword;
     }
 
     public void setPassword(String password) {
-        this.password = password;
+        this.mPassword = password;
     }
 
-    public String getNewpswd() {
-        return newpswd;
+    public String getNewPswd() {
+        return mNewPswd;
     }
 
-    public void setNewpswd(String newpswd) {
-        this.newpswd = newpswd;
+    public void setNewPswd(String newPswd) {
+        this.mNewPswd = newPswd;
     }
 
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("PasswordModel{");
-        sb.append("id=").append(id);
-        sb.append(", username='").append(username).append('\'');
-        sb.append(", password='").append(password).append('\'');
-        sb.append(", newpswd='").append(newpswd).append('\'');
+        sb.append("id=").append(mId);
+        sb.append(", username='").append(mUsername).append('\'');
+        sb.append(", password='").append(mPassword).append('\'');
+        sb.append(", newpswd='").append(mNewPswd).append('\'');
         sb.append('}');
         return sb.toString();
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(id)
-                                    .append(username)
-                                    .append(password)
-                                    .append(newpswd)
+        return new HashCodeBuilder().append(mId)
+                                    .append(mUsername)
+                                    .append(mPassword)
+                                    .append(mNewPswd)
                                     .toHashCode();
     }
 
@@ -104,18 +104,18 @@ public class PasswordModel implements Parcelable
             return false;
         }
         PasswordModel rhs = ((PasswordModel) other);
-        return new EqualsBuilder().append(id, rhs.id)
-                                  .append(username, rhs.username)
-                                  .append(password, rhs.password)
-                                  .append(newpswd, rhs.newpswd)
+        return new EqualsBuilder().append(mId, rhs.mId)
+                                  .append(mUsername, rhs.mUsername)
+                                  .append(mPassword, rhs.mPassword)
+                                  .append(mNewPswd, rhs.mNewPswd)
                                   .isEquals();
     }
 
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeValue(id);
-        dest.writeValue(username);
-        dest.writeValue(password);
-        dest.writeValue(newpswd);
+        dest.writeValue(mId);
+        dest.writeValue(mUsername);
+        dest.writeValue(mPassword);
+        dest.writeValue(mNewPswd);
     }
 
     public int describeContents() {
