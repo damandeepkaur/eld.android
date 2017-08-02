@@ -87,12 +87,6 @@ public class DriverProfileActivity extends BaseMenuActivity implements DriverPro
 
         mPresenter.onNeedUpdateUserInfo();
 
-        mSnackBarLayout.setOnFocusChangeListener((v, hasFocus) -> {
-            if (!hasFocus) {
-                mSnackBarLayout.hideSnackbar();
-            }
-        });
-
         mSignatureLayout.setOnSaveListener(this);
     }
 
@@ -160,6 +154,7 @@ public class DriverProfileActivity extends BaseMenuActivity implements DriverPro
     private void initSnackbar() {
         mSnackBarLayout.setPositiveLabel(getString(R.string.ok), v -> mPresenter.onSaveSignatureClicked(mSignatureLayout.getImageData()))
                        .setNegativeLabel(getString(R.string.clear), v -> mSignatureLayout.clear())
+                       .setHideableOnFocusLost(true)
                        .setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
                             @Override
                             public void onStateChanged(@NonNull View bottomSheet, int newState) {

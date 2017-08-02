@@ -1,115 +1,129 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<android.support.design.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@android:color/white"
-    tools:context="com.bsmwireless.screens.selectasset.SelectAssetActivity">
+    android:layout_height="match_parent">
 
-    <android.support.design.widget.AppBarLayout
-        style="@style/ActionBarTheme"
-        android:id="@+id/select_asset_app_bar"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@android:color/white"
+        tools:context="com.bsmwireless.screens.selectasset.SelectAssetActivity">
+
+        <android.support.design.widget.AppBarLayout
+            style="@style/ActionBarTheme"
+            android:id="@+id/select_asset_app_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:background="@drawable/toolbar_gradient">
+
+                <android.support.v7.widget.Toolbar
+                    android:id="@+id/select_asset_toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="@dimen/default_toolbar_padding"
+                    app:titleTextAppearance="@style/ActionBarTitleTextStyle"
+                    app:popupTheme="@style/ThemeOverlay.AppCompat.Dark"/>
+
+                <android.support.v7.widget.SearchView
+                    android:id="@+id/select_asset_search_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/select_asset_search_margin"
+                    android:background="@android:color/white"
+                    app:iconifiedByDefault="false"
+                    app:searchHintIcon="@null"
+                    app:queryBackground="@null"
+                    app:queryHint="@string/select_asset_search_hint"/>
+
+            </LinearLayout>
+
+        </android.support.design.widget.AppBarLayout>
+
+        <TextView
+            android:id="@+id/select_asset_previous_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/select_asset_app_bar"
+            android:layout_margin="@dimen/select_asset_item_padding"
+            android:textSize="@dimen/text_size_small"
+            android:textColor="@color/accent"
+            android:text="@string/select_asset_previous_assets"/>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/select_asset_last_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/select_asset_previous_text"
+            android:layout_above="@+id/select_asset_buttons_layout"/>
 
         <LinearLayout
+            android:id="@+id/select_asset_buttons_layout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:background="@drawable/toolbar_gradient">
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_margin="@dimen/default_margin"
+            android:orientation="horizontal"
+            android:gravity="center">
 
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/select_asset_toolbar"
-                android:layout_width="match_parent"
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/select_asset_scan_qr_code_button"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingTop="@dimen/default_toolbar_padding"
-                app:titleTextAppearance="@style/ActionBarTitleTextStyle"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Dark"/>
+                android:layout_marginEnd="@dimen/default_margin"
+                android:padding="@dimen/default_margin"
+                android:text="@string/select_asset_scan_qr_code"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/text_size_small"
+                app:backgroundTint="@color/accent"/>
 
-            <android.support.v7.widget.SearchView
-                android:id="@+id/select_asset_search_view"
-                android:layout_width="match_parent"
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/select_asset_not_in_vehicle_button"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/select_asset_search_margin"
-                android:background="@android:color/white"
-                app:iconifiedByDefault="false"
-                app:searchHintIcon="@null"
-                app:queryBackground="@null"
-                app:queryHint="@string/select_asset_search_hint"/>
+                android:padding="@dimen/default_margin"
+                android:text="@string/select_asset_not_in_vehicle"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/text_size_small"
+                app:backgroundTint="@color/accent"/>
 
         </LinearLayout>
 
-    </android.support.design.widget.AppBarLayout>
-
-    <TextView
-        android:id="@+id/select_asset_previous_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/select_asset_app_bar"
-        android:layout_margin="@dimen/select_asset_item_padding"
-        android:textSize="@dimen/text_size_small"
-        android:textColor="@color/accent"
-        android:text="@string/select_asset_previous_assets"/>
-
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/select_asset_last_list"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/select_asset_previous_text"
-        android:layout_above="@+id/select_asset_buttons_layout"/>
-    
-    <LinearLayout
-        android:id="@+id/select_asset_buttons_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_margin="@dimen/default_margin"
-        android:orientation="horizontal"
-        android:gravity="center">
-        
-        <android.support.v7.widget.AppCompatButton
-            android:id="@+id/select_asset_scan_qr_code_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="@dimen/default_margin"
-            android:padding="@dimen/default_margin"
-            android:text="@string/select_asset_scan_qr_code"
-            android:textColor="@android:color/white"
-            android:textSize="@dimen/text_size_small"
-            app:backgroundTint="@color/accent"/>
-
-        <android.support.v7.widget.AppCompatButton
-            android:id="@+id/select_asset_not_in_vehicle_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="@dimen/default_margin"
-            android:text="@string/select_asset_not_in_vehicle"
-            android:textColor="@android:color/white"
-            android:textSize="@dimen/text_size_small"
-            app:backgroundTint="@color/accent"/>
-        
-    </LinearLayout>
-
-    <android.support.v7.widget.CardView
-        android:id="@+id/select_asset_search_card"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/select_asset_app_bar"
-        android:layout_marginTop="@dimen/select_asset_card_top_margin"
-        android:layout_marginLeft="@dimen/select_asset_card_side_margin"
-        android:layout_marginRight="@dimen/select_asset_card_side_margin"
-        android:visibility="gone"
-        app:cardCornerRadius="0dp"
-        app:cardElevation="@dimen/select_asset_card_elevation">
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/select_asset_search_list"
+        <android.support.v7.widget.CardView
+            android:id="@+id/select_asset_search_card"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/select_asset_app_bar"
+            android:layout_marginTop="@dimen/select_asset_card_top_margin"
+            android:layout_marginLeft="@dimen/select_asset_card_side_margin"
+            android:layout_marginRight="@dimen/select_asset_card_side_margin"
+            android:visibility="gone"
+            app:cardCornerRadius="0dp"
+            app:cardElevation="@dimen/select_asset_card_elevation">
 
-    </android.support.v7.widget.CardView>
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/select_asset_search_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
 
-</RelativeLayout>
+        </android.support.v7.widget.CardView>
+
+    </RelativeLayout>
+
+    <com.bsmwireless.widgets.snackbar.SnackBarLayout
+        android:id="@+id/select_asset_snackbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:behavior_peekHeight="?attr/actionBarSize"
+        app:layout_behavior="android.support.design.widget.BottomSheetBehavior"/>
+
+</android.support.design.widget.CoordinatorLayout>
+
