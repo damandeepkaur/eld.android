@@ -23,16 +23,16 @@ import android.os.SystemClock;
 
 public class SchedulerUtils {
 
-    public static int mJobId = 0;
+    private static int mJobId = 0;
 
-    public static final int AUTO_LOGOUT_TRIGGER_DURATION = 60;
+    private static final int AUTO_LOGOUT_TRIGGER_DURATION = 60;
 
     private static PendingIntent mPendingIntent;
 
     public static void schedule() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             scheduleExactJobScheduler();
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
             scheduleExactAlarmManager();
         }
     }
@@ -41,15 +41,24 @@ public class SchedulerUtils {
         Intent intent = new Intent(App.getComponent().context(), AlarmReceiver.class);
         mPendingIntent = PendingIntent.getBroadcast(App.getComponent().context(), 0, intent, 0);
         AlarmManager alarmManager = (AlarmManager) App.getComponent().context().getSystemService(Context.ALARM_SERVICE);
-        alarmManager.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                SystemClock.elapsedRealtime() + TimeUnit.MINUTES.toMillis(AUTO_LOGOUT_TRIGGER_DURATION), mPendingIntent);
+
+        setExectAlarmManager(alarmManager);
     }
 
+    private static void setExectAlarmManager(AlarmManager alarmManager) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            alarmManager.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                    SystemClock.elapsedRealtime() + TimeUnit.MINUTES.toMillis(AUTO_LOGOUT_TRIGGER_DURATION), mPendingIntent);
+        } else {
+            alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                    SystemClock.elapsedRealtime() + TimeUnit.MINUTES.toMillis(AUTO_LOGOUT_TRIGGER_DURATION), mPendingIntent);
+        }
+    }
 
     public static void cancel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             cancelJob();
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
             cancelAlarm();
         }
     }
@@ -72,7 +81,7 @@ public class SchedulerUtils {
     }
 
     @TargetApi(21)
-    public static void scheduleExactJobScheduler() {
+    private static void scheduleExactJobScheduler() {
         JobInfo.Builder builder = new JobInfo.Builder(mJobId++,
                 new ComponentName(App.getComponent().context(), AutoLogoutJobService.class))
                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
@@ -91,7 +100,7 @@ public class SchedulerUtils {
     }
 
     @TargetApi(21)
-    public static void cancelJob() {
+    private static void cancelJob() {
         JobScheduler jobScheduler = (JobScheduler) App.getComponent().context().getSystemService(Context.JOB_SCHEDULER_SERVICE);
         List<JobInfo> allPendingJobs = jobScheduler.getAllPendingJobs();
         if (allPendingJobs.size() > 0) {

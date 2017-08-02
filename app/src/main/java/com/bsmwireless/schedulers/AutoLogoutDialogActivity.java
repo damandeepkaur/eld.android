@@ -44,6 +44,10 @@ public class AutoLogoutDialogActivity extends Activity {
         mAutoLogoutJobService = new AutoLogoutJobService();
         mDisposables = new CompositeDisposable();
 
+        initAutoLogoutDialog();
+    }
+
+    private void initAutoLogoutDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(R.string.auto_logout_message_alert_dialog);
         builder.setCancelable(false);
