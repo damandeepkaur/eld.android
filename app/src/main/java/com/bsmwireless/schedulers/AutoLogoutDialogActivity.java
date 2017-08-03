@@ -3,14 +3,12 @@ package com.bsmwireless.schedulers;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Handler;
 import android.support.v7.app.AlertDialog;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.bsmwireless.common.App;
 import com.bsmwireless.common.utils.SchedulerUtils;
@@ -42,6 +40,8 @@ public class AutoLogoutDialogActivity extends Activity {
     private AutoLogoutJobService mAutoLogoutJobService;
     private CompositeDisposable mDisposables;
 
+    private AlertDialog mAlertDialog;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,10 +65,10 @@ public class AutoLogoutDialogActivity extends Activity {
             SchedulerUtils.cancel();
             SchedulerUtils.schedule();
         });
-        final AlertDialog alertDialog = builder.create();
-        alertDialog.show();
+        mAlertDialog = builder.create();
+        mAlertDialog.show();
 
-        initAutoLogoutIfNoUserInteraction(alertDialog);
+        initAutoLogoutIfNoUserInteraction(mAlertDialog);
     }
 
     private void initAutoLogoutIfNoUserInteraction(AlertDialog alertDialog) {
@@ -110,7 +110,10 @@ public class AutoLogoutDialogActivity extends Activity {
                                 mAutoLogoutJobService.jobFinished(getIntent().getExtras().getParcelable(ARG_JOBS_PARAMETERS), false);
                             }
                         },
-                        error -> Timber.e("LoginUser error: %s", error)
+                        error -> {
+                            Timber.e("LoginUser error: %s", error);
+                            SchedulerUtils.cancel();
+                        }
 
                 );
         mDisposables.add(disposable);
@@ -141,6 +144,7 @@ public class AutoLogoutDialogActivity extends Activity {
 
     @Override
     protected void onDestroy() {
+        mAlertDialog.dismiss();
         mDisposables.dispose();
         super.onDestroy();
     }

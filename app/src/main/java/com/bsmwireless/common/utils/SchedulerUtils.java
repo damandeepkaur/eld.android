@@ -42,10 +42,10 @@ public class SchedulerUtils {
         mPendingIntent = PendingIntent.getBroadcast(App.getComponent().context(), 0, intent, 0);
         AlarmManager alarmManager = (AlarmManager) App.getComponent().context().getSystemService(Context.ALARM_SERVICE);
 
-        setExectAlarmManager(alarmManager);
+        setExactAlarmManager(alarmManager);
     }
 
-    private static void setExectAlarmManager(AlarmManager alarmManager) {
+    private static void setExactAlarmManager(AlarmManager alarmManager) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             alarmManager.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP,
                     SystemClock.elapsedRealtime() + TimeUnit.MINUTES.toMillis(AUTO_LOGOUT_TRIGGER_DURATION), mPendingIntent);
