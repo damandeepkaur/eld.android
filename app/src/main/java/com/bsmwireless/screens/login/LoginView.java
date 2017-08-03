@@ -8,7 +8,7 @@ public interface LoginView {
 
     String getDomain();
 
-    void showErrorMessage(String msg);
+    void showErrorMessage(CharSequence msg);
 
     void goToSelectAssetScreen();
 

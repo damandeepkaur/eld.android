@@ -18,6 +18,7 @@ public class BarcodeScannerActivity extends BasePermissionActivity implements ZX
 
     public static final String BARCODE_UUID = "barcode_uuid";
     public static final String BARCODE_TYPE = "barcode_type";
+    public static final String CANCEL_MESSAGE = "cancel_message";
 
     private BarcodeScannerFragment mBarcodeScannerFragment = null;
 
@@ -28,9 +29,9 @@ public class BarcodeScannerActivity extends BasePermissionActivity implements ZX
 
     @Override
     protected void onPermissionDenied() {
-        Toast.makeText(this, R.string.barcode_scanner_error, Toast.LENGTH_SHORT).show();
-
-        setResult(RESULT_CANCELED);
+        Intent intent = new Intent();
+        intent.putExtra(CANCEL_MESSAGE, getString(R.string.barcode_scanner_error));
+        setResult(RESULT_CANCELED, intent);
         finish();
     }
 

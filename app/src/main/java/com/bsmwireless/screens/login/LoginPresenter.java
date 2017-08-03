@@ -1,11 +1,16 @@
 package com.bsmwireless.screens.login;
 
+import android.content.Context;
+
 import com.bsmwireless.common.dagger.ActivityScope;
+import com.bsmwireless.common.utils.NetworkUtils;
+import com.bsmwireless.data.network.RetrofitException;
 import com.bsmwireless.domain.interactors.LoginUserInteractor;
 import com.bsmwireless.models.User;
 
 import javax.inject.Inject;
 
+import app.bsmuniversal.com.R;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
@@ -14,12 +19,14 @@ import timber.log.Timber;
 
 @ActivityScope
 public class LoginPresenter {
+    private Context mContext;
     private LoginView mView;
     private LoginUserInteractor mLoginUserInteractor;
     private CompositeDisposable mDisposables;
 
     @Inject
-    public LoginPresenter(LoginView view, LoginUserInteractor interactor) {
+    public LoginPresenter(Context context, LoginView view, LoginUserInteractor interactor) {
+        mContext = context;
         mView = view;
         mLoginUserInteractor = interactor;
         mDisposables = new CompositeDisposable();
@@ -64,13 +71,13 @@ public class LoginPresenter {
                             if (status) {
                                 mView.goToSelectAssetScreen();
                             } else {
-                                mView.showErrorMessage("Login failed");
+                                mView.showErrorMessage(mContext.getString(R.string.error_unexpected));
                                 mView.setLoginButtonEnabled(true);
                             }
                         },
                         error -> {
                             Timber.e("LoginUser error: %s", error);
-                            mView.showErrorMessage("Exception:" + error.toString());
+                            mView.showErrorMessage(NetworkUtils.getErrorMessage((RetrofitException) error, mContext));
                             mView.setLoginButtonEnabled(true);
                         }
                 );

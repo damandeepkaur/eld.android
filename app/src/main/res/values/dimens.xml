@@ -62,6 +62,7 @@
     <dimen name="text_size_smallest">8sp</dimen>
     <dimen name="text_size_large">20sp</dimen>
     <dimen name="text_size_spacing">8sp</dimen>
+    <item format="float" name="text_letter_spacing" type="dimen">0.04</item>
 
     <!-- Graphview dimens -->
     <dimen name="graph_view_top_offset">20dp</dimen>
@@ -99,7 +100,6 @@
     <dimen name="driver_profile_signature_height">225dp</dimen>
     <dimen name="driver_profile_signature_margin">15dp</dimen>
     <dimen name="driver_profile_shadow_size">4dp</dimen>
-    <item format="float" name="driver_profile_button_letter_spacing" type="dimen">0.26</item>
 
     <!-- Calendar widget -->
     <dimen name="calendar_item_width">45dp</dimen>

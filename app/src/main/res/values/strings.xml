@@ -28,6 +28,16 @@
     <!--Barcode Scanner-->
     <string name="barcode_scanner_error">Camera permission is necessary for barcode scanning</string>
 
+    <!--Retrofit errors-->
+    <string name="error">Error</string>
+    <string name="error_network">Network error</string>
+    <string name="error_unexpected">Unexpected error</string>
+    <string name="error_bad_request">Bad Request</string>
+    <string name="error_not_authenticated">Not Authenticated</string>
+    <string name="error_timeout">Timeout</string>
+    <string name="error_internal_server">Internal Server Error</string>
+    <string name="error_unknown">Unknown error</string>
+
     <!-- START OLD STRINGS -->
     <string name="no_network">No Network Available</string>
     <string name="app_compatability">Note: Compatible with Android 4.0.3 - 6.0.1</string>
@@ -165,7 +175,6 @@
     <string name="sign_error_message">Please Add Signature to profile to save the Inspection Forms</string>
     <string name="save_error">Save Error</string>
     <string name="defect">Please enter the comment for this defect</string>
-    <string name="error">error</string>
     <string name="error_msg">Error Message</string>
     <string name="logouterror">Logout error</string>
     <string name="hos_txt_graph">GRAPH</string>
@@ -379,6 +388,7 @@
 
     <string name="ok">Ok</string>
     <string name="clear">Clear</string>
+    <string name="try_again">Try again</string>
 
     <!-- Settings Activity -->
     <string name="settings">Settings</string>
