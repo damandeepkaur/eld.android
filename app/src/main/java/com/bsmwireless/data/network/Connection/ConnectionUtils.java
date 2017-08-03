@@ -17,7 +17,7 @@ public class ConnectionUtils {
     public static byte[] intToByte(int value, int size)
     {
         byte[] byteValue = new byte[size];
-        for(int i=0; i<size-1;i++)
+        for(int i=0; i<size;i++)
         {
             byteValue[i] = (byte)(value );
             value>>=8;

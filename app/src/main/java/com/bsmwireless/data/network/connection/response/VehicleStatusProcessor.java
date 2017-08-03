@@ -38,7 +38,7 @@ public class VehicleStatusProcessor extends ResponseProcessor {
             //Event Time
             int year = 2000 + data[index];  // year at 18
             index++;
-            int month = data[index];// month at 19
+            int month = data[index];// month at 19 , zero index
             index++;
             int day = data[index]; //Day at 20
             index++;
@@ -49,7 +49,7 @@ public class VehicleStatusProcessor extends ResponseProcessor {
             int sec = data[index];//Day at 23
             index++;
 
-            Calendar cal = new GregorianCalendar(year,month,day,hr,min,sec);
+            Calendar cal = new GregorianCalendar(year,month+1,day,hr,min,sec);
             cal.setTimeZone(TimeZone.getTimeZone("UTC"));
             boxData.setEvenTimeUTC(cal.getTime());
             String s = cal.getTime().toString();
@@ -66,33 +66,32 @@ public class VehicleStatusProcessor extends ResponseProcessor {
             System.arraycopy(data,index,latArr,0,4);
             double lat =ConnectionUtils.byteToUnsignedInt(latArr);
             boxData.setLat(lat);
-            Timber.i("Latitude received from box:" +  lat);
+            Timber.i("VehicleStatusProcessor: Latitude received from box:" +  lat);
             index = index+4;
             //longitude at 34-37
             byte[] lonArr = new byte[4];
             System.arraycopy(data,index,lonArr,0,4);
             double lon =ConnectionUtils.byteToUnsignedInt(lonArr);
             boxData.setLon(lon);
-            Timber.i("Longitude received from box:" +  lon);
-            index = index+4;
+            Timber.i("VehicleStatusProcessor: Longitude received from box:" +  lon);
+            index = index + 4;
             //Heading at 38-39
             boxData.setHeading(ConnectionUtils.byteToUnsignedInt(new byte[]{data[index], data[index+1]}));
             index += 2;
-            index+=2;
             int speed = (int)(data[index] & 0XFF);
             index++;
             //Odometer 41 to 44
             byte[] odometer = new byte[4];
             System.arraycopy(data,index,odometer,0,4);
             boxData.setOdometer(ConnectionUtils.byteToUnsignedInt(odometer));
-            Timber.i("Odometer received from box:" +  boxData.getOdometer());
+            Timber.i("VehicleStatusProcessor: Odometer received from box:" +  boxData.getOdometer());
             index = index+4;
 
             //Total Engine Run time in seconds 45 to 48
             byte[] TERTArr = new byte[4];
             System.arraycopy(data,index,TERTArr,0,4);
             boxData.setTERT(ConnectionUtils.byteToUnsignedInt(TERTArr));
-            Timber.i("TERT received from box:" +  boxData.getTERT());
+            Timber.i("VehicleStatusProcessor: TERT received from box:" +  boxData.getTERT());
             index = index+4;
             // TD Messages in queue
             boxData.setTDMsgQueue ( (int)(data[index] & 0XFF));
@@ -103,6 +102,16 @@ public class VehicleStatusProcessor extends ResponseProcessor {
             Timber.e("Exception in handling ack handler", e);
         }
         return null;
+    }
+
+
+
+    public static void main(String[] args)
+    {
+        int n = (int) Long.parseLong("02EEF3FC", 16);
+        Timber.i("LOG");
+        int n1 = (int) Long.parseLong("074765F6", 16);
+        Timber.i("LOG");
     }
 
 }

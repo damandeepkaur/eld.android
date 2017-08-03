@@ -3,6 +3,8 @@ package com.bsmwireless.data.network.connection.response;
 import com.bsmwireless.data.network.connection.ConnectionUtils;
 import com.bsmwireless.models.BlackBoxModel;
 
+import java.util.IllegalFormatException;
+
 /**
  *  Abstracted the Response processor with definitions  and  common parser
  */
@@ -61,10 +63,9 @@ public abstract class ResponseProcessor {
                     return Stopped;
                 case 'E':
                     return SensorChange;
-
             }
-            return  null;
 
+            throw new IllegalArgumentException("Unknown Response Type " + type );
         }
 
     };
@@ -75,7 +76,9 @@ public abstract class ResponseProcessor {
     public enum NackReasonCode{
         CheckSum_Wrong((byte)0x01),
         BoxId_MisMatch((byte)0x02),
-        TimeStamp_older((byte)0x03);
+        TimeStamp_older((byte)0x03),
+        Unknown_Error((byte)0x00);
+
         private byte mByteVal;
 
         NackReasonCode(byte val){
@@ -96,7 +99,7 @@ public abstract class ResponseProcessor {
 
             }
 
-            return null;
+            return Unknown_Error;
         }
     };
 
