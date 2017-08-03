@@ -3,11 +3,14 @@ package com.bsmwireless.schedulers;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
+import android.os.Handler;
 import android.support.v7.app.AlertDialog;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.bsmwireless.common.App;
 import com.bsmwireless.common.utils.SchedulerUtils;
@@ -15,6 +18,8 @@ import com.bsmwireless.domain.interactors.LoginUserInteractor;
 import com.bsmwireless.schedulers.alarmmanager.AlarmReceiver;
 import com.bsmwireless.schedulers.jobscheduler.AutoLogoutJobService;
 import com.bsmwireless.screens.login.LoginActivity;
+
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
@@ -28,6 +33,8 @@ import timber.log.Timber;
 public class AutoLogoutDialogActivity extends Activity {
 
     public static final String ARG_JOBS_PARAMETERS = "params";
+
+    private static final int NO_USER_INTERACTION = 1;
 
     @Inject
     LoginUserInteractor mLoginUserInteractor;
@@ -52,17 +59,39 @@ public class AutoLogoutDialogActivity extends Activity {
         builder.setMessage(R.string.auto_logout_message_alert_dialog);
         builder.setCancelable(false);
         builder.setPositiveButton(R.string.auto_logout_positive_button_lbl_alert_dialog, (dialog, which) -> {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                initJobSchedulerAutoLogout();
-            } else {
-                initAlarmManager();
-            }
+            initAutoLogout();
         });
         builder.setNegativeButton(R.string.auto_logout_cancel_button_lbl_alert_dialog, (dialog, which) -> {
             SchedulerUtils.cancel();
             SchedulerUtils.schedule();
         });
-        builder.show();
+        final AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+
+        initAutoLogoutIfNoUserInteraction(alertDialog);
+    }
+
+    private void initAutoLogoutIfNoUserInteraction(AlertDialog alertDialog) {
+        final Handler mHandler = new Handler();
+        final Runnable runnable = () -> {
+            if (alertDialog.isShowing()) {
+                initAutoLogout();
+            }
+        };
+
+        alertDialog.setOnDismissListener(dialog -> {
+            mHandler.removeCallbacks(runnable);
+        });
+
+        mHandler.postDelayed(runnable, TimeUnit.MINUTES.toMillis(NO_USER_INTERACTION));
+    }
+
+    private void initAutoLogout() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            initJobSchedulerAutoLogout();
+        } else {
+            initAlarmManager();
+        }
     }
 
     @TargetApi(21)
