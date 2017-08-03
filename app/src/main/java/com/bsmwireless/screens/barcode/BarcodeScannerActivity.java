@@ -3,7 +3,6 @@ package com.bsmwireless.screens.barcode;
 import android.Manifest;
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Toast;
 
 import com.bsmwireless.screens.common.BaseFragment;
 import com.bsmwireless.screens.common.BasePermissionActivity;
@@ -20,8 +19,6 @@ public class BarcodeScannerActivity extends BasePermissionActivity implements ZX
     public static final String BARCODE_TYPE = "barcode_type";
     public static final String CANCEL_MESSAGE = "cancel_message";
 
-    private BarcodeScannerFragment mBarcodeScannerFragment = null;
-
     @Override
     protected String[] getDesiredPermissions() {
         return new String[] { Manifest.permission.CAMERA };
@@ -30,15 +27,14 @@ public class BarcodeScannerActivity extends BasePermissionActivity implements ZX
     @Override
     protected void onPermissionDenied() {
         Intent intent = new Intent();
-        intent.putExtra(CANCEL_MESSAGE, getString(R.string.barcode_scanner_error));
+        intent.putExtra(CANCEL_MESSAGE, R.string.barcode_scanner_error);
         setResult(RESULT_CANCELED, intent);
         finish();
     }
 
     @Override
     protected void onPermissionGranted() {
-        mBarcodeScannerFragment = new BarcodeScannerFragment();
-        open(mBarcodeScannerFragment);
+        open(new BarcodeScannerFragment());
     }
 
     @Override

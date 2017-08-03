@@ -16,7 +16,9 @@ import android.widget.TextView;
 
 import com.bsmwireless.common.App;
 import com.bsmwireless.common.Constants;
+import com.bsmwireless.common.utils.NetworkUtils;
 import com.bsmwireless.common.utils.ViewUtils;
+import com.bsmwireless.data.network.RetrofitException;
 import com.bsmwireless.models.Vehicle;
 import com.bsmwireless.screens.barcode.BarcodeScannerActivity;
 import com.bsmwireless.screens.common.BaseActivity;
@@ -197,7 +199,7 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
             mSearchView.setQuery(barcodeId, false);
 
         } else if (data != null && data.hasExtra(BarcodeScannerActivity.CANCEL_MESSAGE)) {
-            showErrorMessage(data.getStringExtra(BarcodeScannerActivity.CANCEL_MESSAGE));
+            showErrorMessage(data.getIntExtra(BarcodeScannerActivity.CANCEL_MESSAGE, R.string.error_unexpected));
         }
     }
 
@@ -243,11 +245,20 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
     }
 
     @Override
-    public void showErrorMessage(CharSequence message) {
+    public void showErrorMessage(int id) {
         ViewUtils.hideSoftKeyboard(this);
 
         mSnackBarLayout
-                .setMessage(message)
+                .setMessage(getString(id))
+                .showSnackbar();
+    }
+
+    @Override
+    public void showErrorMessage(RetrofitException error) {
+        ViewUtils.hideSoftKeyboard(this);
+
+        mSnackBarLayout
+                .setMessage(NetworkUtils.getErrorMessage(error, this))
                 .showSnackbar();
     }
 }

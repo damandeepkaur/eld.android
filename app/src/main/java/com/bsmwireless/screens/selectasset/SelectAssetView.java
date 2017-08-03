@@ -2,6 +2,7 @@ package com.bsmwireless.screens.selectasset;
 
 import android.support.annotation.Nullable;
 
+import com.bsmwireless.data.network.RetrofitException;
 import com.bsmwireless.models.Vehicle;
 
 import java.util.List;
@@ -16,7 +17,9 @@ public interface SelectAssetView {
 
     void goToHomeScreen();
 
-    void showErrorMessage(CharSequence message);
+    void showErrorMessage(int id);
+
+    void showErrorMessage(RetrofitException error);
 
     void showSearchErrorMessage();
 

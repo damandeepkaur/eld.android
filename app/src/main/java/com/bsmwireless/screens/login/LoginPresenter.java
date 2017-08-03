@@ -1,9 +1,6 @@
 package com.bsmwireless.screens.login;
 
-import android.content.Context;
-
 import com.bsmwireless.common.dagger.ActivityScope;
-import com.bsmwireless.common.utils.NetworkUtils;
 import com.bsmwireless.data.network.RetrofitException;
 import com.bsmwireless.domain.interactors.LoginUserInteractor;
 import com.bsmwireless.models.User;
@@ -19,14 +16,12 @@ import timber.log.Timber;
 
 @ActivityScope
 public class LoginPresenter {
-    private Context mContext;
     private LoginView mView;
     private LoginUserInteractor mLoginUserInteractor;
     private CompositeDisposable mDisposables;
 
     @Inject
-    public LoginPresenter(Context context, LoginView view, LoginUserInteractor interactor) {
-        mContext = context;
+    public LoginPresenter(LoginView view, LoginUserInteractor interactor) {
         mView = view;
         mLoginUserInteractor = interactor;
         mDisposables = new CompositeDisposable();
@@ -50,13 +45,13 @@ public class LoginPresenter {
         String domain = mView.getDomain();
 
         if (username == null || username.isEmpty()) {
-            mView.showErrorMessage("Username Required");
+            mView.showErrorMessage(R.string.error_username);
             return;
         } else if (password == null || password.isEmpty()) {
-            mView.showErrorMessage("Password Required");
+            mView.showErrorMessage(R.string.error_password);
             return;
         } else if (domain == null || domain.isEmpty()) {
-            mView.showErrorMessage("Domain Required");
+            mView.showErrorMessage(R.string.error_domain);
             return;
         }
         mView.setLoginButtonEnabled(false);
@@ -71,13 +66,13 @@ public class LoginPresenter {
                             if (status) {
                                 mView.goToSelectAssetScreen();
                             } else {
-                                mView.showErrorMessage(mContext.getString(R.string.error_unexpected));
+                                mView.showErrorMessage(R.string.error_unexpected);
                                 mView.setLoginButtonEnabled(true);
                             }
                         },
                         error -> {
                             Timber.e("LoginUser error: %s", error);
-                            mView.showErrorMessage(NetworkUtils.getErrorMessage((RetrofitException) error, mContext));
+                            mView.showErrorMessage((RetrofitException) error);
                             mView.setLoginButtonEnabled(true);
                         }
                 );

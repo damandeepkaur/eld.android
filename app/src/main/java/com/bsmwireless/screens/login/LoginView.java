@@ -1,5 +1,7 @@
 package com.bsmwireless.screens.login;
 
+import com.bsmwireless.data.network.RetrofitException;
+
 public interface LoginView {
 
     String getUsername();
@@ -8,7 +10,9 @@ public interface LoginView {
 
     String getDomain();
 
-    void showErrorMessage(CharSequence msg);
+    void showErrorMessage(int id);
+
+    void showErrorMessage(RetrofitException error);
 
     void goToSelectAssetScreen();
 

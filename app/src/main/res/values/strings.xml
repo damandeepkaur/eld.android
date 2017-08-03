@@ -37,6 +37,9 @@
     <string name="error_timeout">Timeout</string>
     <string name="error_internal_server">Internal Server Error</string>
     <string name="error_unknown">Unknown error</string>
+    <string name="error_username">Username Required</string>
+    <string name="error_password">Password Required</string>
+    <string name="error_domain">Domain Required</string>
 
     <!-- START OLD STRINGS -->
     <string name="no_network">No Network Available</string>

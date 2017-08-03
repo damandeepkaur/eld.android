@@ -1,9 +1,6 @@
 package com.bsmwireless.screens.selectasset;
 
-import android.content.Context;
-
 import com.bsmwireless.common.dagger.ActivityScope;
-import com.bsmwireless.common.utils.NetworkUtils;
 import com.bsmwireless.data.network.RetrofitException;
 import com.bsmwireless.domain.interactors.LoginUserInteractor;
 import com.bsmwireless.domain.interactors.VehiclesInteractor;
@@ -21,11 +18,9 @@ public class SelectAssetPresenter {
     private SelectAssetView mView;
     private VehiclesInteractor mVehiclesInteractor;
     private CompositeDisposable mDisposables;
-    private Context mContext;
 
     @Inject
-    public SelectAssetPresenter(Context context, SelectAssetView view, VehiclesInteractor vehiclesInteractor, LoginUserInteractor userInteractor) {
-        mContext = context;
+    public SelectAssetPresenter(SelectAssetView view, VehiclesInteractor vehiclesInteractor, LoginUserInteractor userInteractor) {
         mView = view;
         mVehiclesInteractor = vehiclesInteractor;
         mDisposables = new CompositeDisposable();
@@ -69,7 +64,7 @@ public class SelectAssetPresenter {
                             },
                             error -> {
                                 Timber.e("SelectAsset error: %s", error);
-                                mView.showErrorMessage(NetworkUtils.getErrorMessage((RetrofitException) error, mContext));
+                                mView.showErrorMessage((RetrofitException) error);
                             }
                     ));
         }
@@ -93,7 +88,7 @@ public class SelectAssetPresenter {
                             },
                             error -> {
                                 Timber.e("SelectAsset error: %s", error);
-                                mView.showErrorMessage(NetworkUtils.getErrorMessage((RetrofitException) error, mContext));
+                                mView.showErrorMessage((RetrofitException) error);
                             }));
         }
     }
