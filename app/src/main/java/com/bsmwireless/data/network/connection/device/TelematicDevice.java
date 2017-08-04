@@ -4,11 +4,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 /**
- *  Interface to connect to the Device, it can be WIFI or Serial
+ *  Interface to connect to the TelematicDevice, it can be WIFI or Serial
  */
 
 
-public interface Device {
+public interface TelematicDevice {
     boolean connect();
     void disconnect();
     boolean isConnected();

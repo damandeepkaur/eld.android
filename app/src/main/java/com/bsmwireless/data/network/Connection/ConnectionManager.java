@@ -5,7 +5,7 @@ package com.bsmwireless.data.network.connection;
 import android.support.annotation.Nullable;
 
 import com.bsmwireless.common.Constants;
-import com.bsmwireless.data.network.connection.device.Device;
+import com.bsmwireless.data.network.connection.device.TelematicDevice;
 import com.bsmwireless.data.network.connection.request.SubscriptionGenerator;
 import com.bsmwireless.data.network.connection.response.AckResponseProcessor;
 import com.bsmwireless.data.network.connection.response.ResponseProcessor;
@@ -23,7 +23,7 @@ import timber.log.Timber;
 
 
 public class ConnectionManager implements ConnectionInterface {
-    private Device mDevice;
+    private TelematicDevice mTelematicDevice;
     private Vehicle mVehicle;
     private ConnectionManagerService mConnectionService;
     private byte sequenceID = 1;
@@ -43,8 +43,8 @@ public class ConnectionManager implements ConnectionInterface {
 
     private final BehaviorSubject<ConnectionStatus> connectionState = BehaviorSubject.create();
 
-    public ConnectionManager(Device device) {
-        mDevice= device;
+    public ConnectionManager(TelematicDevice telematicDevice) {
+        mTelematicDevice = telematicDevice;
     }
 
     public BehaviorSubject<ConnectionStatus> getConnectionStateObservable() {
@@ -60,8 +60,8 @@ public class ConnectionManager implements ConnectionInterface {
     }
 
     @Override
-    public void setDevice(Device device) {
-        mDevice = device;
+    public void setDevice(TelematicDevice telematicDevice) {
+        mTelematicDevice = telematicDevice;
     }
 
 
@@ -78,7 +78,7 @@ public class ConnectionManager implements ConnectionInterface {
 
         mVehicle =vehicle;
         // get the device/vehicle and move it to the ready state
-        if (mDevice == null || mVehicle == null) return;
+        if (mTelematicDevice == null || mVehicle == null) return;
         vehicleConnected = true;
         startConnectionService();
         setConnectionstatus(ConnectionStatus.Ready);
@@ -96,7 +96,7 @@ public class ConnectionManager implements ConnectionInterface {
     public void disconnect() {
         vehicleConnected = false;
         setConnectionstatus(ConnectionStatus.Disconnected);
-        mDevice.disconnect();
+        mTelematicDevice.disconnect();
         stopConnectionService();
     }
 
@@ -122,8 +122,8 @@ public class ConnectionManager implements ConnectionInterface {
             while(vehicleConnected) {
                 if (getConnectionstatus() == ConnectionStatus.Ready) {
                     try {
-                        mDevice.connect();
-                        if (mDevice.isConnected()) {
+                        mTelematicDevice.connect();
+                        if (mTelematicDevice.isConnected()) {
                             resetStatus(ConnectionStatus.Subscribing);
                             initializeCommunication();
 
@@ -165,10 +165,10 @@ public class ConnectionManager implements ConnectionInterface {
      * returns true, on successful write operation returns.
      * returns false, on exception
      */
-    private  boolean sendRequest(byte[] request)
+    private boolean sendRequest(byte[] request)
     {
         try {
-            OutputStream output = mDevice.getOutputStream();
+            OutputStream output = mTelematicDevice.getOutputStream();
             output.write(request);
             output.flush();
             return true;
@@ -188,7 +188,7 @@ public class ConnectionManager implements ConnectionInterface {
      * process the bytes for the status response
      * on timeout sent the subscription request by setting the status to subscribing
      */
-    private  void readStatusResponse()
+    private void readStatusResponse()
     {
         try {
                 byte[] response = readResponse(STATUS_TIMEOUT);
@@ -236,7 +236,7 @@ public class ConnectionManager implements ConnectionInterface {
         long elapsed = 0;
         int total = 0;
         while (total <= 0 && elapsed < timeout) {
-            InputStream input = mDevice.getInputStream();
+            InputStream input = mTelematicDevice.getInputStream();
             byte[] response = new byte[BUFFER_SIZE];
             int available = input.available();
             while (available > 0) {

@@ -1,7 +1,7 @@
 package com.bsmwireless.data.network.connection;
 
 
-import com.bsmwireless.data.network.connection.device.Device;
+import com.bsmwireless.data.network.connection.device.TelematicDevice;
 import com.bsmwireless.models.Vehicle;
 
 /**
@@ -10,7 +10,7 @@ import com.bsmwireless.models.Vehicle;
 
 public interface ConnectionInterface {
 
-    void setDevice(Device device);
+    void setDevice(TelematicDevice telematicDevice);
     void connect(Vehicle vehicle);
     void disconnect();
     boolean isConnected();

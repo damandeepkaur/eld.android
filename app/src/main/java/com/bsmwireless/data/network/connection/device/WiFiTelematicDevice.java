@@ -20,10 +20,10 @@ import java.net.Socket;
 import timber.log.Timber;
 
 /**
- *  Communication through WiFi in the Device.
+ *  Communication through WiFi in the TelematicDevice.
  */
 
-public class WiFiDevice implements Device {
+public class WiFiTelematicDevice implements TelematicDevice {
 
     private String mConnectionString =Constants.WIFI_GATEWAY_IP;
     private int mPort = Constants.WIFI_REMOTE_PORT;

@@ -2,7 +2,7 @@ package com.bsmwireless.common.dagger;
 
 
 import com.bsmwireless.data.network.connection.ConnectionManager;
-import com.bsmwireless.data.network.connection.device.WiFiDevice;
+import com.bsmwireless.data.network.connection.device.WiFiTelematicDevice;
 
 import javax.inject.Singleton;
 
@@ -15,15 +15,15 @@ import dagger.Provides;
 @Module
 public class BoxModule {
 
- @Singleton
+    @Singleton
     @Provides
- WiFiDevice provideDevice() {
-        return new WiFiDevice();
+    WiFiTelematicDevice provideDevice() {
+        return new WiFiTelematicDevice();
     }
 
     @Singleton
     @Provides
-    ConnectionManager provideConnectionManager(WiFiDevice wiFiDevice) {
+    ConnectionManager provideConnectionManager(WiFiTelematicDevice wiFiDevice) {
         return new ConnectionManager(wiFiDevice);
     }
 

@@ -133,7 +133,7 @@ public abstract class ResponseProcessor {
         for (indx=0;indx<5;indx++) {
             if ((char) data[indx] != '@') return false;
         }
-        //Device type -Always android
+        //TelematicDevice type -Always android
         if (data[indx++] != (byte) Constants.DEVICE_TYPE.charAt(0)) return false;
         // Two bytes of 0xFF indicating start of the packet
         if (data[indx++] != (byte)0xFF && data[indx++] != (byte)0xFF)  return false;
