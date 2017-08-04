@@ -7,6 +7,8 @@ import android.support.v7.widget.SwitchCompat;
 import android.widget.EditText;
 
 import com.bsmwireless.common.App;
+import com.bsmwireless.common.utils.NetworkUtils;
+import com.bsmwireless.data.network.RetrofitException;
 import com.bsmwireless.screens.common.BaseActivity;
 import com.bsmwireless.screens.login.dagger.DaggerLoginComponent;
 import com.bsmwireless.screens.login.dagger.LoginModule;
@@ -92,9 +94,36 @@ public class LoginActivity extends BaseActivity implements LoginView {
     }
 
     @Override
-    public void showErrorMessage(CharSequence message) {
+    public void showErrorMessage(Error error) {
+        int id;
+
+        switch (error) {
+            case ERROR_USER:
+                id = R.string.error_username;
+                break;
+
+            case ERROR_DOMAIN:
+                id = R.string.error_domain;
+                break;
+
+            case ERROR_PASSWORD:
+                id = R.string.error_password;
+                break;
+
+            default:
+                id = R.string.error_unexpected;
+                break;
+        }
+
         mSnackBarLayout
-                .setMessage(message)
+                .setMessage(getString(id))
+                .showSnackbar();
+    }
+
+    @Override
+    public void showErrorMessage(RetrofitException error) {
+        mSnackBarLayout
+                .setMessage(NetworkUtils.getErrorMessage(error, this))
                 .showSnackbar();
     }
 
