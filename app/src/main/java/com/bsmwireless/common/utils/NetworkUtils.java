@@ -67,3 +67,4 @@ public class NetworkUtils {
 
         return spannable;
     }
+}
