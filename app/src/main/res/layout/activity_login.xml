@@ -1,106 +1,121 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:local="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/radial_background"
-    android:gravity="center"
-    android:paddingEnd="@dimen/relative_layout_padding"
-    android:paddingLeft="@dimen/relative_layout_padding"
-    android:paddingRight="@dimen/relative_layout_padding"
-    android:paddingStart="@dimen/relative_layout_padding">
+    tools:context="com.bsmwireless.screens.login.LoginActivity">
 
-    <android.support.design.widget.TextInputLayout
-        android:id="@+id/usernameWrapper"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:hintTextAppearance="@style/TextAppearance.TextInputLayout.Green">
+        android:layout_height="match_parent"
+        android:background="@drawable/radial_background"
+        android:gravity="center"
+        android:paddingEnd="@dimen/relative_layout_padding"
+        android:paddingLeft="@dimen/relative_layout_padding"
+        android:paddingRight="@dimen/relative_layout_padding"
+        android:paddingStart="@dimen/relative_layout_padding">
 
-        <android.support.design.widget.TextInputEditText
-            android:id="@+id/username"
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/usernameWrapper"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:completionThreshold="1"
-            android:hint="@string/login_txthint_username"
-            android:imeOptions="actionNext"
-            android:singleLine="true"
-            android:textSize="@dimen/text_size" />
-    </android.support.design.widget.TextInputLayout>
+            app:hintTextAppearance="@style/TextAppearance.TextInputLayout.Green">
 
-    <android.support.design.widget.TextInputLayout
-        android:id="@+id/passwordWrapper"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/usernameWrapper"
-        android:layout_marginTop="@dimen/generic_margin_top"
-        app:hintTextAppearance="@style/TextAppearance.TextInputLayout.Green"
-        local:passwordToggleEnabled="true">
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/username"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:completionThreshold="1"
+                android:hint="@string/login_txthint_username"
+                android:imeOptions="actionNext"
+                android:singleLine="true"
+                android:textSize="@dimen/text_size" />
+        </android.support.design.widget.TextInputLayout>
 
-        <android.support.design.widget.TextInputEditText
-            android:id="@+id/password"
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/passwordWrapper"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/login_txthint_password"
-            android:imeOptions="actionNext"
-            android:inputType="textPassword"
-            android:singleLine="true"
-            android:textSize="@dimen/text_size"/>
-    </android.support.design.widget.TextInputLayout>
+            android:layout_below="@id/usernameWrapper"
+            android:layout_marginTop="@dimen/generic_margin_top"
+            app:hintTextAppearance="@style/TextAppearance.TextInputLayout.Green"
+            app:passwordToggleEnabled="true">
 
-    <android.support.design.widget.TextInputLayout
-        android:id="@+id/domainWrapper"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/passwordWrapper"
-        android:layout_marginTop="@dimen/generic_margin_top"
-        app:hintTextAppearance="@style/TextAppearance.TextInputLayout.Green">
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/password"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/login_txthint_password"
+                android:imeOptions="actionNext"
+                android:inputType="textPassword"
+                android:singleLine="true"
+                android:textSize="@dimen/text_size"/>
+        </android.support.design.widget.TextInputLayout>
 
-        <android.support.design.widget.TextInputEditText
-            android:id="@+id/domain"
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/domainWrapper"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/login_txthint_domain"
-            android:imeOptions="actionDone"
-            android:singleLine="true"
-            android:textSize="@dimen/text_size" />
-    </android.support.design.widget.TextInputLayout>
+            android:layout_below="@id/passwordWrapper"
+            android:layout_marginTop="@dimen/generic_margin_top"
+            app:hintTextAppearance="@style/TextAppearance.TextInputLayout.Green">
 
-    <TextView
-        android:id="@+id/lbl_remember_me"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@id/domainWrapper"
-        android:layout_marginTop="@dimen/generic_margin_top_larger"
-        android:lineSpacingExtra="@dimen/text_view_line_spacing_extra"
-        android:paddingLeft="@dimen/small_margin"
-        android:text="@string/login_lbl_rememberme"
-        android:textColor="@color/white"
-        android:textSize="@dimen/text_size"
-        android:textStyle="normal" />
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/domain"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/login_txthint_domain"
+                android:imeOptions="actionDone"
+                android:singleLine="true"
+                android:textSize="@dimen/text_size" />
+        </android.support.design.widget.TextInputLayout>
 
-    <android.support.v7.widget.SwitchCompat
-        android:id="@+id/switchButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_below="@id/domainWrapper"
-        android:layout_marginTop="@dimen/generic_margin_top_larger" />
+        <TextView
+            android:id="@+id/lbl_remember_me"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@id/domainWrapper"
+            android:layout_marginTop="@dimen/generic_margin_top_larger"
+            android:lineSpacingExtra="@dimen/text_view_line_spacing_extra"
+            android:paddingStart="@dimen/small_margin"
+            android:text="@string/login_lbl_rememberme"
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_size"
+            android:textStyle="normal" />
 
-    <android.support.v7.widget.AppCompatButton
-        android:id="@+id/execute_login"
+        <android.support.v7.widget.SwitchCompat
+            android:id="@+id/switchButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@id/domainWrapper"
+            android:layout_marginTop="@dimen/generic_margin_top_larger" />
+
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/execute_login"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/switchButton"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="@dimen/generic_margin_top_larger"
+            android:padding="@dimen/default_margin"
+            android:maxWidth="300dp"
+            android:text="@string/login_btn_login"
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_size_small"
+            app:backgroundTint="@color/accent"/>
+    </RelativeLayout>
+
+    <com.bsmwireless.widgets.snackbar.SnackBarLayout
+        android:id="@+id/login_snackbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/switchButton"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="@dimen/generic_margin_top_larger"
-        android:padding="@dimen/default_margin"
-        android:maxWidth="300dp"
-        android:text="@string/login_btn_login"
-        android:textColor="@color/white"
-        android:textSize="@dimen/text_size_small"
-        app:backgroundTint="@color/accent"/>
-</RelativeLayout>
+        app:layout_behavior="android.support.design.widget.BottomSheetBehavior"
+        app:sbl_text_color="@android:color/white"
+        app:sbl_background_color="@color/primary_dark"/>
+
+</android.support.design.widget.CoordinatorLayout>
+

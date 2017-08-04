@@ -1,6 +1,7 @@
 package com.bsmwireless.screens.selectasset;
 
 import com.bsmwireless.common.dagger.ActivityScope;
+import com.bsmwireless.data.network.RetrofitException;
 import com.bsmwireless.domain.interactors.LoginUserInteractor;
 import com.bsmwireless.domain.interactors.VehiclesInteractor;
 import com.bsmwireless.models.Vehicle;
@@ -63,7 +64,9 @@ public class SelectAssetPresenter {
                             },
                             error -> {
                                 Timber.e("SelectAsset error: %s", error);
-                                mView.showErrorMessage("Exception:" + error.toString());
+                                if (error instanceof RetrofitException) {
+                                    mView.showErrorMessage((RetrofitException) error);
+                                }
                             }
                     ));
         }
@@ -87,7 +90,9 @@ public class SelectAssetPresenter {
                             },
                             error -> {
                                 Timber.e("SelectAsset error: %s", error);
-                                mView.showErrorMessage("Exception:" + error.toString());
+                                if (error instanceof RetrofitException) {
+                                    mView.showErrorMessage((RetrofitException) error);
+                                }
                             }));
         }
     }

@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -17,6 +16,9 @@ import android.widget.TextView;
 
 import com.bsmwireless.common.App;
 import com.bsmwireless.common.Constants;
+import com.bsmwireless.common.utils.NetworkUtils;
+import com.bsmwireless.common.utils.ViewUtils;
+import com.bsmwireless.data.network.RetrofitException;
 import com.bsmwireless.models.Vehicle;
 import com.bsmwireless.screens.barcode.BarcodeScannerActivity;
 import com.bsmwireless.screens.common.BaseActivity;
@@ -24,6 +26,7 @@ import com.bsmwireless.screens.navigation.NavigationActivity;
 import com.bsmwireless.screens.selectasset.dagger.DaggerSelectAssetComponent;
 import com.bsmwireless.screens.selectasset.dagger.SelectAssetModule;
 import com.bsmwireless.widgets.common.RxSearchView;
+import com.bsmwireless.widgets.snackbar.SnackBarLayout;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -61,6 +64,9 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
 
     @BindView(R.id.select_asset_search_card)
     CardView mSearchCardView;
+
+    @BindView(R.id.select_asset_snackbar)
+    SnackBarLayout mSnackBarLayout;
 
     @Inject
     SelectAssetPresenter mPresenter;
@@ -121,6 +127,10 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
         mLastRecyclerView.setHasFixedSize(true);
         mLastRecyclerView.setLayoutManager(lastManager);
         mLastRecyclerView.setAdapter(mLastAdapter);
+
+        mSnackBarLayout
+                .setHideableOnTimeout(SnackBarLayout.DURATION_LONG)
+                .setHideableOnFocusLost(true);
 
         mPresenter.onViewCreated();
     }
@@ -187,6 +197,9 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
             String type = data.getStringExtra(BARCODE_TYPE);
             Timber.v(barcodeId + " type:" + type);
             mSearchView.setQuery(barcodeId, false);
+
+        } else if (data != null && data.getBooleanExtra(BarcodeScannerActivity.IS_PERMISSION_ERROR, false)) {
+            showErrorMessage(Error.ERROR_PERMISSION);
         }
     }
 
@@ -232,13 +245,31 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
     }
 
     @Override
-    public void showErrorMessage(String message) {
-        AlertDialog.Builder builder;
-        builder = new AlertDialog.Builder(this);
-        builder.setTitle(R.string.select_asset_error);
-        builder.setMessage(message);
-        builder.setCancelable(false);
-        builder.setPositiveButton(R.string.ok, null);
-        builder.show();
+    public void showErrorMessage(Error error) {
+        ViewUtils.hideSoftKeyboard(this);
+
+        int id;
+        switch (error) {
+            case ERROR_PERMISSION:
+                id = R.string.barcode_scanner_error;
+                break;
+
+            default:
+                id = R.string.error_unexpected;
+                break;
+        }
+
+        mSnackBarLayout
+                .setMessage(getString(id))
+                .showSnackbar();
+    }
+
+    @Override
+    public void showErrorMessage(RetrofitException error) {
+        ViewUtils.hideSoftKeyboard(this);
+
+        mSnackBarLayout
+                .setMessage(NetworkUtils.getErrorMessage(error, this))
+                .showSnackbar();
     }
 }
