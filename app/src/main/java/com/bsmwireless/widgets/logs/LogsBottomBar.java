@@ -88,6 +88,12 @@ public class LogsBottomBar extends FrameLayout {
         });
     }
 
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        animate().cancel();
+    }
+
     public void setAddEventClickListener(OnClickListener listener) {
         mAddEventClickListener = listener;
     }

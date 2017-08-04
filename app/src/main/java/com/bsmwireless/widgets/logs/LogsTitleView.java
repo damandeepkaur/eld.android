@@ -17,6 +17,7 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
 public class LogsTitleView extends FrameLayout {
+    private final static int ANIM_DURATION = 200;
 
     @BindView(R.id.list_item_title)
     TextView mTitle;
@@ -27,8 +28,9 @@ public class LogsTitleView extends FrameLayout {
 
     private Unbinder mUnbinder;
     private View mRootView;
-    private boolean isCollapsed = true;
+    private boolean mIsCollapsed = true;
     private Type mType = Type.EVENTS;
+    private Handler mHandler;
 
     public LogsTitleView(@NonNull Context context) {
         super(context);
@@ -47,6 +49,7 @@ public class LogsTitleView extends FrameLayout {
 
     private void init(Context context) {
         mRootView = inflate(context, R.layout.logs_list_item_title, this);
+        mHandler = new Handler();
     }
 
     public Type getType() {
@@ -58,9 +61,11 @@ public class LogsTitleView extends FrameLayout {
     }
 
     public void expand() {
-        new Handler().postDelayed(() -> mArrow.animate().rotation(-180).setDuration(200).start(), 100);
-        mBelowDivider.setVisibility(INVISIBLE);
-        isCollapsed = false;
+        if (isAttachedToWindow()) {
+            mHandler.postDelayed(() -> mArrow.animate().rotation(-180).setDuration(ANIM_DURATION).start(), 100);
+            mBelowDivider.setVisibility(INVISIBLE);
+        }
+        mIsCollapsed = false;
     }
 
     public void collapse() {
@@ -68,11 +73,11 @@ public class LogsTitleView extends FrameLayout {
             mArrow.setRotation(0);
             mBelowDivider.setVisibility(VISIBLE);
         }
-        isCollapsed = true;
+        mIsCollapsed = true;
     }
 
     public boolean isCollapsed() {
-        return isCollapsed;
+        return mIsCollapsed;
     }
 
     @Override
@@ -85,8 +90,8 @@ public class LogsTitleView extends FrameLayout {
             mTitle.setText(R.string.logs_trip_info);
         }
 
-        mArrow.setRotation(isCollapsed ? 0 : -180);
-        mBelowDivider.setVisibility(isCollapsed ? VISIBLE : INVISIBLE);
+        mArrow.setRotation(mIsCollapsed ? 0 : -180);
+        mBelowDivider.setVisibility(mIsCollapsed ? VISIBLE : INVISIBLE);
     }
 
     @Override

@@ -9,12 +9,12 @@
         android:id="@+id/sign_logsheet"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
+        android:layout_margin="@dimen/logs_list_item_header_sign_logsheet_margin"
         android:gravity="right"
         android:text="@string/sign_logsheet"
         android:textAllCaps="true"
         android:textColor="@color/nasty_green"
-        android:textSize="14sp"
+        android:textSize="@dimen/text_size_small"
         android:textStyle="bold"/>
 
     <View
@@ -25,7 +25,7 @@
     <com.bsmwireless.widgets.logs.calendar.CalendarLayout
         android:id="@+id/calendar"
         android:layout_width="wrap_content"
-        android:layout_height="85dp"/>
+        android:layout_height="@dimen/logs_list_item_header_calendar_height"/>
 
     <View
         android:layout_width="match_parent"
@@ -35,9 +35,9 @@
     <com.bsmwireless.widgets.logs.graphview.GraphLayout
         android:id="@+id/graphic"
         android:layout_width="match_parent"
-        android:layout_height="170dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"/>
+        android:layout_height="@dimen/logs_list_item_header_sign_graph_height"
+        android:layout_marginLeft="@dimen/logs_list_item_header_sign_graph_margin_left"
+        android:layout_marginRight="@dimen/logs_list_item_header_sign_graph_margin_right"/>
 
     <View
         android:layout_width="match_parent"

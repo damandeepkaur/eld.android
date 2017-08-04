@@ -115,6 +115,7 @@ public class ELDGraphView extends View {
             canvas.drawBitmap(mBitmap, 0, 0, null);
         } else {
             Bitmap bitmap = getDrawingCache();
+            if (mBitmap != null) mBitmap.recycle();
             mBitmap = bitmap.copy(bitmap.getConfig(), true);
             Canvas bitmapCanvas = new Canvas(mBitmap);
             drawGridBackground(bitmapCanvas);

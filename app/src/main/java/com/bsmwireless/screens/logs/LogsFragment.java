@@ -1,16 +1,16 @@
 package com.bsmwireless.screens.logs;
 
+import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.LinearSmoothScroller;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bsmwireless.common.App;
 import com.bsmwireless.models.ELDEvent;
@@ -29,6 +29,9 @@ import java.util.List;
 import javax.inject.Inject;
 
 import app.bsmuniversal.com.R;
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
 
 import static com.bsmwireless.widgets.logs.LogsBottomBar.Type.ADD_EVENT;
 import static com.bsmwireless.widgets.logs.LogsBottomBar.Type.EDIT;
@@ -40,19 +43,24 @@ public class LogsFragment extends BaseFragment implements LogsView {
     @Inject
     LogsPresenter mPresenter;
     private LogsAdapter mAdapter;
-    private LinearLayoutManager mLayoutManager;
-    private LogsBottomBar mLogsBottomBar;
+
+    @BindView(R.id.recycler_view)
+    RecyclerView mRecyclerView;
+    @BindView(R.id.bottom_bar)
+    LogsBottomBar mLogsBottomBar;
+
+    private Unbinder mUnbinder;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_logs, container, false);
+        mUnbinder = ButterKnife.bind(this, view);
 
         DaggerLogsComponent.builder().appComponent(App.getComponent()).logsModule(new LogsModule(this)).build().inject(this);
 
-        mAdapter = new LogsAdapter();
+        mAdapter = new LogsAdapter(mContext);
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
-        mLayoutManager = new LinearLayoutManager(getActivity());
-        recyclerView.setLayoutManager(mLayoutManager);
+        recyclerView.setLayoutManager(new LinearLayoutManager(mContext));
         recyclerView.setAdapter(mAdapter);
 
         mLogsBottomBar = (LogsBottomBar) view.findViewById(R.id.bottom_bar);
@@ -64,22 +72,32 @@ public class LogsFragment extends BaseFragment implements LogsView {
     }
 
     @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        mUnbinder.unbind();
+        mPresenter.onDestroy();
+    }
+
+    @Override
     public void setELDEvents(List<ELDEvent> events) {
         mAdapter.setELDEvents(events);
+        mAdapter.notifyDataSetChanged();
     }
 
     @Override
     public void setTripInfo(TripInfo tripInfo) {
         mAdapter.setTripInfo(tripInfo);
+        mAdapter.notifyDataSetChanged();
     }
 
     @Override
     public void setLogSheetHeaders(List<LogSheetHeader> logs) {
         mAdapter.setLogSheetHeaders(logs);
+        mAdapter.notifyDataSetChanged();
     }
 
     private void showPopupMenu(View anchorView, ELDEvent event) {
-        PopupMenu popup = new PopupMenu(getActivity(), anchorView);
+        PopupMenu popup = new PopupMenu(mContext, anchorView);
         popup.getMenuInflater().inflate(R.menu.menu_eld_event, popup.getMenu());
 
         //TODO: Add getting delete property from event data (can event be deleted or not)
@@ -101,66 +119,73 @@ public class LogsFragment extends BaseFragment implements LogsView {
         popup.show();
     }
 
-    private final class LogsHolder extends RecyclerView.ViewHolder {
-
+    static class LogsHolder extends RecyclerView.ViewHolder {
         //event
-        private TextView mEventStatus;
-        private TextView mEventTime;
-        private TextView mEventDuration;
-        private TextView mVehicleName;
-        private TextView mAddress;
-        private View mMenuButton;
+        @Nullable
+        @BindView(R.id.event_status)
+        TextView mEventStatus;
+        @Nullable
+        @BindView(R.id.event_time)
+        TextView mEventTime;
+        @Nullable
+        @BindView(R.id.event_duration)
+        TextView mEventDuration;
+        @Nullable
+        @BindView(R.id.vehicle_name)
+        TextView mVehicleName;
+        @Nullable
+        @BindView(R.id.address)
+        TextView mAddress;
+        @Nullable
+        @BindView(R.id.menu_button)
+        View mMenuButton;
 
         //trip info
-        private TextView mCoDriverValue;
-        private TextView mOnDutyLeftValue;
-        private TextView mDriveValue;
-        private TextView mOdometer;
-        private TextView mOdometerValue;
+        @Nullable
+        @BindView(R.id.co_driver)
+        TextView mCoDriverValue;
+        @Nullable
+        @BindView(R.id.on_duty_left)
+        TextView mOnDutyLeftValue;
+        @Nullable
+        @BindView(R.id.drive)
+        TextView mDriveValue;
+        @Nullable
+        @BindView(R.id.odometer)
+        TextView mOdometer;
+        @Nullable
+        @BindView(R.id.odometer_value)
+        TextView mOdometerValue;
 
         private int mViewType;
 
         LogsHolder(View itemView, int viewType) {
             super(itemView);
             mViewType = viewType;
-
-            //event
-            mEventStatus = (TextView) itemView.findViewById(R.id.event_status);
-            mEventTime = (TextView) itemView.findViewById(R.id.event_time);
-            mEventDuration = (TextView) itemView.findViewById(R.id.event_duration);
-            mVehicleName = (TextView) itemView.findViewById(R.id.vehicle_name);
-            mMenuButton = itemView.findViewById(R.id.menu_button);
-            mAddress = (TextView) itemView.findViewById(R.id.address);
-
-            //trip info
-            mCoDriverValue = (TextView) itemView.findViewById(R.id.co_driver);
-            mOnDutyLeftValue = (TextView) itemView.findViewById(R.id.on_duty_left);
-            mDriveValue = (TextView) itemView.findViewById(R.id.drive);
-            mOdometer = (TextView) itemView.findViewById(R.id.odometer);
-            mOdometerValue = (TextView) itemView.findViewById(R.id.odometer_value);
+            ButterKnife.bind(this, itemView);
         }
 
         int getViewType() {
             return mViewType;
         }
 
-        private void bindEventView(ELDEvent event) {
+        private void bindEventView(ELDEvent event, View.OnClickListener menuClickListener) {
             //TODO: change to data from event
             mEventStatus.setText("Driving");
             mEventTime.setText("00:23:30");
             mEventDuration.setText("6 hrs 0 mins");
             mVehicleName.setText("VEH_ID_123");
             mAddress.setText("86 Oak Street, Toronto, ON");
-            mMenuButton.setOnClickListener(v -> showPopupMenu(mMenuButton, event));
+            mMenuButton.setTag(event);
+            mMenuButton.setOnClickListener(menuClickListener);
         }
 
-        private void bindTripInfoView(TripInfo tripInfo) {
+        private void bindTripInfoView(TripInfo tripInfo, String odometerTitle) {
             if (tripInfo != null) {
                 mCoDriverValue.setText(tripInfo.getCoDriverValue());
                 mOnDutyLeftValue.setText(tripInfo.getOnDutyLeftValue());
                 mDriveValue.setText(tripInfo.getDriveValue());
-                String unit = getString(tripInfo.getUnitType() == TripInfo.UnitType.KM ? R.string.km : R.string.ml);
-                mOdometer.setText(getString(R.string.odometer, unit));
+                mOdometer.setText(odometerTitle);
                 mOdometerValue.setText(String.valueOf(tripInfo.getOdometerValue()));
             }
         }
@@ -185,12 +210,19 @@ public class LogsFragment extends BaseFragment implements LogsView {
         private List<ELDEvent> mELDEvents = new ArrayList<>();
         private TripInfo mTripInfo;
         private List<LogSheetHeader> mLogHeaders = new ArrayList<>();
+        private View.OnClickListener mOnClickListener;
+        private Context mContext;
 
-        public LogsAdapter() {
+        public LogsAdapter(Context context) {
+            mContext = context;
+            mOnClickListener = view -> {
+                ELDEvent event = (ELDEvent) view.getTag();
+                showPopupMenu(view, event);
+            };
         }
 
-        public void setELDEvents(List<ELDEvent> ELDEvents) {
-            mELDEvents = ELDEvents;
+        public void setELDEvents(List<ELDEvent> eldEvents) {
+            mELDEvents = eldEvents;
         }
 
         public void setTripInfo(TripInfo tripInfo) {
@@ -203,7 +235,7 @@ public class LogsFragment extends BaseFragment implements LogsView {
 
         @Override
         public LogsHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            LayoutInflater layoutInflater = LayoutInflater.from(getContext());
+            LayoutInflater layoutInflater = LayoutInflater.from(mContext);
             View view;
             switch (viewType) {
                 case VIEW_TYPE_HEADER:
@@ -221,7 +253,7 @@ public class LogsFragment extends BaseFragment implements LogsView {
 
                     break;
                 case VIEW_TYPE_EVENTS_TITLE:
-                    mEventsTitleView = new LogsTitleView(getContext());
+                    mEventsTitleView = new LogsTitleView(mContext);
                     mEventsTitleView.setType(EVENTS);
                     mEventsTitleView.setOnClickListener(v -> onTitleItemClicked((LogsTitleView) v));
                     view = mEventsTitleView;
@@ -230,7 +262,7 @@ public class LogsFragment extends BaseFragment implements LogsView {
                     view = layoutInflater.inflate(R.layout.logs_list_item_eld_event, parent, false);
                     break;
                 case VIEW_TYPE_TRIP_INFO_TITLE:
-                    mTripInfoTitleView = new LogsTitleView(getContext());
+                    mTripInfoTitleView = new LogsTitleView(mContext);
                     mTripInfoTitleView.setType(TRIP_INFO);
                     mTripInfoTitleView.setOnClickListener(v -> onTitleItemClicked((LogsTitleView) v));
                     view = mTripInfoTitleView;
@@ -247,9 +279,10 @@ public class LogsFragment extends BaseFragment implements LogsView {
             int viewType = holder.getViewType();
             if (viewType == VIEW_TYPE_EVENTS_ITEM) {
                 ELDEvent event = mELDEvents.get(position - 2);
-                holder.bindEventView(event);
+                holder.bindEventView(event, mOnClickListener);
             } else if (viewType == VIEW_TYPE_TRIP_INFO_ITEM) {
-                holder.bindTripInfoView(mTripInfo);
+                String unit = getString(mTripInfo.getUnitType() == TripInfo.UnitType.KM ? R.string.km : R.string.ml);
+                holder.bindTripInfoView(mTripInfo, getString(R.string.odometer, unit));
             }
         }
 
@@ -273,14 +306,14 @@ public class LogsFragment extends BaseFragment implements LogsView {
         }
 
         private void scrollToPosition(int position) {
-            RecyclerView.SmoothScroller smoothScroller = new LinearSmoothScroller(getActivity()) {
+            RecyclerView.SmoothScroller smoothScroller = new LinearSmoothScroller(mContext) {
                 @Override
                 protected int getVerticalSnapPreference() {
                     return LinearSmoothScroller.SNAP_TO_START;
                 }
             };
             smoothScroller.setTargetPosition(position);
-            mLayoutManager.startSmoothScroll(smoothScroller);
+            mRecyclerView.getLayoutManager().startSmoothScroll(smoothScroller);
         }
 
         @Override

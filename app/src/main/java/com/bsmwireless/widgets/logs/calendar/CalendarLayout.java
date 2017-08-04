@@ -24,9 +24,9 @@ public class CalendarLayout extends LinearLayout implements View.OnClickListener
 
     private static final int DEFAULT_DAYS_COUNT = 30;
 
-    RecyclerView mRecyclerView;
-    Button mLeftButton;
-    Button mRightButton;	
+    private RecyclerView mRecyclerView;
+    private Button mLeftButton;
+    private Button mRightButton;
     private View mRootView;
     private CalendarAdapter mAdapter;
     private int mDaysCount;
@@ -59,6 +59,8 @@ public class CalendarLayout extends LinearLayout implements View.OnClickListener
         mRecyclerView = (RecyclerView) mRootView.findViewById(R.id.recycler_view);
         mLeftButton = (Button) mRootView.findViewById(R.id.left);
         mRightButton = (Button) mRootView.findViewById(R.id.right);
+        mLeftButton.setOnClickListener(v -> onLeftClicked());
+        mRightButton.setOnClickListener(v -> onRightClicked());
     }
 
     @Override
@@ -98,7 +100,6 @@ public class CalendarLayout extends LinearLayout implements View.OnClickListener
         }
     }
 
-    @OnClick(R.id.left)
     void onLeftClicked() {
         int firstPosition = mLayoutManager.findFirstVisibleItemPosition();
         int lastPosition = mLayoutManager.findLastVisibleItemPosition();
@@ -106,7 +107,6 @@ public class CalendarLayout extends LinearLayout implements View.OnClickListener
         mRecyclerView.smoothScrollToPosition(newPosition < mAdapter.getItemCount() ? newPosition : mAdapter.getItemCount() - 1);
     }
 
-    @OnClick(R.id.right)
     void onRightClicked() {
         int firstPosition = mLayoutManager.findFirstVisibleItemPosition();
         int lastPosition = mLayoutManager.findLastVisibleItemPosition();

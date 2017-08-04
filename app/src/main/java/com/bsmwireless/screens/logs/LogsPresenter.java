@@ -59,6 +59,12 @@ public class LogsPresenter {
     public void onEditTripInfoClicked() {
     }
 
+    public void onDestroy() {
+        mDisposables.dispose();
+
+        Timber.d("DESTROYED");
+    }
+
     private void setupViewForDay(CalendarItem item) {
         //TODO: request data from DB instead of mock
         mView.setELDEvents(makeELDEvents());

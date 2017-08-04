@@ -2,19 +2,19 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
-              android:layout_marginTop="8dp"
+              android:layout_marginTop="@dimen/logs_list_item_trip_info_margin_top"
               android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="48dp"
+        android:layout_height="@dimen/logs_list_item_trip_info_height"
         android:gravity="center"
         android:orientation="horizontal">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_marginLeft="15dp"
+            android:layout_marginLeft="@dimen/logs_list_item_trip_info_margin_left"
             android:gravity="center"
             android:text="@string/logs_co_driver"
             android:textColor="@color/primary_text"
@@ -24,7 +24,7 @@
             android:id="@+id/co_driver"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginRight="93dp"
+            android:layout_marginRight="@dimen/logs_list_item_trip_info_margin_right"
             android:gravity="right"
             android:textColor="@color/secondary_text"
             android:textStyle="bold"/>
@@ -38,14 +38,14 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="48dp"
+        android:layout_height="@dimen/logs_list_item_trip_info_height"
         android:gravity="center"
         android:orientation="horizontal">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="15dp"
+            android:layout_marginLeft="@dimen/logs_list_item_trip_info_margin_left"
             android:gravity="left"
             android:text="@string/logs_on_duty_left"
             android:textColor="@color/primary_text"
@@ -55,7 +55,7 @@
             android:id="@+id/on_duty_left"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginRight="93dp"
+            android:layout_marginRight="@dimen/logs_list_item_trip_info_margin_right"
             android:gravity="right"
             android:textColor="@color/secondary_text"
             android:textStyle="bold"/>
@@ -69,14 +69,14 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="48dp"
+        android:layout_height="@dimen/logs_list_item_trip_info_height"
         android:gravity="center"
         android:orientation="horizontal">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="15dp"
+            android:layout_marginLeft="@dimen/logs_list_item_trip_info_margin_left"
             android:gravity="left"
             android:text="@string/logs_drive"
             android:textColor="@color/primary_text"
@@ -86,7 +86,7 @@
             android:id="@+id/drive"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginRight="93dp"
+            android:layout_marginRight="@dimen/logs_list_item_trip_info_margin_right"
             android:gravity="right"
             android:textColor="@color/secondary_text"
             android:textStyle="bold"/>
@@ -100,7 +100,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="48dp"
+        android:layout_height="@dimen/logs_list_item_trip_info_height"
         android:gravity="center"
         android:orientation="horizontal">
 
@@ -108,7 +108,7 @@
             android:id="@+id/odometer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="15dp"
+            android:layout_marginLeft="@dimen/logs_list_item_trip_info_margin_left"
             android:gravity="left"
             android:textColor="@color/primary_text"
             android:textStyle="bold"/>
@@ -117,7 +117,7 @@
             android:id="@+id/odometer_value"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginRight="93dp"
+            android:layout_marginRight="@dimen/logs_list_item_trip_info_margin_right"
             android:gravity="right"
             android:textColor="@color/secondary_text"
             android:textStyle="bold"/>
