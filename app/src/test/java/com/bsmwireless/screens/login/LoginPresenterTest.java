@@ -58,7 +58,7 @@ public class LoginPresenterTest {
         mLoginPresenter.onLoginButtonClicked(false);
 
         //then
-        verify(mView).showErrorMessage(R.string.error_domain);
+        verify(mView).showErrorMessage(LoginView.Error.ERROR_DOMAIN);
     }
 
     @Test
@@ -72,7 +72,7 @@ public class LoginPresenterTest {
         mLoginPresenter.onLoginButtonClicked(false);
 
         //then
-        verify(mView).showErrorMessage(R.string.error_password);
+        verify(mView).showErrorMessage(LoginView.Error.ERROR_PASSWORD);
     }
 
     @Test
@@ -88,7 +88,7 @@ public class LoginPresenterTest {
         mLoginPresenter.onLoginButtonClicked(false);
 
         //then
-        verify(mView).showErrorMessage(R.string.error_unexpected);
+        verify(mView).showErrorMessage(LoginView.Error.ERROR_UNEXPECTED);
     }
 
     @Test

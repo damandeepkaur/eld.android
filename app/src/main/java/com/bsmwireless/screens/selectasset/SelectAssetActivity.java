@@ -198,8 +198,8 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
             Timber.v(barcodeId + " type:" + type);
             mSearchView.setQuery(barcodeId, false);
 
-        } else if (data != null && data.hasExtra(BarcodeScannerActivity.CANCEL_MESSAGE)) {
-            showErrorMessage(data.getIntExtra(BarcodeScannerActivity.CANCEL_MESSAGE, R.string.error_unexpected));
+        } else if (data != null && data.getBooleanExtra(BarcodeScannerActivity.IS_PERMISSION_ERROR, false)) {
+            showErrorMessage(Error.ERROR_PERMISSION);
         }
     }
 
@@ -245,8 +245,19 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
     }
 
     @Override
-    public void showErrorMessage(int id) {
+    public void showErrorMessage(Error error) {
         ViewUtils.hideSoftKeyboard(this);
+
+        int id;
+        switch (error) {
+            case ERROR_PERMISSION:
+                id = R.string.barcode_scanner_error;
+                break;
+
+            default:
+                id = R.string.error_unexpected;
+                break;
+        }
 
         mSnackBarLayout
                 .setMessage(getString(id))

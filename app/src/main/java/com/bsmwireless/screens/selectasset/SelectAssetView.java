@@ -9,6 +9,11 @@ import java.util.List;
 
 public interface SelectAssetView {
 
+    enum Error {
+        ERROR_UNEXPECTED,
+        ERROR_PERMISSION
+    }
+
     void setVehicleList(@Nullable List<Vehicle> vehicles, @Nullable String searchText);
 
     void setLastVehicleList(@Nullable List<Vehicle> vehicles);
@@ -17,7 +22,7 @@ public interface SelectAssetView {
 
     void goToHomeScreen();
 
-    void showErrorMessage(int id);
+    void showErrorMessage(Error error);
 
     void showErrorMessage(RetrofitException error);
 

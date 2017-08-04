@@ -7,7 +7,6 @@ import com.bsmwireless.models.User;
 
 import javax.inject.Inject;
 
-import app.bsmuniversal.com.R;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
@@ -45,13 +44,13 @@ public class LoginPresenter {
         String domain = mView.getDomain();
 
         if (username == null || username.isEmpty()) {
-            mView.showErrorMessage(R.string.error_username);
+            mView.showErrorMessage(LoginView.Error.ERROR_USER);
             return;
         } else if (password == null || password.isEmpty()) {
-            mView.showErrorMessage(R.string.error_password);
+            mView.showErrorMessage(LoginView.Error.ERROR_PASSWORD);
             return;
         } else if (domain == null || domain.isEmpty()) {
-            mView.showErrorMessage(R.string.error_domain);
+            mView.showErrorMessage(LoginView.Error.ERROR_DOMAIN);
             return;
         }
         mView.setLoginButtonEnabled(false);
@@ -66,13 +65,15 @@ public class LoginPresenter {
                             if (status) {
                                 mView.goToSelectAssetScreen();
                             } else {
-                                mView.showErrorMessage(R.string.error_unexpected);
+                                mView.showErrorMessage(LoginView.Error.ERROR_UNEXPECTED);
                                 mView.setLoginButtonEnabled(true);
                             }
                         },
                         error -> {
                             Timber.e("LoginUser error: %s", error);
-                            mView.showErrorMessage((RetrofitException) error);
+                            if (error instanceof RetrofitException) {
+                                mView.showErrorMessage((RetrofitException) error);
+                            }
                             mView.setLoginButtonEnabled(true);
                         }
                 );

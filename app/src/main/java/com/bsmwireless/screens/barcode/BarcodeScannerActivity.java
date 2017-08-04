@@ -17,7 +17,7 @@ public class BarcodeScannerActivity extends BasePermissionActivity implements ZX
 
     public static final String BARCODE_UUID = "barcode_uuid";
     public static final String BARCODE_TYPE = "barcode_type";
-    public static final String CANCEL_MESSAGE = "cancel_message";
+    public static final String IS_PERMISSION_ERROR = "is_permission_error";
 
     @Override
     protected String[] getDesiredPermissions() {
@@ -27,7 +27,7 @@ public class BarcodeScannerActivity extends BasePermissionActivity implements ZX
     @Override
     protected void onPermissionDenied() {
         Intent intent = new Intent();
-        intent.putExtra(CANCEL_MESSAGE, R.string.barcode_scanner_error);
+        intent.putExtra(IS_PERMISSION_ERROR, true);
         setResult(RESULT_CANCELED, intent);
         finish();
     }

@@ -64,7 +64,9 @@ public class SelectAssetPresenter {
                             },
                             error -> {
                                 Timber.e("SelectAsset error: %s", error);
-                                mView.showErrorMessage((RetrofitException) error);
+                                if (error instanceof RetrofitException) {
+                                    mView.showErrorMessage((RetrofitException) error);
+                                }
                             }
                     ));
         }
@@ -88,7 +90,9 @@ public class SelectAssetPresenter {
                             },
                             error -> {
                                 Timber.e("SelectAsset error: %s", error);
-                                mView.showErrorMessage((RetrofitException) error);
+                                if (error instanceof RetrofitException) {
+                                    mView.showErrorMessage((RetrofitException) error);
+                                }
                             }));
         }
     }

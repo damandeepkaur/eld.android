@@ -94,7 +94,27 @@ public class LoginActivity extends BaseActivity implements LoginView {
     }
 
     @Override
-    public void showErrorMessage(int id) {
+    public void showErrorMessage(Error error) {
+        int id;
+
+        switch (error) {
+            case ERROR_USER:
+                id = R.string.error_username;
+                break;
+
+            case ERROR_DOMAIN:
+                id = R.string.error_domain;
+                break;
+
+            case ERROR_PASSWORD:
+                id = R.string.error_password;
+                break;
+
+            default:
+                id = R.string.error_unexpected;
+                break;
+        }
+
         mSnackBarLayout
                 .setMessage(getString(id))
                 .showSnackbar();

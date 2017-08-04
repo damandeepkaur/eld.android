@@ -4,13 +4,20 @@ import com.bsmwireless.data.network.RetrofitException;
 
 public interface LoginView {
 
+    enum Error {
+        ERROR_UNEXPECTED,
+        ERROR_USER,
+        ERROR_PASSWORD,
+        ERROR_DOMAIN
+    }
+
     String getUsername();
 
     String getPassword();
 
     String getDomain();
 
-    void showErrorMessage(int id);
+    void showErrorMessage(Error error);
 
     void showErrorMessage(RetrofitException error);
 
