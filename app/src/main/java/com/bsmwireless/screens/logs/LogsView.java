@@ -13,4 +13,6 @@ public interface  LogsView {
     void setTripInfo(TripInfo tripInfo);
 
     void setLogSheetHeaders(List<LogSheetHeader> logs);
+
+    void setTime(long[] times);
 }

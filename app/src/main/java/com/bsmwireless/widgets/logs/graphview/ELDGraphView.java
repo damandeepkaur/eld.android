@@ -176,9 +176,11 @@ public class ELDGraphView extends View {
 
         float gridUnit = mGraphWidth / (mHoursCount * SEC_IN_MIN);
 
+        int firstEventCode = 1;
+
         float x1, x2, y1, y2;
         x1 = mGraphLeft;
-        y1 = mGraphTop + logData.get(0).getEventType() * mSegmentHeight + mSegmentHeight / 2;
+        y1 = mGraphTop + (logData.get(0).getEventCode() - firstEventCode) * mSegmentHeight + mSegmentHeight / 2;
 
         for (int i = 1; i < logData.size(); i++) {
             ELDEvent event = logData.get(i);
@@ -190,9 +192,9 @@ public class ELDGraphView extends View {
             long timeStamp = (logDate - prevLogDate) / (SEC_IN_MIN * MS_IN_SEC);
 
             x2 = x1 + timeStamp * gridUnit;
-            y2 = mGraphTop + event.getEventType() * mSegmentHeight + mSegmentHeight / 2;
+            y2 = mGraphTop + (event.getEventCode() - firstEventCode) * mSegmentHeight + mSegmentHeight / 2;
 
-            mBarPaint.setColor(ContextCompat.getColor(getContext(), DutyType.getColorById(event.getEventType())));
+            mBarPaint.setColor(ContextCompat.getColor(getContext(), DutyType.getColorById(event.getEventCode())));
             mBarPaint.setStrokeWidth(ViewUtils.convertDpToPixels(LINE_WIDTH_DP, getContext()));
 
             canvas.drawLine(x1, y1, x2, y1, mBarPaint);

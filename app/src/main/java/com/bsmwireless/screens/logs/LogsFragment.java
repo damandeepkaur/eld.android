@@ -18,6 +18,7 @@ import com.bsmwireless.models.LogSheetHeader;
 import com.bsmwireless.screens.common.BaseFragment;
 import com.bsmwireless.screens.logs.dagger.DaggerLogsComponent;
 import com.bsmwireless.screens.logs.dagger.LogsModule;
+import com.bsmwireless.widgets.alerts.DutyType;
 import com.bsmwireless.widgets.logs.LogsBottomBar;
 import com.bsmwireless.widgets.logs.LogsTitleView;
 import com.bsmwireless.widgets.logs.calendar.CalendarLayout;
@@ -79,6 +80,7 @@ public class LogsFragment extends BaseFragment implements LogsView {
     @Override
     public void setELDEvents(List<ELDEvent> events) {
         mAdapter.setELDEvents(events);
+        mPresenter.calculateTripTime(events);
     }
 
     @Override
@@ -89,6 +91,11 @@ public class LogsFragment extends BaseFragment implements LogsView {
     @Override
     public void setLogSheetHeaders(List<LogSheetHeader> logs) {
         mAdapter.setLogSheetHeaders(logs);
+    }
+
+    @Override
+    public void setTime(long[] times) {
+        mAdapter.setTime(times);
     }
 
     private void showPopupMenu(View anchorView, ELDEvent event) {
@@ -229,6 +236,15 @@ public class LogsFragment extends BaseFragment implements LogsView {
                 mGraphLayout.setELDEvents(eldEvents);
             }
             notifyDataSetChanged();
+        }
+
+        public void setTime(long[] times) {
+            if (mGraphLayout != null) {
+                mGraphLayout.setHOSTimerSleeperBerth(times[DutyType.SLEEPER_BERTH.getId() - 1]);
+                mGraphLayout.setHOSTimerDriving(times[DutyType.DRIVING.getId() - 1]);
+                mGraphLayout.setHOSTimerOffDuty(times[DutyType.OFF_DUTY.getId() - 1]);
+                mGraphLayout.setHOSTimerOnDuty(times[DutyType.ON_DUTY.getId() - 1]);
+            }
         }
 
         public void setTripInfo(TripInfo tripInfo) {

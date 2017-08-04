@@ -5,21 +5,32 @@ import com.bsmwireless.common.utils.ViewUtils;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.LogSheetHeader;
+import com.bsmwireless.widgets.alerts.DutyType;
 import com.bsmwireless.widgets.logs.calendar.CalendarItem;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Observable;
 
 import javax.inject.Inject;
 
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
 import static com.bsmwireless.screens.logs.TripInfo.UnitType.KM;
+import static dagger.internal.InstanceFactory.create;
 
 @ActivityScope
 public class LogsPresenter {
@@ -47,11 +58,11 @@ public class LogsPresenter {
         if (log != null) {
             long startDate = log.getStartOfDay();
             long endDate = startDate + 24 * 60 * 60 * 1000;
-            mELDEventsInteractor.getELDEvents(startDate, endDate)
+            mDisposables.add(mELDEventsInteractor.getELDEvents(startDate, endDate)
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe(eldEvents -> mView.setELDEvents(eldEvents),
-                                        throwable -> Timber.e(throwable.getMessage()));
+                                        throwable -> Timber.e(throwable.getMessage())));
         }
     }
 
@@ -74,6 +85,38 @@ public class LogsPresenter {
         mDisposables.dispose();
 
         Timber.d("DESTROYED");
+    }
+
+    public void calculateTripTime(List<ELDEvent> events) {
+        Disposable disposable = io.reactivex.Observable.create((ObservableOnSubscribe<long[]>) e -> {
+            ArrayList<Long>[] times = new ArrayList[DutyType.values().length];
+            for (int i = 0; i < times.length; i++) {
+                times[i] = new ArrayList<>();
+            }
+            for (ELDEvent event:
+                    events) {
+                if (!event.getEventType().equals(ELDEvent.EventType.DUTY_STATUS_CHANGING.getValue())) {
+                    continue;
+                }
+                Long eventTime = event.getEventTime();
+                DutyType type = DutyType.getTypeById(event.getEventCode());
+                times[type.getId() - 1].add(eventTime);
+            }
+
+            long[] result = new long[DutyType.values().length];
+            for (int i = 0; i < times.length; i++) {
+                List<Long> time = times[i];
+                Collections.sort(time);
+                if (time.size() > 0) {
+                    result[i] = Math.abs(time.get(0) - times[i].get(time.size() - 1));
+                }
+            }
+            e.onNext(result);
+        })
+                                                       .subscribeOn(Schedulers.io())
+                                                       .observeOn(AndroidSchedulers.mainThread())
+                                                       .subscribe(times -> mView.setTime(times), throwable -> Timber.e(throwable.getMessage()));
+        mDisposables.add(disposable);
     }
 
     private void setupViewForDay(CalendarItem item) {
