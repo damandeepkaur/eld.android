@@ -68,7 +68,7 @@
             android:windowSoftInputMode="stateAlwaysHidden"/>
 
         <activity android:name="com.bsmwireless.screens.autologout.AutoLogoutActivity"
-            android:theme="@style/AlertDialogTheme"/>
+            android:theme="@style/custom_dialog"/>
 
         <service android:name="com.bsmwireless.data.network.authenticator.BsmAuthenticatorService">
             <intent-filter>

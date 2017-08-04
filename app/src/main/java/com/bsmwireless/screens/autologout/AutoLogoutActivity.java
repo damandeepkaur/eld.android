@@ -1,7 +1,6 @@
 package com.bsmwireless.screens.autologout;
 
 
-import android.app.Activity;
 import android.app.job.JobParameters;
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,6 +11,7 @@ import android.support.v7.app.AlertDialog;
 import com.bsmwireless.common.App;
 import com.bsmwireless.screens.autologout.dagger.AutoLogoutModule;
 import com.bsmwireless.screens.autologout.dagger.DaggerAutoLogoutComponent;
+import com.bsmwireless.screens.common.BaseActivity;
 import com.bsmwireless.screens.login.LoginActivity;
 
 import java.util.concurrent.TimeUnit;
@@ -20,7 +20,7 @@ import javax.inject.Inject;
 
 import app.bsmuniversal.com.R;
 
-public class AutoLogoutActivity extends Activity implements AutoLogoutView {
+public class AutoLogoutActivity extends BaseActivity implements AutoLogoutView {
 
     private static final String TAG = AutoLogoutActivity.class.getSimpleName();
 
@@ -82,9 +82,7 @@ public class AutoLogoutActivity extends Activity implements AutoLogoutView {
             }
         };
 
-        mAlertDialog.setOnDismissListener(dialog -> {
-            mHandler.removeCallbacks(runnable);
-        });
+        mAlertDialog.setOnDismissListener(dialog -> mHandler.removeCallbacks(runnable));
 
         mHandler.postDelayed(runnable, TimeUnit.MINUTES.toMillis(NO_USER_INTERACTION));
     }
