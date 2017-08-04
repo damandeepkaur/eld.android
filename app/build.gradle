@@ -6,7 +6,7 @@ android {
     buildToolsVersion "25.0.2"
     defaultConfig {
         applicationId "app.bsmuniversal.com"
-        minSdkVersion 19
+        minSdkVersion 15
         targetSdkVersion 25
         versionCode 26
         versionName "1.0.25"
