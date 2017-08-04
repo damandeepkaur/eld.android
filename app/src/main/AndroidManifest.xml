@@ -40,7 +40,7 @@
         <activity
             android:name="com.bsmwireless.screens.selectasset.SelectAssetActivity"
             android:theme="@style/AppTheme"
-            android:windowSoftInputMode="stateHidden|adjustPan"/>
+            android:windowSoftInputMode="stateHidden|adjustResize"/>
 
         <activity
             android:name="com.bsmwireless.screens.navigation.NavigationActivity"

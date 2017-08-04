@@ -31,6 +31,10 @@
         </attr>
     </declare-styleable>
 
+    <declare-styleable name="SnackBarLayout">
+        <attr name="sbl_text_color" format="color"/>
+        <attr name="sbl_background_color" format="color"/>
+    </declare-styleable>
 
     <declare-styleable name="CalendarLayout">
         <attr name="daysCount" format="integer"/>
