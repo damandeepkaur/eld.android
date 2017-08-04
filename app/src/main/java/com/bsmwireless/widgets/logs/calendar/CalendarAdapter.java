@@ -52,7 +52,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.ViewHo
         LogSheetHeader associatedLog = item.getAssociatedLog();
 
         if (associatedLog != null) {
-            if (associatedLog.getSigned() != null && associatedLog.getSigned()) {
+            if (associatedLog.getSigned() == (Boolean)true) {
                 holder.mDayOfMonthTV.setTextColor(ContextCompat.getColor(mContext, R.color.nasty_green));
                 holder.mDayOfMonthTV.setTypeface(null, Typeface.BOLD);
             } else {

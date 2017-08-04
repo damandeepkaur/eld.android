@@ -13,7 +13,7 @@ import android.widget.FrameLayout;
 import app.bsmuniversal.com.R;
 
 public class LogsBottomBar extends FrameLayout {
-    private final static int ANIM_DURATION = 200;
+    private final int ANIM_DURATION = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
     public enum Type {
         ADD_EVENT,

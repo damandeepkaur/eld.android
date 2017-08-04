@@ -17,7 +17,7 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
 public class LogsTitleView extends FrameLayout {
-    private final static int ANIM_DURATION = 200;
+    private final int ANIM_DURATION = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
     @BindView(R.id.list_item_title)
     TextView mTitle;
@@ -61,7 +61,7 @@ public class LogsTitleView extends FrameLayout {
     }
 
     public void expand() {
-        if (isAttachedToWindow()) {
+        if (mBelowDivider != null) {
             mHandler.postDelayed(() -> mArrow.animate().rotation(-180).setDuration(ANIM_DURATION).start(), 100);
             mBelowDivider.setVisibility(INVISIBLE);
         }
@@ -69,7 +69,7 @@ public class LogsTitleView extends FrameLayout {
     }
 
     public void collapse() {
-        if (isAttachedToWindow()) {
+        if (mArrow != null && mBelowDivider !=null) {
             mArrow.setRotation(0);
             mBelowDivider.setVisibility(VISIBLE);
         }
@@ -98,6 +98,7 @@ public class LogsTitleView extends FrameLayout {
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         mUnbinder.unbind();
+        animate().cancel();
     }
 
     public enum Type {

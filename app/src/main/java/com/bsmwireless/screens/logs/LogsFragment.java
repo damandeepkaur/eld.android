@@ -42,13 +42,11 @@ public class LogsFragment extends BaseFragment implements LogsView {
 
     @Inject
     LogsPresenter mPresenter;
-    private LogsAdapter mAdapter;
-
     @BindView(R.id.recycler_view)
     RecyclerView mRecyclerView;
     @BindView(R.id.bottom_bar)
     LogsBottomBar mLogsBottomBar;
-
+    private LogsAdapter mAdapter;
     private Unbinder mUnbinder;
 
     @Override
@@ -81,19 +79,16 @@ public class LogsFragment extends BaseFragment implements LogsView {
     @Override
     public void setELDEvents(List<ELDEvent> events) {
         mAdapter.setELDEvents(events);
-        mAdapter.notifyDataSetChanged();
     }
 
     @Override
     public void setTripInfo(TripInfo tripInfo) {
         mAdapter.setTripInfo(tripInfo);
-        mAdapter.notifyDataSetChanged();
     }
 
     @Override
     public void setLogSheetHeaders(List<LogSheetHeader> logs) {
         mAdapter.setLogSheetHeaders(logs);
-        mAdapter.notifyDataSetChanged();
     }
 
     private void showPopupMenu(View anchorView, ELDEvent event) {
@@ -181,13 +176,11 @@ public class LogsFragment extends BaseFragment implements LogsView {
         }
 
         private void bindTripInfoView(TripInfo tripInfo, String odometerTitle) {
-            if (tripInfo != null) {
-                mCoDriverValue.setText(tripInfo.getCoDriverValue());
-                mOnDutyLeftValue.setText(tripInfo.getOnDutyLeftValue());
-                mDriveValue.setText(tripInfo.getDriveValue());
-                mOdometer.setText(odometerTitle);
-                mOdometerValue.setText(String.valueOf(tripInfo.getOdometerValue()));
-            }
+            mCoDriverValue.setText(tripInfo.getCoDriverValue());
+            mOnDutyLeftValue.setText(tripInfo.getOnDutyLeftValue());
+            mDriveValue.setText(tripInfo.getDriveValue());
+            mOdometer.setText(odometerTitle);
+            mOdometerValue.setText(String.valueOf(tripInfo.getOdometerValue()));
         }
     }
 
@@ -198,7 +191,7 @@ public class LogsFragment extends BaseFragment implements LogsView {
         static final int VIEW_TYPE_TRIP_INFO_TITLE = 3;
         static final int VIEW_TYPE_TRIP_INFO_ITEM = 4;
 
-        //header + logs + trip info items
+        //header + logs + trip info titles
         private final int MIN_LIST_SIZE = 3;
 
         private LogsTitleView mEventsTitleView;
@@ -211,26 +204,38 @@ public class LogsFragment extends BaseFragment implements LogsView {
         private TripInfo mTripInfo;
         private List<LogSheetHeader> mLogHeaders = new ArrayList<>();
         private View.OnClickListener mOnClickListener;
+        private RecyclerView.SmoothScroller mSmoothScroller;
         private Context mContext;
 
         public LogsAdapter(Context context) {
             mContext = context;
+
             mOnClickListener = view -> {
                 ELDEvent event = (ELDEvent) view.getTag();
                 showPopupMenu(view, event);
+            };
+
+            mSmoothScroller = new LinearSmoothScroller(mContext) {
+                @Override
+                protected int getVerticalSnapPreference() {
+                    return LinearSmoothScroller.SNAP_TO_START;
+                }
             };
         }
 
         public void setELDEvents(List<ELDEvent> eldEvents) {
             mELDEvents = eldEvents;
+            notifyDataSetChanged();
         }
 
         public void setTripInfo(TripInfo tripInfo) {
             mTripInfo = tripInfo;
+            notifyDataSetChanged();
         }
 
         public void setLogSheetHeaders(List<LogSheetHeader> logHeaders) {
             mLogHeaders = logHeaders;
+            notifyDataSetChanged();
         }
 
         @Override
@@ -306,20 +311,16 @@ public class LogsFragment extends BaseFragment implements LogsView {
         }
 
         private void scrollToPosition(int position) {
-            RecyclerView.SmoothScroller smoothScroller = new LinearSmoothScroller(mContext) {
-                @Override
-                protected int getVerticalSnapPreference() {
-                    return LinearSmoothScroller.SNAP_TO_START;
-                }
-            };
-            smoothScroller.setTargetPosition(position);
-            mRecyclerView.getLayoutManager().startSmoothScroll(smoothScroller);
+            mSmoothScroller.setTargetPosition(position);
+            mRecyclerView.getLayoutManager().startSmoothScroll(mSmoothScroller);
         }
 
         @Override
         public int getItemCount() {
             int eventsSize = (mEventsTitleView == null || mEventsTitleView.isCollapsed()) ? 0 : mELDEvents.size();
-            return MIN_LIST_SIZE + eventsSize + (((mTripInfoTitleView == null) || mTripInfoTitleView.isCollapsed()) ? 0 : 1);
+            int tripInfoSize = ((mTripInfoTitleView == null) || mTripInfoTitleView.isCollapsed()) ? 0 : 1;
+            return MIN_LIST_SIZE + eventsSize + tripInfoSize;
+
         }
 
         @Override
