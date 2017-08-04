@@ -14,16 +14,22 @@ import timber.log.Timber;
  */
 
 public class VehicleStatusProcessor extends ResponseProcessor {
+    private final int START_INDEX = 11;
 
-
+    /*
+     *  Parse the box data value and return the responseprocessor object
+     *  on Error or invalid response, return null
+     */
     public ResponseProcessor parse(byte[] data) {
         try {
 
             if (!parseHeader(data)) return null;
             BlackBoxModel boxData= this.getBoxData();
-            int index = 11;
+            int index = START_INDEX;
             byte msg = data[index];
-            this.setResponseType(ResponseType.valueOf((char) msg));
+            ResponseType responseType=ResponseType.valueOf((char) msg);
+            this.setResponseType(responseType);
+            boxData.setResponseType(responseType);
             index++;
             //boxID 12 to 15
             long boxId = ConnectionUtils.byteToUnsignedInt(new byte[]{ data[index],  data[index+1],  data[index+2], data[index+3]});
@@ -35,7 +41,8 @@ public class VehicleStatusProcessor extends ResponseProcessor {
             boxData.setSequenceNum(ConnectionUtils.byteToUnsignedInt(new byte[]{data[index], data[index+1]}));
             index += 2;
 
-            //Event Time
+            //Event Time processing
+            // only last two digits of the year are given, add it to 2000
             int year = 2000 + data[index];  // year at 18
             index++;
             int month = data[index];// month at 19 , zero index
@@ -49,10 +56,9 @@ public class VehicleStatusProcessor extends ResponseProcessor {
             int sec = data[index];//Day at 23
             index++;
 
-            Calendar cal = new GregorianCalendar(year,month+1,day,hr,min,sec);
+            Calendar cal = new GregorianCalendar(year,month-1,day,hr,min,sec);
             cal.setTimeZone(TimeZone.getTimeZone("UTC"));
             boxData.setEvenTimeUTC(cal.getTime());
-            String s = cal.getTime().toString();
 
             //TODO: process sensor state
             // sensor state 24-26 3 byte
@@ -66,52 +72,39 @@ public class VehicleStatusProcessor extends ResponseProcessor {
             System.arraycopy(data,index,latArr,0,4);
             double lat =ConnectionUtils.byteToUnsignedInt(latArr);
             boxData.setLat(lat);
-            Timber.i("VehicleStatusProcessor: Latitude received from box:" +  lat);
             index = index+4;
             //longitude at 34-37
             byte[] lonArr = new byte[4];
             System.arraycopy(data,index,lonArr,0,4);
             double lon =ConnectionUtils.byteToUnsignedInt(lonArr);
             boxData.setLon(lon);
-            Timber.i("VehicleStatusProcessor: Longitude received from box:" +  lon);
             index = index + 4;
             //Heading at 38-39
             boxData.setHeading(ConnectionUtils.byteToUnsignedInt(new byte[]{data[index], data[index+1]}));
             index += 2;
-            int speed = (int)(data[index] & 0XFF);
+            int speed =(data[index] & 0XFF);
+            boxData.setSpeed(speed);
             index++;
             //Odometer 41 to 44
             byte[] odometer = new byte[4];
             System.arraycopy(data,index,odometer,0,4);
             boxData.setOdometer(ConnectionUtils.byteToUnsignedInt(odometer));
-            Timber.i("VehicleStatusProcessor: Odometer received from box:" +  boxData.getOdometer());
             index = index+4;
 
             //Total Engine Run time in seconds 45 to 48
             byte[] TERTArr = new byte[4];
             System.arraycopy(data,index,TERTArr,0,4);
             boxData.setTERT(ConnectionUtils.byteToUnsignedInt(TERTArr));
-            Timber.i("VehicleStatusProcessor: TERT received from box:" +  boxData.getTERT());
             index = index+4;
+            Timber.i("Box Model processed:" +  boxData.toString());
             // TD Messages in queue
-            boxData.setTDMsgQueue ( (int)(data[index] & 0XFF));
+            boxData.setTDMsgQueue ( (data[index] & 0XFF));
             return this;
 
         } catch (Exception e) {
 
-            Timber.e("Exception in handling ack handler", e);
+            Timber.e("Exception in handling status ", e);
         }
         return null;
     }
-
-
-
-    public static void main(String[] args)
-    {
-        int n = (int) Long.parseLong("02EEF3FC", 16);
-        Timber.i("LOG");
-        int n1 = (int) Long.parseLong("074765F6", 16);
-        Timber.i("LOG");
-    }
-
 }

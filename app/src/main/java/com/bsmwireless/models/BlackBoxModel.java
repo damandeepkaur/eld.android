@@ -1,6 +1,9 @@
 package com.bsmwireless.models;
 
+import com.bsmwireless.common.utils.ViewUtils;
+import com.bsmwireless.data.network.connection.response.ResponseProcessor.ResponseType;
 import com.bsmwireless.widgets.alerts.DutyType;
+
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -15,7 +18,7 @@ public class BlackBoxModel {
     private int mSpeed;
     private int mHeading;
     public int mTERT;
-    public DutyType mDriverStatus;
+    public ResponseType mResponseType;
     public Date mEvenTimeUTC;
     public int mSequenceNum;
     public long mBoxId;
@@ -67,13 +70,13 @@ public class BlackBoxModel {
 
     public void setTERT(int TERT) { this.mTERT = TERT;   }
 
-    public DutyType getDriverStatus() {return mDriverStatus;   }
+    public ResponseType getResponseType() {return mResponseType;   }
 
-    public void setDriverStatus(DutyType driverStatus) { this.mDriverStatus = mDriverStatus;  }
+    public void setResponseType(ResponseType responseType) { this.mResponseType = responseType;  }
 
     public Date getEvenTimeUTC() {return mEvenTimeUTC;   }
 
-    public void setEvenTimeUTC(Date evenTimeUTC) {this.mEvenTimeUTC = mEvenTimeUTC;  }
+    public void setEvenTimeUTC(Date evenTimeUTC) {this.mEvenTimeUTC = evenTimeUTC;  }
 
     public int getSequenceNum() {return mSequenceNum;  }
 
@@ -85,7 +88,7 @@ public class BlackBoxModel {
 
     public int getTDMsgQueue() { return mTDMsgQueue;   }
 
-    public void setTDMsgQueue(int TDMsgQueue) {this.mTDMsgQueue = mTDMsgQueue;   }
+    public void setTDMsgQueue(int TDMsgQueue) {this.mTDMsgQueue = TDMsgQueue;   }
 
 
     @Override
@@ -104,7 +107,7 @@ public class BlackBoxModel {
                 .append(mSpeed, that.mSpeed)
                 .append(mHeading, that.mLon)
                 .append(mTERT, that.mTERT)
-                .append(mDriverStatus, that.mDriverStatus)
+                .append(mResponseType, that.mResponseType)
                 .append(mEvenTimeUTC, that.mEvenTimeUTC)
                 .append(mSequenceNum, that.mSequenceNum)
                 .append(mBoxId, that.mBoxId)
@@ -123,7 +126,7 @@ public class BlackBoxModel {
                 .append(mSpeed)
                 .append(mHeading)
                 .append(mTERT)
-                .append(mDriverStatus)
+                .append(mResponseType)
                 .append(mEvenTimeUTC)
                 .append(mSequenceNum)
                 .append(mBoxId)
@@ -141,8 +144,8 @@ public class BlackBoxModel {
         sb.append(", mSpeed=").append(mSpeed);
         sb.append(", mHeading=").append(mHeading);
         sb.append(", mTERT=").append(mTERT);
-        sb.append(", mDriverStatus=").append(mDriverStatus);
-        sb.append(", mEvenTimeUTC=").append(mEvenTimeUTC);
+        sb.append(", mResponseType=").append(mResponseType.name());
+        sb.append(", mEvenTimeUTC=").append(ViewUtils.getLocalDate("Etc/UTC", mEvenTimeUTC.getTime()));
         sb.append(", mSequenceNum=").append(mSequenceNum);
         sb.append(", mBoxId=").append(mBoxId);
         sb.append(", mTDMsgQueue=").append(mTDMsgQueue);

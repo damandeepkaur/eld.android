@@ -9,12 +9,9 @@ import java.io.OutputStream;
 
 
 public interface Device {
-
-    public boolean connect();
-    public void disconnect();
-
-    public boolean isConnected();
-
-    public InputStream getInputStream() throws IOException;
-    public OutputStream getOutputStream() throws IOException;
+    boolean connect();
+    void disconnect();
+    boolean isConnected();
+    InputStream getInputStream() throws IOException;
+    OutputStream getOutputStream() throws IOException;
 }

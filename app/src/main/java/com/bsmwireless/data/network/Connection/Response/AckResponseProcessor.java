@@ -9,7 +9,11 @@ import timber.log.Timber;
 public class AckResponseProcessor extends ResponseProcessor {
 
 
-    int START_INDEX = 11;
+    private final int START_INDEX = 11;
+    /*
+     * On successful parsing, return the value in the ResponseProcessor object
+     * On exception or invalid response, return null
+     */
     public ResponseProcessor parse(byte[] data) {
         try {
 

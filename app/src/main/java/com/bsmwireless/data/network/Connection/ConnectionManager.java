@@ -1,12 +1,17 @@
 package com.bsmwireless.data.network.connection;
 
+
+
+import android.support.annotation.Nullable;
+
+import com.bsmwireless.common.Constants;
 import com.bsmwireless.data.network.connection.device.Device;
-import com.bsmwireless.data.network.connection.request.ECMStatusGenerator;
 import com.bsmwireless.data.network.connection.request.SubscriptionGenerator;
 import com.bsmwireless.data.network.connection.response.AckResponseProcessor;
-import com.bsmwireless.data.network.connection.response.ECMDataProcessor;
 import com.bsmwireless.data.network.connection.response.ResponseProcessor;
+import com.bsmwireless.data.network.connection.response.VehicleStatusProcessor;
 import com.bsmwireless.models.Vehicle;
+
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,23 +23,22 @@ import timber.log.Timber;
 
 
 public class ConnectionManager implements ConnectionInterface {
-
-
-
-
     private Device mDevice;
     private Vehicle mVehicle;
+    private ConnectionManagerService mConnectionService;
     private byte sequenceID = 1;
-    private static int RETRY_DELAY=1000;
-    private static int READING_DELAY=1000;
-    private static int READING_TIMEOUT=5000;
+    final int RETRY_CONNECT_DELAY =5000;
+    final int READING_DELAY=1000;
+    final int READING_TIMEOUT=5000;
+    final int STATUS_TIMEOUT = Constants.STATUS_UPDATE_RATE_SECS*1000*2; // Try two times
+    // Response are of max size of 50 bytes. Even if the messages are sent together , below limit seems to be safer.
+    final int BUFFER_SIZE=512;
+    private boolean vehicleConnected = false;
 
-    public enum ConnectionStatus {Ready, Connecting, Subscribing, Paired, Disconnected }
+    public enum ConnectionStatus {Ready,  Subscribing, Paired, Disconnected }
 
-
-    static ConnectionStatus DefaultInitialStatus = ConnectionStatus.Ready;
-    // State mCurrentState;
     volatile ConnectionStatus mConnectionstatus ;
+
 
 
     private final BehaviorSubject<ConnectionStatus> connectionState = BehaviorSubject.create();
@@ -47,62 +51,23 @@ public class ConnectionManager implements ConnectionInterface {
         return connectionState;
     }
 
-
-/*
-    public Observable<ConnectionStatus> getConnectionStatusObservable(Vehicle vehicle){
-        Observable<ConnectionStatus> stateObservable = Observable.create(new ObservableOnSubscribe<ConnectionStatus>(){
-
-            @Override
-            public void subscribe(@NonNull ObservableEmitter<ConnectionStatus> e) throws Exception {
-                setVehicle(vehicle);
-                if (mDevice == null || mVehicle == null) return;
-                setConnectionstatus(ConnectionStatus.Ready);
-                e.onNext(mConnectionstatus);
-                while(mConnectionstatus == ConnectionStatus.Ready) {
-                    mDevice.connect();
-                    if (mDevice.isConnected()) {
-                        setConnectionstatus(ConnectionStatus.Connecting);
-                        e.onNext(mConnectionstatus);
-                        initializeCommunication();
-                        while (mConnectionstatus == ConnectionStatus.Paired) {
-                            readStatusResponse();
-                        }
-                    }
-                    Thread.sleep(RETRY_DELAY); // retry every 1 seconds
-                }
-            }
-        });
-
-        return stateObservable;
-    }*/
-
-    public void setConnectionstatus(ConnectionStatus Connectionstatus) {
-        mConnectionstatus = Connectionstatus;
+    public synchronized void setConnectionstatus(ConnectionStatus connectionstatus) {
+        mConnectionstatus = connectionstatus;
         connectionState.onNext(mConnectionstatus);
-
     }
-   /* public void setCurrentState(State ConnectionState) {
-        mCurrentState = ConnectionState;
-        setConnectionstatus(mCurrentState.getConnectionStatus());
+    public synchronized ConnectionStatus getConnectionstatus() {
+        return mConnectionstatus;
     }
-*/
 
     @Override
     public void setDevice(Device device) {
         mDevice = device;
     }
-    public Device getDevice() {
-        return mDevice;
-    }
 
-    public void setVehicle(Vehicle vehicle)
-    {
-        mVehicle= vehicle;
-    }
 
     public byte getSequenceID() {
         sequenceID++;
-        if (sequenceID > 250)
+        if ((sequenceID & 0xFF )> 250)
             sequenceID = 1;
 
         return sequenceID;
@@ -113,8 +78,9 @@ public class ConnectionManager implements ConnectionInterface {
 
         mVehicle =vehicle;
         // get the device/vehicle and move it to the ready state
-        // mDevice = new WiFiDevice();
         if (mDevice == null || mVehicle == null) return;
+        vehicleConnected = true;
+        startConnectionService();
         setConnectionstatus(ConnectionStatus.Ready);
         // start a separate thread for the communication process
         try {
@@ -128,9 +94,10 @@ public class ConnectionManager implements ConnectionInterface {
 
     @Override
     public void disconnect() {
+        vehicleConnected = false;
         setConnectionstatus(ConnectionStatus.Disconnected);
         mDevice.disconnect();
-
+        stopConnectionService();
     }
 
     @Override
@@ -140,489 +107,196 @@ public class ConnectionManager implements ConnectionInterface {
     }
 
 
+    /*
+     * Status will be disconnected only on logout.
+     * No need to reconnect after reaching the disconnected state.
+     * No need to change status, if current status is equal to the previous status. This may trigger the same status to the listener
+     */
+    private void resetStatus(ConnectionStatus connectionStatus) {
+        if (getConnectionstatus() != connectionStatus && getConnectionstatus() != ConnectionStatus.Disconnected) {
+          setConnectionstatus(connectionStatus);
+        }
+    }
     private class StartConnectionTask extends Thread{
         public void run() {
-            try {
-                while(mConnectionstatus == ConnectionStatus.Ready) {
-                    mDevice.connect();
-                    if (mDevice.isConnected()) {
-                     /*   mDevice.getReadResponseObservable()
-                                .observeOn(Schedulers.computation())
-                                .subscribeOn(Schedulers.io())
-                                .subscribe(response->{
-                                    processResponse(response);
-                                }, error ->{
-                                    Timber.i("Error in reading the response");
-                                        }
-                                        );*/
-                        setConnectionstatus(ConnectionStatus.Connecting);
-                        initializeCommunication();
-                        while (mConnectionstatus == ConnectionStatus.Paired) {
-                            readStatusResponse();
+            while(vehicleConnected) {
+                if (getConnectionstatus() == ConnectionStatus.Ready) {
+                    try {
+                        mDevice.connect();
+                        if (mDevice.isConnected()) {
+                            resetStatus(ConnectionStatus.Subscribing);
+                            initializeCommunication();
+
                         }
+                        Thread.sleep(RETRY_CONNECT_DELAY); // retry after a wait period
+                    } catch (Exception ex) {
+                        Timber.e(ex);
                     }
-                    Thread.sleep(RETRY_DELAY); // retry every 1 seconds
                 }
             }
-            catch (Exception ex)
-            {
-                Timber.e(ex);
-            }
-
         }
     }
 
-    private void processResponse(byte[] response) {
-
-        if (response!=null){
-            byte msgByte = response[11];
-            switch ((char)msgByte){
-                case 'A'://TODO: to test with legacy, need to be removed
-                case 'a':
-                    processSubscriptionResponse(response);
-                    break;
-                case 'S':
-                case 'D':
-                case 'I':
-                case 'i':
-                case 'G':
-                case 'g':
-                case 'E':
-                    processStatusResponse(response);
-                    break;
-            }
-
-        }
-    }
 
     private void initializeCommunication()
     {
-        while(mConnectionstatus == ConnectionStatus.Connecting) {
-            boolean sentRequest = false;
-            setConnectionstatus(ConnectionStatus.Subscribing);
-            if (mVehicle != null) {
+        try {
+            while (getConnectionstatus() == ConnectionStatus.Subscribing) {
+                boolean sentRequest;
                 SubscriptionGenerator subscriptionRequest = new SubscriptionGenerator();
-                //ECMStatusGenerator statusRequest = new ECMStatusGenerator();
-                //VehicleStatusGenerator statusRequest = new VehicleStatusGenerator();
-                sentRequest = sendRequest(subscriptionRequest.generateRequest(getSequenceID(),mVehicle.getBoxId()));
-            }
+                sentRequest = sendRequest(subscriptionRequest.generateRequest(getSequenceID(), mVehicle.getBoxId()));
+                if (sentRequest) {
+                    readSubscriptionResponse();
+                }
 
-            if (sentRequest) {
-                readSubscriptionResponse();
+                while (getConnectionstatus() == ConnectionStatus.Paired) {
+                    readStatusResponse();
+                }
             }
+        }catch(Exception e){
+            Timber.e ("Exception in initializeCommunication : "  ,e   );
         }
-
+        // On any exception or unknown status retry
+        resetStatus(ConnectionStatus.Ready);
     }
 
-    private void newInitializeCommunication()
-    {
-        while(mConnectionstatus == ConnectionStatus.Connecting) {
-            boolean sentRequest = false;
-            setConnectionstatus(ConnectionStatus.Subscribing);
-            if (mVehicle != null) {
-                //SubscriptionGenerator subscriptionRequest = new SubscriptionGenerator();
-                ECMStatusGenerator statusRequest = new ECMStatusGenerator();
-                //VehicleStatusGenerator statusRequest = new VehicleStatusGenerator();
-                sentRequest = sendRequest(statusRequest.generateRequest(getSequenceID(),mVehicle.getBoxId()));
-            }
-
-         /*   if (sentRequest) {
-                readSubscriptionResponse();
-            }*/
-        }
-
-    }
-    public  boolean sendRequest(byte[] request)
+    /*
+     * Write the byte array to the output stream
+     * returns true, on successful write operation returns.
+     * returns false, on exception
+     */
+    private  boolean sendRequest(byte[] request)
     {
         try {
-
-            if (mDevice.isConnected()) {
-
-                OutputStream output = mDevice.getOutputStream();
-                output.write(request);
-                output.flush();
-                return true;
-            }
+            OutputStream output = mDevice.getOutputStream();
+            output.write(request);
+            output.flush();
+            return true;
         }
         catch (IOException e)
         {
-
             Timber.e("Error in Send  Request:" , e);
+            resetStatus(ConnectionStatus.Ready);
 
         }
-        if (mConnectionstatus != ConnectionStatus.Disconnected)
-            setConnectionstatus(ConnectionStatus.Ready);
+
         return false;
     }
 
-    public  void readStatusResponse()
+    /*
+     * Read the response from the inputstream
+     * process the bytes for the status response
+     * on timeout sent the subscription request by setting the status to subscribing
+     */
+    private  void readStatusResponse()
     {
         try {
-            byte[] response = readResponse();
-            if (response != null) {
-                processStatusResponse(response);
-            }
-            else
-                setConnectionstatus(ConnectionStatus.Connecting);
+                byte[] response = readResponse(STATUS_TIMEOUT);
 
-        }catch(Exception e){
-            Timber.i("Exception in reading status response:" , e);
-            if (mConnectionstatus != ConnectionStatus.Disconnected)
-                setConnectionstatus(ConnectionStatus.Ready);
+                if (response != null) {
+                    processStatusResponse(response);
+                } else { // response null , timed out
+                    resetStatus(ConnectionStatus.Subscribing);
+                }
+
+        }catch(Exception e){ // exception from reading , restart the communication
+            resetStatus(ConnectionStatus.Ready);
         }
     }
-    public  void readSubscriptionResponse() {
-        boolean readSubscription = false;
-        long elapsed = 0;
-        byte[] response = null;
+    /*
+    * Read the response from the inputstream
+    * process the bytes for the subscription response
+    * on timeout sent the subscription request by setting the status to subscribing
+    */
+    private  void readSubscriptionResponse() {
+        byte[] response;
         try {
-
-            Timber.i("Reading subscription response");
-            response = readResponse();
-            Timber.i("Processing subscription response");
+            response = readResponse( READING_TIMEOUT);
             if (response != null ) {
                 processSubscriptionResponse(response);
             }
-            else
-                setConnectionstatus(ConnectionStatus.Connecting);
-        }catch(Exception e){
-            Timber.i("Exception in reading subscription response:" , e);
-            if (mConnectionstatus != ConnectionStatus.Disconnected)
-                setConnectionstatus(ConnectionStatus.Ready);
+            else { // response null , timed out
+                resetStatus(ConnectionStatus.Subscribing);
+            }
+        }catch(Exception e){ // on error restart the connection
+            Timber.e("Exception in reading subscription response:" , e);
+            resetStatus(ConnectionStatus.Ready);
         }
 
     }
 
-/*
-    public Observable<byte[]> getReadResponseObservable() {
-        Observable<byte[]> result = Observable.create(new ObservableOnSubscribe<byte[]>() {
-
-            @Override
-            public void subscribe(@NonNull ObservableEmitter<byte[]> e) throws Exception {
-                while(isConnectionAlive()) {
-                    e.onNext(readResponse());
-                }
-
-                e.onError(new RuntimeException("no connection"));
-            }
-        });
-
-
-        return result;
-    }
-*/
-
-
-
-    public boolean isConnectionAlive() {
-        return true; // BAD!!!!!!
-    }
-
-
-    public byte[] readResponse() throws Exception {
+    /*
+     * read bytes from the input stream
+     * if nothing available to read, wait for some time and read again
+     * repeat this process until successful reading or timeout
+     * on timeout return null response
+     */
+    @Nullable
+    private byte[] readResponse(long timeout) throws Exception {
         long elapsed = 0;
         int total = 0;
-        while (total <= 0 && elapsed < READING_TIMEOUT) {
-            Timber.i("Reading  response");
-            if (mConnectionstatus != ConnectionStatus.Disconnected) {
-                InputStream input = mDevice.getInputStream();
-                byte[] response = new byte[1544];
-                int available = input != null ? input.available() : 0;
-                while (available > 0) {
-                    byte[] buf = new byte[available];
-                    int len = input.read(buf, 0, available);
-                    System.arraycopy(buf, 0, response, total, len);
-                    total += len;
-                    available = input != null ? input.available() : 0;
-                }
-
-                if (total >0)
-                    return response;
-                try {
-                    Thread.sleep(READING_DELAY); // wait to read again
-                } catch (InterruptedException ex) {
-                    Timber.e("Error in reading response:", ex);
-                }
-                elapsed += READING_DELAY;
+        while (total <= 0 && elapsed < timeout) {
+            InputStream input = mDevice.getInputStream();
+            byte[] response = new byte[BUFFER_SIZE];
+            int available = input.available();
+            while (available > 0) {
+                byte[] buf = new byte[available];
+                int len = input.read(buf, 0, available);
+                System.arraycopy(buf, 0, response, total, len);
+                total += len;
+                available = input.available();
             }
 
+            if (total >0)
+                return response;
+            Thread.sleep(READING_DELAY); // wait to read again
+
+            elapsed += READING_DELAY;
         }
         return null;
     }
 
 
-    public void processStatusResponse(byte[] response)
+    private void processStatusResponse(byte[] response)
     {
-        //Handle the vehicle state responses from the box - old protocol
-        ECMDataProcessor vehicleResponse =  new ECMDataProcessor();
+        //Handle the vehicle state responses from the box
+        VehicleStatusProcessor vehicleResponse =  new VehicleStatusProcessor();
         vehicleResponse.parse(response);
         if (vehicleResponse.getBoxData().getBoxId() != mVehicle.getBoxId()){
-            setConnectionstatus(ConnectionStatus.Ready);
+            resetStatus(ConnectionStatus.Ready);
         }
 
 
     }
-    public void processSubscriptionResponse(byte[] response)
+    private void processSubscriptionResponse(byte[] response)
     {
         //Handle the packet id comparision and the ack or nack
         AckResponseProcessor ackResponse= new AckResponseProcessor();
         ackResponse.parse(response);
-        if (ackResponse!=null && ackResponse.getResponseType() == ResponseProcessor.ResponseType.Ack)
-            setConnectionstatus(ConnectionStatus.Paired);
+        if (ackResponse.getResponseType() == ResponseProcessor.ResponseType.Ack)
+            resetStatus(ConnectionStatus.Paired);
         else {
-            setConnectionstatus(ConnectionStatus.Ready);
+            resetStatus(ConnectionStatus.Ready);
         }
     }
 
-
-  /*  public class ReadyState implements State{
-
-        ConnectionStatus  connectionType= ConnectionStatus.Ready;
-
-        @Override
-        public ConnectionStatus getConnectionStatus() {
-            return connectionType;
-        }
-
-        @Override
-        public void process(ConnectionManager connectionMgr) {
-
-            boolean result =connectionMgr.getDevice().connect();
-            if (result)
-                this.onSuccess(connectionMgr);
-            this.onFailure(connectionMgr);
-        }
-
-        @Override
-        public void onSuccess(ConnectionManager connectionMgr) {
-            connectionMgr.setCurrentState(new SubscribingState());
-        }
-
-        @Override
-        public void onFailure(ConnectionManager connectionMgr) {
-
-
-        }
+    /*
+     * start a service
+     */
+    private void startConnectionService()
+    {
+        if (mConnectionService == null)
+            mConnectionService =new ConnectionManagerService();
+        mConnectionService.startConnectionService();
     }
-    public class ConnectingState implements State{
-        int MaxCount=4;
-        int retryCount=0;
-        ConnectionStatus  connectionType= ConnectionStatus.Connecting;
-
-        public ConnectingState(ConnectionManager connectionMgr)
-        {
-           process(connectionMgr);
-        }
-        @Override
-        public ConnectionStatus getConnectionStatus() {
-            return connectionType;
-        }
-
-        @Override
-        public void process(ConnectionManager connectionMgr) {
-
-
-            boolean result =connectionMgr.getDevice().connect();
-            if (result) //On successful connection
-                this.onSuccess(connectionMgr);
-            this.onFailure(connectionMgr);
-        }
-
-        @Override
-        public void onSuccess(ConnectionManager connectionMgr) {
-            connectionMgr.setCurrentState(new SubscribingState(connectionMgr));
-        }
-
-        @Override
-        public void onFailure(ConnectionManager connectionMgr) {
-
-            process(connectionMgr); // retry sending
-            if (++retryCount > MaxCount) // after maximum tries change to disconnect
-            {
-                connectionMgr.setCurrentState(new DisconnectedState(connectionMgr));
-            }
-
-
-        }
+   /*
+   * start a service
+   */
+    private void stopConnectionService()
+    {
+        if (mConnectionService != null)
+            mConnectionService.stopConnectionService();
     }
 
-    public class SubscribingState implements State{
-
-        ConnectionStatus  connectionType= ConnectionStatus.Subscribing;
-
-        public SubscribingState(ConnectionManager connectionMgr)
-        {
-            process(connectionMgr);
-        }
-
-        @Override
-        public ConnectionStatus getConnectionStatus() {
-            Timber.i("Subscribing state");
-            return connectionType;
-        }
-
-        @Override
-        public void process(ConnectionManager connectionMgr) {
-
-
-            if (mVehicle!=null) {
-                VehicleStatusGenerator statusRequest = new VehicleStatusGenerator();
-                boolean sentResult = sendRequest(statusRequest.generateRequest(sequenceID, mVehicle.getBoxId()));
-                if (!sentResult)
-                    this.onFailure(connectionMgr);
-
-                boolean readResult = readSubscriptionResponse();
-                if (!readResult)
-                    this.onFailure(connectionMgr);
-
-                this.onSuccess(connectionMgr);
-            }
-        }
-
-
-        public  boolean readSubscriptionResponse() {
-            boolean readSubscription = false;
-            // Try maximum of 4 times
-            int numTries = 0;
-            while (!readSubscription) {
-
-                Timber.i("Reading subscription response");
-                byte[] response = readResponse();
-                if (response == null || numTries > 4) {
-                    readSubscription =false;
-                    break;
-                } else if (response != null && getResponseLength(response) > 0) {
-                    readSubscription = true;
-                    processSubscriptionResponse(response);
-                }
-                numTries++;
-            }
-
-            return readSubscription;
-        }
-        @Override
-        public void onSuccess(ConnectionManager connectionMgr) {
-            connectionMgr.setCurrentState(new PairedState(connectionMgr));
-        }
-
-        @Override
-        public void onFailure(ConnectionManager connectionMgr) {
-            connectionMgr.setCurrentState(new ConnectingState(connectionMgr));
-        }
-    }
-    public class PairedState implements State{
-
-        ConnectionStatus  connectionType= ConnectionStatus.Paired;
-
-        public PairedState(ConnectionManager connectionMgr)
-        {
-            process(connectionMgr);
-        }
-        @Override
-        public ConnectionStatus getConnectionStatus() {
-            return connectionType;
-        }
-
-        @Override
-        public void process(ConnectionManager connectionMgr) {
-
-            ReadThread readThread = new ReadThread();
-            readThread.start();
-        }
-
-        @Override
-        public void onSuccess(ConnectionManager connectionMgr) {
-
-        }
-
-        @Override
-        public void onFailure(ConnectionManager connectionMgr) {
-
-
-        }
-
-        private class ReadThread extends Thread{
-            public void run(){
-
-                try {
-                    while (mDevice.isConnected())
-                        if (mDevice.isConnected() && mDevice.getInputStream()!=null) {
-                            InputStream input = mDevice.getInputStream();
-                            byte[] response = new byte[1544];
-                            int total = 0;
-                            int available = input!=null?input.available():0;
-                            while (input.available() >0) {
-
-                                byte[] buf = new byte[input.available()];
-                                int len = input.read(buf, 0, input.available());
-                                System.arraycopy(buf, 0, response, total, len);
-                                total += len;
-
-                            }
-                            if(response!=null && response.length >0)
-                                processStatusResponse(response);
-
-
-                        }
-                        else
-                        { if (mDevice.isConnected())
-                            setConnectionstatus(ConnectionStatus.Ready);}
-
-                }
-                catch (Exception ex)
-                {
-                    Timber.e(ex);
-                }
-
-            }
-        }
-    }
-    public class DisconnectedState implements State{
-
-        ConnectionStatus  connectionType= ConnectionStatus.Disconnected;
-
-        public DisconnectedState(ConnectionManager connectionMgr)
-        {
-            process(connectionMgr);
-        }
-        @Override
-        public ConnectionStatus getConnectionStatus() {
-            return connectionType;
-        }
-
-        @Override
-        public void process(ConnectionManager connectionMgr) {
-
-            connectionMgr.getDevice().disconnect();
-
-        }
-
-        @Override
-        public void onSuccess(ConnectionManager connectionMgr) {
-
-        }
-
-        @Override
-        public void onFailure(ConnectionManager connectionMgr) {
-
-
-        }
-    }
-    public abstract class  ConnectionState implements State{
-
-        public void process(ConnectionManager connectionMgr) {}
-
-        public void onSuccess(ConnectionManager connectionMgr) {  }
-
-
-        public void onFailure() { }
-    }
-    public interface State{
-        ConnectionStatus getConnectionStatus();
-        void process(ConnectionManager connectionMgr);
-        void onSuccess(ConnectionManager connectionMgr);
-        void onFailure(ConnectionManager connectionMgr);
-
-    }*/
 
 }

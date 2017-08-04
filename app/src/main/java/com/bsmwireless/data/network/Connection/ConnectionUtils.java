@@ -1,17 +1,21 @@
 package com.bsmwireless.data.network.connection;
 
 import com.bsmwireless.common.Constants;
-import com.bsmwireless.widgets.alerts.DutyType;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
 
 /**
- *  Utility function to generate request and process the response
+ *  Utility function used in generating request and processing the response
  */
 
 public class ConnectionUtils {
 
-    byte START_MESSAGE_INDICATOR = (byte)'@';
-    byte START_PACKET_INDICATOR = (byte) 0xFF;
-    byte DEVICE_TYPE = (byte) Constants.DEVICE_TYPE.charAt(0);  // Representing 'A' for the device type Android
+    final byte START_MESSAGE_INDICATOR = (byte)'@';
+    final byte START_PACKET_INDICATOR = (byte) 0xFF;
+    final byte DEVICE_TYPE = (byte) Constants.DEVICE_TYPE.charAt(0);  // Representing 'A' for the device type Android
 
 
     public static byte[] intToByte(int value, int size)
@@ -28,7 +32,7 @@ public class ConnectionUtils {
     public static int byteToUnsignedInt(byte[] byteArr)
     {
         int value=0;
-
+        if (byteArr == null) return value;
         for(int i=0; i<byteArr.length-1;i++)
         {
             value |=( byteArr[i]& 0XFF) <<8*i;
@@ -41,32 +45,24 @@ public class ConnectionUtils {
         return (b2 & 0XFF) <<8 | (b1 &0XFF);
     }
 
-    public static final byte checkSum(byte[] bytes, int indx)
+    /*
+     * Used to calculate the checksum of the bytes for the message sent in the protocol request.
+     */
+    public static  byte checkSum(byte[] bytes, int indx)
     {
         byte sum=0;
         for(int i=indx;i<bytes.length;i++)
         {
-            sum ^=bytes[i];
+            sum ^= bytes[i];
         }
         return sum;
     }
 
-    public static DutyType getDutyType(int ecmStatus)
-    {
-        switch (ecmStatus)
-        {
-            case 1:
-                return DutyType.OFF_DUTY;
-            case 2:
-                return DutyType.ON_DUTY;
-            case 3:
-                return DutyType.DRIVING;
-
-        }
-
-        throw new IllegalArgumentException();
+    public static String formattedDateUTC(Date date){
+        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return formatter.format(date);
     }
-
 
 
 }
