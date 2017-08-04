@@ -58,7 +58,8 @@ public class GraphLayout extends LinearLayout {
     }
 
     public void setHOSTimerOnDuty(Long time) {
-        mHOSTimerOnDuty.setText(convertTimeToString(time));
+        String t = convertTimeToString(time);
+        mHOSTimerOnDuty.setText(t);
     }
 
     public void setHOSTimerOffDuty(Long time) {

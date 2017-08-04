@@ -3,11 +3,14 @@ package com.bsmwireless.screens.logs;
 import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.common.utils.ViewUtils;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
+import com.bsmwireless.domain.interactors.LogSheetInteractor;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.LogSheetHeader;
 import com.bsmwireless.widgets.alerts.DutyType;
 import com.bsmwireless.widgets.logs.calendar.CalendarItem;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -35,21 +38,60 @@ import static dagger.internal.InstanceFactory.create;
 @ActivityScope
 public class LogsPresenter {
     public static final int ONE_DAY_MS = 24 * 60 * 60 * 1000;
+    private final static int SEC_IN_MIN = 60;
+    private final static int MS_IN_SEC = 1000;
 
     private LogsView mView;
     private ELDEventsInteractor mELDEventsInteractor;
+    private LogSheetInteractor mLogSheetInteractor;
     private CompositeDisposable mDisposables;
 
     @Inject
-    public LogsPresenter(LogsView view, ELDEventsInteractor interactor) {
+    public LogsPresenter(LogsView view, ELDEventsInteractor interactor, LogSheetInteractor logSheetInteractor) {
         mView = view;
         mELDEventsInteractor = interactor;
+        mLogSheetInteractor = logSheetInteractor;
         mDisposables = new CompositeDisposable();
         Timber.d("CREATED");
     }
 
     public void onViewCreated() {
         setupViewForDay(null);
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat( "MMdd" );
+        Calendar calendar = Calendar.getInstance();
+        Date today = calendar.getTime();
+        Date monthAgo = new Date(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH)-1, calendar.get(Calendar.DATE));
+
+        String todayDate = calendar.get(Calendar.YEAR) + dateFormat.format(today);
+        String monthAgoDate = calendar.get(Calendar.YEAR) + dateFormat.format(monthAgo);
+
+        long todayDayLong = Long.parseLong(todayDate);
+        long monthAgoLong = Long.parseLong(monthAgoDate);
+
+        mDisposables.add(mLogSheetInteractor.syncLogSheetHeader(todayDayLong, monthAgoLong)
+                                            .subscribeOn(Schedulers.io())
+                                            .observeOn(AndroidSchedulers.mainThread())
+                                            .subscribe(
+                                                    logSheetHeaders -> {
+                                                        for (LogSheetHeader header : logSheetHeaders) {
+                                                            header.setLogDay(convertTimeToUnixMs(header.getLogDay()));
+                                                        }
+                                                        mView.setLogSheetHeaders(logSheetHeaders);
+                                                    },
+                                                    error -> Timber.e("LoginUser error: %s", error)
+                                            ));
+    }
+
+    private long convertTimeToUnixMs(long logday) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+        Date date = null;
+        try {
+            date = sdf.parse(String.valueOf(logday));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return date.getTime();
     }
 
     public void onCalendarDaySelected(CalendarItem calendarItem) {
@@ -89,28 +131,22 @@ public class LogsPresenter {
 
     public void calculateTripTime(List<ELDEvent> events) {
         Disposable disposable = io.reactivex.Observable.create((ObservableOnSubscribe<long[]>) e -> {
-            ArrayList<Long>[] times = new ArrayList[DutyType.values().length];
-            for (int i = 0; i < times.length; i++) {
-                times[i] = new ArrayList<>();
-            }
-            for (ELDEvent event:
-                    events) {
-                if (!event.getEventType().equals(ELDEvent.EventType.DUTY_STATUS_CHANGING.getValue())) {
-                    continue;
-                }
-                Long eventTime = event.getEventTime();
-                DutyType type = DutyType.getTypeById(event.getEventCode());
-                times[type.getId() - 1].add(eventTime);
-            }
+            List<ELDEvent> filteredEvent = filterEventBytType(events, ELDEvent.EventType.DUTY_STATUS_CHANGING);
 
             long[] result = new long[DutyType.values().length];
-            for (int i = 0; i < times.length; i++) {
-                List<Long> time = times[i];
-                Collections.sort(time);
-                if (time.size() > 0) {
-                    result[i] = Math.abs(time.get(0) - times[i].get(time.size() - 1));
-                }
+
+            for (int i = 1; i < filteredEvent.size(); i++) {
+                ELDEvent event = filteredEvent.get(i);
+                ELDEvent prevEvent = filteredEvent.get(i - 1);
+
+                long logDate = event.getEventTime();
+                long prevLogDate = prevEvent.getEventTime();
+
+                long timeStamp = (logDate - prevLogDate);
+
+                result[prevEvent.getEventCode() - 1] += timeStamp;
             }
+
             e.onNext(result);
         })
                                                        .subscribeOn(Schedulers.io())
@@ -173,5 +209,16 @@ public class LogsPresenter {
         tripInfo.setOdometerValue(666);
         tripInfo.setUnitType(KM);
         return tripInfo;
+    }
+
+    private List<ELDEvent> filterEventBytType(List<ELDEvent> events, ELDEvent.EventType eventType) {
+        List<ELDEvent> result = new ArrayList<>();
+        for (ELDEvent event:
+                events) {
+            if (event.getEventType().equals(eventType.getValue())) {
+                result.add(event);
+            }
+        }
+        return result;
     }
 }

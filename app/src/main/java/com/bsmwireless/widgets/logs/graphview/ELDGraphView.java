@@ -194,10 +194,11 @@ public class ELDGraphView extends View {
             x2 = x1 + timeStamp * gridUnit;
             y2 = mGraphTop + (event.getEventCode() - firstEventCode) * mSegmentHeight + mSegmentHeight / 2;
 
-            mBarPaint.setColor(ContextCompat.getColor(getContext(), DutyType.getColorById(event.getEventCode())));
+            mBarPaint.setColor(ContextCompat.getColor(getContext(), DutyType.getColorById(prevEvent.getEventCode())));
             mBarPaint.setStrokeWidth(ViewUtils.convertDpToPixels(LINE_WIDTH_DP, getContext()));
 
             canvas.drawLine(x1, y1, x2, y1, mBarPaint);
+
             if (y1 != y2) {
                 mBarPaint.setColor(ContextCompat.getColor(getContext(), R.color.offduty_light));
                 mBarPaint.setStrokeWidth(ViewUtils.convertDpToPixels(GRID_WIDTH_DP, getContext()));
