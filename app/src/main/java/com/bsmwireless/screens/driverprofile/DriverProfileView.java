@@ -9,4 +9,6 @@ public interface DriverProfileView {
     void hideControlButtons();
     void showControlButtons();
     void setResults(User user);
+    void showChangePasswordError(String error);
+    void showPasswordChanged();
 }
