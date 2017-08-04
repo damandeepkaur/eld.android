@@ -125,7 +125,6 @@
     <string name="sf_btn_skiptour">Quitter la visite guidée</string>
 
     <!-- CATEGORY -->
-    <string name="odometer">Odométre(KM):</string>
     <string name="attacment">Attelage:</string>
     <string name="vehcile">Véhicule</string>
     <string name="select_all">Sélectionner le tout</string>

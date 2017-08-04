@@ -41,6 +41,18 @@
     <string name="error_password">Password Required</string>
     <string name="error_domain">Domain Required</string>
 
+    <!--Logs-->
+    <string name="logs_sign_logsheet">SIGN LOGSHEET</string>
+    <string name="logs_events">EVENTS</string>
+    <string name="logs_trip_info">TRIP INFO</string>
+    <string name="logs_co_driver">Co-driver</string>
+    <string name="logs_on_duty_left">On duty left</string>
+    <string name="logs_drive">Drive</string>
+    <string name="logs_odometer">Odometer</string>
+    <string name="logs_mi_set">mi</string>
+    <string name="logs_km_set">km</string>
+
+
     <!-- START OLD STRINGS -->
     <string name="no_network">No Network Available</string>
     <string name="app_compatability">Note: Compatible with Android 4.0.3 - 6.0.1</string>
@@ -150,7 +162,6 @@
     <string name="sf_txt_quicktour">TAKE A QUICK TOUR OF APP</string>
     <string name="sf_btn_taketour">TAKE A TOUR</string>
     <string name="sf_btn_skiptour">SKIP TOUR</string>
-    <string name="odometer">ODOMETER (KM):</string>
     <string name="attacment">ATTACHMENT:</string>
     <string name="vehcile">VEHICLE</string>
     <string name="select_all">SELECT ALL</string>
@@ -399,5 +410,17 @@
     <string name="settings_box_gps_title">Box GPS</string>
     <string name="settings_fixed_mount_title">Fixed mount</string>
     <string name="settings_odometer_units">Odometer units</string>
+
+    <!-- Logs -->
+    <string name="odometer">Odometer(%1$s)</string>
+    <string name="add_event">Add event</string>
+    <string name="edit">Edit</string>
+    <string name="remove">Remove</string>
+    <string name="km">km</string>
+    <string name="ml">ml</string>
+    <string name= "sign_logsheet">sing logsheet</string>
+
+
+
 
 </resources>
