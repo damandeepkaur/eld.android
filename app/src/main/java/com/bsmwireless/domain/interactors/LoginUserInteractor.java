@@ -193,7 +193,7 @@ public class LoginUserInteractor {
         passwordModel.setId(getDriverId());
         passwordModel.setUsername(getUserName());
         passwordModel.setPassword(oldPassword);
-        passwordModel.setNewPswd(newPassword);
+        passwordModel.setNewPassword(newPassword);
 
         return passwordModel;
     }

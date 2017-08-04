@@ -36,8 +36,6 @@ import butterknife.OnClick;
 import static android.support.design.widget.BottomSheetBehavior.STATE_EXPANDED;
 import static android.support.design.widget.BottomSheetBehavior.STATE_HIDDEN;
 
-import static com.bsmwireless.screens.driverprofile.DriverProfilePresenter.PASSWORD_NOT_MATCH_ERROR;
-
 public class DriverProfileActivity extends BaseMenuActivity implements DriverProfileView, SignatureLayout.OnSaveSignatureListener {
 
     public static final String EXTRA_USER = "user";
@@ -157,6 +155,7 @@ public class DriverProfileActivity extends BaseMenuActivity implements DriverPro
 
     @Override
     public void showError(Throwable error) {
+        // TODO: show notification to user
         Toast.makeText(this, error.getMessage(), Toast.LENGTH_SHORT).show();
     }
 
@@ -189,6 +188,7 @@ public class DriverProfileActivity extends BaseMenuActivity implements DriverPro
 
     @Override
     public void showPasswordChanged() {
+        // TODO: show notification to user
         Toast.makeText(this, getString(R.string.driver_profile_password_changed), Toast.LENGTH_SHORT).show();
         setPasswordChangeError(null);
     }

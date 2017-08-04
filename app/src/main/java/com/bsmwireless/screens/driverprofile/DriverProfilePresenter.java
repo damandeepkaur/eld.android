@@ -20,10 +20,6 @@ import timber.log.Timber;
 @ActivityScope
 public class DriverProfilePresenter {
 
-    public static final String PASSWORD_NOT_MATCH_ERROR = "password not match";
-    public static final String FIELD_PASSWORD_EMPTY = "password field empty";
-    public static final String VALID_PASSWORD = "valid password";
-
     private static final int MAX_SIGNATURE_LENGTH = 50000;
 
     private Context mContext;
@@ -88,7 +84,7 @@ public class DriverProfilePresenter {
 
     public void onChangePasswordClick(String oldPwd, String newPwd, String confirmPwd) {
         String validationError = validatePassword(oldPwd, newPwd, confirmPwd);
-        if (validationError.equals(VALID_PASSWORD)) {
+        if (validationError.equals(mContext.getString(R.string.driver_profile_valid_password))) {
             mLoginUserInteractor.updateDriverPassword(oldPwd, newPwd)
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
@@ -118,10 +114,10 @@ public class DriverProfilePresenter {
     private String validatePassword(String oldPwd, String newPwd, String confirmPwd) {
         if ((newPwd == null || newPwd.isEmpty()) ||
                 (oldPwd == null || oldPwd.isEmpty())) {
-            return FIELD_PASSWORD_EMPTY;
+            return mContext.getString(R.string.driver_profile_password_field_empty);
         } else if (confirmPwd == null || !confirmPwd.equals(newPwd)) {
-            return PASSWORD_NOT_MATCH_ERROR;
+            return mContext.getString(R.string.driver_profile_password_not_match);
         }
-        return VALID_PASSWORD;
+        return mContext.getString(R.string.driver_profile_valid_password);
     }
 }

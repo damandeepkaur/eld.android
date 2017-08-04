@@ -21,7 +21,7 @@ public class PasswordModel implements Parcelable
     private String mPassword;
     @SerializedName("newpswd")
     @Expose
-    private String mNewPswd;
+    private String mNewPassword;
 
     public final static Parcelable.Creator<PasswordModel> CREATOR = new Creator<PasswordModel>() {
 
@@ -33,7 +33,7 @@ public class PasswordModel implements Parcelable
             instance.mId = ((Integer) in.readValue((Integer.class.getClassLoader())));
             instance.mUsername = ((String) in.readValue((String.class.getClassLoader())));
             instance.mPassword = ((String) in.readValue((String.class.getClassLoader())));
-            instance.mNewPswd = ((String) in.readValue((String.class.getClassLoader())));
+            instance.mNewPassword = ((String) in.readValue((String.class.getClassLoader())));
             return instance;
         }
 
@@ -67,12 +67,12 @@ public class PasswordModel implements Parcelable
         this.mPassword = password;
     }
 
-    public String getNewPswd() {
-        return mNewPswd;
+    public String getNewPassword() {
+        return mNewPassword;
     }
 
-    public void setNewPswd(String newPswd) {
-        this.mNewPswd = newPswd;
+    public void setNewPassword(String newPassword) {
+        this.mNewPassword = newPassword;
     }
 
     @Override
@@ -81,7 +81,7 @@ public class PasswordModel implements Parcelable
         sb.append("id=").append(mId);
         sb.append(", username='").append(mUsername).append('\'');
         sb.append(", password='").append(mPassword).append('\'');
-        sb.append(", newpswd='").append(mNewPswd).append('\'');
+        sb.append(", newpswd='").append(mNewPassword).append('\'');
         sb.append('}');
         return sb.toString();
     }
@@ -91,7 +91,7 @@ public class PasswordModel implements Parcelable
         return new HashCodeBuilder().append(mId)
                                     .append(mUsername)
                                     .append(mPassword)
-                                    .append(mNewPswd)
+                                    .append(mNewPassword)
                                     .toHashCode();
     }
 
@@ -107,7 +107,7 @@ public class PasswordModel implements Parcelable
         return new EqualsBuilder().append(mId, rhs.mId)
                                   .append(mUsername, rhs.mUsername)
                                   .append(mPassword, rhs.mPassword)
-                                  .append(mNewPswd, rhs.mNewPswd)
+                                  .append(mNewPassword, rhs.mNewPassword)
                                   .isEquals();
     }
 
@@ -115,7 +115,7 @@ public class PasswordModel implements Parcelable
         dest.writeValue(mId);
         dest.writeValue(mUsername);
         dest.writeValue(mPassword);
-        dest.writeValue(mNewPswd);
+        dest.writeValue(mNewPassword);
     }
 
     public int describeContents() {
