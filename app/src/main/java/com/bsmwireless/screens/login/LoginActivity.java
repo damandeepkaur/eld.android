@@ -2,18 +2,20 @@ package com.bsmwireless.screens.login;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.SwitchCompat;
 import android.widget.EditText;
 
 import com.bsmwireless.common.App;
 import com.bsmwireless.common.utils.SchedulerUtils;
+import com.bsmwireless.common.utils.NetworkUtils;
+import com.bsmwireless.data.network.RetrofitException;
 import com.bsmwireless.screens.common.BaseActivity;
-import com.bsmwireless.screens.navigation.NavigationActivity;
-import com.bsmwireless.screens.selectasset.SelectAssetActivity;
 import com.bsmwireless.screens.login.dagger.DaggerLoginComponent;
 import com.bsmwireless.screens.login.dagger.LoginModule;
+import com.bsmwireless.screens.navigation.NavigationActivity;
+import com.bsmwireless.screens.selectasset.SelectAssetActivity;
+import com.bsmwireless.widgets.snackbar.SnackBarLayout;
 
 import javax.inject.Inject;
 
@@ -42,6 +44,9 @@ public class LoginActivity extends BaseActivity implements LoginView {
     @BindView(R.id.switchButton)
     SwitchCompat mSwitchButton;
 
+    @BindView(R.id.login_snackbar)
+    SnackBarLayout mSnackBarLayout;
+
     @Inject
     LoginPresenter mPresenter;
 
@@ -55,6 +60,11 @@ public class LoginActivity extends BaseActivity implements LoginView {
         setContentView(R.layout.activity_login);
         mUnbinder = ButterKnife.bind(this);
 
+        mSnackBarLayout
+                .setHideableOnFocusLost(true)
+                .setHideableOnTimeout(SnackBarLayout.DURATION_LONG)
+                .setPositiveLabel(getString(R.string.try_again), v -> executeLogin());
+
         mPresenter.onViewCreated();
     }
 
@@ -66,6 +76,7 @@ public class LoginActivity extends BaseActivity implements LoginView {
 
     @OnClick(R.id.execute_login)
     void executeLogin() {
+        mSnackBarLayout.hideSnackbar();
         mPresenter.onLoginButtonClicked(mSwitchButton.isChecked());
     }
 
@@ -85,14 +96,37 @@ public class LoginActivity extends BaseActivity implements LoginView {
     }
 
     @Override
-    public void showErrorMessage(String message) {
-        AlertDialog.Builder builder;
-        builder = new AlertDialog.Builder(this);
-        builder.setTitle(R.string.loginerror);
-        builder.setMessage(message);
-        builder.setCancelable(false);
-        builder.setPositiveButton(R.string.ok, null);
-        builder.show();
+    public void showErrorMessage(Error error) {
+        int id;
+
+        switch (error) {
+            case ERROR_USER:
+                id = R.string.error_username;
+                break;
+
+            case ERROR_DOMAIN:
+                id = R.string.error_domain;
+                break;
+
+            case ERROR_PASSWORD:
+                id = R.string.error_password;
+                break;
+
+            default:
+                id = R.string.error_unexpected;
+                break;
+        }
+
+        mSnackBarLayout
+                .setMessage(getString(id))
+                .showSnackbar();
+    }
+
+    @Override
+    public void showErrorMessage(RetrofitException error) {
+        mSnackBarLayout
+                .setMessage(NetworkUtils.getErrorMessage(error, this))
+                .showSnackbar();
     }
 
     @Override

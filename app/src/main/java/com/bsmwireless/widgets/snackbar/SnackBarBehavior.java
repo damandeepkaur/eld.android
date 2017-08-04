@@ -27,8 +27,11 @@ public class SnackBarBehavior extends AppBarLayout.ScrollingViewBehavior {
             return super.onDependentViewChanged(parent, child, dependency);
         }
 
-        float translationY = -Math.max(0, parent.getHeight() - dependency.getY() - OFFSET);
-        child.setTranslationY(translationY);
+        int translationY = (int) -Math.max(0, parent.getHeight() - dependency.getY() - OFFSET);
+
+        child.setPadding(0, 0, 0, -translationY);
+        child.scrollTo(0, child.getHeight() - translationY);
+
         return true;
     }
 }

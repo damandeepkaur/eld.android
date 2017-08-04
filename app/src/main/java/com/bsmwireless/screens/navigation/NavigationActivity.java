@@ -56,11 +56,10 @@ public class NavigationActivity extends BaseMenuActivity implements OnNavigation
     @BindView(R.id.navigation_view_pager)
     ViewPager mViewPager;
 
-    private NavigationAdapter mPagerAdapter;
-
     @Inject
     NavigationPresenter mPresenter;
 
+    private NavigationAdapter mPagerAdapter;
     private SmoothActionBarDrawerToggle mDrawerToggle;
     private HeaderViewHolder mHeaderViewHolder;
 
@@ -154,9 +153,11 @@ public class NavigationActivity extends BaseMenuActivity implements OnNavigation
         mPagerAdapter = new NavigationAdapter(getApplicationContext(), getSupportFragmentManager());
         mViewPager.setAdapter(mPagerAdapter);
         mViewPager.setOffscreenPageLimit(2);
+        mViewPager.setCurrentItem(1);
 
         mTabLayout.setupWithViewPager(mViewPager);
         mTabLayout.setTabTextColors(ContextCompat.getColor(this, R.color.accent_transparent), ContextCompat.getColor(this, R.color.accent));
+
     }
 
     //TODO: waiting for UI
@@ -207,30 +208,6 @@ public class NavigationActivity extends BaseMenuActivity implements OnNavigation
                 R.plurals.assets, assetsNum, assetsNum));
     }
 
-    protected static class HeaderViewHolder {
-        @BindView(R.id.driver_name)
-        TextView driverName;
-
-        @BindView(R.id.co_drivers_number)
-        TextView coDriversNumber;
-
-        @BindView(R.id.box_id)
-        TextView boxId;
-
-        @BindView(R.id.assets_number)
-        TextView assetNumber;
-
-        private Unbinder mUnbinder;
-
-        HeaderViewHolder(View view) {
-            mUnbinder = ButterKnife.bind(this, view);
-        }
-
-        void unbind() {
-            mUnbinder.unbind();
-        }
-    }
-
     @Override
     protected void onDestroy() {
         mPresenter.onDestroy();
@@ -252,6 +229,30 @@ public class NavigationActivity extends BaseMenuActivity implements OnNavigation
             default: {
                 break;
             }
+        }
+    }
+
+    protected static class HeaderViewHolder {
+        @BindView(R.id.driver_name)
+        TextView driverName;
+
+        @BindView(R.id.co_drivers_number)
+        TextView coDriversNumber;
+
+        @BindView(R.id.box_id)
+        TextView boxId;
+
+        @BindView(R.id.assets_number)
+        TextView assetNumber;
+
+        private Unbinder mUnbinder;
+
+        HeaderViewHolder(View view) {
+            mUnbinder = ButterKnife.bind(this, view);
+        }
+
+        void unbind() {
+            mUnbinder.unbind();
         }
     }
 

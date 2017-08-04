@@ -1,22 +1,19 @@
-package com.bsmwireless.widgets.graphview;
+package com.bsmwireless.widgets.logs.graphview;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.view.View;
 
-import com.bsmwireless.common.App;
 import com.bsmwireless.common.utils.ViewUtils;
-import com.bsmwireless.data.storage.FontCache;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.widgets.alerts.DutyType;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.inject.Inject;
 
 import app.bsmuniversal.com.R;
 
@@ -27,20 +24,13 @@ public class ELDGraphView extends View {
 
     private final int GRID_WIDTH_DP = 1;
     private final int LINE_WIDTH_DP = 3;
-
-    @Inject
-    FontCache mFontCache;
-
     private final int mDutyStatusCount = 4;
     private final int mHoursCount = 24;
-
     private float mTopOffset;
     private float mLeftOffset;
     private float mRightOffset;
     private float mBottomOffset;
     private float mTextSize;
-    private float mWidth;
-    private float mHeight;
     private float mGraphHeight;
     private float mGraphWidth;
     private float mGraphLeft;
@@ -52,6 +42,7 @@ public class ELDGraphView extends View {
     private Paint mBarPaint;
 
     private List<ELDEvent> mLogs;
+    private Bitmap mBitmap;
 
     public ELDGraphView(Context context) {
         super(context);
@@ -68,39 +59,7 @@ public class ELDGraphView extends View {
         init();
     }
 
-    @Override
-    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        super.onLayout(changed, left, top, right, bottom);
-
-        mWidth = right - left;
-        mHeight = bottom - top;
-
-        mGraphWidth = (mWidth - (mLeftOffset + mRightOffset));
-        mGraphHeight = (mHeight - (mTopOffset + mBottomOffset));
-
-        mGraphLeft = mLeftOffset;
-        mGraphTop = mTopOffset;
-
-        mSegmentHeight = mGraphHeight / mDutyStatusCount;
-    }
-
-    @Override
-    protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
-
-        drawGridBackground(canvas);
-
-        drawLog(mLogs, canvas);
-    }
-
-    public void setLogs(List<ELDEvent> logs) {
-        mLogs = new ArrayList<>(logs);
-        invalidate();
-    }
-
     private void init() {
-        App.getComponent().inject(this);
-
         mLogs = new ArrayList<>();
 
         mTopOffset = getResources().getDimensionPixelSize(R.dimen.graph_view_top_offset);
@@ -128,11 +87,50 @@ public class ELDGraphView extends View {
         mBarPaint.setColor(ContextCompat.getColor(getContext(), R.color.offduty_light));
         mBarPaint.setStyle(Paint.Style.STROKE);
         mBarPaint.setStrokeWidth(ViewUtils.convertDpToPixels(LINE_WIDTH_DP, getContext()));
+
+        setDrawingCacheEnabled(true);
+    }
+
+    @Override
+    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+        super.onLayout(changed, left, top, right, bottom);
+
+        float width = right - left;
+        float height = bottom - top;
+
+        mGraphWidth = (width - (mLeftOffset + mRightOffset));
+        mGraphHeight = (height - (mTopOffset + mBottomOffset));
+
+        mGraphLeft = mLeftOffset;
+        mGraphTop = mTopOffset;
+
+        mSegmentHeight = mGraphHeight / mDutyStatusCount;
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+
+        if (mBitmap != null && !mBitmap.isRecycled()) {
+            canvas.drawBitmap(mBitmap, 0, 0, null);
+        } else {
+            Bitmap bitmap = getDrawingCache();
+            if (mBitmap != null) mBitmap.recycle();
+            mBitmap = bitmap.copy(bitmap.getConfig(), true);
+            Canvas bitmapCanvas = new Canvas(mBitmap);
+            drawGridBackground(bitmapCanvas);
+            drawLog(mLogs, bitmapCanvas);
+        }
+    }
+
+    public void setLogs(final List<ELDEvent> logs) {
+        mLogs = logs;
+        invalidate();
     }
 
     private void drawGridBackground(Canvas canvas) {
         float xDelta = mGraphWidth / mHoursCount;
-        for(int i = 0; i <= mHoursCount; i++) {
+        for (int i = 0; i <= mHoursCount; i++) {
             float tickX = mGraphLeft + (i * xDelta);
 
             String headerStr;
@@ -161,11 +159,12 @@ public class ELDGraphView extends View {
                 canvas.drawText(headerStr, tickX - lineWidth / 2, mGraphTop + mGraphHeight + mTextSize, mHeaderPaint);
             }
 
-            canvas.drawLine (tickX, mGraphTop, tickX, mGraphTop + mGraphHeight, mGridPaint);
+            canvas.drawLine(tickX, mGraphTop, tickX, mGraphTop + mGraphHeight, mGridPaint);
         }
     }
 
     private void drawLog(List<ELDEvent> logData, Canvas canvas) {
+
         if (logData == null || logData.size() == 0) {
             return;
         }
@@ -178,7 +177,7 @@ public class ELDGraphView extends View {
         x1 = mGraphLeft;
         y1 = mGraphTop + (logData.get(0).getEventType() - firstTypeId) * mSegmentHeight + mSegmentHeight / 2;
 
-        for(int i = 1; i < logData.size(); i++) {
+        for (int i = 1; i < logData.size(); i++) {
             ELDEvent event = logData.get(i);
             ELDEvent prevEvent = logData.get(i - 1);
 

@@ -53,7 +53,6 @@
     <dimen name="helper_text_size">24dp</dimen>
     <dimen name="helper_text_width">150dp</dimen>
     <!-- END OLD DIMENS -->
-
     <dimen name="default_toolbar_padding">0dp</dimen>
     <dimen name="default_margin">16dp</dimen>
     <dimen name="text_size">16sp</dimen>
@@ -62,6 +61,7 @@
     <dimen name="text_size_smallest">8sp</dimen>
     <dimen name="text_size_large">20sp</dimen>
     <dimen name="text_size_spacing">8sp</dimen>
+    <item name="text_letter_spacing" format="float" type="dimen">0.04</item>
 
     <!-- Graphview dimens -->
     <dimen name="graph_view_top_offset">20dp</dimen>
@@ -99,7 +99,6 @@
     <dimen name="driver_profile_signature_height">225dp</dimen>
     <dimen name="driver_profile_signature_margin">15dp</dimen>
     <dimen name="driver_profile_shadow_size">4dp</dimen>
-    <item format="float" name="driver_profile_button_letter_spacing" type="dimen">0.26</item>
 
     <!-- Calendar widget -->
     <dimen name="calendar_item_width">45dp</dimen>
@@ -107,5 +106,33 @@
 
     <!-- Settings Activity -->
     <dimen name="divider_height">1dp</dimen>
+
+    <!--Logs-->
+    <dimen name="calendar_layout_side_button_size">24dp</dimen>
+    <dimen name="bottom_bar_button_left_padding">36dp</dimen>
+    <dimen name="bottom_bar_button_right_padding">36dp</dimen>
+    <dimen name="logs_list_item_eld_event_margin_left">16dp</dimen>
+    <dimen name="logs_list_item_eld_event_height">88dp</dimen>
+    <dimen name="logs_list_item_eld_event_status_height">20dp</dimen>
+    <dimen name="logs_list_item_eld_event_margin_top">24dp</dimen>
+    <dimen name="logs_list_item_eld_seccond_line_height">24dp</dimen>
+    <dimen name="logs_list_item_eld_seccond_line_margin_bottom">2dp</dimen>
+    <dimen name="logs_list_item_eld_seccond_line_margin_top">2dp</dimen>
+    <dimen name="logs_list_item_eld_event_vehicle_name_margin_end">44dp</dimen>
+    <dimen name="logs_list_item_eld_event_menu_button_width">44dp</dimen>
+    <dimen name="logs_list_item_eld_event_address_height">20dp</dimen>
+    <dimen name="logs_list_item_eld_event_divider_margin_top">10dp</dimen>
+    <dimen name="logs_list_item_header_sign_logsheet_margin">10dp</dimen>
+    <dimen name="logs_list_item_header_calendar_height">85dp</dimen>
+    <dimen name="logs_list_item_header_sign_graph_height">170dp</dimen>
+    <dimen name="logs_list_item_header_sign_graph_margin_left">8dp</dimen>
+    <dimen name="logs_list_item_header_sign_graph_margin_right">8dp</dimen>
+    <dimen name="logs_list_item_title_height">52dp</dimen>
+    <dimen name="logs_list_item_title_margin_left">15dp</dimen>
+    <dimen name="logs_list_item_title_margin_right">16dp</dimen>
+    <dimen name="logs_list_item_trip_info_margin_top">8dp</dimen>
+    <dimen name="logs_list_item_trip_info_height">48dp</dimen>
+    <dimen name="logs_list_item_trip_info_margin_left">15dp</dimen>
+    <dimen name="logs_list_item_trip_info_margin_right">93dp</dimen>
 
 </resources>

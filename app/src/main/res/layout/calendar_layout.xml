@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="horizontal"
               android:layout_width="match_parent"
-              android:layout_height="wrap_content">
+              android:layout_height="wrap_content"
+              android:orientation="horizontal">
 
-    <Button android:id="@+id/left"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:background="@drawable/calendar_left_button"
-        android:layout_gravity="center_vertical"/>
+    <Button
+        android:id="@+id/left"
+        android:layout_width="@dimen/calendar_layout_side_button_size"
+        android:layout_height="@dimen/calendar_layout_side_button_size"
+        android:layout_gravity="center_vertical"
+        android:background="@drawable/calendar_left_button"/>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_view"
@@ -16,10 +17,11 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"/>
 
-    <Button android:id="@+id/right"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:background="@drawable/calendar_right_button"
-        android:layout_gravity="center_vertical"/>
+    <Button
+        android:id="@+id/right"
+        android:layout_width="@dimen/calendar_layout_side_button_size"
+        android:layout_height="@dimen/calendar_layout_side_button_size"
+        android:layout_gravity="center_vertical"
+        android:background="@drawable/calendar_right_button"/>
 
 </LinearLayout>
