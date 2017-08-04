@@ -225,6 +225,9 @@ public class LogsFragment extends BaseFragment implements LogsView {
 
         public void setELDEvents(List<ELDEvent> eldEvents) {
             mELDEvents = eldEvents;
+            if (mGraphLayout != null) {
+                mGraphLayout.setELDEvents(eldEvents);
+            }
             notifyDataSetChanged();
         }
 

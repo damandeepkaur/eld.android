@@ -120,11 +120,16 @@ public class ELDGraphView extends View {
             Canvas bitmapCanvas = new Canvas(mBitmap);
             drawGridBackground(bitmapCanvas);
             drawLog(mLogs, bitmapCanvas);
+
+            canvas.drawBitmap(mBitmap, 0, 0, null);
         }
     }
 
     public void setLogs(final List<ELDEvent> logs) {
-        mLogs = logs;
+        mLogs = filterEventBytType(logs, ELDEvent.EventType.DUTY_STATUS_CHANGING);
+        if (mBitmap != null) {
+            mBitmap.recycle();
+        }
         invalidate();
     }
 
@@ -171,11 +176,9 @@ public class ELDGraphView extends View {
 
         float gridUnit = mGraphWidth / (mHoursCount * SEC_IN_MIN);
 
-        int firstTypeId = DutyType.values()[0].getId();
-
         float x1, x2, y1, y2;
         x1 = mGraphLeft;
-        y1 = mGraphTop + (logData.get(0).getEventType() - firstTypeId) * mSegmentHeight + mSegmentHeight / 2;
+        y1 = mGraphTop + logData.get(0).getEventType() * mSegmentHeight + mSegmentHeight / 2;
 
         for (int i = 1; i < logData.size(); i++) {
             ELDEvent event = logData.get(i);
@@ -187,7 +190,7 @@ public class ELDGraphView extends View {
             long timeStamp = (logDate - prevLogDate) / (SEC_IN_MIN * MS_IN_SEC);
 
             x2 = x1 + timeStamp * gridUnit;
-            y2 = mGraphTop + (event.getEventType() - firstTypeId) * mSegmentHeight + mSegmentHeight / 2;
+            y2 = mGraphTop + event.getEventType() * mSegmentHeight + mSegmentHeight / 2;
 
             mBarPaint.setColor(ContextCompat.getColor(getContext(), DutyType.getColorById(event.getEventType())));
             mBarPaint.setStrokeWidth(ViewUtils.convertDpToPixels(LINE_WIDTH_DP, getContext()));
@@ -203,5 +206,16 @@ public class ELDGraphView extends View {
             x1 = x2;
             y1 = y2;
         }
+    }
+
+    private List<ELDEvent> filterEventBytType(List<ELDEvent> events, ELDEvent.EventType eventType) {
+        List<ELDEvent> result = new ArrayList<>();
+        for (ELDEvent event:
+             events) {
+            if (event.getEventType().equals(eventType.getValue())) {
+                result.add(event);
+            }
+        }
+        return result;
     }
 }

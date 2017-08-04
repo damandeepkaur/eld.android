@@ -1,6 +1,7 @@
 package com.bsmwireless.screens.logs;
 
 import com.bsmwireless.common.dagger.ActivityScope;
+import com.bsmwireless.common.utils.ViewUtils;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.LogSheetHeader;
@@ -42,6 +43,16 @@ public class LogsPresenter {
 
     public void onCalendarDaySelected(CalendarItem calendarItem) {
         //TODO update data for new day
+        LogSheetHeader log = calendarItem.getAssociatedLog();
+        if (log != null) {
+            long startDate = log.getStartOfDay();
+            long endDate = startDate + 24 * 60 * 60 * 1000;
+            mELDEventsInteractor.getELDEvents(startDate, endDate)
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(eldEvents -> mView.setELDEvents(eldEvents),
+                                        throwable -> Timber.e(throwable.getMessage()));
+        }
     }
 
     public void onSignLogsheetButtonClicked() {
@@ -101,6 +112,7 @@ public class LogsPresenter {
             LogSheetHeader log = new LogSheetHeader();
             Long time = calendar.getTime().getTime();
             log.setLogDay(time);
+            log.setStartOfDay(ViewUtils.getStartDate("America/Los_Angeles", calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.MONTH), calendar.get(Calendar.YEAR)));
             if (i % 7 != 0) {
                 logs.add(log);
             }
