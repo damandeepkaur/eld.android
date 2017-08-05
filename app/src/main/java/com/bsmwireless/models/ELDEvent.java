@@ -13,9 +13,11 @@ public class ELDEvent implements Parcelable {
     public enum EventType {
         DUTY_STATUS_CHANGING(1),
         INTERMEDIATE_LOG(2),
+        CHANGE_IN_DRIVER_INDICATION(3),
         CERTIFICATION_OF_RECORDS(4),
         LOGIN_LOGOUT(5),
-        ENGINE_POWER_CHANGING(6);
+        ENGINE_POWER_CHANGING(6),
+        DATA_DIAGNOSTIC(7);
 
         private int mType;
 
