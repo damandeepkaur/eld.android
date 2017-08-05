@@ -94,4 +94,14 @@ public class ViewUtils {
                 timeZone.getDisplayName(Locale.US),
                 zone);
     }
+
+    /**
+     * @param time unix time in ms
+     * @return string with format time like "12:35"
+     */
+    public static  String convertTimeInMsToStringTime(long time) {
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
+        calendar.setTimeInMillis(time);
+        return String.format(Locale.US, "%02d:%02d", calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE));
+    }
 }

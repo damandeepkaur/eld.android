@@ -194,12 +194,8 @@
     <string name="hos_txt_graph">GRAPH</string>
     <string name="hos_txt_events">EVENTS</string>
     <string name="hos_txt_logsheet">LOG SHEET</string>
-    <string name="hos_txt_offduty">OFF DUTY</string>
     <string name="hos_txt_sleepingberth">SLEEPER BERTH</string>
-    <string name="hos_txt_sleeping">SLEEPING </string>
     <string name="hos_txt_berth">BERTH</string>
-    <string name="hos_txt_driving">DRIVING</string>
-    <string name="hos_txt_onduty">ON DUTY</string>
     <string name="hos_txt_summary">SUMMARY</string>
     <string name="hos_txt_location">Location</string>
     <string name="hos_txt_total">TOTAL</string>
@@ -438,6 +434,10 @@
     <string name="km">km</string>
     <string name="ml">ml</string>
     <string name= "sign_logsheet">sing logsheet</string>
+    <string name="hos_txt_offduty">Off Duty</string>
+    <string name="hos_txt_sleeping">Sleeping</string>
+    <string name="hos_txt_driving">Driving</string>
+    <string name="hos_txt_onduty">On Duty</string>
 
 
 
