@@ -39,8 +39,9 @@ public class AutoLogoutActivity extends BaseActivity implements AutoLogoutView {
 
         DaggerAutoLogoutComponent.builder().appComponent(App.getComponent()).autoLogoutModule(new AutoLogoutModule(this)).build().inject(this);
 
-        mAutoLogoutPresenter.initAutoLogoutDialog(getIntent().getExtras().getParcelable(ARG_JOBS_PARAMETERS),
-                getIntent().getParcelableExtra(Intent.EXTRA_INTENT));
+        mAutoLogoutPresenter.initAutoLogoutDialog(getIntent().hasExtra(ARG_JOBS_PARAMETERS) ? getIntent()
+                .getExtras().getParcelable(ARG_JOBS_PARAMETERS) : null, getIntent().hasExtra(Intent.EXTRA_TEXT) ? getIntent()
+                .getParcelableExtra(Intent.EXTRA_INTENT) : null);
     }
 
     @Override
