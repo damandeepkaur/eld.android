@@ -55,7 +55,6 @@ public class LoginActivity extends BaseActivity implements LoginView {
         super.onCreate(savedInstanceState);
 
         DaggerLoginComponent.builder().appComponent(App.getComponent()).loginModule(new LoginModule(this)).build().inject(this);
-        SchedulerUtils.schedule();
 
         setContentView(R.layout.activity_login);
         mUnbinder = ButterKnife.bind(this);

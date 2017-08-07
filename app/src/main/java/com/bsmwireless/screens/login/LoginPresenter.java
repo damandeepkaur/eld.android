@@ -1,6 +1,7 @@
 package com.bsmwireless.screens.login;
 
 import com.bsmwireless.common.dagger.ActivityScope;
+import com.bsmwireless.common.utils.SchedulerUtils;
 import com.bsmwireless.data.network.RetrofitException;
 import com.bsmwireless.domain.interactors.LoginUserInteractor;
 import com.bsmwireless.models.User;
@@ -63,6 +64,7 @@ public class LoginPresenter {
                             Timber.i("LoginUser status = %b", status);
 
                             if (status) {
+                                SchedulerUtils.schedule();
                                 mView.goToSelectAssetScreen();
                             } else {
                                 mView.showErrorMessage(LoginView.Error.ERROR_UNEXPECTED);
