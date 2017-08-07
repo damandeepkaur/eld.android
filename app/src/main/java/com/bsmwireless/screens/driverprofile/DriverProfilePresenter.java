@@ -74,12 +74,30 @@ public class DriverProfilePresenter {
         mView.hideControlButtons();
     }
 
-    public void onSaveUserInfo(String address) {
+    public void onSaveUserInfo() {
         if (mUserEntity != null) {
-            mUserEntity.setAddress(address);
             mView.setResults(UserConverter.toUser(mUserEntity));
         } else {
             mView.showError(new Exception(mContext.getResources().getString(R.string.driver_profile_user_error)));
+        }
+    }
+
+    public void onChangePasswordClick(String oldPwd, String newPwd, String confirmPwd) {
+        String validationError = validatePassword(oldPwd, newPwd, confirmPwd);
+        if (validationError.equals(mContext.getString(R.string.driver_profile_valid_password))) {
+            mLoginUserInteractor.updateDriverPassword(oldPwd, newPwd)
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(passwordUpdated -> {
+                                            if (passwordUpdated) {
+                                                mView.showPasswordChanged();
+                                            } else {
+                                                mView.showError(new Exception(mContext.getString(R.string.driver_profile_password_not_changed)));
+                                            }
+                                        },
+                                        throwable -> mView.showError(throwable));
+        } else {
+            mView.showChangePasswordError(validationError);
         }
     }
 
@@ -91,5 +109,15 @@ public class DriverProfilePresenter {
             return croppedSignature;
         }
         return signature;
+    }
+
+    private String validatePassword(String oldPwd, String newPwd, String confirmPwd) {
+        if ((newPwd == null || newPwd.isEmpty()) ||
+                (oldPwd == null || oldPwd.isEmpty())) {
+            return mContext.getString(R.string.driver_profile_password_field_empty);
+        } else if (confirmPwd == null || !confirmPwd.equals(newPwd)) {
+            return mContext.getString(R.string.driver_profile_password_not_match);
+        }
+        return mContext.getString(R.string.driver_profile_valid_password);
     }
 }

@@ -13,4 +13,11 @@ public interface  LogsView {
     void setTripInfo(TripInfo tripInfo);
 
     void setLogSheetHeaders(List<LogSheetHeader> logs);
+
+    void goToAddEventScreen();
+
+    void goToEditEventScreen(ELDEvent event);
+
+    void goToEditTripInfoScreen();
+
 }
