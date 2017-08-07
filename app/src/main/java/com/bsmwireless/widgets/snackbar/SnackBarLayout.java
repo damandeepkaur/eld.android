@@ -46,6 +46,8 @@ public class SnackBarLayout extends RelativeLayout {
     private int mBackgroundColor;
     private int mDuration = DURATION_INFINITE;
 
+    private boolean mIsHideableOnTouch = true;
+
     private Handler mHandler = new Handler();
     private Runnable mHideTask = this::hideSnackbar;
 
@@ -106,6 +108,11 @@ public class SnackBarLayout extends RelativeLayout {
         return this;
     }
 
+    public SnackBarLayout setHideableOnTouch(boolean hideable) {
+        mIsHideableOnTouch = hideable;
+        return this;
+    }
+
     public SnackBarLayout setHideableOnFocusLost(boolean hideable) {
         setOnFocusChangeListener(!hideable ? null : (v, hasFocus) -> {
             if (!hasFocus) {
@@ -116,15 +123,24 @@ public class SnackBarLayout extends RelativeLayout {
         return this;
     }
 
+    @Override
+    public boolean isShown() {
+        return mIsHideableOnTouch ? super.isShown() : mBottomSheet.getState() == BottomSheetBehavior.STATE_EXPANDED;
+    }
+
     public SnackBarLayout hideSnackbar() {
-        mBottomSheet.setState(BottomSheetBehavior.STATE_HIDDEN);
+        if (mBottomSheet != null) {
+            mBottomSheet.setState(BottomSheetBehavior.STATE_HIDDEN);
+        }
         mHandler.removeCallbacks(mHideTask);
         return this;
     }
 
     public SnackBarLayout showSnackbar() {
-        mBottomSheet.setState(BottomSheetBehavior.STATE_EXPANDED);
-        requestFocus();
+        if (mBottomSheet != null) {
+            mBottomSheet.setState(BottomSheetBehavior.STATE_EXPANDED);
+            requestFocus();
+        }
 
         if (mDuration > 0) {
             mHandler.postDelayed(mHideTask, mDuration);
