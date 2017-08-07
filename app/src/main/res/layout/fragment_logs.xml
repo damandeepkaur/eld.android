@@ -10,14 +10,6 @@
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/toggle_button"
-        android:layout_marginBottom="?attr/actionBarSize"/>
-
-    <com.bsmwireless.widgets.logs.LogsBottomBar
-        android:id="@+id/bottom_bar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:visibility="invisible"/>
+        android:layout_below="@id/toggle_button"/>
 
 </RelativeLayout>
