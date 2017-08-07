@@ -62,8 +62,8 @@ public class LoginUserInteractor {
                     if (lastVehicles != null) {
                         mAppDatabase.userDao().setUserLastVehicles(user.getId(), lastVehicles);
                     }
-                })
-                  .flatMap(user -> {
+                })// TODO: add update user logic.
+                  /*.flatMap(user -> {
                       UserEntity userEntity = mAppDatabase.userDao().getUserSync(user.getId());
                       if (userEntity != null) {
                           Long lastModified = userEntity.getLastModified();
@@ -74,7 +74,8 @@ public class LoginUserInteractor {
                       }
                       return Observable.create((ObservableOnSubscribe<Long>) e -> e.onNext(mAppDatabase.userDao().insertUser(UserConverter.toEntity(user))))
                                        .map(userID -> userID > 0);
-                  });
+                  });*/
+                  .map(user -> user != null);
     }
 
     public Observable<Boolean> logoutUser() {
