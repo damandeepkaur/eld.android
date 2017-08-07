@@ -20,8 +20,8 @@ import com.bsmwireless.models.LogSheetHeader;
 import com.bsmwireless.screens.common.BaseFragment;
 import com.bsmwireless.screens.logs.dagger.DaggerLogsComponent;
 import com.bsmwireless.screens.logs.dagger.LogsModule;
+import com.bsmwireless.screens.navigation.NavigateView;
 import com.bsmwireless.widgets.alerts.DutyType;
-import com.bsmwireless.widgets.logs.LogsBottomBar;
 import com.bsmwireless.widgets.logs.LogsTitleView;
 import com.bsmwireless.widgets.logs.calendar.CalendarLayout;
 import com.bsmwireless.widgets.logs.graphview.GraphLayout;
@@ -39,8 +39,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
-import static com.bsmwireless.widgets.logs.LogsBottomBar.Type.ADD_EVENT;
-import static com.bsmwireless.widgets.logs.LogsBottomBar.Type.EDIT;
 import static com.bsmwireless.widgets.logs.LogsTitleView.Type.EVENTS;
 import static com.bsmwireless.widgets.logs.LogsTitleView.Type.TRIP_INFO;
 
@@ -50,10 +48,28 @@ public class LogsFragment extends BaseFragment implements LogsView {
     LogsPresenter mPresenter;
     @BindView(R.id.recycler_view)
     RecyclerView mRecyclerView;
-    @BindView(R.id.bottom_bar)
-    LogsBottomBar mLogsBottomBar;
+
     private LogsAdapter mAdapter;
     private Unbinder mUnbinder;
+    private NavigateView mNavigateView;
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof NavigateView) {
+            mNavigateView = (NavigateView) context;
+        } else {
+            throw new RuntimeException(context.toString() + " must implement NavigateView");
+        }
+    }
+
+    @Override
+    public void setMenuVisibility(boolean menuVisible) {
+        super.setMenuVisibility(menuVisible);
+        if (menuVisible && mAdapter != null) {
+            mAdapter.showSnackBar();
+        }
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -66,10 +82,6 @@ public class LogsFragment extends BaseFragment implements LogsView {
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(mContext));
         recyclerView.setAdapter(mAdapter);
-
-        mLogsBottomBar = (LogsBottomBar) view.findViewById(R.id.bottom_bar);
-        mLogsBottomBar.setAddEventClickListener(v -> mPresenter.onAddEventClicked());
-        mLogsBottomBar.setEditClickListener(v -> mPresenter.onEditTripInfoClicked());
 
         mPresenter.onViewCreated();
         return view;
@@ -347,20 +359,43 @@ public class LogsFragment extends BaseFragment implements LogsView {
         private void onTitleItemClicked(LogsTitleView titleView) {
             if (titleView.isCollapsed()) {
                 titleView.expand();
+                showSnackBar(titleView.getType());
                 if (titleView.getType() == EVENTS) {
-                    mLogsBottomBar.show(ADD_EVENT);
                     mTripInfoTitleView.collapse();
                 } else {
-                    mLogsBottomBar.show(EDIT);
                     mEventsTitleView.collapse();
                 }
             } else {
                 titleView.collapse();
-                mLogsBottomBar.hide();
+                mNavigateView.getSnackBar().hideSnackbar();
             }
 
             notifyDataSetChanged();
             scrollToPosition(1);
+        }
+
+        public void showSnackBar() {
+            if (mTripInfoTitleView != null && !mTripInfoTitleView.isCollapsed()) {
+                showSnackBar(TRIP_INFO);
+            } else if (mEventsTitleView != null && !mEventsTitleView.isCollapsed()) {
+                showSnackBar(EVENTS);
+            }
+        }
+
+        private void showSnackBar(LogsTitleView.Type title) {
+            switch (title) {
+                case EVENTS:
+                    mNavigateView.getSnackBar()
+                            .setPositiveLabel(mContext.getString(R.string.add_event), v -> mPresenter.onAddEventClicked())
+                            .showSnackbar();
+                    break;
+
+                case TRIP_INFO:
+                    mNavigateView.getSnackBar()
+                            .setPositiveLabel(mContext.getString(R.string.edit), v -> mPresenter.onEditTripInfoClicked())
+                            .showSnackbar();
+                    break;
+            }
         }
 
         private void scrollToPosition(int position) {
