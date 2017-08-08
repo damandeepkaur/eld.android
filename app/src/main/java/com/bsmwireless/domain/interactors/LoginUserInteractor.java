@@ -59,6 +59,8 @@ public class LoginUserInteractor {
 
                     String lastVehicles = mAppDatabase.userDao().getUserLastVehiclesSync(user.getId());
 
+                    mAppDatabase.userDao().insertUser(UserConverter.toEntity(user));
+
                     if (lastVehicles != null) {
                         mAppDatabase.userDao().setUserLastVehicles(user.getId(), lastVehicles);
                     }
