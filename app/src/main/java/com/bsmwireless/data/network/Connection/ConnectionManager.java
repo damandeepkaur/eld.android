@@ -26,7 +26,7 @@ public class ConnectionManager implements ConnectionInterface {
     private TelematicDevice mTelematicDevice;
     private Vehicle mVehicle;
     private ConnectionManagerService mConnectionService;
-    private byte sequenceID = 1;
+    private byte mSequenceID = 1;
     final int RETRY_CONNECT_DELAY =5000;
     final int READING_DELAY=1000;
     final int READING_TIMEOUT=5000;
@@ -65,12 +65,12 @@ public class ConnectionManager implements ConnectionInterface {
     }
 
 
-    public byte getSequenceID() {
-        sequenceID++;
-        if ((sequenceID & 0xFF )> 250)
-            sequenceID = 1;
+    public byte getmSequenceID() {
+        mSequenceID++;
+        if ((mSequenceID & 0xFF )> 250)
+            mSequenceID = 1;
 
-        return sequenceID;
+        return mSequenceID;
     }
 
     @Override
@@ -144,7 +144,7 @@ public class ConnectionManager implements ConnectionInterface {
             while (getConnectionstatus() == ConnectionStatus.Subscribing) {
                 boolean sentRequest;
                 SubscriptionGenerator subscriptionRequest = new SubscriptionGenerator();
-                sentRequest = sendRequest(subscriptionRequest.generateRequest(getSequenceID(), mVehicle.getBoxId()));
+                sentRequest = sendRequest(subscriptionRequest.generateRequest(getmSequenceID(), mVehicle.getBoxId()));
                 if (sentRequest) {
                     readSubscriptionResponse();
                 }
