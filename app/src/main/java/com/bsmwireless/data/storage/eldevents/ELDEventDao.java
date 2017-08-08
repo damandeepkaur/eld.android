@@ -25,6 +25,9 @@ public interface ELDEventDao {
     @Query("SELECT * FROM events WHERE id = :id")
     Flowable<ELDEventEntity> getEventById(int id);
 
+    @Query("SELECT * FROM events WHERE event_time > :startTime and event_time < :endTime ORDER BY event_time")
+    Flowable<List<ELDEventEntity>> getEventFromStartToEndTime(long startTime, long endTime);
+
     @Delete
     void delete(ELDEventEntity event);
 

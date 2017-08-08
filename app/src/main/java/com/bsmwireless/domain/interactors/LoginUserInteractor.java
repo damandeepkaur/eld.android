@@ -59,11 +59,13 @@ public class LoginUserInteractor {
 
                     String lastVehicles = mAppDatabase.userDao().getUserLastVehiclesSync(user.getId());
 
+                    mAppDatabase.userDao().insertUser(UserConverter.toEntity(user));
+
                     if (lastVehicles != null) {
                         mAppDatabase.userDao().setUserLastVehicles(user.getId(), lastVehicles);
                     }
-                })
-                  .flatMap(user -> {
+                })// TODO: add update user logic.
+                  /*.flatMap(user -> {
                       UserEntity userEntity = mAppDatabase.userDao().getUserSync(user.getId());
                       if (userEntity != null) {
                           Long lastModified = userEntity.getLastModified();
@@ -74,7 +76,8 @@ public class LoginUserInteractor {
                       }
                       return Observable.create((ObservableOnSubscribe<Long>) e -> e.onNext(mAppDatabase.userDao().insertUser(UserConverter.toEntity(user))))
                                        .map(userID -> userID > 0);
-                  });
+                  });*/
+                  .map(user -> user != null);
     }
 
     public Observable<Boolean> logoutUser() {
@@ -90,7 +93,7 @@ public class LoginUserInteractor {
 
         return mBlackBoxInteractor.getData()
                 .flatMap(blackBox -> {
-                    logoutEvent.setTimezone(getTimezone(driverId));
+                    logoutEvent.setTimezone(getTimezoneSync(driverId));
                     logoutEvent.setEngineHours(blackBox.getEngineHours());
                     logoutEvent.setOdometer(blackBox.getOdometer());
                     logoutEvent.setLat(blackBox.getLat());
@@ -165,8 +168,12 @@ public class LoginUserInteractor {
         return id == null || id.isEmpty() ? -1 : Integer.valueOf(id);
     }
 
-    public String getTimezone(int driverId) {
+    public String getTimezoneSync(int driverId) {
         return mAppDatabase.userDao().getUserTimezoneSync(driverId);
+    }
+
+    public Flowable<String> getTimezone() {
+        return mAppDatabase.userDao().getUserTimezone(getDriverId());
     }
 
     public boolean isRememberMeEnabled() {

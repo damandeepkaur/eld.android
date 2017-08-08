@@ -112,7 +112,7 @@ public class VehiclesInteractor {
         return mBlackBoxInteractor.getData()
                 .doOnNext(blackBox -> saveVehicle(vehicle))
                 .flatMap(blackBox -> {
-                    event.setTimezone(mUserInteractor.getTimezone(id));
+                    event.setTimezone(mUserInteractor.getTimezoneSync(id));
                     event.setOdometer(blackBox.getOdometer());
                     event.setLat(blackBox.getLat());
                     event.setLng(blackBox.getLon());
