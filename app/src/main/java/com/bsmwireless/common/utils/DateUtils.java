@@ -38,8 +38,6 @@ public class DateUtils {
         return calendar.getTimeInMillis();
     }
 
-
-
     /**
      * @param zone  user timezone for example "America/Los_Angeles"
      * @param day   day in month

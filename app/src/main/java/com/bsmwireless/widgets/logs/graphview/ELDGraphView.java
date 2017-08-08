@@ -6,12 +6,12 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 
 import com.bsmwireless.common.utils.ViewUtils;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.widgets.alerts.DutyType;
+import com.bsmwireless.widgets.logs.DutyColors;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -48,7 +48,7 @@ public class ELDGraphView extends View {
     private Bitmap mBitmap;
     private Paint mBitmapPaint;
     private long mStartDayUnixTimeInMs;
-    private int[] mDutyColors;
+    private DutyColors mDutyColors;
 
     public ELDGraphView(Context context) {
         super(context);
@@ -75,11 +75,7 @@ public class ELDGraphView extends View {
         mTextSize = getResources().getDimension(R.dimen.text_size_smallest);
 
         //initialize duty state colors
-        mDutyColors = new int[4];
-        mDutyColors[0] = ContextCompat.getColor(context, DutyType.OFF_DUTY.getColor());
-        mDutyColors[1] = ContextCompat.getColor(context, DutyType.SLEEPER_BERTH.getColor());
-        mDutyColors[2] = ContextCompat.getColor(context, DutyType.DRIVING.getColor());
-        mDutyColors[3] = ContextCompat.getColor(context, DutyType.ON_DUTY.getColor());
+        mDutyColors = new DutyColors(context);
 
         mGridPaint = new Paint();
         mGridPaint.setAntiAlias(true);
@@ -97,13 +93,13 @@ public class ELDGraphView extends View {
 
         mHorizontalLinesPaint = new Paint();
         mHorizontalLinesPaint.setAntiAlias(true);
-        mHorizontalLinesPaint.setColor(mDutyColors[DutyType.OFF_DUTY.ordinal()]);
+        mHorizontalLinesPaint.setColor(mDutyColors.getColor(DutyType.OFF_DUTY));
         mHorizontalLinesPaint.setStyle(Paint.Style.STROKE);
         mHorizontalLinesPaint.setStrokeWidth(ViewUtils.convertDpToPixels(LINE_WIDTH_DP, getContext()));
 
         mVerticalLinesPaint = new Paint();
         mVerticalLinesPaint.setAntiAlias(true);
-        mVerticalLinesPaint.setColor(mDutyColors[DutyType.OFF_DUTY.ordinal()]);
+        mVerticalLinesPaint.setColor(mDutyColors.getColor(DutyType.OFF_DUTY));
         mVerticalLinesPaint.setStyle(Paint.Style.STROKE);
         mVerticalLinesPaint.setStrokeWidth(ViewUtils.convertDpToPixels(GRID_WIDTH_DP, getContext()));
 
@@ -226,7 +222,7 @@ public class ELDGraphView extends View {
             x2 = x1 + timeStamp * gridUnit;
             y2 = mGraphTop + (event.getEventCode() - firstEventCode) * mSegmentHeight + mSegmentHeight / 2;
 
-            mHorizontalLinesPaint.setColor(mDutyColors[DutyType.getTypeById(prevEvent.getEventCode()).ordinal()]);
+            mHorizontalLinesPaint.setColor(mDutyColors.getColor(prevEvent.getEventCode()));
             canvas.drawLine(x1, y1, x2, y1, mHorizontalLinesPaint);
 
             if (y1 != y2) {

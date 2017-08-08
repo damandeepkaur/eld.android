@@ -2,11 +2,9 @@ package com.bsmwireless.widgets.logs.graphview;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 
-import com.bsmwireless.common.utils.DateUtils;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.widgets.common.FontTextView;
 

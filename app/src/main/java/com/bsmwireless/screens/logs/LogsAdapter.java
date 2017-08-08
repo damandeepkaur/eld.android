@@ -2,7 +2,6 @@ package com.bsmwireless.screens.logs;
 
 import android.content.Context;
 import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearSmoothScroller;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
@@ -14,6 +13,7 @@ import android.widget.TextView;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.LogSheetHeader;
 import com.bsmwireless.widgets.alerts.DutyType;
+import com.bsmwireless.widgets.logs.DutyColors;
 import com.bsmwireless.widgets.logs.LogsTitleView;
 import com.bsmwireless.widgets.logs.calendar.CalendarLayout;
 import com.bsmwireless.widgets.logs.graphview.GraphLayout;
@@ -41,8 +41,6 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
     //header + logs + trip info titles
     private final int MIN_LIST_SIZE = 3;
 
-    private int[] mDutyColors;
-
     private LogsTitleView mEventsTitleView;
     private LogsTitleView mTripInfoTitleView;
     private CalendarLayout mCalendarLayout;
@@ -50,7 +48,7 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
     private View mSignLogsheet;
 
     private List<ELDEvent> mELDEvents = new ArrayList<>();
-    private TripInfo mTripInfo = new TripInfo();
+    private TripInfoModel mTripInfo = new TripInfoModel();
     private List<LogSheetHeader> mLogHeaders = new ArrayList<>();
     private View.OnClickListener mOnMenuClickListener;
     private RecyclerView.SmoothScroller mSmoothScroller;
@@ -58,6 +56,7 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
     private LogsPresenter mPresenter;
     private RecyclerView mRecyclerView;
     private OnLogsTitleStateChangeListener mOnLogsTitleStateChangeListener;
+    private DutyColors mDutyColors;
 
     public LogsAdapter(Context context, LogsPresenter presenter, OnLogsTitleStateChangeListener snackBarClickListener) {
         mContext = context;
@@ -76,12 +75,7 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
             }
         };
 
-        //initialize duty state colors
-        mDutyColors = new int[4];
-        mDutyColors[0] = ContextCompat.getColor(context, DutyType.OFF_DUTY.getColor());
-        mDutyColors[1] = ContextCompat.getColor(context, DutyType.SLEEPER_BERTH.getColor());
-        mDutyColors[2] = ContextCompat.getColor(context, DutyType.DRIVING.getColor());
-        mDutyColors[3] = ContextCompat.getColor(context, DutyType.ON_DUTY.getColor());
+        mDutyColors = new DutyColors(mContext);
     }
 
     public void setELDEvents(List<ELDEvent> eldEvents) {
@@ -92,7 +86,7 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
         notifyDataSetChanged();
     }
 
-    public void setTripInfo(TripInfo tripInfo) {
+    public void setTripInfo(TripInfoModel tripInfo) {
         if (mGraphLayout != null) {
             mGraphLayout.setHOSTimerSleeperBerth(tripInfo.getSleeperBerthTime());
             mGraphLayout.setHOSTimerDriving(tripInfo.getDrivingTime());
@@ -157,9 +151,9 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
         int viewType = holder.getViewType();
         if (viewType == VIEW_TYPE_EVENTS_ITEM) {
             ELDEvent event = mELDEvents.get(position - 2);
-            holder.bindEventView(event, mOnMenuClickListener, mDutyColors[event.getEventCode() - 1]);
+            holder.bindEventView(event, mOnMenuClickListener, mDutyColors.getColor(event.getEventCode()));
         } else if (viewType == VIEW_TYPE_TRIP_INFO_ITEM) {
-            String unit = mContext.getString(mTripInfo.getUnitType() == TripInfo.UnitType.KM ? R.string.km : R.string.ml);
+            String unit = mContext.getString(mTripInfo.getUnitType() == TripInfoModel.UnitType.KM ? R.string.km : R.string.ml);
             holder.bindTripInfoView(mTripInfo, mContext.getString(R.string.odometer, unit));
         }
     }
@@ -331,7 +325,7 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
             mMenuButton.setOnClickListener(menuClickListener);
         }
 
-        private void bindTripInfoView(TripInfo tripInfo, String odometerTitle) {
+        private void bindTripInfoView(TripInfoModel tripInfo, String odometerTitle) {
             mCoDriverValue.setText(tripInfo.getCoDriverValue());
             mOnDutyLeftValue.setText(tripInfo.getOnDutyTime());
             mDriveValue.setText(tripInfo.getDrivingTime());

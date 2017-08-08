@@ -26,12 +26,12 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
-import static com.bsmwireless.screens.logs.TripInfo.UnitType.KM;
+import static com.bsmwireless.screens.logs.TripInfoModel.UnitType.KM;
 
 @ActivityScope
 public class LogsPresenter {
     public static final long ONE_DAY_MS = 24 * 60 * 60 * 1000;
-
+    Disposable mGetEventDisposable;
     private LogsView mView;
     private ELDEventsInteractor mELDEventsInteractor;
     private LogSheetInteractor mLogSheetInteractor;
@@ -39,7 +39,7 @@ public class LogsPresenter {
     private LoginUserInteractor mUserInteractor;
     private CompositeDisposable mDisposables;
     private String mTimeZone;
-    private TripInfo mTripInfo;
+    private TripInfoModel mTripInfo;
 
     @Inject
     public LogsPresenter(LogsView view, ELDEventsInteractor eventsInteractor, LogSheetInteractor logSheetInteractor,
@@ -50,7 +50,7 @@ public class LogsPresenter {
         mVehiclesInteractor = vehiclesInteractor;
         mUserInteractor = userInteractor;
         mDisposables = new CompositeDisposable();
-        mTripInfo = new TripInfo();
+        mTripInfo = new TripInfoModel();
         Timber.d("CREATED");
     }
 
@@ -90,31 +90,39 @@ public class LogsPresenter {
         if (log != null) {
             long startDate = log.getLogDay();
             long endDate = startDate + ONE_DAY_MS;
-            mELDEventsInteractor.getELDEvents(startDate, endDate)
+            if (mGetEventDisposable != null) mGetEventDisposable.dispose();
+            mGetEventDisposable = mELDEventsInteractor.getELDEventsFromDB(startDate, endDate)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(eldEvents -> {
-                                //TODO: delete this filter after fix problem with incorrect data from server
-                                eldEvents = filterEventByStartTime(eldEvents, startDate, endDate);
+                        //TODO: check is this filtering is needed or not
+                        eldEvents = filterEventByType(eldEvents, ELDEvent.EventType.DUTY_STATUS_CHANGING);
 
-                                eldEvents = filterEventByType(eldEvents, ELDEvent.EventType.DUTY_STATUS_CHANGING);
-                                mTripInfo.setStartDayTime(DateUtils.getStartDayTimeInMs(eldEvents.get(0).getEventTime()));
-                                mView.setTripInfo(mTripInfo);
-                                mView.setELDEvents(eldEvents);
-                                updateTripInfo(eldEvents);
-                            },
-                            throwable -> Timber.e(throwable.getMessage()));
+                        mTripInfo.setStartDayTime(DateUtils.getStartDayTimeInMs(eldEvents.get(0).getEventTime()));
+                        mView.setTripInfo(mTripInfo);
+                        mView.setELDEvents(eldEvents);
+                        updateTripInfo(eldEvents);
+                    }, throwable -> Timber.e(throwable.getMessage()));
+
+            //sync with server
+            mDisposables.add(mELDEventsInteractor.getELDEvents(startDate, endDate)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(eldEvents -> {
+                        //Just sync data from server data with DB
+                    }, throwable -> Timber.e(throwable.getMessage())));
+
         } else {
             mView.setELDEvents(Collections.EMPTY_LIST);
-            mTripInfo = new TripInfo();
+            mTripInfo = new TripInfoModel();
             mView.setTripInfo(mTripInfo);
         }
     }
 
     public void updateTripInfo(final List<ELDEvent> events) {
-        TripInfo tripInfo = new TripInfo();
+        TripInfoModel tripInfo = new TripInfoModel();
 
-        Disposable disposable = Observable.create((ObservableOnSubscribe<TripInfo>) e -> {
+        Disposable disposable = Observable.create((ObservableOnSubscribe<TripInfoModel>) e -> {
             long[] result = new long[DutyType.values().length];
             int odometer = 0;
             for (int i = 1; i < events.size(); i++) {
@@ -154,17 +162,6 @@ public class LogsPresenter {
                         throwable -> Timber.e(throwable.getMessage()));
 
         mDisposables.add(disposable);
-    }
-
-    //TODO: should be remove after fix problem with eld request.
-    private List<ELDEvent> filterEventByStartTime(List<ELDEvent> events, long startTime, long endTime) {
-        List<ELDEvent> result = new ArrayList<>();
-        for (ELDEvent event : events) {
-            if (event.getEventTime() > startTime && event.getEventTime() < endTime) {
-                result.add(event);
-            }
-        }
-        return result;
     }
 
     private List<ELDEvent> filterEventByType(List<ELDEvent> events, ELDEvent.EventType eventType) {

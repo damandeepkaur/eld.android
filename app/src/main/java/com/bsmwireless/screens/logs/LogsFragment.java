@@ -119,7 +119,7 @@ public class LogsFragment extends BaseFragment implements LogsView {
     }
 
     @Override
-    public void setTripInfo(TripInfo tripInfo) {
+    public void setTripInfo(TripInfoModel tripInfo) {
         mAdapter.setTripInfo(tripInfo);
     }
 

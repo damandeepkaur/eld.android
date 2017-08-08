@@ -2,7 +2,7 @@ package com.bsmwireless.screens.logs;
 
 import java.util.TimeZone;
 
-public class TripInfo {
+public class TripInfoModel {
 
     private static final String DEFAULT_TIME = "00:00";
 
@@ -15,7 +15,7 @@ public class TripInfo {
     private int mOdometerValue;
     private long mStartDayTime;
 
-    public TripInfo() {
+    public TripInfoModel() {
         mOffDutyTime = DEFAULT_TIME;
         mSleeperBerthTime = DEFAULT_TIME;
         mDrivingTime = DEFAULT_TIME;
