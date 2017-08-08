@@ -15,6 +15,7 @@ import android.widget.ScrollView;
 import android.widget.Toast;
 
 import com.bsmwireless.common.App;
+import com.bsmwireless.common.utils.DateUtils;
 import com.bsmwireless.common.utils.ViewUtils;
 import com.bsmwireless.data.storage.users.UserEntity;
 import com.bsmwireless.models.User;
@@ -141,7 +142,7 @@ public class DriverProfileActivity extends BaseMenuActivity implements DriverPro
         mELDToggle.setChecked(user.getExempt());
         mTerminalName.setText(user.getOrganization());
         mTerminalAddress.setText(user.getOrgAddr());
-        mHomeTerminalTimeZone.setText(ViewUtils.getFullTimeZone(user.getTimezone(), Calendar.getInstance().getTimeInMillis()));
+        mHomeTerminalTimeZone.setText(DateUtils.getFullTimeZone(user.getTimezone(), Calendar.getInstance().getTimeInMillis()));
         mRole.setText(User.DriverType.DRIVER.name());
 
         mSignatureLayout.setImageData(user.getSignature());
