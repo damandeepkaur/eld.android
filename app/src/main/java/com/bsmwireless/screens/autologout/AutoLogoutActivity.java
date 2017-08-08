@@ -24,7 +24,7 @@ public class AutoLogoutActivity extends BaseActivity implements AutoLogoutView {
 
     private static final String TAG = AutoLogoutActivity.class.getSimpleName();
 
-    private static final int NO_USER_INTERACTION = 10;
+    private static final int NO_USER_INTERACTION = 1;
 
     @Inject
     AutoLogoutPresenter mAutoLogoutPresenter;
