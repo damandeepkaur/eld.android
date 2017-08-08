@@ -123,7 +123,8 @@
     <dimen name="logs_list_item_eld_event_menu_button_width">44dp</dimen>
     <dimen name="logs_list_item_eld_event_address_height">20dp</dimen>
     <dimen name="logs_list_item_eld_event_divider_margin_top">10dp</dimen>
-    <dimen name="logs_list_item_header_sign_logsheet_margin">10dp</dimen>
+    <dimen name="logs_list_item_header_sign_logsheet_height">52dp</dimen>
+    <dimen name="logs_list_item_header_sign_logsheet_padding">10dp</dimen>
     <dimen name="logs_list_item_header_calendar_height">85dp</dimen>
     <dimen name="logs_list_item_header_sign_graph_height">170dp</dimen>
     <dimen name="logs_list_item_header_sign_graph_margin_left">8dp</dimen>

@@ -27,6 +27,9 @@ public interface UserDao {
     @Query("SELECT timezone FROM users WHERE id = :id LIMIT 1")
     String getUserTimezoneSync(int id);
 
+    @Query("SELECT timezone FROM users WHERE id = :id LIMIT 1")
+    Flowable<String> getUserTimezone(int id);
+
     @Query("DELETE FROM users WHERE id = :id")
     int deleteUser(int id);
 
