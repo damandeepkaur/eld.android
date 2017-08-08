@@ -1,13 +1,13 @@
 package com.bsmwireless.data.storage.configurations;
 
-import com.bsmwireless.models.Configuration;
+import com.bsmwireless.models.SyncConfiguration;
 
 public class ConfigurationConverter {
-    public static Configuration toModel(ConfigurationEntity entity) {
-        Configuration model = null;
+    public static SyncConfiguration toModel(ConfigurationEntity entity) {
+        SyncConfiguration model = null;
 
         if (entity != null) {
-            model = new Configuration();
+            model = new SyncConfiguration();
             model.setName(entity.getName());
             model.setValue(entity.getValue());
         }
@@ -15,7 +15,7 @@ public class ConfigurationConverter {
         return model;
     }
 
-    public static ConfigurationEntity toEntity(Configuration model, int userId) {
+    public static ConfigurationEntity toEntity(SyncConfiguration model, int userId) {
         ConfigurationEntity entity = null;
 
         if (model != null) {

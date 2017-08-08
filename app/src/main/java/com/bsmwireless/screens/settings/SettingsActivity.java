@@ -15,7 +15,6 @@ import javax.inject.Inject;
 import app.bsmuniversal.com.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.Unbinder;
 
 public class SettingsActivity extends BaseMenuActivity implements SettingsView {
 

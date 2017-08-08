@@ -3,17 +3,20 @@ package com.bsmwireless.screens.driverprofile;
 import android.content.Context;
 
 import com.bsmwireless.common.dagger.ActivityScope;
+import com.bsmwireless.data.storage.carriers.CarrierEntity;
+import com.bsmwireless.data.storage.users.FullUserEntity;
+import com.bsmwireless.data.storage.hometerminals.HomeTerminalEntity;
 import com.bsmwireless.data.storage.users.UserConverter;
-import com.bsmwireless.data.storage.users.UserEntity;
 import com.bsmwireless.domain.interactors.LoginUserInteractor;
 
-import java.util.Calendar;
+import java.util.List;
 
 import javax.inject.Inject;
 
 import app.bsmuniversal.com.R;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
@@ -28,7 +31,9 @@ public class DriverProfilePresenter {
     private DriverProfileView mView;
     private CompositeDisposable mDisposables;
 
-    private UserEntity mUserEntity;
+    private FullUserEntity mFullUserEntity;
+    private HomeTerminalEntity mHomeTerminal;
+    private CarrierEntity mCarrier;
 
     @Inject
     public DriverProfilePresenter(Context context, DriverProfileView view, LoginUserInteractor loginUserInteractor) {
@@ -47,12 +52,25 @@ public class DriverProfilePresenter {
     }
 
     public void onNeedUpdateUserInfo() {
-        mDisposables.add(mLoginUserInteractor.getUser()
+        mDisposables.add(mLoginUserInteractor.getFullUser()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(userEntity -> {
-                            mUserEntity = userEntity;
-                            mView.setUserInfo(mUserEntity);
+                            mFullUserEntity = userEntity;
+                            mView.setUserInfo(mFullUserEntity.getUserEntity());
+
+                            HomeTerminalEntity homeTerminal = findHomeTerminalById(mFullUserEntity.getHomeTerminalEntities(), mFullUserEntity
+                                    .getUserEntity().getHomeTermId());
+                            if (homeTerminal != null) {
+                                mHomeTerminal = homeTerminal;
+                                mView.setHomeTerminalInfo(mHomeTerminal);
+                            }
+
+                            List<CarrierEntity> carriers = mFullUserEntity.getCarriers();
+                            if (carriers != null && carriers.size() > 0) {
+                                mCarrier = carriers.get(0);
+                                mView.setCarrierInfo(mCarrier);
+                            }
                         },
                         throwable -> {
                             Timber.e(throwable.getMessage());
@@ -61,12 +79,23 @@ public class DriverProfilePresenter {
     }
 
     public void onSaveSignatureClicked(String signature) {
-        if (mUserEntity != null) {
+        if (mFullUserEntity != null) {
             if (signature.length() > MAX_SIGNATURE_LENGTH) {
                 signature = cropSignature(signature);
                 mView.showError(new Exception(mContext.getResources().getString(R.string.driver_profile_signature_error)));
             }
-            mUserEntity.setSignature(signature);
+
+            mFullUserEntity.getUserEntity().setSignature(signature);
+
+            Disposable disposable = mLoginUserInteractor.updateDriverSignature(signature)
+                                                        .subscribeOn(Schedulers.io())
+                                                        .observeOn(AndroidSchedulers.mainThread())
+                                                        .subscribe(wasUpdated -> Timber.d("Update signature: " + wasUpdated),
+                                                                throwable -> {
+                                                                    Timber.e(throwable.getMessage());
+                                                                    mView.showError(throwable);
+                                                                });
+            mDisposables.add(disposable);
         } else {
             mView.showError(new Exception(mContext.getResources().getString(R.string.driver_profile_user_error)));
         }
@@ -75,8 +104,8 @@ public class DriverProfilePresenter {
     }
 
     public void onSaveUserInfo() {
-        if (mUserEntity != null) {
-            mView.setResults(UserConverter.toUser(mUserEntity));
+        if (mFullUserEntity != null) {
+            mView.setResults(UserConverter.toUser(mFullUserEntity.getUserEntity()));
         } else {
             mView.showError(new Exception(mContext.getResources().getString(R.string.driver_profile_user_error)));
         }
@@ -119,5 +148,20 @@ public class DriverProfilePresenter {
             return mContext.getString(R.string.driver_profile_password_not_match);
         }
         return mContext.getString(R.string.driver_profile_valid_password);
+    }
+
+    private HomeTerminalEntity findHomeTerminalById(List<HomeTerminalEntity> homeTerminalEntities, Integer homeTerminalId) {
+        if (homeTerminalEntities == null || homeTerminalId == null) {
+            return null;
+        }
+
+        for (HomeTerminalEntity homeTerminalEntity:
+             homeTerminalEntities) {
+            if (homeTerminalEntity.getId().equals(homeTerminalId)) {
+                return homeTerminalEntity;
+            }
+        }
+
+        return null;
     }
 }

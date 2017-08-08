@@ -141,7 +141,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/driver_profile_item_margin"
-            android:layout_marginEnd="@dimen/driver_profile_item_margin"
+            android:layout_marginRight="@dimen/driver_profile_item_margin"
             android:layout_gravity="end"
             style="@style/DriverProfileTheme.ChangePasswordButton"
             android:text="@string/driver_change_password"/>
@@ -183,7 +183,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/driver_profile_item_margin"
-            style="@style/DriverProfileTheme.EditView"
+            style="@style/DriverProfileTheme.EditView.Disabled"
             android:text="@string/driver_profile_item_eld_toggle"/>
 
         <android.support.design.widget.TextInputLayout
@@ -201,8 +201,7 @@
 
         </android.support.design.widget.TextInputLayout>
 
-        <!-- TODO: not implemented on server -->
-        <!--<android.support.design.widget.TextInputLayout
+        <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/driver_profile_item_margin">
@@ -212,10 +211,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/driver_profile_item_carrier_name"
-                style="@style/DriverProfileTheme.EditView"
+                style="@style/DriverProfileTheme.EditView.Disabled"
                 android:imeOptions="actionDone"/>
 
-        </android.support.design.widget.TextInputLayout>-->
+        </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
@@ -227,7 +226,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/driver_profile_item_home_terminal"
-                style="@style/DriverProfileTheme.EditView"
+                style="@style/DriverProfileTheme.EditView.Disabled"
                 android:imeOptions="actionDone"/>
 
         </android.support.design.widget.TextInputLayout>
@@ -242,7 +241,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/driver_profile_item_home_addr"
-                style="@style/DriverProfileTheme.EditView"
+                style="@style/DriverProfileTheme.EditView.Disabled"
                 android:imeOptions="actionDone"/>
 
         </android.support.design.widget.TextInputLayout>

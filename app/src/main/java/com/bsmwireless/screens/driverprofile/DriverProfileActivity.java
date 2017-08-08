@@ -16,6 +16,8 @@ import android.widget.Toast;
 
 import com.bsmwireless.common.App;
 import com.bsmwireless.common.utils.ViewUtils;
+import com.bsmwireless.data.storage.carriers.CarrierEntity;
+import com.bsmwireless.data.storage.hometerminals.HomeTerminalEntity;
 import com.bsmwireless.data.storage.users.UserEntity;
 import com.bsmwireless.models.User;
 import com.bsmwireless.screens.common.BaseMenuActivity;
@@ -79,9 +81,8 @@ public class DriverProfileActivity extends BaseMenuActivity implements DriverPro
     @BindView(R.id.eld_toggle)
     SwitchCompat mELDToggle;
 
-    // TODO: not implemented on server
-    /*@BindView(R.id.carrier_name)
-    TextInputEditText mCarrierName;*/
+    @BindView(R.id.carrier_name)
+    TextInputEditText mCarrierName;
 
     @BindView(R.id.terminal_name)
     TextInputEditText mTerminalName;
@@ -139,12 +140,21 @@ public class DriverProfileActivity extends BaseMenuActivity implements DriverPro
         mEmployeeIDTextView.setText(String.valueOf(user.getId()));
         mLicenseTextView.setText(user.getLicense());
         mELDToggle.setChecked(user.getExempt());
-        mTerminalName.setText(user.getOrganization());
-        mTerminalAddress.setText(user.getOrgAddr());
-        mHomeTerminalTimeZone.setText(ViewUtils.getFullTimeZone(user.getTimezone(), Calendar.getInstance().getTimeInMillis()));
         mRole.setText(User.DriverType.DRIVER.name());
 
         mSignatureLayout.setImageData(user.getSignature());
+    }
+
+    @Override
+    public void setHomeTerminalInfo(HomeTerminalEntity homeTerminal) {
+        mTerminalName.setText(homeTerminal.getName());
+        mTerminalAddress.setText(homeTerminal.getAddress());
+        mHomeTerminalTimeZone.setText(ViewUtils.getFullTimeZone(homeTerminal.getTimezone(), Calendar.getInstance().getTimeInMillis()));
+    }
+
+    @Override
+    public void setCarrierInfo(CarrierEntity carrier) {
+        mCarrierName.setText(carrier.getName());
     }
 
     @Override
