@@ -17,7 +17,6 @@ public class AutoLogoutService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         Intent dialogIntent = new Intent(App.getComponent().context(), AutoLogoutActivity.class);
-        dialogIntent.putExtra(Intent.EXTRA_INTENT, intent);
         dialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         App.getComponent().context().startActivity(dialogIntent);
     }

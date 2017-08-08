@@ -24,14 +24,14 @@ public class AutoLogoutActivity extends BaseActivity implements AutoLogoutView {
 
     private static final String TAG = AutoLogoutActivity.class.getSimpleName();
 
-    public static final String ARG_JOBS_PARAMETERS = "params";
-
-    private static final int NO_USER_INTERACTION = 1;
+    private static final int NO_USER_INTERACTION = 10;
 
     @Inject
     AutoLogoutPresenter mAutoLogoutPresenter;
 
     private AlertDialog mAlertDialog;
+    private Handler mHandler;
+    private Runnable mRunnable;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -39,9 +39,13 @@ public class AutoLogoutActivity extends BaseActivity implements AutoLogoutView {
 
         DaggerAutoLogoutComponent.builder().appComponent(App.getComponent()).autoLogoutModule(new AutoLogoutModule(this)).build().inject(this);
 
-        mAutoLogoutPresenter.initAutoLogoutDialog(getIntent().hasExtra(ARG_JOBS_PARAMETERS) ? getIntent()
-                .getExtras().getParcelable(ARG_JOBS_PARAMETERS) : null, getIntent().hasExtra(Intent.EXTRA_TEXT) ? getIntent()
-                .getParcelableExtra(Intent.EXTRA_INTENT) : null);
+        this.showAutoLogoutDialog();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mHandler.removeCallbacks(mRunnable);
     }
 
     @Override
@@ -60,31 +64,29 @@ public class AutoLogoutActivity extends BaseActivity implements AutoLogoutView {
     }
 
     @Override
-    public void showAutoLogoutDialog(JobParameters jobParameters, Intent intent) {
+    public void showAutoLogoutDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(R.string.auto_logout_message_alert_dialog);
         builder.setCancelable(false);
         builder.setPositiveButton(R.string.auto_logout_positive_button_lbl_alert_dialog, (dialog, which) ->
-                mAutoLogoutPresenter.initAutoLogout(jobParameters, intent));
+                mAutoLogoutPresenter.initAutoLogout());
         builder.setNegativeButton(R.string.auto_logout_cancel_button_lbl_alert_dialog, (dialog, which) ->
                 mAutoLogoutPresenter.rescheduleAutoLogout());
         mAlertDialog = builder.create();
         mAlertDialog.show();
 
-        mAutoLogoutPresenter.initAutoLogoutIfNoUserInteraction(jobParameters, intent);
+        mAutoLogoutPresenter.initAutoLogoutIfNoUserInteraction();
     }
 
     @Override
-    public void initAutoLogoutIfNoUserInteraction(JobParameters jobParameters, Intent intent) {
-        final Handler mHandler = new Handler();
-        final Runnable runnable = () -> {
+    public void initAutoLogoutIfNoUserInteraction() {
+        mHandler = new Handler();
+        mRunnable = () -> {
             if (mAlertDialog.isShowing()) {
-                mAutoLogoutPresenter.initAutoLogout(jobParameters, intent);
+                mAutoLogoutPresenter.initAutoLogout();
             }
         };
 
-        mAlertDialog.setOnDismissListener(dialog -> mHandler.removeCallbacks(runnable));
-
-        mHandler.postDelayed(runnable, TimeUnit.MINUTES.toMillis(NO_USER_INTERACTION));
+        mHandler.postDelayed(mRunnable, TimeUnit.MINUTES.toMillis(NO_USER_INTERACTION));
     }
 }

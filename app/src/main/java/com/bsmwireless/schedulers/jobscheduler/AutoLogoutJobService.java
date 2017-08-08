@@ -14,15 +14,14 @@ public class AutoLogoutJobService extends JobService {
     @Override
     public boolean onStartJob(JobParameters params) {
         Intent dialogIntent = new Intent(App.getComponent().context(), AutoLogoutActivity.class);
-        dialogIntent.putExtra(AutoLogoutActivity.ARG_JOBS_PARAMETERS, params);
         dialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         App.getComponent().context().startActivity(dialogIntent);
 
-        return true;
+        return false;
     }
 
     @Override
     public boolean onStopJob(JobParameters params) {
-        return true;
+        return false;
     }
 }

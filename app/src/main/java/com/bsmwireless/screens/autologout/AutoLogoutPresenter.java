@@ -2,15 +2,10 @@ package com.bsmwireless.screens.autologout;
 
 
 import android.annotation.TargetApi;
-import android.app.job.JobParameters;
-import android.content.Intent;
 import android.os.Build;
-import android.support.annotation.Nullable;
 
 import com.bsmwireless.common.utils.SchedulerUtils;
 import com.bsmwireless.domain.interactors.LoginUserInteractor;
-import com.bsmwireless.schedulers.alarmmanager.AlarmReceiver;
-import com.bsmwireless.schedulers.jobscheduler.AutoLogoutJobService;
 
 import javax.inject.Inject;
 
@@ -23,8 +18,6 @@ import timber.log.Timber;
 public class AutoLogoutPresenter {
 
     private LoginUserInteractor mLoginUserInteractor;
-
-    private AutoLogoutJobService mAutoLogoutJobService;
     private CompositeDisposable mDisposables;
     private AutoLogoutView mView;
 
@@ -33,13 +26,8 @@ public class AutoLogoutPresenter {
         mView = view;
         mLoginUserInteractor = interactor;
         mDisposables = new CompositeDisposable();
-        mAutoLogoutJobService = new AutoLogoutJobService();
 
         Timber.d("CREATED");
-    }
-
-    public void initAutoLogoutDialog(@Nullable JobParameters jobParameters, @Nullable Intent intent) {
-        mView.showAutoLogoutDialog(jobParameters, intent);
     }
 
     public void rescheduleAutoLogout() {
@@ -47,20 +35,20 @@ public class AutoLogoutPresenter {
         SchedulerUtils.schedule();
     }
 
-    public void initAutoLogoutIfNoUserInteraction(JobParameters jobParameters, Intent intent) {
-        mView.initAutoLogoutIfNoUserInteraction(jobParameters, intent);
+    public void initAutoLogoutIfNoUserInteraction() {
+        mView.initAutoLogoutIfNoUserInteraction();
     }
 
-    public void initAutoLogout(JobParameters jobParameters, Intent intent) {
+    public void initAutoLogout() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            initJobSchedulerAutoLogout(jobParameters);
+            initJobSchedulerAutoLogout();
         } else {
-            initAlarmManager(intent);
+            initAlarmManager();
         }
     }
 
     @TargetApi(21)
-    private void initJobSchedulerAutoLogout(JobParameters jobParameters) {
+    private void initJobSchedulerAutoLogout() {
         Disposable disposable = mLoginUserInteractor.logoutUser()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -69,9 +57,8 @@ public class AutoLogoutPresenter {
                             Timber.i("LoginUser status = %b", status);
                             if (status) {
                                 mView.goToLoginScreen();
-
-                                mAutoLogoutJobService.jobFinished(jobParameters, false);
                             }
+                            SchedulerUtils.cancel();
                         },
                         error -> {
                             Timber.e("LoginUser error: %s", error);
@@ -82,7 +69,7 @@ public class AutoLogoutPresenter {
         mDisposables.add(disposable);
     }
 
-    private void initAlarmManager(Intent intent) {
+    private void initAlarmManager() {
         Disposable disposable = mLoginUserInteractor.logoutUser()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -91,13 +78,12 @@ public class AutoLogoutPresenter {
                             Timber.i("LoginUser status = %b", status);
                             if (status) {
                                 mView.goToLoginScreen();
-
-                                AlarmReceiver.completeWakefulIntent(intent);
                             }
+                            SchedulerUtils.cancel();
                         },
                         error -> {
                             Timber.e("LoginUser error: %s", error);
-                            AlarmReceiver.completeWakefulIntent(intent);
+                            SchedulerUtils.cancel();
                         }
                 );
         mDisposables.add(disposable);

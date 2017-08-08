@@ -7,7 +7,7 @@ public interface AutoLogoutView {
 
     void goToLoginScreen();
 
-    void showAutoLogoutDialog(JobParameters jobParameters, Intent intent);
+    void showAutoLogoutDialog();
 
-    void initAutoLogoutIfNoUserInteraction(JobParameters jobParameters, Intent intent);
+    void initAutoLogoutIfNoUserInteraction();
 }
