@@ -28,7 +28,7 @@ public class WiFiTelematicDevice implements TelematicDevice {
     private String mConnectionString =Constants.WIFI_GATEWAY_IP;
     private int mPort = Constants.WIFI_REMOTE_PORT;
     private final IntentFilter intentFilter = new IntentFilter();
-    private BroadcastReceiver receiver = null;
+    private BroadcastReceiver mReceiver = null;
     private Socket mSocket;
 
 
@@ -36,9 +36,8 @@ public class WiFiTelematicDevice implements TelematicDevice {
     @Override
     public boolean connect() {
         Context appContext = App.getComponent().context();
-       // WifiManager wifiMgr = (WifiManager) appContext.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         intentFilter.addAction(WifiManager.SUPPLICANT_STATE_CHANGED_ACTION);
-        receiver = new BroadcastReceiver() {
+        mReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 String action = intent.getAction();
@@ -53,7 +52,7 @@ public class WiFiTelematicDevice implements TelematicDevice {
 
             }
         };
-        appContext.registerReceiver(receiver,intentFilter);
+        appContext.registerReceiver(mReceiver,intentFilter);
 
         try {
             //disconnect first if a connection is still open.
@@ -75,7 +74,7 @@ public class WiFiTelematicDevice implements TelematicDevice {
     }
     @Override
     public void disconnect() {
-        App.getComponent().context().unregisterReceiver(receiver);
+        App.getComponent().context().unregisterReceiver(mReceiver);
 
         try {
 

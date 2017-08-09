@@ -1,5 +1,6 @@
 package com.bsmwireless.models;
 
+import com.bsmwireless.common.utils.DateUtils;
 import com.bsmwireless.common.utils.ViewUtils;
 import com.bsmwireless.data.network.connection.response.ResponseProcessor.ResponseType;
 import com.bsmwireless.widgets.alerts.DutyType;
@@ -145,7 +146,7 @@ public class BlackBoxModel {
         sb.append(", mHeading=").append(mHeading);
         sb.append(", mTERT=").append(mTERT);
         sb.append(", mResponseType=").append(mResponseType.name());
-        sb.append(", mEvenTimeUTC=").append(ViewUtils.getLocalDate("Etc/UTC", mEvenTimeUTC.getTime()));
+        sb.append(", mEvenTimeUTC=").append(DateUtils.getLocalDate("Etc/UTC", mEvenTimeUTC.getTime()));
         sb.append(", mSequenceNum=").append(mSequenceNum);
         sb.append(", mBoxId=").append(mBoxId);
         sb.append(", mTDMsgQueue=").append(mTDMsgQueue);

@@ -37,8 +37,6 @@ public abstract class ResponseProcessor {
 
         public static ResponseType valueOf(char type)
         {
-
-
             switch(type)
             {
                 case 'a':
@@ -136,8 +134,9 @@ public abstract class ResponseProcessor {
         //TelematicDevice type -Always android
         if (data[indx++] != (byte) Constants.DEVICE_TYPE.charAt(0)) return false;
         // Two bytes of 0xFF indicating start of the packet
-        if (data[indx++] != (byte)0xFF && data[indx++] != (byte)0xFF)  return false;
-
+        boolean res1 = (data[indx++] != (byte)0xFF);
+        boolean res2 = (data[indx++] != (byte)0xFF);
+        if (res1 &&  res2) return false;
         this.mCheckSum = data[indx++] & 0xFF;
 
         this.mLength= ConnectionUtils.byteToUnsignedInt(data[indx++] , data[indx]);// length -> 2 bytes

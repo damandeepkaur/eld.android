@@ -16,7 +16,7 @@ import app.bsmuniversal.com.R;
 /*
  * Foreground service to keep the box communication alive
  */
-public class ConnectionManagerService extends Service {
+public class TelematicConnectionManagerService extends Service {
     private final int NOTIFICATION_ID=911;
     @Override
     public void onCreate() {
@@ -52,14 +52,14 @@ public class ConnectionManagerService extends Service {
     public void startConnectionService()
     {
         Context appContext = App.getComponent().context();
-        Intent intent = new Intent(appContext, ConnectionManagerService.class);
+        Intent intent = new Intent(appContext, TelematicConnectionManagerService.class);
         appContext.startService(intent);
 
     }
     public void stopConnectionService()
     {
         Context appContext = App.getComponent().context();
-        Intent intent = new Intent(appContext, ConnectionManagerService.class);
+        Intent intent = new Intent(appContext, TelematicConnectionManagerService.class);
         appContext.stopService(intent);
     }
 

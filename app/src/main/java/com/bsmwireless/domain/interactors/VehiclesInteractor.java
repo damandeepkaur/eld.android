@@ -1,7 +1,7 @@
 package com.bsmwireless.domain.interactors;
 
 import com.bsmwireless.common.Constants;
-import com.bsmwireless.data.network.connection.ConnectionManager;
+import com.bsmwireless.data.network.connection.TelematicDeviceConnectionManager;
 import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.PreferencesManager;
@@ -31,8 +31,8 @@ public class VehiclesInteractor {
     private LoginUserInteractor mUserInteractor;
     private BlackBoxInteractor mBlackBoxInteractor;
     private ELDEventsInteractor mELDEventsInteractor;
-    private ConnectionManager mConnectionManager;
-    private Subject<ConnectionManager.ConnectionStatus> mConnectionStatusSubject;
+    private TelematicDeviceConnectionManager mConnectionManager;
+    private Subject<TelematicDeviceConnectionManager.ConnectionStatus> mConnectionStatusSubject;
     @Inject
     public VehiclesInteractor(ServiceApi serviceApi,
                               PreferencesManager preferencesManager,
@@ -41,7 +41,7 @@ public class VehiclesInteractor {
                               BlackBoxInteractor blackBoxInteractor,
                               BlackBoxInteractor fblackBoxInteractor,
                               ELDEventsInteractor eventsInteractor,
-                              ConnectionManager connectionManager) {
+                              TelematicDeviceConnectionManager connectionManager) {
         mServiceApi = serviceApi;
         mPreferencesManager = preferencesManager;
         mAppDatabase = appDatabase;

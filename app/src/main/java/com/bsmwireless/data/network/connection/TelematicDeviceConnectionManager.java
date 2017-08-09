@@ -22,28 +22,27 @@ import timber.log.Timber;
 
 
 
-public class ConnectionManager implements ConnectionInterface {
-    private TelematicDevice mTelematicDevice;
-    private Vehicle mVehicle;
-    private ConnectionManagerService mConnectionService;
-    private byte mSequenceID = 1;
+public class TelematicDeviceConnectionManager implements TelematicDeviceConnectionInterface {
+
     final int RETRY_CONNECT_DELAY =5000;
     final int READING_DELAY=1000;
     final int READING_TIMEOUT=5000;
     final int STATUS_TIMEOUT = Constants.STATUS_UPDATE_RATE_SECS*1000*2; // Try two times
     // Response are of max size of 50 bytes. Even if the messages are sent together , below limit seems to be safer.
     final int BUFFER_SIZE=512;
-    private boolean vehicleConnected = false;
 
     public enum ConnectionStatus {Ready,  Subscribing, Paired, Disconnected }
 
-    volatile ConnectionStatus mConnectionstatus ;
+    private TelematicDevice mTelematicDevice;
+    private Vehicle mVehicle;
+    private TelematicConnectionManagerService mConnectionService;
+    private byte mSequenceID = 1;
 
+    private boolean mVehicleConnected = false;
+    private volatile ConnectionStatus mConnectionstatus ;
+    private  BehaviorSubject<ConnectionStatus> connectionState = BehaviorSubject.create();
 
-
-    private final BehaviorSubject<ConnectionStatus> connectionState = BehaviorSubject.create();
-
-    public ConnectionManager(TelematicDevice telematicDevice) {
+    public TelematicDeviceConnectionManager(TelematicDevice telematicDevice) {
         mTelematicDevice = telematicDevice;
     }
 
@@ -65,7 +64,7 @@ public class ConnectionManager implements ConnectionInterface {
     }
 
 
-    public byte getmSequenceID() {
+    public byte getSequenceID() {
         mSequenceID++;
         if ((mSequenceID & 0xFF )> 250)
             mSequenceID = 1;
@@ -79,7 +78,8 @@ public class ConnectionManager implements ConnectionInterface {
         mVehicle =vehicle;
         // get the device/vehicle and move it to the ready state
         if (mTelematicDevice == null || mVehicle == null) return;
-        vehicleConnected = true;
+        mVehicleConnected = true;
+        //connectionState = BehaviorSubject.create();
         startConnectionService();
         setConnectionstatus(ConnectionStatus.Ready);
         // start a separate thread for the communication process
@@ -94,7 +94,8 @@ public class ConnectionManager implements ConnectionInterface {
 
     @Override
     public void disconnect() {
-        vehicleConnected = false;
+        mVehicleConnected = false;
+        connectionState.onComplete();
         setConnectionstatus(ConnectionStatus.Disconnected);
         mTelematicDevice.disconnect();
         stopConnectionService();
@@ -119,7 +120,7 @@ public class ConnectionManager implements ConnectionInterface {
     }
     private class StartConnectionTask extends Thread{
         public void run() {
-            while(vehicleConnected) {
+            while(mVehicleConnected) {
                 if (getConnectionstatus() == ConnectionStatus.Ready) {
                     try {
                         mTelematicDevice.connect();
@@ -144,7 +145,7 @@ public class ConnectionManager implements ConnectionInterface {
             while (getConnectionstatus() == ConnectionStatus.Subscribing) {
                 boolean sentRequest;
                 SubscriptionGenerator subscriptionRequest = new SubscriptionGenerator();
-                sentRequest = sendRequest(subscriptionRequest.generateRequest(getmSequenceID(), mVehicle.getBoxId()));
+                sentRequest = sendRequest(subscriptionRequest.generateRequest(getSequenceID(), mVehicle.getBoxId()));
                 if (sentRequest) {
                     readSubscriptionResponse();
                 }
@@ -286,11 +287,11 @@ public class ConnectionManager implements ConnectionInterface {
     private void startConnectionService()
     {
         if (mConnectionService == null)
-            mConnectionService =new ConnectionManagerService();
+            mConnectionService =new TelematicConnectionManagerService();
         mConnectionService.startConnectionService();
     }
    /*
-   * start a service
+   * stop a service
    */
     private void stopConnectionService()
     {

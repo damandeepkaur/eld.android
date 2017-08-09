@@ -1,6 +1,6 @@
 package com.bsmwireless.domain.interactors;
 
-import com.bsmwireless.data.network.connection.ConnectionManager;
+import com.bsmwireless.data.network.connection.TelematicDeviceConnectionManager;
 import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.models.BlackBoxModel;
 import com.bsmwireless.models.Vehicle;
@@ -12,12 +12,12 @@ import io.reactivex.subjects.Subject;
 
 //TODO: return real data
 public class BlackBoxInteractor {
-    private ConnectionManager mConnectionManager;
+    private TelematicDeviceConnectionManager mConnectionManager;
 
     private PreferencesManager mPreferencesManager;
 
     @Inject
-    public BlackBoxInteractor(PreferencesManager preferencesManager, ConnectionManager connectionManager) {
+    public BlackBoxInteractor(PreferencesManager preferencesManager, TelematicDeviceConnectionManager connectionManager) {
         mPreferencesManager = preferencesManager;
         mConnectionManager = connectionManager;
     }
@@ -48,7 +48,7 @@ public class BlackBoxInteractor {
     {
         mConnectionManager.disconnect();
     }
-    public Subject<ConnectionManager.ConnectionStatus> getConnectionState() {
+    public Subject<TelematicDeviceConnectionManager.ConnectionStatus> getConnectionState() {
 
         return mConnectionManager.getConnectionStateObservable();
     }

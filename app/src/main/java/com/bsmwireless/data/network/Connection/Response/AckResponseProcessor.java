@@ -30,7 +30,6 @@ public class AckResponseProcessor extends ResponseProcessor {
                 this.setVinNumber(new String(data, index,24, "ASCII"));// from 13 to 36
                 Timber.i("VIN number from the box" + this.getVinNumber());
             }
-
             if (this.getResponseType()== ResponseType.NAck) {
                 this.setErrReasonCode(NackReasonCode.fromValue(data[index]));
             }

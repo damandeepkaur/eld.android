@@ -8,7 +8,7 @@ import com.bsmwireless.models.Vehicle;
  *  Common Interface for connection with the box
  */
 
-public interface ConnectionInterface {
+public interface TelematicDeviceConnectionInterface {
 
     void setDevice(TelematicDevice telematicDevice);
     void connect(Vehicle vehicle);

@@ -2,7 +2,7 @@ package com.bsmwireless.common.dagger;
 
 import android.content.Context;
 
-import com.bsmwireless.data.network.connection.ConnectionManager;
+import com.bsmwireless.data.network.connection.TelematicDeviceConnectionManager;
 import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.network.authenticator.TokenManager;
 import com.bsmwireless.data.storage.AppDatabase;
@@ -26,7 +26,7 @@ public interface AppComponent {
 
     PreferencesManager prefsManager();
 
-    ConnectionManager connManager();
+    TelematicDeviceConnectionManager connManager();
 
     void inject(FontTextView fontTextView);
 }
