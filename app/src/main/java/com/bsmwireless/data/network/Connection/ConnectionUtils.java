@@ -7,8 +7,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
-import timber.log.Timber;
-
 /**
  *  Utility function used in generating request and processing the response
  */
@@ -89,10 +87,7 @@ public class ConnectionUtils {
         byte srcByte =  sensorArr[bytePosition];
         // Shift to the bit position and add 1
         int valInt = srcByte>>(bitPosition ) & 0x001;
-
         return valInt == 1;
-
-
     }
 
     /**

@@ -36,23 +36,25 @@ public class WiFiTelematicDevice implements TelematicDevice {
     @Override
     public boolean connect() {
         Context appContext = App.getComponent().context();
-        intentFilter.addAction(WifiManager.SUPPLICANT_STATE_CHANGED_ACTION);
-        mReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                String action = intent.getAction();
+        if (mReceiver == null) {
+            intentFilter.addAction(WifiManager.SUPPLICANT_STATE_CHANGED_ACTION);
+            mReceiver = new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    String action = intent.getAction();
 
-                if (WifiManager.SUPPLICANT_STATE_CHANGED_ACTION.equals(action)){
+                    if (WifiManager.SUPPLICANT_STATE_CHANGED_ACTION.equals(action)) {
 
-                    SupplicantState supplicantState = intent.getParcelableExtra(WifiManager.EXTRA_NEW_STATE);
-                    if (supplicantState ==  SupplicantState.DISCONNECTED) {
-                        disconnect();
+                        SupplicantState supplicantState = intent.getParcelableExtra(WifiManager.EXTRA_NEW_STATE);
+                        if (supplicantState == SupplicantState.DISCONNECTED) {
+                            disconnect();
+                        }
                     }
-                }
 
-            }
-        };
-        appContext.registerReceiver(mReceiver,intentFilter);
+                }
+            };
+            appContext.registerReceiver(mReceiver, intentFilter);
+        }
 
         try {
             //disconnect first if a connection is still open.
@@ -74,7 +76,10 @@ public class WiFiTelematicDevice implements TelematicDevice {
     }
     @Override
     public void disconnect() {
-        App.getComponent().context().unregisterReceiver(mReceiver);
+        if (mReceiver!= null) {
+            App.getComponent().context().unregisterReceiver(mReceiver);
+            mReceiver=null;
+        }
 
         try {
 
