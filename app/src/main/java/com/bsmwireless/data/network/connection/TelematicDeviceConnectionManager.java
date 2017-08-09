@@ -95,10 +95,10 @@ public class TelematicDeviceConnectionManager implements TelematicDeviceConnecti
     @Override
     public void disconnect() {
         mVehicleConnected = false;
-        connectionState.onComplete();
         setConnectionstatus(ConnectionStatus.Disconnected);
         mTelematicDevice.disconnect();
         stopConnectionService();
+        connectionState.onComplete();
     }
 
     @Override
