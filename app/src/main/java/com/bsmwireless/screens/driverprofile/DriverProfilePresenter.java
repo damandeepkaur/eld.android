@@ -96,7 +96,12 @@ public class DriverProfilePresenter {
             Disposable disposable = mLoginUserInteractor.updateDriverSignature(signature)
                                                         .subscribeOn(Schedulers.io())
                                                         .observeOn(AndroidSchedulers.mainThread())
-                                                        .subscribe(wasUpdated -> Timber.d("Update signature: " + wasUpdated),
+                                                        .subscribe(wasUpdated -> {
+                                                                    Timber.d("Update signature: " + wasUpdated);
+                                                                    if (!wasUpdated) {
+                                                                        mView.showError(new Exception(mContext.getString(R.string.driver_profile_signature_changing_error)));
+                                                                    }
+                                                                },
                                                                 throwable -> {
                                                                     Timber.e(throwable.getMessage());
                                                                     mView.showError(throwable);
