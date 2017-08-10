@@ -334,8 +334,6 @@ public class DriverProfilePresenterTest {
         verify(mView).showError(any(Exception.class));
     }
 
-    // TODO: add test for checking if old password is correct after it is coded
-
     // TODO: move cropSignature tests if cropSignature is moved to a class for signatures or utility class
 
     // TODO: add tests for cropSignature if error handling added for invalid signature strings
