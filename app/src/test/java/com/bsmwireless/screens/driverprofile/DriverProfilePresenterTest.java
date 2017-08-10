@@ -19,13 +19,16 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import app.bsmuniversal.com.R;
 import app.bsmuniversal.com.RxSchedulerRule;
 import io.reactivex.Flowable;
+import io.reactivex.Observable;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 import static junit.framework.Assert.fail;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -54,7 +57,6 @@ public class DriverProfilePresenterTest {
 
     private static final int MAX_SIGNATURE_LENGTH = 50000; // defined here explicitly because number is defined in API
 
-    private final String mFakeAddress = "fake address somewhere on Earth";
     private final String mTestSignature = "51,377;89,310;89,310;-544,-1";
     private final String mTooLongTestSignature;
 
@@ -169,6 +171,170 @@ public class DriverProfilePresenterTest {
         // then
         verify(mView).setResults(eq(UserConverter.toUser(mFakeUserEntity)));
     }
+
+    @Test
+    public void testOnChangePasswordClickSuccess() {
+        // given
+        String oldPwd = "oldPwd";
+        String newPwd = "newPwd";
+        String confirmPwd = newPwd;
+
+        String mockStrValidPass = "mock valid password";
+        String mockStrDriverProfilePwdEmpty = "mock empty password";
+        String mockStrDriverProfilePwdNoMatch = "mock no-match password";
+        String mockStrDriverProfilePwdNoChange = "mock password not changed";
+
+        when(mContext.getString(eq(R.string.driver_profile_valid_password))).thenReturn(mockStrValidPass);
+        when(mContext.getString(eq(R.string.driver_profile_password_field_empty))).thenReturn(mockStrDriverProfilePwdEmpty);
+        when(mContext.getString(eq(R.string.driver_profile_password_not_match))).thenReturn(mockStrDriverProfilePwdNoMatch);
+        when(mContext.getString(eq(R.string.driver_profile_password_not_changed))).thenReturn(mockStrDriverProfilePwdNoChange);
+
+        when(mLoginUserInteractor.updateDriverPassword(anyString(), anyString())).thenReturn(Observable.just(true));
+
+
+        // when
+        mDriverProfilePresenter.onChangePasswordClick(oldPwd, newPwd, confirmPwd);
+
+        // then
+        verify(mView).showPasswordChanged();
+    }
+
+    @Test
+    public void testOnChangePasswordClickEmptyOld() {
+        // given
+        String oldPwd = "";
+        String newPwd = "newPwd";
+        String confirmPwd = newPwd;
+
+        String mockStrValidPass = "mock valid password";
+        String mockStrDriverProfilePwdEmpty = "mock empty password";
+        String mockStrDriverProfilePwdNoMatch = "mock no-match password";
+        String mockStrDriverProfilePwdNoChange = "mock password not changed";
+
+        when(mContext.getString(eq(R.string.driver_profile_valid_password))).thenReturn(mockStrValidPass);
+        when(mContext.getString(eq(R.string.driver_profile_password_field_empty))).thenReturn(mockStrDriverProfilePwdEmpty);
+        when(mContext.getString(eq(R.string.driver_profile_password_not_match))).thenReturn(mockStrDriverProfilePwdNoMatch);
+        when(mContext.getString(eq(R.string.driver_profile_password_not_changed))).thenReturn(mockStrDriverProfilePwdNoChange);
+
+        when(mLoginUserInteractor.updateDriverPassword(anyString(), anyString())).thenReturn(Observable.just(true));
+
+
+        // when
+        mDriverProfilePresenter.onChangePasswordClick(oldPwd, newPwd, confirmPwd);
+
+        // then
+        verify(mView).showChangePasswordError(eq(mockStrDriverProfilePwdEmpty));
+    }
+
+    @Test
+    public void testOnChangePasswordClickEmptyNew() {
+        // given
+        String oldPwd = "oldPwd";
+        String newPwd = "";
+        String confirmPwd = "confirmPwd";
+
+        String mockStrValidPass = "mock valid password";
+        String mockStrDriverProfilePwdEmpty = "mock empty password";
+        String mockStrDriverProfilePwdNoMatch = "mock no-match password";
+        String mockStrDriverProfilePwdNoChange = "mock password not changed";
+
+        when(mContext.getString(eq(R.string.driver_profile_valid_password))).thenReturn(mockStrValidPass);
+        when(mContext.getString(eq(R.string.driver_profile_password_field_empty))).thenReturn(mockStrDriverProfilePwdEmpty);
+        when(mContext.getString(eq(R.string.driver_profile_password_not_match))).thenReturn(mockStrDriverProfilePwdNoMatch);
+        when(mContext.getString(eq(R.string.driver_profile_password_not_changed))).thenReturn(mockStrDriverProfilePwdNoChange);
+
+        when(mLoginUserInteractor.updateDriverPassword(anyString(), anyString())).thenReturn(Observable.just(true));
+
+
+        // when
+        mDriverProfilePresenter.onChangePasswordClick(oldPwd, newPwd, confirmPwd);
+
+        // then
+        verify(mView).showChangePasswordError(eq(mockStrDriverProfilePwdEmpty));
+    }
+
+    @Test
+    public void testOnChangePasswordClickConfirmMismatch() {
+        // given
+        String oldPwd = "oldPwd";
+        String newPwd = "newPwd";
+        String confirmPwd = "confirmPwd";
+
+        String mockStrValidPass = "mock valid password";
+        String mockStrDriverProfilePwdEmpty = "mock empty password";
+        String mockStrDriverProfilePwdNoMatch = "mock no-match password";
+        String mockStrDriverProfilePwdNoChange = "mock password not changed";
+
+        when(mContext.getString(eq(R.string.driver_profile_valid_password))).thenReturn(mockStrValidPass);
+        when(mContext.getString(eq(R.string.driver_profile_password_field_empty))).thenReturn(mockStrDriverProfilePwdEmpty);
+        when(mContext.getString(eq(R.string.driver_profile_password_not_match))).thenReturn(mockStrDriverProfilePwdNoMatch);
+        when(mContext.getString(eq(R.string.driver_profile_password_not_changed))).thenReturn(mockStrDriverProfilePwdNoChange);
+
+        when(mLoginUserInteractor.updateDriverPassword(anyString(), anyString())).thenReturn(Observable.just(true));
+
+
+        // when
+        mDriverProfilePresenter.onChangePasswordClick(oldPwd, newPwd, confirmPwd);
+
+        // then
+        verify(mView).showChangePasswordError(eq(mockStrDriverProfilePwdNoMatch));
+    }
+
+    @Test
+    public void testOnChangePasswordNotUpdated() {
+        // given
+        String oldPwd = "oldPwd";
+        String newPwd = "newPwd";
+        String confirmPwd = newPwd;
+
+        String mockStrValidPass = "mock valid password";
+        String mockStrDriverProfilePwdEmpty = "mock empty password";
+        String mockStrDriverProfilePwdNoMatch = "mock no-match password";
+        String mockStrDriverProfilePwdNoChange = "mock password not changed";
+
+        when(mContext.getString(eq(R.string.driver_profile_valid_password))).thenReturn(mockStrValidPass);
+        when(mContext.getString(eq(R.string.driver_profile_password_field_empty))).thenReturn(mockStrDriverProfilePwdEmpty);
+        when(mContext.getString(eq(R.string.driver_profile_password_not_match))).thenReturn(mockStrDriverProfilePwdNoMatch);
+        when(mContext.getString(eq(R.string.driver_profile_password_not_changed))).thenReturn(mockStrDriverProfilePwdNoChange);
+
+        when(mLoginUserInteractor.updateDriverPassword(anyString(), anyString())).thenReturn(Observable.just(false));
+
+
+        // when
+        mDriverProfilePresenter.onChangePasswordClick(oldPwd, newPwd, confirmPwd);
+
+        // then
+        verify(mView).showError(any(Exception.class));
+    }
+
+    @Test
+    public void testOnChangePasswordError() {
+        // given
+        String oldPwd = "oldPwd";
+        String newPwd = "newPwd";
+        String confirmPwd = newPwd;
+
+        String mockStrValidPass = "mock valid password";
+        String mockStrDriverProfilePwdEmpty = "mock empty password";
+        String mockStrDriverProfilePwdNoMatch = "mock no-match password";
+        String mockStrDriverProfilePwdNoChange = "mock password not changed";
+
+        when(mContext.getString(eq(R.string.driver_profile_valid_password))).thenReturn(mockStrValidPass);
+        when(mContext.getString(eq(R.string.driver_profile_password_field_empty))).thenReturn(mockStrDriverProfilePwdEmpty);
+        when(mContext.getString(eq(R.string.driver_profile_password_not_match))).thenReturn(mockStrDriverProfilePwdNoMatch);
+        when(mContext.getString(eq(R.string.driver_profile_password_not_changed))).thenReturn(mockStrDriverProfilePwdNoChange);
+
+        when(mLoginUserInteractor.updateDriverPassword(anyString(), anyString())).thenReturn(Observable.error(new Exception("didn't work")));
+
+
+        // when
+        mDriverProfilePresenter.onChangePasswordClick(oldPwd, newPwd, confirmPwd);
+
+        // then
+        verify(mView).showError(any(Exception.class));
+    }
+
+    // TODO: add test for checking if old password is correct after it is coded
 
     // TODO: move cropSignature tests if cropSignature is moved to a class for signatures or utility class
 
