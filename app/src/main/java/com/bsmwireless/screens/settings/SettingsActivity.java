@@ -93,7 +93,7 @@ public class SettingsActivity extends BaseMenuActivity implements SettingsView {
                     mPresenter.onKMOdometerUnitsSelected(true);
                     return true;
                 case R.id.menu_odometer_units_mi:
-                    mPresenter.onMIOdometerUnitsSelected(true);
+                    mPresenter.onKMOdometerUnitsSelected(false);
                     return true;
             }
             return false;

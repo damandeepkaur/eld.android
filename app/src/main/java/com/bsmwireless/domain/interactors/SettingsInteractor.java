@@ -39,12 +39,4 @@ public class SettingsInteractor {
     public boolean isKMOdometerUnitsSelected() {
         return mPreferencesManager.isKMOdometerUnitsSelected();
     }
-
-    public void saveMIOdometerUnitsSelected(boolean miOdometerUnitsSelected) {
-        mPreferencesManager.setMIOdometerUnits(miOdometerUnitsSelected);
-    }
-
-    public boolean isMIOdometerUnitsSelected() {
-        return mPreferencesManager.isMIOdometerUnitsSelected();
-    }
 }

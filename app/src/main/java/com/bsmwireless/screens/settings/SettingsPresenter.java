@@ -41,13 +41,13 @@ public class SettingsPresenter {
     }
 
     public void onKMOdometerUnitsSelected(boolean isKMOdometerUnitsSelected) {
-        mSettingsInteractor.saveKMOdometerUnitsSelected(isKMOdometerUnitsSelected);
-        mView.showOdometerUnits(SettingsView.OdometerUnits.ODOMETER_UNITS_KM);
-    }
+        if (isKMOdometerUnitsSelected) {
+            mView.showOdometerUnits(SettingsView.OdometerUnits.ODOMETER_UNITS_KM);
+        } else {
+            mView.showOdometerUnits(SettingsView.OdometerUnits.ODOMETER_UNITS_MI);
+        }
 
-    public void onMIOdometerUnitsSelected(boolean isMIOdometerUnitsSelected) {
-        mSettingsInteractor.saveMIOdometerUnitsSelected(isMIOdometerUnitsSelected);
-        mView.showOdometerUnits(SettingsView.OdometerUnits.ODOMETER_UNITS_MI);
+        mSettingsInteractor.saveKMOdometerUnitsSelected(isKMOdometerUnitsSelected);
     }
 
     public void onDestroy() {
