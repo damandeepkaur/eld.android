@@ -46,6 +46,7 @@ public class ELDEvent implements Parcelable {
             return mCode;
         }
     }
+
     public enum EventOrigin {
         AUTOMATIC_RECORD(1),
         AUTOMATIC_EDIT(2),
@@ -55,7 +56,7 @@ public class ELDEvent implements Parcelable {
 
         private int mOriginCode;
 
-        EventOrigin(int code){mOriginCode = code; }
+        EventOrigin(int code) { mOriginCode = code; }
 
         public int getValue() { return mOriginCode; }
     }
