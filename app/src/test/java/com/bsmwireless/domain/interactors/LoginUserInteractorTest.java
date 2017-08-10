@@ -5,10 +5,12 @@ import com.bsmwireless.data.network.authenticator.TokenManager;
 import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.data.storage.users.UserDao;
+import com.bsmwireless.data.storage.users.UserEntity;
 import com.bsmwireless.models.Auth;
 import com.bsmwireless.models.BlackBoxModel;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.LoginModel;
+import com.bsmwireless.models.PasswordModel;
 import com.bsmwireless.models.ResponseMessage;
 import com.bsmwireless.models.User;
 
@@ -21,6 +23,7 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import app.bsmuniversal.com.RxSchedulerRule;
+import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.observers.TestObserver;
 
@@ -78,21 +81,6 @@ public class LoginUserInteractorTest {
 
 
 
-    /**
-     * Make a fake User for testing purposes.
-     *
-     * @return a fake User
-     */
-    private User makeFakeUser() {
-        Auth auth = mAuth;
-
-        User user = new User();
-
-        user.setAuth(auth);
-
-
-        return user;
-    }
 
     @Before
     public void before() throws Exception {
@@ -122,20 +110,116 @@ public class LoginUserInteractorTest {
     // TODO: Verify call to ServiceApi layer of logout - re-implement test when stable
 
 
-
-    /**
-     * Verify call to ServiceApi layer.
-     */
     @Test
-    public void testUpdateUserCallToServiceApi() {
+    public void testUpdateUserCallToServiceApiSuccess() {
         // given
+        ResponseMessage responseMessage = new ResponseMessage();
+        responseMessage.setMessage("ACK");
+
+        TestObserver<Boolean> testObserver = TestObserver.create();
         User user = makeFakeUser();
 
+        when(mAppDatabase.userDao()).thenReturn(mFakeUserDao);
+        when(mServiceApi.updateProfile(any(User.class))).thenReturn(Observable.just(responseMessage));
+
         // when
-        mLoginUserInteractor.updateUserOnServer(user);
+        mLoginUserInteractor.updateUser(user).subscribe(testObserver);
 
         // then
-        verify(mServiceApi).updateProfile(user);
+        verify(mServiceApi).updateProfile(any(User.class));
+        testObserver.assertValue(true);
+    }
+
+    @Test
+    public void testUpdateUserCallToServiceApiNotSuccess() {
+        // given
+        ResponseMessage responseMessage = new ResponseMessage();
+        responseMessage.setMessage("");
+
+        TestObserver<Boolean> testObserver = TestObserver.create();
+        User user = makeFakeUser();
+
+        when(mAppDatabase.userDao()).thenReturn(mFakeUserDao);
+        when(mServiceApi.updateProfile(any(User.class))).thenReturn(Observable.just(responseMessage));
+
+        // when
+        mLoginUserInteractor.updateUser(user).subscribe(testObserver);
+
+        // then
+        verify(mServiceApi).updateProfile(any(User.class));
+        testObserver.assertValue(false);
+    }
+
+    @Test
+    public void testUpdateDriverPasswordSuccess() {
+        // given
+        ResponseMessage successResponse = new ResponseMessage();
+        successResponse.setMessage("ACK");  // from API
+
+        String passOld = "oldPassword";
+        String passNew = "newPassword";
+
+        TestObserver<Boolean> testObserver = TestObserver.create();
+
+        when(mServiceApi.updateDriverPassword(any(PasswordModel.class))).thenReturn(Observable.just(successResponse));
+
+        // when
+        mLoginUserInteractor.updateDriverPassword(passOld, passNew)
+                .subscribe(testObserver);
+
+        // then
+        verify(mServiceApi).updateDriverPassword(any(PasswordModel.class));
+        testObserver.assertResult(true);
+    }
+
+    @Test
+    public void testUpdateDriverPasswordFailed() {
+        // given
+        ResponseMessage notSuccessResponse = new ResponseMessage();
+        notSuccessResponse.setMessage("");  // not "ACK"
+
+        String passOld = "oldPassword";
+        String passNew = "newPassword";
+
+        TestObserver<Boolean> testObserver = TestObserver.create();
+
+        when(mServiceApi.updateDriverPassword(any(PasswordModel.class))).thenReturn(Observable.just(notSuccessResponse));
+
+        // when
+        mLoginUserInteractor.updateDriverPassword(passOld, passNew)
+                .subscribe(testObserver);
+
+        // then
+        verify(mServiceApi).updateDriverPassword(any(PasswordModel.class));
+        testObserver.assertResult(false);
+    }
+
+    /**
+     * Test error propagation from ServiceApi
+     */
+    @Test
+    public void testUpdateDriverPasswordError() {
+        // given
+        ResponseMessage notSuccessResponse = new ResponseMessage();
+        notSuccessResponse.setMessage("");  // not "ACK"
+
+        Exception fakeError = new Exception("nope.");
+
+        String passOld = "oldPassword";
+        String passNew = "newPassword";
+
+        TestObserver<Boolean> testObserver = TestObserver.create();
+
+        when(mServiceApi.updateDriverPassword(any(PasswordModel.class)))
+                .thenReturn(Observable.error(fakeError));
+
+        // when
+        mLoginUserInteractor.updateDriverPassword(passOld, passNew)
+                .subscribe(testObserver);
+
+        // then
+        verify(mServiceApi).updateDriverPassword(any(PasswordModel.class));
+        testObserver.assertError(fakeError);
     }
 
 
@@ -277,5 +361,76 @@ public class LoginUserInteractorTest {
     // TODO: add tests for getDriverId
     // TODO: add tests for getTimezone
     // TODO: add tests for isRememberMeEnabled
+
+
+
+    /**
+     * Make a fake User for testing purposes.
+     *
+     * @return a fake User
+     */
+    private User makeFakeUser() {
+        Auth auth = mAuth;
+
+        User user = new User();
+        user.setId(1991);
+
+        user.setAuth(auth);
+
+
+        return user;
+    }
+
+    /**
+     * A fake user DAO.
+     * <p>
+     * It mocks some of the expected return values.
+     */
+    private UserDao mFakeUserDao = new UserDao() {
+        @Override
+        public Flowable<UserEntity> getUser(int id) {
+            return null;
+        }
+
+        @Override
+        public UserEntity getUserSync(int id) {
+            return null;
+        }
+
+        @Override
+        public Flowable<String[]> getUserLastVehicles(int id) {
+            return null;
+        }
+
+        @Override
+        public String getUserLastVehiclesSync(int id) {
+            return null;
+        }
+
+        @Override
+        public String getUserTimezoneSync(int id) {
+            return null;
+        }
+
+        @Override
+        public Flowable<String> getUserTimezone(int id) {
+            return null;
+        }
+
+        @Override
+        public int deleteUser(int id) {
+            return 0;
+        }
+
+        @Override
+        public long insertUser(UserEntity user) {
+            return user.getId();
+        }
+
+        @Override
+        public void setUserLastVehicles(int id, String vehicles) {
+
+        }
+    };
 
 }
