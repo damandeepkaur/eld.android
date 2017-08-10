@@ -2,6 +2,7 @@ package com.bsmwireless.widgets.logs.calendar;
 
 import android.support.annotation.Nullable;
 
+import com.bsmwireless.common.utils.DateUtils;
 import com.bsmwireless.models.LogSheetHeader;
 
 import java.text.SimpleDateFormat;
@@ -19,16 +20,16 @@ public class CalendarItem {
     private Calendar mCalendar = Calendar.getInstance();
 
     private LogSheetHeader mAssociatedLog;
-    private Long mDate;
+    private Long mTimestamp;
 
     private String mMonth;
     private String mDay;
     private String mDayOfWeek;
 
-    public CalendarItem(Long date, LogSheetHeader log) {
+    public CalendarItem(Long timestamp, LogSheetHeader log) {
         mAssociatedLog = log;
-        mDate = date;
-        mCalendar.setTime(new Date(mDate));
+        mTimestamp = timestamp;
+        mCalendar.setTime(new Date(mTimestamp));
 
         mDay = String.valueOf(mCalendar.get(Calendar.DAY_OF_MONTH));
         mMonth = mMonthFormat.format(mCalendar.getTime());
@@ -47,12 +48,16 @@ public class CalendarItem {
         return mDayOfWeek;
     }
 
-    public Long getDate() {
-        return mDate;
+    public Long getTimestamp() {
+        return mTimestamp;
+    }
+
+    public Calendar getCalendar() {
+        return mCalendar;
     }
 
     @Nullable
-    public LogSheetHeader getAssociatedLog() {
+    public LogSheetHeader getAssociatedLogSheet() {
         return mAssociatedLog;
     }
 

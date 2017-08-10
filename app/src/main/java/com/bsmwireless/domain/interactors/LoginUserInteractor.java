@@ -77,7 +77,7 @@ public class LoginUserInteractor {
                       return Observable.create((ObservableOnSubscribe<Long>) e -> e.onNext(mAppDatabase.userDao().insertUser(UserConverter.toEntity(user))))
                                        .map(userID -> userID > 0);
                   });*/
-                  .map(user -> user != null);
+                .map(user -> user != null);
     }
 
     public Observable<Boolean> logoutUser() {
@@ -116,24 +116,24 @@ public class LoginUserInteractor {
     public Observable<Boolean> updateUser(User user) {
         UserEntity userEntity = UserConverter.toEntity(user);
         return Observable.create((ObservableOnSubscribe<Long>) e -> {
-                                    userEntity.setLastModified(Calendar.getInstance().getTimeInMillis());
-                                    e.onNext(mAppDatabase.userDao().insertUser(userEntity));
-                         })
-                         .map(userId -> userId > 0)
-                         .flatMap(userInserted -> {
-                             if (userInserted) {
-                                 return mServiceApi.updateProfile(getUpdatedUser(userEntity));
-                             }
-                             ResponseMessage responseMessage = new ResponseMessage();
-                             responseMessage.setMessage("");
-                             return Observable.just(responseMessage);
-                         })
-                         .map(responseMessage -> responseMessage.getMessage().equals("ACK"));
+            userEntity.setLastModified(Calendar.getInstance().getTimeInMillis());
+            e.onNext(mAppDatabase.userDao().insertUser(userEntity));
+        })
+                .map(userId -> userId > 0)
+                .flatMap(userInserted -> {
+                    if (userInserted) {
+                        return mServiceApi.updateProfile(getUpdatedUser(userEntity));
+                    }
+                    ResponseMessage responseMessage = new ResponseMessage();
+                    responseMessage.setMessage("");
+                    return Observable.just(responseMessage);
+                })
+                .map(responseMessage -> responseMessage.getMessage().equals("ACK"));
     }
 
     public Observable<Boolean> updateDriverPassword(String oldPassword, String newPassword) {
         return mServiceApi.updateDriverPassword(getPasswordModel(oldPassword, newPassword))
-                          .map(responseMessage -> responseMessage.getMessage().equals("ACK"));
+                .map(responseMessage -> responseMessage.getMessage().equals("ACK"));
     }
 
     public String getUserName() {

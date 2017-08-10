@@ -89,6 +89,31 @@ public class DateUtils {
     }
 
     /**
+     * @param time unix time in ms
+     * @return string with format time like "2 hrs 35 mins"
+     */
+    public static String convertTimeInMsToDurationString(long time, String hrs, String mins) {
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
+        calendar.setTimeInMillis(time);
+        String duration = "";
+        if (calendar.get(Calendar.HOUR_OF_DAY) > 0) {
+            duration = String.format(Locale.US, "%02d " + hrs + " ", calendar.get(Calendar.HOUR_OF_DAY));
+        }
+        return duration + String.format(Locale.US, "%02d " + mins, calendar.get(Calendar.MINUTE));
+    }
+
+    /**
+     * @param time unix time in ms
+     * @return string with format time like "01:19:24"
+     */
+    public static String convertTimeInMsToDayTime(String timezone, long time) {
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(timezone));
+        calendar.setTimeInMillis(time);
+        return String.format(Locale.US, "%02d:%02d:%02d", calendar.get(Calendar.HOUR_OF_DAY),
+                calendar.get(Calendar.MINUTE), calendar.get(Calendar.SECOND));
+    }
+
+    /**
      * @param zone user timezone for example "America/Los_Angeles"
      * @param time unix time in ms
      * @return long with format time like 20170708
@@ -109,6 +134,22 @@ public class DateUtils {
      */
     public static long convertDayNumberToUnixMs(long logday) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+        Date date = null;
+        try {
+            date = sdf.parse(String.valueOf(logday));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return date.getTime();
+    }
+
+    /**
+     * @param logday long with format time like 20170708
+     * @return time of start appropriate day in unix time ms
+     */
+    public static long getStartDayInUnixMsFromLogday(String zone, long logday) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+        sdf.setTimeZone(TimeZone.getTimeZone(zone));
         Date date = null;
         try {
             date = sdf.parse(String.valueOf(logday));
