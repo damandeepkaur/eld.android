@@ -152,7 +152,7 @@ public class DriverProfilePresenterTest {
         when(mResources.getString(any(Integer.class))).thenReturn("mock resource string");
 
         // when
-        mDriverProfilePresenter.onSaveUserInfo(mFakeAddress);
+        mDriverProfilePresenter.onSaveUserInfo();
 
         // then
         verify(mView).showError(any(Exception.class));
@@ -164,7 +164,7 @@ public class DriverProfilePresenterTest {
         setUserToNotNull();
 
         // when
-        mDriverProfilePresenter.onSaveUserInfo(mFakeAddress);
+        mDriverProfilePresenter.onSaveUserInfo();
 
         // then
         assertEquals(mFakeAddress, mFakeUserEntity.getAddress());
