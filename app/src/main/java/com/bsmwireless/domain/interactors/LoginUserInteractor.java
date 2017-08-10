@@ -83,8 +83,10 @@ public class LoginUserInteractor {
     public Observable<Boolean> logoutUser() {
         ELDEvent logoutEvent = new ELDEvent();
         int driverId = getDriverId();
+        logoutEvent.setStatus(ELDEvent.StatusCode.ACTIVE.getValue());
+        logoutEvent.setOrigin(ELDEvent.EventOrigin.MANUAL_ENTER.getValue());
         logoutEvent.setEventType(LOGIN_LOGOUT.getValue());
-        logoutEvent.setEventCode(ELDEvent.StatusCode.ACTIVE.getValue());
+        logoutEvent.setEventCode(ELDEvent.LoginLogoutCode.LOGOUT.getValue());
         logoutEvent.setEventTime(System.currentTimeMillis());
         logoutEvent.setMobileTime(System.currentTimeMillis());
         logoutEvent.setDriverId(getDriverId());
