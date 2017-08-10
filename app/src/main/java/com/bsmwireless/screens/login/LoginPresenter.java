@@ -1,6 +1,8 @@
 package com.bsmwireless.screens.login;
 
 import com.bsmwireless.common.dagger.ActivityScope;
+import com.bsmwireless.common.utils.SchedulerUtils;
+import com.bsmwireless.data.network.RetrofitException;
 import com.bsmwireless.domain.interactors.LoginUserInteractor;
 import com.bsmwireless.models.User;
 
@@ -43,13 +45,13 @@ public class LoginPresenter {
         String domain = mView.getDomain();
 
         if (username == null || username.isEmpty()) {
-            mView.showErrorMessage("Username Required");
+            mView.showErrorMessage(LoginView.Error.ERROR_USER);
             return;
         } else if (password == null || password.isEmpty()) {
-            mView.showErrorMessage("Password Required");
+            mView.showErrorMessage(LoginView.Error.ERROR_PASSWORD);
             return;
         } else if (domain == null || domain.isEmpty()) {
-            mView.showErrorMessage("Domain Required");
+            mView.showErrorMessage(LoginView.Error.ERROR_DOMAIN);
             return;
         }
         mView.setLoginButtonEnabled(false);
@@ -62,15 +64,18 @@ public class LoginPresenter {
                             Timber.i("LoginUser status = %b", status);
 
                             if (status) {
+                                SchedulerUtils.schedule();
                                 mView.goToSelectAssetScreen();
                             } else {
-                                mView.showErrorMessage("Login failed");
+                                mView.showErrorMessage(LoginView.Error.ERROR_UNEXPECTED);
                                 mView.setLoginButtonEnabled(true);
                             }
                         },
                         error -> {
                             Timber.e("LoginUser error: %s", error);
-                            mView.showErrorMessage("Exception:" + error.toString());
+                            if (error instanceof RetrofitException) {
+                                mView.showErrorMessage((RetrofitException) error);
+                            }
                             mView.setLoginButtonEnabled(true);
                         }
                 );

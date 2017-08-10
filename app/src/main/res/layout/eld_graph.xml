@@ -63,7 +63,7 @@
 
     </LinearLayout>
 
-    <com.bsmwireless.widgets.graphview.ELDGraphView
+    <com.bsmwireless.widgets.logs.graphview.ELDGraphView
         android:id="@+id/hos_graph"
         android:layout_width="0dp"
         android:layout_height="match_parent"

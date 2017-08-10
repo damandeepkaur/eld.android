@@ -37,7 +37,13 @@
             android:id="@+id/navigation_view_pager"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+            app:layout_behavior="com.bsmwireless.widgets.snackbar.SnackBarBehavior" />
+
+        <com.bsmwireless.widgets.snackbar.SnackBarLayout
+            android:id="@+id/navigation_snackbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_behavior="android.support.design.widget.BottomSheetBehavior"/>
 
     </android.support.design.widget.CoordinatorLayout>
 

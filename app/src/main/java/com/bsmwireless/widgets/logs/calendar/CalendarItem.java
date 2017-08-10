@@ -1,4 +1,4 @@
-package com.bsmwireless.widgets.calendar;
+package com.bsmwireless.widgets.logs.calendar;
 
 import android.support.annotation.Nullable;
 

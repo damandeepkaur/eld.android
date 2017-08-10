@@ -27,6 +27,7 @@ import com.bsmwireless.screens.login.LoginActivity;
 import com.bsmwireless.screens.navigation.dagger.DaggerNavigationComponent;
 import com.bsmwireless.screens.navigation.dagger.NavigationModule;
 import com.bsmwireless.screens.settings.SettingsActivity;
+import com.bsmwireless.widgets.snackbar.SnackBarLayout;
 
 import javax.inject.Inject;
 
@@ -37,7 +38,7 @@ import butterknife.Unbinder;
 
 import static com.bsmwireless.screens.driverprofile.DriverProfileActivity.EXTRA_USER;
 
-public class NavigationActivity extends BaseMenuActivity implements OnNavigationItemSelectedListener, NavigateView {
+public class NavigationActivity extends BaseMenuActivity implements OnNavigationItemSelectedListener, NavigateView, ViewPager.OnPageChangeListener {
 
     private static final int REQUEST_CODE_UPDATE_USER = 101;
 
@@ -56,11 +57,13 @@ public class NavigationActivity extends BaseMenuActivity implements OnNavigation
     @BindView(R.id.navigation_view_pager)
     ViewPager mViewPager;
 
-    private NavigationAdapter mPagerAdapter;
+    @BindView(R.id.navigation_snackbar)
+    SnackBarLayout mSnackBarLayout;
 
     @Inject
     NavigationPresenter mPresenter;
 
+    private NavigationAdapter mPagerAdapter;
     private SmoothActionBarDrawerToggle mDrawerToggle;
     private HeaderViewHolder mHeaderViewHolder;
 
@@ -154,9 +157,13 @@ public class NavigationActivity extends BaseMenuActivity implements OnNavigation
         mPagerAdapter = new NavigationAdapter(getApplicationContext(), getSupportFragmentManager());
         mViewPager.setAdapter(mPagerAdapter);
         mViewPager.setOffscreenPageLimit(2);
+        mViewPager.setCurrentItem(1);
+        mViewPager.addOnPageChangeListener(this);
 
         mTabLayout.setupWithViewPager(mViewPager);
         mTabLayout.setTabTextColors(ContextCompat.getColor(this, R.color.accent_transparent), ContextCompat.getColor(this, R.color.accent));
+
+        mSnackBarLayout.setHideableOnTouch(false);
     }
 
     //TODO: waiting for UI
@@ -207,6 +214,51 @@ public class NavigationActivity extends BaseMenuActivity implements OnNavigation
                 R.plurals.assets, assetsNum, assetsNum));
     }
 
+    @Override
+    public SnackBarLayout getSnackBar() {
+        return mSnackBarLayout;
+    }
+
+    @Override
+    protected void onDestroy() {
+        mViewPager.removeOnPageChangeListener(this);
+        mPresenter.onDestroy();
+        mHeaderViewHolder.unbind();
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case REQUEST_CODE_UPDATE_USER: {
+                if (data != null && data.hasExtra(EXTRA_USER)) {
+                    User user = data.getParcelableExtra(EXTRA_USER);
+                    mPresenter.onUserUpdated(user);
+                }
+                break;
+            }
+            default: {
+                break;
+            }
+        }
+    }
+
+    @Override
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+    }
+
+    @Override
+    public void onPageSelected(int position) {
+        mSnackBarLayout.hideSnackbar();
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int state) {
+
+    }
+
     protected static class HeaderViewHolder {
         @BindView(R.id.driver_name)
         TextView driverName;
@@ -228,30 +280,6 @@ public class NavigationActivity extends BaseMenuActivity implements OnNavigation
 
         void unbind() {
             mUnbinder.unbind();
-        }
-    }
-
-    @Override
-    protected void onDestroy() {
-        mPresenter.onDestroy();
-        mHeaderViewHolder.unbind();
-        super.onDestroy();
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode) {
-            case REQUEST_CODE_UPDATE_USER: {
-                if (data != null && data.hasExtra(EXTRA_USER)) {
-                    User user = data.getParcelableExtra(EXTRA_USER);
-                    mPresenter.onUserUpdated(user);
-                }
-                break;
-            }
-            default: {
-                break;
-            }
         }
     }
 

@@ -5,6 +5,7 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.util.AttributeSet;
 import android.view.View;
+import android.widget.ScrollView;
 
 import app.bsmuniversal.com.R;
 
@@ -27,8 +28,13 @@ public class SnackBarBehavior extends AppBarLayout.ScrollingViewBehavior {
             return super.onDependentViewChanged(parent, child, dependency);
         }
 
-        float translationY = -Math.max(0, parent.getHeight() - dependency.getY() - OFFSET);
-        child.setTranslationY(translationY);
+        int translationY = (int) -Math.max(0, parent.getHeight() - dependency.getY() - OFFSET);
+
+        child.setPadding(0, 0, 0, -translationY);
+        if (child instanceof ScrollView) {
+            child.scrollBy(0, -translationY);
+        }
+
         return true;
     }
 }
