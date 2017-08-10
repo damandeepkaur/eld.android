@@ -20,8 +20,8 @@ public class SettingsInteractor {
         mPreferencesManager.setBoxGPSEnabled(boxGPSEnabled);
     }
 
-    public void saveFixedAmountEnabled(boolean fixedAmount) {
-        mPreferencesManager.setFixedAmountEnabled(fixedAmount);
+    public void saveFixedAmountEnabled(boolean fixedAmountEnabled) {
+        mPreferencesManager.setFixedAmountEnabled(fixedAmountEnabled);
     }
 
     public boolean isBoxGPSEnabled() {
@@ -30,5 +30,21 @@ public class SettingsInteractor {
 
     public boolean isFixedAmountEnabled() {
         return mPreferencesManager.isFixedAmountEnabled();
+    }
+
+    public void saveKMOdometerUnitsSelected(boolean kmOdometerUnitsSelected) {
+        mPreferencesManager.setKMOdometerUnits(kmOdometerUnitsSelected);
+    }
+
+    public boolean isKMOdometerUnitsSelected() {
+        return mPreferencesManager.isKMOdometerUnitsSelected();
+    }
+
+    public void saveMIOdometerUnitsSelected(boolean miOdometerUnitsSelected) {
+        mPreferencesManager.setMIOdometerUnits(miOdometerUnitsSelected);
+    }
+
+    public boolean isMIOdometerUnitsSelected() {
+        return mPreferencesManager.isMIOdometerUnitsSelected();
     }
 }

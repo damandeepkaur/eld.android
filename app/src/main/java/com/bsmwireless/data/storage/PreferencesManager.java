@@ -10,6 +10,8 @@ public class PreferencesManager {
     private static final String KEY_SHOW_HOME_SCREEN_ENABLED = "show_home_screen_enabled";
     private static final String KEY_BOX_GPS_ENABLED = "keep_box_gps_enabled";
     private static final String KEY_FIXED_AMOUNT_ENABLED = "keep_fixed_amount_enabled";
+    private static final String KEY_SELECTED_KM_UNITS = "selected_km_units";
+    private static final String KEY_SELECTED_MI_UNITS = "selected_mi_units";
 
 
     public static final int NOT_FOUND_VALUE = -1;
@@ -94,5 +96,25 @@ public class PreferencesManager {
 
     public boolean isFixedAmountEnabled() {
         return mPreferences.getBoolean(KEY_FIXED_AMOUNT_ENABLED, false);
+    }
+
+    public void setKMOdometerUnits(boolean kmOdometerUnitsSelected) {
+        SharedPreferences.Editor editor = mPreferences.edit();
+        editor.putBoolean(KEY_SELECTED_KM_UNITS, kmOdometerUnitsSelected);
+        editor.apply();
+    }
+
+    public boolean isKMOdometerUnitsSelected() {
+        return mPreferences.getBoolean(KEY_SELECTED_KM_UNITS, true);
+    }
+
+    public void setMIOdometerUnits(boolean miOdometerUnits) {
+        SharedPreferences.Editor editor = mPreferences.edit();
+        editor.putBoolean(KEY_SELECTED_MI_UNITS, miOdometerUnits);
+        editor.apply();
+    }
+
+    public boolean isMIOdometerUnitsSelected() {
+        return mPreferences.getBoolean(KEY_SELECTED_MI_UNITS, false);
     }
 }
