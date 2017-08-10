@@ -65,7 +65,7 @@ public class NavigationPresenter {
 
     public void onUserUpdated(User user) {
         if (user != null) {
-            mDisposables.add(mLoginUserInteractor.updateDriverProfile(user)
+            mDisposables.add(mLoginUserInteractor.syncDriverProfile(user)
                                                  .subscribeOn(Schedulers.io())
                                                  .observeOn(AndroidSchedulers.mainThread())
                                                  .subscribe(userUpdated -> {},

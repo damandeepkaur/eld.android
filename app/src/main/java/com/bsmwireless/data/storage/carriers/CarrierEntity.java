@@ -12,13 +12,13 @@ public class CarrierEntity {
     private Integer mId;
     @ColumnInfo(name = "dot")
     private String mDot;
-    @ColumnInfo(name = "orgId")
+    @ColumnInfo(name = "org_id")
     private Integer mOrgId;
     @ColumnInfo(name = "name")
     private String mName;
     @ColumnInfo(name = "address")
     private String mAddress;
-    @ColumnInfo(name = "lastmodified")
+    @ColumnInfo(name = "last_modified")
     private Long mLastModified;
     @ColumnInfo(name = "user_id")
     private Integer mUserId;

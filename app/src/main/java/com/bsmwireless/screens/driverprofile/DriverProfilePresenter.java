@@ -9,14 +9,19 @@ import com.bsmwireless.data.storage.hometerminals.HomeTerminalEntity;
 import com.bsmwireless.data.storage.users.UserConverter;
 import com.bsmwireless.domain.interactors.LoginUserInteractor;
 
+import org.reactivestreams.Subscription;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
 
 import app.bsmuniversal.com.R;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
@@ -32,7 +37,7 @@ public class DriverProfilePresenter {
     private CompositeDisposable mDisposables;
 
     private FullUserEntity mFullUserEntity;
-    private HomeTerminalEntity mHomeTerminal;
+    private List<HomeTerminalEntity> mHomeTerminals;
     private CarrierEntity mCarrier;
 
     @Inject
@@ -52,30 +57,31 @@ public class DriverProfilePresenter {
     }
 
     public void onNeedUpdateUserInfo() {
-        mDisposables.add(mLoginUserInteractor.getFullUser()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(userEntity -> {
-                            mFullUserEntity = userEntity;
-                            mView.setUserInfo(mFullUserEntity.getUserEntity());
+        Disposable disposable = mLoginUserInteractor.getFullUser()
+                                                    .subscribeOn(Schedulers.io())
+                                                    .observeOn(AndroidSchedulers.mainThread())
+                                                    .subscribe(userEntity -> {
+                                                                mFullUserEntity = userEntity;
+                                                                mView.setUserInfo(mFullUserEntity.getUserEntity());
 
-                            HomeTerminalEntity homeTerminal = findHomeTerminalById(mFullUserEntity.getHomeTerminalEntities(), mFullUserEntity
-                                    .getUserEntity().getHomeTermId());
-                            if (homeTerminal != null) {
-                                mHomeTerminal = homeTerminal;
-                                mView.setHomeTerminalInfo(mHomeTerminal);
-                            }
+                                                                mHomeTerminals = mFullUserEntity.getHomeTerminalEntities();
+                                                                if (mHomeTerminals != null && mHomeTerminals.size() > 0) {
+                                                                    Integer selectedHomeTerminalId = mFullUserEntity.getUserEntity().getHomeTermId();
+                                                                    int position = findHomeTerminalById(mHomeTerminals, selectedHomeTerminalId);
+                                                                    mView.setHomeTerminalsSpinner(getHomeTerminalNames(mHomeTerminals), position);
+                                                                }
 
-                            List<CarrierEntity> carriers = mFullUserEntity.getCarriers();
-                            if (carriers != null && carriers.size() > 0) {
-                                mCarrier = carriers.get(0);
-                                mView.setCarrierInfo(mCarrier);
-                            }
-                        },
-                        throwable -> {
-                            Timber.e(throwable.getMessage());
-                            mView.showError(throwable);
-                        }));
+                                                                List<CarrierEntity> carriers = mFullUserEntity.getCarriers();
+                                                                if (carriers != null && carriers.size() > 0) {
+                                                                    mCarrier = carriers.get(0);
+                                                                    mView.setCarrierInfo(mCarrier);
+                                                                }
+                                                            },
+                                                            throwable -> {
+                                                                Timber.e(throwable.getMessage());
+                                                                mView.showError(throwable);
+                                                            });
+        mDisposables.add(disposable);
     }
 
     public void onSaveSignatureClicked(String signature) {
@@ -114,19 +120,42 @@ public class DriverProfilePresenter {
     public void onChangePasswordClick(String oldPwd, String newPwd, String confirmPwd) {
         String validationError = validatePassword(oldPwd, newPwd, confirmPwd);
         if (validationError.equals(mContext.getString(R.string.driver_profile_valid_password))) {
-            mLoginUserInteractor.updateDriverPassword(oldPwd, newPwd)
-                                .subscribeOn(Schedulers.io())
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe(passwordUpdated -> {
-                                            if (passwordUpdated) {
-                                                mView.showPasswordChanged();
-                                            } else {
-                                                mView.showError(new Exception(mContext.getString(R.string.driver_profile_password_not_changed)));
-                                            }
-                                        },
-                                        throwable -> mView.showError(throwable));
+            Disposable disposable = mLoginUserInteractor.updateDriverPassword(oldPwd, newPwd)
+                                                        .subscribeOn(Schedulers.io())
+                                                        .observeOn(AndroidSchedulers.mainThread())
+                                                        .subscribe(passwordUpdated -> {
+                                                                    if (passwordUpdated) {
+                                                                        mView.showPasswordChanged();
+                                                                    } else {
+                                                                        mView.showError(new Exception(mContext.getString(R.string.driver_profile_password_not_changed)));
+                                                                    }
+                                                                },
+                                                                throwable -> mView.showError(throwable));
+            mDisposables.add(disposable);
         } else {
             mView.showChangePasswordError(validationError);
+        }
+    }
+
+    public void onChooseHomeTerminal(int position) {
+        if (mHomeTerminals != null && mHomeTerminals.size() > position) {
+            HomeTerminalEntity homeTerminal = mHomeTerminals.get(position);
+
+            mFullUserEntity.getUserEntity().setHomeTermId(homeTerminal.getId());
+
+            Disposable disposable = mLoginUserInteractor.updateDriverHomeTerminal(homeTerminal.getId())
+                                                        .subscribeOn(Schedulers.io())
+                                                        .observeOn(AndroidSchedulers.mainThread())
+                                                        .subscribe(wasUpdated -> {
+                                                            if (!wasUpdated) {
+                                                                mView.showError(new Exception(mContext.getString(R.string.driver_profile_home_terminal_updating_error)));
+                                                            }
+                                                        }, throwable -> mView.showError(throwable));
+            mDisposables.add(disposable);
+
+            mView.setHomeTerminalInfo(homeTerminal);
+        } else {
+            mView.showError(new Exception(mContext.getString(R.string.driver_profile_home_terminal_updating_error)));
         }
     }
 
@@ -150,18 +179,25 @@ public class DriverProfilePresenter {
         return mContext.getString(R.string.driver_profile_valid_password);
     }
 
-    private HomeTerminalEntity findHomeTerminalById(List<HomeTerminalEntity> homeTerminalEntities, Integer homeTerminalId) {
+    private int findHomeTerminalById(List<HomeTerminalEntity> homeTerminalEntities, Integer homeTerminalId) {
         if (homeTerminalEntities == null || homeTerminalId == null) {
-            return null;
+            return 0;
         }
 
-        for (HomeTerminalEntity homeTerminalEntity:
-             homeTerminalEntities) {
-            if (homeTerminalEntity.getId().equals(homeTerminalId)) {
-                return homeTerminalEntity;
+        for (int i = 0; i < homeTerminalEntities.size(); i++) {
+            if (homeTerminalEntities.get(i).getId().equals(homeTerminalId)) {
+                return i;
             }
         }
 
-        return null;
+        return 0;
+    }
+
+    private List<String> getHomeTerminalNames(List<HomeTerminalEntity> homeTerminals) {
+        List<String> terminalNames = new ArrayList<>();
+        for (HomeTerminalEntity homeTerminal: homeTerminals) {
+            terminalNames.add(homeTerminal.getName());
+        }
+        return terminalNames;
     }
 }

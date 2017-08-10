@@ -41,8 +41,7 @@ public class CarrierConverter {
         List<Carrier> carriers = null;
         if (entities != null) {
             carriers = new ArrayList<>();
-            for (CarrierEntity entity :
-                    entities) {
+            for (CarrierEntity entity : entities) {
                 carriers.add(toCarrier(entity));
             }
         }
@@ -53,8 +52,7 @@ public class CarrierConverter {
         List<CarrierEntity> entities = null;
         if (carriers != null) {
             entities = new ArrayList<>();
-            for (Carrier carrier :
-                    carriers) {
+            for (Carrier carrier : carriers) {
                 entities.add(toEntity(carrier, userId));
             }
         }

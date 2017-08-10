@@ -39,8 +39,7 @@ public class HomeTerminalConverter {
         List<HomeTerminal> homeTerminals = null;
         if (entities != null) {
             homeTerminals = new ArrayList<>();
-            for (HomeTerminalEntity entity :
-                    entities) {
+            for (HomeTerminalEntity entity : entities) {
                 homeTerminals.add(toHomeTerminal(entity));
             }
         }
@@ -51,8 +50,7 @@ public class HomeTerminalConverter {
         List<HomeTerminalEntity> entities = null;
         if (homeTerminals != null) {
             entities = new ArrayList<>();
-            for (HomeTerminal homeTerminal :
-                    homeTerminals) {
+            for (HomeTerminal homeTerminal : homeTerminals) {
                 entities.add(toEntity(homeTerminal, userId));
             }
         }

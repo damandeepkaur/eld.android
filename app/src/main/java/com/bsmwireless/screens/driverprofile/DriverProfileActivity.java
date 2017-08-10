@@ -11,6 +11,8 @@ import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ScrollView;
 import android.widget.Toast;
 
@@ -27,6 +29,7 @@ import com.bsmwireless.widgets.signview.SignatureLayout;
 import com.bsmwireless.widgets.snackbar.SnackBarLayout;
 
 import java.util.Calendar;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -38,7 +41,7 @@ import butterknife.OnClick;
 import static android.support.design.widget.BottomSheetBehavior.STATE_EXPANDED;
 import static android.support.design.widget.BottomSheetBehavior.STATE_HIDDEN;
 
-public class DriverProfileActivity extends BaseMenuActivity implements DriverProfileView, SignatureLayout.OnSaveSignatureListener {
+public class DriverProfileActivity extends BaseMenuActivity implements DriverProfileView, SignatureLayout.OnSaveSignatureListener, AdapterView.OnItemSelectedListener {
 
     public static final String EXTRA_USER = "user";
 
@@ -84,8 +87,8 @@ public class DriverProfileActivity extends BaseMenuActivity implements DriverPro
     @BindView(R.id.carrier_name)
     TextInputEditText mCarrierName;
 
-    @BindView(R.id.terminal_name)
-    TextInputEditText mTerminalName;
+    @BindView(R.id.terminal_name_spinner)
+    AppCompatSpinner mTerminalNames;
 
     @BindView(R.id.terminal_address)
     TextInputEditText mTerminalAddress;
@@ -140,14 +143,23 @@ public class DriverProfileActivity extends BaseMenuActivity implements DriverPro
         mEmployeeIDTextView.setText(String.valueOf(user.getId()));
         mLicenseTextView.setText(user.getLicense());
         mELDToggle.setChecked(user.getExempt());
+        // TODO: set real role
         mRole.setText(User.DriverType.DRIVER.name());
 
         mSignatureLayout.setImageData(user.getSignature());
     }
 
     @Override
+    public void setHomeTerminalsSpinner(List<String> homeTerminalNames, int selectedTerminal) {
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, homeTerminalNames);
+
+        mTerminalNames.setAdapter(adapter);
+        mTerminalNames.setSelection(selectedTerminal);
+        mTerminalNames.setOnItemSelectedListener(this);
+    }
+
+    @Override
     public void setHomeTerminalInfo(HomeTerminalEntity homeTerminal) {
-        mTerminalName.setText(homeTerminal.getName());
         mTerminalAddress.setText(homeTerminal.getAddress());
         mHomeTerminalTimeZone.setText(ViewUtils.getFullTimeZone(homeTerminal.getTimezone(), Calendar.getInstance().getTimeInMillis()));
     }
@@ -246,5 +258,15 @@ public class DriverProfileActivity extends BaseMenuActivity implements DriverPro
         mCurrentPasswordLayout.setError(error);
         mNewPasswordLayout.setError(error);
         mConfirmPasswordLayout.setError(error);
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        mPresenter.onChooseHomeTerminal(position);
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
     }
 }

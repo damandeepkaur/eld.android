@@ -25,11 +25,15 @@ import javax.inject.Inject;
 
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.annotations.NonNull;
 
 import static com.bsmwireless.models.ELDEvent.EventType.LOGIN_LOGOUT;
 
 public class LoginUserInteractor {
+
+    private static final String SUCCESS = "ACK";
 
     private ServiceApi mServiceApi;
     private AppDatabase mAppDatabase;
@@ -113,13 +117,13 @@ public class LoginUserInteractor {
                                     mTokenManager.clearToken(mTokenManager.getToken(mPreferencesManager.getAccountName()));
                                 }
                             })
-                            .map(responseMessage -> responseMessage.getMessage().equals("ACK"));
+                            .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
                 });
     }
 
-    public Observable<Boolean> updateDriverProfile(User user) {
+    public Observable<Boolean> syncDriverProfile(User user) {
         UserEntity userEntity = UserConverter.toEntity(user);
-        return Observable.create((ObservableOnSubscribe<Long>) e -> e.onNext(mAppDatabase.userDao().insertUser(userEntity)))
+        return Observable.fromCallable(() -> mAppDatabase.userDao().insertUser(userEntity))
                          .map(userId -> userId > 0)
                          .flatMap(userInserted -> {
                              if (userInserted) {
@@ -127,27 +131,27 @@ public class LoginUserInteractor {
                              }
                              return Observable.just(new ResponseMessage(""));
                          })
-                         .map(responseMessage -> responseMessage.getMessage().equals("ACK"));
+                         .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
     }
 
     public Observable<Boolean> updateDriverPassword(String oldPassword, String newPassword) {
         return mServiceApi.updateDriverPassword(getPasswordModel(oldPassword, newPassword))
-                          .map(responseMessage -> responseMessage.getMessage().equals("ACK"));
+                          .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
     }
 
     public Observable<Boolean> updateDriverSignature(String signature) {
         return mServiceApi.updateDriverSignature(getDriverSignature(signature))
-                          .map(responseMessage -> responseMessage.getMessage().equals("ACK"));
+                          .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
     }
 
     public Observable<Boolean> updateDriverRule(String ruleException) {
         return mServiceApi.updateDriverRule(getRuleSelectionModel(ruleException))
-                          .map(responseMessage -> responseMessage.getMessage().equals("ACK"));
+                          .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
     }
 
     public Observable<Boolean> updateDriverHomeTerminal(Integer homeTerminalId) {
         return mServiceApi.updateDriverHomeTerminal(getHomeTerminal(homeTerminalId))
-                          .map(responseMessage -> responseMessage.getMessage().equals("ACK"));
+                          .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
     }
 
     public String getUserName() {

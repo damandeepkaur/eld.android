@@ -138,13 +138,13 @@ public class NavigationPresenterTest {
     public void testOnUserUpdated() {
         // given
         User user = new User();
-        when(mLoginUserInteractor.updateDriverProfile(any(User.class))).thenReturn(Observable.just(true)); // prevent null pointer exception
+        when(mLoginUserInteractor.syncDriverProfile(any(User.class))).thenReturn(Observable.just(true)); // prevent null pointer exception
 
         // when
         mNavigationPresenter.onUserUpdated(user);
 
         // then
-        verify(mLoginUserInteractor).updateDriverProfile(eq(user));
+        verify(mLoginUserInteractor).syncDriverProfile(eq(user));
     }
 
     @Test
@@ -156,7 +156,7 @@ public class NavigationPresenterTest {
         mNavigationPresenter.onUserUpdated(null);
 
         // then
-        verify(mLoginUserInteractor, never()).updateDriverProfile(any(User.class));
+        verify(mLoginUserInteractor, never()).syncDriverProfile(any(User.class));
     }
 
     @Test
@@ -164,7 +164,7 @@ public class NavigationPresenterTest {
         // given
         User user = new User();
         String error = "sorry, it didn't work";
-        when(mLoginUserInteractor.updateDriverProfile(any(User.class))).thenReturn(Observable.error(new RuntimeException(error)));
+        when(mLoginUserInteractor.syncDriverProfile(any(User.class))).thenReturn(Observable.error(new RuntimeException(error)));
 
         // when
         mNavigationPresenter.onUserUpdated(user);
