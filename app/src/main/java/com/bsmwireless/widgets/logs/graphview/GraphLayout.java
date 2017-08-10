@@ -1,4 +1,4 @@
-package com.bsmwireless.widgets.graphview;
+package com.bsmwireless.widgets.logs.graphview;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -8,6 +8,7 @@ import android.widget.LinearLayout;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.widgets.common.FontTextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import app.bsmuniversal.com.R;
@@ -17,11 +18,6 @@ import butterknife.Unbinder;
 
 public class GraphLayout extends LinearLayout {
 
-    private Unbinder mUnbinder;
-
-    private View mRootView;
-
-    @BindView(R.id.hos_graph)
     ELDGraphView mELDGraphView;
     @BindView(R.id.time_on)
     FontTextView mHOSTimerOnDuty;
@@ -31,6 +27,9 @@ public class GraphLayout extends LinearLayout {
     FontTextView mHOSTimerSleeperBerth;
     @BindView(R.id.time_dr)
     FontTextView mHOSTimerDriving;
+
+    private Unbinder mUnbinder;
+    private View mRootView;
 
     public GraphLayout(Context context) {
         super(context);
@@ -47,8 +46,10 @@ public class GraphLayout extends LinearLayout {
         init(context);
     }
 
-    public void updateGraph(List<ELDEvent> logs) {
-        mELDGraphView.setLogs(logs);
+    public void setELDEvents(List<ELDEvent> logs, long startDayTime) {
+        if (mELDGraphView != null) {
+            mELDGraphView.setLogs(filterOffNotDutyTypeEvents(logs), startDayTime);
+        }
     }
 
     public void setHOSTimerOnDuty(String time) {
@@ -69,17 +70,28 @@ public class GraphLayout extends LinearLayout {
 
     private void init(Context context) {
         mRootView = inflate(context, R.layout.eld_graph, this);
+        mELDGraphView = (ELDGraphView) mRootView.findViewById(R.id.hos_graph);
     }
 
     @Override
-    protected void onFinishInflate() {
-        super.onFinishInflate();
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
         mUnbinder = ButterKnife.bind(this, mRootView);
     }
 
     @Override
     protected void onDetachedFromWindow() {
-        mUnbinder.unbind();
         super.onDetachedFromWindow();
+        mUnbinder.unbind();
+    }
+
+    private List<ELDEvent> filterOffNotDutyTypeEvents(List<ELDEvent> events) {
+        List<ELDEvent> result = new ArrayList<>();
+        for (ELDEvent event : events) {
+            if (event.getEventType().equals(ELDEvent.EventType.DUTY_STATUS_CHANGING.getValue())) {
+                result.add(event);
+            }
+        }
+        return result;
     }
 }

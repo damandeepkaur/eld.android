@@ -17,6 +17,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import io.reactivex.Flowable;
 import io.reactivex.Observable;
 
 public class ELDEventsInteractor {
@@ -45,6 +46,11 @@ public class ELDEventsInteractor {
         return mServiceApi.getELDEvents(startTime, endTime)
                 .onErrorReturn(throwable -> ELDEventConverter.toModelList(mELDEventDao.getEventsForInterval(startTime, endTime)))
                 .doOnNext(events -> storeEvents(events, false));
+    }
+
+    public Flowable<List<ELDEvent>> getELDEventsFromDB(long startTime, long endTime) {
+       return mELDEventDao.getEventFromStartToEndTime(startTime, endTime)
+               .map(eldEventEntities -> ELDEventConverter.toModelList(eldEventEntities));
     }
 
     public Observable<ResponseMessage> postNewELDEvent(ELDEvent event) {

@@ -8,6 +8,7 @@ import com.bsmwireless.data.storage.users.UserConverter;
 import com.bsmwireless.data.storage.users.UserEntity;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.LoginModel;
+import com.bsmwireless.models.PasswordModel;
 import com.bsmwireless.models.ResponseMessage;
 import com.bsmwireless.models.User;
 
@@ -17,9 +18,7 @@ import javax.inject.Inject;
 
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.annotations.NonNull;
 
 import static com.bsmwireless.models.ELDEvent.EventType.LOGIN_LOGOUT;
 
@@ -60,11 +59,13 @@ public class LoginUserInteractor {
 
                     String lastVehicles = mAppDatabase.userDao().getUserLastVehiclesSync(user.getId());
 
+                    mAppDatabase.userDao().insertUser(UserConverter.toEntity(user));
+
                     if (lastVehicles != null) {
                         mAppDatabase.userDao().setUserLastVehicles(user.getId(), lastVehicles);
                     }
-                })
-                  .flatMap(user -> {
+                })// TODO: add update user logic.
+                  /*.flatMap(user -> {
                       UserEntity userEntity = mAppDatabase.userDao().getUserSync(user.getId());
                       if (userEntity != null) {
                           Long lastModified = userEntity.getLastModified();
@@ -75,7 +76,8 @@ public class LoginUserInteractor {
                       }
                       return Observable.create((ObservableOnSubscribe<Long>) e -> e.onNext(mAppDatabase.userDao().insertUser(UserConverter.toEntity(user))))
                                        .map(userID -> userID > 0);
-                  });
+                  });*/
+                  .map(user -> user != null);
     }
 
     public Observable<Boolean> logoutUser() {
@@ -91,7 +93,7 @@ public class LoginUserInteractor {
 
         return mBlackBoxInteractor.getData()
                 .flatMap(blackBox -> {
-                    logoutEvent.setTimezone(getTimezone(driverId));
+                    logoutEvent.setTimezone(getTimezoneSync(driverId));
                     logoutEvent.setEngineHours(blackBox.getEngineHours());
                     logoutEvent.setOdometer(blackBox.getOdometer());
                     logoutEvent.setLat(blackBox.getLat());
@@ -129,6 +131,11 @@ public class LoginUserInteractor {
                          .map(responseMessage -> responseMessage.getMessage().equals("ACK"));
     }
 
+    public Observable<Boolean> updateDriverPassword(String oldPassword, String newPassword) {
+        return mServiceApi.updateDriverPassword(getPasswordModel(oldPassword, newPassword))
+                          .map(responseMessage -> responseMessage.getMessage().equals("ACK"));
+    }
+
     public String getUserName() {
         return mTokenManager.getName(mPreferencesManager.getAccountName());
     }
@@ -160,8 +167,12 @@ public class LoginUserInteractor {
         return id == null || id.isEmpty() ? -1 : Integer.valueOf(id);
     }
 
-    public String getTimezone(int driverId) {
+    public String getTimezoneSync(int driverId) {
         return mAppDatabase.userDao().getUserTimezoneSync(driverId);
+    }
+
+    public Flowable<String> getTimezone() {
+        return mAppDatabase.userDao().getUserTimezone(getDriverId());
     }
 
     public boolean isRememberMeEnabled() {
@@ -181,6 +192,17 @@ public class LoginUserInteractor {
         user.setAddress(userEntity.getAddress());
 
         return user;
+    }
+
+    private PasswordModel getPasswordModel(String oldPassword, String newPassword) {
+        PasswordModel passwordModel = new PasswordModel();
+
+        passwordModel.setId(getDriverId());
+        passwordModel.setUsername(getUserName());
+        passwordModel.setPassword(oldPassword);
+        passwordModel.setNewPassword(newPassword);
+
+        return passwordModel;
     }
 }
 

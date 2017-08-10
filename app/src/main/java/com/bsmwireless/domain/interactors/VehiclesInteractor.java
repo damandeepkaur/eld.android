@@ -9,7 +9,6 @@ import com.bsmwireless.data.storage.vehicles.VehicleConverter;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.Vehicle;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -98,7 +97,7 @@ public class VehiclesInteractor {
         return mBlackBoxInteractor.getData()
                 .doOnNext(blackBox -> saveVehicle(vehicle))
                 .flatMap(blackBox -> {
-                    event.setTimezone(mUserInteractor.getTimezone(id));
+                    event.setTimezone(mUserInteractor.getTimezoneSync(id));
                     event.setOdometer(blackBox.getOdometer());
                     event.setLat(blackBox.getLat());
                     event.setLng(blackBox.getLon());

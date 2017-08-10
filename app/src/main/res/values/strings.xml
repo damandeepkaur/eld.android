@@ -28,6 +28,31 @@
     <!--Barcode Scanner-->
     <string name="barcode_scanner_error">Camera permission is necessary for barcode scanning</string>
 
+    <!--Retrofit errors-->
+    <string name="error">Error</string>
+    <string name="error_network">Network error</string>
+    <string name="error_unexpected">Unexpected error</string>
+    <string name="error_bad_request">Bad Request</string>
+    <string name="error_not_authenticated">Not Authenticated</string>
+    <string name="error_timeout">Timeout</string>
+    <string name="error_internal_server">Internal Server Error</string>
+    <string name="error_unknown">Unknown error</string>
+    <string name="error_username">Username Required</string>
+    <string name="error_password">Password Required</string>
+    <string name="error_domain">Domain Required</string>
+
+    <!--Logs-->
+    <string name="logs_sign_logsheet">SIGN LOGSHEET</string>
+    <string name="logs_events">EVENTS</string>
+    <string name="logs_trip_info">TRIP INFO</string>
+    <string name="logs_co_driver">Co-driver</string>
+    <string name="logs_on_duty_left">On duty left</string>
+    <string name="logs_drive">Drive</string>
+    <string name="logs_odometer">Odometer</string>
+    <string name="logs_mi_set">mi</string>
+    <string name="logs_km_set">km</string>
+
+
     <!-- START OLD STRINGS -->
     <string name="no_network">No Network Available</string>
     <string name="app_compatability">Note: Compatible with Android 4.0.3 - 6.0.1</string>
@@ -137,7 +162,6 @@
     <string name="sf_txt_quicktour">TAKE A QUICK TOUR OF APP</string>
     <string name="sf_btn_taketour">TAKE A TOUR</string>
     <string name="sf_btn_skiptour">SKIP TOUR</string>
-    <string name="odometer">ODOMETER (KM):</string>
     <string name="attacment">ATTACHMENT:</string>
     <string name="vehcile">VEHICLE</string>
     <string name="select_all">SELECT ALL</string>
@@ -165,18 +189,13 @@
     <string name="sign_error_message">Please Add Signature to profile to save the Inspection Forms</string>
     <string name="save_error">Save Error</string>
     <string name="defect">Please enter the comment for this defect</string>
-    <string name="error">error</string>
     <string name="error_msg">Error Message</string>
     <string name="logouterror">Logout error</string>
     <string name="hos_txt_graph">GRAPH</string>
     <string name="hos_txt_events">EVENTS</string>
     <string name="hos_txt_logsheet">LOG SHEET</string>
-    <string name="hos_txt_offduty">OFF DUTY</string>
     <string name="hos_txt_sleepingberth">SLEEPER BERTH</string>
-    <string name="hos_txt_sleeping">SLEEPING </string>
     <string name="hos_txt_berth">BERTH</string>
-    <string name="hos_txt_driving">DRIVING</string>
-    <string name="hos_txt_onduty">ON DUTY</string>
     <string name="hos_txt_summary">SUMMARY</string>
     <string name="hos_txt_location">Location</string>
     <string name="hos_txt_total">TOTAL</string>
@@ -329,20 +348,39 @@
 
     <!-- Driver Profile -->
     <string name="driver_profile">Driver profile</string>
-    <string name="driver_profile_item_name">Name</string>
+    <string name="driver_settings">Driver Settings</string>
+    <string name="driver_change_password">Change Password</string>
+    <string name="driver_change_signature">Change Signature</string>
+    <string name="driver_profile_item_name">First Name &amp; Last Name</string>
     <string name="driver_profile_item_emp_id">Employee ID</string>
     <string name="driver_profile_item_company">Company</string>
     <string name="driver_profile_item_license">Driver license</string>
-    <string name="driver_profile_item_home_addr">Home address</string>
-    <string name="driver_profile_item_home_terminal">Home terminal</string>
+    <string name="driver_profile_item_home_addr">Home Terminal Address</string>
+    <string name="driver_profile_item_home_terminal">Home Terminal Name</string>
     <string name="driver_profile_item_time_zone">Time zone</string>
-    <string name="driver_profile_item_password">Password</string>
-    <string name="driver_profile_item_cycle">Cycle</string>
+    <string name="driver_profile_item_current_password">Current password</string>
+    <string name="driver_profile_item_new_password">New password</string>
+    <string name="driver_profile_item_confirm_password">Confirm password</string>
+    <string name="driver_profile_item_cycle">HOS Cycle</string>
     <string name="driver_profile_menu_eld">ELD</string>
     <string name="driver_profile_menu_sign">Sign</string>
     <string name="driver_profile_menu_occupants">Occupants</string>
     <string name="driver_profile_signature_error">Signature size too large. It will be cropped.</string>
     <string name="driver_profile_user_error">Invalid user.</string>
+    <string name="driver_profile_item_eld_toggle">ELD toggle</string>
+    <string name="driver_profile_item_configured_for">Configured for</string>
+    <string name="driver_profile_item_carrier_name">Carrier Name</string>
+    <string name="driver_profile_item_terminal_time_zone">Home Terminal Time Zone</string>
+    <string name="driver_profile_item_role">Role</string>
+    <string name="driver_profile_password_changed">Password was changed.</string>
+    <string name="driver_profile_password_not_changed">Password was not changed.</string>
+    <string-array name="driver_profile_tmp_hos_cycles">
+        <item>Canadian 70h 7d</item>
+    </string-array>
+    <string name="driver_profile_configured_for_tmp">Yard Move &amp; Personal Use</string>
+    <string name="driver_profile_password_not_match">Password not match</string>
+    <string name="driver_profile_password_field_empty">Password field empty</string>
+    <string name="driver_profile_valid_password">Valid password</string>
 
     <!-- Navigation drawer-->
     <string name="nav_home">Home</string>
@@ -379,6 +417,7 @@
 
     <string name="ok">Ok</string>
     <string name="clear">Clear</string>
+    <string name="try_again">Try again</string>
 
     <!-- Settings Activity -->
     <string name="settings">Settings</string>
@@ -386,5 +425,23 @@
     <string name="settings_box_gps_title">Box GPS</string>
     <string name="settings_fixed_mount_title">Fixed mount</string>
     <string name="settings_odometer_units">Odometer units</string>
+
+    <!-- Logs -->
+    <string name="odometer">Odometer(%1$s)</string>
+    <string name="add_event">Add event</string>
+    <string name="edit">Edit</string>
+    <string name="remove">Remove</string>
+    <string name="km">km</string>
+    <string name="ml">ml</string>
+    <string name= "sign_logsheet">sing logsheet</string>
+    <string name="hos_txt_offduty">Off Duty</string>
+    <string name="hos_txt_sleeping">Sleeping</string>
+    <string name="hos_txt_driving">Driving</string>
+    <string name="hos_txt_onduty">On Duty</string>
+
+    <!-- Auto Logout Activity -->
+    <string name="auto_logout_message_alert_dialog">Auto Logout</string>
+    <string name="auto_logout_positive_button_lbl_alert_dialog">Logout</string>
+    <string name="auto_logout_cancel_button_lbl_alert_dialog">Cancel</string>
 
 </resources>

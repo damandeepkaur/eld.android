@@ -1,4 +1,4 @@
-package com.bsmwireless.widgets.calendar;
+package com.bsmwireless.widgets.logs.calendar;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -18,37 +18,21 @@ import java.util.Date;
 import java.util.List;
 
 import app.bsmuniversal.com.R;
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
-import butterknife.Unbinder;
 
-public class CalendarLayout extends LinearLayout implements View.OnClickListener{
+public class CalendarLayout extends LinearLayout implements View.OnClickListener {
 
     private static final int DEFAULT_DAYS_COUNT = 30;
 
+    private RecyclerView mRecyclerView;
+    private Button mLeftButton;
+    private Button mRightButton;
     private View mRootView;
-
-    private Unbinder mUnbinder;
-
     private CalendarAdapter mAdapter;
-
     private int mDaysCount;
-
     private LinearLayoutManager mLayoutManager;
-
     private OnItemSelectListener mListener;
-
-    @BindView(R.id.recycler_view)
-    RecyclerView mRecyclerView;
-    @BindView(R.id.left)
-    Button mLeftButton;
-    @BindView(R.id.right)
-    Button mRightButton;
-
-    public interface OnItemSelectListener {
-        void onItemSelected(CalendarItem log);
-    }
+    private List<LogSheetHeader> mLogSheetHeaders;
 
     public CalendarLayout(Context context) {
         super(context);
@@ -71,12 +55,17 @@ public class CalendarLayout extends LinearLayout implements View.OnClickListener
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.CalendarLayout, defStyleAttr, 0);
         mDaysCount = typedArray.getInt(R.styleable.CalendarLayout_daysCount, DEFAULT_DAYS_COUNT);
         typedArray.recycle();
+
+        mRecyclerView = (RecyclerView) mRootView.findViewById(R.id.recycler_view);
+        mLeftButton = (Button) mRootView.findViewById(R.id.left);
+        mRightButton = (Button) mRootView.findViewById(R.id.right);
+        mLeftButton.setOnClickListener(v -> onLeftClicked());
+        mRightButton.setOnClickListener(v -> onRightClicked());
     }
 
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
-        mUnbinder = ButterKnife.bind(this, mRootView);
 
         mLayoutManager = new LinearLayoutManager(getContext(), HORIZONTAL, true);
         mRecyclerView.setLayoutManager(mLayoutManager);
@@ -97,12 +86,8 @@ public class CalendarLayout extends LinearLayout implements View.OnClickListener
         });
         mRecyclerView.smoothScrollToPosition(0);
         mRightButton.setEnabled(false);
-    }
 
-    @Override
-    protected void onDetachedFromWindow() {
-        mUnbinder.unbind();
-        super.onDetachedFromWindow();
+        mAdapter.updateLogs(mLogSheetHeaders);
     }
 
     @Override
@@ -115,7 +100,6 @@ public class CalendarLayout extends LinearLayout implements View.OnClickListener
         }
     }
 
-    @OnClick(R.id.left)
     void onLeftClicked() {
         int firstPosition = mLayoutManager.findFirstVisibleItemPosition();
         int lastPosition = mLayoutManager.findLastVisibleItemPosition();
@@ -123,7 +107,6 @@ public class CalendarLayout extends LinearLayout implements View.OnClickListener
         mRecyclerView.smoothScrollToPosition(newPosition < mAdapter.getItemCount() ? newPosition : mAdapter.getItemCount() - 1);
     }
 
-    @OnClick(R.id.right)
     void onRightClicked() {
         int firstPosition = mLayoutManager.findFirstVisibleItemPosition();
         int lastPosition = mLayoutManager.findLastVisibleItemPosition();
@@ -131,9 +114,11 @@ public class CalendarLayout extends LinearLayout implements View.OnClickListener
         mRecyclerView.smoothScrollToPosition(newPosition > 0 ? newPosition : 0);
     }
 
-    public void setLogs(List<LogSheetHeader> logs) {
+    public void setLogs(List<LogSheetHeader> logsSheetHeaders) {
+        mLogSheetHeaders = logsSheetHeaders;
         if (mAdapter != null) {
-            mAdapter.updateLogs(logs);
+            mAdapter.updateLogs(logsSheetHeaders);
+            mAdapter.notifyDataSetChanged();
         }
     }
 
@@ -154,5 +139,9 @@ public class CalendarLayout extends LinearLayout implements View.OnClickListener
             calendar.setTime(new Date(time));
         }
         return logs;
+    }
+
+    public interface OnItemSelectListener {
+        void onItemSelected(CalendarItem log);
     }
 }
