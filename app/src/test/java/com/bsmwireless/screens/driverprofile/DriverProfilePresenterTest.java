@@ -167,7 +167,6 @@ public class DriverProfilePresenterTest {
         mDriverProfilePresenter.onSaveUserInfo();
 
         // then
-        assertEquals(mFakeAddress, mFakeUserEntity.getAddress());
         verify(mView).setResults(eq(UserConverter.toUser(mFakeUserEntity)));
     }
 
