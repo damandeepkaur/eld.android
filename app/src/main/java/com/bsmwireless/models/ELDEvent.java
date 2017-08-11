@@ -47,6 +47,34 @@ public class ELDEvent implements Parcelable {
         }
     }
 
+    public enum EventOrigin {
+        AUTOMATIC_RECORD(1),
+        AUTOMATIC_EDIT(2),
+        MANUAL_ENTER(3),
+        MANUAL_ACCEPT(4),
+        UNIDENTIFIED_DRIVER(5);
+
+        private int mOriginCode;
+
+        EventOrigin(int code) { mOriginCode = code; }
+
+        public int getValue() { return mOriginCode; }
+    }
+
+    public enum LoginLogoutCode {
+        LOGIN(1),
+        LOGOUT(2);
+
+        private int mCode;
+
+        LoginLogoutCode(int code) {
+            mCode = code;
+        }
+
+        public int getValue() {
+            return mCode;
+        }
+    }
     @SerializedName("id")
     @Expose
     private Integer mId;
