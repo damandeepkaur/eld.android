@@ -3,10 +3,10 @@
 
     <item
         android:id="@+id/menu_odometer_units_km"
-        android:title="@string/settings_odometer_units_km"/>
+        android:title="@string/logs_km_set"/>
 
     <item
         android:id="@+id/menu_odometer_units_mi"
-        android:title="@string/settings_odometer_units_mi"/>
+        android:title="@string/logs_mi_set"/>
 
 </menu>

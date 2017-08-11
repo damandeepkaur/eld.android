@@ -28,8 +28,8 @@ public class SettingsPresenter {
         mView.setBoxGPSSwitchEnabled(mSettingsInteractor.isBoxGPSEnabled());
         mView.setFixedAmountSwitchEnabled(mSettingsInteractor.isFixedAmountEnabled());
 
-        // set default value to km for odometer units
-        mView.showOdometerUnits(SettingsView.OdometerUnits.ODOMETER_UNITS_KM);
+        // set current selected value for odometer units
+        mView.showOdometerUnits(loadLastSelectedOdometerUnit());
     }
 
     public void onBoxGPSSwitchChecked(boolean isBoxGPSEnabled) {
@@ -54,5 +54,12 @@ public class SettingsPresenter {
         mDisposables.dispose();
 
         Timber.d("DESTROYED");
+    }
+
+    private SettingsView.OdometerUnits loadLastSelectedOdometerUnit() {
+        if (mSettingsInteractor.isKMOdometerUnitsSelected()) {
+            return SettingsView.OdometerUnits.ODOMETER_UNITS_KM;
+        }
+        return SettingsView.OdometerUnits.ODOMETER_UNITS_MI;
     }
 }

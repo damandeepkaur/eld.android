@@ -108,15 +108,15 @@ public class SettingsActivity extends BaseMenuActivity implements SettingsView {
 
         switch (odometerUnits) {
             case ODOMETER_UNITS_KM:
-                id = R.string.settings_odometer_units_km;
+                id = R.string.logs_km_set;
                 break;
 
             case ODOMETER_UNITS_MI:
-                id = R.string.settings_odometer_units_mi;
+                id = R.string.logs_mi_set;
                 break;
 
             default:
-                id = R.string.settings_odometer_units_km;
+                id = R.string.logs_km_set;
                 break;
         }
 
