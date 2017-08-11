@@ -2,6 +2,7 @@ package com.bsmwireless.widgets.logs.calendar;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Canvas;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -69,6 +70,7 @@ public class CalendarLayout extends LinearLayout implements View.OnClickListener
 
         mLayoutManager = new LinearLayoutManager(getContext(), HORIZONTAL, true);
         mRecyclerView.setLayoutManager(mLayoutManager);
+
         mAdapter = new CalendarAdapter(getContext(), getItems(), this);
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setHasFixedSize(true);

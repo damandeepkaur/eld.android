@@ -125,7 +125,7 @@ public class SnackBarLayout extends RelativeLayout {
 
     @Override
     public boolean isShown() {
-        return mIsHideableOnTouch ? super.isShown() : mBottomSheet.getState() == BottomSheetBehavior.STATE_EXPANDED;
+        return mIsHideableOnTouch && super.isShown();
     }
 
     public SnackBarLayout hideSnackbar() {
