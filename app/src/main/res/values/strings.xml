@@ -417,13 +417,6 @@
     <string name="clear">Clear</string>
     <string name="try_again">Try again</string>
 
-    <!-- Settings Activity -->
-    <string name="settings">Settings</string>
-    <string name="settings_title">Settings</string>
-    <string name="settings_box_gps_title">Box GPS</string>
-    <string name="settings_fixed_mount_title">Fixed mount</string>
-    <string name="settings_odometer_units">Odometer units</string>
-
     <!-- Logs -->
     <string name="odometer">Odometer(%1$s)</string>
     <string name="add_event">Add event</string>
@@ -452,4 +445,12 @@
     <string name="auto_logout_message_alert_dialog">Auto Logout</string>
     <string name="auto_logout_positive_button_lbl_alert_dialog">Logout</string>
     <string name="auto_logout_cancel_button_lbl_alert_dialog">Cancel</string>
+
+    <!-- Settings Activity -->
+    <string name="settings">Settings</string>
+    <string name="settings_title">Settings</string>
+    <string name="settings_box_gps_title">Box GPS</string>
+    <string name="settings_fixed_mount_title">Fixed mount</string>
+    <string name="settings_odometer_units">Odometer units</string>
+
 </resources>
