@@ -244,8 +244,6 @@
     <string name="jan">JAN</string>
     <string name="comment">Please enter a comment</string>
     <string name="delete">DELETE</string>
-    <string name="hours">HOURS</string>
-    <string name="minutes">MINUTES</string>
     <string name="seconds">SECONDS</string>
     <string name="daily">daily</string>
     <string name="seven_days">7 days</string>
@@ -433,15 +431,25 @@
     <string name="remove">Remove</string>
     <string name="km">km</string>
     <string name="ml">ml</string>
-    <string name= "sign_logsheet">sing logsheet</string>
-    <string name="hos_txt_offduty">Off Duty</string>
-    <string name="hos_txt_sleeping">Sleeping</string>
-    <string name="hos_txt_driving">Driving</string>
-    <string name="hos_txt_onduty">On Duty</string>
+    <string name="sign_logsheet">sign logsheet</string>
+    <string name="no_address_available">No address available</string>
+    <string name="hours">hrs</string>
+    <string name="minutes">mins</string>
+    <!-- Event description, probably should be updated -->
+    <string name="event_type_off_duty">Off Duty</string>
+    <string name="event_type_sleeping">Sleeping</string>
+    <string name="event_type_driving">Driving</string>
+    <string name="event_type_on_duty">On Duty</string>
+    <string name="event_type_int_location">Int Location</string>
+    <string name="event_type_cert">Cert</string>
+    <string name="event_type_login">Login</string>
+    <string name="event_type_logout">Logout</string>
+    <string name="event_type_shut_down">Shut Down</string>
+    <string name="event_type_power_up">Power Up</string>
+    <string name="event_type_unknown_type">Unknown event type</string>
 
     <!-- Auto Logout Activity -->
     <string name="auto_logout_message_alert_dialog">Auto Logout</string>
     <string name="auto_logout_positive_button_lbl_alert_dialog">Logout</string>
     <string name="auto_logout_cancel_button_lbl_alert_dialog">Cancel</string>
-
 </resources>

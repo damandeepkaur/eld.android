@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.LinearLayout;
 
 import com.bsmwireless.models.ELDEvent;
+import com.bsmwireless.screens.logs.dagger.EventLogModel;
 import com.bsmwireless.widgets.common.FontTextView;
 
 import java.util.ArrayList;
@@ -46,7 +47,7 @@ public class GraphLayout extends LinearLayout {
         init(context);
     }
 
-    public void setELDEvents(List<ELDEvent> logs, long startDayTime) {
+    public void setELDEvents(List<EventLogModel> logs, long startDayTime) {
         if (mELDGraphView != null) {
             mELDGraphView.setLogs(filterOffNotDutyTypeEvents(logs), startDayTime);
         }
@@ -85,9 +86,9 @@ public class GraphLayout extends LinearLayout {
         mUnbinder.unbind();
     }
 
-    private List<ELDEvent> filterOffNotDutyTypeEvents(List<ELDEvent> events) {
-        List<ELDEvent> result = new ArrayList<>();
-        for (ELDEvent event : events) {
+    private List<EventLogModel> filterOffNotDutyTypeEvents(List<EventLogModel> events) {
+        List<EventLogModel> result = new ArrayList<>();
+        for (EventLogModel event : events) {
             if (event.getEventType().equals(ELDEvent.EventType.DUTY_STATUS_CHANGING.getValue())) {
                 result.add(event);
             }
