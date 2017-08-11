@@ -1,10 +1,11 @@
 package com.bsmwireless.screens.driverprofile;
 
-import android.content.Context;
 import android.content.res.Resources;
 
+import com.bsmwireless.data.storage.carriers.CarrierEntity;
+import com.bsmwireless.data.storage.hometerminals.HomeTerminalEntity;
+import com.bsmwireless.data.storage.users.FullUserEntity;
 import com.bsmwireless.data.storage.users.UserConverter;
-import com.bsmwireless.data.storage.users.UserEntity;
 import com.bsmwireless.domain.interactors.LoginUserInteractor;
 
 import org.junit.Before;
@@ -18,8 +19,9 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
-import app.bsmuniversal.com.R;
 import app.bsmuniversal.com.RxSchedulerRule;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
@@ -44,9 +46,6 @@ public class DriverProfilePresenterTest {
     public static final RxSchedulerRule RULE = new RxSchedulerRule();
 
     @Mock
-    Context mContext;
-
-    @Mock
     Resources mResources;
 
     @Mock
@@ -60,7 +59,7 @@ public class DriverProfilePresenterTest {
     private final String mTestSignature = "51,377;89,310;89,310;-544,-1";
     private final String mTooLongTestSignature;
 
-    private UserEntity mFakeUserEntity;
+    private FullUserEntity mFakeFullUserEntity;
     private DriverProfilePresenter mDriverProfilePresenter;
 
 
@@ -72,28 +71,27 @@ public class DriverProfilePresenterTest {
     public void before() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        mFakeUserEntity = new UserEntity();
-        mDriverProfilePresenter = new DriverProfilePresenter(mContext, mView, mLoginUserInteractor);
+        mFakeFullUserEntity = new FullUserEntity();
+        mDriverProfilePresenter = new DriverProfilePresenter(mView, mLoginUserInteractor);
     }
 
     @Test
     public void testOnNeedUpdateUserInfo() {
         // given
-        final UserEntity user = new UserEntity();
-        when(mLoginUserInteractor.getUser()).thenReturn(Flowable.just(user));
+        when(mLoginUserInteractor.getFullUser()).thenReturn(Flowable.just(mFakeFullUserEntity));
 
         // when
         mDriverProfilePresenter.onNeedUpdateUserInfo();
 
         // then
-        verify(mView).setUserInfo(eq(user));
+        verify(mView).setUserInfo(eq(mFakeFullUserEntity.getUserEntity()));
     }
 
     @Test
     public void testOnNeedUpdateUserInfoError() {
         // given
         final Throwable error = new RuntimeException("error!");
-        when(mLoginUserInteractor.getUser()).thenReturn(Flowable.error(error));
+        when(mLoginUserInteractor.getFullUser()).thenReturn(Flowable.error(error));
 
         // when
         mDriverProfilePresenter.onNeedUpdateUserInfo();
@@ -103,61 +101,145 @@ public class DriverProfilePresenterTest {
     }
 
     @Test
+    public void testOnNeedUpdateUserInfoValidHomeTerminal() {
+        // given
+        List<HomeTerminalEntity> homeTerminals = new ArrayList<>();
+
+        HomeTerminalEntity ht1 = new HomeTerminalEntity();
+        ht1.setId(101);
+        ht1.setName("ht1");
+        homeTerminals.add(ht1);
+
+        HomeTerminalEntity ht2 = new HomeTerminalEntity();
+        ht2.setId(102);
+        ht2.setName("ht2");
+        homeTerminals.add(ht2);
+
+        HomeTerminalEntity ht3 = new HomeTerminalEntity();
+        ht3.setId(103);
+        ht3.setName("ht3");
+        homeTerminals.add(ht3);
+
+        final int selectedHomeTerminalId = 102;
+        final int listIdxOfSelected = 1;  // id 102 is at list index 1
+
+        // note that mFakeFullUserEntity is reset before every test is run
+        mFakeFullUserEntity.getUserEntity().setHomeTermId(selectedHomeTerminalId);
+        mFakeFullUserEntity.setHomeTerminalEntities(homeTerminals);
+
+        when(mLoginUserInteractor.getFullUser()).thenReturn(Flowable.just(mFakeFullUserEntity));
+
+        // when
+        mDriverProfilePresenter.onNeedUpdateUserInfo();
+
+        // then
+        verify(mView).setHomeTerminalsSpinner(any(List.class), eq(listIdxOfSelected));
+    }
+
+    @Test
+    public void testOnNeedUpdateUserInfoWithCarriers() {
+        // given
+        List<CarrierEntity> carriers = new ArrayList<>();
+
+        CarrierEntity ce1 = new CarrierEntity();
+        ce1.setId(101);
+        ce1.setName("ce1");
+        carriers.add(ce1);
+
+        CarrierEntity ce2 = new CarrierEntity();
+        ce2.setId(102);
+        ce2.setName("ce2");
+        carriers.add(ce2);
+
+        mFakeFullUserEntity.setCarriers(carriers);
+
+        when(mLoginUserInteractor.getFullUser()).thenReturn(Flowable.just(mFakeFullUserEntity));
+
+        // when
+        mDriverProfilePresenter.onNeedUpdateUserInfo();
+
+        // then
+        verify(mView).setCarrierInfo(eq(ce1));
+    }
+
+    @Test
     public void testOnSaveSignatureClickedNullUser() {
         // given
         setUserToNull();
 
-        when(mContext.getResources()).thenReturn(mResources);
-        when(mResources.getString(any(Integer.class))).thenReturn("mock error");
-
         // when
         mDriverProfilePresenter.onSaveSignatureClicked(mTestSignature);
 
         // then
-        verify(mView).showError(any(Throwable.class));  // Note: verification of string from resource is done in instrumented tests
+        verify(mView).showError(eq(DriverProfileView.Error.ERROR_INVALID_USER));
         verify(mView).hideControlButtons();
     }
 
     @Test
-    public void testOnSaveSignatureClickedValidUserShortSig() {
+    public void testOnSaveSignatureClickedValidUserShortSigSuccess() {
         // given
         setUserToNotNull();
+        when(mLoginUserInteractor.updateDriverSignature(anyString())).thenReturn(Observable.just(true));
 
         // when
         mDriverProfilePresenter.onSaveSignatureClicked(mTestSignature);
 
         // then
         verify(mView).hideControlButtons();
-        assertTrue(mFakeUserEntity.getSignature().equals(mTestSignature));
+        assertTrue(mFakeFullUserEntity.getUserEntity().getSignature().equals(mTestSignature));
+    }
+
+    @Test
+    public void testOnSaveSignatureClickedApiFailed() {
+        // given
+        setUserToNotNull();
+        when(mLoginUserInteractor.updateDriverSignature(anyString())).thenReturn(Observable.just(false));
+
+        // when
+        mDriverProfilePresenter.onSaveSignatureClicked(mTestSignature);
+
+        // then
+        verify(mView).showError(eq(DriverProfileView.Error.ERROR_SAVE_SIGNATURE));
+    }
+
+    @Test
+    public void testOnSaveSignatureClickedApiError() {
+        // given
+        setUserToNotNull();
+        when(mLoginUserInteractor.updateDriverSignature(anyString())).thenReturn(Observable.error(new Exception("broken :(")));
+
+        // when
+        mDriverProfilePresenter.onSaveSignatureClicked(mTestSignature);
+
+        // then
+        verify(mView).showError(any(Throwable.class));
     }
 
     @Test
     public void testOnSaveSignatureClickedValidUserLongSig() {
         // given
         setUserToNotNull(); // sets to mFakeUserEntity
-        when(mContext.getResources()).thenReturn(mResources);
-        when(mResources.getString(any(Integer.class))).thenReturn("mock resource string");
+        when(mLoginUserInteractor.updateDriverSignature(anyString())).thenReturn(Observable.just(true)); // API success
 
         // when
         mDriverProfilePresenter.onSaveSignatureClicked(mTooLongTestSignature);
 
         // then
-        verify(mView).showError(any(Throwable.class)); // signature-too-large error
-        assertTrue(mFakeUserEntity.getSignature().length() < MAX_SIGNATURE_LENGTH);  // check cropped
+        verify(mView).showError(eq(DriverProfileView.Error.ERROR_SIGNATURE_LENGTH));
+        assertTrue(mFakeFullUserEntity.getUserEntity().getSignature().length() <= MAX_SIGNATURE_LENGTH);  // check cropped
     }
 
     @Test
     public void testOnSaveUserInfoNullUser() {
         // given
         setUserToNull();
-        when(mContext.getResources()).thenReturn(mResources);
         when(mResources.getString(any(Integer.class))).thenReturn("mock resource string");
 
         // when
         mDriverProfilePresenter.onSaveUserInfo();
 
         // then
-        verify(mView).showError(any(Exception.class));
+        verify(mView).showError(eq(DriverProfileView.Error.ERROR_INVALID_USER));
     }
 
     @Test
@@ -169,7 +251,7 @@ public class DriverProfilePresenterTest {
         mDriverProfilePresenter.onSaveUserInfo();
 
         // then
-        verify(mView).setResults(eq(UserConverter.toUser(mFakeUserEntity)));
+        verify(mView).setResults(eq(UserConverter.toUser(mFakeFullUserEntity.getUserEntity())));
     }
 
     @Test
@@ -179,18 +261,7 @@ public class DriverProfilePresenterTest {
         String newPwd = "newPwd";
         String confirmPwd = newPwd;
 
-        String mockStrValidPass = "mock valid password";
-        String mockStrDriverProfilePwdEmpty = "mock empty password";
-        String mockStrDriverProfilePwdNoMatch = "mock no-match password";
-        String mockStrDriverProfilePwdNoChange = "mock password not changed";
-
-        when(mContext.getString(eq(R.string.driver_profile_valid_password))).thenReturn(mockStrValidPass);
-        when(mContext.getString(eq(R.string.driver_profile_password_field_empty))).thenReturn(mockStrDriverProfilePwdEmpty);
-        when(mContext.getString(eq(R.string.driver_profile_password_not_match))).thenReturn(mockStrDriverProfilePwdNoMatch);
-        when(mContext.getString(eq(R.string.driver_profile_password_not_changed))).thenReturn(mockStrDriverProfilePwdNoChange);
-
         when(mLoginUserInteractor.updateDriverPassword(anyString(), anyString())).thenReturn(Observable.just(true));
-
 
         // when
         mDriverProfilePresenter.onChangePasswordClick(oldPwd, newPwd, confirmPwd);
@@ -206,16 +277,6 @@ public class DriverProfilePresenterTest {
         String newPwd = "newPwd";
         String confirmPwd = newPwd;
 
-        String mockStrValidPass = "mock valid password";
-        String mockStrDriverProfilePwdEmpty = "mock empty password";
-        String mockStrDriverProfilePwdNoMatch = "mock no-match password";
-        String mockStrDriverProfilePwdNoChange = "mock password not changed";
-
-        when(mContext.getString(eq(R.string.driver_profile_valid_password))).thenReturn(mockStrValidPass);
-        when(mContext.getString(eq(R.string.driver_profile_password_field_empty))).thenReturn(mockStrDriverProfilePwdEmpty);
-        when(mContext.getString(eq(R.string.driver_profile_password_not_match))).thenReturn(mockStrDriverProfilePwdNoMatch);
-        when(mContext.getString(eq(R.string.driver_profile_password_not_changed))).thenReturn(mockStrDriverProfilePwdNoChange);
-
         when(mLoginUserInteractor.updateDriverPassword(anyString(), anyString())).thenReturn(Observable.just(true));
 
 
@@ -223,7 +284,7 @@ public class DriverProfilePresenterTest {
         mDriverProfilePresenter.onChangePasswordClick(oldPwd, newPwd, confirmPwd);
 
         // then
-        verify(mView).showChangePasswordError(eq(mockStrDriverProfilePwdEmpty));
+        verify(mView).showError(eq(DriverProfileView.PasswordError.PASSWORD_FIELD_EMPTY));
     }
 
     @Test
@@ -233,16 +294,6 @@ public class DriverProfilePresenterTest {
         String newPwd = "";
         String confirmPwd = "confirmPwd";
 
-        String mockStrValidPass = "mock valid password";
-        String mockStrDriverProfilePwdEmpty = "mock empty password";
-        String mockStrDriverProfilePwdNoMatch = "mock no-match password";
-        String mockStrDriverProfilePwdNoChange = "mock password not changed";
-
-        when(mContext.getString(eq(R.string.driver_profile_valid_password))).thenReturn(mockStrValidPass);
-        when(mContext.getString(eq(R.string.driver_profile_password_field_empty))).thenReturn(mockStrDriverProfilePwdEmpty);
-        when(mContext.getString(eq(R.string.driver_profile_password_not_match))).thenReturn(mockStrDriverProfilePwdNoMatch);
-        when(mContext.getString(eq(R.string.driver_profile_password_not_changed))).thenReturn(mockStrDriverProfilePwdNoChange);
-
         when(mLoginUserInteractor.updateDriverPassword(anyString(), anyString())).thenReturn(Observable.just(true));
 
 
@@ -250,7 +301,7 @@ public class DriverProfilePresenterTest {
         mDriverProfilePresenter.onChangePasswordClick(oldPwd, newPwd, confirmPwd);
 
         // then
-        verify(mView).showChangePasswordError(eq(mockStrDriverProfilePwdEmpty));
+        verify(mView).showError(eq(DriverProfileView.PasswordError.PASSWORD_FIELD_EMPTY));
     }
 
     @Test
@@ -260,16 +311,6 @@ public class DriverProfilePresenterTest {
         String newPwd = "newPwd";
         String confirmPwd = "confirmPwd";
 
-        String mockStrValidPass = "mock valid password";
-        String mockStrDriverProfilePwdEmpty = "mock empty password";
-        String mockStrDriverProfilePwdNoMatch = "mock no-match password";
-        String mockStrDriverProfilePwdNoChange = "mock password not changed";
-
-        when(mContext.getString(eq(R.string.driver_profile_valid_password))).thenReturn(mockStrValidPass);
-        when(mContext.getString(eq(R.string.driver_profile_password_field_empty))).thenReturn(mockStrDriverProfilePwdEmpty);
-        when(mContext.getString(eq(R.string.driver_profile_password_not_match))).thenReturn(mockStrDriverProfilePwdNoMatch);
-        when(mContext.getString(eq(R.string.driver_profile_password_not_changed))).thenReturn(mockStrDriverProfilePwdNoChange);
-
         when(mLoginUserInteractor.updateDriverPassword(anyString(), anyString())).thenReturn(Observable.just(true));
 
 
@@ -277,7 +318,7 @@ public class DriverProfilePresenterTest {
         mDriverProfilePresenter.onChangePasswordClick(oldPwd, newPwd, confirmPwd);
 
         // then
-        verify(mView).showChangePasswordError(eq(mockStrDriverProfilePwdNoMatch));
+        verify(mView).showError(eq(DriverProfileView.PasswordError.PASSWORD_NOT_MATCH));
     }
 
     @Test
@@ -287,16 +328,6 @@ public class DriverProfilePresenterTest {
         String newPwd = "newPwd";
         String confirmPwd = newPwd;
 
-        String mockStrValidPass = "mock valid password";
-        String mockStrDriverProfilePwdEmpty = "mock empty password";
-        String mockStrDriverProfilePwdNoMatch = "mock no-match password";
-        String mockStrDriverProfilePwdNoChange = "mock password not changed";
-
-        when(mContext.getString(eq(R.string.driver_profile_valid_password))).thenReturn(mockStrValidPass);
-        when(mContext.getString(eq(R.string.driver_profile_password_field_empty))).thenReturn(mockStrDriverProfilePwdEmpty);
-        when(mContext.getString(eq(R.string.driver_profile_password_not_match))).thenReturn(mockStrDriverProfilePwdNoMatch);
-        when(mContext.getString(eq(R.string.driver_profile_password_not_changed))).thenReturn(mockStrDriverProfilePwdNoChange);
-
         when(mLoginUserInteractor.updateDriverPassword(anyString(), anyString())).thenReturn(Observable.just(false));
 
 
@@ -304,7 +335,7 @@ public class DriverProfilePresenterTest {
         mDriverProfilePresenter.onChangePasswordClick(oldPwd, newPwd, confirmPwd);
 
         // then
-        verify(mView).showError(any(Exception.class));
+        verify(mView).showError(eq(DriverProfileView.Error.ERROR_CHANGE_PASSWORD));
     }
 
     @Test
@@ -313,16 +344,6 @@ public class DriverProfilePresenterTest {
         String oldPwd = "oldPwd";
         String newPwd = "newPwd";
         String confirmPwd = newPwd;
-
-        String mockStrValidPass = "mock valid password";
-        String mockStrDriverProfilePwdEmpty = "mock empty password";
-        String mockStrDriverProfilePwdNoMatch = "mock no-match password";
-        String mockStrDriverProfilePwdNoChange = "mock password not changed";
-
-        when(mContext.getString(eq(R.string.driver_profile_valid_password))).thenReturn(mockStrValidPass);
-        when(mContext.getString(eq(R.string.driver_profile_password_field_empty))).thenReturn(mockStrDriverProfilePwdEmpty);
-        when(mContext.getString(eq(R.string.driver_profile_password_not_match))).thenReturn(mockStrDriverProfilePwdNoMatch);
-        when(mContext.getString(eq(R.string.driver_profile_password_not_changed))).thenReturn(mockStrDriverProfilePwdNoChange);
 
         when(mLoginUserInteractor.updateDriverPassword(anyString(), anyString())).thenReturn(Observable.error(new Exception("didn't work")));
 
@@ -400,15 +421,15 @@ public class DriverProfilePresenterTest {
      */
     private void setUserToNull() {
         try {
-            Field field = mDriverProfilePresenter.getClass().getDeclaredField("mUserEntity");
+            Field field = mDriverProfilePresenter.getClass().getDeclaredField("mFullUserEntity");
             field.setAccessible(true);
             field.set(mDriverProfilePresenter, null);
         } catch (NoSuchFieldException e) {
             e.printStackTrace();
-            fail("could not explicitly set mDriverProfilePresenter.mUserEntity to null");
+            fail("could not explicitly set mDriverProfilePresenter.mFullUserEntity to null");
         } catch (IllegalAccessException e) {
             e.printStackTrace();
-            fail("could not access mDriverProfilePresenter.mUserEntity");
+            fail("could not access mDriverProfilePresenter.mFullUserEntity");
         }
     }
 
@@ -419,15 +440,15 @@ public class DriverProfilePresenterTest {
      */
     private void setUserToNotNull() {
         try {
-            Field field = mDriverProfilePresenter.getClass().getDeclaredField("mUserEntity");
+            Field field = mDriverProfilePresenter.getClass().getDeclaredField("mFullUserEntity");
             field.setAccessible(true);
-            field.set(mDriverProfilePresenter, mFakeUserEntity);
+            field.set(mDriverProfilePresenter, mFakeFullUserEntity);
         } catch (NoSuchFieldException e) {
             e.printStackTrace();
-            fail("could not explicitly set mDriverProfilePresenter.mUserEntity");
+            fail("could not explicitly set mDriverProfilePresenter.mFullUserEntity");
         } catch (IllegalAccessException e) {
             e.printStackTrace();
-            fail("could not access mDriverProfilePresenter.mUserEntity");
+            fail("could not access mDriverProfilePresenter.mFullUserEntity");
         }
     }
 
