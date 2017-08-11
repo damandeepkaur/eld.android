@@ -1,6 +1,5 @@
 package com.bsmwireless.screens.driverprofile;
 
-import com.bsmwireless.data.network.RetrofitException;
 import com.bsmwireless.data.storage.carriers.CarrierEntity;
 import com.bsmwireless.data.storage.hometerminals.HomeTerminalEntity;
 import com.bsmwireless.data.storage.users.UserEntity;
