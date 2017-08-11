@@ -12,7 +12,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import app.bsmuniversal.com.R;
 import app.bsmuniversal.com.RxSchedulerRule;
 import io.reactivex.Observable;
 

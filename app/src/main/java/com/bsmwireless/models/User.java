@@ -1,18 +1,16 @@
-
 package com.bsmwireless.models;
 
+import java.util.List;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import java.util.List;
-
 public class User implements Parcelable {
+
     public enum DriverType {
         DRIVER,
         CO_DRIVER,
@@ -23,30 +21,12 @@ public class User implements Parcelable {
     @SerializedName("id")
     @Expose
     private Integer mId;
-    @SerializedName("username")
-    @Expose
-    private String mUsername;
-    @SerializedName("password")
-    @Expose
-    private String mPassword;
     @SerializedName("timezone")
     @Expose
     private String mTimezone;
     @SerializedName("email")
     @Expose
     private String mEmail;
-    @SerializedName("address")
-    @Expose
-    private String mAddress;
-    @SerializedName("city")
-    @Expose
-    private String mCity;
-    @SerializedName("state")
-    @Expose
-    private String mState;
-    @SerializedName("country")
-    @Expose
-    private String mCountry;
     @SerializedName("license")
     @Expose
     private String mLicense;
@@ -59,15 +39,21 @@ public class User implements Parcelable {
     @SerializedName("updated")
     @Expose
     private Boolean mUpdated;
-    @SerializedName("organization")
+    @SerializedName("dot")
     @Expose
-    private String mOrganization;
-    @SerializedName("configuration")
-    @Expose
-    private List<Configuration> mConfigurations;
+    private String mDot;
     @SerializedName("syncTime")
     @Expose
     private Long mSyncTime;
+    @SerializedName("configuration")
+    @Expose
+    private List<SyncConfiguration> mConfigurations = null;
+    @SerializedName("home")
+    @Expose
+    private List<HomeTerminal> mHomeTerminals = null;
+    @SerializedName("carrier")
+    @Expose
+    private List<Carrier> mCarriers = null;
     @SerializedName("auth")
     @Expose
     private Auth mAuth;
@@ -80,31 +66,60 @@ public class User implements Parcelable {
     @SerializedName("lastName")
     @Expose
     private String mLastName;
+    @SerializedName("dutyCycle")
+    @Expose
+    private String mDutyCycle;
     @SerializedName("ruleException")
     @Expose
     private String mRuleException;
-    @SerializedName("applyDST")
+    @SerializedName("homeTermId")
     @Expose
-    private Integer mApplyDST;
-    @SerializedName("usCycle")
+    private Integer mHomeTermId;
+    @SerializedName("uom")
     @Expose
-    private Integer mUsCycle;
-    @SerializedName("caCycle")
-    @Expose
-    private Integer mCaCycle;
-    @SerializedName("cycleCountry")
-    @Expose
-    private Integer mCycleCountry;
-    @SerializedName("orgAddr")
-    @Expose
-    private String mOrgAddr;
+    private Integer mUom;
+    public final static Parcelable.Creator<User> CREATOR = new Creator<User>() {
+
+        @SuppressWarnings({
+            "unchecked"
+        })
+        public User createFromParcel(Parcel in) {
+            User instance = new User();
+            instance.mId = ((Integer) in.readValue((Integer.class.getClassLoader())));
+            instance.mTimezone = ((String) in.readValue((String.class.getClassLoader())));
+            instance.mEmail = ((String) in.readValue((String.class.getClassLoader())));
+            instance.mLicense = ((String) in.readValue((String.class.getClassLoader())));
+            instance.mSignature = ((String) in.readValue((String.class.getClassLoader())));
+            instance.mExempt = ((Boolean) in.readValue((Boolean.class.getClassLoader())));
+            instance.mUpdated = ((Boolean) in.readValue((Boolean.class.getClassLoader())));
+            instance.mDot = ((String) in.readValue((String.class.getClassLoader())));
+            instance.mSyncTime = ((Long) in.readValue((Long.class.getClassLoader())));
+            in.readList(instance.mConfigurations, (SyncConfiguration.class.getClassLoader()));
+            in.readList(instance.mHomeTerminals, (HomeTerminal.class.getClassLoader()));
+            in.readList(instance.mCarriers, (com.bsmwireless.models.Carrier.class.getClassLoader()));
+            instance.mAuth = ((Auth) in.readValue((Auth.class.getClassLoader())));
+            instance.mFirstName = ((String) in.readValue((String.class.getClassLoader())));
+            instance.mMidName = ((String) in.readValue((String.class.getClassLoader())));
+            instance.mLastName = ((String) in.readValue((String.class.getClassLoader())));
+            instance.mDutyCycle = ((String) in.readValue((String.class.getClassLoader())));
+            instance.mRuleException = ((String) in.readValue((String.class.getClassLoader())));
+            instance.mHomeTermId = ((Integer) in.readValue((Integer.class.getClassLoader())));
+            instance.mUom = ((Integer) in.readValue((Integer.class.getClassLoader())));
+            return instance;
+        }
+
+        public User[] newArray(int size) {
+            return (new User[size]);
+        }
+
+    };
 
     public Integer getId() {
         return mId;
     }
 
     public void setId(Integer id) {
-        mId = id;
+        this.mId = id;
     }
 
     public String getTimezone() {
@@ -112,7 +127,7 @@ public class User implements Parcelable {
     }
 
     public void setTimezone(String timezone) {
-        mTimezone = timezone;
+        this.mTimezone = timezone;
     }
 
     public String getEmail() {
@@ -120,39 +135,7 @@ public class User implements Parcelable {
     }
 
     public void setEmail(String email) {
-        mEmail = email;
-    }
-
-    public String getAddress() {
-        return mAddress;
-    }
-
-    public void setAddress(String address) {
-        mAddress = address;
-    }
-
-    public String getCity() {
-        return mCity;
-    }
-
-    public void setCity(String city) {
-        mCity = city;
-    }
-
-    public String getState() {
-        return mState;
-    }
-
-    public void setState(String state) {
-        mState = state;
-    }
-
-    public String getCountry() {
-        return mCountry;
-    }
-
-    public void setCountry(String country) {
-        mCountry = country;
+        this.mEmail = email;
     }
 
     public String getLicense() {
@@ -160,7 +143,7 @@ public class User implements Parcelable {
     }
 
     public void setLicense(String license) {
-        mLicense = license;
+        this.mLicense = license;
     }
 
     public String getSignature() {
@@ -168,7 +151,7 @@ public class User implements Parcelable {
     }
 
     public void setSignature(String signature) {
-        mSignature = signature;
+        this.mSignature = signature;
     }
 
     public Boolean getExempt() {
@@ -184,23 +167,15 @@ public class User implements Parcelable {
     }
 
     public void setUpdated(Boolean updated) {
-        mUpdated = updated;
+        this.mUpdated = updated;
     }
 
-    public String getOrganization() {
-        return mOrganization;
+    public String getDot() {
+        return mDot;
     }
 
-    public void setOrganization(String organization) {
-        mOrganization = organization;
-    }
-
-    public List<Configuration> getConfigurations() {
-        return mConfigurations;
-    }
-
-    public void setConfigurations(List<Configuration> configurations) {
-        mConfigurations = configurations;
+    public void setDot(String dot) {
+        this.mDot = dot;
     }
 
     public Long getSyncTime() {
@@ -208,7 +183,31 @@ public class User implements Parcelable {
     }
 
     public void setSyncTime(Long syncTime) {
-        mSyncTime = syncTime;
+        this.mSyncTime = syncTime;
+    }
+
+    public List<SyncConfiguration> getConfigurations() {
+        return mConfigurations;
+    }
+
+    public void setConfigurations(List<SyncConfiguration> configurations) {
+        this.mConfigurations = configurations;
+    }
+
+    public List<HomeTerminal> getHomeTerminals() {
+        return mHomeTerminals;
+    }
+
+    public void setHomeTerminals(List<HomeTerminal> homeTerminals) {
+        this.mHomeTerminals = homeTerminals;
+    }
+
+    public List<Carrier> getCarriers() {
+        return mCarriers;
+    }
+
+    public void setCarriers(List<Carrier> carriers) {
+        this.mCarriers = carriers;
     }
 
     public Auth getAuth() {
@@ -216,7 +215,7 @@ public class User implements Parcelable {
     }
 
     public void setAuth(Auth auth) {
-        mAuth = auth;
+        this.mAuth = auth;
     }
 
     public String getFirstName() {
@@ -224,7 +223,7 @@ public class User implements Parcelable {
     }
 
     public void setFirstName(String firstName) {
-        mFirstName = firstName;
+        this.mFirstName = firstName;
     }
 
     public String getMidName() {
@@ -232,7 +231,7 @@ public class User implements Parcelable {
     }
 
     public void setMidName(String midName) {
-        mMidName = midName;
+        this.mMidName = midName;
     }
 
     public String getLastName() {
@@ -240,7 +239,15 @@ public class User implements Parcelable {
     }
 
     public void setLastName(String lastName) {
-        mLastName = lastName;
+        this.mLastName = lastName;
+    }
+
+    public String getDutyCycle() {
+        return mDutyCycle;
+    }
+
+    public void setDutyCycle(String dutyCycle) {
+        this.mDutyCycle = dutyCycle;
     }
 
     public String getRuleException() {
@@ -248,133 +255,23 @@ public class User implements Parcelable {
     }
 
     public void setRuleException(String ruleException) {
-        mRuleException = ruleException;
+        this.mRuleException = ruleException;
     }
 
-    public Integer getApplyDST() {
-        return mApplyDST;
+    public Integer getHomeTermId() {
+        return mHomeTermId;
     }
 
-    public void setApplyDST(Integer applyDST) {
-        mApplyDST = applyDST;
+    public void setHomeTermId(Integer homeTermId) {
+        this.mHomeTermId = homeTermId;
     }
 
-    public Integer getUsCycle() {
-        return mUsCycle;
+    public Integer getUom() {
+        return mUom;
     }
 
-    public void setUsCycle(Integer usCycle) {
-        mUsCycle = usCycle;
-    }
-
-    public Integer getCaCycle() {
-        return mCaCycle;
-    }
-
-    public void setCaCycle(Integer caCycle) {
-        mCaCycle = caCycle;
-    }
-
-    public Integer getCycleCountry() {
-        return mCycleCountry;
-    }
-
-    public void setCycleCountry(Integer cycleCountry) {
-        mCycleCountry = cycleCountry;
-    }
-
-    public String getOrgAddr() {
-        return mOrgAddr;
-    }
-
-    public void setOrgAddr(String orgAddr) {
-        mOrgAddr = orgAddr;
-    }
-
-    public String getUsername() {
-        return mUsername;
-    }
-
-    public void setUsername(String username) {
-        mUsername = username;
-    }
-
-    public String getPassword() {
-        return mPassword;
-    }
-
-    public void setPassword(String password) {
-        mPassword = password;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-
-        if (o == null || getClass() != o.getClass()) return false;
-
-        User user = (User) o;
-
-        return new EqualsBuilder()
-                .append(mId, user.mId)
-                .append(mTimezone, user.mTimezone)
-                .append(mEmail, user.mEmail)
-                .append(mAddress, user.mAddress)
-                .append(mCity, user.mCity)
-                .append(mState, user.mState)
-                .append(mCountry, user.mCountry)
-                .append(mLicense, user.mLicense)
-                .append(mSignature, user.mSignature)
-                .append(mExempt, user.mExempt)
-                .append(mUpdated, user.mUpdated)
-                .append(mOrganization, user.mOrganization)
-                .append(mConfigurations, user.mConfigurations)
-                .append(mSyncTime, user.mSyncTime)
-                .append(mAuth, user.mAuth)
-                .append(mFirstName, user.mFirstName)
-                .append(mMidName, user.mMidName)
-                .append(mLastName, user.mLastName)
-                .append(mRuleException, user.mRuleException)
-                .append(mApplyDST, user.mApplyDST)
-                .append(mUsCycle, user.mUsCycle)
-                .append(mCaCycle, user.mCaCycle)
-                .append(mCycleCountry, user.mCycleCountry)
-                .append(mOrgAddr, user.mOrgAddr)
-                .append(mUsername, user.mUsername)
-                .append(mPassword, user.mPassword)
-                .isEquals();
-    }
-
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder(17, 37)
-                .append(mId)
-                .append(mTimezone)
-                .append(mEmail)
-                .append(mAddress)
-                .append(mCity)
-                .append(mState)
-                .append(mCountry)
-                .append(mLicense)
-                .append(mSignature)
-                .append(mExempt)
-                .append(mUpdated)
-                .append(mOrganization)
-                .append(mConfigurations)
-                .append(mSyncTime)
-                .append(mAuth)
-                .append(mFirstName)
-                .append(mMidName)
-                .append(mLastName)
-                .append(mRuleException)
-                .append(mApplyDST)
-                .append(mUsCycle)
-                .append(mCaCycle)
-                .append(mCycleCountry)
-                .append(mOrgAddr)
-                .append(mUsername)
-                .append(mPassword)
-                .toHashCode();
+    public void setUom(Integer uom) {
+        this.mUom = uom;
     }
 
     @Override
@@ -383,109 +280,87 @@ public class User implements Parcelable {
         sb.append("mId=").append(mId);
         sb.append(", mTimezone='").append(mTimezone).append('\'');
         sb.append(", mEmail='").append(mEmail).append('\'');
-        sb.append(", mAddress='").append(mAddress).append('\'');
-        sb.append(", mCity='").append(mCity).append('\'');
-        sb.append(", mState='").append(mState).append('\'');
-        sb.append(", mCountry='").append(mCountry).append('\'');
         sb.append(", mLicense='").append(mLicense).append('\'');
         sb.append(", mSignature='").append(mSignature).append('\'');
-        sb.append(", mExempt='").append(mExempt).append('\'');
+        sb.append(", mExempt=").append(mExempt);
         sb.append(", mUpdated=").append(mUpdated);
-        sb.append(", mOrganization='").append(mOrganization).append('\'');
-        sb.append(", mConfigurations=").append(mConfigurations);
+        sb.append(", mDot='").append(mDot).append('\'');
         sb.append(", mSyncTime=").append(mSyncTime);
+        sb.append(", mConfigurations=").append(mConfigurations);
+        sb.append(", mHomeTerminals=").append(mHomeTerminals);
+        sb.append(", mCarriers=").append(mCarriers);
         sb.append(", mAuth=").append(mAuth);
         sb.append(", mFirstName='").append(mFirstName).append('\'');
         sb.append(", mMidName='").append(mMidName).append('\'');
         sb.append(", mLastName='").append(mLastName).append('\'');
+        sb.append(", mDutyCycle='").append(mDutyCycle).append('\'');
         sb.append(", mRuleException='").append(mRuleException).append('\'');
-        sb.append(", mApplyDST=").append(mApplyDST);
-        sb.append(", mUsCycle=").append(mUsCycle);
-        sb.append(", mCaCycle=").append(mCaCycle);
-        sb.append(", mCycleCountry=").append(mCycleCountry);
-        sb.append(", mOrgAddr='").append(mOrgAddr).append('\'');
-        sb.append(", mUsername='").append(mUsername).append('\'');
-        sb.append(", mPassword='").append(mPassword).append('\'');
+        sb.append(", mHomeTermId=").append(mHomeTermId);
+        sb.append(", mUom=").append(mUom);
         sb.append('}');
         return sb.toString();
     }
 
     @Override
-    public int describeContents() {
-        return 0;
+    public int hashCode() {
+        return new HashCodeBuilder().append(mId).append(mTimezone).append(mEmail).append(mLicense)
+                                    .append(mSignature).append(mExempt).append(mUpdated)
+                                    .append(mDot).append(mSyncTime).append(mConfigurations)
+                                    .append(mHomeTerminals).append(mCarriers).append(mAuth)
+                                    .append(mFirstName).append(mMidName).append(mLastName)
+                                    .append(mDutyCycle).append(mRuleException).append(mHomeTermId)
+                                    .append(mUom).toHashCode();
     }
 
     @Override
+    public boolean equals(Object other) {
+        if (other == this) {
+            return true;
+        }
+        if (!(other instanceof User)) {
+            return false;
+        }
+        User rhs = ((User) other);
+        return new EqualsBuilder().append(mId, rhs.mId).append(mTimezone, rhs.mTimezone)
+                                  .append(mEmail, rhs.mEmail).append(mLicense, rhs.mLicense)
+                                  .append(mSignature, rhs.mSignature).append(mExempt, rhs.mExempt)
+                                  .append(mUpdated, rhs.mUpdated).append(mDot, rhs.mDot)
+                                  .append(mSyncTime, rhs.mSyncTime)
+                                  .append(mConfigurations, rhs.mConfigurations)
+                                  .append(mHomeTerminals, rhs.mHomeTerminals).append(mCarriers, rhs.mCarriers)
+                                  .append(mAuth, rhs.mAuth).append(mFirstName, rhs.mFirstName)
+                                  .append(mMidName, rhs.mMidName).append(mLastName, rhs.mLastName)
+                                  .append(mDutyCycle, rhs.mDutyCycle)
+                                  .append(mRuleException, rhs.mRuleException)
+                                  .append(mHomeTermId, rhs.mHomeTermId).append(mUom, rhs.mUom)
+                                  .isEquals();
+    }
+
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeValue(this.mId);
-        dest.writeString(this.mUsername);
-        dest.writeString(this.mPassword);
-        dest.writeString(this.mTimezone);
-        dest.writeString(this.mEmail);
-        dest.writeString(this.mAddress);
-        dest.writeString(this.mCity);
-        dest.writeString(this.mState);
-        dest.writeString(this.mCountry);
-        dest.writeString(this.mLicense);
-        dest.writeString(this.mSignature);
-        dest.writeByte((byte) (this.mExempt ? 1 : 0));
-        dest.writeValue(this.mUpdated);
-        dest.writeString(this.mOrganization);
-        dest.writeTypedList(this.mConfigurations);
-        dest.writeValue(this.mSyncTime);
-        dest.writeParcelable(this.mAuth, flags);
-        dest.writeString(this.mFirstName);
-        dest.writeString(this.mMidName);
-        dest.writeString(this.mLastName);
-        dest.writeString(this.mRuleException);
-        dest.writeValue(this.mApplyDST);
-        dest.writeValue(this.mUsCycle);
-        dest.writeValue(this.mCaCycle);
-        dest.writeValue(this.mCycleCountry);
-        dest.writeString(this.mOrgAddr);
+        dest.writeValue(mId);
+        dest.writeValue(mTimezone);
+        dest.writeValue(mEmail);
+        dest.writeValue(mLicense);
+        dest.writeValue(mSignature);
+        dest.writeValue(mExempt);
+        dest.writeValue(mUpdated);
+        dest.writeValue(mDot);
+        dest.writeValue(mSyncTime);
+        dest.writeList(mConfigurations);
+        dest.writeList(mHomeTerminals);
+        dest.writeList(mCarriers);
+        dest.writeValue(mAuth);
+        dest.writeValue(mFirstName);
+        dest.writeValue(mMidName);
+        dest.writeValue(mLastName);
+        dest.writeValue(mDutyCycle);
+        dest.writeValue(mRuleException);
+        dest.writeValue(mHomeTermId);
+        dest.writeValue(mUom);
     }
 
-    public User() {
+    public int describeContents() {
+        return  0;
     }
 
-    protected User(Parcel in) {
-        this.mId = (Integer) in.readValue(Integer.class.getClassLoader());
-        this.mUsername = in.readString();
-        this.mPassword = in.readString();
-        this.mTimezone = in.readString();
-        this.mEmail = in.readString();
-        this.mAddress = in.readString();
-        this.mCity = in.readString();
-        this.mState = in.readString();
-        this.mCountry = in.readString();
-        this.mLicense = in.readString();
-        this.mSignature = in.readString();
-        this.mExempt = in.readByte() != 0;
-        this.mUpdated = (Boolean) in.readValue(Boolean.class.getClassLoader());
-        this.mOrganization = in.readString();
-        this.mConfigurations = in.createTypedArrayList(Configuration.CREATOR);
-        this.mSyncTime = (Long) in.readValue(Long.class.getClassLoader());
-        this.mAuth = in.readParcelable(Auth.class.getClassLoader());
-        this.mFirstName = in.readString();
-        this.mMidName = in.readString();
-        this.mLastName = in.readString();
-        this.mRuleException = in.readString();
-        this.mApplyDST = (Integer) in.readValue(Integer.class.getClassLoader());
-        this.mUsCycle = (Integer) in.readValue(Integer.class.getClassLoader());
-        this.mCaCycle = (Integer) in.readValue(Integer.class.getClassLoader());
-        this.mCycleCountry = (Integer) in.readValue(Integer.class.getClassLoader());
-        this.mOrgAddr = in.readString();
-    }
-
-    public static final Parcelable.Creator<User> CREATOR = new Parcelable.Creator<User>() {
-        @Override
-        public User createFromParcel(Parcel source) {
-            return new User(source);
-        }
-
-        @Override
-        public User[] newArray(int size) {
-            return new User[size];
-        }
-    };
 }
