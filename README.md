@@ -4,6 +4,7 @@ ELD app for Android
 # Version history
 
 * **1.0.31** - Updated driver profile screen
+* **1.0.30** - Show event for all types (_EA-271_)
 * **1.0.28** - Added Logs screen
 * **1.0.27** - Added Driver profile screen
 * **1.0.24** - Added error snacks

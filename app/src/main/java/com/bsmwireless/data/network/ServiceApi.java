@@ -93,7 +93,7 @@ public interface ServiceApi {
      * @return List of unidentified or changed event records {@link ELDEvent}.
      */
     @GET("v1/sync/records/search/{start}/{end}")
-    Observable<List<ELDEvent>> getELDEvents(@Path("start") long startTime, @Path("end") long endTime);
+    Observable<List<ELDEvent>> getELDEvents(@Path("start") Long startTime, @Path("end") Long endTime);
 
     /**
      * Update unidentified records or change record request.

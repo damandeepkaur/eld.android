@@ -16,10 +16,10 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="@dimen/logs_list_item_eld_seccond_line_height"
-        android:layout_marginBottom="@dimen/logs_list_item_eld_seccond_line_margin_bottom"
+        android:layout_height="@dimen/logs_list_item_eld_second_line_height"
+        android:layout_marginBottom="@dimen/logs_list_item_eld_second_line_margin_bottom"
         android:layout_marginLeft="@dimen/logs_list_item_eld_event_margin_left"
-        android:layout_marginTop="@dimen/logs_list_item_eld_seccond_line_margin_top">
+        android:layout_marginTop="@dimen/logs_list_item_eld_second_line_margin_top">
 
         <TextView
             android:id="@+id/event_time"
@@ -37,16 +37,6 @@
             android:layout_toRightOf="@id/event_time"
             android:gravity="center"
             android:textColor="@color/primary_text"
-            android:textSize="@dimen/text_size"/>
-
-        <TextView
-            android:id="@+id/vehicle_name"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="@dimen/logs_list_item_eld_event_vehicle_name_margin_end"
-            android:gravity="center"
-            android:textColor="@color/secondary_text"
             android:textSize="@dimen/text_size_small"/>
 
         <ImageView
@@ -57,6 +47,25 @@
             android:gravity="center"
             android:scaleType="centerInside"
             android:src="@drawable/ic_more_vert"/>
+
+        <TextView
+            android:id="@+id/vehicle_name"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_toLeftOf="@id/menu_button"
+            android:layout_toRightOf="@id/event_duration"
+            android:paddingLeft="@dimen/logs_list_item_eld_event_margin_left"
+            android:gravity="right"
+            android:maxLines="1"
+            android:ellipsize="marquee"
+            android:marqueeRepeatLimit ="marquee_forever"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:scrollHorizontally="true"
+            android:textColor="@color/secondary_text"
+            android:textSize="@dimen/text_size_small"/>
+
+
     </RelativeLayout>
 
     <TextView

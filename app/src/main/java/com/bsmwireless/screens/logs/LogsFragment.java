@@ -15,6 +15,7 @@ import com.bsmwireless.models.LogSheetHeader;
 import com.bsmwireless.screens.common.BaseFragment;
 import com.bsmwireless.screens.logs.LogsAdapter.OnLogsTitleStateChangeListener;
 import com.bsmwireless.screens.logs.dagger.DaggerLogsComponent;
+import com.bsmwireless.screens.logs.dagger.EventLogModel;
 import com.bsmwireless.screens.logs.dagger.LogsModule;
 import com.bsmwireless.screens.navigation.NavigateView;
 import com.bsmwireless.widgets.logs.LogsTitleView;
@@ -114,8 +115,8 @@ public class LogsFragment extends BaseFragment implements LogsView {
     }
 
     @Override
-    public void setELDEvents(List<ELDEvent> events) {
-        mAdapter.setELDEvents(events);
+    public void setEventLogs(List<EventLogModel> eventLogs) {
+        mAdapter.setEventLogs(eventLogs);
     }
 
     @Override
