@@ -101,7 +101,7 @@ public class LoginUserInteractor {
 
         return mBlackBoxInteractor.getData()
                 .flatMap(blackBox -> {
-                    logoutEvent.setTimezone(getTimezone(driverId));
+                    logoutEvent.setTimezone(getTimezoneSync(driverId));
                     logoutEvent.setEngineHours(blackBox.getEngineHours());
                     logoutEvent.setOdometer(blackBox.getOdometer());
                     logoutEvent.setLat(blackBox.getLat());
@@ -189,8 +189,12 @@ public class LoginUserInteractor {
         return id == null || id.isEmpty() ? -1 : Integer.valueOf(id);
     }
 
-    public String getTimezone(int driverId) {
+    public String getTimezoneSync(int driverId) {
         return mAppDatabase.userDao().getUserTimezoneSync(driverId);
+    }
+
+    public Flowable<String> getTimezone() {
+        return mAppDatabase.userDao().getUserTimezone(getDriverId());
     }
 
     public boolean isRememberMeEnabled() {

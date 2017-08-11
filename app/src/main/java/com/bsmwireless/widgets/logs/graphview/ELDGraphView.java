@@ -11,8 +11,10 @@ import android.view.View;
 import com.bsmwireless.common.utils.ViewUtils;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.widgets.alerts.DutyType;
+import com.bsmwireless.widgets.logs.DutyColors;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import app.bsmuniversal.com.R;
@@ -20,12 +22,14 @@ import app.bsmuniversal.com.R;
 public class ELDGraphView extends View {
 
     private final static int SEC_IN_MIN = 60;
-    private final static int MS_IN_SEC = 1000;
+    private final static int MS_IN_MIN = 60 * 1000;
+    private final static int MS_IN_DAY = 24 * 60 * MS_IN_MIN;
 
     private final int GRID_WIDTH_DP = 1;
     private final int LINE_WIDTH_DP = 3;
     private final int mDutyStatusCount = 4;
     private final int mHoursCount = 24;
+    private boolean invalidateLogsData;
     private float mTopOffset;
     private float mLeftOffset;
     private float mRightOffset;
@@ -36,30 +40,32 @@ public class ELDGraphView extends View {
     private float mGraphLeft;
     private float mGraphTop;
     private float mSegmentHeight;
-
     private Paint mGridPaint;
     private Paint mHeaderPaint;
-    private Paint mBarPaint;
-
+    private Paint mHorizontalLinesPaint;
+    private Paint mVerticalLinesPaint;
     private List<ELDEvent> mLogs;
     private Bitmap mBitmap;
+    private Paint mBitmapPaint;
+    private long mStartDayUnixTimeInMs;
+    private DutyColors mDutyColors;
 
     public ELDGraphView(Context context) {
         super(context);
-        init();
+        init(context);
     }
 
     public ELDGraphView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init();
+        init(context);
     }
 
     public ELDGraphView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init();
+        init(context);
     }
 
-    private void init() {
+    private void init(Context context) {
         mLogs = new ArrayList<>();
 
         mTopOffset = getResources().getDimensionPixelSize(R.dimen.graph_view_top_offset);
@@ -67,6 +73,9 @@ public class ELDGraphView extends View {
         mRightOffset = getResources().getDimensionPixelSize(R.dimen.graph_view_right_offset);
         mBottomOffset = getResources().getDimensionPixelSize(R.dimen.graph_view_bottom_offset);
         mTextSize = getResources().getDimension(R.dimen.text_size_smallest);
+
+        //initialize duty state colors
+        mDutyColors = new DutyColors(context);
 
         mGridPaint = new Paint();
         mGridPaint.setAntiAlias(true);
@@ -82,11 +91,22 @@ public class ELDGraphView extends View {
         mHeaderPaint.setTextSize(mTextSize);
         mHeaderPaint.setFakeBoldText(true);
 
-        mBarPaint = new Paint();
-        mBarPaint.setAntiAlias(true);
-        mBarPaint.setColor(ContextCompat.getColor(getContext(), R.color.offduty_light));
-        mBarPaint.setStyle(Paint.Style.STROKE);
-        mBarPaint.setStrokeWidth(ViewUtils.convertDpToPixels(LINE_WIDTH_DP, getContext()));
+        mHorizontalLinesPaint = new Paint();
+        mHorizontalLinesPaint.setAntiAlias(true);
+        mHorizontalLinesPaint.setColor(mDutyColors.getColor(DutyType.OFF_DUTY));
+        mHorizontalLinesPaint.setStyle(Paint.Style.STROKE);
+        mHorizontalLinesPaint.setStrokeWidth(ViewUtils.convertDpToPixels(LINE_WIDTH_DP, getContext()));
+
+        mVerticalLinesPaint = new Paint();
+        mVerticalLinesPaint.setAntiAlias(true);
+        mVerticalLinesPaint.setColor(mDutyColors.getColor(DutyType.OFF_DUTY));
+        mVerticalLinesPaint.setStyle(Paint.Style.STROKE);
+        mVerticalLinesPaint.setStrokeWidth(ViewUtils.convertDpToPixels(GRID_WIDTH_DP, getContext()));
+
+        mBitmapPaint = new Paint(Paint.FILTER_BITMAP_FLAG);
+
+
+        invalidateLogsData = true;
 
         setDrawingCacheEnabled(true);
     }
@@ -111,25 +131,24 @@ public class ELDGraphView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        if (mBitmap != null && !mBitmap.isRecycled()) {
-            canvas.drawBitmap(mBitmap, 0, 0, null);
-        } else {
+        if (invalidateLogsData) {
             Bitmap bitmap = getDrawingCache();
-            if (mBitmap != null) mBitmap.recycle();
             mBitmap = bitmap.copy(bitmap.getConfig(), true);
             Canvas bitmapCanvas = new Canvas(mBitmap);
             drawGridBackground(bitmapCanvas);
             drawLog(mLogs, bitmapCanvas);
+            invalidateLogsData = false;
+        }
 
-            canvas.drawBitmap(mBitmap, 0, 0, null);
+        if (mBitmap != null && !mBitmap.isRecycled()) {
+            canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
         }
     }
 
-    public void setLogs(final List<ELDEvent> logs) {
-        mLogs = filterEventBytType(logs, ELDEvent.EventType.DUTY_STATUS_CHANGING);
-        if (mBitmap != null) {
-            mBitmap.recycle();
-        }
+    public void setLogs(final List<ELDEvent> logs, long startDayTime) {
+        mLogs = logs;
+        mStartDayUnixTimeInMs = startDayTime;
+        invalidateLogsData = true;
         invalidate();
     }
 
@@ -179,8 +198,17 @@ public class ELDGraphView extends View {
         int firstEventCode = 1;
 
         float x1, x2, y1, y2;
-        x1 = mGraphLeft;
+
+        long firstLogDayTime = (logData.get(0).getEventTime() - mStartDayUnixTimeInMs) / MS_IN_MIN;
+        x1 = mGraphLeft + firstLogDayTime * gridUnit;
         y1 = mGraphTop + (logData.get(0).getEventCode() - firstEventCode) * mSegmentHeight + mSegmentHeight / 2;
+
+        ELDEvent endDayEvent = new ELDEvent();
+        endDayEvent.setEventCode(logData.get(logData.size() - 1).getEventCode());
+        Long endDayTime = mStartDayUnixTimeInMs + MS_IN_DAY;
+        long currentTime = Calendar.getInstance().getTimeInMillis();
+        endDayEvent.setEventTime(currentTime > endDayTime ? endDayTime : currentTime);
+        logData.add(endDayEvent);
 
         for (int i = 1; i < logData.size(); i++) {
             ELDEvent event = logData.get(i);
@@ -189,35 +217,20 @@ public class ELDGraphView extends View {
             Long logDate = event.getEventTime();
             Long prevLogDate = prevEvent.getEventTime();
 
-            long timeStamp = (logDate - prevLogDate) / (SEC_IN_MIN * MS_IN_SEC);
+            long timeStamp = (logDate - prevLogDate) / MS_IN_MIN;
 
             x2 = x1 + timeStamp * gridUnit;
             y2 = mGraphTop + (event.getEventCode() - firstEventCode) * mSegmentHeight + mSegmentHeight / 2;
 
-            mBarPaint.setColor(ContextCompat.getColor(getContext(), DutyType.getColorById(prevEvent.getEventCode())));
-            mBarPaint.setStrokeWidth(ViewUtils.convertDpToPixels(LINE_WIDTH_DP, getContext()));
-
-            canvas.drawLine(x1, y1, x2, y1, mBarPaint);
+            mHorizontalLinesPaint.setColor(mDutyColors.getColor(prevEvent.getEventCode()));
+            canvas.drawLine(x1, y1, x2, y1, mHorizontalLinesPaint);
 
             if (y1 != y2) {
-                mBarPaint.setColor(ContextCompat.getColor(getContext(), R.color.offduty_light));
-                mBarPaint.setStrokeWidth(ViewUtils.convertDpToPixels(GRID_WIDTH_DP, getContext()));
-
-                canvas.drawLine(x2, y1, x2, y2, mBarPaint);
+                canvas.drawLine(x2, y1, x2, y2, mVerticalLinesPaint);
             }
 
             x1 = x2;
             y1 = y2;
         }
-    }
-
-    private List<ELDEvent> filterEventBytType(List<ELDEvent> events, ELDEvent.EventType eventType) {
-        List<ELDEvent> result = new ArrayList<>();
-        for (ELDEvent event : events) {
-            if (event.getEventType().equals(eventType.getValue())) {
-                result.add(event);
-            }
-        }
-        return result;
     }
 }

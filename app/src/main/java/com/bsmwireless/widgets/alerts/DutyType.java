@@ -18,14 +18,6 @@ public enum DutyType {
         mColor = color;
     }
 
-    public int getId() {
-        return mId;
-    }
-
-    public int getName() {
-        return mName;
-    }
-
     public static int getNameById(int id) {
         for (DutyType t : DutyType.values()) {
             if (t.mId == id) {
@@ -45,11 +37,23 @@ public enum DutyType {
     }
 
     public static DutyType getTypeById(int id) {
-        for (DutyType t: DutyType.values()) {
+        for (DutyType t : DutyType.values()) {
             if (t.mId == id) {
                 return t;
             }
         }
         return DutyType.OFF_DUTY;
+    }
+
+    public int getId() {
+        return mId;
+    }
+
+    public int getName() {
+        return mName;
+    }
+
+    public int getColor() {
+        return mColor;
     }
 }
