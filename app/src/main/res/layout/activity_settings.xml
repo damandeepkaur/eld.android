@@ -47,14 +47,15 @@
         android:layout_alignParentRight="true"
         android:layout_below="@id/settings_app_bar"
         android:layout_marginEnd="@dimen/default_margin"
+        android:layout_marginRight="@dimen/default_margin"
         android:layout_marginTop="@dimen/default_margin"/>
 
     <View
         android:id="@+id/first_divider"
         android:layout_width="match_parent"
         android:layout_height="@dimen/divider_height"
-        android:layout_marginTop="@dimen/default_margin"
         android:layout_below="@id/lbl_box_gps"
+        android:layout_marginTop="@dimen/default_margin"
         android:background="?android:attr/listDivider"/>
 
     <TextView
@@ -80,14 +81,15 @@
         android:layout_alignParentRight="true"
         android:layout_below="@id/first_divider"
         android:layout_marginEnd="@dimen/default_margin"
+        android:layout_marginRight="@dimen/default_margin"
         android:layout_marginTop="@dimen/default_margin"/>
 
     <View
         android:id="@+id/second_divider"
         android:layout_width="match_parent"
         android:layout_height="@dimen/divider_height"
-        android:layout_marginTop="@dimen/default_margin"
         android:layout_below="@id/lbl_fixed_amount"
+        android:layout_marginTop="@dimen/default_margin"
         android:background="?android:attr/listDivider"/>
 
     <TextView
@@ -103,6 +105,19 @@
         android:text="@string/settings_odometer_units"
         android:textColor="@color/primary_text"
         android:textSize="@dimen/text_size"
+        android:textStyle="normal"/>
+
+    <TextView
+        android:id="@+id/lbl_odometer_units_value"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@id/lbl_odometer_units"
+        android:layout_marginLeft="@dimen/default_margin"
+        android:lineSpacingExtra="@dimen/text_view_line_spacing_extra_smaller"
+        android:textColor="@color/secondary_text"
+        android:textSize="@dimen/text_size_small"
         android:textStyle="normal"/>
 
 </RelativeLayout>

@@ -32,6 +32,12 @@ public class ResponseMessage implements Parcelable {
 
     };
 
+    public ResponseMessage() {}
+
+    public ResponseMessage(String message) {
+        mMessage = message;
+    }
+
     public String getMessage() {
         return mMessage;
     }

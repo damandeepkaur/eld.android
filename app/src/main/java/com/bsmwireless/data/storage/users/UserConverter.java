@@ -11,26 +11,21 @@ public class UserConverter {
             user.setId(entity.getId());
             user.setTimezone(entity.getTimezone());
             user.setEmail(entity.getEmail());
-            user.setAddress(entity.getAddress());
-            user.setCity(entity.getCity());
-            user.setState(entity.getState());
-            user.setCountry(entity.getCountry());
             user.setLicense(entity.getLicense());
             user.setSignature(entity.getSignature());
             user.setExempt(entity.getExempt());
             user.setUpdated(entity.getUpdated());
-            user.setOrganization(entity.getOrganization());
+            user.setDot(entity.getDot());
             user.setSyncTime(entity.getSyncTime());
+            //TODO: set configurations
             user.setFirstName(entity.getFirstName());
             user.setMidName(entity.getMidName());
             user.setLastName(entity.getLastName());
+            user.setDutyCycle(entity.getDutyCycle());
             user.setRuleException(entity.getRuleException());
-            user.setApplyDST(entity.getApplyDST());
-            user.setUsCycle(entity.getUsCycle());
-            user.setCaCycle(entity.getCaCycle());
-            user.setCycleCountry(entity.getCycleCountry());
-            user.setOrgAddr(entity.getOrgAddr());
-            //TODO: set configurations
+            user.setHomeTermId(entity.getHomeTermId());
+            user.setUom(entity.getUom());
+
         }
 
         return user;
@@ -44,25 +39,20 @@ public class UserConverter {
             entity.setId(user.getId());
             entity.setTimezone(user.getTimezone());
             entity.setEmail(user.getEmail());
-            entity.setAddress(user.getAddress());
-            entity.setCity(user.getCity());
-            entity.setState(user.getState());
-            entity.setCountry(user.getCountry());
             entity.setLicense(user.getLicense());
             entity.setSignature(user.getSignature());
             entity.setExempt(user.getExempt());
             entity.setUpdated(user.getUpdated());
-            entity.setOrganization(user.getOrganization());
+            entity.setDot(user.getDot());
             entity.setSyncTime(user.getSyncTime());
+            //TODO: set configurations
             entity.setFirstName(user.getFirstName());
             entity.setMidName(user.getMidName());
             entity.setLastName(user.getLastName());
+            entity.setDutyCycle(user.getDutyCycle());
             entity.setRuleException(user.getRuleException());
-            entity.setApplyDST(user.getApplyDST());
-            entity.setUsCycle(user.getUsCycle());
-            entity.setCaCycle(user.getCaCycle());
-            entity.setCycleCountry(user.getCycleCountry());
-            entity.setOrgAddr(user.getOrgAddr());
+            entity.setHomeTermId(user.getHomeTermId());
+            entity.setUom(user.getUom());
         }
 
         return entity;
