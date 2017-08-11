@@ -17,6 +17,7 @@ import com.bsmwireless.widgets.logs.calendar.CalendarItem;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -112,27 +113,32 @@ public class LogsPresenter {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(eldEvents -> {
                     List<EventLogModel> logs = new ArrayList<>(eldEvents.size());
-                    ELDEvent prevEvent = eldEvents.get(0);
-                    long duration = prevEvent.getEventTime() - startDayTime;
-                    logs.add(new EventLogModel(prevEvent, mTimeZone));
-
+                    List<EventLogModel> dutyStateLogs = Collections.EMPTY_LIST;
                     HashSet<Integer> vehicleIds = new HashSet<>();
-                    for (ELDEvent event : eldEvents) {
-                        EventLogModel log = new EventLogModel(event, mTimeZone);
 
-                        if (mVehicleIdToNameMap.containsKey(event.getVehicleId())) {
-                            log.setVehicleName(mVehicleIdToNameMap.get(event.getVehicleId()));
-                        } else {
-                            vehicleIds.add(event.getVehicleId());
+                    if(!eldEvents.isEmpty()) {
+                        ELDEvent prevEvent = eldEvents.get(0);
+                        long duration = prevEvent.getEventTime() - startDayTime;
+                        logs.add(new EventLogModel(prevEvent, mTimeZone));
+
+
+                        for (ELDEvent event : eldEvents) {
+                            EventLogModel log = new EventLogModel(event, mTimeZone);
+
+                            if (mVehicleIdToNameMap.containsKey(event.getVehicleId())) {
+                                log.setVehicleName(mVehicleIdToNameMap.get(event.getVehicleId()));
+                            } else {
+                                vehicleIds.add(event.getVehicleId());
+                            }
+
+                            logs.add(log);
                         }
 
-                        logs.add(log);
-                    }
-
-                    List<EventLogModel> dutyStateLogs = filterEventByType(logs, ELDEvent.EventType.DUTY_STATUS_CHANGING);
-                    for (int i = 1; i < dutyStateLogs.size(); i++) {
-                        duration = dutyStateLogs.get(i).getEventTime() - dutyStateLogs.get(i - 1).getEventTime();
-                        dutyStateLogs.get(i).setDuration(duration);
+                        dutyStateLogs = filterEventByType(logs, ELDEvent.EventType.DUTY_STATUS_CHANGING);
+                        for (int i = 1; i < dutyStateLogs.size(); i++) {
+                            duration = dutyStateLogs.get(i).getEventTime() - dutyStateLogs.get(i - 1).getEventTime();
+                            dutyStateLogs.get(i).setDuration(duration);
+                        }
                     }
 
                     mTripInfo.setStartDayTime(startDayTime);
