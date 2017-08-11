@@ -17,8 +17,6 @@ import android.widget.ScrollView;
 import android.widget.Toast;
 
 import com.bsmwireless.common.App;
-import com.bsmwireless.common.utils.DateUtils;
-import com.bsmwireless.common.utils.ViewUtils;
 import com.bsmwireless.data.storage.carriers.CarrierEntity;
 import com.bsmwireless.data.storage.hometerminals.HomeTerminalEntity;
 import com.bsmwireless.data.storage.users.UserEntity;
@@ -42,6 +40,7 @@ import timber.log.Timber;
 
 import static android.support.design.widget.BottomSheetBehavior.STATE_EXPANDED;
 import static android.support.design.widget.BottomSheetBehavior.STATE_HIDDEN;
+import static com.bsmwireless.common.utils.DateUtils.getFullTimeZone;
 
 public class DriverProfileActivity extends BaseMenuActivity implements DriverProfileView, SignatureLayout.OnSaveSignatureListener, AdapterView.OnItemSelectedListener {
 
@@ -163,7 +162,7 @@ public class DriverProfileActivity extends BaseMenuActivity implements DriverPro
     @Override
     public void setHomeTerminalInfo(HomeTerminalEntity homeTerminal) {
         mTerminalAddress.setText(homeTerminal.getAddress());
-        mHomeTerminalTimeZone.setText(ViewUtils.getFullTimeZone(homeTerminal.getTimezone(), Calendar.getInstance().getTimeInMillis()));
+        mHomeTerminalTimeZone.setText(getFullTimeZone(homeTerminal.getTimezone(), Calendar.getInstance().getTimeInMillis()));
     }
 
     @Override
@@ -174,7 +173,20 @@ public class DriverProfileActivity extends BaseMenuActivity implements DriverPro
     @Override
     public void showError(Throwable error) {
         // TODO: show notification to user
+        Timber.e(error.getMessage());
         Toast.makeText(this, error.getMessage(), Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showError(Error error) {
+        Timber.e(getString(error.getStringId()));
+        Toast.makeText(this, getString(error.getStringId()), Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showError(PasswordError error) {
+        Timber.e(getString(error.getStringId()));
+        setPasswordChangeError(getString(error.getStringId()));
     }
 
     @Override
@@ -200,50 +212,10 @@ public class DriverProfileActivity extends BaseMenuActivity implements DriverPro
     }
 
     @Override
-    public void showChangePasswordError(DriverProfilePresenter.PasswordError error) {
-        setPasswordChangeError(getString(error.getStringId()));
-    }
-
-    @Override
     public void showPasswordChanged() {
         // TODO: show notification to user
         Toast.makeText(this, getString(R.string.driver_profile_password_changed), Toast.LENGTH_SHORT).show();
         setPasswordChangeError(null);
-    }
-
-    @Override
-    public void showPasswordChangeError() {
-        // TODO: show notification to user
-        Timber.e(getString(R.string.driver_profile_password_not_changed));
-        Toast.makeText(this, getString(R.string.driver_profile_password_not_changed), Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void showSaveSignatureError() {
-        // TODO: show notification to user
-        Timber.e(getString(R.string.driver_profile_signature_changing_error));
-        Toast.makeText(this, getString(R.string.driver_profile_signature_changing_error), Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void showSignatureLengthError() {
-        // TODO: show notification to user
-        Timber.e(getString(R.string.driver_profile_signature_error));
-        Toast.makeText(this, getString(R.string.driver_profile_signature_error), Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void showInvalidUserError() {
-        // TODO: show notification to user
-        Timber.e(getString(R.string.driver_profile_user_error));
-        Toast.makeText(this, getString(R.string.driver_profile_user_error), Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void showHomeTerminalUpdateError() {
-        // TODO: show notification to user
-        Timber.e(getString(R.string.driver_profile_home_terminal_updating_error));
-        Toast.makeText(this, getString(R.string.driver_profile_home_terminal_updating_error), Toast.LENGTH_SHORT).show();
     }
 
     @OnClick(R.id.change_password_button)

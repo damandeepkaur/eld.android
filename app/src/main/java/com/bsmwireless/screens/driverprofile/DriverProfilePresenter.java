@@ -6,7 +6,6 @@ import com.bsmwireless.data.storage.users.FullUserEntity;
 import com.bsmwireless.data.storage.hometerminals.HomeTerminalEntity;
 import com.bsmwireless.data.storage.users.UserConverter;
 import com.bsmwireless.domain.interactors.LoginUserInteractor;
-import com.bsmwireless.models.PasswordModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +19,10 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
+import static com.bsmwireless.screens.driverprofile.DriverProfileView.PasswordError.PASSWORD_FIELD_EMPTY;
+import static com.bsmwireless.screens.driverprofile.DriverProfileView.PasswordError.PASSWORD_NOT_MATCH;
+import static com.bsmwireless.screens.driverprofile.DriverProfileView.PasswordError.VALID_PASSWORD;
+
 @ActivityScope
 public class DriverProfilePresenter {
 
@@ -32,22 +35,6 @@ public class DriverProfilePresenter {
     private FullUserEntity mFullUserEntity;
     private List<HomeTerminalEntity> mHomeTerminals;
     private CarrierEntity mCarrier;
-
-    public enum PasswordError {
-        VALID_PASSWORD(R.string.driver_profile_valid_password),
-        PASSWORD_NOT_MATCH(R.string.driver_profile_password_not_match),
-        PASSWORD_FIELD_EMPTY(R.string.driver_profile_password_field_empty);
-
-        private int mStringId;
-
-        PasswordError(int stringId) {
-            mStringId = stringId;
-        }
-
-        public int getStringId() {
-            return mStringId;
-        }
-    }
 
     @Inject
     public DriverProfilePresenter(DriverProfileView view, LoginUserInteractor loginUserInteractor) {
@@ -96,7 +83,7 @@ public class DriverProfilePresenter {
         if (mFullUserEntity != null) {
             if (signature.length() > MAX_SIGNATURE_LENGTH) {
                 signature = cropSignature(signature);
-                mView.showSignatureLengthError();
+                mView.showError(DriverProfileView.Error.ERROR_SIGNATURE_LENGTH);
             }
 
             mFullUserEntity.getUserEntity().setSignature(signature);
@@ -107,7 +94,7 @@ public class DriverProfilePresenter {
                                                         .subscribe(wasUpdated -> {
                                                                     Timber.d("Update signature: " + wasUpdated);
                                                                     if (!wasUpdated) {
-                                                                        mView.showSaveSignatureError();
+                                                                        mView.showError(DriverProfileView.Error.ERROR_SAVE_SIGNATURE);
                                                                     }
                                                                 },
                                                                 throwable -> {
@@ -116,7 +103,7 @@ public class DriverProfilePresenter {
                                                                 });
             mDisposables.add(disposable);
         } else {
-            mView.showInvalidUserError();
+            mView.showError(DriverProfileView.Error.ERROR_INVALID_USER);
         }
 
         mView.hideControlButtons();
@@ -126,13 +113,13 @@ public class DriverProfilePresenter {
         if (mFullUserEntity != null) {
             mView.setResults(UserConverter.toUser(mFullUserEntity.getUserEntity()));
         } else {
-            mView.showInvalidUserError();
+            mView.showError(DriverProfileView.Error.ERROR_INVALID_USER);
         }
     }
 
     public void onChangePasswordClick(String oldPwd, String newPwd, String confirmPwd) {
-        PasswordError validationError = validatePassword(oldPwd, newPwd, confirmPwd);
-        if (validationError.equals(PasswordError.VALID_PASSWORD)) {
+        DriverProfileView.PasswordError validationError = validatePassword(oldPwd, newPwd, confirmPwd);
+        if (validationError.equals(VALID_PASSWORD)) {
             Disposable disposable = mLoginUserInteractor.updateDriverPassword(oldPwd, newPwd)
                                                         .subscribeOn(Schedulers.io())
                                                         .observeOn(AndroidSchedulers.mainThread())
@@ -140,13 +127,13 @@ public class DriverProfilePresenter {
                                                                     if (passwordUpdated) {
                                                                         mView.showPasswordChanged();
                                                                     } else {
-                                                                        mView.showPasswordChangeError();
+                                                                        mView.showError(DriverProfileView.Error.ERROR_CHANGE_PASSWORD);
                                                                     }
                                                                 },
                                                                 throwable -> mView.showError(throwable));
             mDisposables.add(disposable);
         } else {
-            mView.showChangePasswordError(validationError);
+            mView.showError(validationError);
         }
     }
 
@@ -161,14 +148,14 @@ public class DriverProfilePresenter {
                                                         .observeOn(AndroidSchedulers.mainThread())
                                                         .subscribe(wasUpdated -> {
                                                             if (!wasUpdated) {
-                                                                mView.showHomeTerminalUpdateError();
+                                                                mView.showError(DriverProfileView.Error.ERROR_TERMINAL_UPDATE);
                                                             }
                                                         }, throwable -> mView.showError(throwable));
             mDisposables.add(disposable);
 
             mView.setHomeTerminalInfo(homeTerminal);
         } else {
-            mView.showHomeTerminalUpdateError();
+            mView.showError(DriverProfileView.Error.ERROR_TERMINAL_UPDATE);
         }
     }
 
@@ -182,14 +169,14 @@ public class DriverProfilePresenter {
         return signature;
     }
 
-    private PasswordError validatePassword(String oldPwd, String newPwd, String confirmPwd) {
+    private DriverProfileView.PasswordError validatePassword(String oldPwd, String newPwd, String confirmPwd) {
         if ((newPwd == null || newPwd.isEmpty()) ||
                 (oldPwd == null || oldPwd.isEmpty())) {
-            return PasswordError.PASSWORD_FIELD_EMPTY;
+            return PASSWORD_FIELD_EMPTY;
         } else if (confirmPwd == null || !confirmPwd.equals(newPwd)) {
-            return PasswordError.PASSWORD_NOT_MATCH;
+            return PASSWORD_NOT_MATCH;
         }
-        return PasswordError.VALID_PASSWORD;
+        return VALID_PASSWORD;
     }
 
     private int findHomeTerminalById(List<HomeTerminalEntity> homeTerminals, Integer homeTerminalId) {
