@@ -26,6 +26,7 @@ import app.bsmuniversal.com.RxSchedulerRule;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.observers.TestObserver;
+import io.reactivex.subscribers.TestSubscriber;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
@@ -119,7 +120,8 @@ public class LoginUserInteractorTest {
         TestObserver<Boolean> testObserver = TestObserver.create();
         User user = makeFakeUser();
 
-        when(mAppDatabase.userDao()).thenReturn(mFakeUserDao);
+        when(mAppDatabase.userDao()).thenReturn(mUserDao);
+        when(mUserDao.insertUser(any(UserEntity.class))).thenReturn(Long.valueOf(user.getId())); // expect same id as given user
         when(mServiceApi.updateProfile(any(User.class))).thenReturn(Observable.just(responseMessage));
 
         // when
@@ -139,7 +141,8 @@ public class LoginUserInteractorTest {
         TestObserver<Boolean> testObserver = TestObserver.create();
         User user = makeFakeUser();
 
-        when(mAppDatabase.userDao()).thenReturn(mFakeUserDao);
+        when(mAppDatabase.userDao()).thenReturn(mUserDao);
+        when(mUserDao.insertUser(any(UserEntity.class))).thenReturn(Long.valueOf(user.getId())); // expect same id as given user
         when(mServiceApi.updateProfile(any(User.class))).thenReturn(Observable.just(responseMessage));
 
         // when
@@ -237,6 +240,31 @@ public class LoginUserInteractorTest {
         // then
         verify(mTokenManager).getName(anyString());
     }
+
+    @Test
+    public void testGetFullName() {
+        // given
+        UserEntity user1 = new UserEntity();
+        user1.setFirstName("First");
+        user1.setLastName("Last");
+        user1.setMidName("Middle");
+
+        String expected1 = "First Last"; // TODO: verify with PO if ignore middle name, or include it?
+
+        when(mAppDatabase.userDao()).thenReturn(mUserDao);
+        when(mUserDao.getUser(any(Integer.class))).thenReturn(Flowable.just(user1));
+
+        TestSubscriber<String> testSubscriber = TestSubscriber.create();
+
+        // when
+        mLoginUserInteractor.getFullName().subscribe(testSubscriber);
+
+        // then
+        testSubscriber.assertResult(expected1);
+    }
+
+
+    // TODO: test co-drivers number once getCoDriversNumber is implemented
 
 
     /**
@@ -380,57 +408,5 @@ public class LoginUserInteractorTest {
 
         return user;
     }
-
-    /**
-     * A fake user DAO.
-     * <p>
-     * It mocks some of the expected return values.
-     */
-    private UserDao mFakeUserDao = new UserDao() {
-        @Override
-        public Flowable<UserEntity> getUser(int id) {
-            return null;
-        }
-
-        @Override
-        public UserEntity getUserSync(int id) {
-            return null;
-        }
-
-        @Override
-        public Flowable<String[]> getUserLastVehicles(int id) {
-            return null;
-        }
-
-        @Override
-        public String getUserLastVehiclesSync(int id) {
-            return null;
-        }
-
-        @Override
-        public String getUserTimezoneSync(int id) {
-            return null;
-        }
-
-        @Override
-        public Flowable<String> getUserTimezone(int id) {
-            return null;
-        }
-
-        @Override
-        public int deleteUser(int id) {
-            return 0;
-        }
-
-        @Override
-        public long insertUser(UserEntity user) {
-            return user.getId();
-        }
-
-        @Override
-        public void setUserLastVehicles(int id, String vehicles) {
-
-        }
-    };
 
 }
