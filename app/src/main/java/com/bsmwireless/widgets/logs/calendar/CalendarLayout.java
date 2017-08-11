@@ -69,7 +69,6 @@ public class CalendarLayout extends LinearLayout implements View.OnClickListener
         super.onFinishInflate();
 
         mLayoutManager = new LinearLayoutManager(getContext(), HORIZONTAL, true);
-//        mLayoutManager.setStackFromEnd(true);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         mAdapter = new CalendarAdapter(getContext(), getItems(), this);

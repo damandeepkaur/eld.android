@@ -56,8 +56,6 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
     private RecyclerView mRecyclerView;
     private OnLogsTitleStateChangeListener mOnLogsTitleStateChangeListener;
     private DutyColors mDutyColors;
-    private String mHoursLabel;
-    private String mMinutesLabel;
     private String mNoAddressLabel;
 
 
@@ -79,8 +77,6 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
         };
 
         mDutyColors = new DutyColors(mContext);
-        mHoursLabel = mContext.getResources().getString(R.string.hours);
-        mMinutesLabel = mContext.getResources().getString(R.string.minutes);
         mNoAddressLabel = mContext.getResources().getString(R.string.no_address_available);
     }
 
@@ -157,7 +153,7 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
         int viewType = holder.getViewType();
         if (viewType == VIEW_TYPE_EVENTS_ITEM) {
             EventLogModel event = mEventLogs.get(position - 2);
-            String duration = event.getDuration() != null ? DateUtils.convertTimeInMsToDurationString(event.getDuration(), mHoursLabel, mMinutesLabel) : "";
+            String duration = event.getDuration() != null ? DateUtils.convertTimeInMsToDurationString(event.getDuration(), mContext) : "";
             String address = (event.getLocation() != null) ? event.getLocation() : mNoAddressLabel;
             holder.bindEventView(event, mOnMenuClickListener, mDutyColors.getColor(event.getEventType(), event.getEventCode()), duration, address);
         } else if (viewType == VIEW_TYPE_TRIP_INFO_ITEM) {

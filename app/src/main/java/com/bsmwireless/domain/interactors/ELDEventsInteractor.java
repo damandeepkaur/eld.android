@@ -54,18 +54,13 @@ public class ELDEventsInteractor {
                 .map(ELDEventConverter::toModelList);
     }
 
-    public void syncELDEvents(long startTime, long endTime) {
+    public void syncELDEvents(Long startTime, Long endTime) {
         if (mSyncEventsDisposable != null) {
             mSyncEventsDisposable.dispose();
         }
-        mSyncEventsDisposable = getELDEventsFromServer(startTime, endTime)
+        mSyncEventsDisposable = mServiceApi.getELDEvents(startTime, endTime)
                 .subscribeOn(Schedulers.io())
                 .subscribe(eldEvents -> storeEvents(eldEvents, false), Timber::d);
-    }
-
-    private Observable<List<ELDEvent>> getELDEventsFromServer(long startTime, long endTime) {
-        return mServiceApi.getELDEvents(startTime, endTime)
-                .doOnNext(events -> storeEvents(events, false));
     }
 
     public Observable<ResponseMessage> postNewELDEvent(ELDEvent event) {

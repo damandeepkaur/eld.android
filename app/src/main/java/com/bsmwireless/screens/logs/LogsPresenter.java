@@ -1,5 +1,7 @@
 package com.bsmwireless.screens.logs;
 
+import android.util.Log;
+
 import com.bsmwireless.common.Constants;
 import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.common.utils.DateUtils;
@@ -19,6 +21,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 import javax.inject.Inject;
 
@@ -80,22 +83,28 @@ public class LogsPresenter {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                        logSheetHeaders -> mView.setLogSheetHeaders(logSheetHeaders),
+                        logSheetHeaders -> {
+                            mView.setLogSheetHeaders(logSheetHeaders);
+                            Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(mTimeZone));
+                            updateEventForDay(calendar);
+                        },
                         error -> Timber.e("LoginUser error: %s", error)
                 ));
     }
 
     public void onCalendarDaySelected(CalendarItem calendarItem) {
-
         //TODO: check should we show events for day without logsheet or not
         // logSheetHeader logSheet = calendarItem.getAssociatedLogSheet();
         // long startDayTime = DateUtils.getStartDayInUnixMsFromLogday(mTimeZone, logSheet.getLogDay());
 
-        Calendar calendar = calendarItem.getCalendar();
+        updateEventForDay(calendarItem.getCalendar());
+    }
+
+    private void updateEventForDay(Calendar calendar) {
         long startDayTime = DateUtils.getStartDate(mTimeZone, calendar.get(Calendar.DAY_OF_MONTH),
                 calendar.get(Calendar.MONTH), calendar.get(Calendar.YEAR));
-
         long endDayTime = startDayTime + ONE_DAY_MS;
+
         mELDEventsInteractor.syncELDEvents(startDayTime, endDayTime);
         if (mGetEventDisposable != null) mGetEventDisposable.dispose();
         mGetEventDisposable = mELDEventsInteractor.getELDEventsFromDB(startDayTime, endDayTime)
@@ -129,7 +138,7 @@ public class LogsPresenter {
                     mTripInfo.setStartDayTime(startDayTime);
                     mView.setTripInfo(mTripInfo);
                     mView.setEventLogs(logs);
-                    updateTripInfo(dutyStateLogs);
+                    updateTripInfo(dutyStateLogs, endDayTime);
                     updateVehicleInfo(new ArrayList<>(vehicleIds), logs);
                 }, throwable -> Timber.e(throwable.getMessage()));
     }
@@ -153,14 +162,15 @@ public class LogsPresenter {
                 ));
     }
 
-    public void updateTripInfo(final List<EventLogModel> events) {
+    public void updateTripInfo(final List<EventLogModel> events, final long endDayTime) {
         TripInfoModel tripInfo = new TripInfoModel();
 
         Disposable disposable = Observable.create((ObservableOnSubscribe<TripInfoModel>) e -> {
             long[] result = new long[DutyType.values().length];
             int odometer = 0;
+            EventLogModel log = events.get(0);
             for (int i = 1; i < events.size(); i++) {
-                EventLogModel log = events.get(i);
+                log = events.get(i);
                 EventLogModel prevLog = events.get(i - 1);
                 long logDate = log.getEventTime();
                 long prevLogDate = prevLog.getEventTime();
@@ -171,6 +181,7 @@ public class LogsPresenter {
                     odometer = log.getEvent().getOdometer();
                 }
             }
+            result[log.getEventCode() - 1] += endDayTime - log.getEventTime();
 
             tripInfo.setSleeperBerthTime(DateUtils.convertTimeInMsToStringTime(
                     result[DutyType.SLEEPER_BERTH.getId() - 1]));
@@ -228,8 +239,10 @@ public class LogsPresenter {
     }
 
     public void onDestroy() {
+        if (mGetEventDisposable != null) {
+            mGetEventDisposable.dispose();
+        }
         mDisposables.dispose();
-        mGetEventDisposable.dispose();
         Timber.d("DESTROYED");
     }
 }

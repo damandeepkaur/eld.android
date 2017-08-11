@@ -1,5 +1,7 @@
 package com.bsmwireless.common.utils;
 
+import android.content.Context;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -7,6 +9,8 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
+
+import app.bsmuniversal.com.R;
 
 public class DateUtils {
     private final static int MINUTES_IN_HOUR = 60;
@@ -92,7 +96,9 @@ public class DateUtils {
      * @param time unix time in ms
      * @return string with format time like "2 hrs 35 mins"
      */
-    public static String convertTimeInMsToDurationString(long time, String hrs, String mins) {
+    public static String convertTimeInMsToDurationString(long time, Context context) {
+        String hrs = context.getResources().getString(R.string.hours);
+        String mins = context.getResources().getString(R.string.minutes);
         Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
         calendar.setTimeInMillis(time);
         String duration = "";
@@ -134,22 +140,6 @@ public class DateUtils {
      */
     public static long convertDayNumberToUnixMs(long logday) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-        Date date = null;
-        try {
-            date = sdf.parse(String.valueOf(logday));
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return date.getTime();
-    }
-
-    /**
-     * @param logday long with format time like 20170708
-     * @return time of start appropriate day in unix time ms
-     */
-    public static long getStartDayInUnixMsFromLogday(String zone, long logday) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-        sdf.setTimeZone(TimeZone.getTimeZone(zone));
         Date date = null;
         try {
             date = sdf.parse(String.valueOf(logday));

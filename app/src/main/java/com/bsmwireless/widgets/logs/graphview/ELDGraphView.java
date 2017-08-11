@@ -202,7 +202,7 @@ public class ELDGraphView extends View {
         long firstLogDayTime = (firstEvent.getEventTime() - mStartDayUnixTimeInMs) / MS_IN_MIN;
         x1 = mGraphLeft + firstLogDayTime * gridUnit;
         y1 = mGraphTop + (firstEvent.getEventCode() - firstEventCode) * mSegmentHeight + mSegmentHeight / 2;
-        int color = mDutyColors.getColor(firstEvent.getEventCode());
+        int color;
 
         for (int i = 1; i < logData.size(); i++) {
             EventLogModel event = logData.get(i);
@@ -228,9 +228,8 @@ public class ELDGraphView extends View {
             y1 = y2;
         }
 
+        color = mDutyColors.getColor(logData.get(logData.size() - 1).getEventCode());
         mHorizontalLinesPaint.setColor(color);
         canvas.drawLine(x1, y1, mGraphWidth + mGraphLeft, y1, mHorizontalLinesPaint);
-
-
     }
 }
