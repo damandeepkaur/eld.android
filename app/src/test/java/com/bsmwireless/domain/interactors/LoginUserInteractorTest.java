@@ -4,10 +4,13 @@ import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.network.authenticator.TokenManager;
 import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.PreferencesManager;
+import com.bsmwireless.data.storage.carriers.CarrierDao;
+import com.bsmwireless.data.storage.hometerminals.HomeTerminalDao;
 import com.bsmwireless.data.storage.users.UserDao;
 import com.bsmwireless.data.storage.users.UserEntity;
 import com.bsmwireless.models.Auth;
 import com.bsmwireless.models.BlackBoxModel;
+import com.bsmwireless.models.Carrier;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.LoginModel;
 import com.bsmwireless.models.PasswordModel;
@@ -21,6 +24,9 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import app.bsmuniversal.com.RxSchedulerRule;
 import io.reactivex.Flowable;
@@ -70,9 +76,14 @@ public class LoginUserInteractorTest {
     @Mock
     BlackBoxInteractor mBlackBoxInteractor;
 
-
     @Mock
     UserDao mUserDao;
+
+    @Mock
+    CarrierDao mCarrierDao;
+
+    @Mock
+    HomeTerminalDao mHomeTerminalDao;
 
     @Mock
     ResponseMessage mResponseMessage;
@@ -95,63 +106,139 @@ public class LoginUserInteractorTest {
      * Verify call to ServiceApi layer.
      */
     @Test
-    public void testLoginUserCallToServiceApi() {
+    public void testLoginUserApiCall() {
         // given
-        when(mServiceApi.loginUser(any(LoginModel.class))).thenReturn(Observable.just(makeFakeUser()));
+        User user = makeFakeUser();
+        when(mServiceApi.loginUser(any(LoginModel.class))).thenReturn(Observable.just(user));
 
         // when
         mLoginUserInteractor.loginUser(mName, mPassword, mDomain, mKeepToken, mDriverType);
 
         // then
         verify(mServiceApi).loginUser(any(LoginModel.class));
-    }
 
-
-
-    // TODO: Verify call to ServiceApi layer of logout - re-implement test when stable
-
-
-    @Test
-    public void testUpdateUserCallToServiceApiSuccess() {
-        // given
-        ResponseMessage responseMessage = new ResponseMessage();
-        responseMessage.setMessage("ACK");
-
-        TestObserver<Boolean> testObserver = TestObserver.create();
-        User user = makeFakeUser();
-
-        when(mAppDatabase.userDao()).thenReturn(mUserDao);
-        when(mUserDao.insertUser(any(UserEntity.class))).thenReturn(Long.valueOf(user.getId())); // expect same id as given user
-        when(mServiceApi.updateProfile(any(User.class))).thenReturn(Observable.just(responseMessage));
-
-        // when
-        mLoginUserInteractor.updateUser(user).subscribe(testObserver);
-
-        // then
-        verify(mServiceApi).updateProfile(any(User.class));
-        testObserver.assertValue(true);
     }
 
     @Test
-    public void testUpdateUserCallToServiceApiNotSuccess() {
+    public void testLoginUserSuccess() {
         // given
-        ResponseMessage responseMessage = new ResponseMessage();
-        responseMessage.setMessage("");
-
-        TestObserver<Boolean> testObserver = TestObserver.create();
         User user = makeFakeUser();
+        TestObserver<Boolean> testObserver = TestObserver.create();
+        String fakeAccountName = "fake account name";
 
+        when(mServiceApi.loginUser((any(LoginModel.class)))).thenReturn(Observable.just(user));
+        when(mTokenManager.getAccountName(anyString(), anyString())).thenReturn(fakeAccountName);
         when(mAppDatabase.userDao()).thenReturn(mUserDao);
-        when(mUserDao.insertUser(any(UserEntity.class))).thenReturn(Long.valueOf(user.getId())); // expect same id as given user
-        when(mServiceApi.updateProfile(any(User.class))).thenReturn(Observable.just(responseMessage));
 
         // when
-        mLoginUserInteractor.updateUser(user).subscribe(testObserver);
+        mLoginUserInteractor.loginUser(mName, mPassword, mDomain, mKeepToken, mDriverType)
+                .subscribe(testObserver);
 
         // then
-        verify(mServiceApi).updateProfile(any(User.class));
-        testObserver.assertValue(false);
+        verify(mPreferencesManager).setAccountName(anyString());
+        verify(mPreferencesManager).setRememberUserEnabled(eq(mKeepToken));
+        verify(mPreferencesManager).setShowHomeScreenEnabled(any(Boolean.class));
+        verify(mUserDao).insertUser(any(UserEntity.class));
     }
+
+    // TODO: test login failed, if possible (right now code will result in NullPointerException if the observable from mServiceApi.loginUser somehow emits a null)
+
+    /**
+     * Verifies login actions when carrier list is not null
+     */
+    @Test
+    public void testLoginUserCarriers() {
+        // given
+        User user = makeFakeUser();
+        user.setId(123456);
+
+        TestObserver<Boolean> testObserver = TestObserver.create();
+        String fakeAccountName = "fake account name";
+
+        when(mServiceApi.loginUser((any(LoginModel.class)))).thenReturn(Observable.just(user));
+        when(mTokenManager.getAccountName(anyString(), anyString())).thenReturn(fakeAccountName);
+        when(mAppDatabase.userDao()).thenReturn(mUserDao);
+
+        when(mAppDatabase.carrierDao()).thenReturn(mCarrierDao);
+
+        List<Carrier> listOfCarriers = new ArrayList<>();
+
+        Carrier carrier1 = new Carrier();
+        carrier1.setName("carrier 1");
+        listOfCarriers.add(carrier1);
+
+        Carrier carrier2 = new Carrier();
+        carrier2.setName("carrier 2");
+        listOfCarriers.add(carrier2);
+
+        user.setCarriers(listOfCarriers);
+
+        // when
+        mLoginUserInteractor.loginUser(mName, mPassword, mDomain, mKeepToken, mDriverType)
+                .subscribe(testObserver);
+
+        // then
+        verify(mCarrierDao).insertCarriers(any(List.class));
+
+    }
+
+    /**
+     * Verifies login actions when home terminals list is not null
+     */
+    @Test
+    public void testLoginUserHomeTerminals() {
+        // given
+        User user = makeFakeUser();
+        user.setId(123456);
+
+        TestObserver<Boolean> testObserver = TestObserver.create();
+        String fakeAccountName = "fake account name";
+
+        when(mServiceApi.loginUser((any(LoginModel.class)))).thenReturn(Observable.just(user));
+        when(mTokenManager.getAccountName(anyString(), anyString())).thenReturn(fakeAccountName);
+        when(mAppDatabase.userDao()).thenReturn(mUserDao);
+
+        when(mAppDatabase.homeTerminalDao()).thenReturn(mHomeTerminalDao);
+
+        // when
+        mLoginUserInteractor.loginUser(mName, mPassword, mDomain, mKeepToken, mDriverType)
+                .subscribe(testObserver);
+
+        // then
+        verify(mHomeTerminalDao).insertHomeTerminals(any(List.class));
+    }
+
+    /**
+     * Verifies login actions when last-vehicles list is not null
+     *
+     * TODO: check that this behavior is intended, as we fetch the last vehicles from the db only to then persist it again, it seems?
+     */
+    @Test
+    public void testLoginUserLastVehicles() {
+        // given
+        User user = makeFakeUser();
+        user.setId(123456);
+
+        TestObserver<Boolean> testObserver = TestObserver.create();
+        String fakeAccountName = "fake account name";
+
+        // TODO: test string format, and get from utility function when it is written + delete these comments
+        String lastVehicles = "101,102,105"; // <-- format is currently coded in VehiclesInteractor#saveLastVehicles, and possibly needs to be moved + enforced/tested
+
+        when(mServiceApi.loginUser((any(LoginModel.class)))).thenReturn(Observable.just(user));
+        when(mTokenManager.getAccountName(anyString(), anyString())).thenReturn(fakeAccountName);
+        when(mAppDatabase.userDao()).thenReturn(mUserDao);
+
+        when(mUserDao.getUserLastVehiclesSync(any(Integer.class))).thenReturn(lastVehicles);
+
+        // when
+        mLoginUserInteractor.loginUser(mName, mPassword, mDomain, mKeepToken, mDriverType)
+                .subscribe(testObserver);
+
+        // then
+        verify(mUserDao).setUserLastVehicles(any(Integer.class), eq(lastVehicles));
+    }
+
 
     @Test
     public void testUpdateDriverPasswordSuccess() {
