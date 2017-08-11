@@ -1,15 +1,12 @@
 package com.bsmwireless.screens.driverprofile;
 
-import android.content.Context;
-
 import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.data.storage.carriers.CarrierEntity;
 import com.bsmwireless.data.storage.users.FullUserEntity;
 import com.bsmwireless.data.storage.hometerminals.HomeTerminalEntity;
 import com.bsmwireless.data.storage.users.UserConverter;
 import com.bsmwireless.domain.interactors.LoginUserInteractor;
-
-import org.reactivestreams.Subscription;
+import com.bsmwireless.models.PasswordModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,10 +15,8 @@ import javax.inject.Inject;
 
 import app.bsmuniversal.com.R;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
@@ -29,8 +24,6 @@ import timber.log.Timber;
 public class DriverProfilePresenter {
 
     private static final int MAX_SIGNATURE_LENGTH = 50000;
-
-    private Context mContext;
 
     private LoginUserInteractor mLoginUserInteractor;
     private DriverProfileView mView;
@@ -40,12 +33,27 @@ public class DriverProfilePresenter {
     private List<HomeTerminalEntity> mHomeTerminals;
     private CarrierEntity mCarrier;
 
+    public enum PasswordError {
+        VALID_PASSWORD(R.string.driver_profile_valid_password),
+        PASSWORD_NOT_MATCH(R.string.driver_profile_password_not_match),
+        PASSWORD_FIELD_EMPTY(R.string.driver_profile_password_field_empty);
+
+        private int mStringId;
+
+        PasswordError(int stringId) {
+            mStringId = stringId;
+        }
+
+        public int getStringId() {
+            return mStringId;
+        }
+    }
+
     @Inject
-    public DriverProfilePresenter(Context context, DriverProfileView view, LoginUserInteractor loginUserInteractor) {
+    public DriverProfilePresenter(DriverProfileView view, LoginUserInteractor loginUserInteractor) {
         mView = view;
         mLoginUserInteractor = loginUserInteractor;
         mDisposables = new CompositeDisposable();
-        mContext = context;
 
         Timber.d("CREATED");
     }
@@ -88,7 +96,7 @@ public class DriverProfilePresenter {
         if (mFullUserEntity != null) {
             if (signature.length() > MAX_SIGNATURE_LENGTH) {
                 signature = cropSignature(signature);
-                mView.showError(new Exception(mContext.getResources().getString(R.string.driver_profile_signature_error)));
+                mView.showSignatureLengthError();
             }
 
             mFullUserEntity.getUserEntity().setSignature(signature);
@@ -99,7 +107,7 @@ public class DriverProfilePresenter {
                                                         .subscribe(wasUpdated -> {
                                                                     Timber.d("Update signature: " + wasUpdated);
                                                                     if (!wasUpdated) {
-                                                                        mView.showError(new Exception(mContext.getString(R.string.driver_profile_signature_changing_error)));
+                                                                        mView.showSaveSignatureError();
                                                                     }
                                                                 },
                                                                 throwable -> {
@@ -108,7 +116,7 @@ public class DriverProfilePresenter {
                                                                 });
             mDisposables.add(disposable);
         } else {
-            mView.showError(new Exception(mContext.getResources().getString(R.string.driver_profile_user_error)));
+            mView.showInvalidUserError();
         }
 
         mView.hideControlButtons();
@@ -118,13 +126,13 @@ public class DriverProfilePresenter {
         if (mFullUserEntity != null) {
             mView.setResults(UserConverter.toUser(mFullUserEntity.getUserEntity()));
         } else {
-            mView.showError(new Exception(mContext.getResources().getString(R.string.driver_profile_user_error)));
+            mView.showInvalidUserError();
         }
     }
 
     public void onChangePasswordClick(String oldPwd, String newPwd, String confirmPwd) {
-        String validationError = validatePassword(oldPwd, newPwd, confirmPwd);
-        if (validationError.equals(mContext.getString(R.string.driver_profile_valid_password))) {
+        PasswordError validationError = validatePassword(oldPwd, newPwd, confirmPwd);
+        if (validationError.equals(PasswordError.VALID_PASSWORD)) {
             Disposable disposable = mLoginUserInteractor.updateDriverPassword(oldPwd, newPwd)
                                                         .subscribeOn(Schedulers.io())
                                                         .observeOn(AndroidSchedulers.mainThread())
@@ -132,7 +140,7 @@ public class DriverProfilePresenter {
                                                                     if (passwordUpdated) {
                                                                         mView.showPasswordChanged();
                                                                     } else {
-                                                                        mView.showError(new Exception(mContext.getString(R.string.driver_profile_password_not_changed)));
+                                                                        mView.showPasswordChangeError();
                                                                     }
                                                                 },
                                                                 throwable -> mView.showError(throwable));
@@ -153,14 +161,14 @@ public class DriverProfilePresenter {
                                                         .observeOn(AndroidSchedulers.mainThread())
                                                         .subscribe(wasUpdated -> {
                                                             if (!wasUpdated) {
-                                                                mView.showError(new Exception(mContext.getString(R.string.driver_profile_home_terminal_updating_error)));
+                                                                mView.showHomeTerminalUpdateError();
                                                             }
                                                         }, throwable -> mView.showError(throwable));
             mDisposables.add(disposable);
 
             mView.setHomeTerminalInfo(homeTerminal);
         } else {
-            mView.showError(new Exception(mContext.getString(R.string.driver_profile_home_terminal_updating_error)));
+            mView.showHomeTerminalUpdateError();
         }
     }
 
@@ -174,23 +182,23 @@ public class DriverProfilePresenter {
         return signature;
     }
 
-    private String validatePassword(String oldPwd, String newPwd, String confirmPwd) {
+    private PasswordError validatePassword(String oldPwd, String newPwd, String confirmPwd) {
         if ((newPwd == null || newPwd.isEmpty()) ||
                 (oldPwd == null || oldPwd.isEmpty())) {
-            return mContext.getString(R.string.driver_profile_password_field_empty);
+            return PasswordError.PASSWORD_FIELD_EMPTY;
         } else if (confirmPwd == null || !confirmPwd.equals(newPwd)) {
-            return mContext.getString(R.string.driver_profile_password_not_match);
+            return PasswordError.PASSWORD_NOT_MATCH;
         }
-        return mContext.getString(R.string.driver_profile_valid_password);
+        return PasswordError.VALID_PASSWORD;
     }
 
-    private int findHomeTerminalById(List<HomeTerminalEntity> homeTerminalEntities, Integer homeTerminalId) {
-        if (homeTerminalEntities == null || homeTerminalId == null) {
+    private int findHomeTerminalById(List<HomeTerminalEntity> homeTerminals, Integer homeTerminalId) {
+        if (homeTerminals == null || homeTerminalId == null) {
             return 0;
         }
 
-        for (int i = 0; i < homeTerminalEntities.size(); i++) {
-            if (homeTerminalEntities.get(i).getId().equals(homeTerminalId)) {
+        for (int i = 0; i < homeTerminals.size(); i++) {
+            if (homeTerminals.get(i).getId().equals(homeTerminalId)) {
                 return i;
             }
         }
@@ -200,8 +208,10 @@ public class DriverProfilePresenter {
 
     private List<String> getHomeTerminalNames(List<HomeTerminalEntity> homeTerminals) {
         List<String> terminalNames = new ArrayList<>();
-        for (HomeTerminalEntity homeTerminal: homeTerminals) {
-            terminalNames.add(homeTerminal.getName());
+        if (homeTerminals != null) {
+            for (HomeTerminalEntity homeTerminal : homeTerminals) {
+                terminalNames.add(homeTerminal.getName());
+            }
         }
         return terminalNames;
     }

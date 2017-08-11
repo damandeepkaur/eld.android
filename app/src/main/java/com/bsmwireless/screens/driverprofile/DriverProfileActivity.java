@@ -37,6 +37,7 @@ import app.bsmuniversal.com.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import timber.log.Timber;
 
 import static android.support.design.widget.BottomSheetBehavior.STATE_EXPANDED;
 import static android.support.design.widget.BottomSheetBehavior.STATE_HIDDEN;
@@ -198,8 +199,8 @@ public class DriverProfileActivity extends BaseMenuActivity implements DriverPro
     }
 
     @Override
-    public void showChangePasswordError(String error) {
-        setPasswordChangeError(error);
+    public void showChangePasswordError(DriverProfilePresenter.PasswordError error) {
+        setPasswordChangeError(getString(error.getStringId()));
     }
 
     @Override
@@ -207,6 +208,41 @@ public class DriverProfileActivity extends BaseMenuActivity implements DriverPro
         // TODO: show notification to user
         Toast.makeText(this, getString(R.string.driver_profile_password_changed), Toast.LENGTH_SHORT).show();
         setPasswordChangeError(null);
+    }
+
+    @Override
+    public void showPasswordChangeError() {
+        // TODO: show notification to user
+        Timber.e(getString(R.string.driver_profile_password_not_changed));
+        Toast.makeText(this, getString(R.string.driver_profile_password_not_changed), Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showSaveSignatureError() {
+        // TODO: show notification to user
+        Timber.e(getString(R.string.driver_profile_signature_changing_error));
+        Toast.makeText(this, getString(R.string.driver_profile_signature_changing_error), Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showSignatureLengthError() {
+        // TODO: show notification to user
+        Timber.e(getString(R.string.driver_profile_signature_error));
+        Toast.makeText(this, getString(R.string.driver_profile_signature_error), Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showInvalidUserError() {
+        // TODO: show notification to user
+        Timber.e(getString(R.string.driver_profile_user_error));
+        Toast.makeText(this, getString(R.string.driver_profile_user_error), Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showHomeTerminalUpdateError() {
+        // TODO: show notification to user
+        Timber.e(getString(R.string.driver_profile_home_terminal_updating_error));
+        Toast.makeText(this, getString(R.string.driver_profile_home_terminal_updating_error), Toast.LENGTH_SHORT).show();
     }
 
     @OnClick(R.id.change_password_button)

@@ -16,6 +16,11 @@ public interface DriverProfileView {
     void hideControlButtons();
     void showControlButtons();
     void setResults(User user);
-    void showChangePasswordError(String error);
+    void showChangePasswordError(DriverProfilePresenter.PasswordError error);
     void showPasswordChanged();
+    void showPasswordChangeError();
+    void showSaveSignatureError();
+    void showSignatureLengthError();
+    void showInvalidUserError();
+    void showHomeTerminalUpdateError();
 }
