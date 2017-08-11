@@ -2,12 +2,13 @@ package com.bsmwireless.screens.logs;
 
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.LogSheetHeader;
+import com.bsmwireless.screens.logs.dagger.EventLogModel;
 
 import java.util.List;
 
 public interface  LogsView {
 
-    void setELDEvents(List<ELDEvent> events);
+    void setEventLogs(List<EventLogModel> logs);
 
     void setTripInfo(TripInfoModel tripInfo);
 

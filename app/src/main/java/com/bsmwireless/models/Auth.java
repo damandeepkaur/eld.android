@@ -1,4 +1,3 @@
-
 package com.bsmwireless.models;
 
 import android.os.Parcel;
@@ -14,25 +13,38 @@ public class Auth implements Parcelable {
     @SerializedName("token")
     @Expose
     private String mToken;
-
     @SerializedName("cluster")
     @Expose
     private String mCluster;
-
-    @SerializedName("driverId")
-    @Expose
-    private Integer mDriverId;
-
     @SerializedName("orgId")
     @Expose
     private Integer mOrgId;
-
+    @SerializedName("driverId")
+    @Expose
+    private Integer mDriverId;
     @SerializedName("expire")
     @Expose
-    private long mTokenExpire;
+    private Long mExpire;
+    public final static Parcelable.Creator<Auth> CREATOR = new Creator<Auth>() {
 
-    public Auth() {
-    }
+        @SuppressWarnings({
+            "unchecked"
+        })
+        public Auth createFromParcel(Parcel in) {
+            Auth instance = new Auth();
+            instance.mToken = ((String) in.readValue((String.class.getClassLoader())));
+            instance.mCluster = ((String) in.readValue((String.class.getClassLoader())));
+            instance.mOrgId = ((Integer) in.readValue((Integer.class.getClassLoader())));
+            instance.mDriverId = ((Integer) in.readValue((Integer.class.getClassLoader())));
+            instance.mExpire = ((Long) in.readValue((Long.class.getClassLoader())));
+            return instance;
+        }
+
+        public Auth[] newArray(int size) {
+            return (new Auth[size]);
+        }
+
+    };
 
     public String getToken() {
         return mToken;
@@ -50,14 +62,6 @@ public class Auth implements Parcelable {
         this.mCluster = cluster;
     }
 
-    public Integer getDriverId() {
-        return mDriverId;
-    }
-
-    public void setDriverId(Integer driverId) {
-        this.mDriverId = driverId;
-    }
-
     public Integer getOrgId() {
         return mOrgId;
     }
@@ -66,40 +70,20 @@ public class Auth implements Parcelable {
         this.mOrgId = orgId;
     }
 
-    public long getTokenExpire() {
-        return mTokenExpire;
+    public Integer getDriverId() {
+        return mDriverId;
     }
 
-    public void setTokenExpire(long tokenExpire) {
-        mTokenExpire = tokenExpire;
+    public void setDriverId(Integer driverId) {
+        this.mDriverId = driverId;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Auth auth = (Auth) o;
-
-        return new EqualsBuilder()
-                .append(mTokenExpire, auth.mTokenExpire)
-                .append(mToken, auth.mToken)
-                .append(mCluster, auth.mCluster)
-                .append(mDriverId, auth.mDriverId)
-                .append(mOrgId, auth.mOrgId)
-                .isEquals();
+    public Long getExpire() {
+        return mExpire;
     }
 
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder(17, 37)
-                .append(mToken)
-                .append(mCluster)
-                .append(mDriverId)
-                .append(mOrgId)
-                .append(mTokenExpire)
-                .toHashCode();
+    public void setExpire(Long expire) {
+        this.mExpire = expire;
     }
 
     @Override
@@ -107,44 +91,40 @@ public class Auth implements Parcelable {
         final StringBuilder sb = new StringBuilder("Auth{");
         sb.append("mToken='").append(mToken).append('\'');
         sb.append(", mCluster='").append(mCluster).append('\'');
-        sb.append(", mDriverId=").append(mDriverId);
         sb.append(", mOrgId=").append(mOrgId);
-        sb.append(", mTokenExpire=").append(mTokenExpire);
+        sb.append(", mDriverId=").append(mDriverId);
+        sb.append(", mExpire=").append(mExpire);
         sb.append('}');
         return sb.toString();
     }
 
     @Override
-    public int describeContents() {
-        return 0;
+    public int hashCode() {
+        return new HashCodeBuilder().append(mToken).append(mCluster).append(mOrgId).append(mDriverId).append(mExpire).toHashCode();
     }
 
     @Override
+    public boolean equals(Object other) {
+        if (other == this) {
+            return true;
+        }
+        if (!(other instanceof Auth)) {
+            return false;
+        }
+        Auth rhs = ((Auth) other);
+        return new EqualsBuilder().append(mToken, rhs.mToken).append(mCluster, rhs.mCluster).append(mOrgId, rhs.mOrgId).append(mDriverId, rhs.mDriverId).append(mExpire, rhs.mExpire).isEquals();
+    }
+
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(this.mToken);
-        dest.writeString(this.mCluster);
-        dest.writeValue(this.mDriverId);
-        dest.writeValue(this.mOrgId);
-        dest.writeLong(this.mTokenExpire);
+        dest.writeValue(mToken);
+        dest.writeValue(mCluster);
+        dest.writeValue(mOrgId);
+        dest.writeValue(mDriverId);
+        dest.writeValue(mExpire);
     }
 
-    protected Auth(Parcel in) {
-        this.mToken = in.readString();
-        this.mCluster = in.readString();
-        this.mDriverId = (Integer) in.readValue(Integer.class.getClassLoader());
-        this.mOrgId = (Integer) in.readValue(Integer.class.getClassLoader());
-        this.mTokenExpire = in.readLong();
+    public int describeContents() {
+        return  0;
     }
 
-    public static final Creator<Auth> CREATOR = new Creator<Auth>() {
-        @Override
-        public Auth createFromParcel(Parcel source) {
-            return new Auth(source);
-        }
-
-        @Override
-        public Auth[] newArray(int size) {
-            return new Auth[size];
-        }
-    };
 }
