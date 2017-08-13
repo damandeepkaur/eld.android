@@ -17,6 +17,7 @@ import com.bsmwireless.screens.logs.dagger.EventLogModel;
 import com.bsmwireless.widgets.logs.DutyColors;
 import com.bsmwireless.widgets.logs.EventDescription;
 import com.bsmwireless.widgets.logs.LogsTitleView;
+import com.bsmwireless.widgets.logs.calendar.CalendarItem;
 import com.bsmwireless.widgets.logs.calendar.CalendarLayout;
 import com.bsmwireless.widgets.logs.graphview.GraphLayout;
 
@@ -66,7 +67,7 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
 
         mOnMenuClickListener = view -> {
             EventLogModel log = (EventLogModel) view.getTag();
-            showPopupMenu(view, log.getEvent());
+            showPopupMenu(view, log);
         };
 
         mSmoothScroller = new LinearSmoothScroller(mContext) {
@@ -225,7 +226,7 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
         }
     }
 
-    private void showPopupMenu(View anchorView, ELDEvent event) {
+    private void showPopupMenu(View anchorView, EventLogModel event) {
         PopupMenu popup = new PopupMenu(mContext, anchorView);
         popup.getMenuInflater().inflate(R.menu.menu_eld_event, popup.getMenu());
 
@@ -242,6 +243,10 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
         });
 
         popup.show();
+    }
+
+    public CalendarItem getCurrentItem() {
+        return mCalendarLayout.getCurrentItme();
     }
 
     public interface OnLogsTitleStateChangeListener {

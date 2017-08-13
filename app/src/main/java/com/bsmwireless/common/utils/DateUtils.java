@@ -148,4 +148,42 @@ public class DateUtils {
         }
         return date.getTime();
     }
+
+    /**
+     * @param time long unix time in ms
+     * @return string with format time like "12:35 AM"
+     */
+    public static String convertTimeToAMPMString(long time, String timezone) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm aaa");
+        TimeZone timeZone = TimeZone.getTimeZone(timezone);
+        dateFormat.setTimeZone(timeZone);
+        Calendar calendar = Calendar.getInstance(timeZone);
+        calendar.setTimeInMillis(time);
+        return dateFormat.format(calendar.getTime());
+    }
+
+    /**
+     * @param time string with format time like "12:35 AM"
+     * @param day current day time
+     * @return long unix time in ms
+     */
+    public static Long convertStringAMPMToTime(String time, long day, String timezone) {
+        SimpleDateFormat format = new SimpleDateFormat("hh:mm aaa", Locale.US);
+        TimeZone timeZone = TimeZone.getTimeZone(timezone);
+        format.setTimeZone(timeZone);
+        try {
+            Date date = format.parse(time);
+            Calendar timeCalendar = Calendar.getInstance(timeZone);
+            timeCalendar.setTime(date);
+
+            Calendar dayCalendar = Calendar.getInstance(timeZone);
+            dayCalendar.setTimeInMillis(day);
+            dayCalendar.set(Calendar.HOUR_OF_DAY, timeCalendar.get(Calendar.HOUR_OF_DAY));
+            dayCalendar.set(Calendar.MINUTE, timeCalendar.get(Calendar.MINUTE));
+            return dayCalendar.getTimeInMillis();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return 0L;
+    }
 }

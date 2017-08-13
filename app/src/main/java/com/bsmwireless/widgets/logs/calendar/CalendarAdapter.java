@@ -98,6 +98,10 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.ViewHo
         return mItems != null && position < mItems.size() ? mItems.get(position) : null;
     }
 
+    public CalendarItem getSelectedItem() {
+        return mItems != null ? mItems.get(mSelectedPosition) : null;
+    }
+
     private CalendarItem findItemByDate(Long date) {
         for (CalendarItem item : mItems) {
             if (item.isCurrentDay(date)) {

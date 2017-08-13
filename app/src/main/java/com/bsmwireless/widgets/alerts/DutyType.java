@@ -1,5 +1,10 @@
 package com.bsmwireless.widgets.alerts;
 
+import android.content.Context;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import app.bsmuniversal.com.R;
 
 public enum DutyType {
@@ -39,6 +44,24 @@ public enum DutyType {
     public static DutyType getTypeById(int id) {
         for (DutyType t : DutyType.values()) {
             if (t.mId == id) {
+                return t;
+            }
+        }
+        return DutyType.OFF_DUTY;
+    }
+
+    public static List<String> getNames(Context context) {
+        List<String> names = new ArrayList<>();
+        for (DutyType type:
+             DutyType.values()) {
+            names.add(context.getString(type.getName()));
+        }
+        return names;
+    }
+
+    public static DutyType getTypeByName(Context context, String name) {
+        for (DutyType t: DutyType.values()) {
+            if (context.getString(t.mName).equals(name)) {
                 return t;
             }
         }

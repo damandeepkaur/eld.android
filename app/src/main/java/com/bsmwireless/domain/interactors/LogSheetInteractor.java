@@ -13,6 +13,8 @@ import io.reactivex.schedulers.Schedulers;
 
 public class LogSheetInteractor {
 
+    private static final String SUCCESS = "ACK";
+
     private ServiceApi mServiceApi;
 
     @Inject
@@ -24,7 +26,7 @@ public class LogSheetInteractor {
         return mServiceApi.getLogSheets(startLogDay, endLogDay);
     }
 
-    public Observable<ResponseMessage> updateLogSheetHeader(LogSheetHeader logSheetHeader) {
-        return mServiceApi.updateLogSheetHeader(logSheetHeader);
+    public Observable<Boolean> updateLogSheetHeader(LogSheetHeader logSheetHeader) {
+        return mServiceApi.updateLogSheetHeader(logSheetHeader).map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
     }
 }
