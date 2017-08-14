@@ -3,19 +3,23 @@ package com.bsmwireless.widgets.alerts;
 import app.bsmuniversal.com.R;
 
 public enum DutyType {
-    OFF_DUTY(1, R.string.hos_txt_offduty, R.color.offduty_light),
-    SLEEPER_BERTH(2, R.string.hos_txt_sleeping, R.color.sleepingberth_light),
-    DRIVING(3, R.string.hos_txt_driving, R.color.driving_light),
-    ON_DUTY(4, R.string.hos_txt_onduty, R.color.onduty_light);
+    OFF_DUTY(1, R.string.hos_txt_offduty, R.color.offduty_light, R.drawable.ic_duty_status_of),
+    SLEEPER_BERTH(2, R.string.hos_txt_sleeping, R.color.sleepingberth_light, R.drawable.ic_duty_status_sb),
+    DRIVING(3, R.string.hos_txt_driving, R.color.driving_light, R.drawable.ic_duty_status_dr),
+    ON_DUTY(4, R.string.hos_txt_onduty, R.color.onduty_light, R.drawable.ic_duty_status_on),
+    PERSONAL_USE(5, R.string.hos_txt_personal_use, R.color.driving_light, R.drawable.ic_duty_status_pu),
+    YARD_MOVES(6, R.string.hos_txt_yard_moves, R.color.onduty_light, R.drawable.ic_duty_status_ym);
 
     private int mId;
     private int mName;
     private int mColor;
+    private int mIcon;
 
-    DutyType(int type, int name, int color) {
+    DutyType(int type, int name, int color, int icon) {
         mId = type;
         mName = name;
         mColor = color;
+        mIcon = icon;
     }
 
     public static int getNameById(int id) {
@@ -55,5 +59,9 @@ public enum DutyType {
 
     public int getColor() {
         return mColor;
+    }
+
+    public int getIcon() {
+        return mIcon;
     }
 }

@@ -6,7 +6,8 @@ import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 
 import com.bsmwireless.common.App;
-import com.bsmwireless.screens.common.BaseMenuActivity;
+import com.bsmwireless.screens.common.menu.BaseMenuActivity;
+import com.bsmwireless.screens.common.menu.BaseMenuPresenter;
 import com.bsmwireless.screens.settings.dagger.DaggerSettingsComponent;
 import com.bsmwireless.screens.settings.dagger.SettingsModule;
 
@@ -15,7 +16,6 @@ import javax.inject.Inject;
 import app.bsmuniversal.com.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.Unbinder;
 
 public class SettingsActivity extends BaseMenuActivity implements SettingsView {
 
@@ -77,5 +77,10 @@ public class SettingsActivity extends BaseMenuActivity implements SettingsView {
     protected void onDestroy() {
         mPresenter.onDestroy();
         super.onDestroy();
+    }
+
+    @Override
+    protected BaseMenuPresenter getPresenter() {
+        return mPresenter;
     }
 }

@@ -1,9 +1,12 @@
 package com.bsmwireless.screens.navigation;
 
-import com.bsmwireless.data.storage.users.UserConverter;
+import com.bsmwireless.data.storage.DutyManager;
+import com.bsmwireless.domain.interactors.ELDEventsInteractor;
 import com.bsmwireless.domain.interactors.LoginUserInteractor;
 import com.bsmwireless.domain.interactors.VehiclesInteractor;
 import com.bsmwireless.models.User;
+import com.bsmwireless.screens.common.menu.BaseMenuPresenter;
+import com.bsmwireless.screens.common.menu.BaseMenuView;
 
 import javax.inject.Inject;
 
@@ -13,7 +16,7 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
-public class NavigationPresenter {
+public class NavigationPresenter extends BaseMenuPresenter {
 
     private NavigateView mView;
     private LoginUserInteractor mLoginUserInteractor;
@@ -21,10 +24,11 @@ public class NavigationPresenter {
     private CompositeDisposable mDisposables;
 
     @Inject
-    public NavigationPresenter(NavigateView view, LoginUserInteractor loginUserInteractor, VehiclesInteractor vehiclesInteractor) {
+    public NavigationPresenter(NavigateView view, LoginUserInteractor loginUserInteractor, VehiclesInteractor vehiclesInteractor, DutyManager dutyManager) {
         mView = view;
         mLoginUserInteractor = loginUserInteractor;
         mVehiclesInteractor = vehiclesInteractor;
+        mDutyManager = dutyManager;
         mDisposables = new CompositeDisposable();
     }
 
@@ -51,7 +55,10 @@ public class NavigationPresenter {
     }
 
     public void onDestroy() {
+        super.onDestroy();
         mDisposables.dispose();
+
+        Timber.d("DESTROYED");
     }
 
     public void onViewCreated() {
@@ -62,6 +69,11 @@ public class NavigationPresenter {
         mView.setCoDriversNumber(mLoginUserInteractor.getCoDriversNumber());
         mView.setBoxId(mVehiclesInteractor.getBoxId());
         mView.setAssetsNumber(mVehiclesInteractor.getAssetsNumber());
+    }
+
+    @Override
+    protected BaseMenuView getView() {
+        return mView;
     }
 
     public void onUserUpdated(User user) {

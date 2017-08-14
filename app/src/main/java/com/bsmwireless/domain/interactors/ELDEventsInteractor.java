@@ -4,7 +4,6 @@ import android.accounts.NetworkErrorException;
 
 import com.bsmwireless.common.utils.NetworkUtils;
 import com.bsmwireless.data.network.ServiceApi;
-import com.bsmwireless.data.network.authenticator.TokenManager;
 import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.data.storage.eldevents.ELDEventConverter;

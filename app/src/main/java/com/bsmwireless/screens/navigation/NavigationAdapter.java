@@ -5,6 +5,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
+import com.bsmwireless.screens.dashboard.DashboardFragment;
 import com.bsmwireless.screens.logs.LogsFragment;
 
 import app.bsmuniversal.com.R;
@@ -24,7 +25,7 @@ public class NavigationAdapter extends FragmentStatePagerAdapter {
         //TODO: return actual fragments
         switch (position) {
             case 0:
-                return new NavigationFakeFragment();
+                return new DashboardFragment();
             case 1:
                 return new LogsFragment();
             default:

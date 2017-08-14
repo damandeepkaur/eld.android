@@ -10,7 +10,13 @@ public class PreferencesManager {
     private static final String KEY_SHOW_HOME_SCREEN_ENABLED = "show_home_screen_enabled";
     private static final String KEY_BOX_GPS_ENABLED = "keep_box_gps_enabled";
     private static final String KEY_FIXED_AMOUNT_ENABLED = "keep_fixed_amount_enabled";
+    //TODO: validate from server
+    private static final String KEY_TIME_ON_DUTY = "time_on_duty";
+    private static final String KEY_TIME_DRIVING = "time_driving";
+    private static final String KEY_TIME_SLEEPER_BERTH = "time_sleeper_berth";
 
+    public static final String KEY_DUTY_TYPE = "duty_type";
+    private static final String KEY_DUTY_DAY = "duty_day";
 
     public static final int NOT_FOUND_VALUE = -1;
 
@@ -94,5 +100,64 @@ public class PreferencesManager {
 
     public boolean isFixedAmountEnabled() {
         return mPreferences.getBoolean(KEY_FIXED_AMOUNT_ENABLED, false);
+    }
+
+    public void setOnDutyTime(int time) {
+        SharedPreferences.Editor editor = mPreferences.edit();
+        editor.putInt(KEY_TIME_ON_DUTY, time);
+        editor.apply();
+    }
+
+    public int getOnDutyTime() {
+        return mPreferences.getInt(KEY_TIME_ON_DUTY, 0);
+    }
+
+    public void setDrivingTime(int time) {
+        SharedPreferences.Editor editor = mPreferences.edit();
+        editor.putInt(KEY_TIME_DRIVING, time);
+        editor.apply();
+    }
+
+    public int getDrivingTime() {
+        return mPreferences.getInt(KEY_TIME_DRIVING, 0);
+    }
+
+    public void setSleeperBerthTime(int time) {
+        SharedPreferences.Editor editor = mPreferences.edit();
+        editor.putInt(KEY_TIME_SLEEPER_BERTH, time);
+        editor.apply();
+    }
+
+    public int getSleeperBerthTime() {
+        return mPreferences.getInt(KEY_TIME_SLEEPER_BERTH, 0);
+    }
+
+    //Should be used via DutyManager only
+    public void setDutyType(int dutyType) {
+        SharedPreferences.Editor editor = mPreferences.edit();
+        editor.putInt(KEY_DUTY_TYPE, dutyType);
+        editor.apply();
+    }
+
+    public int getDutyType() {
+        return mPreferences.getInt(KEY_DUTY_TYPE, 0);
+    }
+
+    public void setDutyDay(long day) {
+        SharedPreferences.Editor editor = mPreferences.edit();
+        editor.putLong(KEY_DUTY_DAY, day);
+        editor.apply();
+    }
+
+    public int getDutyDay() {
+        return mPreferences.getInt(KEY_DUTY_DAY, 0);
+    }
+
+    public void addListener(SharedPreferences.OnSharedPreferenceChangeListener listener) {
+        mPreferences.registerOnSharedPreferenceChangeListener(listener);
+    }
+
+    public void removeListener(SharedPreferences.OnSharedPreferenceChangeListener listener) {
+        mPreferences.unregisterOnSharedPreferenceChangeListener(listener);
     }
 }

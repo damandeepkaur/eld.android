@@ -3,9 +3,12 @@ package com.bsmwireless.screens.driverprofile;
 import android.content.Context;
 
 import com.bsmwireless.common.dagger.ActivityScope;
+import com.bsmwireless.data.storage.DutyManager;
 import com.bsmwireless.data.storage.users.UserConverter;
 import com.bsmwireless.data.storage.users.UserEntity;
 import com.bsmwireless.domain.interactors.LoginUserInteractor;
+import com.bsmwireless.screens.common.menu.BaseMenuPresenter;
+import com.bsmwireless.screens.common.menu.BaseMenuView;
 
 import java.util.Calendar;
 
@@ -18,7 +21,7 @@ import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
 @ActivityScope
-public class DriverProfilePresenter {
+public class DriverProfilePresenter extends BaseMenuPresenter {
 
     private static final int MAX_SIGNATURE_LENGTH = 50000;
 
@@ -31,9 +34,10 @@ public class DriverProfilePresenter {
     private UserEntity mUserEntity;
 
     @Inject
-    public DriverProfilePresenter(Context context, DriverProfileView view, LoginUserInteractor loginUserInteractor) {
+    public DriverProfilePresenter(Context context, DriverProfileView view, LoginUserInteractor loginUserInteractor, DutyManager dutyManager) {
         mView = view;
         mLoginUserInteractor = loginUserInteractor;
+        mDutyManager = dutyManager;
         mDisposables = new CompositeDisposable();
         mContext = context;
 
@@ -41,6 +45,7 @@ public class DriverProfilePresenter {
     }
 
     public void onDestroy() {
+        super.onDestroy();
         mDisposables.dispose();
 
         Timber.d("DESTROYED");
@@ -58,6 +63,11 @@ public class DriverProfilePresenter {
                             Timber.e(throwable.getMessage());
                             mView.showError(throwable);
                         }));
+    }
+
+    @Override
+    protected BaseMenuView getView() {
+        return mView;
     }
 
     public void onSaveSignatureClicked(String signature) {

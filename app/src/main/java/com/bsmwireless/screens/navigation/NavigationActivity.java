@@ -21,7 +21,8 @@ import android.widget.Toast;
 
 import com.bsmwireless.common.App;
 import com.bsmwireless.models.User;
-import com.bsmwireless.screens.common.BaseMenuActivity;
+import com.bsmwireless.screens.common.menu.BaseMenuActivity;
+import com.bsmwireless.screens.common.menu.BaseMenuPresenter;
 import com.bsmwireless.screens.driverprofile.DriverProfileActivity;
 import com.bsmwireless.screens.login.LoginActivity;
 import com.bsmwireless.screens.navigation.dagger.DaggerNavigationComponent;
@@ -157,7 +158,6 @@ public class NavigationActivity extends BaseMenuActivity implements OnNavigation
         mPagerAdapter = new NavigationAdapter(getApplicationContext(), getSupportFragmentManager());
         mViewPager.setAdapter(mPagerAdapter);
         mViewPager.setOffscreenPageLimit(2);
-        mViewPager.setCurrentItem(1);
         mViewPager.addOnPageChangeListener(this);
 
         mTabLayout.setupWithViewPager(mViewPager);
@@ -225,6 +225,11 @@ public class NavigationActivity extends BaseMenuActivity implements OnNavigation
         mPresenter.onDestroy();
         mHeaderViewHolder.unbind();
         super.onDestroy();
+    }
+
+    @Override
+    protected BaseMenuPresenter getPresenter() {
+        return mPresenter;
     }
 
     @Override

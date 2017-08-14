@@ -16,10 +16,10 @@ import android.widget.Toast;
 
 import com.bsmwireless.common.App;
 import com.bsmwireless.common.utils.DateUtils;
-import com.bsmwireless.common.utils.ViewUtils;
 import com.bsmwireless.data.storage.users.UserEntity;
 import com.bsmwireless.models.User;
-import com.bsmwireless.screens.common.BaseMenuActivity;
+import com.bsmwireless.screens.common.menu.BaseMenuActivity;
+import com.bsmwireless.screens.common.menu.BaseMenuPresenter;
 import com.bsmwireless.screens.driverprofile.dagger.DaggerDriverProfileComponent;
 import com.bsmwireless.screens.driverprofile.dagger.DriverProfileModule;
 import com.bsmwireless.widgets.signview.SignatureLayout;
@@ -132,6 +132,11 @@ public class DriverProfileActivity extends BaseMenuActivity implements DriverPro
     protected void onDestroy() {
         mPresenter.onDestroy();
         super.onDestroy();
+    }
+
+    @Override
+    protected BaseMenuPresenter getPresenter() {
+        return mPresenter;
     }
 
     @Override

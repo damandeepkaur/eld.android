@@ -64,6 +64,17 @@ public class DateUtils {
     }
 
     /**
+     * @param time in Unix ms
+     * @return end date in ms
+     */
+    public static long getEndDayTimeInMs(long time) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(time);
+        calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DATE), 23, 59, 59);
+        return calendar.getTimeInMillis();
+    }
+
+    /**
      * @param zone user timezone for example "America/Los_Angeles"
      * @return Full time zone like "GMT -4.0, Eastern Standard Time (Canada/Eastern)"
      */

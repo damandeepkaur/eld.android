@@ -435,11 +435,15 @@
     <string name="ml">ml</string>
     <string name= "sign_logsheet">sing logsheet</string>
     <string name="hos_txt_offduty">Off Duty</string>
-    <string name="hos_txt_sleeping">Sleeping</string>
+    <string name="hos_txt_sleeping">Sleeper Berth</string>
     <string name="hos_txt_driving">Driving</string>
     <string name="hos_txt_onduty">On Duty</string>
+    <string name="hos_txt_personal_use">Personal Use</string>
+    <string name="hos_txt_yard_moves">Yard Moves</string>
 
-
-
+    <string name="duty_hours">HOURS</string>
+    <string name="duty_minutes">MINUTES</string>
+    <string name="duty_seconds">SECONDS</string>
+    <string name="duty_tap_to_change_status">Tap to change status</string>
 
 </resources>
