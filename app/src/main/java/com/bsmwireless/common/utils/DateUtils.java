@@ -157,9 +157,7 @@ public class DateUtils {
         SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm aaa");
         TimeZone timeZone = TimeZone.getTimeZone(timezone);
         dateFormat.setTimeZone(timeZone);
-        Calendar calendar = Calendar.getInstance(timeZone);
-        calendar.setTimeInMillis(time);
-        return dateFormat.format(calendar.getTime());
+        return dateFormat.format(time);
     }
 
     /**
@@ -172,15 +170,19 @@ public class DateUtils {
         TimeZone timeZone = TimeZone.getTimeZone(timezone);
         format.setTimeZone(timeZone);
         try {
+            // Parse hour of day and minute
             Date date = format.parse(time);
-            Calendar timeCalendar = Calendar.getInstance(timeZone);
-            timeCalendar.setTime(date);
+            Calendar calendar = Calendar.getInstance(timeZone);
+            calendar.setTime(date);
 
-            Calendar dayCalendar = Calendar.getInstance(timeZone);
-            dayCalendar.setTimeInMillis(day);
-            dayCalendar.set(Calendar.HOUR_OF_DAY, timeCalendar.get(Calendar.HOUR_OF_DAY));
-            dayCalendar.set(Calendar.MINUTE, timeCalendar.get(Calendar.MINUTE));
-            return dayCalendar.getTimeInMillis();
+            int hourOfDay = calendar.get(Calendar.HOUR_OF_DAY);
+            int minute = calendar.get(Calendar.MINUTE);
+
+            // Time of day
+            calendar.setTimeInMillis(day);
+            calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+            calendar.set(Calendar.MINUTE, minute);
+            return calendar.getTimeInMillis();
         } catch (ParseException e) {
             e.printStackTrace();
         }

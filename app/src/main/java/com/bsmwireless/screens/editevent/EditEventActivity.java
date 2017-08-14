@@ -82,7 +82,7 @@ public class EditEventActivity extends BaseMenuActivity implements EditEventView
 
     @Override
     public void setStatus(DutyType type) {
-        mEventStatus.setSelection(type.getId() - 1);
+        mEventStatus.setSelection(type.ordinal());
     }
 
     @Override
@@ -130,10 +130,10 @@ public class EditEventActivity extends BaseMenuActivity implements EditEventView
         if (intent != null) {
             if (intent.hasExtra(OLD_ELD_EVENT_EXTRA)) {
                 ELDEvent event = intent.getParcelableExtra(OLD_ELD_EVENT_EXTRA);
-                mPresenter.onEvent(event);
+                mPresenter.setEvent(event);
             }
             if (intent.hasExtra(DAY_TIME_EXTRA)) {
-                mPresenter.onDayTime(intent.getLongExtra(DAY_TIME_EXTRA, 0));
+                mPresenter.setDayTime(intent.getLongExtra(DAY_TIME_EXTRA, 0));
             }
         }
     }

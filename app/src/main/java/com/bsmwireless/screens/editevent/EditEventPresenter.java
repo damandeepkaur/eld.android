@@ -37,7 +37,7 @@ public class EditEventPresenter {
         mLoginUserInteractor = loginUserInteractor;
         mVehiclesInteractor = vehiclesInteractor;
         mTimezone = TimeZone.getDefault().getID();
-        mCalendar = Calendar.getInstance(TimeZone.getTimeZone(mTimezone));
+        mCalendar = Calendar.getInstance();
 
         Timber.d("CREATED");
     }
@@ -96,7 +96,7 @@ public class EditEventPresenter {
         }
     }
 
-    public void onEvent(ELDEvent event) {
+    public void setEvent(ELDEvent event) {
         mELDEvent = event;
         if (mELDEvent != null) {
             DutyType type = DutyType.getTypeById(event.getEventCode());
@@ -115,7 +115,7 @@ public class EditEventPresenter {
         }
     }
 
-    public void onDayTime(long dayTime) {
+    public void setDayTime(long dayTime) {
         mEventDay = dayTime;
     }
 
