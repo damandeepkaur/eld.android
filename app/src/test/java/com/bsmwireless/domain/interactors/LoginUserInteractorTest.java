@@ -12,6 +12,7 @@ import com.bsmwireless.models.Auth;
 import com.bsmwireless.models.BlackBoxModel;
 import com.bsmwireless.models.Carrier;
 import com.bsmwireless.models.ELDEvent;
+import com.bsmwireless.models.HomeTerminal;
 import com.bsmwireless.models.LoginModel;
 import com.bsmwireless.models.PasswordModel;
 import com.bsmwireless.models.ResponseMessage;
@@ -54,6 +55,7 @@ public class LoginUserInteractorTest {
     private final String mDomain = "domain";
     private final boolean mKeepToken = false;
     private final User.DriverType mDriverType = User.DriverType.DRIVER;
+    private final String mSuccessResponse = "ACK";
 
     @ClassRule
     public static final RxSchedulerRule RULE = new RxSchedulerRule();
@@ -141,7 +143,7 @@ public class LoginUserInteractorTest {
         verify(mUserDao).insertUser(any(UserEntity.class));
     }
 
-    // TODO: test login failed, if possible (right now code will result in NullPointerException if the observable from mServiceApi.loginUser somehow emits a null)
+    // TODO: test login-failed, if possible (right now code will result in NullPointerException if the observable from mServiceApi.loginUser somehow emits a null)
 
     /**
      * Verifies login actions when carrier list is not null
@@ -191,6 +193,18 @@ public class LoginUserInteractorTest {
         User user = makeFakeUser();
         user.setId(123456);
 
+        List<HomeTerminal> homeTerminals = new ArrayList<>();
+
+        HomeTerminal ht1 = new HomeTerminal();
+        HomeTerminal ht2 = new HomeTerminal();
+        HomeTerminal ht3 = new HomeTerminal();
+
+        homeTerminals.add(ht1);
+        homeTerminals.add(ht2);
+        homeTerminals.add(ht3);
+
+        user.setHomeTerminals(homeTerminals);
+
         TestObserver<Boolean> testObserver = TestObserver.create();
         String fakeAccountName = "fake account name";
 
@@ -237,6 +251,96 @@ public class LoginUserInteractorTest {
 
         // then
         verify(mUserDao).setUserLastVehicles(any(Integer.class), eq(lastVehicles));
+    }
+
+    /**
+     * Verify PreferencesManager and TokenManager workflow when login.
+     */
+    @Test
+    public void testLoginUser() {
+        // given
+        User user = makeFakeUser();
+
+        TestObserver<Boolean> testObserver = new TestObserver<>();
+        when(mServiceApi.loginUser(any(LoginModel.class))).thenReturn(Observable.just(user));
+
+        // when
+
+        mLoginUserInteractor.loginUser(mName, mPassword, mDomain, mKeepToken, mDriverType)
+                .subscribe(testObserver);
+
+        // then
+        verify(mPreferencesManager).setAccountName(anyString());
+
+        verify(mPreferencesManager).setRememberUserEnabled(eq(mKeepToken));
+        verify(mTokenManager).setToken(anyString(), eq(mName), eq(mDomain), any(Auth.class));
+    }
+
+
+    @Test
+    public void testLogoutUserSuccessNoRemember() {
+        // given
+        final String accountName = "mock account name";
+        final String driver = "90210"; // parsable to int
+        final int driverInt = 90210; // int version of driver
+
+        TestObserver<Boolean> isLogoutTestObserver = new TestObserver<>();
+        BlackBoxModel blackBoxModel = new BlackBoxModel();
+
+        when(mPreferencesManager.getAccountName()).thenReturn(accountName);
+        when(mTokenManager.getDriver(anyString())).thenReturn(driver);
+        when(mBlackBoxInteractor.getData()).thenReturn(Observable.just(blackBoxModel));
+        when(mAppDatabase.userDao()).thenReturn(mUserDao);
+
+        when(mPreferencesManager.isRememberUserEnabled()).thenReturn(false);
+        when(mServiceApi.logout(any(ELDEvent.class))).thenReturn(Observable.just(mResponseMessage));
+        when(mResponseMessage.getMessage()).thenReturn(mSuccessResponse);
+
+        // when
+        Observable<Boolean> isLogout = mLoginUserInteractor.logoutUser();
+        isLogout.subscribeWith(isLogoutTestObserver);
+
+        // then
+        verify(mServiceApi).logout(any(ELDEvent.class));
+        verify(mUserDao).deleteUser(eq(driverInt));
+        verify(mTokenManager).removeAccount(eq(accountName));
+        verify(mPreferencesManager).clearValues();
+        isLogoutTestObserver.assertResult(true);
+    }
+
+    @Test
+    public void testLogoutUserSuccessRemember() {
+        // given
+        final String accountName = "mock account name";
+        final String driver = "90210"; // parsable to int
+        final String fakeToken = "314159265";
+
+        TestObserver<Boolean> isLogoutTestObserver = new TestObserver<>();
+        BlackBoxModel blackBoxModel = new BlackBoxModel();
+
+        when(mPreferencesManager.getAccountName()).thenReturn(accountName);
+        when(mTokenManager.getDriver(anyString())).thenReturn(driver);
+        when(mBlackBoxInteractor.getData()).thenReturn(Observable.just(blackBoxModel));
+        when(mAppDatabase.userDao()).thenReturn(mUserDao);
+        when(mTokenManager.getToken(anyString())).thenReturn(fakeToken);
+
+        when(mPreferencesManager.isRememberUserEnabled()).thenReturn(true);
+        when(mServiceApi.logout(any(ELDEvent.class))).thenReturn(Observable.just(mResponseMessage));
+        when(mResponseMessage.getMessage()).thenReturn(mSuccessResponse);
+
+        // when
+        Observable<Boolean> isLogout = mLoginUserInteractor.logoutUser();
+        isLogout.subscribeWith(isLogoutTestObserver);
+
+        // then
+        verify(mServiceApi).logout(any(ELDEvent.class));
+        verify(mTokenManager).clearToken(eq(fakeToken));
+        isLogoutTestObserver.assertResult(true);
+    }
+
+    @Test
+    public void testLogoutUserFailure() {
+
     }
 
 
@@ -353,100 +457,6 @@ public class LoginUserInteractorTest {
 
     // TODO: test co-drivers number once getCoDriversNumber is implemented
 
-
-    /**
-     * Verify PreferencesManager and TokenManager workflow when login.
-     */
-    @Test
-    public void testLoginUser() {
-        // given
-        User user = makeFakeUser();
-
-        TestObserver<Boolean> testObserver = new TestObserver<>();
-        when(mServiceApi.loginUser(any(LoginModel.class))).thenReturn(Observable.just(user));
-
-        // when
-
-        mLoginUserInteractor.loginUser(mName, mPassword, mDomain, mKeepToken, mDriverType)
-                .subscribe(testObserver);
-
-        // then
-        verify(mPreferencesManager).setAccountName(anyString());
-
-        verify(mPreferencesManager).setRememberUserEnabled(eq(mKeepToken));
-        verify(mTokenManager).setToken(anyString(), eq(mName), eq(mDomain), any(Auth.class));
-    }
-
-    // TODO: add tests for logoutUser
-
-
-    @Test
-    public void testLogoutUserSuccessNoRemember() {
-        // given
-        final String accountName = "mock account name";
-        final String driver = "90210"; // parsable to int
-        final int driverInt = 90210; // int version of driver
-        final String successResponse = "ACK";
-
-        TestObserver<Boolean> isLogoutTestObserver = new TestObserver<>();
-        BlackBoxModel blackBoxModel = new BlackBoxModel();
-
-        when(mPreferencesManager.getAccountName()).thenReturn(accountName);
-        when(mTokenManager.getDriver(anyString())).thenReturn(driver);
-        when(mBlackBoxInteractor.getData()).thenReturn(Observable.just(blackBoxModel));
-        when(mAppDatabase.userDao()).thenReturn(mUserDao);
-
-        when(mPreferencesManager.isRememberUserEnabled()).thenReturn(false);
-        when(mServiceApi.logout(any(ELDEvent.class))).thenReturn(Observable.just(mResponseMessage));
-        when(mResponseMessage.getMessage()).thenReturn(successResponse);
-
-        // when
-        Observable<Boolean> isLogout = mLoginUserInteractor.logoutUser();
-        isLogout.subscribeWith(isLogoutTestObserver);
-
-        // then
-        verify(mServiceApi).logout(any(ELDEvent.class));
-        verify(mUserDao).deleteUser(eq(driverInt));
-        verify(mTokenManager).removeAccount(eq(accountName));
-        verify(mPreferencesManager).clearValues();
-        isLogoutTestObserver.assertResult(true);
-    }
-
-    @Test
-    public void testLogoutUserSuccessRemember() {
-        // given
-        final String accountName = "mock account name";
-        final String driver = "90210"; // parsable to int
-        final String successResponse = "ACK";
-        final String fakeToken = "314159265";
-
-        TestObserver<Boolean> isLogoutTestObserver = new TestObserver<>();
-        BlackBoxModel blackBoxModel = new BlackBoxModel();
-
-        when(mPreferencesManager.getAccountName()).thenReturn(accountName);
-        when(mTokenManager.getDriver(anyString())).thenReturn(driver);
-        when(mBlackBoxInteractor.getData()).thenReturn(Observable.just(blackBoxModel));
-        when(mAppDatabase.userDao()).thenReturn(mUserDao);
-        when(mTokenManager.getToken(anyString())).thenReturn(fakeToken);
-
-        when(mPreferencesManager.isRememberUserEnabled()).thenReturn(true);
-        when(mServiceApi.logout(any(ELDEvent.class))).thenReturn(Observable.just(mResponseMessage));
-        when(mResponseMessage.getMessage()).thenReturn(successResponse);
-
-        // when
-        Observable<Boolean> isLogout = mLoginUserInteractor.logoutUser();
-        isLogout.subscribeWith(isLogoutTestObserver);
-
-        // then
-        verify(mServiceApi).logout(any(ELDEvent.class));
-        verify(mTokenManager).clearToken(eq(fakeToken));
-        isLogoutTestObserver.assertResult(true);
-    }
-
-    @Test
-    public void testLogoutUserFailure() {
-
-    }
 
     // TODO: add tests for updateDBUser
     // TODO: add tests for updateUserOnServer
