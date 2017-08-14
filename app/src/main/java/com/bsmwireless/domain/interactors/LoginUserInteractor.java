@@ -5,8 +5,8 @@ import com.bsmwireless.data.network.authenticator.TokenManager;
 import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.data.storage.carriers.CarrierConverter;
-import com.bsmwireless.data.storage.users.FullUserEntity;
 import com.bsmwireless.data.storage.hometerminals.HomeTerminalConverter;
+import com.bsmwireless.data.storage.users.FullUserEntity;
 import com.bsmwireless.data.storage.users.UserConverter;
 import com.bsmwireless.data.storage.users.UserEntity;
 import com.bsmwireless.models.DriverHomeTerminal;
@@ -25,9 +25,6 @@ import javax.inject.Inject;
 
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.annotations.NonNull;
 
 import static com.bsmwireless.models.ELDEvent.EventType.LOGIN_LOGOUT;
 
@@ -92,7 +89,7 @@ public class LoginUserInteractor {
         ELDEvent logoutEvent = new ELDEvent();
         int driverId = getDriverId();
         logoutEvent.setStatus(ELDEvent.StatusCode.ACTIVE.getValue());
-        logoutEvent.setOrigin(ELDEvent.EventOrigin.MANUAL_ENTER.getValue());
+        logoutEvent.setOrigin(ELDEvent.EventOrigin.DRIVER.getValue());
         logoutEvent.setEventType(LOGIN_LOGOUT.getValue());
         logoutEvent.setEventCode(ELDEvent.LoginLogoutCode.LOGOUT.getValue());
         logoutEvent.setEventTime(System.currentTimeMillis());
