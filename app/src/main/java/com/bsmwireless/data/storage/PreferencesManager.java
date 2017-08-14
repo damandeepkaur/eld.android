@@ -10,6 +10,7 @@ public class PreferencesManager {
     private static final String KEY_SHOW_HOME_SCREEN_ENABLED = "show_home_screen_enabled";
     private static final String KEY_BOX_GPS_ENABLED = "keep_box_gps_enabled";
     private static final String KEY_FIXED_AMOUNT_ENABLED = "keep_fixed_amount_enabled";
+    private static final String KEY_SELECTED_KM_UNITS = "selected_km_units";
     //TODO: validate from server
     private static final String KEY_TIME_ON_DUTY = "time_on_duty";
     private static final String KEY_TIME_DRIVING = "time_driving";
@@ -159,5 +160,21 @@ public class PreferencesManager {
 
     public void removeListener(SharedPreferences.OnSharedPreferenceChangeListener listener) {
         mPreferences.unregisterOnSharedPreferenceChangeListener(listener);
+    }
+
+    public void setKMOdometerUnits(boolean kmOdometerUnitsSelected) {
+        SharedPreferences.Editor editor = mPreferences.edit();
+        editor.putBoolean(KEY_SELECTED_KM_UNITS, kmOdometerUnitsSelected);
+        editor.apply();
+    }
+
+    /**
+     * Retrieves whether the user selected km
+     * or mi odometer units. Default value will be km.
+     *
+     * @return True if km odometer units selected, or false for mi.
+     */
+    public boolean isKMOdometerUnitsSelected() {
+        return mPreferences.getBoolean(KEY_SELECTED_KM_UNITS, true);
     }
 }

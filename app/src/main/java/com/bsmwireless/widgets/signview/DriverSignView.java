@@ -19,6 +19,8 @@ import android.view.ViewParent;
 import com.bsmwireless.common.utils.ViewUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import app.bsmuniversal.com.R;
@@ -228,28 +230,58 @@ public class DriverSignView extends View implements View.OnTouchListener {
             Path path = new Path();
 
             Bitmap bmp = Bitmap.createBitmap(bitmap);
+            List<Point> data = new ArrayList<>(mData);
 
             Canvas canvas = new Canvas(bmp);
             canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
 
-            for (int i = 2; i < mData.size(); i+=2) {
-                if ((mData.get(i).x < 0 || mData.get(i).y < 0) ||
-                        (mData.get(i - 1).x < 0 || mData.get(i - 1).y < 0) ||
-                        (mData.get(i - 2).x < 0 || mData.get(i - 2).y < 0)) {
+            float maxX = -1;
+            float maxY = -1;
+
+            for (int i = 0; i < data.size(); i++) {
+                Point point = data.get(i);
+                if (point.x > maxX) {
+                    maxX = point.x;
+                }
+                if (point.y > maxY) {
+                    maxY = point.y;
+                }
+            }
+
+            float width = bmp.getWidth();
+            float height = bmp.getHeight();
+
+            float scaleX = width / maxX;
+            float scaleY = height / maxY;
+
+            float scale = ((scaleX * maxX <= width) && (scaleX * maxY <= height)) ? scaleX : scaleY;
+
+            for (int i = 0; i < data.size(); i++) {
+                if (scale != 1 && data.get(i).x > 0 && data.get(i).y > 0){
+                    data.set(i, new Point((int) (data.get(i).x * scale), (int) (data.get(i).y * scale)));
+                }
+            }
+
+            for (int i = 2; i < data.size(); i+=2) {
+                if ((data.get(i).x < 0 || data.get(i).y < 0) ||
+                        (data.get(i - 1).x < 0 || data.get(i - 1).y < 0) ||
+                        (data.get(i - 2).x < 0 || data.get(i - 2).y < 0)) {
                     path = new Path();
                     continue;
                 }
 
-                path.moveTo(mData.get(i - 2).x, mData.get(i - 2).y);
-                path.cubicTo(mData.get(i - 2).x,
-                        mData.get(i - 2).y,
-                        mData.get(i - 1).x,
-                        mData.get(i - 1).y,
-                        mData.get(i).x,
-                        mData.get(i).y);
+                path.moveTo(data.get(i - 2).x, data.get(i - 2).y);
+                path.cubicTo(data.get(i - 2).x,
+                        data.get(i - 2).y,
+                        data.get(i - 1).x,
+                        data.get(i - 1).y,
+                        data.get(i).x,
+                        data.get(i).y);
 
                 canvas.drawPath(path, mPaint);
             }
+
+            mData = data;
 
             e.onNext(bmp);
         }).subscribeOn(Schedulers.io())
@@ -283,20 +315,13 @@ public class DriverSignView extends View implements View.OnTouchListener {
     }
 
     public static String pointsToString(List<Point> data) {
-        int xShift = Integer.MAX_VALUE;
-        for (int i = 0; i < data.size(); i++) {
-            if (data.get(i).x > -1 && data.get(i).x < xShift) {
-                xShift = data.get(i).x;
-            }
-        }
-
         StringBuilder rtnSign = new StringBuilder();
         for (int i = 0; i < data.size(); i++) {
             if (i > 0) {
                 rtnSign.append(";");
             }
 
-            rtnSign.append(data.get(i).x - xShift)
+            rtnSign.append(data.get(i).x)
                    .append(",")
                    .append(data.get(i).y);
         }

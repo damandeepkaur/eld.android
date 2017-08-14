@@ -1,7 +1,6 @@
 package com.bsmwireless.screens.navigation;
 
 import com.bsmwireless.data.storage.DutyManager;
-import com.bsmwireless.domain.interactors.ELDEventsInteractor;
 import com.bsmwireless.domain.interactors.LoginUserInteractor;
 import com.bsmwireless.domain.interactors.VehiclesInteractor;
 import com.bsmwireless.models.User;
@@ -78,7 +77,7 @@ public class NavigationPresenter extends BaseMenuPresenter {
 
     public void onUserUpdated(User user) {
         if (user != null) {
-            mDisposables.add(mLoginUserInteractor.updateUser(user)
+            mDisposables.add(mLoginUserInteractor.syncDriverProfile(user)
                                                  .subscribeOn(Schedulers.io())
                                                  .observeOn(AndroidSchedulers.mainThread())
                                                  .subscribe(userUpdated -> {},

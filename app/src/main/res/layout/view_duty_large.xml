@@ -96,7 +96,7 @@
             android:layout_alignStart="@id/duty_time"
             android:layout_alignRight="@id/duty_time"
             android:layout_below="@+id/duty_time_subtitle"
-            android:max="86400"
+            android:max="@integer/max_duration"
             tools:progress="56"/>
 
         <View

@@ -31,6 +31,9 @@ public class SettingsPresenter extends BaseMenuPresenter {
     public void onViewCreated() {
         mView.setBoxGPSSwitchEnabled(mSettingsInteractor.isBoxGPSEnabled());
         mView.setFixedAmountSwitchEnabled(mSettingsInteractor.isFixedAmountEnabled());
+
+        // set current selected value for odometer units
+        mView.showOdometerUnits(loadLastSelectedOdometerUnit());
     }
 
     public void onBoxGPSSwitchChecked(boolean isBoxGPSEnabled) {
@@ -46,10 +49,27 @@ public class SettingsPresenter extends BaseMenuPresenter {
         return mView;
     }
 
+    public void onKMOdometerUnitsSelected(boolean isKMOdometerUnitsSelected) {
+        if (isKMOdometerUnitsSelected) {
+            mView.showOdometerUnits(SettingsView.OdometerUnits.ODOMETER_UNITS_KM);
+        } else {
+            mView.showOdometerUnits(SettingsView.OdometerUnits.ODOMETER_UNITS_MI);
+        }
+
+        mSettingsInteractor.saveKMOdometerUnitsSelected(isKMOdometerUnitsSelected);
+    }
+
     public void onDestroy() {
         super.onDestroy();
         mDisposables.dispose();
 
         Timber.d("DESTROYED");
+    }
+
+    private SettingsView.OdometerUnits loadLastSelectedOdometerUnit() {
+        if (mSettingsInteractor.isKMOdometerUnitsSelected()) {
+            return SettingsView.OdometerUnits.ODOMETER_UNITS_KM;
+        }
+        return SettingsView.OdometerUnits.ODOMETER_UNITS_MI;
     }
 }

@@ -1,5 +1,7 @@
 package com.bsmwireless.common.utils;
 
+import android.content.Context;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -7,6 +9,8 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
+
+import app.bsmuniversal.com.R;
 
 public class DateUtils {
     private final static int MINUTES_IN_HOUR = 60;
@@ -97,6 +101,33 @@ public class DateUtils {
         Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
         calendar.setTimeInMillis(time);
         return String.format(Locale.US, "%02d:%02d", calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE));
+    }
+
+    /**
+     * @param time unix time in ms
+     * @return string with format time like "2 hrs 35 mins"
+     */
+    public static String convertTimeInMsToDurationString(long time, Context context) {
+        String hrs = context.getResources().getString(R.string.hours);
+        String mins = context.getResources().getString(R.string.minutes);
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
+        calendar.setTimeInMillis(time);
+        String duration = "";
+        if (calendar.get(Calendar.HOUR_OF_DAY) > 0) {
+            duration = String.format(Locale.US, "%02d " + hrs + " ", calendar.get(Calendar.HOUR_OF_DAY));
+        }
+        return duration + String.format(Locale.US, "%02d " + mins, calendar.get(Calendar.MINUTE));
+    }
+
+    /**
+     * @param time unix time in ms
+     * @return string with format time like "01:19:24"
+     */
+    public static String convertTimeInMsToDayTime(String timezone, long time) {
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(timezone));
+        calendar.setTimeInMillis(time);
+        return String.format(Locale.US, "%02d:%02d:%02d", calendar.get(Calendar.HOUR_OF_DAY),
+                calendar.get(Calendar.MINUTE), calendar.get(Calendar.SECOND));
     }
 
     /**

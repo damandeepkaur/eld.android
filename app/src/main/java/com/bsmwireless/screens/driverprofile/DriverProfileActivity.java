@@ -11,11 +11,14 @@ import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ScrollView;
 import android.widget.Toast;
 
 import com.bsmwireless.common.App;
-import com.bsmwireless.common.utils.DateUtils;
+import com.bsmwireless.data.storage.carriers.CarrierEntity;
+import com.bsmwireless.data.storage.hometerminals.HomeTerminalEntity;
 import com.bsmwireless.data.storage.users.UserEntity;
 import com.bsmwireless.models.User;
 import com.bsmwireless.screens.common.menu.BaseMenuActivity;
@@ -26,6 +29,7 @@ import com.bsmwireless.widgets.signview.SignatureLayout;
 import com.bsmwireless.widgets.snackbar.SnackBarLayout;
 
 import java.util.Calendar;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -33,11 +37,13 @@ import app.bsmuniversal.com.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import timber.log.Timber;
 
 import static android.support.design.widget.BottomSheetBehavior.STATE_EXPANDED;
 import static android.support.design.widget.BottomSheetBehavior.STATE_HIDDEN;
+import static com.bsmwireless.common.utils.DateUtils.getFullTimeZone;
 
-public class DriverProfileActivity extends BaseMenuActivity implements DriverProfileView, SignatureLayout.OnSaveSignatureListener {
+public class DriverProfileActivity extends BaseMenuActivity implements DriverProfileView, SignatureLayout.OnSaveSignatureListener, AdapterView.OnItemSelectedListener {
 
     public static final String EXTRA_USER = "user";
 
@@ -80,12 +86,11 @@ public class DriverProfileActivity extends BaseMenuActivity implements DriverPro
     @BindView(R.id.eld_toggle)
     SwitchCompat mELDToggle;
 
-    // TODO: not implemented on server
-    /*@BindView(R.id.carrier_name)
-    TextInputEditText mCarrierName;*/
+    @BindView(R.id.carrier_name)
+    TextInputEditText mCarrierName;
 
-    @BindView(R.id.terminal_name)
-    TextInputEditText mTerminalName;
+    @BindView(R.id.terminal_name_spinner)
+    AppCompatSpinner mTerminalNames;
 
     @BindView(R.id.terminal_address)
     TextInputEditText mTerminalAddress;
@@ -145,18 +150,49 @@ public class DriverProfileActivity extends BaseMenuActivity implements DriverPro
         mEmployeeIDTextView.setText(String.valueOf(user.getId()));
         mLicenseTextView.setText(user.getLicense());
         mELDToggle.setChecked(user.getExempt());
-        mTerminalName.setText(user.getOrganization());
-        mTerminalAddress.setText(user.getOrgAddr());
-        mHomeTerminalTimeZone.setText(DateUtils.getFullTimeZone(user.getTimezone(), Calendar.getInstance().getTimeInMillis()));
+        // TODO: set real role
         mRole.setText(User.DriverType.DRIVER.name());
 
         mSignatureLayout.setImageData(user.getSignature());
     }
 
     @Override
+    public void setHomeTerminalsSpinner(List<String> homeTerminalNames, int selectedTerminal) {
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, homeTerminalNames);
+
+        mTerminalNames.setAdapter(adapter);
+        mTerminalNames.setSelection(selectedTerminal);
+        mTerminalNames.setOnItemSelectedListener(this);
+    }
+
+    @Override
+    public void setHomeTerminalInfo(HomeTerminalEntity homeTerminal) {
+        mTerminalAddress.setText(homeTerminal.getAddress());
+        mHomeTerminalTimeZone.setText(getFullTimeZone(homeTerminal.getTimezone(), Calendar.getInstance().getTimeInMillis()));
+    }
+
+    @Override
+    public void setCarrierInfo(CarrierEntity carrier) {
+        mCarrierName.setText(carrier.getName());
+    }
+
+    @Override
     public void showError(Throwable error) {
         // TODO: show notification to user
+        Timber.e(error.getMessage());
         Toast.makeText(this, error.getMessage(), Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showError(Error error) {
+        Timber.e(getString(error.getStringId()));
+        Toast.makeText(this, getString(error.getStringId()), Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showError(PasswordError error) {
+        Timber.e(getString(error.getStringId()));
+        setPasswordChangeError(getString(error.getStringId()));
     }
 
     @Override
@@ -179,11 +215,6 @@ public class DriverProfileActivity extends BaseMenuActivity implements DriverPro
         Intent resultIntent = new Intent();
         resultIntent.putExtra(EXTRA_USER, user);
         setResult(RESULT_OK, resultIntent);
-    }
-
-    @Override
-    public void showChangePasswordError(String error) {
-        setPasswordChangeError(error);
     }
 
     @Override
@@ -242,5 +273,15 @@ public class DriverProfileActivity extends BaseMenuActivity implements DriverPro
         mCurrentPasswordLayout.setError(error);
         mNewPasswordLayout.setError(error);
         mConfirmPasswordLayout.setError(error);
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        mPresenter.onChooseHomeTerminal(position);
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
     }
 }

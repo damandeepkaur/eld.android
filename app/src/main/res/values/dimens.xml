@@ -108,9 +108,6 @@
     <dimen name="calendar_item_width">45dp</dimen>
     <dimen name="calendar_item_height">85dp</dimen>
 
-    <!-- Settings Activity -->
-    <dimen name="divider_height">1dp</dimen>
-
     <!--Logs-->
     <dimen name="calendar_layout_side_button_size">24dp</dimen>
     <dimen name="bottom_bar_button_left_padding">36dp</dimen>
@@ -119,9 +116,9 @@
     <dimen name="logs_list_item_eld_event_height">88dp</dimen>
     <dimen name="logs_list_item_eld_event_status_height">20dp</dimen>
     <dimen name="logs_list_item_eld_event_margin_top">24dp</dimen>
-    <dimen name="logs_list_item_eld_seccond_line_height">24dp</dimen>
-    <dimen name="logs_list_item_eld_seccond_line_margin_bottom">2dp</dimen>
-    <dimen name="logs_list_item_eld_seccond_line_margin_top">2dp</dimen>
+    <dimen name="logs_list_item_eld_second_line_height">24dp</dimen>
+    <dimen name="logs_list_item_eld_second_line_margin_bottom">2dp</dimen>
+    <dimen name="logs_list_item_eld_second_line_margin_top">2dp</dimen>
     <dimen name="logs_list_item_eld_event_vehicle_name_margin_end">44dp</dimen>
     <dimen name="logs_list_item_eld_event_menu_button_width">44dp</dimen>
     <dimen name="logs_list_item_eld_event_address_height">20dp</dimen>
@@ -143,5 +140,11 @@
     <!-- Dashboard -->
     <dimen name="duty_timer_text_size">60sp</dimen>
     <dimen name="duty_title_size">24dp</dimen>
+
+    <integer name="max_duration">86400</integer>
+
+    <!-- Settings Activity -->
+    <dimen name="divider_height">1dp</dimen>
+    <dimen name="text_view_line_spacing_extra_smaller">6sp</dimen>
 
 </resources>

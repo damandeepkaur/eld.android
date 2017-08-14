@@ -9,12 +9,11 @@ import android.util.AttributeSet;
 import android.view.View;
 
 import com.bsmwireless.common.utils.ViewUtils;
-import com.bsmwireless.models.ELDEvent;
+import com.bsmwireless.screens.logs.dagger.EventLogModel;
 import com.bsmwireless.widgets.alerts.DutyType;
 import com.bsmwireless.widgets.logs.DutyColors;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 import app.bsmuniversal.com.R;
@@ -44,7 +43,7 @@ public class ELDGraphView extends View {
     private Paint mHeaderPaint;
     private Paint mHorizontalLinesPaint;
     private Paint mVerticalLinesPaint;
-    private List<ELDEvent> mLogs;
+    private List<EventLogModel> mLogs;
     private Bitmap mBitmap;
     private Paint mBitmapPaint;
     private long mStartDayUnixTimeInMs;
@@ -132,8 +131,8 @@ public class ELDGraphView extends View {
         super.onDraw(canvas);
 
         if (invalidateLogsData) {
-            Bitmap bitmap = getDrawingCache();
-            mBitmap = bitmap.copy(bitmap.getConfig(), true);
+            Bitmap.Config conf = Bitmap.Config.ARGB_8888;
+            mBitmap = Bitmap.createBitmap(canvas.getWidth(), canvas.getHeight(), conf);
             Canvas bitmapCanvas = new Canvas(mBitmap);
             drawGridBackground(bitmapCanvas);
             drawLog(mLogs, bitmapCanvas);
@@ -145,7 +144,7 @@ public class ELDGraphView extends View {
         }
     }
 
-    public void setLogs(final List<ELDEvent> logs, long startDayTime) {
+    public void setLogs(final List<EventLogModel> logs, long startDayTime) {
         mLogs = logs;
         mStartDayUnixTimeInMs = startDayTime;
         invalidateLogsData = true;
@@ -187,7 +186,7 @@ public class ELDGraphView extends View {
         }
     }
 
-    private void drawLog(List<ELDEvent> logData, Canvas canvas) {
+    private void drawLog(List<EventLogModel> logData, Canvas canvas) {
 
         if (logData == null || logData.size() == 0) {
             return;
@@ -199,20 +198,15 @@ public class ELDGraphView extends View {
 
         float x1, x2, y1, y2;
 
-        long firstLogDayTime = (logData.get(0).getEventTime() - mStartDayUnixTimeInMs) / MS_IN_MIN;
+        EventLogModel firstEvent = logData.get(0);
+        long firstLogDayTime = (firstEvent.getEventTime() - mStartDayUnixTimeInMs) / MS_IN_MIN;
         x1 = mGraphLeft + firstLogDayTime * gridUnit;
-        y1 = mGraphTop + (logData.get(0).getEventCode() - firstEventCode) * mSegmentHeight + mSegmentHeight / 2;
-
-        ELDEvent endDayEvent = new ELDEvent();
-        endDayEvent.setEventCode(logData.get(logData.size() - 1).getEventCode());
-        Long endDayTime = mStartDayUnixTimeInMs + MS_IN_DAY;
-        long currentTime = Calendar.getInstance().getTimeInMillis();
-        endDayEvent.setEventTime(currentTime > endDayTime ? endDayTime : currentTime);
-        logData.add(endDayEvent);
+        y1 = mGraphTop + (firstEvent.getEventCode() - firstEventCode) * mSegmentHeight + mSegmentHeight / 2;
+        int color;
 
         for (int i = 1; i < logData.size(); i++) {
-            ELDEvent event = logData.get(i);
-            ELDEvent prevEvent = logData.get(i - 1);
+            EventLogModel event = logData.get(i);
+            EventLogModel prevEvent = logData.get(i - 1);
 
             Long logDate = event.getEventTime();
             Long prevLogDate = prevEvent.getEventTime();
@@ -222,7 +216,8 @@ public class ELDGraphView extends View {
             x2 = x1 + timeStamp * gridUnit;
             y2 = mGraphTop + (event.getEventCode() - firstEventCode) * mSegmentHeight + mSegmentHeight / 2;
 
-            mHorizontalLinesPaint.setColor(mDutyColors.getColor(prevEvent.getEventCode()));
+            color = mDutyColors.getColor(prevEvent.getEventCode());
+            mHorizontalLinesPaint.setColor(color);
             canvas.drawLine(x1, y1, x2, y1, mHorizontalLinesPaint);
 
             if (y1 != y2) {
@@ -232,5 +227,9 @@ public class ELDGraphView extends View {
             x1 = x2;
             y1 = y2;
         }
+
+        color = mDutyColors.getColor(logData.get(logData.size() - 1).getEventCode());
+        mHorizontalLinesPaint.setColor(color);
+        canvas.drawLine(x1, y1, mGraphWidth + mGraphLeft, y1, mHorizontalLinesPaint);
     }
 }

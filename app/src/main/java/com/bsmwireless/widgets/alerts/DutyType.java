@@ -3,12 +3,12 @@ package com.bsmwireless.widgets.alerts;
 import app.bsmuniversal.com.R;
 
 public enum DutyType {
-    OFF_DUTY(1, R.string.hos_txt_offduty, R.color.offduty_light, R.drawable.ic_duty_status_of),
-    SLEEPER_BERTH(2, R.string.hos_txt_sleeping, R.color.sleepingberth_light, R.drawable.ic_duty_status_sb),
-    DRIVING(3, R.string.hos_txt_driving, R.color.driving_light, R.drawable.ic_duty_status_dr),
-    ON_DUTY(4, R.string.hos_txt_onduty, R.color.onduty_light, R.drawable.ic_duty_status_on),
-    PERSONAL_USE(5, R.string.hos_txt_personal_use, R.color.driving_light, R.drawable.ic_duty_status_pu),
-    YARD_MOVES(6, R.string.hos_txt_yard_moves, R.color.onduty_light, R.drawable.ic_duty_status_ym);
+    OFF_DUTY(1, R.string.event_type_off_duty, R.color.offduty_light, R.drawable.ic_duty_status_of),
+    SLEEPER_BERTH(2, R.string.event_type_sleeping, R.color.sleepingberth_light, R.drawable.ic_duty_status_sb),
+    DRIVING(3, R.string.event_type_driving, R.color.driving_light, R.drawable.ic_duty_status_dr),
+    ON_DUTY(4, R.string.event_type_on_duty, R.color.onduty_light, R.drawable.ic_duty_status_on),
+    PERSONAL_USE(5, R.string.event_type_personal_use, R.color.driving_light, R.drawable.ic_duty_status_pu),
+    YARD_MOVES(6, R.string.event_type_yard_moves, R.color.onduty_light, R.drawable.ic_duty_status_ym);
 
     private int mId;
     private int mName;
@@ -28,7 +28,7 @@ public enum DutyType {
                 return t.mName;
             }
         }
-        return R.string.hos_txt_offduty;
+        return R.string.event_type_off_duty;
     }
 
     public static int getColorById(int id) {

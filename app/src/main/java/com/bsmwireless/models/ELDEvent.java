@@ -47,6 +47,34 @@ public class ELDEvent implements Parcelable {
         }
     }
 
+    public enum EventOrigin {
+        AUTOMATIC_RECORD(1),
+        AUTOMATIC_EDIT(2),
+        MANUAL_ENTER(3),
+        MANUAL_ACCEPT(4),
+        UNIDENTIFIED_DRIVER(5);
+
+        private int mOriginCode;
+
+        EventOrigin(int code) { mOriginCode = code; }
+
+        public int getValue() { return mOriginCode; }
+    }
+
+    public enum LoginLogoutCode {
+        LOGIN(1),
+        LOGOUT(2);
+
+        private int mCode;
+
+        LoginLogoutCode(int code) {
+            mCode = code;
+        }
+
+        public int getValue() {
+            return mCode;
+        }
+    }
     @SerializedName("id")
     @Expose
     private Integer mId;
@@ -77,6 +105,9 @@ public class ELDEvent implements Parcelable {
     @SerializedName("lng")
     @Expose
     private Double mLng;
+    @SerializedName("latLnFlag")
+    @Expose
+    private String mLatLnFlag;
     @SerializedName("distance")
     @Expose
     private Integer mDistance;
@@ -89,12 +120,6 @@ public class ELDEvent implements Parcelable {
     @SerializedName("checksum")
     @Expose
     private String mCheckSum;
-    @SerializedName("shippingId")
-    @Expose
-    private String mShippingId;
-    @SerializedName("coDriverId")
-    @Expose
-    private Integer mCoDriverId;
     @SerializedName("boxId")
     @Expose
     private Integer mBoxId;
@@ -113,12 +138,18 @@ public class ELDEvent implements Parcelable {
     @SerializedName("driverId")
     @Expose
     private Integer mDriverId;
+    @SerializedName("sequence")
+    @Expose
+    private Integer mSequence;
     @SerializedName("malfunction")
     @Expose
     private Boolean mMalfunction;
     @SerializedName("diagnostic")
     @Expose
     private Boolean mDiagnostic;
+    @SerializedName("malCode")
+    @Expose
+    private String mMalCode;
 
     public ELDEvent() {
     }
@@ -133,12 +164,11 @@ public class ELDEvent implements Parcelable {
         this.mEngineHours = in.readInt();
         this.mLat = in.readDouble();
         this.mLng = in.readDouble();
+        this.mLatLnFlag = in.readString();
         this.mDistance = in.readInt();
         this.mComment = in.readString();
         this.mLocation = in.readString();
         this.mCheckSum = in.readString();
-        this.mShippingId = in.readString();
-        this.mCoDriverId = in.readInt();
         this.mBoxId = in.readInt();
         this.mVehicleId = in.readInt();
         this.mId = in.readInt();
@@ -146,8 +176,10 @@ public class ELDEvent implements Parcelable {
         this.mTimezone = in.readString();
         this.mMobileTime = in.readLong();
         this.mDriverId = in.readInt();
+        this.mSequence = in.readInt();
         this.mMalfunction = in.readByte() != 0;
         this.mDiagnostic = in.readByte() != 0;
+        this.mMalCode = in.readString();
     }
 
     public Integer getStatus() {
@@ -226,6 +258,14 @@ public class ELDEvent implements Parcelable {
         this.mLng = lng;
     }
 
+    public String getLatLnFlag() {
+        return mLatLnFlag;
+    }
+
+    public void setLatLnFlag(String latLnFlag) {
+        this.mLatLnFlag = latLnFlag;
+    }
+
     public Integer getDistance() {
         return mDistance;
     }
@@ -256,22 +296,6 @@ public class ELDEvent implements Parcelable {
 
     public void setCheckSum(String checkSum) {
         this.mCheckSum = checkSum;
-    }
-
-    public String getShippingId() {
-        return mShippingId;
-    }
-
-    public void setShippingId(String shippingId) {
-        this.mShippingId = shippingId;
-    }
-
-    public Integer getCoDriverId() {
-        return mCoDriverId;
-    }
-
-    public void setCoDriverId(Integer coDriverId) {
-        this.mCoDriverId = coDriverId;
     }
 
     public Integer getBoxId() {
@@ -330,6 +354,14 @@ public class ELDEvent implements Parcelable {
         this.mDriverId = driverId;
     }
 
+    public Integer getSequence() {
+        return mSequence;
+    }
+
+    public void setSequence(Integer sequence) {
+        this.mSequence = sequence;
+    }
+
     public Boolean getMalfunction() {
         return mMalfunction;
     }
@@ -346,6 +378,14 @@ public class ELDEvent implements Parcelable {
         this.mDiagnostic = diagnostic;
     }
 
+    public String getMalCode() {
+        return mMalCode;
+    }
+
+    public void setMalCode(String malCode) {
+        this.mMalCode = malCode;
+    }
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("ELDEvent{");
@@ -359,20 +399,21 @@ public class ELDEvent implements Parcelable {
         sb.append(", mEngineHours=").append(mEngineHours);
         sb.append(", mLat=").append(mLat);
         sb.append(", mLng='").append(mLng);
+        sb.append(", mLatLnFlag='").append(mLatLnFlag);
         sb.append(", mDistance=").append(mDistance);
         sb.append(", mComment=").append(mComment).append('\'');
         sb.append(", mLocation=").append(mLocation).append('\'');
         sb.append(", mCheckSum=").append(mCheckSum).append('\'');
-        sb.append(", mShippingId=").append(mShippingId).append('\'');
-        sb.append(", mCoDriverId=").append(mCoDriverId);
         sb.append(", mBoxId=").append(mBoxId);
         sb.append(", mVehicleId=").append(mVehicleId);
         sb.append(", mTzOffset=").append(mTzOffset);
         sb.append(", mTimezone=").append(mTimezone).append('\'');
         sb.append(", mMobileTime=").append(mMobileTime);
         sb.append(", mDriverId=").append(mDriverId);
+        sb.append(", mSequence=").append(mSequence);
         sb.append(", mMalfunction=").append(mMalfunction);
         sb.append(", mDiagnostic=").append(mDiagnostic);
+        sb.append(", mMalCode=").append(mMalCode);
         sb.append('}');
         return sb.toString();
     }
@@ -398,12 +439,11 @@ public class ELDEvent implements Parcelable {
                 .append(mEngineHours, rhs.mEngineHours)
                 .append(mLat, rhs.mLat)
                 .append(mLng, rhs.mLng)
+                .append(mLatLnFlag, rhs.mLatLnFlag)
                 .append(mDistance, rhs.mDistance)
                 .append(mComment, rhs.mComment)
                 .append(mLocation, rhs.mLocation)
                 .append(mCheckSum, rhs.mCheckSum)
-                .append(mShippingId, rhs.mShippingId)
-                .append(mCoDriverId, rhs.mCoDriverId)
                 .append(mBoxId, rhs.mBoxId)
                 .append(mVehicleId, rhs.mVehicleId)
                 .append(mId, rhs.mId)
@@ -411,8 +451,10 @@ public class ELDEvent implements Parcelable {
                 .append(mTimezone, rhs.mTimezone)
                 .append(mMobileTime, rhs.mMobileTime)
                 .append(mDriverId, rhs.mDriverId)
+                .append(mSequence, rhs.mSequence)
                 .append(mMalfunction, rhs.mMalfunction)
                 .append(mDiagnostic, rhs.mDiagnostic)
+                .append(mMalCode, rhs.mMalCode)
                 .isEquals();
     }
 
@@ -428,12 +470,11 @@ public class ELDEvent implements Parcelable {
                 .append(mEngineHours)
                 .append(mLat)
                 .append(mLng)
+                .append(mLatLnFlag)
                 .append(mDistance)
                 .append(mComment)
                 .append(mLocation)
                 .append(mCheckSum)
-                .append(mShippingId)
-                .append(mCoDriverId)
                 .append(mBoxId)
                 .append(mVehicleId)
                 .append(mId)
@@ -441,8 +482,10 @@ public class ELDEvent implements Parcelable {
                 .append(mTimezone)
                 .append(mMobileTime)
                 .append(mDriverId)
+                .append(mSequence)
                 .append(mMalfunction)
                 .append(mDiagnostic)
+                .append(mMalCode)
                 .toHashCode();
     }
 
@@ -462,12 +505,11 @@ public class ELDEvent implements Parcelable {
         dest.writeInt(this.mEngineHours);
         dest.writeDouble(this.mLat);
         dest.writeDouble(this.mLng);
+        dest.writeString(this.mLatLnFlag);
         dest.writeInt(this.mDistance);
         dest.writeString(this.mComment);
         dest.writeString(this.mLocation);
         dest.writeString(this.mCheckSum);
-        dest.writeString(this.mShippingId);
-        dest.writeInt(this.mCoDriverId);
         dest.writeInt(this.mBoxId);
         dest.writeInt(this.mVehicleId);
         dest.writeInt(this.mId);
@@ -475,8 +517,10 @@ public class ELDEvent implements Parcelable {
         dest.writeString(this.mTimezone);
         dest.writeLong(this.mMobileTime);
         dest.writeInt(this.mDriverId);
+        dest.writeInt(this.mSequence);
         dest.writeByte((byte) (mMalfunction ? 1 : 0));
         dest.writeByte((byte) (mDiagnostic ? 1 : 0));
+        dest.writeString(this.mMalCode);
     }
 
     public static final Creator<ELDEvent> CREATOR = new Creator<ELDEvent>() {

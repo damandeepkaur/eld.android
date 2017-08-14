@@ -53,7 +53,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/duty_time"
             android:layout_marginTop="@dimen/margin_small"
-            android:max="86400"
+            android:max="@integer/max_duration"
             tools:progress="56"/>
 
     </RelativeLayout>

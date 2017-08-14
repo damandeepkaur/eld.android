@@ -1,5 +1,6 @@
 package com.bsmwireless.screens.navigation;
 
+import com.bsmwireless.data.storage.DutyManager;
 import com.bsmwireless.domain.interactors.LoginUserInteractor;
 import com.bsmwireless.domain.interactors.VehiclesInteractor;
 import com.bsmwireless.models.User;
@@ -42,6 +43,9 @@ public class NavigationPresenterTest {
     @Mock
     VehiclesInteractor mVehiclesInteractor;
 
+    @Mock
+    DutyManager mDutyManager;
+
 
     private NavigationPresenter mNavigationPresenter;
 
@@ -50,7 +54,7 @@ public class NavigationPresenterTest {
     public void before() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        mNavigationPresenter = new NavigationPresenter(mView, mLoginUserInteractor, mVehiclesInteractor);
+        mNavigationPresenter = new NavigationPresenter(mView, mLoginUserInteractor, mVehiclesInteractor, mDutyManager);
     }
 
     /**
@@ -138,13 +142,13 @@ public class NavigationPresenterTest {
     public void testOnUserUpdated() {
         // given
         User user = new User();
-        when(mLoginUserInteractor.updateUser(any(User.class))).thenReturn(Observable.just(true)); // prevent null pointer exception
+        when(mLoginUserInteractor.syncDriverProfile(any(User.class))).thenReturn(Observable.just(true)); // prevent null pointer exception
 
         // when
         mNavigationPresenter.onUserUpdated(user);
 
         // then
-        verify(mLoginUserInteractor).updateUser(eq(user));
+        verify(mLoginUserInteractor).syncDriverProfile(eq(user));
     }
 
     @Test
@@ -156,7 +160,7 @@ public class NavigationPresenterTest {
         mNavigationPresenter.onUserUpdated(null);
 
         // then
-        verify(mLoginUserInteractor, never()).updateUser(any(User.class));
+        verify(mLoginUserInteractor, never()).syncDriverProfile(any(User.class));
     }
 
     @Test
@@ -164,7 +168,7 @@ public class NavigationPresenterTest {
         // given
         User user = new User();
         String error = "sorry, it didn't work";
-        when(mLoginUserInteractor.updateUser(any(User.class))).thenReturn(Observable.error(new RuntimeException(error)));
+        when(mLoginUserInteractor.syncDriverProfile(any(User.class))).thenReturn(Observable.error(new RuntimeException(error)));
 
         // when
         mNavigationPresenter.onUserUpdated(user);

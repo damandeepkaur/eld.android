@@ -18,8 +18,12 @@ import javax.inject.Inject;
 
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
+import timber.log.Timber;
 
 public class ELDEventsInteractor {
+    private Disposable mSyncEventsDisposable;
     private ServiceApi mServiceApi;
     private PreferencesManager mPreferencesManager;
     private ELDEventDao mELDEventDao;
@@ -41,15 +45,22 @@ public class ELDEventsInteractor {
         }
     }
 
-    public Observable<List<ELDEvent>> getELDEvents(long startTime, long endTime) {
-        return mServiceApi.getELDEvents(startTime, endTime)
-                .onErrorReturn(throwable -> ELDEventConverter.toModelList(mELDEventDao.getEventsForInterval(startTime, endTime)))
-                .doOnNext(events -> storeEvents(events, false));
+    public Flowable<List<ELDEvent>> getELDEvents(long startTime, long endTime) {
+        return getELDEventsFromDB(startTime, endTime);
     }
 
     public Flowable<List<ELDEvent>> getELDEventsFromDB(long startTime, long endTime) {
-       return mELDEventDao.getEventFromStartToEndTime(startTime, endTime)
-               .map(eldEventEntities -> ELDEventConverter.toModelList(eldEventEntities));
+        return mELDEventDao.getEventFromStartToEndTime(startTime, endTime)
+                .map(ELDEventConverter::toModelList);
+    }
+
+    public void syncELDEvents(Long startTime, Long endTime) {
+        if (mSyncEventsDisposable != null) {
+            mSyncEventsDisposable.dispose();
+        }
+        mSyncEventsDisposable = mServiceApi.getELDEvents(startTime, endTime)
+                .subscribeOn(Schedulers.io())
+                .subscribe(eldEvents -> storeEvents(eldEvents, false), Timber::d);
     }
 
     public Observable<ResponseMessage> postNewELDEvent(ELDEvent event) {

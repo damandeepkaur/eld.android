@@ -10,18 +10,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.bsmwireless.common.utils.DateUtils;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.LogSheetHeader;
-import com.bsmwireless.widgets.alerts.DutyType;
+import com.bsmwireless.screens.logs.dagger.EventLogModel;
 import com.bsmwireless.widgets.logs.DutyColors;
+import com.bsmwireless.widgets.logs.EventDescription;
 import com.bsmwireless.widgets.logs.LogsTitleView;
 import com.bsmwireless.widgets.logs.calendar.CalendarLayout;
 import com.bsmwireless.widgets.logs.graphview.GraphLayout;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import app.bsmuniversal.com.R;
@@ -47,7 +46,7 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
     private GraphLayout mGraphLayout;
     private View mSignLogsheet;
 
-    private List<ELDEvent> mELDEvents = new ArrayList<>();
+    private List<EventLogModel> mEventLogs = new ArrayList<>();
     private TripInfoModel mTripInfo = new TripInfoModel();
     private List<LogSheetHeader> mLogHeaders = new ArrayList<>();
     private View.OnClickListener mOnMenuClickListener;
@@ -57,6 +56,8 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
     private RecyclerView mRecyclerView;
     private OnLogsTitleStateChangeListener mOnLogsTitleStateChangeListener;
     private DutyColors mDutyColors;
+    private String mNoAddressLabel;
+
 
     public LogsAdapter(Context context, LogsPresenter presenter, OnLogsTitleStateChangeListener snackBarClickListener) {
         mContext = context;
@@ -64,8 +65,8 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
         mOnLogsTitleStateChangeListener = snackBarClickListener;
 
         mOnMenuClickListener = view -> {
-            ELDEvent event = (ELDEvent) view.getTag();
-            showPopupMenu(view, event);
+            EventLogModel log = (EventLogModel) view.getTag();
+            showPopupMenu(view, log.getEvent());
         };
 
         mSmoothScroller = new LinearSmoothScroller(mContext) {
@@ -76,12 +77,13 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
         };
 
         mDutyColors = new DutyColors(mContext);
+        mNoAddressLabel = mContext.getResources().getString(R.string.no_address_available);
     }
 
-    public void setELDEvents(List<ELDEvent> eldEvents) {
-        mELDEvents = eldEvents;
+    public void setEventLogs(List<EventLogModel> eventLogs) {
+        mEventLogs = eventLogs;
         if (mGraphLayout != null) {
-            mGraphLayout.setELDEvents(eldEvents, mTripInfo.getStartDayTime());
+            mGraphLayout.setELDEvents(eventLogs, mTripInfo.getStartDayTime());
         }
         notifyDataSetChanged();
     }
@@ -121,7 +123,7 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
                 mCalendarLayout.setOnItemSelectedListener(calendarItem -> mPresenter.onCalendarDaySelected(calendarItem));
 
                 mGraphLayout = (GraphLayout) view.findViewById(R.id.graphic);
-                mGraphLayout.setELDEvents(mELDEvents, mTripInfo.getStartDayTime());
+                mGraphLayout.setELDEvents(mEventLogs, mTripInfo.getStartDayTime());
 
                 break;
             case VIEW_TYPE_EVENTS_TITLE:
@@ -150,8 +152,10 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
     public void onBindViewHolder(LogsHolder holder, int position) {
         int viewType = holder.getViewType();
         if (viewType == VIEW_TYPE_EVENTS_ITEM) {
-            ELDEvent event = mELDEvents.get(position - 2);
-            holder.bindEventView(event, mOnMenuClickListener, mDutyColors.getColor(event.getEventCode()));
+            EventLogModel event = mEventLogs.get(position - 2);
+            String duration = event.getDuration() != null ? DateUtils.convertTimeInMsToDurationString(event.getDuration(), mContext) : "";
+            String address = (event.getLocation() != null) ? event.getLocation() : mNoAddressLabel;
+            holder.bindEventView(event, mOnMenuClickListener, mDutyColors.getColor(event.getEventType(), event.getEventCode()), duration, address);
         } else if (viewType == VIEW_TYPE_TRIP_INFO_ITEM) {
             String unit = mContext.getString(mTripInfo.getUnitType() == TripInfoModel.UnitType.KM ? R.string.km : R.string.ml);
             holder.bindTripInfoView(mTripInfo, mContext.getString(R.string.odometer, unit));
@@ -199,7 +203,7 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
 
     @Override
     public int getItemCount() {
-        int eventsSize = (mEventsTitleView == null || mEventsTitleView.isCollapsed()) ? 0 : mELDEvents.size();
+        int eventsSize = (mEventsTitleView == null || mEventsTitleView.isCollapsed()) ? 0 : mEventLogs.size();
         int tripInfoSize = ((mTripInfoTitleView == null) || mTripInfoTitleView.isCollapsed()) ? 0 : 1;
         return MIN_LIST_SIZE + eventsSize + tripInfoSize;
 
@@ -207,7 +211,7 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
 
     @Override
     public int getItemViewType(int position) {
-        int eventsSize = (mEventsTitleView == null || mEventsTitleView.isCollapsed()) ? 0 : mELDEvents.size();
+        int eventsSize = (mEventsTitleView == null || mEventsTitleView.isCollapsed()) ? 0 : mEventLogs.size();
         if (position == 0) {
             return VIEW_TYPE_HEADER;
         } else if (position == 1) {
@@ -225,17 +229,13 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
         PopupMenu popup = new PopupMenu(mContext, anchorView);
         popup.getMenuInflater().inflate(R.menu.menu_eld_event, popup.getMenu());
 
-        //TODO: Add getting delete property from event data (can event be deleted or not)
-        boolean isDeletable = false;
-        popup.getMenu().getItem(1).setEnabled(isDeletable);
-
         popup.setOnMenuItemClickListener(menuItem -> {
             switch (menuItem.getItemId()) {
                 case R.id.menu_edit:
                     mPresenter.onEditEventClicked(event);
                     return true;
                 case R.id.menu_remove:
-                    mPresenter.onDeleteEventClicked(event);
+                    mPresenter.onRemovedEventClicked(event);
                     return true;
             }
             return false;
@@ -287,42 +287,40 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
         @Nullable
         @BindView(R.id.odometer_value)
         TextView mOdometerValue;
-        private DateFormat mDateFormatter;
         private int mViewType;
 
         LogsHolder(View itemView, int viewType) {
             super(itemView);
             mViewType = viewType;
             ButterKnife.bind(this, itemView);
-
-            mDateFormatter = new SimpleDateFormat("HH:mm:ss");
         }
 
         int getViewType() {
             return mViewType;
         }
 
-        private void bindEventView(ELDEvent event, View.OnClickListener menuClickListener, int color) {
+        private void bindEventView(EventLogModel log, View.OnClickListener menuClickListener,
+                                   int color, String duration, String address) {
 
-            mEventStatus.setText(DutyType.getNameById(event.getEventCode()));
-
+            mEventStatus.setText(EventDescription.getTitle(log.getEventType(), log.getEventCode()));
             mEventStatus.setTextColor(color);
+            String dayTime = DateUtils.convertTimeInMsToDayTime(log.getDriverTimezone(), log.getEventTime());
+            mEventTime.setText(dayTime);
 
-            //TODO: update date formatting for using timzone
-            String dateFormatted = mDateFormatter.format(new Date(event.getEventTime()));
-            mEventTime.setText(dateFormatted);
-
-            //TODO: find how we should calculate duration
-            mEventDuration.setText("0 hrs 0 mins");
+            mEventDuration.setText(duration);
 
             //TODO: probably we need vehicle name here
-            String vehicleId = event.getVehicleId() != null ? String.valueOf(event.getVehicleId()) : "";
+            String vehicleId = log.getVehicleName() != null ? String.valueOf(log.getVehicleName()) : "";
             mVehicleName.setText(vehicleId);
+            mAddress.setText(address);
 
-            mAddress.setText(event.getLocation());
-
-            mMenuButton.setTag(event);
-            mMenuButton.setOnClickListener(menuClickListener);
+            if (log.getEventType() == ELDEvent.EventType.DUTY_STATUS_CHANGING.getValue()) {
+                mMenuButton.setVisibility(View.VISIBLE);
+                mMenuButton.setTag(log);
+                mMenuButton.setOnClickListener(menuClickListener);
+            } else {
+                mMenuButton.setVisibility(View.INVISIBLE);
+            }
         }
 
         private void bindTripInfoView(TripInfoModel tripInfo, String odometerTitle) {
