@@ -22,6 +22,7 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -37,6 +38,7 @@ import io.reactivex.subscribers.TestSubscriber;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -56,6 +58,50 @@ public class LoginUserInteractorTest {
     private final boolean mKeepToken = false;
     private final User.DriverType mDriverType = User.DriverType.DRIVER;
     private final String mSuccessResponse = "ACK";
+
+    /**
+     * Matches an ELD event that has a valid logout event type and valid logout event code.
+     *<p>
+     *     Checks event code and event type against ELD 7.20 and 7.25.
+     *</p>
+     */
+    private final ArgumentMatcher<ELDEvent> mEldEventLogoutCodeMatcher = new ArgumentMatcher<ELDEvent>(){
+
+        @Override
+        public boolean matches(Object argument) {
+            return ((ELDEvent) argument).getEventType() == 5 // ELD 7.20, Table 6 (5 = login/logout) & ELD 7.25, Table 9
+                    && ((ELDEvent) argument).getEventCode() == 2; // ELD 7.20, Table 6 (2 = Authenticated driver's ELD logout activity)
+        }
+    };
+
+    /**
+     * Matches an ELD event that has an active event record status.
+     * <p>
+     *     Checks event record status against ELD 7.23.
+     * </p>
+     */
+    private final ArgumentMatcher<ELDEvent> mEldEventActiveStatusCodeMatcher = new ArgumentMatcher<ELDEvent>() {
+        @Override
+        public boolean matches(Object argument) {
+            ELDEvent arg = (ELDEvent) argument;
+            return arg.getStatus() == 1; // ELD 7.23 (1 = active)
+        }
+    };
+
+    /**
+     * Matches an ELD event that has an edited or entered by the Driver origin.
+     * <p>
+     *     Checks event record status against ELD 7.22.
+     * </p>
+     */
+    private final ArgumentMatcher<ELDEvent> mEldEventDriverEditOriginCodeMatcher = new ArgumentMatcher<ELDEvent>() {
+        @Override
+        public boolean matches(Object argument) {
+            ELDEvent arg = (ELDEvent) argument;
+            return arg.getOrigin() == 2; // ELD 7.22 (2 = edited or entered by the driver)
+        }
+    };
+
 
     @ClassRule
     public static final RxSchedulerRule RULE = new RxSchedulerRule();
@@ -305,6 +351,9 @@ public class LoginUserInteractorTest {
         verify(mUserDao).deleteUser(eq(driverInt));
         verify(mTokenManager).removeAccount(eq(accountName));
         verify(mPreferencesManager).clearValues();
+        verify(mServiceApi).logout(argThat(mEldEventLogoutCodeMatcher)); // validates ELD logout event against ELD 7.20 Table 6
+        verify(mServiceApi).logout(argThat(mEldEventActiveStatusCodeMatcher)); // validates ELD 7.23
+        verify(mServiceApi).logout(argThat(mEldEventDriverEditOriginCodeMatcher)); // validates ELD 7.22
         isLogoutTestObserver.assertResult(true);
     }
 
@@ -335,12 +384,36 @@ public class LoginUserInteractorTest {
         // then
         verify(mServiceApi).logout(any(ELDEvent.class));
         verify(mTokenManager).clearToken(eq(fakeToken));
+        verify(mServiceApi).logout(argThat(mEldEventLogoutCodeMatcher)); // validates ELD logout event against ELD 7.20 Table 6
+        verify(mServiceApi).logout(argThat(mEldEventActiveStatusCodeMatcher)); // validates ELD 7.23
+        verify(mServiceApi).logout(argThat(mEldEventDriverEditOriginCodeMatcher)); // validates ELD 7.22
         isLogoutTestObserver.assertResult(true);
     }
 
     @Test
     public void testLogoutUserFailure() {
+        // given
+        ResponseMessage failMessage = new ResponseMessage();
+        failMessage.setMessage("not success");  // at this time, anything but "ACK"
 
+        BlackBoxModel fakeBlackBoxModel = new BlackBoxModel();
+
+        when(mServiceApi.logout(any(ELDEvent.class))).thenReturn(Observable.just(failMessage));
+        when(mPreferencesManager.isRememberUserEnabled()).thenReturn(false); // either is ok
+        when(mBlackBoxInteractor.getData()).thenReturn(Observable.just(fakeBlackBoxModel));
+        when(mAppDatabase.userDao()).thenReturn(mUserDao);
+        when(mUserDao.getUserTimezoneSync(any(Integer.class))).thenReturn("Etc/UTC");
+
+        TestObserver<Boolean> testObserver = TestObserver.create();
+
+        // when
+        mLoginUserInteractor.logoutUser().subscribe(testObserver);
+
+        // then
+        testObserver.assertResult(false);
+        verify(mServiceApi).logout(argThat(mEldEventLogoutCodeMatcher)); // validates ELD logout event against ELD 7.20 Table 6
+        verify(mServiceApi).logout(argThat(mEldEventActiveStatusCodeMatcher)); // validates ELD 7.23
+        verify(mServiceApi).logout(argThat(mEldEventDriverEditOriginCodeMatcher)); // validates ELD 7.22
     }
 
 
