@@ -30,7 +30,6 @@ public class BlackBoxParser {
     private static final int CHECK_SUM_INDX = 8;
 
     public static final int PREAMBLE_LENGTH = 5;
-    public static final char PREAMBLE_SYMBOL = '@';
 
     public static final int VIN_INDEX_START = 13;
     public static final int VIN_INDEX_END = 36;
@@ -189,7 +188,7 @@ public class BlackBoxParser {
         int index;
         // Header starts with five @
         for (index = 0; index < PREAMBLE_LENGTH; ++index) {
-            if ((char) data[index] != PREAMBLE_SYMBOL) {
+            if ((char) data[index] != START_MESSAGE_INDICATOR) {
                 return false;
             }
         }
