@@ -50,24 +50,6 @@ public enum DutyType {
         return DutyType.OFF_DUTY;
     }
 
-    public static List<String> getNames(Context context) {
-        List<String> names = new ArrayList<>();
-        for (DutyType type:
-             DutyType.values()) {
-            names.add(context.getString(type.getName()));
-        }
-        return names;
-    }
-
-    public static DutyType getTypeByName(Context context, String name) {
-        for (DutyType t: DutyType.values()) {
-            if (context.getString(t.mName).equals(name)) {
-                return t;
-            }
-        }
-        return DutyType.OFF_DUTY;
-    }
-
     public int getId() {
         return mId;
     }

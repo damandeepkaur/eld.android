@@ -143,14 +143,14 @@ public class LogsFragment extends BaseFragment implements LogsView {
 
     @Override
     public void goToAddEventScreen(CalendarItem day) {
-        Intent addEventIntent = new Intent(getContext(), EditEventActivity.class);
+        Intent addEventIntent = new Intent(mContext, EditEventActivity.class);
         addEventIntent.putExtra(DAY_TIME_EXTRA, day.getTimestamp());
         startActivityForResult(addEventIntent, REQUEST_CODE_ADD_EVENT);
     }
 
     @Override
     public void goToEditEventScreen(EventLogModel event) {
-        Intent editEventIntent = new Intent(getContext(), EditEventActivity.class);
+        Intent editEventIntent = new Intent(mContext, EditEventActivity.class);
         editEventIntent.putExtra(OLD_ELD_EVENT_EXTRA, event.getEvent());
         startActivityForResult(editEventIntent, REQUEST_CODE_EDIT_EVENT);
     }

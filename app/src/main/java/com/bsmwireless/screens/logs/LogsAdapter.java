@@ -246,7 +246,7 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
     }
 
     public CalendarItem getCurrentItem() {
-        return mCalendarLayout.getCurrentItme();
+        return mCalendarLayout.getCurrentItem();
     }
 
     public interface OnLogsTitleStateChangeListener {

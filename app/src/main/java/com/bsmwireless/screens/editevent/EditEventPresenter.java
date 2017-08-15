@@ -2,8 +2,10 @@ package com.bsmwireless.screens.editevent;
 
 import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.common.utils.DateUtils;
+import com.bsmwireless.domain.interactors.BlackBoxInteractor;
 import com.bsmwireless.domain.interactors.LoginUserInteractor;
 import com.bsmwireless.domain.interactors.VehiclesInteractor;
+import com.bsmwireless.models.BlackBoxModel;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.widgets.alerts.DutyType;
 
@@ -29,13 +31,17 @@ public class EditEventPresenter {
 
     private LoginUserInteractor mLoginUserInteractor;
     private VehiclesInteractor mVehiclesInteractor;
+    private BlackBoxInteractor mBlackBoxInteractor;
+
+    private BlackBoxModel mBlackBoxModel;
 
     @Inject
-    public EditEventPresenter(EditEventView view, LoginUserInteractor loginUserInteractor, VehiclesInteractor vehiclesInteractor) {
+    public EditEventPresenter(EditEventView view, LoginUserInteractor loginUserInteractor, VehiclesInteractor vehiclesInteractor, BlackBoxInteractor blackBoxInteractor) {
         mView = view;
         mDisposables = new CompositeDisposable();
         mLoginUserInteractor = loginUserInteractor;
         mVehiclesInteractor = vehiclesInteractor;
+        mBlackBoxInteractor = blackBoxInteractor;
         mTimezone = TimeZone.getDefault().getID();
         mCalendar = Calendar.getInstance();
 
@@ -51,6 +57,9 @@ public class EditEventPresenter {
                     mCalendar = Calendar.getInstance(TimeZone.getTimeZone(mTimezone));
                     mView.getExtrasFromIntent();
                 }));
+        mDisposables.add(mBlackBoxInteractor.getData()
+                .subscribeOn(Schedulers.io())
+                .subscribe(blackBoxModel -> mBlackBoxModel = blackBoxModel));
     }
 
     public void onDestroy() {
@@ -87,9 +96,6 @@ public class EditEventPresenter {
         newEvent.setComment(comment);
         if (mELDEvent == null) {
             newEvent.setMobileTime(eventTime);
-        }
-
-        if (mELDEvent == null) {
             mView.addEvent(newEvent);
         } else {
             mView.changeEvent(mELDEvent, newEvent);
@@ -126,9 +132,6 @@ public class EditEventPresenter {
         event.setEventType(ELDEvent.EventType.DUTY_STATUS_CHANGING.getValue());
         event.setEventCode(DutyType.OFF_DUTY.getId());
         event.setEventTime(mEventDay);
-        event.setEngineHours(0);
-        event.setLat(0d);
-        event.setLng(0d);
         event.setLocation("");
         event.setDistance(0);
         event.setMalfunction(false);
@@ -138,6 +141,10 @@ public class EditEventPresenter {
         event.setBoxId(mVehiclesInteractor.getBoxId());
         event.setVehicleId(mVehiclesInteractor.getVehicleId());
         event.setMobileTime(mEventDay);
+        event.setEngineHours(mBlackBoxModel != null ? mBlackBoxModel.getEngineHours() : 0);
+        event.setLat(mBlackBoxModel != null ? mBlackBoxModel.getLat() : 0d);
+        event.setLng(mBlackBoxModel != null ? mBlackBoxModel.getLon() : 0d);
+        event.setOdometer(mBlackBoxModel != null ? mBlackBoxModel.getOdometer() : 0);
         return event;
     }
 }

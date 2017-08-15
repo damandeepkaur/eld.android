@@ -12,7 +12,6 @@ import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 
 import com.bsmwireless.common.App;
 import com.bsmwireless.models.ELDEvent;
@@ -119,8 +118,7 @@ public class EditEventActivity extends BaseMenuActivity implements EditEventView
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        String name = (String) parent.getItemAtPosition(position);
-        DutyType type = DutyType.getTypeByName(this, name);
+        DutyType type = (DutyType) parent.getItemAtPosition(position);
         mEventStatus.getBackground().setColorFilter(ContextCompat.getColor(this, DutyType.getColorById(type.getId())), PorterDuff.Mode.SRC_ATOP);
     }
 
@@ -157,7 +155,7 @@ public class EditEventActivity extends BaseMenuActivity implements EditEventView
 
     private void initSnackbar() {
         mSnackBarLayout.setPositiveLabel(getString(R.string.edit_event_save), v -> {
-            DutyType type = DutyType.getTypeByName(this, (String) mEventStatus.getSelectedItem());
+            DutyType type = (DutyType) mEventStatus.getSelectedItem();
             String startTime = mStartTime.getText().toString();
             String comment = mComment.getText().toString();
 
@@ -167,10 +165,7 @@ public class EditEventActivity extends BaseMenuActivity implements EditEventView
     }
 
     private void initStatusSpinner() {
-        mEventStatus.setAdapter(new ArrayAdapter<>(this,
-                android.R.layout.simple_spinner_dropdown_item,
-                android.R.id.text1,
-                DutyType.getNames(this)));
+        mEventStatus.setAdapter(new DutyTypeSpinnerAdapter(this, DutyType.values()));
         mEventStatus.setOnItemSelectedListener(this);
     }
 }

@@ -457,8 +457,8 @@
     <string name="event_type_shut_down">Shut Down</string>
     <string name="event_type_power_up">Power Up</string>
     <string name="event_type_unknown_type">Unknown event type</string>
-    <string name="update_event_error">Update event error.</string>
-    <string name="add_event_error">Add event error.</string>
+    <string name="update_event_error">Update event error</string>
+    <string name="add_event_error">Add event error</string>
 
     <!-- Auto Logout Activity -->
     <string name="auto_logout_message_alert_dialog">Auto Logout</string>

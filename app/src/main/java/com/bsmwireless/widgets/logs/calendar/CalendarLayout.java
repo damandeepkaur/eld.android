@@ -143,7 +143,7 @@ public class CalendarLayout extends LinearLayout implements View.OnClickListener
         return logs;
     }
 
-    public CalendarItem getCurrentItme() {
+    public CalendarItem getCurrentItem() {
         return mAdapter.getSelectedItem();
     }
 
