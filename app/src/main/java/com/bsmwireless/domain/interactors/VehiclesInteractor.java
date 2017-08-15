@@ -132,6 +132,6 @@ public class VehiclesInteractor {
     }
 
     public int getVehicleId() {
-        return mPreferencesManager.getVehicleId() > 0 ? mPreferencesManager.getVehicleId() : 0;
+        return mPreferencesManager.getVehicleId();
     }
 }

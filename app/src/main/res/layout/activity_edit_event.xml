@@ -35,27 +35,26 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <LinearLayout android:layout_width="match_parent"
-                          android:layout_height="wrap_content"
-                          android:layout_margin="@dimen/default_margin"
-                          android:orientation="vertical">
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/edit_event_status"
-                    android:paddingStart="@dimen/spinner_label_spacing"
-                    android:paddingEnd="@dimen/spinner_label_spacing"
-                    android:paddingBottom="@dimen/spinner_label_spacing"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/edit_event_status"
+                android:layout_marginTop="@dimen/default_margin"
+                android:layout_marginLeft="@dimen/default_margin"
+                android:layout_marginRight="@dimen/default_margin"
+                android:paddingStart="@dimen/spinner_label_spacing"
+                android:paddingEnd="@dimen/spinner_label_spacing"/>
 
-                <android.support.v7.widget.AppCompatSpinner
-                    android:id="@+id/event_status"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:theme="@style/DriverProfileTheme.EditView"
-                    style="@style/Widget.AppCompat.Spinner.Underlined"/>
-
-            </LinearLayout>
+            <android.support.v7.widget.AppCompatSpinner
+                android:id="@+id/event_status"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/default_margin"
+                android:layout_marginRight="@dimen/default_margin"
+                android:layout_marginBottom="@dimen/default_margin"
+                android:theme="@style/DriverProfileTheme.EditView"
+                style="@style/Widget.AppCompat.Spinner.Underlined"/>
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"

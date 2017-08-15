@@ -11,9 +11,9 @@ import javax.inject.Inject;
 import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
 
-public class LogSheetInteractor {
+import static com.bsmwireless.common.Constants.SUCCESS;
 
-    private static final String SUCCESS = "ACK";
+public class LogSheetInteractor {
 
     private ServiceApi mServiceApi;
 

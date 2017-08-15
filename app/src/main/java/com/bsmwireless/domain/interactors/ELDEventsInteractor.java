@@ -23,9 +23,9 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
-public class ELDEventsInteractor {
+import static com.bsmwireless.common.Constants.SUCCESS;
 
-    private static final String SUCCESS = "ACK";
+public class ELDEventsInteractor {
 
     private Disposable mSyncEventsDisposable;
 
