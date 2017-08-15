@@ -11,11 +11,15 @@ import com.bsmwireless.data.storage.users.UserEntity;
 import com.bsmwireless.models.Auth;
 import com.bsmwireless.models.BlackBoxModel;
 import com.bsmwireless.models.Carrier;
+import com.bsmwireless.models.DriverHomeTerminal;
+import com.bsmwireless.models.DriverProfileModel;
+import com.bsmwireless.models.DriverSignature;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.HomeTerminal;
 import com.bsmwireless.models.LoginModel;
 import com.bsmwireless.models.PasswordModel;
 import com.bsmwireless.models.ResponseMessage;
+import com.bsmwireless.models.RuleSelectionModel;
 import com.bsmwireless.models.User;
 
 import org.junit.Before;
@@ -25,7 +29,9 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.stubbing.Answer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,6 +64,7 @@ public class LoginUserInteractorTest {
     private final boolean mKeepToken = false;
     private final User.DriverType mDriverType = User.DriverType.DRIVER;
     private final String mSuccessResponse = "ACK";
+    private final String mShortValidSignature = "1,2;2,3;3,4;5,-1;";
 
     /**
      * Matches an ELD event that has a valid logout event type and valid logout event code.
@@ -416,6 +423,125 @@ public class LoginUserInteractorTest {
         verify(mServiceApi).logout(argThat(mEldEventDriverEditOriginCodeMatcher)); // validates ELD 7.22
     }
 
+    @Test
+    public void testSyncDriverProfileInvalidUserId() {
+        // given
+        User user1 = new User();
+        user1.setId(-1); // negative
+
+        User user2 = new User();
+        user2.setId(0); // boundary
+
+        TestObserver<Boolean> testObserver1 = TestObserver.create();
+        TestObserver<Boolean> testObserver2 = TestObserver.create();
+
+        when(mAppDatabase.userDao()).thenReturn(mUserDao);
+        when(mUserDao.insertUser(any(UserEntity.class))).thenAnswer(new Answer<Long>() {
+
+            @Override
+            public Long answer(InvocationOnMock invocation) throws Throwable {
+                Object[] args = invocation.getArguments();
+                return Long.valueOf(((UserEntity) args[0]).getId());
+            }
+        });
+
+        // when
+        mLoginUserInteractor.syncDriverProfile(user1).subscribe(testObserver1);
+        mLoginUserInteractor.syncDriverProfile(user2).subscribe(testObserver2);
+
+        // then
+        testObserver1.assertResult(false);
+        testObserver2.assertResult(false);
+    }
+
+    @Test
+    public void testSyncDriverProfileApiFailed() {
+        // given
+        User user = new User();
+        user.setId(12345);
+
+        ResponseMessage responseMessage = new ResponseMessage();
+        responseMessage.setMessage(""); // not "ACK" = fail
+
+        TestObserver<Boolean> testObserver = TestObserver.create();
+        when(mAppDatabase.userDao()).thenReturn(mUserDao);
+        when(mUserDao.insertUser(any(UserEntity.class))).thenAnswer(new Answer<Long>() {
+
+            @Override
+            public Long answer(InvocationOnMock invocation) throws Throwable {
+                Object[] args = invocation.getArguments();
+                return Long.valueOf(((UserEntity) args[0]).getId());
+            }
+        });
+
+        when(mServiceApi.updateDriverProfile(any(DriverProfileModel.class))).thenReturn(Observable.just(responseMessage));
+
+        // when
+        mLoginUserInteractor.syncDriverProfile(user).subscribe(testObserver);
+
+        // then
+        testObserver.assertResult(false);
+    }
+
+    @Test
+    public void testSyncDriverProfileApiError() {
+        // given
+        User user = new User();
+        user.setId(12345);
+
+        String fakeErrorMessage = "sorry.";
+
+        ResponseMessage responseMessage = new ResponseMessage();
+        responseMessage.setMessage(""); // not "ACK" = fail
+
+        TestObserver<Boolean> testObserver = TestObserver.create();
+        when(mAppDatabase.userDao()).thenReturn(mUserDao);
+        when(mUserDao.insertUser(any(UserEntity.class))).thenAnswer(new Answer<Long>() {
+
+            @Override
+            public Long answer(InvocationOnMock invocation) throws Throwable {
+                Object[] args = invocation.getArguments();
+                return Long.valueOf(((UserEntity) args[0]).getId());
+            }
+        });
+
+        when(mServiceApi.updateDriverProfile(any(DriverProfileModel.class))).thenReturn(Observable.error(new Exception(fakeErrorMessage)));
+
+        // when
+        mLoginUserInteractor.syncDriverProfile(user).subscribe(testObserver);
+
+        // then
+        testObserver.assertErrorMessage(fakeErrorMessage);
+    }
+
+    @Test
+    public void testSyncDriverProfileSuccess() {
+        // given
+        User user = new User();
+        user.setId(12345);
+
+        ResponseMessage responseMessage = new ResponseMessage();
+        responseMessage.setMessage("ACK"); // "ACK" = success
+
+        TestObserver<Boolean> testObserver = TestObserver.create();
+        when(mAppDatabase.userDao()).thenReturn(mUserDao);
+        when(mUserDao.insertUser(any(UserEntity.class))).thenAnswer(new Answer<Long>() {
+
+            @Override
+            public Long answer(InvocationOnMock invocation) throws Throwable {
+                Object[] args = invocation.getArguments();
+                return Long.valueOf(((UserEntity) args[0]).getId());
+            }
+        });
+
+        when(mServiceApi.updateDriverProfile(any(DriverProfileModel.class))).thenReturn(Observable.just(responseMessage));
+
+        // when
+        mLoginUserInteractor.syncDriverProfile(user).subscribe(testObserver);
+
+        // then
+        testObserver.assertResult(true);
+    }
 
     @Test
     public void testUpdateDriverPasswordSuccess() {
@@ -489,6 +615,173 @@ public class LoginUserInteractorTest {
         testObserver.assertError(fakeError);
     }
 
+    @Test
+    public void testUpdateDriverSignatureSuccess() {
+        // given
+        ResponseMessage successMessage = new ResponseMessage();
+        successMessage.setMessage(mSuccessResponse);
+
+        TestObserver<Boolean> testObserver = new TestObserver<>();
+
+        when(mServiceApi.updateDriverSignature(any(DriverSignature.class))).thenReturn(Observable.just(successMessage));
+
+        // when
+        mLoginUserInteractor.updateDriverSignature(mShortValidSignature).subscribe(testObserver);
+
+        // then
+        testObserver.assertResult(true);
+    }
+
+    @Test
+    public void testUpdateDriverSignatureApiFail() {
+        // given
+        ResponseMessage responseMessage = new ResponseMessage();
+        responseMessage.setMessage("");
+
+        TestObserver<Boolean> testObserver = new TestObserver<>();
+
+        when(mServiceApi.updateDriverSignature(any(DriverSignature.class))).thenReturn(Observable.just(responseMessage));
+
+        // when
+        mLoginUserInteractor.updateDriverSignature(mShortValidSignature).subscribe(testObserver);
+
+        // then
+        testObserver.assertResult(false);
+    }
+
+    /** Tests for propagation of error message from API. */
+    @Test
+    public void testUpdateDriverSignatureApiError() {
+        // given
+        TestObserver<Boolean> testObserver = new TestObserver<>();
+        String errorMessage = "failed";
+
+        when(mServiceApi.updateDriverSignature(any(DriverSignature.class))).thenReturn(Observable.error(new Exception(errorMessage)));
+
+        // when
+        mLoginUserInteractor.updateDriverSignature(mShortValidSignature).subscribe(testObserver);
+
+        // then
+        testObserver.assertErrorMessage(errorMessage);
+    }
+
+    @Test
+    public void testUpdateDriverRuleSuccess() {
+        // given
+        ResponseMessage responseMessage = new ResponseMessage();
+        responseMessage.setMessage(mSuccessResponse);
+
+        String fakeRule = "fake rule";
+
+        TestObserver<Boolean> testObserver = new TestObserver<>();
+
+        when(mServiceApi.updateDriverRule(any(RuleSelectionModel.class))).thenReturn(Observable.just(responseMessage));
+
+        // when
+        mLoginUserInteractor.updateDriverRule(fakeRule).subscribe(testObserver);
+
+        // then
+        testObserver.assertResult(true);
+    }
+
+    @Test
+    public void testUpdateDriverRuleApiFail() {
+        // given
+        ResponseMessage responseMessage = new ResponseMessage();
+        responseMessage.setMessage("");
+
+        String fakeRule = "fake rule";
+
+        TestObserver<Boolean> testObserver = new TestObserver<>();
+
+        when(mServiceApi.updateDriverRule(any(RuleSelectionModel.class))).thenReturn(Observable.just(responseMessage));
+
+        // when
+        mLoginUserInteractor.updateDriverRule(fakeRule).subscribe(testObserver);
+
+        // then
+        testObserver.assertResult(false);
+    }
+
+    /** Tests for propagation of error message from API. */
+    @Test
+    public void testUpdateDriverRuleApiError() {
+        // given
+        ResponseMessage responseMessage = new ResponseMessage();
+        responseMessage.setMessage("");
+
+        String fakeRule = "fake rule";
+        String fakeError = "not this time.";
+
+        TestObserver<Boolean> testObserver = new TestObserver<>();
+
+        when(mServiceApi.updateDriverRule(any(RuleSelectionModel.class))).thenReturn(Observable.error(new Exception(fakeError)));
+
+        // when
+        mLoginUserInteractor.updateDriverRule(fakeRule).subscribe(testObserver);
+
+        // then
+        testObserver.assertErrorMessage(fakeError);
+    }
+
+    @Test
+    public void testUpdateHomeTerminalSuccess() {
+        // given
+        ResponseMessage responseMessage = new ResponseMessage();
+        responseMessage.setMessage(mSuccessResponse);
+
+        Integer fakeTerminalId = Integer.valueOf(31415926);
+
+        TestObserver<Boolean> testObserver = new TestObserver<>();
+
+        when(mServiceApi.updateDriverHomeTerminal(any(DriverHomeTerminal.class))).thenReturn(Observable.just(responseMessage));
+
+        // when
+        mLoginUserInteractor.updateDriverHomeTerminal(fakeTerminalId).subscribe(testObserver);
+
+        // then
+        testObserver.assertResult(true);
+    }
+
+    @Test
+    public void testUpdateDriverHomeTerminalApiFail() {
+        // given
+        ResponseMessage responseMessage = new ResponseMessage();
+        responseMessage.setMessage("");
+
+        Integer fakeTerminalId = Integer.valueOf(31415926);
+
+        TestObserver<Boolean> testObserver = new TestObserver<>();
+
+        when(mServiceApi.updateDriverHomeTerminal(any(DriverHomeTerminal.class))).thenReturn(Observable.just(responseMessage));
+
+        // when
+        mLoginUserInteractor.updateDriverHomeTerminal(fakeTerminalId).subscribe(testObserver);
+
+        // then
+        testObserver.assertResult(false);
+    }
+
+    /** Tests for propagation of error message from API. */
+    @Test
+    public void testUpdateDriverHomeTerminalApiError() {
+        // given
+        ResponseMessage responseMessage = new ResponseMessage();
+        responseMessage.setMessage("");
+
+        Integer fakeTerminalId = Integer.valueOf(31415926);
+        String fakeErrorMessage = "fake error";
+
+        TestObserver<Boolean> testObserver = new TestObserver<>();
+
+        when(mServiceApi.updateDriverHomeTerminal(any(DriverHomeTerminal.class))).thenReturn(Observable.error(new Exception(fakeErrorMessage)));
+
+        // when
+        mLoginUserInteractor.updateDriverHomeTerminal(fakeTerminalId).subscribe(testObserver);
+
+        // then
+        testObserver.assertErrorMessage(fakeErrorMessage);
+    }
 
     /**
      * Verify PreferencesManager and TokenManager workflow in getter.
