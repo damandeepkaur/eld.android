@@ -94,7 +94,7 @@ public class VehiclesInteractor {
         event.setVehicleId(vehicle.getId());
         event.setBoxId(vehicle.getBoxId());
 
-        return mBlackBoxInteractor.getData()
+        return mBlackBoxInteractor.getData(vehicle.getBoxId())
                 .doOnNext(blackBox -> saveVehicle(vehicle))
                 .flatMap(blackBox -> {
                     event.setTimezone(mUserInteractor.getTimezoneSync(id));

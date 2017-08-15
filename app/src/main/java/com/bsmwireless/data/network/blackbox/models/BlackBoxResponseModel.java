@@ -121,7 +121,6 @@ public class BlackBoxResponseModel {
 
     }
 
-
     public enum NackReasonCode {
         CheckSum_Wrong((byte) 0x01),
         BoxId_MisMatch((byte) 0x02),

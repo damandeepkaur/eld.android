@@ -11,9 +11,12 @@ import java.net.Socket;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
 import timber.log.Timber;
+
+import static io.reactivex.internal.operators.observable.ObservableBlockingSubscribe.subscribe;
 
 /**
  * Created by osminin on 10.08.2017.
@@ -30,28 +33,40 @@ public final class BlackBoxImpl implements BlackBox {
     private Socket mSocket;
     private byte mSequenceID = 1;
     private BehaviorSubject<BlackBoxModel> mEmitter;
+    private int mBoxId;
+    private Disposable mDisposable;
 
     @Override
-    public void connect() throws Exception {
+    public void connect(int boxId) throws Exception {
+        Timber.d("connect");
         if (!isConnected()) {
             mSocket = new Socket(WIFI_GATEWAY_IP, WIFI_REMOTE_PORT);
             mEmitter = BehaviorSubject.create();
-            Observable.interval(RETRY_CONNECT_DELAY, TimeUnit.MILLISECONDS)
+            mBoxId = boxId;
+            mDisposable = Observable.interval(RETRY_CONNECT_DELAY, TimeUnit.MILLISECONDS)
                     .take(RETRY_COUNT)
                     .filter(this::initializeCommunication)
                     .take(1)
                     .switchMap(unused -> startContinuousRead())
-                    .doOnError(throwable -> Timber.e(throwable))
-                    .subscribe(mEmitter);
+                    .doOnError(throwable -> {
+                        Timber.e(throwable);
+                        mEmitter.onError(throwable);
+                    })
+                    .doOnNext(model -> mEmitter.onNext(model))
+                    .doOnComplete(() -> mEmitter.onComplete())
+                    .subscribe();
         }
     }
 
     @Override
     public void disconnect() throws IOException {
-        mEmitter.onComplete();
-        mEmitter = null;
-        mSocket.close();
-        mSocket = null;
+        Timber.d("disconnect");
+        if (isConnected()) {
+            mDisposable.dispose();
+            mEmitter = null;
+            mSocket.close();
+            mSocket = null;
+        }
     }
 
     @Override
@@ -66,11 +81,10 @@ public final class BlackBoxImpl implements BlackBox {
 
     private boolean initializeCommunication(long retryIndex) throws Exception {
         Timber.d("initializeCommunication");
-        if (retryIndex ==  RETRY_COUNT) {
-            //TODO: throw custom exception
-            throw new RuntimeException();
+        if (retryIndex ==  RETRY_COUNT - 1) {
+            throw new BlackBoxConnectionException();
         }
-        writeRawData(BlackBoxParser.generateRequest(getSequenceID(), 209926, UPDATE_RATE_MILLIS));
+        writeRawData(BlackBoxParser.generateSubscriptionRequest(getSequenceID(), mBoxId, UPDATE_RATE_MILLIS));
         return readSubscriptionResponse();
     }
 
@@ -78,6 +92,7 @@ public final class BlackBoxImpl implements BlackBox {
         Timber.d("startContinuousRead");
         return Observable.interval(UPDATE_RATE_MILLIS / 2, TimeUnit.MILLISECONDS)
                 .observeOn(Schedulers.io())
+                .filter(unused -> isConnected())
                 .map(unused -> mSocket.getInputStream())
                 .filter(stream -> stream.available() > 0)
                 .map(this::readRawData)

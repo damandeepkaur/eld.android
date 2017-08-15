@@ -20,12 +20,17 @@ public class BlackBoxInteractor {
         mConnectionManager = connectionManager;
     }
 
-    public Observable<BlackBoxModel> getData() {
+    public Observable<BlackBoxModel> getData(int boxId) {
         if (!mConnectionManager.isConnected()) {
-            return mConnectionManager.connectBlackBox()
+            return mConnectionManager.connectBlackBox(boxId)
                     .switchMap(connectionManager ->  connectionManager.getDataObservable());
         }
 
         return mConnectionManager.getDataObservable();
+    }
+
+    public <T> Observable<T> shutdown(T item) {
+        return Observable.zip(Observable.just(item), mConnectionManager.disconnectBlackBox(),
+                (tItem, manager) -> tItem);
     }
 }

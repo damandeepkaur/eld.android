@@ -11,7 +11,7 @@ import io.reactivex.Observable;
  */
 
 public interface BlackBox {
-    void connect() throws Exception;
+    void connect(int boxId) throws Exception;
 
     void disconnect() throws IOException;
 

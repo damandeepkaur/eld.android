@@ -17,7 +17,7 @@ import timber.log.Timber;
  */
 
 public class BlackBoxParser {
-    private static final int START_INDEX = 11;
+    public static final int START_INDEX = 11;
     //  2 start bytes, 1 checksum, 2 length, 1 command, 1 packetId,  4 boxid, 2 year, 1 month, 1 day, 1 hour, 1 minute, 1 sec, 2 millisecond, 1 GPS, 1 update rate.
     private static final int PACKET_LENGTH = 22;
     private static final byte SUBSCRIPTION_REQUEST = (byte) 'C';
@@ -32,20 +32,29 @@ public class BlackBoxParser {
     public static final int PREAMBLE_LENGTH = 5;
     public static final char PREAMBLE_SYMBOL = '@';
 
+    public static final int VIN_INDEX_START = 13;
+    public static final int VIN_INDEX_END = 36;
+
     public static BlackBoxResponseModel parseSubscription(byte[] data) throws UnsupportedEncodingException {
         BlackBoxResponseModel responseModel = new BlackBoxResponseModel();
         if (parseHeader(data, responseModel)) {
             int index = START_INDEX;
-            byte msg = data[index];
+            byte msg = data[index++];
             responseModel.setResponseType(BlackBoxResponseModel.ResponseType.valueOf((char) msg));
-            index++;
-            responseModel.setSequenceId(data[index] & 0x0FF);
-            index++;
+            responseModel.setSequenceId(data[index++] & 0x0FF);
             // on Ack - parse for the VIN , available from the subscription ack message
             // is length 31 excluding the header
             if (responseModel.getResponseType() == BlackBoxResponseModel.ResponseType.Ack && responseModel.getLength() == 31) {
-                responseModel.setVinNumber(new String(data, index, 24, "ASCII"));// from 13 to 36
-                Timber.i("VIN number from the box" + responseModel.getVinNumber());
+                int sum = 0;
+                for (int i = VIN_INDEX_START; i < VIN_INDEX_END; ++i) {
+                    sum |= data[i];
+                }
+                String vinNumber = "";
+                if (sum > 0) {
+                    vinNumber = new String(data, index, VIN_INDEX_END - VIN_INDEX_START, "ASCII");
+                }
+                responseModel.setVinNumber(vinNumber);
+                Timber.i("VIN number from the box " + responseModel.getVinNumber());
             }
             if (responseModel.getResponseType() == BlackBoxResponseModel.ResponseType.NAck) {
                 responseModel.setErrReasonCode(BlackBoxResponseModel.NackReasonCode.fromValue(data[index]));
@@ -59,24 +68,20 @@ public class BlackBoxParser {
         if (parseHeader(data, responseModel)) {
             BlackBoxModel boxData = responseModel.getBoxData();
             int index = START_INDEX;
-            byte msg = data[index];
+            byte msg = data[index++];
             BlackBoxResponseModel.ResponseType responseType = BlackBoxResponseModel.ResponseType.valueOf((char) msg);
             responseModel.setResponseType(responseType);
             boxData.setResponseType(responseType);
-            index++;
             //boxID 12 to 15
-            long boxId = ByteBuffer.wrap(new byte[]{data[index],
-                    data[index + 1],
-                    data[index + 2],
-                    data[index + 3]})
+            long boxId = ByteBuffer.wrap(new byte[]{data[index++],
+                    data[index++],
+                    data[index++],
+                    data[index++]})
                     .order(java.nio.ByteOrder.LITTLE_ENDIAN).getInt();
-            index += 4;
-
             boxData.setBoxId(boxId);
 
             //sequence number 16 and 17
-            boxData.setSequenceNum(ConnectionUtils.byteToUnsignedInt(new byte[]{data[index], data[index + 1]}));
-            index += 2;
+            boxData.setSequenceNum(ConnectionUtils.byteToUnsignedInt(new byte[]{data[index++], data[index++]}));
 
             //Event Time processing
             // only last two digits of the year are given, add it to 2000
@@ -110,6 +115,7 @@ public class BlackBoxParser {
             //Heading at 38-39
             boxData.setHeading(ByteBuffer.wrap(new byte[]{data[index++],
                     data[index++]}).order(java.nio.ByteOrder.LITTLE_ENDIAN).getShort());
+            //Speed 40
             int speed = (data[index++] & 0XFF);
             boxData.setSpeed(speed);
             //Odometer 41 to 44
@@ -130,12 +136,10 @@ public class BlackBoxParser {
         return responseModel;
     }
 
-    public static byte[] generateRequest(byte sequenceID, int boxID, int updateRateMillis) {
+    public static byte[] generateSubscriptionRequest(byte sequenceID, int boxID, int updateRateMillis) {
         byte[] request = new byte[PACKET_LENGTH + HEADER_LENGTH];
         int index = 0;
-       /* request[index++] = request[index++] = request[index++] = request[index++] = request[index++] = START_MESSAGE_INDICATOR; //Five characters ‘@’ (0X40)
-        request[index++] = DEVICE_TYPE; // Representing 'A' for the device type Android
-        request[index++] = request[index++] = START_PACKET_INDICATOR;*/
+
         System.arraycopy(generateHeader(), 0, request, index, HEADER_LENGTH + 2);
         index = HEADER_LENGTH + 2;
         // checksum
@@ -181,7 +185,7 @@ public class BlackBoxParser {
         return request;
     }
 
-    private static boolean parseHeader(byte[] data, BlackBoxResponseModel responseModel) {
+    public static boolean parseHeader(byte[] data, BlackBoxResponseModel responseModel) {
         int index;
         // Header starts with five @
         for (index = 0; index < PREAMBLE_LENGTH; ++index) {

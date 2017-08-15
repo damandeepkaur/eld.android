@@ -12,7 +12,7 @@ import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
 
 public interface BlackBoxConnectionManager {
 
-    Observable<BlackBoxConnectionManager> connectBlackBox();
+    Observable<BlackBoxConnectionManager> connectBlackBox(int boxId);
 
     Observable<BlackBoxConnectionManager> disconnectBlackBox();
 

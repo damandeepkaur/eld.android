@@ -21,10 +21,10 @@ public class BlackBoxConnectionManagerImpl implements BlackBoxConnectionManager 
     }
 
     @Override
-    public Observable<BlackBoxConnectionManager> connectBlackBox() {
+    public Observable<BlackBoxConnectionManager> connectBlackBox(int boxId) {
         return Observable.just((BlackBoxConnectionManager) this)
                 .subscribeOn(Schedulers.io())
-                .doOnNext(manager -> manager.getBlackBox().connect());
+                .doOnNext(manager -> manager.getBlackBox().connect(boxId));
     }
 
     @Override

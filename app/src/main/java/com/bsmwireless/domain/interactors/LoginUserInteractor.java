@@ -91,7 +91,7 @@ public class LoginUserInteractor {
         logoutEvent.setBoxId(mPreferencesManager.getBoxId());
         logoutEvent.setVehicleId(mPreferencesManager.getVehicleId());
 
-        return mBlackBoxInteractor.getData()
+        return mBlackBoxInteractor.getData(mPreferencesManager.getBoxId())
                 .flatMap(blackBox -> {
                     logoutEvent.setTimezone(getTimezoneSync(driverId));
                     logoutEvent.setEngineHours(blackBox.getEngineHours());
@@ -110,7 +110,8 @@ public class LoginUserInteractor {
                                 }
                             })
                             .map(responseMessage -> responseMessage.getMessage().equals("ACK"));
-                });
+                })
+                .switchMap(aBoolean -> mBlackBoxInteractor.shutdown(aBoolean));
     }
 
     public Observable<Boolean> updateUser(User user) {
