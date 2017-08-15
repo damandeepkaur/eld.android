@@ -13,14 +13,6 @@ public class UserEntity {
     private String mTimezone;
     @ColumnInfo(name = "email")
     private String mEmail;
-    @ColumnInfo(name = "address")
-    private String mAddress;
-    @ColumnInfo(name = "city")
-    private String mCity;
-    @ColumnInfo(name = "state")
-    private String mState;
-    @ColumnInfo(name = "country")
-    private String mCountry;
     @ColumnInfo(name = "license")
     private String mLicense;
     @ColumnInfo(name = "signature")
@@ -29,8 +21,8 @@ public class UserEntity {
     private Boolean mExempt;
     @ColumnInfo(name = "updated")
     private Boolean mUpdated;
-    @ColumnInfo(name = "organization")
-    private String mOrganization;
+    @ColumnInfo(name = "dot")
+    private String mDot;
     @ColumnInfo(name = "sync_time")
     private Long mSyncTime;
     @ColumnInfo(name = "first_name")
@@ -39,20 +31,14 @@ public class UserEntity {
     private String mMidName;
     @ColumnInfo(name = "last_name")
     private String mLastName;
+    @ColumnInfo(name = "duty_cycle")
+    private String mDutyCycle;
     @ColumnInfo(name = "rule_exception")
     private String mRuleException;
-    @ColumnInfo(name = "apply_dst")
-    private Integer mApplyDST;
-    @ColumnInfo(name = "us_cycle")
-    private Integer mUsCycle;
-    @ColumnInfo(name = "ca_cycle")
-    private Integer mCaCycle;
-    @ColumnInfo(name = "cycle_country")
-    private Integer mCycleCountry;
-    @ColumnInfo(name = "org_addr")
-    private String mOrgAddr;
-    @ColumnInfo(name = "lastmodified")
-    private Long mLastModified;
+    @ColumnInfo(name = "home_terminal_id")
+    private Integer mHomeTermId;
+    @ColumnInfo(name = "uom")
+    private Integer mUom;
     @ColumnInfo(name = "last_vehicle_ids")
     private String mLastVehicleIds;
 
@@ -78,38 +64,6 @@ public class UserEntity {
 
     public void setEmail(String email) {
         mEmail = email;
-    }
-
-    public String getAddress() {
-        return mAddress;
-    }
-
-    public void setAddress(String address) {
-        mAddress = address;
-    }
-
-    public String getCity() {
-        return mCity;
-    }
-
-    public void setCity(String city) {
-        mCity = city;
-    }
-
-    public String getState() {
-        return mState;
-    }
-
-    public void setState(String state) {
-        mState = state;
-    }
-
-    public String getCountry() {
-        return mCountry;
-    }
-
-    public void setCountry(String country) {
-        mCountry = country;
     }
 
     public String getLicense() {
@@ -142,14 +96,6 @@ public class UserEntity {
 
     public void setUpdated(Boolean updated) {
         mUpdated = updated;
-    }
-
-    public String getOrganization() {
-        return mOrganization;
-    }
-
-    public void setOrganization(String organization) {
-        mOrganization = organization;
     }
 
     public Long getSyncTime() {
@@ -192,59 +138,43 @@ public class UserEntity {
         mRuleException = ruleException;
     }
 
-    public Integer getApplyDST() {
-        return mApplyDST;
-    }
-
-    public void setApplyDST(Integer applyDST) {
-        mApplyDST = applyDST;
-    }
-
-    public Integer getUsCycle() {
-        return mUsCycle;
-    }
-
-    public void setUsCycle(Integer usCycle) {
-        mUsCycle = usCycle;
-    }
-
-    public Integer getCaCycle() {
-        return mCaCycle;
-    }
-
-    public void setCaCycle(Integer caCycle) {
-        mCaCycle = caCycle;
-    }
-
-    public Integer getCycleCountry() {
-        return mCycleCountry;
-    }
-
-    public void setCycleCountry(Integer cycleCountry) {
-        mCycleCountry = cycleCountry;
-    }
-
-    public String getOrgAddr() {
-        return mOrgAddr;
-    }
-
-    public void setOrgAddr(String orgAddr) {
-        mOrgAddr = orgAddr;
-    }
-
-    public Long getLastModified() {
-        return mLastModified;
-    }
-
-    public void setLastModified(Long lastModified) {
-        mLastModified = lastModified;
-    }
-
     public String getLastVehicleIds() {
         return mLastVehicleIds;
     }
 
     public void setLastVehicleIds(String lastVehicleIds) {
         mLastVehicleIds = lastVehicleIds;
+    }
+
+    public String getDot() {
+        return mDot;
+    }
+
+    public void setDot(String dot) {
+        mDot = dot;
+    }
+
+    public String getDutyCycle() {
+        return mDutyCycle;
+    }
+
+    public void setDutyCycle(String dutyCycle) {
+        mDutyCycle = dutyCycle;
+    }
+
+    public Integer getHomeTermId() {
+        return mHomeTermId;
+    }
+
+    public void setHomeTermId(Integer homeTermId) {
+        mHomeTermId = homeTermId;
+    }
+
+    public Integer getUom() {
+        return mUom;
+    }
+
+    public void setUom(Integer uom) {
+        mUom = uom;
     }
 }

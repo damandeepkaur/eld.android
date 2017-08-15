@@ -25,8 +25,6 @@ public class ELDEventConverter {
             event.setComment(entity.getComment());
             event.setLocation(entity.getLocation());
             event.setCheckSum(entity.getCheckSum());
-            event.setShippingId(entity.getShippingId());
-            event.setCoDriverId(entity.getCoDriverId());
             event.setBoxId(entity.getBoxId());
             event.setVehicleId(entity.getVehicleId());
             event.setTzOffset(entity.getTzOffset());
@@ -59,8 +57,6 @@ public class ELDEventConverter {
             entity.setComment(event.getComment());
             entity.setLocation(event.getLocation());
             entity.setCheckSum(event.getCheckSum());
-            entity.setShippingId(event.getShippingId());
-            entity.setCoDriverId(event.getCoDriverId());
             entity.setBoxId(event.getBoxId());
             entity.setVehicleId(event.getVehicleId());
             entity.setTzOffset(event.getTzOffset());

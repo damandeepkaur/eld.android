@@ -4,12 +4,19 @@ import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.network.authenticator.TokenManager;
 import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.PreferencesManager;
+import com.bsmwireless.data.storage.carriers.CarrierConverter;
+import com.bsmwireless.data.storage.users.FullUserEntity;
+import com.bsmwireless.data.storage.hometerminals.HomeTerminalConverter;
 import com.bsmwireless.data.storage.users.UserConverter;
 import com.bsmwireless.data.storage.users.UserEntity;
+import com.bsmwireless.models.DriverHomeTerminal;
+import com.bsmwireless.models.DriverProfileModel;
+import com.bsmwireless.models.DriverSignature;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.LoginModel;
 import com.bsmwireless.models.PasswordModel;
 import com.bsmwireless.models.ResponseMessage;
+import com.bsmwireless.models.RuleSelectionModel;
 import com.bsmwireless.models.User;
 
 import java.util.Calendar;
@@ -18,8 +25,12 @@ import javax.inject.Inject;
 
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.annotations.NonNull;
+import retrofit2.http.HEAD;
 
+import static com.bsmwireless.common.Constants.SUCCESS;
 import static com.bsmwireless.models.ELDEvent.EventType.LOGIN_LOGOUT;
 
 public class LoginUserInteractor {
@@ -61,30 +72,29 @@ public class LoginUserInteractor {
 
                     mAppDatabase.userDao().insertUser(UserConverter.toEntity(user));
 
+                    if (user.getCarriers() != null) {
+                        mAppDatabase.carrierDao().insertCarriers(CarrierConverter
+                                .toEntityList(user.getCarriers(), user.getId()));
+                    }
+
+                    if (user.getHomeTerminals() != null) {
+                        mAppDatabase.homeTerminalDao().insertHomeTerminals(HomeTerminalConverter
+                                .toEntityList(user.getHomeTerminals(), user.getId()));
+                    }
+
                     if (lastVehicles != null) {
                         mAppDatabase.userDao().setUserLastVehicles(user.getId(), lastVehicles);
                     }
-                })// TODO: add update user logic.
-                  /*.flatMap(user -> {
-                      UserEntity userEntity = mAppDatabase.userDao().getUserSync(user.getId());
-                      if (userEntity != null) {
-                          Long lastModified = userEntity.getLastModified();
-                          if (lastModified != null && lastModified > user.getSyncTime()) {
-                              return mServiceApi.updateProfile(getUpdatedUser(userEntity))
-                                                .map(responseMessage -> responseMessage.getMessage().equals("ACK"));
-                          }
-                      }
-                      return Observable.create((ObservableOnSubscribe<Long>) e -> e.onNext(mAppDatabase.userDao().insertUser(UserConverter.toEntity(user))))
-                                       .map(userID -> userID > 0);
-                  });*/
-                  .map(user -> user != null);
+                }).map(user -> user != null);
     }
 
     public Observable<Boolean> logoutUser() {
         ELDEvent logoutEvent = new ELDEvent();
         int driverId = getDriverId();
+        logoutEvent.setStatus(ELDEvent.StatusCode.ACTIVE.getValue());
+        logoutEvent.setOrigin(ELDEvent.EventOrigin.MANUAL_ENTER.getValue());
         logoutEvent.setEventType(LOGIN_LOGOUT.getValue());
-        logoutEvent.setEventCode(ELDEvent.StatusCode.ACTIVE.getValue());
+        logoutEvent.setEventCode(ELDEvent.LoginLogoutCode.LOGOUT.getValue());
         logoutEvent.setEventTime(System.currentTimeMillis());
         logoutEvent.setMobileTime(System.currentTimeMillis());
         logoutEvent.setDriverId(getDriverId());
@@ -109,32 +119,42 @@ public class LoginUserInteractor {
                                     mTokenManager.clearToken(mTokenManager.getToken(mPreferencesManager.getAccountName()));
                                 }
                             })
-                            .map(responseMessage -> responseMessage.getMessage().equals("ACK"));
+                            .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
                 })
                 .switchMap(aBoolean -> mBlackBoxInteractor.shutdown(aBoolean));
     }
 
-    public Observable<Boolean> updateUser(User user) {
+    public Observable<Boolean> syncDriverProfile(User user) {
         UserEntity userEntity = UserConverter.toEntity(user);
-        return Observable.create((ObservableOnSubscribe<Long>) e -> {
-                                    userEntity.setLastModified(Calendar.getInstance().getTimeInMillis());
-                                    e.onNext(mAppDatabase.userDao().insertUser(userEntity));
-                         })
+        return Observable.fromCallable(() -> mAppDatabase.userDao().insertUser(userEntity))
                          .map(userId -> userId > 0)
                          .flatMap(userInserted -> {
                              if (userInserted) {
-                                 return mServiceApi.updateProfile(getUpdatedUser(userEntity));
+                                 return mServiceApi.updateDriverProfile(new DriverProfileModel(userEntity));
                              }
-                             ResponseMessage responseMessage = new ResponseMessage();
-                             responseMessage.setMessage("");
-                             return Observable.just(responseMessage);
+                             return Observable.just(new ResponseMessage(""));
                          })
-                         .map(responseMessage -> responseMessage.getMessage().equals("ACK"));
+                         .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
     }
 
     public Observable<Boolean> updateDriverPassword(String oldPassword, String newPassword) {
         return mServiceApi.updateDriverPassword(getPasswordModel(oldPassword, newPassword))
-                          .map(responseMessage -> responseMessage.getMessage().equals("ACK"));
+                          .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
+    }
+
+    public Observable<Boolean> updateDriverSignature(String signature) {
+        return mServiceApi.updateDriverSignature(getDriverSignature(signature))
+                          .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
+    }
+
+    public Observable<Boolean> updateDriverRule(String ruleException) {
+        return mServiceApi.updateDriverRule(getRuleSelectionModel(ruleException))
+                          .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
+    }
+
+    public Observable<Boolean> updateDriverHomeTerminal(Integer homeTerminalId) {
+        return mServiceApi.updateDriverHomeTerminal(getHomeTerminal(homeTerminalId))
+                          .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
     }
 
     public String getUserName() {
@@ -159,6 +179,10 @@ public class LoginUserInteractor {
         return mAppDatabase.userDao().getUser(getDriverId());
     }
 
+    public Flowable<FullUserEntity> getFullUser() {
+        return mAppDatabase.userDao().getFullUser(getDriverId());
+    }
+
     public boolean isLoginActive() {
         return mPreferencesManager.isShowHomeScreenEnabled() && mTokenManager.getToken(mPreferencesManager.getAccountName()) != null;
     }
@@ -180,21 +204,6 @@ public class LoginUserInteractor {
         return mPreferencesManager.isRememberUserEnabled();
     }
 
-    // TODO: change server logic
-    private User getUpdatedUser(UserEntity userEntity) {
-        User user = new User();
-
-        user.setId(userEntity.getId());
-        user.setTimezone(userEntity.getTimezone());
-        user.setFirstName(userEntity.getFirstName());
-        user.setLastName(userEntity.getLastName());
-        user.setCycleCountry(userEntity.getCycleCountry());
-        user.setSignature(userEntity.getSignature());
-        user.setAddress(userEntity.getAddress());
-
-        return user;
-    }
-
     private PasswordModel getPasswordModel(String oldPassword, String newPassword) {
         PasswordModel passwordModel = new PasswordModel();
 
@@ -204,6 +213,34 @@ public class LoginUserInteractor {
         passwordModel.setNewPassword(newPassword);
 
         return passwordModel;
+    }
+
+    private DriverHomeTerminal getHomeTerminal(Integer homeTerminalId) {
+        DriverHomeTerminal homeTerminal = new DriverHomeTerminal();
+
+        homeTerminal.setDriverId(getDriverId());
+        homeTerminal.setHomeTermId(homeTerminalId);
+
+        return homeTerminal;
+    }
+
+    private RuleSelectionModel getRuleSelectionModel(String ruleException) {
+        RuleSelectionModel ruleSelectionModel = new RuleSelectionModel();
+
+        ruleSelectionModel.setDriverId(getDriverId());
+        ruleSelectionModel.setRuleException(ruleException);
+        ruleSelectionModel.setApplyTime(Calendar.getInstance().getTimeInMillis());
+
+        return ruleSelectionModel;
+    }
+
+    private DriverSignature getDriverSignature(String signature) {
+        DriverSignature signatureInfo = new DriverSignature();
+
+        signatureInfo.setDriverId(getDriverId());
+        signatureInfo.setSignature(signature);
+
+        return signatureInfo;
     }
 }
 

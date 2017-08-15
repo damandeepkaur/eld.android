@@ -2,8 +2,12 @@ package com.bsmwireless.data.network;
 
 import com.bsmwireless.models.Auth;
 import com.bsmwireless.models.CUDTripInfo;
+import com.bsmwireless.models.DriverHomeTerminal;
 import com.bsmwireless.models.DriverLog;
+import com.bsmwireless.models.DriverProfileModel;
+import com.bsmwireless.models.DriverSignature;
 import com.bsmwireless.models.ELDEvent;
+import com.bsmwireless.models.ELDUpdate;
 import com.bsmwireless.models.EmailReport;
 import com.bsmwireless.models.Event;
 import com.bsmwireless.models.HOSAlert;
@@ -18,9 +22,10 @@ import com.bsmwireless.models.RegistryInformation;
 import com.bsmwireless.models.Report;
 import com.bsmwireless.models.ResponseMessage;
 import com.bsmwireless.models.Rule;
+import com.bsmwireless.models.RuleSelectionModel;
+import com.bsmwireless.models.User;
 import com.bsmwireless.models.SyncInspectionCategory;
 import com.bsmwireless.models.Trailer;
-import com.bsmwireless.models.User;
 import com.bsmwireless.models.Vehicle;
 
 import java.util.List;
@@ -29,12 +34,21 @@ import io.reactivex.Observable;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
-import retrofit2.http.Header;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
 
 public interface ServiceApi {
+
+    /**
+     * Driver Login
+     *
+     * @param request - model with login information.
+     * @return User Response {@link User}.
+     */
+    @POST("v1/login/driver")
+    Observable<User> loginUser(@Body LoginModel request);
+
     /**
      * Request to update current token
      *
@@ -63,15 +77,6 @@ public interface ServiceApi {
     Observable<ResponseMessage> postNewELDEvent(@Body ELDEvent event);
 
     /**
-     * Update user profile and signature
-     *
-     * @param user user information.
-     * @return update user information response {@link ResponseMessage}.
-     */
-    @PUT("v1/app/driver/profile")
-    Observable<ResponseMessage> updateProfile(@Body User user);
-
-    /**
      * Send ELD events;
      * Send ELD driver duty status; According doc section 4.5.1.1; 4.5.1.2; 4.5.1.3; 4.5.1.4; 4.5.1.7; It sends a list of new records ordered by event time.
      *
@@ -82,6 +87,15 @@ public interface ServiceApi {
     Observable<ResponseMessage> postNewELDEvents(@Body List<ELDEvent> statusList);
 
     /**
+     * Update ELD Event which already sent to server
+     *
+     * @param events driver status list.
+     * @return update events response {@link ResponseMessage}.
+     */
+    @POST("v1/app/driver/updateevents")
+    Observable<ResponseMessage> updateELDEvents(@Body List<ELDEvent> events);
+
+    /**
      * Fetch processed driver records.
      *
      * @param startTime start time.
@@ -89,7 +103,7 @@ public interface ServiceApi {
      * @return List of unidentified or changed event records {@link ELDEvent}.
      */
     @GET("v1/sync/records/search/{start}/{end}")
-    Observable<List<ELDEvent>> getELDEvents(@Path("start") long startTime, @Path("end") long endTime);
+    Observable<List<ELDEvent>> getELDEvents(@Path("start") Long startTime, @Path("end") Long endTime);
 
     /**
      * Update unidentified records or change record request.
@@ -98,7 +112,16 @@ public interface ServiceApi {
      * @return Response {@link ResponseMessage}.
      */
     @PUT("v1/sync/records/update")
-    Observable<ResponseMessage> updateELDEvents(@Body List<ELDEvent> events);
+    Observable<ResponseMessage> updateRescords(@Body List<ELDUpdate> events);
+
+    /**
+     * Update user profile.
+     *
+     * @param driverProfile driver information.
+     * @return update driver information response {@link ResponseMessage}.
+     */
+    @PUT("v1/app/driver/profile")
+    Observable<ResponseMessage> updateDriverProfile(@Body DriverProfileModel driverProfile);
 
     /**
      * Update driver password
@@ -108,6 +131,33 @@ public interface ServiceApi {
      */
     @PUT("v1/app/driver/pswd")
     Observable<ResponseMessage> updateDriverPassword(@Body PasswordModel passwordModel);
+
+    /**
+     * Update driver signature
+     *
+     * @param signature new driver signature.
+     * @return update driver signature response {@link ResponseMessage}.
+     */
+    @PUT("v1/app/driver/signature")
+    Observable<ResponseMessage> updateDriverSignature(@Body DriverSignature signature);
+
+    /**
+     * Update driver's HOS rule selection
+     *
+     * @param ruleSelectionModel rule selection model.
+     * @return update driver rule response {@link ResponseMessage}.
+     */
+    @PUT("v1/app/driver/rules")
+    Observable<ResponseMessage> updateDriverRule(@Body RuleSelectionModel ruleSelectionModel);
+
+    /**
+     * Update driver's home terminal selection
+     *
+     * @param driverHomeTerminal home terminal.
+     * @return update driver home terminal response {@link ResponseMessage}.
+     */
+    @PUT("v1/app/driver/home")
+    Observable<ResponseMessage> updateDriverHomeTerminal(@Body DriverHomeTerminal driverHomeTerminal);
 
     /**
      * Inspection Categories from category Ids
@@ -170,15 +220,6 @@ public interface ServiceApi {
      */
     @POST("v1/login/pair")
     Observable<List<ELDEvent>> pairVehicle(@Body ELDEvent status);
-
-    /**
-     * Login request Vehicle.
-     *
-     * @param request - model with login information.
-     * @return User Response {@link User}.
-     */
-    @POST("v1/login/driver")
-    Observable<User> loginUser(@Body LoginModel request);
 
     /**
      * Search Vehicle.

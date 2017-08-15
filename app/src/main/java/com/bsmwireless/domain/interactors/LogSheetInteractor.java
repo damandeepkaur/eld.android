@@ -11,6 +11,8 @@ import javax.inject.Inject;
 import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
 
+import static com.bsmwireless.common.Constants.SUCCESS;
+
 public class LogSheetInteractor {
 
     private ServiceApi mServiceApi;
@@ -24,7 +26,7 @@ public class LogSheetInteractor {
         return mServiceApi.getLogSheets(startLogDay, endLogDay);
     }
 
-    public Observable<ResponseMessage> updateLogSheetHeader(LogSheetHeader logSheetHeader) {
-        return mServiceApi.updateLogSheetHeader(logSheetHeader);
+    public Observable<Boolean> updateLogSheetHeader(LogSheetHeader logSheetHeader) {
+        return mServiceApi.updateLogSheetHeader(logSheetHeader).map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
     }
 }

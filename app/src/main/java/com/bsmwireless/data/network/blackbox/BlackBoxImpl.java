@@ -16,8 +16,6 @@ import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
 import timber.log.Timber;
 
-import static io.reactivex.internal.operators.observable.ObservableBlockingSubscribe.subscribe;
-
 /**
  * Created by osminin on 10.08.2017.
  */
@@ -29,6 +27,7 @@ public final class BlackBoxImpl implements BlackBox {
     private static final int RETRY_COUNT = 5;
     public static final int BUFFER_SIZE = 512;
     public static final int UPDATE_RATE_MILLIS = 10000;
+    public static final int TIMEOUT_RATIO = 5;
 
     private Socket mSocket;
     private byte mSequenceID = 1;
@@ -42,19 +41,23 @@ public final class BlackBoxImpl implements BlackBox {
         if (!isConnected()) {
             mSocket = new Socket(WIFI_GATEWAY_IP, WIFI_REMOTE_PORT);
             mEmitter = BehaviorSubject.create();
+            //TODO: remove fake
             mBoxId = boxId;
             mDisposable = Observable.interval(RETRY_CONNECT_DELAY, TimeUnit.MILLISECONDS)
                     .take(RETRY_COUNT)
                     .filter(this::initializeCommunication)
                     .take(1)
                     .switchMap(unused -> startContinuousRead())
+                    .timeout(UPDATE_RATE_MILLIS * TIMEOUT_RATIO,
+                            TimeUnit.MILLISECONDS,
+                            Observable.error(new BlackBoxConnectionException()))
                     .doOnError(throwable -> {
                         Timber.e(throwable);
-                        mEmitter.onError(throwable);
+                        disconnect();
                     })
-                    .doOnNext(model -> mEmitter.onNext(model))
-                    .doOnComplete(() -> mEmitter.onComplete())
-                    .subscribe();
+                    .subscribe(model -> mEmitter.onNext(model),
+                            throwable -> mEmitter.onError(throwable),
+                            () -> mEmitter.onComplete());
         }
     }
 
@@ -81,7 +84,7 @@ public final class BlackBoxImpl implements BlackBox {
 
     private boolean initializeCommunication(long retryIndex) throws Exception {
         Timber.d("initializeCommunication");
-        if (retryIndex ==  RETRY_COUNT - 1) {
+        if (retryIndex == RETRY_COUNT - 1) {
             throw new BlackBoxConnectionException();
         }
         writeRawData(BlackBoxParser.generateSubscriptionRequest(getSequenceID(), mBoxId, UPDATE_RATE_MILLIS));
@@ -96,8 +99,7 @@ public final class BlackBoxImpl implements BlackBox {
                 .map(unused -> mSocket.getInputStream())
                 .filter(stream -> stream.available() > 0)
                 .map(this::readRawData)
-                .map(bytes -> BlackBoxParser.parseVehicleStatus(bytes).getBoxData())
-                .doOnError(throwable -> Timber.e(throwable));
+                .map(bytes -> BlackBoxParser.parseVehicleStatus(bytes).getBoxData());
     }
 
     public byte getSequenceID() {

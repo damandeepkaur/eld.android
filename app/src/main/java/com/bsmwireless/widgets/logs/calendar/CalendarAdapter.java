@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.bsmwireless.common.utils.DateUtils;
 import com.bsmwireless.models.LogSheetHeader;
 
 import java.util.List;
@@ -49,7 +50,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.ViewHo
 
         holder.itemView.setOnClickListener(mOnClickListener);
 
-        LogSheetHeader associatedLog = item.getAssociatedLog();
+        LogSheetHeader associatedLog = item.getAssociatedLogSheet();
 
         if (associatedLog != null) {
             if (associatedLog.getSigned() == (Boolean) true) {
@@ -84,7 +85,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.ViewHo
     public void updateLogs(List<LogSheetHeader> logs) {
         if (logs != null) {
             for (LogSheetHeader log : logs) {
-                CalendarItem item = findItemByDate(log.getLogDay());
+                CalendarItem item = findItemByDate(DateUtils.convertDayNumberToUnixMs(log.getLogDay()));
                 if (item != null) {
                     item.setAssociatedLog(log);
                 }
@@ -95,6 +96,10 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.ViewHo
 
     public CalendarItem getItemByPosition(int position) {
         return mItems != null && position < mItems.size() ? mItems.get(position) : null;
+    }
+
+    public CalendarItem getSelectedItem() {
+        return mItems != null ? mItems.get(mSelectedPosition) : null;
     }
 
     private CalendarItem findItemByDate(Long date) {

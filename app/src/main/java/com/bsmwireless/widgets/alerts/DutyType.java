@@ -1,12 +1,17 @@
 package com.bsmwireless.widgets.alerts;
 
+import android.content.Context;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import app.bsmuniversal.com.R;
 
 public enum DutyType {
-    OFF_DUTY(1, R.string.hos_txt_offduty, R.color.offduty_light),
-    SLEEPER_BERTH(2, R.string.hos_txt_sleeping, R.color.sleepingberth_light),
-    DRIVING(3, R.string.hos_txt_driving, R.color.driving_light),
-    ON_DUTY(4, R.string.hos_txt_onduty, R.color.onduty_light);
+    OFF_DUTY(1, R.string.event_type_off_duty, R.color.offduty_light),
+    SLEEPER_BERTH(2, R.string.event_type_sleeping, R.color.sleepingberth_light),
+    DRIVING(3, R.string.event_type_driving, R.color.driving_light),
+    ON_DUTY(4, R.string.event_type_on_duty, R.color.onduty_light);
 
     private int mId;
     private int mName;
@@ -24,7 +29,7 @@ public enum DutyType {
                 return t.mName;
             }
         }
-        return R.string.hos_txt_offduty;
+        return R.string.event_type_off_duty;
     }
 
     public static int getColorById(int id) {

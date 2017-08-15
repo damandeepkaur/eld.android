@@ -158,14 +158,8 @@
     <string name="hos_txt_graph">Graphique</string>
     <string name="hos_txt_events">Evénements</string>
     <string name="hos_txt_logsheet">Journal de bord</string>
-    <string name="hos_txt_offduty">En congé</string>
     <string name="hos_txt_sleepingberth">Couchette</string>
-
-    <string name="hos_txt_sleeping">SLEEPING </string>
     <string name="hos_txt_berth">BERTH</string>
-
-    <string name="hos_txt_driving">Conduite</string>
-    <string name="hos_txt_onduty">En service</string>
     <string name="hos_txt_summary">Sommaire</string>
     <string name="hos_txt_location">Localisation</string>
     <string name="hos_txt_total">Total</string>

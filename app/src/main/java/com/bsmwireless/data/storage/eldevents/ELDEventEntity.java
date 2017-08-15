@@ -8,9 +8,9 @@ import android.arch.persistence.room.PrimaryKey;
 public class ELDEventEntity {
     @PrimaryKey
     @ColumnInfo(name = "id")
-    private int mId;
+    private Integer mId;
     @ColumnInfo(name = "is_sync")
-    private boolean mSync = true;
+    private Boolean mSync = true;
     @ColumnInfo(name = "event_type")
     private Integer mEventType;
     @ColumnInfo(name = "event_code")
@@ -29,6 +29,8 @@ public class ELDEventEntity {
     private Double mLat;
     @ColumnInfo(name = "lng")
     private Double mLng;
+    @ColumnInfo(name = "lat_ln_flag")
+    private String mLatLnFlag;
     @ColumnInfo(name = "distance")
     private Integer mDistance;
     @ColumnInfo(name = "comment")
@@ -37,10 +39,6 @@ public class ELDEventEntity {
     private String mLocation;
     @ColumnInfo(name = "check_sum")
     private String mCheckSum;
-    @ColumnInfo(name = "shipping_id")
-    private String mShippingId;
-    @ColumnInfo(name = "co_driver_id")
-    private Integer mCoDriverId;
     @ColumnInfo(name = "box_id")
     private Integer mBoxId;
     @ColumnInfo(name = "vehicle_id")
@@ -53,24 +51,28 @@ public class ELDEventEntity {
     private Long mMobileTime;
     @ColumnInfo(name = "driver_id")
     private Integer mDriverId;
+    @ColumnInfo(name = "sequence")
+    private Integer mSequence;
     @ColumnInfo(name = "malfunction")
     private Boolean mMalfunction;
     @ColumnInfo(name = "diagnostic")
     private Boolean mDiagnostic;
+    @ColumnInfo(name = "mal_code")
+    private String mMalCode;
 
-    public int getId() {
+    public Integer getId() {
         return mId;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         mId = id;
     }
 
-    public boolean isSync() {
+    public Boolean isSync() {
         return mSync;
     }
 
-    public void setSync(boolean sync) {
+    public void setSync(Boolean sync) {
         mSync = sync;
     }
 
@@ -146,6 +148,14 @@ public class ELDEventEntity {
         mLng = lng;
     }
 
+    public String getLatLnFlag() {
+        return mLatLnFlag;
+    }
+
+    public void setLatLnFlag(String latLnFlag) {
+        this.mLatLnFlag = latLnFlag;
+    }
+
     public Integer getDistance() {
         return mDistance;
     }
@@ -176,22 +186,6 @@ public class ELDEventEntity {
 
     public void setCheckSum(String checkSum) {
         mCheckSum = checkSum;
-    }
-
-    public String getShippingId() {
-        return mShippingId;
-    }
-
-    public void setShippingId(String shippingId) {
-        mShippingId = shippingId;
-    }
-
-    public Integer getCoDriverId() {
-        return mCoDriverId;
-    }
-
-    public void setCoDriverId(Integer coDriverId) {
-        mCoDriverId = coDriverId;
     }
 
     public Integer getBoxId() {
@@ -242,6 +236,14 @@ public class ELDEventEntity {
         mDriverId = driverId;
     }
 
+    public Integer getSequence() {
+        return mSequence;
+    }
+
+    public void setSequence(Integer sequence) {
+        this.mSequence = sequence;
+    }
+
     public Boolean getMalfunction() {
         return mMalfunction;
     }
@@ -256,5 +258,13 @@ public class ELDEventEntity {
 
     public void setDiagnostic(Boolean diagnostic) {
         mDiagnostic = diagnostic;
+    }
+
+    public String getMalCode() {
+        return mMalCode;
+    }
+
+    public void setMalCode(String malCode) {
+        this.mMalCode = malCode;
     }
 }

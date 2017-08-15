@@ -1,5 +1,7 @@
 package com.bsmwireless.common.utils;
 
+import android.content.Context;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -7,6 +9,8 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
+
+import app.bsmuniversal.com.R;
 
 public class DateUtils {
     private final static int MINUTES_IN_HOUR = 60;
@@ -89,6 +93,33 @@ public class DateUtils {
     }
 
     /**
+     * @param time unix time in ms
+     * @return string with format time like "2 hrs 35 mins"
+     */
+    public static String convertTimeInMsToDurationString(long time, Context context) {
+        String hrs = context.getResources().getString(R.string.hours);
+        String mins = context.getResources().getString(R.string.minutes);
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
+        calendar.setTimeInMillis(time);
+        String duration = "";
+        if (calendar.get(Calendar.HOUR_OF_DAY) > 0) {
+            duration = String.format(Locale.US, "%02d " + hrs + " ", calendar.get(Calendar.HOUR_OF_DAY));
+        }
+        return duration + String.format(Locale.US, "%02d " + mins, calendar.get(Calendar.MINUTE));
+    }
+
+    /**
+     * @param time unix time in ms
+     * @return string with format time like "01:19:24"
+     */
+    public static String convertTimeInMsToDayTime(String timezone, long time) {
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(timezone));
+        calendar.setTimeInMillis(time);
+        return String.format(Locale.US, "%02d:%02d:%02d", calendar.get(Calendar.HOUR_OF_DAY),
+                calendar.get(Calendar.MINUTE), calendar.get(Calendar.SECOND));
+    }
+
+    /**
      * @param zone user timezone for example "America/Los_Angeles"
      * @param time unix time in ms
      * @return long with format time like 20170708
@@ -116,5 +147,45 @@ public class DateUtils {
             e.printStackTrace();
         }
         return date.getTime();
+    }
+
+    /**
+     * @param time long unix time in ms
+     * @return string with format time like "12:35 AM"
+     */
+    public static String convertTimeToAMPMString(long time, String timezone) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm aaa");
+        TimeZone timeZone = TimeZone.getTimeZone(timezone);
+        dateFormat.setTimeZone(timeZone);
+        return dateFormat.format(time);
+    }
+
+    /**
+     * @param time string with format time like "12:35 AM"
+     * @param day current day time
+     * @return long unix time in ms
+     */
+    public static Long convertStringAMPMToTime(String time, long day, String timezone) {
+        SimpleDateFormat format = new SimpleDateFormat("hh:mm aaa", Locale.US);
+        TimeZone timeZone = TimeZone.getTimeZone(timezone);
+        format.setTimeZone(timeZone);
+        try {
+            // Parse hour of day and minute
+            Date date = format.parse(time);
+            Calendar calendar = Calendar.getInstance(timeZone);
+            calendar.setTime(date);
+
+            int hourOfDay = calendar.get(Calendar.HOUR_OF_DAY);
+            int minute = calendar.get(Calendar.MINUTE);
+
+            // Time of day
+            calendar.setTimeInMillis(day);
+            calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+            calendar.set(Calendar.MINUTE, minute);
+            return calendar.getTimeInMillis();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return 0L;
     }
 }

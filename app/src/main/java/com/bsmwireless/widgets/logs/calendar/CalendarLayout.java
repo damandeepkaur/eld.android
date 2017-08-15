@@ -2,6 +2,7 @@ package com.bsmwireless.widgets.logs.calendar;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Canvas;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -69,6 +70,7 @@ public class CalendarLayout extends LinearLayout implements View.OnClickListener
 
         mLayoutManager = new LinearLayoutManager(getContext(), HORIZONTAL, true);
         mRecyclerView.setLayoutManager(mLayoutManager);
+
         mAdapter = new CalendarAdapter(getContext(), getItems(), this);
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setHasFixedSize(true);
@@ -100,14 +102,14 @@ public class CalendarLayout extends LinearLayout implements View.OnClickListener
         }
     }
 
-    void onLeftClicked() {
+    private void onLeftClicked() {
         int firstPosition = mLayoutManager.findFirstVisibleItemPosition();
         int lastPosition = mLayoutManager.findLastVisibleItemPosition();
         int newPosition = lastPosition + (lastPosition - firstPosition) - 1;
         mRecyclerView.smoothScrollToPosition(newPosition < mAdapter.getItemCount() ? newPosition : mAdapter.getItemCount() - 1);
     }
 
-    void onRightClicked() {
+    private void onRightClicked() {
         int firstPosition = mLayoutManager.findFirstVisibleItemPosition();
         int lastPosition = mLayoutManager.findLastVisibleItemPosition();
         int newPosition = firstPosition - (lastPosition - firstPosition) + 1;
@@ -139,6 +141,10 @@ public class CalendarLayout extends LinearLayout implements View.OnClickListener
             calendar.setTime(new Date(time));
         }
         return logs;
+    }
+
+    public CalendarItem getCurrentItem() {
+        return mAdapter.getSelectedItem();
     }
 
     public interface OnItemSelectListener {

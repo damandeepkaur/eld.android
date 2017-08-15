@@ -74,6 +74,11 @@ public class VehiclesInteractor {
         mAppDatabase.userDao().setUserLastVehicles(driverId, builder.toString());
     }
 
+    public Flowable<List<Vehicle>> getVehiclesFromDB(List<Integer> vehicleIds){
+        return mAppDatabase.vehicleDao().getVehicles(vehicleIds)
+                .map(VehicleConverter::toVehicle);
+    }
+
     public Completable cleanSelectedVehicle() {
         return Completable.fromAction(
                 () -> {
@@ -124,5 +129,9 @@ public class VehiclesInteractor {
     public int getAssetsNumber() {
         //TODO: implement getting assets number
         return mPreferencesManager.getBoxId() > 0 ? 1 : 0;
+    }
+
+    public int getVehicleId() {
+        return mPreferencesManager.getVehicleId();
     }
 }
