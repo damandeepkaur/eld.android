@@ -51,6 +51,8 @@ public class SnackBarLayout extends RelativeLayout {
     private Handler mHandler = new Handler();
     private Runnable mHideTask = this::hideSnackbar;
 
+    private int mCurrentState = BottomSheetBehavior.STATE_HIDDEN;
+
     public SnackBarLayout(Context context) {
         super(context);
         init(context, null, 0);
@@ -91,7 +93,7 @@ public class SnackBarLayout extends RelativeLayout {
         super.onAttachedToWindow();
         mBottomSheet = BottomSheetBehavior.from(this);
         mBottomSheet.setHideable(true);
-        mBottomSheet.setState(BottomSheetBehavior.STATE_HIDDEN);
+        mBottomSheet.setState(mCurrentState);
         mBottomSheet.setBottomSheetCallback(mListener);
     }
 
@@ -129,16 +131,21 @@ public class SnackBarLayout extends RelativeLayout {
     }
 
     public SnackBarLayout hideSnackbar() {
+        mCurrentState = BottomSheetBehavior.STATE_HIDDEN;
+
         if (mBottomSheet != null) {
-            mBottomSheet.setState(BottomSheetBehavior.STATE_HIDDEN);
+            mBottomSheet.setState(mCurrentState);
         }
+
         mHandler.removeCallbacks(mHideTask);
         return this;
     }
 
     public SnackBarLayout showSnackbar() {
+        mCurrentState = BottomSheetBehavior.STATE_EXPANDED;
+
         if (mBottomSheet != null) {
-            mBottomSheet.setState(BottomSheetBehavior.STATE_EXPANDED);
+            mBottomSheet.setState(mCurrentState);
             requestFocus();
         }
 

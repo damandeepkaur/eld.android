@@ -29,11 +29,10 @@ import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.annotations.NonNull;
 
+import static com.bsmwireless.common.Constants.SUCCESS;
 import static com.bsmwireless.models.ELDEvent.EventType.LOGIN_LOGOUT;
 
 public class LoginUserInteractor {
-
-    private static final String SUCCESS = "ACK";
 
     private ServiceApi mServiceApi;
     private AppDatabase mAppDatabase;

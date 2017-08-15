@@ -1,5 +1,10 @@
 package com.bsmwireless.widgets.alerts;
 
+import android.content.Context;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import app.bsmuniversal.com.R;
 
 public enum DutyType {
