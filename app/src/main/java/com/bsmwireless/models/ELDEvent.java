@@ -47,12 +47,14 @@ public class ELDEvent implements Parcelable {
         }
     }
 
+    /**
+     * Event Origin as defined by ELD 7.22, Table 7.
+     */
     public enum EventOrigin {
-        AUTOMATIC_RECORD(1),
-        AUTOMATIC_EDIT(2),
-        MANUAL_ENTER(3),
-        MANUAL_ACCEPT(4),
-        UNIDENTIFIED_DRIVER(5);
+        AUTOMATIC_RECORD(1),        // ELD 7.22 Table 7: "Automatically recorded by ELD"
+        DRIVER(2),                  // ELD 7.22 Table 7: "Edited or entered by the Driver"
+        NON_DRIVER(3),              // ELD 7.22 Table 7: "Edit requested by an Authenticated User other than the Driver"
+        UNIDENTIFIED_DRIVER(4);     // ELD 7.22 Table 7: "Assumed from Unidentified Driver profile"
 
         private int mOriginCode;
 
