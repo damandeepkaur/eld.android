@@ -1,7 +1,5 @@
 package com.bsmwireless.screens.logs;
 
-import android.util.Log;
-
 import com.bsmwireless.common.Constants;
 import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.common.utils.DateUtils;
@@ -101,7 +99,7 @@ public class LogsPresenter {
         updateEventForDay(calendarItem.getCalendar());
     }
 
-    private void updateEventForDay(Calendar calendar) {
+    public void updateEventForDay(Calendar calendar) {
         long startDayTime = DateUtils.getStartDate(mTimeZone, calendar.get(Calendar.DAY_OF_MONTH),
                 calendar.get(Calendar.MONTH), calendar.get(Calendar.YEAR));
         long endDayTime = startDayTime + ONE_DAY_MS;
@@ -122,7 +120,9 @@ public class LogsPresenter {
                         logs.add(new EventLogModel(prevEvent, mTimeZone));
 
 
-                        for (ELDEvent event : eldEvents) {
+                        for (int i = 1; i < eldEvents.size(); i++) {
+                            ELDEvent event = eldEvents.get(i);
+
                             EventLogModel log = new EventLogModel(event, mTimeZone);
 
                             if (mVehicleIdToNameMap.containsKey(event.getVehicleId())) {
@@ -229,19 +229,47 @@ public class LogsPresenter {
     public void onSignLogsheetButtonClicked() {
     }
 
-    public void onEditEventClicked(ELDEvent event) {
+    public void onEditEventClicked(EventLogModel event) {
         mView.goToEditEventScreen(event);
     }
 
-    public void onRemovedEventClicked(ELDEvent event) {
+    public void onRemovedEventClicked(EventLogModel event) {
     }
 
-    public void onAddEventClicked() {
-        mView.goToAddEventScreen();
+    public void onAddEventClicked(CalendarItem day) {
+        mView.goToAddEventScreen(day);
     }
 
     public void onEditTripInfoClicked() {
         mView.goToEditTripInfoScreen();
+    }
+
+    public void onEventAdded(ELDEvent newEvent) {
+        Disposable disposable = mELDEventsInteractor.postNewELDEvents(new ArrayList<ELDEvent>() {{ add(newEvent); }})
+                                                    .subscribeOn(Schedulers.io())
+                                                    .observeOn(AndroidSchedulers.mainThread())
+                                                    .subscribe(isUpdated -> {
+                                                        if (isUpdated) {
+                                                            mView.eventAdded();
+                                                        } else {
+                                                            mView.showError(LogsView.Error.ERROR_ADD_EVENT);
+                                                        }
+                                                    }, throwable -> mView.showError(throwable));
+        mDisposables.add(disposable);
+    }
+
+    public void onEventChanged(ELDEvent updatedEvent) {
+        Disposable disposable = mELDEventsInteractor.updateELDEvents(new ArrayList<ELDEvent>() {{ add(updatedEvent); }})
+                                                    .subscribeOn(Schedulers.io())
+                                                    .observeOn(AndroidSchedulers.mainThread())
+                                                    .subscribe(isUpdated -> {
+                                                        if (isUpdated) {
+                                                            mView.eventUpdated();
+                                                        } else {
+                                                            mView.showError(LogsView.Error.ERROR_UPDATE_EVENT);
+                                                        }
+                                                    }, throwable -> mView.showError(throwable));
+        mDisposables.add(disposable);
     }
 
     public void onDestroy() {
