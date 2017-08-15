@@ -824,13 +824,6 @@ public class LoginUserInteractorTest {
     // TODO: test co-drivers number once getCoDriversNumber is implemented
 
 
-    // TODO: add tests for updateDBUser
-    // TODO: add tests for updateUserOnServer
-    // TODO: add tests for getUserName
-    // TODO: add tests for getFullName
-    // TODO: add tests for getCoDriversNumber after implemented
-
-
     /**
      * Verify PreferencesManager and TokenManager workflow in getter.
      */
@@ -848,11 +841,11 @@ public class LoginUserInteractorTest {
 
 
     // TODO: add tests for getUser
+    // TODO: add tests for getFullUser
     // TODO: add tests for isLoginActive
     // TODO: add tests for getDriverId
     // TODO: add tests for getTimezone
     // TODO: add tests for isRememberMeEnabled
-
 
 
     /**
