@@ -6,10 +6,6 @@ import java.io.IOException;
 
 import io.reactivex.Observable;
 
-/**
- * Created by osminin on 10.08.2017.
- */
-
 public interface BlackBox {
     void connect(int boxId) throws Exception;
 

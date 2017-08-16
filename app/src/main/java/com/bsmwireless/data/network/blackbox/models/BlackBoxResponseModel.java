@@ -2,10 +2,6 @@ package com.bsmwireless.data.network.blackbox.models;
 
 import com.bsmwireless.models.BlackBoxModel;
 
-/**
- * Created by osminin on 14.08.2017.
- */
-
 public class BlackBoxResponseModel {
 
     private ResponseType mResponseType = ResponseType.None;

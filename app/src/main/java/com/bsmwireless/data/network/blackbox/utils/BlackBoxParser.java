@@ -12,10 +12,6 @@ import java.util.TimeZone;
 
 import timber.log.Timber;
 
-/**
- * Created by osminin on 14.08.2017.
- */
-
 public class BlackBoxParser {
     public static final int START_INDEX = 11;
     //  2 start bytes, 1 checksum, 2 length, 1 command, 1 packetId,  4 boxid, 2 year, 1 month, 1 day, 1 hour, 1 minute, 1 sec, 2 millisecond, 1 GPS, 1 update rate.
@@ -24,7 +20,7 @@ public class BlackBoxParser {
     private static final byte START_MESSAGE_INDICATOR = (byte) '@';
     private static final byte START_PACKET_INDICATOR = (byte) 0xFF;
     private static final byte DEVICE_TYPE = (byte) Constants.DEVICE_TYPE.charAt(0);  // Representing 'A' for the device type Android
-    private static final int HEADER_LENGTH = 6;
+    public static final int HEADER_LENGTH = 6;
     private static final int GPS_DATA = 1;
     private static final int NO_GPS_DATA = 0;
     private static final int CHECK_SUM_INDX = 8;
@@ -97,7 +93,12 @@ public class BlackBoxParser {
 
             //TODO: process sensor state
             // sensor state 24-26 3 byte
-            int sensorState = ConnectionUtils.byteToUnsignedInt(new byte[]{data[index++], data[index++], data[index++]});
+            int sensorState = ByteBuffer.wrap(new byte[]{0,
+                    data[index++],
+                    data[index++],
+                    data[index++]})
+                    .order(java.nio.ByteOrder.LITTLE_ENDIAN).getInt();
+            boxData.setSensorState(sensorState);
             // sensor change mask 27-29 3 byte
             int sensorMask = ConnectionUtils.byteToUnsignedInt(new byte[]{data[index++], data[index++], data[index++]});
             //latitude at 30-33
@@ -128,7 +129,6 @@ public class BlackBoxParser {
             System.arraycopy(data, index, TERTArr, 0, 4);
             boxData.setTERT(ByteBuffer.wrap(TERTArr).order(java.nio.ByteOrder.LITTLE_ENDIAN).getInt());
             index += 4;
-            Timber.i("Box Model processed:" + boxData.toString());
             // TD Messages in queue
             boxData.setTDMsgQueue((data[index] & 0XFF));
         }

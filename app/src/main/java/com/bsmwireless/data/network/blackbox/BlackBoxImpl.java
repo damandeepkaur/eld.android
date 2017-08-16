@@ -16,16 +16,16 @@ import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
 import timber.log.Timber;
 
-/**
- * Created by osminin on 10.08.2017.
- */
+import static com.bsmwireless.data.network.blackbox.models.BlackBoxResponseModel.NackReasonCode.Unknown_Error;
+import static com.bsmwireless.data.network.blackbox.utils.BlackBoxParser.HEADER_LENGTH;
+import static com.bsmwireless.data.network.blackbox.utils.BlackBoxParser.START_INDEX;
 
 public final class BlackBoxImpl implements BlackBox {
     private static final String WIFI_GATEWAY_IP = "192.168.1.1";
     private static final int WIFI_REMOTE_PORT = 2880;
     private static final int RETRY_CONNECT_DELAY = 3000;
     private static final int RETRY_COUNT = 5;
-    public static final int BUFFER_SIZE = 512;
+    public static final int BUFFER_SIZE = 64;
     public static final int UPDATE_RATE_MILLIS = 10000;
     public static final int TIMEOUT_RATIO = 5;
 
@@ -41,7 +41,7 @@ public final class BlackBoxImpl implements BlackBox {
         if (!isConnected()) {
             mSocket = new Socket(WIFI_GATEWAY_IP, WIFI_REMOTE_PORT);
             mEmitter = BehaviorSubject.create();
-            mBoxId = boxId;
+            mBoxId = /*boxId;*/ 209926;
             mDisposable = Observable.interval(RETRY_CONNECT_DELAY, TimeUnit.MILLISECONDS)
                     .take(RETRY_COUNT)
                     .filter(this::initializeCommunication)
@@ -49,7 +49,7 @@ public final class BlackBoxImpl implements BlackBox {
                     .switchMap(unused -> startContinuousRead())
                     .timeout(UPDATE_RATE_MILLIS * TIMEOUT_RATIO,
                             TimeUnit.MILLISECONDS,
-                            Observable.error(new BlackBoxConnectionException()))
+                            Observable.error(new BlackBoxConnectionException(Unknown_Error)))
                     .doOnError(throwable -> {
                         Timber.e(throwable);
                         disconnect();
@@ -84,10 +84,18 @@ public final class BlackBoxImpl implements BlackBox {
     private boolean initializeCommunication(long retryIndex) throws Exception {
         Timber.d("initializeCommunication");
         if (retryIndex == RETRY_COUNT - 1) {
-            throw new BlackBoxConnectionException();
+            throw new BlackBoxConnectionException(Unknown_Error);
         }
         writeRawData(BlackBoxParser.generateSubscriptionRequest(getSequenceID(), mBoxId, UPDATE_RATE_MILLIS));
-        return readSubscriptionResponse();
+        BlackBoxResponseModel response = readSubscriptionResponse();
+        if (response.getResponseType() == BlackBoxResponseModel.ResponseType.Ack) {
+            Timber.d("readSubscriptionResponse ok");
+            return true;
+        } else if (response.getResponseType() == BlackBoxResponseModel.ResponseType.NAck){
+            Timber.e("readSubscriptionResponse error");
+            throw new BlackBoxConnectionException(response.getErrReasonCode());
+        }
+        return false;
     }
 
     private Observable<BlackBoxModel> startContinuousRead() {
@@ -98,39 +106,41 @@ public final class BlackBoxImpl implements BlackBox {
                 .map(unused -> mSocket.getInputStream())
                 .filter(stream -> stream.available() > 0)
                 .map(this::readRawData)
-                .map(bytes -> BlackBoxParser.parseVehicleStatus(bytes).getBoxData());
+                .map(bytes -> BlackBoxParser.parseVehicleStatus(bytes).getBoxData())
+                .distinctUntilChanged()
+                .doOnNext(model -> {
+                    Timber.v("Box Model processed:" + model.toString());
+                });
     }
 
     public byte getSequenceID() {
         return (mSequenceID & 0xFF) > 250 ? 1 : ++mSequenceID;
     }
 
-    private boolean readSubscriptionResponse() throws Exception {
+    private BlackBoxResponseModel readSubscriptionResponse() throws Exception {
         byte[] response;
         response = readRawData(mSocket.getInputStream());
+        BlackBoxResponseModel responseModel = null;
         if (response != null) {
-            BlackBoxResponseModel responseModel = BlackBoxParser.parseSubscription(response);
-            if (responseModel.getResponseType() == BlackBoxResponseModel.ResponseType.Ack) {
-                Timber.d("readSubscriptionResponse ok");
-                return true;
-            } else {
-                Timber.e("readSubscriptionResponse error");
-                return false;
-            }
+            responseModel = BlackBoxParser.parseSubscription(response);
         }
-        return false;
+        return responseModel;
     }
 
     private byte[] readRawData(InputStream input) throws Exception {
-        int total = 0;
         byte[] response = new byte[BUFFER_SIZE];
         int available = input.available();
-        while (available > 0) {
-            byte[] buf = new byte[available];
-            int len = input.read(buf, 0, available);
-            System.arraycopy(buf, 0, response, total, len);
-            total += len;
-            available = input.available();
+        if (available > START_INDEX) {
+            byte[] buf = new byte[START_INDEX];
+            int len = input.read(buf, 0, START_INDEX);
+            System.arraycopy(buf, 0, response, 0, len);
+            BlackBoxResponseModel model = new BlackBoxResponseModel();
+            if (BlackBoxParser.parseHeader(response, model)) {
+                int packetLength = model.getLength();
+                buf = new byte[packetLength - START_INDEX + HEADER_LENGTH];
+                len = input.read(buf, 0, packetLength - START_INDEX + HEADER_LENGTH);
+                System.arraycopy(buf, 0, response, START_INDEX, len - HEADER_LENGTH);
+            }
         }
         return response;
     }

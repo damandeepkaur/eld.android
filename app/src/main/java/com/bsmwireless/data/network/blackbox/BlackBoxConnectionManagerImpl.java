@@ -7,10 +7,6 @@ import javax.inject.Inject;
 import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
 
-/**
- * Created by osminin on 10.08.2017.
- */
-
 public class BlackBoxConnectionManagerImpl implements BlackBoxConnectionManager {
 
     private BlackBox mBlackBox;

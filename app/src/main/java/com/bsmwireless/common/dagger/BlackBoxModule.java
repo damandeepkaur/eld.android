@@ -10,10 +10,6 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 
-/**
- * Created by osminin on 10.08.2017.
- */
-
 @Module
 public class BlackBoxModule {
 

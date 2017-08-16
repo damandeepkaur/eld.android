@@ -1,8 +1,16 @@
 package com.bsmwireless.data.network.blackbox;
 
-/**
- * Created by osminin on 15.08.2017.
- */
+import com.bsmwireless.data.network.blackbox.models.BlackBoxResponseModel;
 
 public final class BlackBoxConnectionException extends RuntimeException {
+
+    final BlackBoxResponseModel.NackReasonCode mReasonCode;
+
+    public BlackBoxConnectionException(BlackBoxResponseModel.NackReasonCode reasonCode) {
+        mReasonCode = reasonCode;
+    }
+
+    public BlackBoxResponseModel.NackReasonCode getReasonCode() {
+        return mReasonCode;
+    }
 }

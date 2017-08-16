@@ -60,36 +60,4 @@ public class ConnectionUtils {
         }
         return sum;
     }
-
-    /**
-     * Util function to check if a bit is set or not, which represent a vehicle state in the protocol
-     *
-     * @param sensorArr bytearray of sensor bits
-     * @param sensorbit bit position to read from the array
-     * @return true for bit 1 and false for bit 0
-     */
-    public static boolean checkSensorState(byte[] sensorArr, int sensorbit) {
-        byte[] sensorLSB = new byte[sensorArr.length];
-        // Find the byte position in the array
-        int bytePosition = sensorbit / 8;
-        // Find the bit position in that byte
-        int bitPosition = sensorbit % 8;
-        byte srcByte = sensorArr[bytePosition];
-        // Shift to the bit position and add 1
-        int valInt = srcByte >> (bitPosition) & 0x001;
-        return valInt == 1;
-    }
-
-    /**
-     * Util function to convert Date to formatted string
-     *
-     * @param date Given a UTC date
-     * @return return a date string in "yyyy-MM-dd HH:mm:ss" format
-     */
-    public static String formattedDateUTC(Date date) {
-        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
-        return formatter.format(date);
-    }
-
 }

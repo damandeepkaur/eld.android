@@ -6,10 +6,6 @@ import io.reactivex.Observable;
 
 import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
 
-/**
- * Created by osminin on 10.08.2017.
- */
-
 public interface BlackBoxConnectionManager {
 
     Observable<BlackBoxConnectionManager> connectBlackBox(int boxId);

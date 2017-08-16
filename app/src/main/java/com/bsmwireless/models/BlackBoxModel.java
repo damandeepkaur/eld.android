@@ -15,12 +15,14 @@ public class BlackBoxModel {
     private double mLon;
     private int mSpeed;
     private int mHeading;
-    public int mTERT;
-    public BlackBoxResponseModel.ResponseType mResponseType;
-    public Date mEvenTimeUTC;
-    public int mSequenceNum;
-    public long mBoxId;
-    public int mTDMsgQueue;
+    private int mTERT;
+    private BlackBoxResponseModel.ResponseType mResponseType;
+    private Date mEvenTimeUTC;
+    private int mSequenceNum;
+    private long mBoxId;
+    private int mTDMsgQueue;
+    private int mSensorState;
+
 
     private int mEngineHours;
 
@@ -120,6 +122,13 @@ public class BlackBoxModel {
         this.mTDMsgQueue = TDMsgQueue;
     }
 
+    public boolean getSensorState(BlackBoxSensorState state) {
+        return (mSensorState & state.getMask()) == 0 ? false : true;
+    }
+
+    public void setSensorState(int sensorState) {
+        mSensorState = sensorState;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -142,6 +151,7 @@ public class BlackBoxModel {
                 .append(mSequenceNum, that.mSequenceNum)
                 .append(mBoxId, that.mBoxId)
                 .append(mTDMsgQueue, that.mTDMsgQueue)
+                .append(mSensorState, that.mSensorState)
                 .isEquals();
     }
 
@@ -161,6 +171,7 @@ public class BlackBoxModel {
                 .append(mSequenceNum)
                 .append(mBoxId)
                 .append(mTDMsgQueue)
+                .append(mSensorState)
                 .toHashCode();
     }
 
@@ -179,6 +190,7 @@ public class BlackBoxModel {
         sb.append(", mSequenceNum=").append(mSequenceNum);
         sb.append(", mBoxId=").append(mBoxId);
         sb.append(", mTDMsgQueue=").append(mTDMsgQueue);
+        sb.append(", mSensorState=").append(mSensorState);
         sb.append('}');
         return sb.toString();
     }
