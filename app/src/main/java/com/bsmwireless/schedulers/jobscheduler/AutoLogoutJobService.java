@@ -4,7 +4,6 @@ import android.annotation.TargetApi;
 import android.app.job.JobParameters;
 import android.app.job.JobService;
 import android.content.Intent;
-import android.util.Log;
 
 import com.bsmwireless.common.App;
 import com.bsmwireless.screens.autologout.AutoLogoutActivity;

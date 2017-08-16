@@ -3,7 +3,6 @@ package com.bsmwireless.screens.autologout;
 
 import android.annotation.TargetApi;
 import android.os.Build;
-import android.util.Log;
 
 import com.bsmwireless.common.utils.SchedulerUtils;
 import com.bsmwireless.domain.interactors.LoginUserInteractor;
