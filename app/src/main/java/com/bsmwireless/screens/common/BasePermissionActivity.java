@@ -40,7 +40,7 @@ public abstract class BasePermissionActivity extends BaseActivity {
         }
     }
 
-    private boolean hasAllPermissions(String[] perms) {
+    protected boolean hasAllPermissions(String[] perms) {
         for (String perm : perms) {
             if (!hasPermission(perm)) {
                 return(false);

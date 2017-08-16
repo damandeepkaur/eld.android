@@ -41,7 +41,7 @@ public final class BlackBoxImpl implements BlackBox {
         if (!isConnected()) {
             mSocket = new Socket(WIFI_GATEWAY_IP, WIFI_REMOTE_PORT);
             mEmitter = BehaviorSubject.create();
-            mBoxId = /*boxId;*/ 209926;
+            mBoxId = boxId;
             mDisposable = Observable.interval(RETRY_CONNECT_DELAY, TimeUnit.MILLISECONDS)
                     .take(RETRY_COUNT)
                     .filter(this::initializeCommunication)

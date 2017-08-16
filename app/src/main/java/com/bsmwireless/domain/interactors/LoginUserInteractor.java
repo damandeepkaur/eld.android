@@ -5,8 +5,8 @@ import com.bsmwireless.data.network.authenticator.TokenManager;
 import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.data.storage.carriers.CarrierConverter;
-import com.bsmwireless.data.storage.users.FullUserEntity;
 import com.bsmwireless.data.storage.hometerminals.HomeTerminalConverter;
+import com.bsmwireless.data.storage.users.FullUserEntity;
 import com.bsmwireless.data.storage.users.UserConverter;
 import com.bsmwireless.data.storage.users.UserEntity;
 import com.bsmwireless.models.DriverHomeTerminal;
@@ -25,10 +25,6 @@ import javax.inject.Inject;
 
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.annotations.NonNull;
-import retrofit2.http.HEAD;
 
 import static com.bsmwireless.common.Constants.SUCCESS;
 import static com.bsmwireless.models.ELDEvent.EventType.LOGIN_LOGOUT;
@@ -92,7 +88,7 @@ public class LoginUserInteractor {
         ELDEvent logoutEvent = new ELDEvent();
         int driverId = getDriverId();
         logoutEvent.setStatus(ELDEvent.StatusCode.ACTIVE.getValue());
-        logoutEvent.setOrigin(ELDEvent.EventOrigin.MANUAL_ENTER.getValue());
+        logoutEvent.setOrigin(ELDEvent.EventOrigin.DRIVER.getValue());
         logoutEvent.setEventType(LOGIN_LOGOUT.getValue());
         logoutEvent.setEventCode(ELDEvent.LoginLogoutCode.LOGOUT.getValue());
         logoutEvent.setEventTime(System.currentTimeMillis());
@@ -127,34 +123,34 @@ public class LoginUserInteractor {
     public Observable<Boolean> syncDriverProfile(User user) {
         UserEntity userEntity = UserConverter.toEntity(user);
         return Observable.fromCallable(() -> mAppDatabase.userDao().insertUser(userEntity))
-                         .map(userId -> userId > 0)
-                         .flatMap(userInserted -> {
-                             if (userInserted) {
-                                 return mServiceApi.updateDriverProfile(new DriverProfileModel(userEntity));
-                             }
-                             return Observable.just(new ResponseMessage(""));
-                         })
-                         .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
+                .map(userId -> userId > 0)
+                .flatMap(userInserted -> {
+                    if (userInserted) {
+                        return mServiceApi.updateDriverProfile(new DriverProfileModel(userEntity));
+                    }
+                    return Observable.just(new ResponseMessage(""));
+                })
+                .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
     }
 
     public Observable<Boolean> updateDriverPassword(String oldPassword, String newPassword) {
         return mServiceApi.updateDriverPassword(getPasswordModel(oldPassword, newPassword))
-                          .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
+                .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
     }
 
     public Observable<Boolean> updateDriverSignature(String signature) {
         return mServiceApi.updateDriverSignature(getDriverSignature(signature))
-                          .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
+                .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
     }
 
     public Observable<Boolean> updateDriverRule(String ruleException) {
         return mServiceApi.updateDriverRule(getRuleSelectionModel(ruleException))
-                          .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
+                .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
     }
 
     public Observable<Boolean> updateDriverHomeTerminal(Integer homeTerminalId) {
         return mServiceApi.updateDriverHomeTerminal(getHomeTerminal(homeTerminalId))
-                          .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
+                .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
     }
 
     public String getUserName() {
