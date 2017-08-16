@@ -14,7 +14,6 @@ public class AutoLogoutJobService extends JobService {
 
     @Override
     public boolean onStartJob(JobParameters params) {
-        Log.d("JobScheduler", "onStartJob");
         Intent dialogIntent = new Intent(App.getComponent().context(), AutoLogoutActivity.class);
         dialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         App.getComponent().context().startActivity(dialogIntent);

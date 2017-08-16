@@ -43,7 +43,6 @@ public class AutoLogoutPresenter {
     }
 
     public void initAutoLogout() {
-        Log.d("JobScheduler", "initAutoLogout");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             initJobSchedulerAutoLogout();
         } else {
