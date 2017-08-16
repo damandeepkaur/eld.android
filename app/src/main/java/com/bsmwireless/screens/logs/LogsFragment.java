@@ -166,7 +166,7 @@ public class LogsFragment extends BaseFragment implements LogsView {
         //TODO: show message
         Toast.makeText(mContext, "Event added.", Toast.LENGTH_SHORT).show();
         CalendarItem item = mAdapter.getCurrentItem();
-        mPresenter.updateEventForDay(item.getCalendar());
+        mPresenter.setEventsForDay(item.getCalendar());
     }
 
     @Override
@@ -174,7 +174,7 @@ public class LogsFragment extends BaseFragment implements LogsView {
         //TODO: show message
         Toast.makeText(mContext, "Event updated.", Toast.LENGTH_SHORT).show();
         CalendarItem item = mAdapter.getCurrentItem();
-        mPresenter.updateEventForDay(item.getCalendar());
+        mPresenter.setEventsForDay(item.getCalendar());
     }
 
     @Override

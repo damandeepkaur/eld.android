@@ -83,7 +83,10 @@ public class ELDEventsInteractor {
     public Observable<Boolean> postNewELDEvents(List<ELDEvent> events) {
         if (NetworkUtils.isOnlineMode()) {
             return mServiceApi.postNewELDEvents(events)
-                    .doOnError(throwable -> events.forEach(event -> storeEvent(event, false)))
+                    .doOnError(throwable -> {
+                        //TODO: we should store event only in offline mode or server unavailability
+                        //events.forEach(event -> storeEvent(event, false));
+                    })
                     .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
         } else {
             storeEvents(events, false);

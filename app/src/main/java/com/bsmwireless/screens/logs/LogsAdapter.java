@@ -2,6 +2,7 @@ package com.bsmwireless.screens.logs;
 
 import android.content.Context;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearSmoothScroller;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
@@ -40,13 +41,13 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
 
     //header + logs + trip info titles
     private final int MIN_LIST_SIZE = 3;
-
+    private final AlertDialog mSignDialog;
     private LogsTitleView mEventsTitleView;
     private LogsTitleView mTripInfoTitleView;
     private CalendarLayout mCalendarLayout;
     private GraphLayout mGraphLayout;
-    private View mSignLogsheet;
-
+    private TextView mSignLogsheet;
+    private View mSigned;
     private List<EventLogModel> mEventLogs = new ArrayList<>();
     private TripInfoModel mTripInfo = new TripInfoModel();
     private List<LogSheetHeader> mLogHeaders = new ArrayList<>();
@@ -58,9 +59,11 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
     private OnLogsTitleStateChangeListener mOnLogsTitleStateChangeListener;
     private DutyColors mDutyColors;
     private String mNoAddressLabel;
+    private LayoutInflater mLayoutInflater;
 
 
-    public LogsAdapter(Context context, LogsPresenter presenter, OnLogsTitleStateChangeListener snackBarClickListener) {
+    public LogsAdapter(Context context, LogsPresenter presenter,
+                       OnLogsTitleStateChangeListener snackBarClickListener) {
         mContext = context;
         mPresenter = presenter;
         mOnLogsTitleStateChangeListener = snackBarClickListener;
@@ -79,6 +82,21 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
 
         mDutyColors = new DutyColors(mContext);
         mNoAddressLabel = mContext.getResources().getString(R.string.no_address_available);
+        mLayoutInflater = LayoutInflater.from(mContext);
+        mSignDialog = createDialog();
+    }
+
+    private AlertDialog createDialog() {
+        View alertView = mLayoutInflater.inflate(R.layout.sign_dialog_view, null);
+        AlertDialog signDialog = new AlertDialog.Builder(mContext)
+                .setTitle(R.string.sign_dialog_title)
+                .setPositiveButton(R.string.accept,
+                        (dialog, whichButton) -> mPresenter.onSignLogsheetButtonClicked(
+                                mCalendarLayout.getSelectedCalendarItem()))
+                .setNegativeButton(R.string.decline, null)
+                .create();
+        signDialog.setView(alertView);
+        return signDialog;
     }
 
     public void setEventLogs(List<EventLogModel> eventLogs) {
@@ -104,24 +122,46 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
         mLogHeaders = logHeaders;
         if (mCalendarLayout != null) {
             mCalendarLayout.setLogs(logHeaders);
+            updateSignButton();
         }
         notifyDataSetChanged();
     }
 
+    private void updateSignButton() {
+        CalendarItem calendarItem = mCalendarLayout.getSelectedCalendarItem();
+        LogSheetHeader logSheetHeader = calendarItem.getAssociatedLogSheet();
+        if (logSheetHeader != null) {
+            if (logSheetHeader.getSigned() == (Boolean) true) {
+                mSignLogsheet.setVisibility(View.GONE);
+                mSigned.setVisibility(View.VISIBLE);
+            } else {
+                mSignLogsheet.setVisibility(View.VISIBLE);
+                mSigned.setVisibility(View.GONE);
+            }
+        } else {
+            mSignLogsheet.setVisibility(View.VISIBLE);
+            mSigned.setVisibility(View.GONE);
+        }
+    }
+
     @Override
     public LogsHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        LayoutInflater layoutInflater = LayoutInflater.from(mContext);
         View view;
         switch (viewType) {
             case VIEW_TYPE_HEADER:
-                view = layoutInflater.inflate(R.layout.logs_list_item_header, parent, false);
-
-                mSignLogsheet = view.findViewById(R.id.sign_logsheet);
-                mSignLogsheet.setOnClickListener(v -> mPresenter.onSignLogsheetButtonClicked());
+                view = mLayoutInflater.inflate(R.layout.logs_list_item_header, parent, false);
 
                 mCalendarLayout = (CalendarLayout) view.findViewById(R.id.calendar);
                 mCalendarLayout.setLogs(mLogHeaders);
-                mCalendarLayout.setOnItemSelectedListener(calendarItem -> mPresenter.onCalendarDaySelected(calendarItem));
+                mCalendarLayout.setOnItemSelectedListener(calendarItem -> {
+                    updateSignButton();
+                    mPresenter.onCalendarDaySelected(calendarItem);
+                });
+
+                mSignLogsheet = (TextView) view.findViewById(R.id.sign_logsheet);
+                mSigned = view.findViewById(R.id.signed);
+
+                mSignLogsheet.setOnClickListener(v -> mSignDialog.show());
 
                 mGraphLayout = (GraphLayout) view.findViewById(R.id.graphic);
                 mGraphLayout.setELDEvents(mEventLogs, mTripInfo.getStartDayTime());
@@ -134,7 +174,7 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
                 view = mEventsTitleView;
                 break;
             case VIEW_TYPE_EVENTS_ITEM:
-                view = layoutInflater.inflate(R.layout.logs_list_item_eld_event, parent, false);
+                view = mLayoutInflater.inflate(R.layout.logs_list_item_eld_event, parent, false);
                 break;
             case VIEW_TYPE_TRIP_INFO_TITLE:
                 mTripInfoTitleView = new LogsTitleView(mContext);
@@ -143,7 +183,7 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
                 view = mTripInfoTitleView;
                 break;
             default:
-                view = layoutInflater.inflate(R.layout.logs_list_item_trip_info, parent, false);
+                view = mLayoutInflater.inflate(R.layout.logs_list_item_trip_info, parent, false);
                 break;
         }
         return new LogsHolder(view, viewType);

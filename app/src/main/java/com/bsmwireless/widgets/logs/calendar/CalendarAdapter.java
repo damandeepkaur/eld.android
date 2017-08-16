@@ -20,6 +20,11 @@ import butterknife.ButterKnife;
 
 public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.ViewHolder> {
 
+    private final int mNastyGreenColor;
+    private final int mBlackColor;
+    private final int mGrayColor;
+
+
     private Context mContext;
 
     private List<CalendarItem> mItems;
@@ -32,6 +37,11 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.ViewHo
         mItems = items;
         mContext = context;
         mOnClickListener = onClickListener;
+
+        //colors
+        mNastyGreenColor = ContextCompat.getColor(mContext, R.color.nasty_green);
+        mBlackColor = ContextCompat.getColor(mContext, android.R.color.black);
+        mGrayColor = ContextCompat.getColor(mContext, R.color.secondary_text);
     }
 
     @Override
@@ -54,16 +64,16 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.ViewHo
 
         if (associatedLog != null) {
             if (associatedLog.getSigned() == (Boolean) true) {
-                holder.mDayOfMonthTV.setTextColor(ContextCompat.getColor(mContext, R.color.nasty_green));
+                holder.mDayOfMonthTV.setTextColor(mNastyGreenColor);
                 holder.mDayOfMonthTV.setTypeface(null, Typeface.BOLD);
             } else {
-                holder.mDayOfMonthTV.setTextColor(ContextCompat.getColor(mContext, android.R.color.black));
+                holder.mDayOfMonthTV.setTextColor(mBlackColor);
                 holder.mDayOfMonthTV.setTypeface(null, Typeface.NORMAL);
             }
-            holder.mDayOfWeekTV.setTextColor(ContextCompat.getColor(mContext, R.color.secondary_text));
+            holder.mDayOfWeekTV.setTextColor(mGrayColor);
         } else {
-            holder.mDayOfMonthTV.setTextColor(ContextCompat.getColor(mContext, R.color.disabled_calendar_item_day));
-            holder.mDayOfWeekTV.setTextColor(ContextCompat.getColor(mContext, R.color.disabled_calendar_item_week));
+            holder.mDayOfMonthTV.setTextColor(mBlackColor);
+            holder.mDayOfWeekTV.setTextColor(mGrayColor);
             holder.mDayOfMonthTV.setTypeface(null, Typeface.NORMAL);
         }
     }
@@ -80,6 +90,10 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.ViewHo
             notifyItemChanged(prevPosition);
             notifyItemChanged(mSelectedPosition);
         }
+    }
+
+    public CalendarItem getSelectedCalendarItem() {
+        return getItemByPosition(mSelectedPosition);
     }
 
     public void updateLogs(List<LogSheetHeader> logs) {
