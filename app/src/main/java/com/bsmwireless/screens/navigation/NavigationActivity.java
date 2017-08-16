@@ -60,6 +60,9 @@ public class NavigationActivity extends BaseMenuActivity implements OnNavigation
     @BindView(R.id.navigation_snackbar)
     SnackBarLayout mSnackBarLayout;
 
+    @BindView(R.id.navigation_snackbar_error)
+    SnackBarLayout mErrorSnackBarLayout;
+
     @Inject
     NavigationPresenter mPresenter;
 
@@ -219,6 +222,10 @@ public class NavigationActivity extends BaseMenuActivity implements OnNavigation
         return mSnackBarLayout;
     }
 
+    public SnackBarLayout getErrorSnackBar() {
+        return mErrorSnackBarLayout;
+    }
+
     @Override
     protected void onDestroy() {
         mViewPager.removeOnPageChangeListener(this);
@@ -252,6 +259,7 @@ public class NavigationActivity extends BaseMenuActivity implements OnNavigation
     @Override
     public void onPageSelected(int position) {
         mSnackBarLayout.hideSnackbar();
+        mErrorSnackBarLayout.hideSnackbar();
     }
 
     @Override

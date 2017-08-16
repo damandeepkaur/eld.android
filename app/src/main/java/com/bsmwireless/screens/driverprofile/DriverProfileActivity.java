@@ -238,27 +238,15 @@ public class DriverProfileActivity extends BaseMenuActivity implements DriverPro
         mSnackBarLayout.setPositiveLabel(getString(R.string.ok), v -> mPresenter.onSaveSignatureClicked(mSignatureLayout.getImageData()))
                        .setNegativeLabel(getString(R.string.clear), v -> mSignatureLayout.clear())
                        .setHideableOnFocusLost(true)
-                       .setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
-                            @Override
-                            public void onStateChanged(@NonNull View bottomSheet, int newState) {
-                                switch (newState) {
-                                    case STATE_HIDDEN: {
-                                        mSignatureLayout.setEditable(false);
-                                        break;
-                                    }
-                                    case STATE_EXPANDED: {
-                                        mSignatureLayout.setEditable(true);
-                                        break;
-                                    }
-                                    default: {
-                                        break;
-                                    }
-                                }
-                            }
+                       .setOnCloseListener(new SnackBarLayout.OnCloseListener() {
+                           @Override
+                           public void onClose(SnackBarLayout snackBar) {
+                               mSignatureLayout.setEditable(false);
+                           }
 
                            @Override
-                           public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-
+                           public void onOpen(SnackBarLayout snackBar) {
+                               mSignatureLayout.setEditable(true);
                            }
                        });
     }

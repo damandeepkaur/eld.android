@@ -11,4 +11,5 @@ public interface NavigateView {
     void setAssetsNumber(int assetsNum);
 
     SnackBarLayout getSnackBar();
+    SnackBarLayout getErrorSnackBar();
 }
