@@ -11,7 +11,5 @@ public interface SettingsView {
 
     void setFixedAmountSwitchEnabled(boolean isEnabled);
 
-    void showPopupMenu();
-
-    void showOdometerUnits(OdometerUnits odometerUnits);
+    void checkOdometerUnit(OdometerUnits odometerUnits);
 }

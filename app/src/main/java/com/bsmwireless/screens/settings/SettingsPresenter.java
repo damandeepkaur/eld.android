@@ -29,7 +29,7 @@ public class SettingsPresenter {
         mView.setFixedAmountSwitchEnabled(mSettingsInteractor.isFixedAmountEnabled());
 
         // set current selected value for odometer units
-        mView.showOdometerUnits(loadLastSelectedOdometerUnit());
+        mView.checkOdometerUnit(loadLastSelectedOdometerUnit());
     }
 
     public void onBoxGPSSwitchChecked(boolean isBoxGPSEnabled) {
@@ -42,9 +42,9 @@ public class SettingsPresenter {
 
     public void onKMOdometerUnitsSelected(boolean isKMOdometerUnitsSelected) {
         if (isKMOdometerUnitsSelected) {
-            mView.showOdometerUnits(SettingsView.OdometerUnits.ODOMETER_UNITS_KM);
+            mView.checkOdometerUnit(SettingsView.OdometerUnits.ODOMETER_UNITS_KM);
         } else {
-            mView.showOdometerUnits(SettingsView.OdometerUnits.ODOMETER_UNITS_MI);
+            mView.checkOdometerUnit(SettingsView.OdometerUnits.ODOMETER_UNITS_MI);
         }
 
         mSettingsInteractor.saveKMOdometerUnitsSelected(isKMOdometerUnitsSelected);

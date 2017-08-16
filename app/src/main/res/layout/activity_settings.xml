@@ -107,17 +107,29 @@
         android:textSize="@dimen/text_size"
         android:textStyle="normal"/>
 
-    <TextView
-        android:id="@+id/lbl_odometer_units_value"
+    <RadioGroup
+        android:id="@+id/radio_group_odometer_units"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_below="@id/lbl_odometer_units"
+        android:layout_below="@+id/lbl_odometer_units"
         android:layout_marginLeft="@dimen/default_margin"
-        android:lineSpacingExtra="@dimen/text_view_line_spacing_extra_smaller"
-        android:textColor="@color/secondary_text"
-        android:textSize="@dimen/text_size_small"
-        android:textStyle="normal"/>
+        android:layout_marginTop="@dimen/default_margin"
+        android:orientation="vertical">
+
+        <android.support.v7.widget.AppCompatRadioButton
+            android:id="@+id/kilometers_units_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/settings_kilometers_title"/>
+
+        <android.support.v7.widget.AppCompatRadioButton
+            android:id="@+id/miles_units_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/settings_miles_title"/>
+
+    </RadioGroup>
 
 </RelativeLayout>
