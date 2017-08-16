@@ -119,13 +119,13 @@
         android:orientation="vertical">
 
         <android.support.v7.widget.AppCompatRadioButton
-            android:id="@+id/kilometers_units_button"
+            android:id="@+id/kilometers_unit_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/settings_kilometers_title"/>
 
         <android.support.v7.widget.AppCompatRadioButton
-            android:id="@+id/miles_units_button"
+            android:id="@+id/miles_unit_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/settings_miles_title"/>
