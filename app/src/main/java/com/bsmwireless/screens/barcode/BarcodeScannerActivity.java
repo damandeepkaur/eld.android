@@ -33,14 +33,20 @@ public class BarcodeScannerActivity extends BasePermissionActivity implements ZX
     }
 
     @Override
-    protected void onPermissionGranted() {
-        open(new BarcodeScannerFragment());
-    }
+    protected void onPermissionGranted() {}
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_barcode_scanner);
+    }
+
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+        if (hasAllPermissions(getDesiredPermissions())) {
+            open(new BarcodeScannerFragment());
+        }
     }
 
     @Override
