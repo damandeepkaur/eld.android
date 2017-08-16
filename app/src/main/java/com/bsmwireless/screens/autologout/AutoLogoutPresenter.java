@@ -3,6 +3,7 @@ package com.bsmwireless.screens.autologout;
 
 import android.annotation.TargetApi;
 import android.os.Build;
+import android.util.Log;
 
 import com.bsmwireless.common.utils.SchedulerUtils;
 import com.bsmwireless.domain.interactors.LoginUserInteractor;
@@ -32,7 +33,9 @@ public class AutoLogoutPresenter {
 
     public void rescheduleAutoLogout() {
         SchedulerUtils.cancel();
-        SchedulerUtils.schedule();
+        if (mLoginUserInteractor.isLoginActive()) {
+            SchedulerUtils.schedule();
+        }
     }
 
     public void initAutoLogoutIfNoUserInteraction() {
@@ -40,6 +43,7 @@ public class AutoLogoutPresenter {
     }
 
     public void initAutoLogout() {
+        Log.d("JobScheduler", "initAutoLogout");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             initJobSchedulerAutoLogout();
         } else {

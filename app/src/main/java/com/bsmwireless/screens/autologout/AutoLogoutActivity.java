@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 
 import com.bsmwireless.common.App;
 import com.bsmwireless.screens.autologout.dagger.AutoLogoutModule;
@@ -43,13 +44,17 @@ public class AutoLogoutActivity extends BaseActivity implements AutoLogoutView {
 
     @Override
     protected void onStop() {
+        if (App.isAppInBackground()) {
+            mHandler.removeCallbacks(mRunnable);
+        }
         super.onStop();
-        mHandler.removeCallbacks(mRunnable);
     }
 
     @Override
     protected void onDestroy() {
-        mAlertDialog.dismiss();
+        if (mAlertDialog != null) {
+            mAlertDialog.dismiss();
+        }
         mAutoLogoutPresenter.onDestroy();
         super.onDestroy();
     }
@@ -69,8 +74,12 @@ public class AutoLogoutActivity extends BaseActivity implements AutoLogoutView {
         builder.setCancelable(false);
         builder.setPositiveButton(R.string.auto_logout_positive_button_lbl_alert_dialog, (dialog, which) ->
                 mAutoLogoutPresenter.initAutoLogout());
-        builder.setNegativeButton(R.string.auto_logout_cancel_button_lbl_alert_dialog, (dialog, which) ->
-                mAutoLogoutPresenter.rescheduleAutoLogout());
+        builder.setNegativeButton(R.string.auto_logout_cancel_button_lbl_alert_dialog, (dialog, which) -> {
+                    mAlertDialog.dismiss();
+                    mAutoLogoutPresenter.rescheduleAutoLogout();
+                    finish();
+                });
+
         mAlertDialog = builder.create();
         mAlertDialog.show();
 

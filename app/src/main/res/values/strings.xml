@@ -447,7 +447,7 @@
     <string name="event_type_unknown_type">Unknown event type</string>
 
     <!-- Auto Logout Activity -->
-    <string name="auto_logout_message_alert_dialog">Auto Logout</string>
+    <string name="auto_logout_message_alert_dialog">Do you want to proceed with logout?</string>
     <string name="auto_logout_positive_button_lbl_alert_dialog">Logout</string>
     <string name="auto_logout_cancel_button_lbl_alert_dialog">Cancel</string>
 
