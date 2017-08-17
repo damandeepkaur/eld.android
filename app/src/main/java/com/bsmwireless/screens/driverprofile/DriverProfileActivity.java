@@ -131,6 +131,7 @@ public class DriverProfileActivity extends BaseMenuActivity implements DriverPro
     @Override
     protected void onDestroy() {
         mPresenter.onDestroy();
+        mSnackBarLayout.reset().hideSnackbar();
         super.onDestroy();
     }
 
