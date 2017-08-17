@@ -5,14 +5,11 @@ import android.accounts.NetworkErrorException;
 import com.bsmwireless.common.utils.NetworkUtils;
 import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.storage.AppDatabase;
-import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.data.storage.eldevents.ELDEventConverter;
 import com.bsmwireless.data.storage.eldevents.ELDEventDao;
 import com.bsmwireless.data.storage.eldevents.ELDEventEntity;
 import com.bsmwireless.models.ELDEvent;
-import com.bsmwireless.models.ELDUpdate;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -30,13 +27,11 @@ public class ELDEventsInteractor {
     private Disposable mSyncEventsDisposable;
 
     private ServiceApi mServiceApi;
-    private PreferencesManager mPreferencesManager;
     private ELDEventDao mELDEventDao;
 
     @Inject
-    public ELDEventsInteractor(ServiceApi serviceApi, PreferencesManager preferencesManager, AppDatabase appDatabase) {
+    public ELDEventsInteractor(ServiceApi serviceApi, AppDatabase appDatabase) {
         mServiceApi = serviceApi;
-        mPreferencesManager = preferencesManager;
         mELDEventDao = appDatabase.ELDEventDao();
     }
 
@@ -61,15 +56,17 @@ public class ELDEventsInteractor {
     public Observable<Boolean> updateELDEvents(List<ELDEvent> events) {
         if (NetworkUtils.isOnlineMode()) {
             return mServiceApi.updateELDEvents(events)
-                              .doOnError(throwable -> storeEvents(events, false))
-                              .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
+                    .doOnError(throwable -> storeEvents(events, false))
+                    .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
         } else {
-            storeEvents(events, false);
-            return Observable.error(new NetworkErrorException("No Internet Connection"));
+            return Observable.create(e -> {
+                storeEvents(events, false);
+                e.onError(new NetworkErrorException("No Internet Connection"));
+            });
         }
     }
 
-	public Observable<Boolean> postNewELDEvent(ELDEvent event) {
+    public Observable<Boolean> postNewELDEvent(ELDEvent event) {
         if (NetworkUtils.isOnlineMode()) {
             return mServiceApi.postNewELDEvent(event)
                     .doOnError(throwable -> storeEvent(event, false))
@@ -83,10 +80,7 @@ public class ELDEventsInteractor {
     public Observable<Boolean> postNewELDEvents(List<ELDEvent> events) {
         if (NetworkUtils.isOnlineMode()) {
             return mServiceApi.postNewELDEvents(events)
-                    .doOnError(throwable -> {
-                        //TODO: we should store event only in offline mode or server unavailability
-                        //events.forEach(event -> storeEvent(event, false));
-                    })
+                    .doOnError(throwable -> events.forEach(event -> storeEvent(event, false)))
                     .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
         } else {
             storeEvents(events, false);

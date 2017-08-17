@@ -102,10 +102,6 @@ public class CalendarLayout extends LinearLayout implements View.OnClickListener
         }
     }
 
-    public CalendarItem getSelectedCalendarItem() {
-        return mAdapter.getSelectedCalendarItem();
-    }
-
     private void onLeftClicked() {
         int firstPosition = mLayoutManager.findFirstVisibleItemPosition();
         int lastPosition = mLayoutManager.findLastVisibleItemPosition();

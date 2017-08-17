@@ -244,14 +244,17 @@ public class LogsPresenter {
 
     private void onSignLogsheet(LogSheetHeader logSheetHeader) {
         logSheetHeader.setSigned(true);
-        ELDEvent event = createSertEvent(logSheetHeader);
+        ELDEvent event = createCertEvent(logSheetHeader);
         mDisposables.add(mELDEventsInteractor.postNewELDEvent(event)
                 .subscribeOn(Schedulers.io())
                 .flatMap(isCreated -> mLogSheetInteractor.updateLogSheetHeader(logSheetHeader))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         response -> mView.setLogSheetHeaders(mLogSheetHeaders),
-                        error -> mView.showError(error)
+                        error -> {
+                            logSheetHeader.setSigned(false);
+                            mView.showError(error);
+                        }
                 ));
     }
 
@@ -310,8 +313,8 @@ public class LogsPresenter {
         Timber.d("DESTROYED");
     }
 
-    private ELDEvent createSertEvent(LogSheetHeader logSheetHeader) {
-        long sertDay = DateUtils.convertDayNumberToUnixMs(logSheetHeader.getLogDay());
+    private ELDEvent createCertEvent(LogSheetHeader logSheetHeader) {
+        long certDay = DateUtils.convertDayNumberToUnixMs(logSheetHeader.getLogDay());
         ELDEvent event = new ELDEvent();
         event.setStatus(ELDEvent.StatusCode.ACTIVE.getValue());
         event.setOrigin(ELDEvent.EventOrigin.DRIVER.getValue());
@@ -319,7 +322,7 @@ public class LogsPresenter {
         event.setEventCode(1);
         event.setDriverId(logSheetHeader.getDriverId());
         event.setVehicleId(logSheetHeader.getVehicleId());
-        event.setEventTime(sertDay);
+        event.setEventTime(certDay);
         event.setMobileTime(Calendar.getInstance().getTimeInMillis());
         event.setTimezone(mTimeZone);
         event.setBoxId(logSheetHeader.getBoxId());

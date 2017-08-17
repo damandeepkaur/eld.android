@@ -172,7 +172,7 @@ public class DriverProfileActivity extends BaseMenuActivity implements DriverPro
 
     @Override
     public void showError(Throwable error) {
-        // TODO: show notification to user
+        // TODO: showTitle notification to user
         Timber.e(error.getMessage());
         Toast.makeText(this, error.getMessage(), Toast.LENGTH_SHORT).show();
     }
@@ -213,7 +213,7 @@ public class DriverProfileActivity extends BaseMenuActivity implements DriverPro
 
     @Override
     public void showPasswordChanged() {
-        // TODO: show notification to user
+        // TODO: showTitle notification to user
         Toast.makeText(this, getString(R.string.driver_profile_password_changed), Toast.LENGTH_SHORT).show();
         setPasswordChangeError(null);
     }

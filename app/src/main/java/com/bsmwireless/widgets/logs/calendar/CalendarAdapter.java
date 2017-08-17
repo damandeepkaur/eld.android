@@ -62,38 +62,20 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.ViewHo
 
         LogSheetHeader associatedLog = item.getAssociatedLogSheet();
 
-        if (associatedLog != null) {
-            if (associatedLog.getSigned() == (Boolean) true) {
-                holder.mDayOfMonthTV.setTextColor(mNastyGreenColor);
-                holder.mDayOfMonthTV.setTypeface(null, Typeface.BOLD);
-            } else {
-                holder.mDayOfMonthTV.setTextColor(mBlackColor);
-                holder.mDayOfMonthTV.setTypeface(null, Typeface.NORMAL);
-            }
-            holder.mDayOfWeekTV.setTextColor(mGrayColor);
+        if (associatedLog != null && Boolean.TRUE.equals(associatedLog.getSigned())) {
+            holder.mDayOfMonthTV.setTextColor(mNastyGreenColor);
+            holder.mDayOfMonthTV.setTypeface(null, Typeface.BOLD);
         } else {
             holder.mDayOfMonthTV.setTextColor(mBlackColor);
-            holder.mDayOfWeekTV.setTextColor(mGrayColor);
             holder.mDayOfMonthTV.setTypeface(null, Typeface.NORMAL);
         }
+
+        holder.mDayOfWeekTV.setTextColor(mGrayColor);
     }
 
     @Override
     public int getItemCount() {
         return mItems != null ? mItems.size() : 0;
-    }
-
-    public void setSelectedItem(int position) {
-        if (mSelectedPosition != position) {
-            int prevPosition = mSelectedPosition;
-            mSelectedPosition = position;
-            notifyItemChanged(prevPosition);
-            notifyItemChanged(mSelectedPosition);
-        }
-    }
-
-    public CalendarItem getSelectedCalendarItem() {
-        return getItemByPosition(mSelectedPosition);
     }
 
     public void updateLogs(List<LogSheetHeader> logs) {
@@ -114,6 +96,15 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.ViewHo
 
     public CalendarItem getSelectedItem() {
         return mItems != null ? mItems.get(mSelectedPosition) : null;
+    }
+
+    public void setSelectedItem(int position) {
+        if (mSelectedPosition != position) {
+            int prevPosition = mSelectedPosition;
+            mSelectedPosition = position;
+            notifyItemChanged(prevPosition);
+            notifyItemChanged(mSelectedPosition);
+        }
     }
 
     private CalendarItem findItemByDate(Long date) {

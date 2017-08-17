@@ -2,7 +2,6 @@ package com.bsmwireless.screens.logs;
 
 import android.content.Context;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearSmoothScroller;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
@@ -41,7 +40,6 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
 
     //header + logs + trip info titles
     private final int MIN_LIST_SIZE = 3;
-    private final AlertDialog mSignDialog;
     private LogsTitleView mEventsTitleView;
     private LogsTitleView mTripInfoTitleView;
     private CalendarLayout mCalendarLayout;
@@ -56,17 +54,17 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
     private Context mContext;
     private LogsPresenter mPresenter;
     private RecyclerView mRecyclerView;
-    private OnLogsTitleStateChangeListener mOnLogsTitleStateChangeListener;
+    private OnLogsStateChangeListener mOnLogsStateChangeListener;
     private DutyColors mDutyColors;
     private String mNoAddressLabel;
     private LayoutInflater mLayoutInflater;
 
 
     public LogsAdapter(Context context, LogsPresenter presenter,
-                       OnLogsTitleStateChangeListener snackBarClickListener) {
+                       OnLogsStateChangeListener snackBarClickListener) {
         mContext = context;
         mPresenter = presenter;
-        mOnLogsTitleStateChangeListener = snackBarClickListener;
+        mOnLogsStateChangeListener = snackBarClickListener;
 
         mOnMenuClickListener = view -> {
             EventLogModel log = (EventLogModel) view.getTag();
@@ -83,20 +81,6 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
         mDutyColors = new DutyColors(mContext);
         mNoAddressLabel = mContext.getResources().getString(R.string.no_address_available);
         mLayoutInflater = LayoutInflater.from(mContext);
-        mSignDialog = createDialog();
-    }
-
-    private AlertDialog createDialog() {
-        View alertView = mLayoutInflater.inflate(R.layout.sign_dialog_view, null);
-        AlertDialog signDialog = new AlertDialog.Builder(mContext)
-                .setTitle(R.string.sign_dialog_title)
-                .setPositiveButton(R.string.accept,
-                        (dialog, whichButton) -> mPresenter.onSignLogsheetButtonClicked(
-                                mCalendarLayout.getSelectedCalendarItem()))
-                .setNegativeButton(R.string.decline, null)
-                .create();
-        signDialog.setView(alertView);
-        return signDialog;
     }
 
     public void setEventLogs(List<EventLogModel> eventLogs) {
@@ -128,16 +112,11 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
     }
 
     private void updateSignButton() {
-        CalendarItem calendarItem = mCalendarLayout.getSelectedCalendarItem();
+        CalendarItem calendarItem = mCalendarLayout.getCurrentItem();
         LogSheetHeader logSheetHeader = calendarItem.getAssociatedLogSheet();
-        if (logSheetHeader != null) {
-            if (logSheetHeader.getSigned() == (Boolean) true) {
-                mSignLogsheet.setVisibility(View.GONE);
-                mSigned.setVisibility(View.VISIBLE);
-            } else {
-                mSignLogsheet.setVisibility(View.VISIBLE);
-                mSigned.setVisibility(View.GONE);
-            }
+        if (logSheetHeader != null && Boolean.TRUE.equals(logSheetHeader.getSigned())) {
+            mSignLogsheet.setVisibility(View.GONE);
+            mSigned.setVisibility(View.VISIBLE);
         } else {
             mSignLogsheet.setVisibility(View.VISIBLE);
             mSigned.setVisibility(View.GONE);
@@ -161,7 +140,8 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
                 mSignLogsheet = (TextView) view.findViewById(R.id.sign_logsheet);
                 mSigned = view.findViewById(R.id.signed);
 
-                mSignLogsheet.setOnClickListener(v -> mSignDialog.show());
+                mSignLogsheet.setOnClickListener(v -> mOnLogsStateChangeListener.onSignButtonClicked(
+                        mCalendarLayout.getCurrentItem()));
 
                 mGraphLayout = (GraphLayout) view.findViewById(R.id.graphic);
                 mGraphLayout.setELDEvents(mEventLogs, mTripInfo.getStartDayTime());
@@ -212,7 +192,7 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
     private void onTitleItemClicked(LogsTitleView titleView) {
         if (titleView.isCollapsed()) {
             titleView.expand();
-            mOnLogsTitleStateChangeListener.show(titleView.getType());
+            mOnLogsStateChangeListener.showTitle(titleView.getType());
             if (titleView.getType() == EVENTS) {
                 mTripInfoTitleView.collapse();
             } else {
@@ -220,7 +200,7 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
             }
         } else {
             titleView.collapse();
-            mOnLogsTitleStateChangeListener.hide();
+            mOnLogsStateChangeListener.hideTitle();
         }
 
         notifyDataSetChanged();
@@ -289,10 +269,12 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
         return mCalendarLayout.getCurrentItem();
     }
 
-    public interface OnLogsTitleStateChangeListener {
-        void show(LogsTitleView.Type type);
+    public interface OnLogsStateChangeListener {
+        void showTitle(LogsTitleView.Type type);
 
-        void hide();
+        void hideTitle();
+
+        void onSignButtonClicked(CalendarItem calendarItem);
     }
 
     static class LogsHolder extends RecyclerView.ViewHolder {

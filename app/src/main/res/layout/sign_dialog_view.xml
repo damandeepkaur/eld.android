@@ -8,7 +8,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="@dimen/sign_dialog_margin_top"
         android:layout_marginLeft="@dimen/sign_dialog_margin_left"
         android:layout_marginRight="@dimen/sign_dialog_margin_right"
         android:lineSpacingExtra="@dimen/sign_dialog_title_line_spacing_extra"

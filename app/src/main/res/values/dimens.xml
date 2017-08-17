@@ -138,6 +138,7 @@
     <dimen name="logs_list_item_trip_info_margin_right">93dp</dimen>
 
     <!--Logs sign dialog-->
+    <dimen name="sign_dialog_margin_top">12dp</dimen>
     <dimen name="sign_dialog_margin_left">24dp</dimen>
     <dimen name="sign_dialog_margin_right">24dp</dimen>
     <dimen name="sign_dialog_title_line_spacing_extra">8sp</dimen>
