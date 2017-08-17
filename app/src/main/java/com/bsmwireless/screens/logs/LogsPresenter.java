@@ -231,12 +231,12 @@ public class LogsPresenter {
             //TODO: move creation log sheet if not exist in event creation operation
             //create log sheet header if not exist
             long logday = DateUtils.convertTimeToDayNumber(mTimeZone, calendarItem.getCalendar().getTimeInMillis());
-            mLogSheetInteractor.createLogSheetHeader(logday)
+            mDisposables.add(mLogSheetInteractor.createLogSheetHeader(logday)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(logSheet -> onSignLogsheet(logSheet),
-                            error -> Timber.e("Create logsheet error: %s", error)
-                    );
+                            error -> mView.showError(error)
+                    ));
         } else {
             onSignLogsheet(logSheetHeader);
         }
