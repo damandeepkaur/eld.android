@@ -57,8 +57,10 @@ public class MultidayPresenter {
         mDisposables.add(mLoginUserInteractor.getTimezone()
                                              .subscribeOn(Schedulers.io())
                                              .subscribe(timezone -> {
-                                                 mTimeZone = timezone;
-                                                 getItems(mView.getDayCount());
+                                                 if (!mTimeZone.equals(timezone)) {
+                                                     mTimeZone = timezone;
+                                                     getItems(mView.getDayCount());
+                                                 }
                                              }, Timber::e));
     }
 
