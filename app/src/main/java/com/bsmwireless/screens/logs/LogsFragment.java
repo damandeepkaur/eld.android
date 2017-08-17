@@ -11,6 +11,8 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.bsmwireless.common.App;
+import com.bsmwireless.common.utils.NetworkUtils;
+import com.bsmwireless.data.network.RetrofitException;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.LogSheetHeader;
 import com.bsmwireless.screens.common.BaseFragment;
@@ -22,6 +24,7 @@ import com.bsmwireless.screens.logs.dagger.LogsModule;
 import com.bsmwireless.screens.navigation.NavigateView;
 import com.bsmwireless.widgets.logs.LogsTitleView;
 import com.bsmwireless.widgets.logs.calendar.CalendarItem;
+import com.bsmwireless.widgets.snackbar.SnackBarLayout;
 
 import java.util.List;
 
@@ -113,17 +116,38 @@ public class LogsFragment extends BaseFragment implements LogsView {
         switch (expandedType) {
             case EVENTS:
                 mNavigateView.getSnackBar()
-                        .setPositiveLabel(mContext.getString(R.string.add_event),
-                                v -> mPresenter.onAddEventClicked(mAdapter.getCurrentItem()))
-                        .showSnackbar();
+                             .setPreShowListener(snackBar ->
+                                     snackBar.reset()
+                                             .setPositiveLabel(mContext.getString(R.string.add_event), v -> mPresenter.onAddEventClicked(mAdapter.getCurrentItem())))
+                             .showSnackbar();
                 break;
             case TRIP_INFO:
                 mNavigateView.getSnackBar()
-                        .setPositiveLabel(mContext.getString(R.string.edit),
-                                v -> mPresenter.onEditTripInfoClicked())
-                        .showSnackbar();
+                             .setPreShowListener(snackBar ->
+                                     snackBar.reset()
+                                             .setPositiveLabel(mContext.getString(R.string.edit), v -> mPresenter.onEditTripInfoClicked()))
+                             .showSnackbar();
                 break;
         }
+    }
+
+    public void showSnackBarError(String message) {
+        mNavigateView.getSnackBar()
+                     .setPreShowListener(snackBar -> {
+                         snackBar.reset()
+                                 .setMessage(message)
+                                 .setHideableOnTimeout(SnackBarLayout.DURATION_LONG)
+                                 .setOnCloseListener(new SnackBarLayout.OnCloseListener() {
+                                     @Override
+                                     public void onClose(SnackBarLayout snackBar) {
+                                         showSnackBar();
+                                     }
+
+                                     @Override
+                                     public void onOpen(SnackBarLayout snackBar) {}
+                                 });
+                     })
+                     .showSnackbar();
     }
 
     @Override
@@ -179,16 +203,14 @@ public class LogsFragment extends BaseFragment implements LogsView {
 
     @Override
     public void showError(Throwable throwable) {
-        //TODO: show error message
         Timber.e(throwable.getMessage());
-        Toast.makeText(mContext, throwable.getMessage(), Toast.LENGTH_SHORT).show();
+        showSnackBarError(NetworkUtils.getErrorMessage((RetrofitException) throwable, mContext).toString());
     }
 
     @Override
     public void showError(Error error) {
-        //TODO: show error message
         Timber.e(getString(error.getStringId()));
-        Toast.makeText(mContext, getString(error.getStringId()), Toast.LENGTH_SHORT).show();
+        showSnackBarError(getString(error.getStringId()));
     }
 
     @Override

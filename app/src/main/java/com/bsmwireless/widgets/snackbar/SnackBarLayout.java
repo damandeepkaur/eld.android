@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
 import android.util.AttributeSet;
@@ -17,10 +18,14 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
+import static android.support.design.widget.BottomSheetBehavior.STATE_EXPANDED;
+import static android.support.design.widget.BottomSheetBehavior.STATE_HIDDEN;
+
 public class SnackBarLayout extends RelativeLayout {
     public static final int DURATION_SHORT = 1000;
     public static final int DURATION_LONG = 5000;
     public static final int DURATION_INFINITE = 0;
+    public static final int DURATION_REOPEN = 500;
 
     private View mRootView;
 
@@ -28,7 +33,9 @@ public class SnackBarLayout extends RelativeLayout {
 
     private BottomSheetBehavior mBottomSheet;
 
-    private BottomSheetBehavior.BottomSheetCallback mListener;
+    private OnCloseListener mCloseListener;
+
+    private PreShowListener mPreShowListener;
 
     @BindView(R.id.snackbar_layout)
     View mLayout;
@@ -50,8 +57,34 @@ public class SnackBarLayout extends RelativeLayout {
 
     private Handler mHandler = new Handler();
     private Runnable mHideTask = this::hideSnackbar;
+    private Runnable mReopenTask = this::showSnackbar;
 
-    private int mCurrentState = BottomSheetBehavior.STATE_HIDDEN;
+    private int mCurrentState = STATE_HIDDEN;
+
+    private BottomSheetBehavior.BottomSheetCallback mBottomSheetCallback = new BottomSheetBehavior.BottomSheetCallback() {
+        @Override
+        public void onStateChanged(@NonNull View bottomSheet, int newState) {
+            switch (newState) {
+                case STATE_HIDDEN: {
+                    if (mCloseListener != null) {
+                        mCloseListener.onClose(SnackBarLayout.this);
+                    }
+                    break;
+                }
+                case STATE_EXPANDED: {
+                    if (mCloseListener != null) {
+                        mCloseListener.onOpen(SnackBarLayout.this);
+                    }
+                    break;
+                }
+            }
+        }
+
+        @Override
+        public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+
+        }
+    };
 
     public SnackBarLayout(Context context) {
         super(context);
@@ -94,7 +127,7 @@ public class SnackBarLayout extends RelativeLayout {
         mBottomSheet = BottomSheetBehavior.from(this);
         mBottomSheet.setHideable(true);
         mBottomSheet.setState(mCurrentState);
-        mBottomSheet.setBottomSheetCallback(mListener);
+        mBottomSheet.setBottomSheetCallback(mBottomSheetCallback);
     }
 
     @Override
@@ -131,7 +164,7 @@ public class SnackBarLayout extends RelativeLayout {
     }
 
     public SnackBarLayout hideSnackbar() {
-        mCurrentState = BottomSheetBehavior.STATE_HIDDEN;
+        mCurrentState = STATE_HIDDEN;
 
         if (mBottomSheet != null) {
             mBottomSheet.setState(mCurrentState);
@@ -142,27 +175,39 @@ public class SnackBarLayout extends RelativeLayout {
     }
 
     public SnackBarLayout showSnackbar() {
-        mCurrentState = BottomSheetBehavior.STATE_EXPANDED;
+        if (mCurrentState == STATE_EXPANDED) {
+            hideSnackbar();
+            mHandler.postDelayed(mReopenTask, DURATION_REOPEN);
+        } else {
+            mCurrentState = STATE_EXPANDED;
 
-        if (mBottomSheet != null) {
-            mBottomSheet.setState(mCurrentState);
-            requestFocus();
-        }
+            if (mPreShowListener != null) {
+                mPreShowListener.onPreShow(this);
+            }
 
-        if (mDuration > 0) {
-            mHandler.postDelayed(mHideTask, mDuration);
+            if (mBottomSheet != null) {
+                mBottomSheet.setState(mCurrentState);
+                requestFocus();
+            }
+
+            if (mDuration > 0) {
+                mHandler.postDelayed(mHideTask, mDuration);
+            }
+
+            mHandler.removeCallbacks(mReopenTask);
         }
         return this;
     }
 
     public SnackBarLayout setMessage(CharSequence message) {
         mMessage.setText(message);
+        mMessage.setVisibility(VISIBLE);
         return this;
     }
 
     public SnackBarLayout setPositiveLabel(String label, OnClickListener listener) {
         mPosAction.setText(label);
-        mPosAction.setVisibility(View.VISIBLE);
+        mPosAction.setVisibility(VISIBLE);
         mPosAction.setOnClickListener(listener);
         return this;
     }
@@ -174,8 +219,36 @@ public class SnackBarLayout extends RelativeLayout {
         return this;
     }
 
-    public SnackBarLayout setBottomSheetCallback(BottomSheetBehavior.BottomSheetCallback callback) {
-        mListener = callback;
+    public SnackBarLayout setOnCloseListener(OnCloseListener listener) {
+        mCloseListener = listener;
         return this;
+    }
+
+    public SnackBarLayout reset() {
+        mPosAction.setVisibility(GONE);
+        mPosAction.setOnClickListener(null);
+        mNegativeAction.setVisibility(GONE);
+        mNegativeAction.setOnClickListener(null);
+        mMessage.setVisibility(GONE);
+        mDuration = DURATION_INFINITE;
+        mHandler.removeCallbacksAndMessages(null);
+        mCloseListener = null;
+        mPreShowListener = null;
+
+        return this;
+    }
+
+    public SnackBarLayout setPreShowListener(PreShowListener preShowListener) {
+        mPreShowListener = preShowListener;
+        return this;
+    }
+
+    public interface OnCloseListener {
+        void onClose(SnackBarLayout snackBar);
+        void onOpen(SnackBarLayout snackBar);
+    }
+
+    public interface PreShowListener {
+        void onPreShow(SnackBarLayout snackBar);
     }
 }
