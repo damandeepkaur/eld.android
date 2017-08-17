@@ -3,6 +3,7 @@ ELD app for Android
 
 # Version history
 
+* **1.0.35** - Showing errors through snack bar
 * **1.0.34** - Driver’s Certification of Own Records
 * **1.0.33** - Fix crash when open QR scanner first time
 * **1.0.32** - Add/edit duty events screen

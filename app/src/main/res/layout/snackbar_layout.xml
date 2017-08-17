@@ -22,7 +22,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_toStartOf="@+id/positive_action"
-            android:gravity="center_vertical"/>
+            android:gravity="center_vertical"
+            android:visibility="gone"/>
 
         <Button
             android:id="@+id/negative_action"

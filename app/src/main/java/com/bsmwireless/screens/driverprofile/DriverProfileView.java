@@ -48,10 +48,9 @@ public interface DriverProfileView {
     void setHomeTerminalsSpinner(List<String> homeTerminalNames, int selectedTerminal);
     void setHomeTerminalInfo(HomeTerminalEntity homeTerminal);
     void setCarrierInfo(CarrierEntity carrier);
-    void hideControlButtons();
-    void showControlButtons();
     void showPasswordChanged();
     void setResults(User user);
+    void showSignatureChanged();
 
     void showError(Throwable error);
     void showError(Error error);
