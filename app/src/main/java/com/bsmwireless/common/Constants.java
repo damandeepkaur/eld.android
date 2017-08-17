@@ -16,4 +16,5 @@ public interface Constants {
     int MIN_IN_HOUR = 60;
     int HOUR_IN_DAY = 24;
     int SEC_IN_DAY = HOUR_IN_DAY * MIN_IN_HOUR * SEC_IN_MIN;
+    int MS_IN_DAY = MS_IN_SEC * SEC_IN_DAY;
 }

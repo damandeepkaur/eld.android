@@ -22,6 +22,8 @@ public class DutyManager {
         mPreferencesManager.setOnDutyTime(onDuty);
         mPreferencesManager.setDrivingTime(driving);
         mPreferencesManager.setSleeperBerthTime(sleeperBerth);
+
+        mPreferencesManager.setDutyType(mDutyType.ordinal());
     }
 
     public void setDutyType(DutyType dutyType) {
@@ -37,7 +39,6 @@ public class DutyManager {
                 break;
 
             case DRIVING:
-            case PERSONAL_USE:
                 mPreferencesManager.setDrivingTime(mPreferencesManager.getDrivingTime() + time);
                 break;
 
@@ -64,7 +65,6 @@ public class DutyManager {
                 break;
 
             case DRIVING:
-            case PERSONAL_USE:
                 time = mPreferencesManager.getDrivingTime();
                 break;
 
@@ -78,14 +78,6 @@ public class DutyManager {
         }
 
         return time;
-    }
-
-    public void resetTime() {
-        mPreferencesManager.setDrivingTime(0);
-        mPreferencesManager.setOnDutyTime(0);
-        mPreferencesManager.setSleeperBerthTime(0);
-
-        mPreferencesManager.setDutyType(mDutyType.ordinal());
     }
 
     public void addListener(DutyTypeListener listener) {

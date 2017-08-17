@@ -16,7 +16,6 @@ public class SettingsPresenter extends BaseMenuPresenter {
 
     private SettingsView mView;
     private SettingsInteractor mSettingsInteractor;
-    private CompositeDisposable mDisposables;
 
     @Inject
     public SettingsPresenter(SettingsView view, SettingsInteractor settingsInteractor, DutyManager dutyManager) {
@@ -57,13 +56,6 @@ public class SettingsPresenter extends BaseMenuPresenter {
         }
 
         mSettingsInteractor.saveKMOdometerUnitsSelected(isKMOdometerUnitsSelected);
-    }
-
-    public void onDestroy() {
-        super.onDestroy();
-        mDisposables.dispose();
-
-        Timber.d("DESTROYED");
     }
 
     private SettingsView.OdometerUnits loadLastSelectedOdometerUnit() {

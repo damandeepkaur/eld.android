@@ -10,6 +10,7 @@ public interface NavigateView extends BaseMenuView {
     void setCoDriversNumber(int coDriverNum);
     void setBoxId(int boxId);
     void setAssetsNumber(int assetsNum);
+    void setResetTime(long time);
 
     SnackBarLayout getSnackBar();
 }

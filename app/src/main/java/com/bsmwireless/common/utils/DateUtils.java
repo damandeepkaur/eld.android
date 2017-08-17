@@ -60,8 +60,8 @@ public class DateUtils {
      * @param time in Unix ms
      * @return start date in ms
      */
-    public static long getStartDayTimeInMs(long time) {
-        Calendar calendar = Calendar.getInstance();
+    public static long getStartDayTimeInMs(String zone, long time) {
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(zone));
         calendar.setTimeInMillis(time);
         calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DATE), 0, 0, 0);
         return calendar.getTimeInMillis();
@@ -71,8 +71,8 @@ public class DateUtils {
      * @param time in Unix ms
      * @return end date in ms
      */
-    public static long getEndDayTimeInMs(long time) {
-        Calendar calendar = Calendar.getInstance();
+    public static long getEndDayTimeInMs(String zone, long time) {
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(zone));
         calendar.setTimeInMillis(time);
         calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DATE), 23, 59, 59);
         return calendar.getTimeInMillis();

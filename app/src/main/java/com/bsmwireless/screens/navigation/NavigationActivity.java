@@ -3,6 +3,7 @@ package com.bsmwireless.screens.navigation;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.NavigationView.OnNavigationItemSelectedListener;
@@ -68,6 +69,9 @@ public class NavigationActivity extends BaseMenuActivity implements OnNavigation
     private SmoothActionBarDrawerToggle mDrawerToggle;
     private HeaderViewHolder mHeaderViewHolder;
 
+    private Handler mHandler = new Handler();
+    private Runnable mResetTimeTask = () -> mPresenter.onResetTime();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,6 +88,7 @@ public class NavigationActivity extends BaseMenuActivity implements OnNavigation
         initNavigation();
 
         mPresenter.onViewCreated();
+        mPresenter.onResetTime();
     }
 
     @Override
@@ -221,6 +226,7 @@ public class NavigationActivity extends BaseMenuActivity implements OnNavigation
 
     @Override
     protected void onDestroy() {
+        mHandler.removeCallbacks(mResetTimeTask);
         mViewPager.removeOnPageChangeListener(this);
         mPresenter.onDestroy();
         mHeaderViewHolder.unbind();
@@ -262,6 +268,11 @@ public class NavigationActivity extends BaseMenuActivity implements OnNavigation
     @Override
     public void onPageScrollStateChanged(int state) {
 
+    }
+
+    public void setResetTime(long time) {
+        mHandler.removeCallbacks(mResetTimeTask);
+        mHandler.postAtTime(mResetTimeTask, time);
     }
 
     protected static class HeaderViewHolder {

@@ -1,13 +1,11 @@
 package com.bsmwireless.screens.logs;
 
-import android.util.Log;
-
 import com.bsmwireless.common.Constants;
 import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.common.utils.DateUtils;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
 import com.bsmwireless.domain.interactors.LogSheetInteractor;
-import com.bsmwireless.domain.interactors.LoginUserInteractor;
+import com.bsmwireless.domain.interactors.UserInteractor;
 import com.bsmwireless.domain.interactors.VehiclesInteractor;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.Vehicle;
@@ -44,7 +42,7 @@ public class LogsPresenter {
     private ELDEventsInteractor mELDEventsInteractor;
     private LogSheetInteractor mLogSheetInteractor;
     private VehiclesInteractor mVehiclesInteractor;
-    private LoginUserInteractor mUserInteractor;
+    private UserInteractor mUserInteractor;
     private CompositeDisposable mDisposables;
     private String mTimeZone;
     private TripInfoModel mTripInfo;
@@ -52,7 +50,7 @@ public class LogsPresenter {
 
     @Inject
     public LogsPresenter(LogsView view, ELDEventsInteractor eventsInteractor, LogSheetInteractor logSheetInteractor,
-                         VehiclesInteractor vehiclesInteractor, LoginUserInteractor userInteractor) {
+                         VehiclesInteractor vehiclesInteractor, UserInteractor userInteractor) {
         mView = view;
         mELDEventsInteractor = eventsInteractor;
         mLogSheetInteractor = logSheetInteractor;
@@ -190,13 +188,13 @@ public class LogsPresenter {
             result[log.getEventCode() - 1] += endDayTime - log.getEventTime();
 
             tripInfo.setSleeperBerthTime(DateUtils.convertTimeInMsToStringTime(
-                    result[DutyType.SLEEPER_BERTH.getId() - 1]));
+                    result[DutyType.SLEEPER_BERTH.getValue() - 1]));
             tripInfo.setDrivingTime(DateUtils.convertTimeInMsToStringTime(
-                    result[DutyType.DRIVING.getId() - 1]));
+                    result[DutyType.DRIVING.getValue() - 1]));
             tripInfo.setOffDutyTime(DateUtils.convertTimeInMsToStringTime(
-                    result[DutyType.OFF_DUTY.getId() - 1]));
+                    result[DutyType.OFF_DUTY.getValue() - 1]));
             tripInfo.setOnDutyTime(DateUtils.convertTimeInMsToStringTime(
-                    result[DutyType.ON_DUTY.getId() - 1]));
+                    result[DutyType.ON_DUTY.getValue() - 1]));
 
             //TODO: convert odometer value from meters to appropriate unit
             tripInfo.setUnitType(KM);

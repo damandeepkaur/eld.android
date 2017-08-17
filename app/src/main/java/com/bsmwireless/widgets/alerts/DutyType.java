@@ -7,50 +7,50 @@ public enum DutyType {
     SLEEPER_BERTH(2, R.string.event_type_sleeping, R.color.sleepingberth_light, R.drawable.ic_duty_status_sb),
     DRIVING(3, R.string.event_type_driving, R.color.driving_light, R.drawable.ic_duty_status_dr),
     ON_DUTY(4, R.string.event_type_on_duty, R.color.onduty_light, R.drawable.ic_duty_status_on),
-    PERSONAL_USE(5, R.string.event_type_personal_use, R.color.driving_light, R.drawable.ic_duty_status_pu),
-    YARD_MOVES(6, R.string.event_type_yard_moves, R.color.onduty_light, R.drawable.ic_duty_status_ym);
+    PERSONAL_USE(1, R.string.event_type_personal_use, R.color.offduty_light, R.drawable.ic_duty_status_pu),
+    YARD_MOVES(2, R.string.event_type_yard_moves, R.color.onduty_light, R.drawable.ic_duty_status_ym);
 
-    private int mId;
+    private int mCode;
     private int mName;
     private int mColor;
     private int mIcon;
 
-    DutyType(int type, int name, int color, int icon) {
-        mId = type;
+    DutyType(int code, int name, int color, int icon) {
+        mCode = code;
         mName = name;
         mColor = color;
         mIcon = icon;
     }
 
-    public static int getNameById(int id) {
+    public static int getNameByCode(int id) {
         for (DutyType t : DutyType.values()) {
-            if (t.mId == id) {
+            if (t.mCode == id) {
                 return t.mName;
             }
         }
         return R.string.event_type_off_duty;
     }
 
-    public static int getColorById(int id) {
+    public static int getColorByCode(int id) {
         for (DutyType t : DutyType.values()) {
-            if (t.mId == id) {
+            if (t.mCode == id) {
                 return t.mColor;
             }
         }
         return R.color.offduty_light;
     }
 
-    public static DutyType getTypeById(int id) {
+    public static DutyType getTypeByCode(int id) {
         for (DutyType t : DutyType.values()) {
-            if (t.mId == id) {
+            if (t.mCode == id) {
                 return t;
             }
         }
         return DutyType.OFF_DUTY;
     }
 
-    public int getId() {
-        return mId;
+    public int getValue() {
+        return mCode;
     }
 
     public int getName() {

@@ -1,7 +1,8 @@
 package com.bsmwireless.screens.navigation;
 
 import com.bsmwireless.data.storage.DutyManager;
-import com.bsmwireless.domain.interactors.LoginUserInteractor;
+import com.bsmwireless.domain.interactors.ELDEventsInteractor;
+import com.bsmwireless.domain.interactors.UserInteractor;
 import com.bsmwireless.domain.interactors.VehiclesInteractor;
 import com.bsmwireless.models.User;
 
@@ -38,13 +39,16 @@ public class NavigationPresenterTest {
     NavigateView mView;
 
     @Mock
-    LoginUserInteractor mLoginUserInteractor;
+    UserInteractor mUserInteractor;
 
     @Mock
     VehiclesInteractor mVehiclesInteractor;
 
     @Mock
     DutyManager mDutyManager;
+
+    @Mock
+    ELDEventsInteractor mEventsInteractor;
 
 
     private NavigationPresenter mNavigationPresenter;
@@ -54,22 +58,22 @@ public class NavigationPresenterTest {
     public void before() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        mNavigationPresenter = new NavigationPresenter(mView, mLoginUserInteractor, mVehiclesInteractor, mDutyManager);
+        mNavigationPresenter = new NavigationPresenter(mView, mUserInteractor, mVehiclesInteractor, mEventsInteractor, mDutyManager);
     }
 
     /**
-     * Verify call to LoginUserInteractor#logoutUser
+     * Verify call to UserInteractor#logoutUser
      */
     @Test
     public void testOnLogoutInteractorCall() {
         // given
-        when(mLoginUserInteractor.logoutUser()).thenReturn(Observable.just(true));
+        when(mUserInteractor.logoutUser()).thenReturn(Observable.just(true));
 
         // when
         mNavigationPresenter.onLogoutItemSelected();
 
         // then
-        verify(mLoginUserInteractor).logoutUser();
+        verify(mUserInteractor).logoutUser();
     }
 
     /**
@@ -78,7 +82,7 @@ public class NavigationPresenterTest {
     @Test
     public void testOnLogoutFailed() {
         // given
-        when(mLoginUserInteractor.logoutUser()).thenReturn(Observable.just(false));
+        when(mUserInteractor.logoutUser()).thenReturn(Observable.just(false));
 
         // when
         mNavigationPresenter.onLogoutItemSelected();
@@ -96,7 +100,7 @@ public class NavigationPresenterTest {
     @Test
     public void testOnLogoutError() {
         // given
-        when(mLoginUserInteractor.logoutUser()).thenReturn(Observable.error(new RuntimeException("it broke.")));
+        when(mUserInteractor.logoutUser()).thenReturn(Observable.error(new RuntimeException("it broke.")));
 
         // when
         mNavigationPresenter.onLogoutItemSelected();
@@ -118,12 +122,12 @@ public class NavigationPresenterTest {
         final int boxId = 1111;
         final int assetNumber = 2222;
 
-        when(mLoginUserInteractor.getFullName()).thenReturn(userFlowable);
-        when(mLoginUserInteractor.getCoDriversNumber()).thenReturn(coDriver);
+        when(mUserInteractor.getFullName()).thenReturn(userFlowable);
+        when(mUserInteractor.getCoDriversNumber()).thenReturn(coDriver);
         when(mVehiclesInteractor.getBoxId()).thenReturn(boxId);
         when(mVehiclesInteractor.getAssetsNumber()).thenReturn(assetNumber);
 
-        when(mLoginUserInteractor.isLoginActive()).thenReturn(true);
+        when(mUserInteractor.isLoginActive()).thenReturn(true);
 
         // when
         mNavigationPresenter.onViewCreated();
@@ -142,13 +146,13 @@ public class NavigationPresenterTest {
     public void testOnUserUpdated() {
         // given
         User user = new User();
-        when(mLoginUserInteractor.syncDriverProfile(any(User.class))).thenReturn(Observable.just(true)); // prevent null pointer exception
+        when(mUserInteractor.syncDriverProfile(any(User.class))).thenReturn(Observable.just(true)); // prevent null pointer exception
 
         // when
         mNavigationPresenter.onUserUpdated(user);
 
         // then
-        verify(mLoginUserInteractor).syncDriverProfile(eq(user));
+        verify(mUserInteractor).syncDriverProfile(eq(user));
     }
 
     @Test
@@ -160,7 +164,7 @@ public class NavigationPresenterTest {
         mNavigationPresenter.onUserUpdated(null);
 
         // then
-        verify(mLoginUserInteractor, never()).syncDriverProfile(any(User.class));
+        verify(mUserInteractor, never()).syncDriverProfile(any(User.class));
     }
 
     @Test
@@ -168,7 +172,7 @@ public class NavigationPresenterTest {
         // given
         User user = new User();
         String error = "sorry, it didn't work";
-        when(mLoginUserInteractor.syncDriverProfile(any(User.class))).thenReturn(Observable.error(new RuntimeException(error)));
+        when(mUserInteractor.syncDriverProfile(any(User.class))).thenReturn(Observable.error(new RuntimeException(error)));
 
         // when
         mNavigationPresenter.onUserUpdated(user);

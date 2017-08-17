@@ -6,7 +6,8 @@ import com.bsmwireless.data.storage.carriers.CarrierEntity;
 import com.bsmwireless.data.storage.hometerminals.HomeTerminalEntity;
 import com.bsmwireless.data.storage.users.FullUserEntity;
 import com.bsmwireless.data.storage.users.UserConverter;
-import com.bsmwireless.domain.interactors.LoginUserInteractor;
+import com.bsmwireless.domain.interactors.ELDEventsInteractor;
+import com.bsmwireless.domain.interactors.UserInteractor;
 import com.bsmwireless.screens.common.menu.BaseMenuPresenter;
 import com.bsmwireless.screens.common.menu.BaseMenuView;
 
@@ -30,33 +31,26 @@ public class DriverProfilePresenter extends BaseMenuPresenter {
 
     private static final int MAX_SIGNATURE_LENGTH = 50000;
 
-    private LoginUserInteractor mLoginUserInteractor;
+    private UserInteractor mUserInteractor;
     private DriverProfileView mView;
-    private CompositeDisposable mDisposables;
 
     private FullUserEntity mFullUserEntity;
     private List<HomeTerminalEntity> mHomeTerminals;
     private CarrierEntity mCarrier;
 
     @Inject
-    public DriverProfilePresenter(DriverProfileView view, LoginUserInteractor loginUserInteractor, DutyManager dutyManager) {
+    public DriverProfilePresenter(DriverProfileView view, UserInteractor userInteractor, DutyManager dutyManager, ELDEventsInteractor eventsInteractor) {
         mView = view;
-        mLoginUserInteractor = loginUserInteractor;
+        mUserInteractor = userInteractor;
         mDutyManager = dutyManager;
+        mEventsInteractor = eventsInteractor;
         mDisposables = new CompositeDisposable();
 
         Timber.d("CREATED");
     }
 
-    public void onDestroy() {
-        super.onDestroy();
-        mDisposables.dispose();
-
-        Timber.d("DESTROYED");
-    }
-
     public void onNeedUpdateUserInfo() {
-        Disposable disposable = mLoginUserInteractor.getFullUser()
+        Disposable disposable = mUserInteractor.getFullUser()
                                                     .subscribeOn(Schedulers.io())
                                                     .observeOn(AndroidSchedulers.mainThread())
                                                     .subscribe(userEntity -> {
@@ -97,7 +91,7 @@ public class DriverProfilePresenter extends BaseMenuPresenter {
 
             mFullUserEntity.getUserEntity().setSignature(signature);
 
-            Disposable disposable = mLoginUserInteractor.updateDriverSignature(signature)
+            Disposable disposable = mUserInteractor.updateDriverSignature(signature)
                                                         .subscribeOn(Schedulers.io())
                                                         .observeOn(AndroidSchedulers.mainThread())
                                                         .subscribe(wasUpdated -> {
@@ -129,7 +123,7 @@ public class DriverProfilePresenter extends BaseMenuPresenter {
     public void onChangePasswordClick(String oldPwd, String newPwd, String confirmPwd) {
         DriverProfileView.PasswordError validationError = validatePassword(oldPwd, newPwd, confirmPwd);
         if (validationError.equals(VALID_PASSWORD)) {
-            Disposable disposable = mLoginUserInteractor.updateDriverPassword(oldPwd, newPwd)
+            Disposable disposable = mUserInteractor.updateDriverPassword(oldPwd, newPwd)
                                                         .subscribeOn(Schedulers.io())
                                                         .observeOn(AndroidSchedulers.mainThread())
                                                         .subscribe(passwordUpdated -> {
@@ -152,7 +146,7 @@ public class DriverProfilePresenter extends BaseMenuPresenter {
 
             mFullUserEntity.getUserEntity().setHomeTermId(homeTerminal.getId());
 
-            Disposable disposable = mLoginUserInteractor.updateDriverHomeTerminal(homeTerminal.getId())
+            Disposable disposable = mUserInteractor.updateDriverHomeTerminal(homeTerminal.getId())
                                                         .subscribeOn(Schedulers.io())
                                                         .observeOn(AndroidSchedulers.mainThread())
                                                         .subscribe(wasUpdated -> {

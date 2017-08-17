@@ -27,6 +27,14 @@ public class PreferencesManager {
         mPreferences = preferences;
     }
 
+    public void addListener(SharedPreferences.OnSharedPreferenceChangeListener listener) {
+        mPreferences.registerOnSharedPreferenceChangeListener(listener);
+    }
+
+    public void removeListener(SharedPreferences.OnSharedPreferenceChangeListener listener) {
+        mPreferences.unregisterOnSharedPreferenceChangeListener(listener);
+    }
+
     public String setAccountName(String accountName) {
         SharedPreferences.Editor editor = mPreferences.edit();
         editor.putString(KEY_ACCOUNT_NAME, accountName);
@@ -152,14 +160,6 @@ public class PreferencesManager {
 
     public int getDutyDay() {
         return mPreferences.getInt(KEY_DUTY_DAY, 0);
-    }
-
-    public void addListener(SharedPreferences.OnSharedPreferenceChangeListener listener) {
-        mPreferences.registerOnSharedPreferenceChangeListener(listener);
-    }
-
-    public void removeListener(SharedPreferences.OnSharedPreferenceChangeListener listener) {
-        mPreferences.unregisterOnSharedPreferenceChangeListener(listener);
     }
 
     public void setKMOdometerUnits(boolean kmOdometerUnitsSelected) {

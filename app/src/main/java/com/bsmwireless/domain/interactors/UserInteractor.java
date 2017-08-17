@@ -31,7 +31,7 @@ import io.reactivex.annotations.NonNull;
 
 import static com.bsmwireless.models.ELDEvent.EventType.LOGIN_LOGOUT;
 
-public class LoginUserInteractor {
+public class UserInteractor {
 
     private static final String SUCCESS = "ACK";
 
@@ -42,8 +42,8 @@ public class LoginUserInteractor {
     private BlackBoxInteractor mBlackBoxInteractor;
 
     @Inject
-    public LoginUserInteractor(ServiceApi serviceApi, PreferencesManager preferencesManager, AppDatabase appDatabase,
-                               TokenManager tokenManager, BlackBoxInteractor blackBoxInteractor) {
+    public UserInteractor(ServiceApi serviceApi, PreferencesManager preferencesManager, AppDatabase appDatabase,
+                          TokenManager tokenManager, BlackBoxInteractor blackBoxInteractor) {
         mServiceApi = serviceApi;
         mPreferencesManager = preferencesManager;
         mAppDatabase = appDatabase;
