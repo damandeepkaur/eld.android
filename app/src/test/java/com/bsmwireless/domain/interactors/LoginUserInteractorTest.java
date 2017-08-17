@@ -6,6 +6,7 @@ import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.data.storage.carriers.CarrierDao;
 import com.bsmwireless.data.storage.hometerminals.HomeTerminalDao;
+import com.bsmwireless.data.storage.users.FullUserEntity;
 import com.bsmwireless.data.storage.users.UserDao;
 import com.bsmwireless.data.storage.users.UserEntity;
 import com.bsmwireless.models.Auth;
@@ -839,14 +840,93 @@ public class LoginUserInteractorTest {
         verify(mTokenManager).getDomain(anyString());
     }
 
+    @Test
+    public void testGetUser() {
+        // given
+        mockGetDriverId();
 
-    // TODO: add tests for getUser
-    // TODO: add tests for getFullUser
+        when(mAppDatabase.userDao()).thenReturn(mUserDao);
+        when(mUserDao.getUser(any(Integer.class))).thenReturn(Flowable.just(new UserEntity()));
+
+        TestSubscriber<UserEntity> testSubscriber = TestSubscriber.create();
+
+        // when
+        mLoginUserInteractor.getUser().subscribe(testSubscriber);
+
+        // then
+        verify(mUserDao).getUser(any(Integer.class));
+        verify(mAppDatabase).userDao();
+    }
+
+    @Test
+    public void testGetFullUser() {
+        // given
+        mockGetDriverId();
+
+        when(mAppDatabase.userDao()).thenReturn(mUserDao);
+        when(mUserDao.getFullUser(any(Integer.class))).thenReturn(Flowable.just(new FullUserEntity()));
+
+        TestSubscriber<FullUserEntity> testSubscriber = TestSubscriber.create();
+
+        // when
+        mLoginUserInteractor.getFullUser().subscribe(testSubscriber);
+
+        // then
+        verify(mUserDao).getFullUser(any(Integer.class));
+        verify(mAppDatabase).userDao();
+    }
+
     // TODO: add tests for isLoginActive
-    // TODO: add tests for getDriverId
-    // TODO: add tests for getTimezone
-    // TODO: add tests for isRememberMeEnabled
+    // seems better to test as instrumented
 
+    // TODO: add tests for getDriverId
+    // seems better to test as instrumented
+
+    @Test
+    public void testGetTimezoneSync() {
+        // given
+        int fakeDriverId = 123456;
+
+        when(mAppDatabase.userDao()).thenReturn(mUserDao);
+        when(mUserDao.getUserTimezoneSync(any(Integer.class))).thenReturn("fake timezone");
+
+        // when
+        mLoginUserInteractor.getTimezoneSync(fakeDriverId);
+
+        // then
+        verify(mUserDao).getUserTimezoneSync(any(Integer.class));
+        verify(mAppDatabase).userDao();
+    }
+
+    @Test
+    public void testGetTimezone() {
+        // given
+        mockGetDriverId();
+
+        when(mAppDatabase.userDao()).thenReturn(mUserDao);
+        when(mUserDao.getUserTimezone(any(Integer.class))).thenReturn(Flowable.just("fake timezone"));
+
+        // when
+        mLoginUserInteractor.getTimezone();
+
+        // then
+        verify(mUserDao).getUserTimezone(any(Integer.class));
+        verify(mAppDatabase).userDao();
+    }
+
+    // verifying call to preferences manager
+    // note: seems better to test as instrumented
+    @Test
+    public void testIsRememberMeEnabled() {
+        // given
+        // n/a
+
+        // when
+        mLoginUserInteractor.isRememberMeEnabled();
+
+        // then
+        verify(mPreferencesManager).isRememberUserEnabled();
+    }
 
     /**
      * Make a fake User for testing purposes.
@@ -863,6 +943,16 @@ public class LoginUserInteractorTest {
 
 
         return user;
+    }
+
+    /**
+     * Mocks LoginUserInteractor#getDriverId.
+     *
+     * Used in tests to prevent exceptions, and only when return value does not matter.
+     */
+    private void mockGetDriverId() {
+        when(mPreferencesManager.getAccountName()).thenReturn("fake account");
+        when(mTokenManager.getDriver(anyString())).thenReturn("12222"); // fake driver id
     }
 
 }
