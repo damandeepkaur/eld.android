@@ -3,6 +3,7 @@ ELD app for Android
 
 # Version history
 
+* **1.0.33** - Multi day screen
 * **1.0.32** - Add/edit duty events screen
 * **1.0.31** - Updated driver profile screen
 * **1.0.30** - Show event for all types (_EA-271_)
