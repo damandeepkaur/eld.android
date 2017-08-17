@@ -25,7 +25,6 @@ import static com.bsmwireless.common.Constants.SUCCESS;
 public class ELDEventsInteractor {
 
     private Disposable mSyncEventsDisposable;
-
     private ServiceApi mServiceApi;
     private ELDEventDao mELDEventDao;
 
@@ -72,8 +71,10 @@ public class ELDEventsInteractor {
                     .doOnError(throwable -> storeEvent(event, false))
                     .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
         } else {
-            storeEvent(event, false);
-            return Observable.error(new NetworkErrorException("No Internet Connection"));
+            return Observable.create(e -> {
+                storeEvent(event, false);
+                e.onError(new NetworkErrorException("No Internet Connection"));
+            });
         }
     }
 
@@ -83,8 +84,10 @@ public class ELDEventsInteractor {
                     .doOnError(throwable -> events.forEach(event -> storeEvent(event, false)))
                     .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
         } else {
-            storeEvents(events, false);
-            return Observable.error(new NetworkErrorException("No Internet Connection"));
+            return Observable.create(e -> {
+                storeEvents(events, false);
+                e.onError(new NetworkErrorException("No Internet Connection"));
+            });
         }
     }
 
