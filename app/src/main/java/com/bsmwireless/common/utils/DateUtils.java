@@ -14,6 +14,8 @@ import app.bsmuniversal.com.R;
 
 public class DateUtils {
     private final static int MINUTES_IN_HOUR = 60;
+    private final static int MS_IN_MINUTE = 60 * 1000;
+    private final static int MS_IN_HOUR = MINUTES_IN_HOUR * MS_IN_MINUTE;
 
     /**
      * @param zone user timezone for example "America/Los_Angeles"
@@ -90,6 +92,16 @@ public class DateUtils {
         Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
         calendar.setTimeInMillis(time);
         return String.format(Locale.US, "%02d:%02d", calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE));
+    }
+
+    /**
+     * @param time unix time in ms
+     * @return string with format time like "128:35"
+     */
+    public static String convertTotalTimeInMsToStringTime(long time) {
+        int hours = (int) (time / MS_IN_HOUR);
+        int minutes = (int) ((time - hours * MS_IN_HOUR) / MS_IN_MINUTE);
+        return String.format(Locale.US, "%02d:%02d", hours, minutes);
     }
 
     /**
@@ -188,4 +200,16 @@ public class DateUtils {
         }
         return 0L;
     }
+
+    /**
+     * @param time unix time in ms
+     * @return string with format time like "Sunday, July 4"
+     */
+    public static String convertTimeInMsToDate(String timezone, long time) {
+        SimpleDateFormat format = new SimpleDateFormat("EEEE, MMMM d", Locale.US);
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(timezone));
+        calendar.setTimeInMillis(time);
+        return format.format(calendar.getTime());
+    }
+
 }

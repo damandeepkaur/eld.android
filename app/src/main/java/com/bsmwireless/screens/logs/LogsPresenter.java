@@ -3,6 +3,7 @@ package com.bsmwireless.screens.logs;
 import com.bsmwireless.common.Constants;
 import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.common.utils.DateUtils;
+import com.bsmwireless.common.utils.DutyUtils;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
 import com.bsmwireless.domain.interactors.LogSheetInteractor;
 import com.bsmwireless.domain.interactors.LoginUserInteractor;
@@ -134,7 +135,7 @@ public class LogsPresenter {
                             logs.add(log);
                         }
 
-                        dutyStateLogs = filterEventByType(logs, ELDEvent.EventType.DUTY_STATUS_CHANGING);
+                        dutyStateLogs = DutyUtils.filterEventModelsByTypeAndStatus(logs, ELDEvent.EventType.DUTY_STATUS_CHANGING, ELDEvent.StatusCode.ACTIVE);
                         for (int i = 1; i < dutyStateLogs.size(); i++) {
                             duration = dutyStateLogs.get(i).getEventTime() - dutyStateLogs.get(i - 1).getEventTime();
                             dutyStateLogs.get(i - 1).setDuration(duration);
@@ -215,15 +216,6 @@ public class LogsPresenter {
         mDisposables.add(disposable);
     }
 
-    private List<EventLogModel> filterEventByType(List<EventLogModel> events, ELDEvent.EventType eventType) {
-        List<EventLogModel> result = new ArrayList<>();
-        for (EventLogModel event : events) {
-            if (event.getEventType().equals(eventType.getValue())) {
-                result.add(event);
-            }
-        }
-        return result;
-    }
 
     public void onSignLogsheetButtonClicked(CalendarItem calendarItem) {
         LogSheetHeader logSheetHeader = calendarItem.getAssociatedLogSheet();

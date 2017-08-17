@@ -482,4 +482,11 @@
     <string name="settings_fixed_mount_title">Fixed mount</string>
     <string name="settings_odometer_units">Odometer units</string>
 
+    <!-- Multiday fragment -->
+    <string-array name="multiday_selector">
+        <item>7 days</item>
+        <item>14 days</item>
+    </string-array>
+    <string name="multiday_total_hours">Total hours</string>
+
 </resources>
