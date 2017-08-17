@@ -1,4 +1,4 @@
-package com.bsmwireless.screens.multyday;
+package com.bsmwireless.screens.multiday;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -14,8 +14,8 @@ import android.widget.TextView;
 
 import com.bsmwireless.common.App;
 import com.bsmwireless.screens.common.BaseFragment;
-import com.bsmwireless.screens.multyday.dagger.DaggerMultydayComponent;
-import com.bsmwireless.screens.multyday.dagger.MultydayModule;
+import com.bsmwireless.screens.multiday.dagger.DaggerMultidayComponent;
+import com.bsmwireless.screens.multiday.dagger.MultidayModule;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,12 +29,12 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
-public class MultydayFragment extends BaseFragment implements MultydayView, AdapterView.OnItemSelectedListener {
+public class MultidayFragment extends BaseFragment implements MultidayView, AdapterView.OnItemSelectedListener {
 
     public Unbinder mUnbinder;
 
-    @BindView(R.id.multyday_selector)
-    AppCompatSpinner mMultyDaySelector;
+    @BindView(R.id.multiday_selector)
+    AppCompatSpinner mMultiDaySelector;
     @BindView(R.id.total_off_duty_time)
     TextView mTotalTimeOffDuty;
     @BindView(R.id.total_sleeping_time)
@@ -43,19 +43,19 @@ public class MultydayFragment extends BaseFragment implements MultydayView, Adap
     TextView mTotalTimeDriving;
     @BindView(R.id.total_on_duty_time)
     TextView mTotalTimeOnDuty;
-    @BindView(R.id.multyday_recycler_view)
+    @BindView(R.id.multiday_recycler_view)
     RecyclerView mRecyclerView;
 
     @Inject
-    MultydayPresenter mPresenter;
+    MultidayPresenter mPresenter;
 
-    private MultydayAdapter mAdapter;
+    private MultidayAdapter mAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_multyday, container, false);
+        View view = inflater.inflate(R.layout.fragment_multiday, container, false);
         mUnbinder = ButterKnife.bind(this, view);
-        DaggerMultydayComponent.builder().appComponent(App.getComponent()).multydayModule(new MultydayModule(this)).build().inject(this);
+        DaggerMultidayComponent.builder().appComponent(App.getComponent()).multidayModule(new MultidayModule(this)).build().inject(this);
         return view;
     }
 
@@ -65,20 +65,19 @@ public class MultydayFragment extends BaseFragment implements MultydayView, Adap
 
         initRecyclerView();
 
-        mMultyDaySelector.setOnItemSelectedListener(this);
+        mMultiDaySelector.setOnItemSelectedListener(this);
 
         mPresenter.onViewCreated();
     }
 
     @Override
     public void onDestroyView() {
-        mUnbinder.unbind();
         mPresenter.onDestroy();
         super.onDestroyView();
     }
 
     @Override
-    public void setItems(List<MultydayItemModel> items) {
+    public void setItems(List<MultidayItemModel> items) {
         mAdapter.updateItems(items);
     }
 
@@ -102,10 +101,16 @@ public class MultydayFragment extends BaseFragment implements MultydayView, Adap
         mTotalTimeOnDuty.setText(time);
     }
 
+    @Override
+    public int getDayCount() {
+        String item = (String) mMultiDaySelector.getSelectedItem();
+        return parseDayCount(item);
+    }
+
     private void initRecyclerView() {
         LinearLayoutManager layoutManager = new LinearLayoutManager(mContext);
         mRecyclerView.setLayoutManager(layoutManager);
-        mAdapter = new MultydayAdapter(new ArrayList<>());
+        mAdapter = new MultidayAdapter(new ArrayList<>());
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.addItemDecoration(new DividerItemDecoration(mContext, DividerItemDecoration.VERTICAL));
     }
@@ -113,10 +118,7 @@ public class MultydayFragment extends BaseFragment implements MultydayView, Adap
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         String item = (String) parent.getItemAtPosition(position);
-        Pattern pattern = Pattern.compile("[^0-9]");
-        Matcher matcher = pattern.matcher(item);
-        String number = matcher.replaceAll("");
-        int daysCount = Integer.parseInt(number);
+        int daysCount = parseDayCount(item);
         if (daysCount > 0) {
             mPresenter.getItems(daysCount);
         }
@@ -125,5 +127,12 @@ public class MultydayFragment extends BaseFragment implements MultydayView, Adap
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
 
+    }
+
+    private int parseDayCount(String item) {
+        Pattern pattern = Pattern.compile("[^0-9]");
+        Matcher matcher = pattern.matcher(item);
+        String number = matcher.replaceAll("");
+        return Integer.parseInt(number);
     }
 }

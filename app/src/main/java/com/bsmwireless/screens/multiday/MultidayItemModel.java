@@ -1,8 +1,8 @@
-package com.bsmwireless.screens.multyday;
+package com.bsmwireless.screens.multiday;
 
 import com.bsmwireless.common.utils.DateUtils;
 
-public class MultydayItemModel {
+public class MultidayItemModel {
 
     private static final String DEFAULT_TIME = "00:00";
 
@@ -20,7 +20,7 @@ public class MultydayItemModel {
 
     private long mStartOfDay;
 
-    public MultydayItemModel(long startOfDay) {
+    public MultidayItemModel(long startOfDay) {
         mStartOfDay = startOfDay;
     }
 

@@ -14,8 +14,8 @@ import app.bsmuniversal.com.R;
 
 public class DateUtils {
     private final static int MINUTES_IN_HOUR = 60;
-    private final static int MINUTES_IN_MS = 60 * 1000;
-    private final static int HOURS_IN_MS = 60 * MINUTES_IN_MS;
+    private final static int MS_IN_MINUTE = 60 * 1000;
+    private final static int MS_IN_HOUR = MINUTES_IN_HOUR * MS_IN_MINUTE;
 
     /**
      * @param zone user timezone for example "America/Los_Angeles"
@@ -99,8 +99,8 @@ public class DateUtils {
      * @return string with format time like "128:35"
      */
     public static String convertTotalTimeInMsToStringTime(long time) {
-        int hours = (int) (time / HOURS_IN_MS);
-        int minutes = (int) ((time - hours * HOURS_IN_MS) / MINUTES_IN_MS);
+        int hours = (int) (time / MS_IN_HOUR);
+        int minutes = (int) ((time - hours * MS_IN_HOUR) / MS_IN_MINUTE);
         return String.format(Locale.US, "%02d:%02d", hours, minutes);
     }
 

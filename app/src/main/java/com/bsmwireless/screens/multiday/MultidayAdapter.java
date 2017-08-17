@@ -1,4 +1,4 @@
-package com.bsmwireless.screens.multyday;
+package com.bsmwireless.screens.multiday;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -12,23 +12,23 @@ import app.bsmuniversal.com.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class MultydayAdapter extends RecyclerView.Adapter<MultydayAdapter.ViewHolder> {
+public class MultidayAdapter extends RecyclerView.Adapter<MultidayAdapter.ViewHolder> {
 
-    private List<MultydayItemModel> mItems;
+    private List<MultidayItemModel> mItems;
 
-    public MultydayAdapter(List<MultydayItemModel> items) {
+    public MultidayAdapter(List<MultidayItemModel> items) {
         mItems = items;
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.multyday_item, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.multiday_item, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        MultydayItemModel item = mItems.get(position);
+        MultidayItemModel item = mItems.get(position);
 
         holder.mDrivingTime.setText(item.getTotalDriving());
         holder.mOnDutyTime.setText(item.getTotalOnDuty());
@@ -42,7 +42,7 @@ public class MultydayAdapter extends RecyclerView.Adapter<MultydayAdapter.ViewHo
         return mItems != null ? mItems.size() : 0;
     }
 
-    public void updateItems(List<MultydayItemModel> items) {
+    public void updateItems(List<MultidayItemModel> items) {
         mItems = items;
         notifyDataSetChanged();
     }
