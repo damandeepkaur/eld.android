@@ -4,13 +4,7 @@ import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
 
-import com.bsmwireless.data.storage.carriers.CarrierEntity;
-import com.bsmwireless.data.storage.users.FullUserEntity;
-import com.bsmwireless.data.storage.users.UserEntity;
-
 import java.util.List;
-
-import io.reactivex.Flowable;
 
 import static android.arch.persistence.room.OnConflictStrategy.REPLACE;
 
@@ -22,4 +16,7 @@ public interface HomeTerminalDao {
 
     @Insert(onConflict = REPLACE)
     void insertHomeTerminals(List<HomeTerminalEntity> homeTerminals);
+
+    @Query("SELECT * FROM home_terminals WHERE id = :id LIMIT 1")
+    HomeTerminalEntity getHomeTerminalSync(int id);
 }

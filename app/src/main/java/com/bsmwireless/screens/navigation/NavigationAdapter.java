@@ -6,6 +6,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
 import com.bsmwireless.screens.logs.LogsFragment;
+import com.bsmwireless.screens.multiday.MultidayFragment;
 
 import app.bsmuniversal.com.R;
 
@@ -28,7 +29,7 @@ public class NavigationAdapter extends FragmentStatePagerAdapter {
             case 1:
                 return new LogsFragment();
             default:
-                return new NavigationFakeFragment();
+                return new MultidayFragment();
         }
     }
 

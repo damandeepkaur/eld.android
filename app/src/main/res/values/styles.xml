@@ -11,9 +11,8 @@
         <item name="colorControlActivated">@color/accent</item>
         <item name="android:windowTranslucentStatus">true</item>
         <item name="android:windowTranslucentNavigation">false</item>
+        <item name="alertDialogTheme">@style/AlertDialogTheme</item>
     </style>
-
-    <style name="AlertDialogTheme" parent="Theme.AppCompat.Dialog.Alert"/>
 
     <style name="AppTheme.NoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="windowActionBar">false</item>
@@ -95,6 +94,19 @@
 
     <style name="UnderlinedSpinner" parent="@style/Widget.AppCompat.Spinner.Underlined">
         <item name="android:minHeight">50dp</item>
+    </style>
+
+    <style name="AlertDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="buttonBarNegativeButtonStyle">@style/NegativeButtonStyle</item>
+        <item name="buttonBarPositiveButtonStyle">@style/PositiveButtonStyle</item>
+    </style>
+
+    <style name="NegativeButtonStyle" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
+        <item name="android:textColor">@color/coral</item>
+    </style>
+
+    <style name="PositiveButtonStyle" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
+        <item name="android:textColor">@color/nasty_green</item>
     </style>
 
     <!-- START OLD STYLES -->
