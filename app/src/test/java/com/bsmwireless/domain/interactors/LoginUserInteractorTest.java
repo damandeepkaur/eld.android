@@ -731,7 +731,7 @@ public class LoginUserInteractorTest {
         ResponseMessage responseMessage = new ResponseMessage();
         responseMessage.setMessage(mSuccessResponse);
 
-        Integer fakeTerminalId = Integer.valueOf(31415926);
+        Integer fakeTerminalId = 31415926;
 
         TestObserver<Boolean> testObserver = new TestObserver<>();
 
@@ -750,7 +750,7 @@ public class LoginUserInteractorTest {
         ResponseMessage responseMessage = new ResponseMessage();
         responseMessage.setMessage("");
 
-        Integer fakeTerminalId = Integer.valueOf(31415926);
+        Integer fakeTerminalId = 31415926;
 
         TestObserver<Boolean> testObserver = new TestObserver<>();
 
@@ -770,7 +770,7 @@ public class LoginUserInteractorTest {
         ResponseMessage responseMessage = new ResponseMessage();
         responseMessage.setMessage("");
 
-        Integer fakeTerminalId = Integer.valueOf(31415926);
+        Integer fakeTerminalId = 31415926;
         String fakeErrorMessage = "fake error";
 
         TestObserver<Boolean> testObserver = new TestObserver<>();
