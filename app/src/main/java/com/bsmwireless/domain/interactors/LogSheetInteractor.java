@@ -1,6 +1,11 @@
 package com.bsmwireless.domain.interactors;
 
 import com.bsmwireless.data.network.ServiceApi;
+import com.bsmwireless.data.storage.AppDatabase;
+import com.bsmwireless.data.storage.PreferencesManager;
+import com.bsmwireless.data.storage.hometerminals.HomeTerminalConverter;
+import com.bsmwireless.data.storage.hometerminals.HomeTerminalEntity;
+import com.bsmwireless.models.HomeTerminal;
 import com.bsmwireless.models.LogSheetHeader;
 import com.bsmwireless.models.ResponseMessage;
 
@@ -9,24 +14,66 @@ import java.util.List;
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
-import io.reactivex.schedulers.Schedulers;
 
 import static com.bsmwireless.common.Constants.SUCCESS;
 
 public class LogSheetInteractor {
 
     private ServiceApi mServiceApi;
+    private LoginUserInteractor mUserInteractor;
+    private PreferencesManager mPreferencesManager;
+    private AppDatabase mAppDatabase;
 
     @Inject
-    public LogSheetInteractor(ServiceApi serviceApi) {
+    public LogSheetInteractor(ServiceApi serviceApi, LoginUserInteractor userInteractor, PreferencesManager preferencesManager, AppDatabase appDatabase) {
         mServiceApi = serviceApi;
+        mUserInteractor = userInteractor;
+        mPreferencesManager = preferencesManager;
+        mAppDatabase = appDatabase;
     }
 
-    public Observable<List<LogSheetHeader>> syncLogSheetHeader(Long startLogDay, Long endLogDay) {
+    public Observable<List<LogSheetHeader>> getLogSheetHeaders(Long startLogDay, Long endLogDay) {
         return mServiceApi.getLogSheets(startLogDay, endLogDay);
     }
 
     public Observable<Boolean> updateLogSheetHeader(LogSheetHeader logSheetHeader) {
-        return mServiceApi.updateLogSheetHeader(logSheetHeader).map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
+        return mServiceApi.updateLogSheetHeader(logSheetHeader)
+                .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
     }
+
+    public Observable<LogSheetHeader> createLogSheetHeader(long logday) {
+        LogSheetHeader logSheetHeader = new LogSheetHeader();
+        return Observable.fromCallable(() -> {
+            int driverId = mPreferencesManager.getDriverId();
+            int boxId = mPreferencesManager.getBoxId();
+            int vehicleId = mPreferencesManager.getVehicleId();
+
+            int homeTermId = mAppDatabase.userDao().getUserSync(driverId).getHomeTermId();
+            HomeTerminalEntity entity = mAppDatabase.homeTerminalDao().getHomeTerminalSync(homeTermId);
+            HomeTerminal homeTerminal = HomeTerminalConverter.toHomeTerminal(entity);
+
+            logSheetHeader.setHomeTerminal(homeTerminal);
+            logSheetHeader.setBoxId(boxId);
+            logSheetHeader.setDriverId(driverId);
+            logSheetHeader.setVehicleId(vehicleId);
+
+            logSheetHeader.setLogDay(logday);
+            logSheetHeader.setSigned(false);
+
+            //TODO: fill appropriate fields to real data
+            logSheetHeader.setDutyCycle("");
+            logSheetHeader.setCoDriverIds("");
+            logSheetHeader.setTrailerIds("");
+            logSheetHeader.setStartOfDay(0L);
+            return logSheetHeader;
+        })
+                .flatMap(this::updateLogSheetHeader)
+                .map(updated -> {
+                    if (updated) {
+                        return logSheetHeader;
+                    }
+                    return null;
+                });
+    }
+
 }

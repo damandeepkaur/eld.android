@@ -40,13 +40,12 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
 
     //header + logs + trip info titles
     private final int MIN_LIST_SIZE = 3;
-
     private LogsTitleView mEventsTitleView;
     private LogsTitleView mTripInfoTitleView;
     private CalendarLayout mCalendarLayout;
     private GraphLayout mGraphLayout;
-    private View mSignLogsheet;
-
+    private TextView mSignLogsheet;
+    private View mSigned;
     private List<EventLogModel> mEventLogs = new ArrayList<>();
     private TripInfoModel mTripInfo = new TripInfoModel();
     private List<LogSheetHeader> mLogHeaders = new ArrayList<>();
@@ -55,15 +54,17 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
     private Context mContext;
     private LogsPresenter mPresenter;
     private RecyclerView mRecyclerView;
-    private OnLogsTitleStateChangeListener mOnLogsTitleStateChangeListener;
+    private OnLogsStateChangeListener mOnLogsStateChangeListener;
     private DutyColors mDutyColors;
     private String mNoAddressLabel;
+    private LayoutInflater mLayoutInflater;
 
 
-    public LogsAdapter(Context context, LogsPresenter presenter, OnLogsTitleStateChangeListener snackBarClickListener) {
+    public LogsAdapter(Context context, LogsPresenter presenter,
+                       OnLogsStateChangeListener snackBarClickListener) {
         mContext = context;
         mPresenter = presenter;
-        mOnLogsTitleStateChangeListener = snackBarClickListener;
+        mOnLogsStateChangeListener = snackBarClickListener;
 
         mOnMenuClickListener = view -> {
             EventLogModel log = (EventLogModel) view.getTag();
@@ -79,6 +80,7 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
 
         mDutyColors = new DutyColors(mContext);
         mNoAddressLabel = mContext.getResources().getString(R.string.no_address_available);
+        mLayoutInflater = LayoutInflater.from(mContext);
     }
 
     public void setEventLogs(List<EventLogModel> eventLogs) {
@@ -104,24 +106,42 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
         mLogHeaders = logHeaders;
         if (mCalendarLayout != null) {
             mCalendarLayout.setLogs(logHeaders);
+            updateSignButton();
         }
         notifyDataSetChanged();
     }
 
+    private void updateSignButton() {
+        CalendarItem calendarItem = mCalendarLayout.getCurrentItem();
+        LogSheetHeader logSheetHeader = calendarItem.getAssociatedLogSheet();
+        if (logSheetHeader != null && Boolean.TRUE.equals(logSheetHeader.getSigned())) {
+            mSignLogsheet.setVisibility(View.GONE);
+            mSigned.setVisibility(View.VISIBLE);
+        } else {
+            mSignLogsheet.setVisibility(View.VISIBLE);
+            mSigned.setVisibility(View.GONE);
+        }
+    }
+
     @Override
     public LogsHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        LayoutInflater layoutInflater = LayoutInflater.from(mContext);
         View view;
         switch (viewType) {
             case VIEW_TYPE_HEADER:
-                view = layoutInflater.inflate(R.layout.logs_list_item_header, parent, false);
-
-                mSignLogsheet = view.findViewById(R.id.sign_logsheet);
-                mSignLogsheet.setOnClickListener(v -> mPresenter.onSignLogsheetButtonClicked());
+                view = mLayoutInflater.inflate(R.layout.logs_list_item_header, parent, false);
 
                 mCalendarLayout = (CalendarLayout) view.findViewById(R.id.calendar);
                 mCalendarLayout.setLogs(mLogHeaders);
-                mCalendarLayout.setOnItemSelectedListener(calendarItem -> mPresenter.onCalendarDaySelected(calendarItem));
+                mCalendarLayout.setOnItemSelectedListener(calendarItem -> {
+                    updateSignButton();
+                    mPresenter.onCalendarDaySelected(calendarItem);
+                });
+
+                mSignLogsheet = (TextView) view.findViewById(R.id.sign_logsheet);
+                mSigned = view.findViewById(R.id.signed);
+
+                mSignLogsheet.setOnClickListener(v -> mOnLogsStateChangeListener.onSignButtonClicked(
+                        mCalendarLayout.getCurrentItem()));
 
                 mGraphLayout = (GraphLayout) view.findViewById(R.id.graphic);
                 mGraphLayout.setELDEvents(mEventLogs, mTripInfo.getStartDayTime());
@@ -134,7 +154,7 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
                 view = mEventsTitleView;
                 break;
             case VIEW_TYPE_EVENTS_ITEM:
-                view = layoutInflater.inflate(R.layout.logs_list_item_eld_event, parent, false);
+                view = mLayoutInflater.inflate(R.layout.logs_list_item_eld_event, parent, false);
                 break;
             case VIEW_TYPE_TRIP_INFO_TITLE:
                 mTripInfoTitleView = new LogsTitleView(mContext);
@@ -143,7 +163,7 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
                 view = mTripInfoTitleView;
                 break;
             default:
-                view = layoutInflater.inflate(R.layout.logs_list_item_trip_info, parent, false);
+                view = mLayoutInflater.inflate(R.layout.logs_list_item_trip_info, parent, false);
                 break;
         }
         return new LogsHolder(view, viewType);
@@ -172,7 +192,7 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
     private void onTitleItemClicked(LogsTitleView titleView) {
         if (titleView.isCollapsed()) {
             titleView.expand();
-            mOnLogsTitleStateChangeListener.show(titleView.getType());
+            mOnLogsStateChangeListener.showTitle(titleView.getType());
             if (titleView.getType() == EVENTS) {
                 mTripInfoTitleView.collapse();
             } else {
@@ -180,7 +200,7 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
             }
         } else {
             titleView.collapse();
-            mOnLogsTitleStateChangeListener.hide();
+            mOnLogsStateChangeListener.hideTitle();
         }
 
         notifyDataSetChanged();
@@ -249,10 +269,12 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
         return mCalendarLayout.getCurrentItem();
     }
 
-    public interface OnLogsTitleStateChangeListener {
-        void show(LogsTitleView.Type type);
+    public interface OnLogsStateChangeListener {
+        void showTitle(LogsTitleView.Type type);
 
-        void hide();
+        void hideTitle();
+
+        void onSignButtonClicked(CalendarItem calendarItem);
     }
 
     static class LogsHolder extends RecyclerView.ViewHolder {

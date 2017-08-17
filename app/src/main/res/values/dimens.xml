@@ -125,6 +125,7 @@
     <dimen name="logs_list_item_eld_event_divider_margin_top">10dp</dimen>
     <dimen name="logs_list_item_header_sign_logsheet_height">52dp</dimen>
     <dimen name="logs_list_item_header_sign_logsheet_padding">10dp</dimen>
+    <dimen name="logs_list_item_header_sign_logsheet_margin_top">8dp</dimen>
     <dimen name="logs_list_item_header_calendar_height">85dp</dimen>
     <dimen name="logs_list_item_header_sign_graph_height">170dp</dimen>
     <dimen name="logs_list_item_header_sign_graph_margin_left">8dp</dimen>
@@ -136,6 +137,14 @@
     <dimen name="logs_list_item_trip_info_height">48dp</dimen>
     <dimen name="logs_list_item_trip_info_margin_left">15dp</dimen>
     <dimen name="logs_list_item_trip_info_margin_right">93dp</dimen>
+
+    <!--Logs sign dialog-->
+    <dimen name="sign_dialog_margin_top">12dp</dimen>
+    <dimen name="sign_dialog_margin_left">24dp</dimen>
+    <dimen name="sign_dialog_margin_right">24dp</dimen>
+    <dimen name="sign_dialog_title_line_spacing_extra">8sp</dimen>
+    <dimen name="sign_dialog_visibility_note_margin_top">8dp</dimen>
+    <dimen name="sign_dialog_visibility_note_line_spacing_extra">6sp</dimen>
 
     <!-- Settings Activity -->
     <dimen name="divider_height">1dp</dimen>

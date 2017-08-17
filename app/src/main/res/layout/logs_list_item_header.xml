@@ -5,11 +5,13 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <TextView
+    <Button
         android:id="@+id/sign_logsheet"
         android:layout_width="wrap_content"
-        android:layout_height="@dimen/logs_list_item_header_sign_logsheet_height"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
         android:layout_gravity="end"
+        android:layout_margin="@dimen/logs_list_item_header_sign_logsheet_margin_top"
         android:gravity="center_vertical"
         android:padding="@dimen/logs_list_item_header_sign_logsheet_padding"
         android:text="@string/sign_logsheet"
@@ -17,6 +19,22 @@
         android:textColor="@color/nasty_green"
         android:textSize="@dimen/text_size_small"
         android:textStyle="bold"/>
+
+    <Button
+        android:id="@+id/signed"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:layout_margin="@dimen/logs_list_item_header_sign_logsheet_margin_top"
+        android:background="@drawable/signed_btn_bg"
+        android:gravity="center"
+        android:padding="@dimen/logs_list_item_header_sign_logsheet_padding"
+        android:text="@string/signed"
+        android:textAllCaps="true"
+        android:textColor="@color/light_gray_color"
+        android:textSize="@dimen/text_size_small"
+        android:textStyle="bold"
+        android:visibility="gone"/>
 
     <View
         android:layout_width="match_parent"
