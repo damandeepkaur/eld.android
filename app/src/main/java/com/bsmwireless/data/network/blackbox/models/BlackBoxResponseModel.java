@@ -4,7 +4,7 @@ import com.bsmwireless.models.BlackBoxModel;
 
 public class BlackBoxResponseModel {
 
-    private ResponseType mResponseType = ResponseType.None;
+    private ResponseType mResponseType = ResponseType.NONE;
     private int mCheckSum;
     private int mLength;
     private int mSequenceId;
@@ -76,15 +76,15 @@ public class BlackBoxResponseModel {
     }
 
     public enum ResponseType {
-        None(Character.MIN_VALUE),
-        Ack('a'),
-        NAck('n'),
-        StatusUpdate('S'),
-        IgnitionOn('I'),
-        IgnitionOff('i'),
-        Moving('G'),
-        Stopped('g'),
-        SensorChange('E');
+        NONE(Character.MIN_VALUE),
+        ACK('a'),
+        NACK('n'),
+        STATUS_UPDATE('S'),
+        IGNITION_ON('I'),
+        IGNITION_OFF('i'),
+        MOVING('G'),
+        STOPPED('g'),
+        SENSOR_CHANGE('E');
 
         final char msgType;
 
@@ -95,33 +95,33 @@ public class BlackBoxResponseModel {
         public static ResponseType valueOf(char type) {
             switch (type) {
                 case 'a':
-                    return Ack;
+                    return ACK;
                 case 'n':
-                    return NAck;
+                    return NACK;
                 case 'S':
-                    return StatusUpdate;
+                    return STATUS_UPDATE;
                 case 'I':
-                    return IgnitionOn;
+                    return IGNITION_ON;
                 case 'i':
-                    return IgnitionOff;
+                    return IGNITION_OFF;
                 case 'G':
-                    return Moving;
+                    return MOVING;
                 case 'g':
-                    return Stopped;
+                    return STOPPED;
                 case 'E':
-                    return SensorChange;
+                    return SENSOR_CHANGE;
                 default:
-                    return None;
+                    return NONE;
             }
         }
 
     }
 
     public enum NackReasonCode {
-        CheckSum_Wrong((byte) 0x01),
-        BoxId_MisMatch((byte) 0x02),
-        TimeStamp_older((byte) 0x03),
-        Unknown_Error((byte) 0x00);
+        CHECK_SUM_WRONG((byte) 0x01),
+        BOX_ID_MISMATCH((byte) 0x02),
+        TIME_STAMP_OLDER((byte) 0x03),
+        UNKNOWN_ERROR((byte) 0x00);
 
         final byte mByteVal;
 
@@ -137,10 +137,8 @@ public class BlackBoxResponseModel {
             for (NackReasonCode reasonCode : values()) {
                 if (reasonCode.getByteVal() == byteVal)
                     return reasonCode;
-
             }
-
-            return Unknown_Error;
+            return UNKNOWN_ERROR;
         }
     }
 }

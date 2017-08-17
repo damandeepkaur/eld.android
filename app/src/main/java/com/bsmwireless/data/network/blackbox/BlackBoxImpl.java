@@ -16,7 +16,7 @@ import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
 import timber.log.Timber;
 
-import static com.bsmwireless.data.network.blackbox.models.BlackBoxResponseModel.NackReasonCode.Unknown_Error;
+import static com.bsmwireless.data.network.blackbox.models.BlackBoxResponseModel.NackReasonCode.UNKNOWN_ERROR;
 import static com.bsmwireless.data.network.blackbox.utils.BlackBoxParser.HEADER_LENGTH;
 import static com.bsmwireless.data.network.blackbox.utils.BlackBoxParser.START_INDEX;
 
@@ -27,6 +27,7 @@ public final class BlackBoxImpl implements BlackBox {
     private static final int RETRY_COUNT = 5;
     public static final int BUFFER_SIZE = 64;
     public static final int UPDATE_RATE_MILLIS = 10000;
+    public static final int UPDATE_RATE_RATIO = 10;
     public static final int TIMEOUT_RATIO = 5;
 
     private Socket mSocket;
@@ -41,7 +42,7 @@ public final class BlackBoxImpl implements BlackBox {
         if (!isConnected()) {
             mSocket = new Socket(WIFI_GATEWAY_IP, WIFI_REMOTE_PORT);
             mEmitter = BehaviorSubject.create();
-            mBoxId = boxId;
+            mBoxId = /*boxId;*/ 209926;
             mDisposable = Observable.interval(RETRY_CONNECT_DELAY, TimeUnit.MILLISECONDS)
                     .take(RETRY_COUNT)
                     .filter(this::initializeCommunication)
@@ -49,7 +50,7 @@ public final class BlackBoxImpl implements BlackBox {
                     .switchMap(unused -> startContinuousRead())
                     .timeout(UPDATE_RATE_MILLIS * TIMEOUT_RATIO,
                             TimeUnit.MILLISECONDS,
-                            Observable.error(new BlackBoxConnectionException(Unknown_Error)))
+                            Observable.error(new BlackBoxConnectionException(UNKNOWN_ERROR)))
                     .doOnError(throwable -> {
                         Timber.e(throwable);
                         disconnect();
@@ -84,14 +85,14 @@ public final class BlackBoxImpl implements BlackBox {
     private boolean initializeCommunication(long retryIndex) throws Exception {
         Timber.d("initializeCommunication");
         if (retryIndex == RETRY_COUNT - 1) {
-            throw new BlackBoxConnectionException(Unknown_Error);
+            throw new BlackBoxConnectionException(UNKNOWN_ERROR);
         }
         writeRawData(BlackBoxParser.generateSubscriptionRequest(getSequenceID(), mBoxId, UPDATE_RATE_MILLIS));
         BlackBoxResponseModel response = readSubscriptionResponse();
-        if (response.getResponseType() == BlackBoxResponseModel.ResponseType.Ack) {
+        if (response.getResponseType() == BlackBoxResponseModel.ResponseType.ACK) {
             Timber.d("readSubscriptionResponse ok");
             return true;
-        } else if (response.getResponseType() == BlackBoxResponseModel.ResponseType.NAck){
+        } else if (response.getResponseType() == BlackBoxResponseModel.ResponseType.NACK){
             Timber.e("readSubscriptionResponse error");
             throw new BlackBoxConnectionException(response.getErrReasonCode());
         }
@@ -100,11 +101,11 @@ public final class BlackBoxImpl implements BlackBox {
 
     private Observable<BlackBoxModel> startContinuousRead() {
         Timber.d("startContinuousRead");
-        return Observable.interval(UPDATE_RATE_MILLIS / 2, TimeUnit.MILLISECONDS)
+        return Observable.interval(UPDATE_RATE_MILLIS / UPDATE_RATE_RATIO, TimeUnit.MILLISECONDS)
                 .observeOn(Schedulers.io())
                 .filter(unused -> isConnected())
                 .map(unused -> mSocket.getInputStream())
-                .filter(stream -> stream.available() > 0)
+                .filter(stream -> stream.available() > START_INDEX)
                 .map(this::readRawData)
                 .map(bytes -> BlackBoxParser.parseVehicleStatus(bytes).getBoxData())
                 .distinctUntilChanged()
@@ -129,18 +130,15 @@ public final class BlackBoxImpl implements BlackBox {
 
     private byte[] readRawData(InputStream input) throws Exception {
         byte[] response = new byte[BUFFER_SIZE];
-        int available = input.available();
-        if (available > START_INDEX) {
-            byte[] buf = new byte[START_INDEX];
-            int len = input.read(buf, 0, START_INDEX);
-            System.arraycopy(buf, 0, response, 0, len);
-            BlackBoxResponseModel model = new BlackBoxResponseModel();
-            if (BlackBoxParser.parseHeader(response, model)) {
-                int packetLength = model.getLength();
-                buf = new byte[packetLength - START_INDEX + HEADER_LENGTH];
-                len = input.read(buf, 0, packetLength - START_INDEX + HEADER_LENGTH);
-                System.arraycopy(buf, 0, response, START_INDEX, len - HEADER_LENGTH);
-            }
+        byte[] buf = new byte[START_INDEX];
+        int len = input.read(buf, 0, START_INDEX);
+        System.arraycopy(buf, 0, response, 0, len);
+        BlackBoxResponseModel model = new BlackBoxResponseModel();
+        if (BlackBoxParser.parseHeader(response, model)) {
+            int packetLength = model.getLength();
+            buf = new byte[packetLength - START_INDEX + HEADER_LENGTH];
+            len = input.read(buf, 0, packetLength - START_INDEX + HEADER_LENGTH);
+            System.arraycopy(buf, 0, response, START_INDEX, len - HEADER_LENGTH);
         }
         return response;
     }

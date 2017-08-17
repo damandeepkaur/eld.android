@@ -15,7 +15,7 @@ import timber.log.Timber;
 public class BlackBoxParser {
     public static final int START_INDEX = 11;
     //  2 start bytes, 1 checksum, 2 length, 1 command, 1 packetId,  4 boxid, 2 year, 1 month, 1 day, 1 hour, 1 minute, 1 sec, 2 millisecond, 1 GPS, 1 update rate.
-    private static final int PACKET_LENGTH = 22;
+    private static final int SUBSCRIPTION_PACKET_LENGTH = 22;
     private static final byte SUBSCRIPTION_REQUEST = (byte) 'C';
     private static final byte START_MESSAGE_INDICATOR = (byte) '@';
     private static final byte START_PACKET_INDICATOR = (byte) 0xFF;
@@ -37,9 +37,9 @@ public class BlackBoxParser {
             byte msg = data[index++];
             responseModel.setResponseType(BlackBoxResponseModel.ResponseType.valueOf((char) msg));
             responseModel.setSequenceId(data[index++] & 0x0FF);
-            // on Ack - parse for the VIN , available from the subscription ack message
+            // on ACK - parse for the VIN , available from the subscription ack message
             // is length 31 excluding the header
-            if (responseModel.getResponseType() == BlackBoxResponseModel.ResponseType.Ack && responseModel.getLength() == 31) {
+            if (responseModel.getResponseType() == BlackBoxResponseModel.ResponseType.ACK && responseModel.getLength() == 31) {
                 int sum = 0;
                 for (int i = VIN_INDEX_START; i < VIN_INDEX_END; ++i) {
                     sum |= data[i];
@@ -51,7 +51,7 @@ public class BlackBoxParser {
                 responseModel.setVinNumber(vinNumber);
                 Timber.i("VIN number from the box " + responseModel.getVinNumber());
             }
-            if (responseModel.getResponseType() == BlackBoxResponseModel.ResponseType.NAck) {
+            if (responseModel.getResponseType() == BlackBoxResponseModel.ResponseType.NACK) {
                 responseModel.setErrReasonCode(BlackBoxResponseModel.NackReasonCode.fromValue(data[index]));
             }
         }
@@ -89,7 +89,7 @@ public class BlackBoxParser {
 
             Calendar cal = new GregorianCalendar(year, month - 1, day, hr, min, sec);
             cal.setTimeZone(TimeZone.getTimeZone("UTC"));
-            boxData.setEvenTimeUTC(cal.getTime());
+            boxData.setEventTimeUTC(cal.getTime());
 
             //TODO: process sensor state
             // sensor state 24-26 3 byte
@@ -136,7 +136,7 @@ public class BlackBoxParser {
     }
 
     public static byte[] generateSubscriptionRequest(byte sequenceID, int boxID, int updateRateMillis) {
-        byte[] request = new byte[PACKET_LENGTH + HEADER_LENGTH];
+        byte[] request = new byte[SUBSCRIPTION_PACKET_LENGTH + HEADER_LENGTH];
         int index = 0;
 
         System.arraycopy(generateHeader(), 0, request, index, HEADER_LENGTH + 2);
@@ -145,7 +145,7 @@ public class BlackBoxParser {
         request[CHECK_SUM_INDX] = 0;
         index++;
         //Packet length
-        byte[] lengthBytes = ConnectionUtils.intToByte(PACKET_LENGTH, 2);
+        byte[] lengthBytes = ConnectionUtils.intToByte(SUBSCRIPTION_PACKET_LENGTH, 2);
         System.arraycopy(lengthBytes, 0, request, index, 2); // 2 bytes
         index += 2;
         //Command
@@ -193,7 +193,7 @@ public class BlackBoxParser {
             }
         }
         //TelematicDevice type -Always android
-        if (data[index++] != (byte) Constants.DEVICE_TYPE.charAt(0)) {
+        if (data[index++] != DEVICE_TYPE) {
             return false;
         }
         // Two bytes of 0xFF indicating start of the packet

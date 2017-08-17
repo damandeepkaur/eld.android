@@ -1,10 +1,5 @@
 package com.bsmwireless.data.network.blackbox.utils;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.TimeZone;
-
 /**
  * Utility function used in generating request and processing the response
  */

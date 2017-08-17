@@ -17,7 +17,7 @@ public class BlackBoxModel {
     private int mHeading;
     private int mTERT;
     private BlackBoxResponseModel.ResponseType mResponseType;
-    private Date mEvenTimeUTC;
+    private Date mEventTimeUTC;
     private int mSequenceNum;
     private long mBoxId;
     private int mTDMsgQueue;
@@ -90,12 +90,12 @@ public class BlackBoxModel {
         this.mResponseType = responseType;
     }
 
-    public Date getEvenTimeUTC() {
-        return mEvenTimeUTC;
+    public Date getEventTimeUTC() {
+        return mEventTimeUTC;
     }
 
-    public void setEvenTimeUTC(Date evenTimeUTC) {
-        this.mEvenTimeUTC = evenTimeUTC;
+    public void setEventTimeUTC(Date eventTimeUTC) {
+        this.mEventTimeUTC = eventTimeUTC;
     }
 
     public int getSequenceNum() {
@@ -147,7 +147,7 @@ public class BlackBoxModel {
                 .append(mHeading, that.mLon)
                 .append(mTERT, that.mTERT)
                 .append(mResponseType, that.mResponseType)
-                .append(mEvenTimeUTC, that.mEvenTimeUTC)
+                .append(mEventTimeUTC, that.mEventTimeUTC)
                 .append(mSequenceNum, that.mSequenceNum)
                 .append(mBoxId, that.mBoxId)
                 .append(mTDMsgQueue, that.mTDMsgQueue)
@@ -167,7 +167,7 @@ public class BlackBoxModel {
                 .append(mHeading)
                 .append(mTERT)
                 .append(mResponseType)
-                .append(mEvenTimeUTC)
+                .append(mEventTimeUTC)
                 .append(mSequenceNum)
                 .append(mBoxId)
                 .append(mTDMsgQueue)
@@ -186,7 +186,7 @@ public class BlackBoxModel {
         sb.append(", mHeading=").append(mHeading);
         sb.append(", mTERT=").append(mTERT);
         sb.append(", mResponseType=").append(mResponseType.name());
-        sb.append(", mEvenTimeUTC=").append(DateUtils.getLocalDate("Etc/UTC", mEvenTimeUTC.getTime()));
+        sb.append(", mEventTimeUTC=").append(DateUtils.getLocalDate("Etc/UTC", mEventTimeUTC.getTime()));
         sb.append(", mSequenceNum=").append(mSequenceNum);
         sb.append(", mBoxId=").append(mBoxId);
         sb.append(", mTDMsgQueue=").append(mTDMsgQueue);
