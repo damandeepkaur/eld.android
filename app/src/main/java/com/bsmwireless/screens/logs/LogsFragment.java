@@ -131,7 +131,7 @@ public class LogsFragment extends BaseFragment implements LogsView {
         }
     }
 
-    public void showSnackBarError(String message) {
+    public void showNotificationSnackBar(String message) {
         mNavigateView.getSnackBar()
                      .setOnReadyListener(snackBar -> {
                          snackBar.reset()
@@ -187,16 +187,14 @@ public class LogsFragment extends BaseFragment implements LogsView {
 
     @Override
     public void eventAdded() {
-        //TODO: show message
-        Toast.makeText(mContext, "Event added.", Toast.LENGTH_SHORT).show();
+        showNotificationSnackBar(getString(R.string.event_added));
         CalendarItem item = mAdapter.getCurrentItem();
         mPresenter.updateEventForDay(item.getCalendar());
     }
 
     @Override
     public void eventUpdated() {
-        //TODO: show message
-        Toast.makeText(mContext, "Event updated.", Toast.LENGTH_SHORT).show();
+        showNotificationSnackBar(getString(R.string.event_updated));
         CalendarItem item = mAdapter.getCurrentItem();
         mPresenter.updateEventForDay(item.getCalendar());
     }
@@ -204,13 +202,13 @@ public class LogsFragment extends BaseFragment implements LogsView {
     @Override
     public void showError(Throwable throwable) {
         Timber.e(throwable.getMessage());
-        showSnackBarError(NetworkUtils.getErrorMessage((RetrofitException) throwable, mContext).toString());
+        showNotificationSnackBar(NetworkUtils.getErrorMessage((RetrofitException) throwable, mContext).toString());
     }
 
     @Override
     public void showError(Error error) {
         Timber.e(getString(error.getStringId()));
-        showSnackBarError(getString(error.getStringId()));
+        showNotificationSnackBar(getString(error.getStringId()));
     }
 
     @Override
