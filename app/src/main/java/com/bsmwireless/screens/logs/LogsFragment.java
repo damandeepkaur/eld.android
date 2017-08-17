@@ -116,14 +116,14 @@ public class LogsFragment extends BaseFragment implements LogsView {
         switch (expandedType) {
             case EVENTS:
                 mNavigateView.getSnackBar()
-                             .setPreShowListener(snackBar ->
+                             .setOnReadyListener(snackBar ->
                                      snackBar.reset()
                                              .setPositiveLabel(mContext.getString(R.string.add_event), v -> mPresenter.onAddEventClicked(mAdapter.getCurrentItem())))
                              .showSnackbar();
                 break;
             case TRIP_INFO:
                 mNavigateView.getSnackBar()
-                             .setPreShowListener(snackBar ->
+                             .setOnReadyListener(snackBar ->
                                      snackBar.reset()
                                              .setPositiveLabel(mContext.getString(R.string.edit), v -> mPresenter.onEditTripInfoClicked()))
                              .showSnackbar();
@@ -133,7 +133,7 @@ public class LogsFragment extends BaseFragment implements LogsView {
 
     public void showSnackBarError(String message) {
         mNavigateView.getSnackBar()
-                     .setPreShowListener(snackBar -> {
+                     .setOnReadyListener(snackBar -> {
                          snackBar.reset()
                                  .setMessage(message)
                                  .setHideableOnTimeout(SnackBarLayout.DURATION_LONG)

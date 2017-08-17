@@ -35,7 +35,7 @@ public class SnackBarLayout extends RelativeLayout {
 
     private OnCloseListener mCloseListener;
 
-    private PreShowListener mPreShowListener;
+    private OnReadyListener mOnReadyListener;
 
     @BindView(R.id.snackbar_layout)
     View mLayout;
@@ -181,8 +181,8 @@ public class SnackBarLayout extends RelativeLayout {
         } else {
             mCurrentState = STATE_EXPANDED;
 
-            if (mPreShowListener != null) {
-                mPreShowListener.onPreShow(this);
+            if (mOnReadyListener != null) {
+                mOnReadyListener.onReadyToShow(this);
             }
 
             if (mBottomSheet != null) {
@@ -233,13 +233,13 @@ public class SnackBarLayout extends RelativeLayout {
         mDuration = DURATION_INFINITE;
         mHandler.removeCallbacksAndMessages(null);
         mCloseListener = null;
-        mPreShowListener = null;
+        mOnReadyListener = null;
 
         return this;
     }
 
-    public SnackBarLayout setPreShowListener(PreShowListener preShowListener) {
-        mPreShowListener = preShowListener;
+    public SnackBarLayout setOnReadyListener(OnReadyListener onReadyListener) {
+        mOnReadyListener = onReadyListener;
         return this;
     }
 
@@ -248,7 +248,7 @@ public class SnackBarLayout extends RelativeLayout {
         void onOpen(SnackBarLayout snackBar);
     }
 
-    public interface PreShowListener {
-        void onPreShow(SnackBarLayout snackBar);
+    public interface OnReadyListener {
+        void onReadyToShow(SnackBarLayout snackBar);
     }
 }
