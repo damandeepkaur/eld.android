@@ -3,6 +3,7 @@ package com.bsmwireless.screens.logs;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -15,7 +16,7 @@ import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.LogSheetHeader;
 import com.bsmwireless.screens.common.BaseFragment;
 import com.bsmwireless.screens.editevent.EditEventActivity;
-import com.bsmwireless.screens.logs.LogsAdapter.OnLogsTitleStateChangeListener;
+import com.bsmwireless.screens.logs.LogsAdapter.OnLogsStateChangeListener;
 import com.bsmwireless.screens.logs.dagger.DaggerLogsComponent;
 import com.bsmwireless.screens.logs.dagger.EventLogModel;
 import com.bsmwireless.screens.logs.dagger.LogsModule;
@@ -77,15 +78,20 @@ public class LogsFragment extends BaseFragment implements LogsView {
 
         DaggerLogsComponent.builder().appComponent(App.getComponent()).logsModule(new LogsModule(this)).build().inject(this);
 
-        mAdapter = new LogsAdapter(mContext, mPresenter, new OnLogsTitleStateChangeListener() {
+        mAdapter = new LogsAdapter(mContext, mPresenter, new OnLogsStateChangeListener() {
             @Override
-            public void show(LogsTitleView.Type expandedType) {
+            public void showTitle(LogsTitleView.Type expandedType) {
                 showSnackBar(expandedType);
             }
 
             @Override
-            public void hide() {
+            public void hideTitle() {
                 mNavigateView.getSnackBar().hideSnackbar();
+            }
+
+            @Override
+            public void onSignButtonClicked(CalendarItem calendarItem) {
+                showSignDialog(calendarItem);
             }
         });
 
@@ -126,6 +132,19 @@ public class LogsFragment extends BaseFragment implements LogsView {
         }
     }
 
+    public void showSignDialog(CalendarItem calendarItem) {
+        View alertView = getActivity().getLayoutInflater().inflate(R.layout.sign_dialog_view, null);
+        AlertDialog signDialog = new AlertDialog.Builder(mContext)
+                .setTitle(R.string.sign_dialog_title)
+                .setPositiveButton(R.string.accept,
+                        (dialog, whichButton) -> mPresenter.onSignLogsheetButtonClicked(
+                                calendarItem))
+                .setNegativeButton(R.string.decline, null)
+                .create();
+        signDialog.setView(alertView);
+        signDialog.show();
+    }
+
     @Override
     public void setEventLogs(List<EventLogModel> eventLogs) {
         mAdapter.setEventLogs(eventLogs);
@@ -163,30 +182,30 @@ public class LogsFragment extends BaseFragment implements LogsView {
 
     @Override
     public void eventAdded() {
-        //TODO: show message
+        //TODO: showTitle message
         Toast.makeText(mContext, "Event added.", Toast.LENGTH_SHORT).show();
         CalendarItem item = mAdapter.getCurrentItem();
-        mPresenter.updateEventForDay(item.getCalendar());
+        mPresenter.setEventsForDay(item.getCalendar());
     }
 
     @Override
     public void eventUpdated() {
-        //TODO: show message
+        //TODO: showTitle message
         Toast.makeText(mContext, "Event updated.", Toast.LENGTH_SHORT).show();
         CalendarItem item = mAdapter.getCurrentItem();
-        mPresenter.updateEventForDay(item.getCalendar());
+        mPresenter.setEventsForDay(item.getCalendar());
     }
 
     @Override
     public void showError(Throwable throwable) {
-        //TODO: show error message
+        //TODO: showTitle error message
         Timber.e(throwable.getMessage());
         Toast.makeText(mContext, throwable.getMessage(), Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void showError(Error error) {
-        //TODO: show error message
+        //TODO: showTitle error message
         Timber.e(getString(error.getStringId()));
         Toast.makeText(mContext, getString(error.getStringId()), Toast.LENGTH_SHORT).show();
     }
