@@ -70,4 +70,17 @@ public class CalendarItem {
         calendar.setTime(new Date(date));
         return calendar.get(Calendar.DAY_OF_YEAR) == mCalendar.get(Calendar.DAY_OF_YEAR);
     }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("CalendarItem{");
+        sb.append("mCalendar=").append(mCalendar);
+        sb.append(", mAssociatedLog=").append(mAssociatedLog);
+        sb.append(", mTimestamp=").append(mTimestamp);
+        sb.append(", mMonth='").append(mMonth).append('\'');
+        sb.append(", mDay='").append(mDay).append('\'');
+        sb.append(", mDayOfWeek='").append(mDayOfWeek).append('\'');
+        sb.append('}');
+        return sb.toString();
+    }
 }

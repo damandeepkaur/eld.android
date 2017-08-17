@@ -128,7 +128,7 @@ public class EditEventPresenter {
     private ELDEvent prepareNewELDEvent() {
         ELDEvent event = new ELDEvent();
         event.setStatus(ELDEvent.StatusCode.ACTIVE.getValue());
-        event.setOrigin(2);
+        event.setOrigin(ELDEvent.EventOrigin.DRIVER.getValue());
         event.setEventType(ELDEvent.EventType.DUTY_STATUS_CHANGING.getValue());
         event.setEventCode(DutyType.OFF_DUTY.getId());
         event.setEventTime(mEventDay);

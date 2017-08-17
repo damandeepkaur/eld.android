@@ -3,6 +3,7 @@ package com.bsmwireless.screens.logs;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -17,7 +18,7 @@ import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.LogSheetHeader;
 import com.bsmwireless.screens.common.BaseFragment;
 import com.bsmwireless.screens.editevent.EditEventActivity;
-import com.bsmwireless.screens.logs.LogsAdapter.OnLogsTitleStateChangeListener;
+import com.bsmwireless.screens.logs.LogsAdapter.OnLogsStateChangeListener;
 import com.bsmwireless.screens.logs.dagger.DaggerLogsComponent;
 import com.bsmwireless.screens.logs.dagger.EventLogModel;
 import com.bsmwireless.screens.logs.dagger.LogsModule;
@@ -80,15 +81,20 @@ public class LogsFragment extends BaseFragment implements LogsView {
 
         DaggerLogsComponent.builder().appComponent(App.getComponent()).logsModule(new LogsModule(this)).build().inject(this);
 
-        mAdapter = new LogsAdapter(mContext, mPresenter, new OnLogsTitleStateChangeListener() {
+        mAdapter = new LogsAdapter(mContext, mPresenter, new OnLogsStateChangeListener() {
             @Override
-            public void show(LogsTitleView.Type expandedType) {
+            public void showTitle(LogsTitleView.Type expandedType) {
                 showSnackBar(expandedType);
             }
 
             @Override
-            public void hide() {
+            public void hideTitle() {
                 mNavigateView.getSnackBar().hideSnackbar();
+            }
+
+            @Override
+            public void onSignButtonClicked(CalendarItem calendarItem) {
+                showSignDialog(calendarItem);
             }
         });
 
@@ -150,6 +156,19 @@ public class LogsFragment extends BaseFragment implements LogsView {
                      .showSnackbar();
     }
 
+    public void showSignDialog(CalendarItem calendarItem) {
+        View alertView = getActivity().getLayoutInflater().inflate(R.layout.sign_dialog_view, null);
+        AlertDialog signDialog = new AlertDialog.Builder(mContext)
+                .setTitle(R.string.sign_dialog_title)
+                .setPositiveButton(R.string.accept,
+                        (dialog, whichButton) -> mPresenter.onSignLogsheetButtonClicked(
+                                calendarItem))
+                .setNegativeButton(R.string.decline, null)
+                .create();
+        signDialog.setView(alertView);
+        signDialog.show();
+    }
+
     @Override
     public void setEventLogs(List<EventLogModel> eventLogs) {
         mAdapter.setEventLogs(eventLogs);
@@ -189,14 +208,14 @@ public class LogsFragment extends BaseFragment implements LogsView {
     public void eventAdded() {
         showNotificationSnackBar(getString(R.string.event_added));
         CalendarItem item = mAdapter.getCurrentItem();
-        mPresenter.updateEventForDay(item.getCalendar());
+        mPresenter.setEventsForDay(item.getCalendar());
     }
 
     @Override
     public void eventUpdated() {
         showNotificationSnackBar(getString(R.string.event_updated));
         CalendarItem item = mAdapter.getCurrentItem();
-        mPresenter.updateEventForDay(item.getCalendar());
+        mPresenter.setEventsForDay(item.getCalendar());
     }
 
     @Override
