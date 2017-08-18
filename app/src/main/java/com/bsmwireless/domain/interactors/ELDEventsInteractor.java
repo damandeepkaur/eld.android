@@ -5,11 +5,14 @@ import android.accounts.NetworkErrorException;
 import com.bsmwireless.common.utils.NetworkUtils;
 import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.storage.AppDatabase;
+import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.data.storage.eldevents.ELDEventConverter;
 import com.bsmwireless.data.storage.eldevents.ELDEventDao;
 import com.bsmwireless.data.storage.eldevents.ELDEventEntity;
 import com.bsmwireless.models.ELDEvent;
+import com.bsmwireless.screens.logs.dagger.EventLogModel;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -27,11 +30,13 @@ public class ELDEventsInteractor {
     private Disposable mSyncEventsDisposable;
     private ServiceApi mServiceApi;
     private ELDEventDao mELDEventDao;
+    private PreferencesManager mPreferencesManager;
 
     @Inject
-    public ELDEventsInteractor(ServiceApi serviceApi, AppDatabase appDatabase) {
+    public ELDEventsInteractor(ServiceApi serviceApi, AppDatabase appDatabase, PreferencesManager preferencesManager) {
         mServiceApi = serviceApi;
         mELDEventDao = appDatabase.ELDEventDao();
+        mPreferencesManager = preferencesManager;
     }
 
     public Flowable<List<ELDEvent>> getELDEvents(long startTime, long endTime) {
@@ -39,7 +44,8 @@ public class ELDEventsInteractor {
     }
 
     public Flowable<List<ELDEvent>> getELDEventsFromDB(long startTime, long endTime) {
-        return mELDEventDao.getEventFromStartToEndTime(startTime, endTime)
+        int driverId = mPreferencesManager.getDriverId();
+        return mELDEventDao.getEventFromStartToEndTime(startTime, endTime, driverId)
                 .map(ELDEventConverter::toModelList);
     }
 
@@ -81,7 +87,7 @@ public class ELDEventsInteractor {
     public Observable<Boolean> postNewELDEvents(List<ELDEvent> events) {
         if (NetworkUtils.isOnlineMode()) {
             return mServiceApi.postNewELDEvents(events)
-                    .doOnError(throwable -> events.forEach(event -> storeEvent(event, false)))
+                    .doOnError(throwable -> storeEvents(events, false))
                     .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
         } else {
             return Observable.create(e -> {

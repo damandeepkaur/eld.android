@@ -14,6 +14,7 @@ import com.bsmwireless.widgets.alerts.DutyType;
 import com.bsmwireless.widgets.logs.DutyColors;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import app.bsmuniversal.com.R;
@@ -230,6 +231,14 @@ public class ELDGraphView extends View {
 
         color = mDutyColors.getColor(logData.get(logData.size() - 1).getEventCode());
         mHorizontalLinesPaint.setColor(color);
-        canvas.drawLine(x1, y1, mGraphWidth + mGraphLeft, y1, mHorizontalLinesPaint);
+
+        if (mStartDayUnixTimeInMs + MS_IN_DAY < Calendar.getInstance().getTimeInMillis()) {
+            x2 = mGraphWidth + mGraphLeft;
+        } else {
+            long timeStamp = logData.get(logData.size() - 1).getDuration() / MS_IN_MIN;
+            x2 = x1 + timeStamp * gridUnit;
+        }
+
+        canvas.drawLine(x1, y1, x2, y1, mHorizontalLinesPaint);
     }
 }

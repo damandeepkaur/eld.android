@@ -86,16 +86,6 @@ public class DateUtils {
 
     /**
      * @param time unix time in ms
-     * @return string with format time like "12:35"
-     */
-    public static String convertTimeInMsToStringTime(long time) {
-        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
-        calendar.setTimeInMillis(time);
-        return String.format(Locale.US, "%02d:%02d", calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE));
-    }
-
-    /**
-     * @param time unix time in ms
      * @return string with format time like "128:35"
      */
     public static String convertTotalTimeInMsToStringTime(long time) {
@@ -114,10 +104,12 @@ public class DateUtils {
         Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
         calendar.setTimeInMillis(time);
         String duration = "";
-        if (calendar.get(Calendar.HOUR_OF_DAY) > 0) {
-            duration = String.format(Locale.US, "%02d " + hrs + " ", calendar.get(Calendar.HOUR_OF_DAY));
+        int hours = (int) (time / MS_IN_HOUR);
+        int minutes = (int) ((time - hours * MS_IN_HOUR) / MS_IN_MINUTE);
+        if (hours > 0) {
+            duration = String.format(Locale.US, "%02d " + hrs + " ", hours);
         }
-        return duration + String.format(Locale.US, "%02d " + mins, calendar.get(Calendar.MINUTE));
+        return duration + String.format(Locale.US, "%02d " + mins, minutes);
     }
 
     /**
