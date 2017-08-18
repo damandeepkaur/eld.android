@@ -452,6 +452,7 @@
     <string name="sign_dialog_visibility_note">Signed logsheets will be visible to supervisors</string>
     <string name="decline">decline</string>
     <string name="accept">accept</string>
+    <string name="event_changed">(CHANGED)</string>
 
     <!-- Event description, probably should be updated -->
     <string name="event_type_off_duty">Off Duty</string>

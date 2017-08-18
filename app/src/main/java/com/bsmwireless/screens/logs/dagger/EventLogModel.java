@@ -64,4 +64,8 @@ public class EventLogModel {
     public void setVehicleName(String vehicleName) {
         mVehicleName = vehicleName;
     }
+
+    public boolean isActive() {
+        return mEvent.getStatus().equals(ELDEvent.StatusCode.ACTIVE.getValue());
+    }
 }

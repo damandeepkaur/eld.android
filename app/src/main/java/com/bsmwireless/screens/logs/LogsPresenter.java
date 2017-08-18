@@ -136,7 +136,7 @@ public class LogsPresenter {
                             logs.add(log);
                         }
 
-                        dutyStateLogs = DutyUtils.filterEventModelsByTypeAndStatus(logs, ELDEvent.EventType.DUTY_STATUS_CHANGING, ELDEvent.StatusCode.ACTIVE);
+                        dutyStateLogs = DutyUtils.filterEventModelsByTypeAndStatus(logs, ELDEvent.EventType.DUTY_STATUS_CHANGING, null);
                         for (int i = 1; i < dutyStateLogs.size(); i++) {
                             duration = dutyStateLogs.get(i).getEventTime() - dutyStateLogs.get(i - 1).getEventTime();
                             dutyStateLogs.get(i - 1).setDuration(duration);
