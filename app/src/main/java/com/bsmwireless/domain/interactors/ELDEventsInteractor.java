@@ -1,8 +1,7 @@
 package com.bsmwireless.domain.interactors;
 
-import android.accounts.NetworkErrorException;
-
 import com.bsmwireless.common.utils.NetworkUtils;
+import com.bsmwireless.data.network.RetrofitException;
 import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.PreferencesManager;
@@ -10,9 +9,8 @@ import com.bsmwireless.data.storage.eldevents.ELDEventConverter;
 import com.bsmwireless.data.storage.eldevents.ELDEventDao;
 import com.bsmwireless.data.storage.eldevents.ELDEventEntity;
 import com.bsmwireless.models.ELDEvent;
-import com.bsmwireless.screens.logs.dagger.EventLogModel;
 
-import java.util.ArrayList;
+import java.net.ConnectException;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -66,7 +64,7 @@ public class ELDEventsInteractor {
         } else {
             return Observable.create(e -> {
                 storeEvents(events, false);
-                e.onError(new NetworkErrorException("No Internet Connection"));
+                e.onError(RetrofitException.networkError(new ConnectException()));
             });
         }
     }
@@ -79,7 +77,7 @@ public class ELDEventsInteractor {
         } else {
             return Observable.create(e -> {
                 storeEvent(event, false);
-                e.onError(new NetworkErrorException("No Internet Connection"));
+                e.onError(RetrofitException.networkError(new ConnectException()));
             });
         }
     }
@@ -92,7 +90,7 @@ public class ELDEventsInteractor {
         } else {
             return Observable.create(e -> {
                 storeEvents(events, false);
-                e.onError(new NetworkErrorException("No Internet Connection"));
+                e.onError(RetrofitException.networkError(new ConnectException()));
             });
         }
     }

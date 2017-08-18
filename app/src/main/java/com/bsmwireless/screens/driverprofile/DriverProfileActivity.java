@@ -168,20 +168,12 @@ public class DriverProfileActivity extends BaseMenuActivity implements DriverPro
     }
 
     @Override
-    public void showError(Throwable error) {
-        Timber.e(error.getMessage());
-        showNotificationSnackBar(NetworkUtils.getErrorMessage((RetrofitException) error, this).toString());
+    public void showError(RetrofitException error) {
+        showNotificationSnackBar(NetworkUtils.getErrorMessage(error, this).toString());
     }
 
     @Override
     public void showError(Error error) {
-        Timber.e(getString(error.getStringId()));
-        showNotificationSnackBar(getString(error.getStringId()));
-    }
-
-    @Override
-    public void showError(PasswordError error) {
-        Timber.e(getString(error.getStringId()));
         showNotificationSnackBar(getString(error.getStringId()));
     }
 
