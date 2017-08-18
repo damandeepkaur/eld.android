@@ -42,7 +42,7 @@ public final class BlackBoxImpl implements BlackBox {
         if (!isConnected()) {
             mSocket = new Socket(WIFI_GATEWAY_IP, WIFI_REMOTE_PORT);
             mEmitter = BehaviorSubject.create();
-            mBoxId = /*boxId;*/ 209926;
+            mBoxId = boxId;
             mDisposable = Observable.interval(RETRY_CONNECT_DELAY, TimeUnit.MILLISECONDS)
                     .take(RETRY_COUNT)
                     .filter(this::initializeCommunication)
@@ -138,7 +138,7 @@ public final class BlackBoxImpl implements BlackBox {
             int packetLength = model.getLength();
             buf = new byte[packetLength - START_INDEX + HEADER_LENGTH];
             len = input.read(buf, 0, packetLength - START_INDEX + HEADER_LENGTH);
-            System.arraycopy(buf, 0, response, START_INDEX, len - HEADER_LENGTH);
+            System.arraycopy(buf, 0, response, START_INDEX, Math.abs(len - HEADER_LENGTH));
         }
         return response;
     }

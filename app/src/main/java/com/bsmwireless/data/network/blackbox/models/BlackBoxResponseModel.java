@@ -86,35 +86,22 @@ public class BlackBoxResponseModel {
         STOPPED('g'),
         SENSOR_CHANGE('E');
 
-        final char msgType;
+        final Character msgType;
 
         ResponseType(char msgType) {
             this.msgType = msgType;
         }
 
         public static ResponseType valueOf(char type) {
-            switch (type) {
-                case 'a':
-                    return ACK;
-                case 'n':
-                    return NACK;
-                case 'S':
-                    return STATUS_UPDATE;
-                case 'I':
-                    return IGNITION_ON;
-                case 'i':
-                    return IGNITION_OFF;
-                case 'G':
-                    return MOVING;
-                case 'g':
-                    return STOPPED;
-                case 'E':
-                    return SENSOR_CHANGE;
-                default:
-                    return NONE;
+            ResponseType responseType = NONE;
+            for (ResponseType r : ResponseType.values()) {
+                if (r.msgType.equals(type)) {
+                    responseType = r;
+                    break;
+                }
             }
+            return responseType;
         }
-
     }
 
     public enum NackReasonCode {
