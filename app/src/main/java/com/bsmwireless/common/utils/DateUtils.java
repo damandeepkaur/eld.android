@@ -13,9 +13,15 @@ import java.util.concurrent.TimeUnit;
 import app.bsmuniversal.com.R;
 
 public class DateUtils {
-    private final static int MINUTES_IN_HOUR = 60;
-    private final static int MS_IN_MINUTE = 60 * 1000;
-    private final static int MS_IN_HOUR = MINUTES_IN_HOUR * MS_IN_MINUTE;
+    public static final int MS_IN_SEC = 1000;
+    public static final int SEC_IN_MIN = 60;
+    public static final int MIN_IN_HOUR = 60;
+    public static final int HOUR_IN_DAY = 24;
+    public static final int SEC_IN_DAY = HOUR_IN_DAY * MIN_IN_HOUR * SEC_IN_MIN;
+    private final static int MS_IN_MIN = SEC_IN_MIN * MS_IN_SEC;
+    private final static int MS_IN_HOUR = MIN_IN_HOUR * MS_IN_MIN;
+    public static final long MS_IN_DAY = MS_IN_SEC * SEC_IN_DAY;
+    public static final long MS_IN_WEEK = MS_IN_DAY * 7;
 
     /**
      * @param zone user timezone for example "America/Los_Angeles"
@@ -62,10 +68,21 @@ public class DateUtils {
      * @param time in Unix ms
      * @return start date in ms
      */
-    public static long getStartDayTimeInMs(long time) {
-        Calendar calendar = Calendar.getInstance();
+    public static long getStartDayTimeInMs(String zone, long time) {
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(zone));
         calendar.setTimeInMillis(time);
         calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DATE), 0, 0, 0);
+        return calendar.getTimeInMillis();
+    }
+
+    /**
+     * @param time in Unix ms
+     * @return end date in ms
+     */
+    public static long getEndDayTimeInMs(String zone, long time) {
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(zone));
+        calendar.setTimeInMillis(time);
+        calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DATE), 23, 59, 59);
         return calendar.getTimeInMillis();
     }
 
@@ -78,8 +95,8 @@ public class DateUtils {
         long minutes = TimeUnit.MINUTES.convert(timeZone.getOffset(time), TimeUnit.MILLISECONDS);
 
         return String.format(Locale.US, "GMT %s.%s, %s (%s)",
-                minutes / MINUTES_IN_HOUR,
-                minutes % MINUTES_IN_HOUR,
+                minutes / MIN_IN_HOUR,
+                minutes % MIN_IN_HOUR,
                 timeZone.getDisplayName(Locale.US),
                 zone);
     }
@@ -90,7 +107,7 @@ public class DateUtils {
      */
     public static String convertTotalTimeInMsToStringTime(long time) {
         int hours = (int) (time / MS_IN_HOUR);
-        int minutes = (int) ((time - hours * MS_IN_HOUR) / MS_IN_MINUTE);
+        int minutes = (int) ((time - hours * MS_IN_HOUR) / MS_IN_MIN);
         return String.format(Locale.US, "%02d:%02d", hours, minutes);
     }
 
@@ -105,7 +122,7 @@ public class DateUtils {
         calendar.setTimeInMillis(time);
         String duration = "";
         int hours = (int) (time / MS_IN_HOUR);
-        int minutes = (int) ((time - hours * MS_IN_HOUR) / MS_IN_MINUTE);
+        int minutes = (int) ((time - hours * MS_IN_HOUR) / MS_IN_MIN);
         if (hours > 0) {
             duration = String.format(Locale.US, "%02d " + hrs + " ", hours);
         }

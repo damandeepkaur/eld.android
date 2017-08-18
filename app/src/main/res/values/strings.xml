@@ -447,6 +447,7 @@
     <string name="no_address_available">No address available</string>
     <string name="hours">hrs</string>
     <string name="minutes">mins</string>
+
     <string name="sign_dialog_title">Sign confirmation</string>
     <string name="sign_dialog_confirmation_text">Are you sure you want to sign this logsheet?</string>
     <string name="sign_dialog_visibility_note">Signed logsheets will be visible to supervisors</string>
@@ -458,6 +459,8 @@
     <string name="event_type_sleeping">Sleeping</string>
     <string name="event_type_driving">Driving</string>
     <string name="event_type_on_duty">On Duty</string>
+    <string name="event_type_personal_use">Personal Use</string>
+    <string name="event_type_yard_moves">Yard Moves</string>
     <string name="event_type_int_location">Int Location</string>
     <string name="event_type_cert">Cert</string>
     <string name="event_type_login">Login</string>
@@ -481,6 +484,12 @@
     <string name="settings_box_gps_title">Box GPS</string>
     <string name="settings_fixed_mount_title">Fixed mount</string>
     <string name="settings_odometer_units">Odometer units</string>
+
+    <!-- Dashboard -->
+    <string name="duty_hours">HOURS</string>
+    <string name="duty_minutes">MINUTES</string>
+    <string name="duty_seconds">SECONDS</string>
+    <string name="duty_tap_to_change_status">Tap to change status</string>
 
     <!-- Multiday fragment -->
     <string-array name="multiday_selector">

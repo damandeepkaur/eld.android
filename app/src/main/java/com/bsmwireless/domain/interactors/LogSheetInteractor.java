@@ -7,7 +7,6 @@ import com.bsmwireless.data.storage.hometerminals.HomeTerminalConverter;
 import com.bsmwireless.data.storage.hometerminals.HomeTerminalEntity;
 import com.bsmwireless.models.HomeTerminal;
 import com.bsmwireless.models.LogSheetHeader;
-import com.bsmwireless.models.ResponseMessage;
 
 import java.util.List;
 

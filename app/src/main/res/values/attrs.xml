@@ -8,6 +8,18 @@
         <enum name="topToBottom" value="3" />
     </attr>
 
+    <attr name="dutyType">
+        <enum name="offDuty" value="0" />
+        <enum name="sleeperBerth" value="1" />
+        <enum name="driving" value="2" />
+        <enum name="onDuty" value="3" />
+    </attr>
+
+    <attr name="size">
+        <enum name="large" value="0" />
+        <enum name="normal" value="1" />
+    </attr>
+
     <declare-styleable name="customfont">
         <attr name="textformat" format="string"/>
     </declare-styleable>
@@ -38,6 +50,11 @@
 
     <declare-styleable name="CalendarLayout">
         <attr name="daysCount" format="integer"/>
+    </declare-styleable>
+
+    <declare-styleable name="DutyView">
+        <attr name="dutyType"/>
+        <attr name="size"/>
     </declare-styleable>
 
 </resources>
