@@ -2,6 +2,7 @@ package com.bsmwireless.screens.driverprofile;
 
 import android.content.res.Resources;
 
+import com.bsmwireless.data.network.RetrofitException;
 import com.bsmwireless.data.storage.carriers.CarrierEntity;
 import com.bsmwireless.data.storage.hometerminals.HomeTerminalEntity;
 import com.bsmwireless.data.storage.users.FullUserEntity;
@@ -19,6 +20,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -95,9 +97,6 @@ public class DriverProfilePresenterTest {
 
         // when
         mDriverProfilePresenter.onNeedUpdateUserInfo();
-
-        // then
-        verify(mView).showError(eq(error));
     }
 
     @Test
@@ -204,13 +203,13 @@ public class DriverProfilePresenterTest {
     public void testOnSaveSignatureClickedApiError() {
         // given
         setUserToNotNull();
-        when(mLoginUserInteractor.updateDriverSignature(anyString())).thenReturn(Observable.error(new Exception("broken :(")));
+        when(mLoginUserInteractor.updateDriverSignature(anyString())).thenReturn(Observable.error(RetrofitException.networkError(new ConnectException())));
 
         // when
         mDriverProfilePresenter.onSaveSignatureClicked(mTestSignature);
 
         // then
-        verify(mView).showError(any(Throwable.class));
+        verify(mView).showError(any(RetrofitException.class));
     }
 
     @Test
@@ -282,7 +281,7 @@ public class DriverProfilePresenterTest {
         mDriverProfilePresenter.onChangePasswordClick(oldPwd, newPwd, confirmPwd);
 
         // then
-        verify(mView).showError(eq(DriverProfileView.PasswordError.PASSWORD_FIELD_EMPTY));
+        verify(mView).showError(eq(DriverProfileView.Error.PASSWORD_FIELD_EMPTY));
     }
 
     @Test
@@ -299,7 +298,7 @@ public class DriverProfilePresenterTest {
         mDriverProfilePresenter.onChangePasswordClick(oldPwd, newPwd, confirmPwd);
 
         // then
-        verify(mView).showError(eq(DriverProfileView.PasswordError.PASSWORD_FIELD_EMPTY));
+        verify(mView).showError(eq(DriverProfileView.Error.PASSWORD_FIELD_EMPTY));
     }
 
     @Test
@@ -316,7 +315,7 @@ public class DriverProfilePresenterTest {
         mDriverProfilePresenter.onChangePasswordClick(oldPwd, newPwd, confirmPwd);
 
         // then
-        verify(mView).showError(eq(DriverProfileView.PasswordError.PASSWORD_NOT_MATCH));
+        verify(mView).showError(eq(DriverProfileView.Error.PASSWORD_NOT_MATCH));
     }
 
     @Test
@@ -343,14 +342,14 @@ public class DriverProfilePresenterTest {
         String newPwd = "newPwd";
         String confirmPwd = newPwd;
 
-        when(mLoginUserInteractor.updateDriverPassword(anyString(), anyString())).thenReturn(Observable.error(new Exception("didn't work")));
+        when(mLoginUserInteractor.updateDriverPassword(anyString(), anyString())).thenReturn(Observable.error(RetrofitException.networkError(new ConnectException())));
 
 
         // when
         mDriverProfilePresenter.onChangePasswordClick(oldPwd, newPwd, confirmPwd);
 
         // then
-        verify(mView).showError(any(Exception.class));
+        verify(mView).showError(any(RetrofitException.class));
     }
 
     // TODO: move cropSignature tests if cropSignature is moved to a class for signatures or utility class
