@@ -1,5 +1,6 @@
 package com.bsmwireless.screens.logs;
 
+import com.bsmwireless.data.network.RetrofitException;
 import com.bsmwireless.models.LogSheetHeader;
 import com.bsmwireless.screens.logs.dagger.EventLogModel;
 import com.bsmwireless.widgets.logs.calendar.CalendarItem;
@@ -41,8 +42,10 @@ public interface LogsView {
 
     void eventUpdated();
 
-    void showError(Throwable throwable);
+    void showError(RetrofitException exception);
 
     void showError(Error error);
+
+    void showError(Throwable exception);
 
 }

@@ -1,6 +1,7 @@
 package com.bsmwireless.screens.driverprofile;
 
 import com.bsmwireless.common.dagger.ActivityScope;
+import com.bsmwireless.data.network.RetrofitException;
 import com.bsmwireless.data.storage.carriers.CarrierEntity;
 import com.bsmwireless.data.storage.users.FullUserEntity;
 import com.bsmwireless.data.storage.hometerminals.HomeTerminalEntity;
@@ -12,16 +13,15 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import app.bsmuniversal.com.R;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
-import static com.bsmwireless.screens.driverprofile.DriverProfileView.PasswordError.PASSWORD_FIELD_EMPTY;
-import static com.bsmwireless.screens.driverprofile.DriverProfileView.PasswordError.PASSWORD_NOT_MATCH;
-import static com.bsmwireless.screens.driverprofile.DriverProfileView.PasswordError.VALID_PASSWORD;
+import static com.bsmwireless.screens.driverprofile.DriverProfileView.Error.PASSWORD_FIELD_EMPTY;
+import static com.bsmwireless.screens.driverprofile.DriverProfileView.Error.PASSWORD_NOT_MATCH;
+import static com.bsmwireless.screens.driverprofile.DriverProfileView.Error.VALID_PASSWORD;
 
 @ActivityScope
 public class DriverProfilePresenter {
@@ -101,7 +101,11 @@ public class DriverProfilePresenter {
                                                                 },
                                                                 throwable -> {
                                                                     Timber.e(throwable.getMessage());
-                                                                    mView.showError(throwable);
+                                                                    if (throwable instanceof RetrofitException) {
+                                                                        mView.showError((RetrofitException) throwable);
+                                                                    } else {
+                                                                        mView.showError(throwable);
+                                                                    }
                                                                 });
             mDisposables.add(disposable);
         } else {
@@ -118,7 +122,7 @@ public class DriverProfilePresenter {
     }
 
     public void onChangePasswordClick(String oldPwd, String newPwd, String confirmPwd) {
-        DriverProfileView.PasswordError validationError = validatePassword(oldPwd, newPwd, confirmPwd);
+        DriverProfileView.Error validationError = validatePassword(oldPwd, newPwd, confirmPwd);
         if (validationError.equals(VALID_PASSWORD)) {
             Disposable disposable = mLoginUserInteractor.updateDriverPassword(oldPwd, newPwd)
                                                         .subscribeOn(Schedulers.io())
@@ -130,7 +134,14 @@ public class DriverProfilePresenter {
                                                                         mView.showError(DriverProfileView.Error.ERROR_CHANGE_PASSWORD);
                                                                     }
                                                                 },
-                                                                throwable -> mView.showError(throwable));
+                                                                throwable -> {
+                                                                    Timber.e(throwable.getMessage());
+                                                                    if (throwable instanceof RetrofitException) {
+                                                                        mView.showError((RetrofitException) throwable);
+                                                                    } else {
+                                                                        mView.showError(throwable);
+                                                                    }
+                                                                });
             mDisposables.add(disposable);
         } else {
             mView.showError(validationError);
@@ -150,7 +161,14 @@ public class DriverProfilePresenter {
                                                             if (!wasUpdated) {
                                                                 mView.showError(DriverProfileView.Error.ERROR_TERMINAL_UPDATE);
                                                             }
-                                                        }, throwable -> mView.showError(throwable));
+                                                        }, throwable -> {
+                                                            Timber.e(throwable.getMessage());
+                                                            if (throwable instanceof RetrofitException) {
+                                                                mView.showError((RetrofitException) throwable);
+                                                            } else {
+                                                                mView.showError(throwable);
+                                                            }
+                                                        });
             mDisposables.add(disposable);
 
             mView.setHomeTerminalInfo(homeTerminal);
@@ -169,7 +187,7 @@ public class DriverProfilePresenter {
         return signature;
     }
 
-    private DriverProfileView.PasswordError validatePassword(String oldPwd, String newPwd, String confirmPwd) {
+    private DriverProfileView.Error validatePassword(String oldPwd, String newPwd, String confirmPwd) {
         if ((newPwd == null || newPwd.isEmpty()) ||
                 (oldPwd == null || oldPwd.isEmpty())) {
             return PASSWORD_FIELD_EMPTY;
