@@ -31,11 +31,11 @@ public class ELDEventsInteractor {
 
     private Disposable mSyncEventsDisposable;
     private ServiceApi mServiceApi;
-    private PreferencesManager mPreferencesManager;
     private BlackBoxInteractor mBlackBoxInteractor;
     private UserInteractor mUserInteractor;
     private DutyManager mDutyManager;
     private ELDEventDao mELDEventDao;
+    private PreferencesManager mPreferencesManager;
 
     @Inject
     public ELDEventsInteractor(ServiceApi serviceApi, PreferencesManager preferencesManager, AppDatabase appDatabase, UserInteractor userInteractor, BlackBoxInteractor blackBoxInteractor, DutyManager dutyManager) {
@@ -45,6 +45,7 @@ public class ELDEventsInteractor {
         mBlackBoxInteractor = blackBoxInteractor;
         mDutyManager = dutyManager;
         mELDEventDao = appDatabase.ELDEventDao();
+        mPreferencesManager = preferencesManager;
     }
 
     public Flowable<List<ELDEvent>> getELDEvents(long startTime, long endTime) {
@@ -52,7 +53,8 @@ public class ELDEventsInteractor {
     }
 
     public Flowable<List<ELDEvent>> getELDEventsFromDB(long startTime, long endTime) {
-        return mELDEventDao.getEventFromStartToEndTime(startTime, endTime)
+        int driverId = mPreferencesManager.getDriverId();
+        return mELDEventDao.getEventFromStartToEndTime(startTime, endTime, driverId)
                 .map(ELDEventConverter::toModelList);
     }
 

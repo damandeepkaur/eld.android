@@ -1,11 +1,11 @@
 package com.bsmwireless.screens.logs;
 
+
 import com.bsmwireless.common.Constants;
 import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.common.utils.DateUtils;
-import com.bsmwireless.data.storage.DutyManager;
-import com.bsmwireless.common.utils.DutyUtils;
 import com.bsmwireless.data.network.RetrofitException;
+import com.bsmwireless.data.storage.DutyManager;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
 import com.bsmwireless.domain.interactors.LogSheetInteractor;
 import com.bsmwireless.domain.interactors.UserInteractor;
@@ -19,10 +19,10 @@ import com.bsmwireless.widgets.logs.calendar.CalendarItem;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.TimeZone;
 
@@ -118,40 +118,23 @@ public class LogsPresenter {
                 calendar.get(Calendar.MONTH), calendar.get(Calendar.YEAR));
         long endDayTime = startDayTime + MS_IN_DAY;
 
-        mELDEventsInteractor.syncELDEvents(startDayTime, endDayTime);
+        mELDEventsInteractor.syncELDEvents(startDayTime - MS_IN_DAY, endDayTime);
         if (mGetEventDisposable != null) mGetEventDisposable.dispose();
-        mGetEventDisposable = mELDEventsInteractor.getELDEventsFromDB(startDayTime, endDayTime)
+        mGetEventDisposable = mELDEventsInteractor.getELDEventsFromDB(startDayTime - MS_IN_DAY, endDayTime)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(eldEvents -> {
-                    List<EventLogModel> logs = new ArrayList<>(eldEvents.size());
-                    List<EventLogModel> dutyStateLogs = Collections.EMPTY_LIST;
+                    long currentTime = Calendar.getInstance().getTimeInMillis();
+                    List<EventLogModel> dutyStateLogs = preparingLogs(eldEvents, startDayTime,
+                            endDayTime < currentTime ? endDayTime : currentTime);
+
                     HashSet<Integer> vehicleIds = new HashSet<>();
-
-                    if (!eldEvents.isEmpty()) {
-                        ELDEvent prevEvent = eldEvents.get(0);
-                        long duration = prevEvent.getEventTime() - startDayTime;
-                        logs.add(new EventLogModel(prevEvent, mTimeZone));
-
-
-                        for (int i = 1; i < eldEvents.size(); i++) {
-                            ELDEvent event = eldEvents.get(i);
-
-                            EventLogModel log = new EventLogModel(event, mTimeZone);
-
-                            if (mVehicleIdToNameMap.containsKey(event.getVehicleId())) {
-                                log.setVehicleName(mVehicleIdToNameMap.get(event.getVehicleId()));
-                            } else {
-                                vehicleIds.add(event.getVehicleId());
-                            }
-
-                            logs.add(log);
-                        }
-
-                        dutyStateLogs = DutyUtils.filterEventModelsByTypeAndStatus(logs, ELDEvent.EventType.DUTY_STATUS_CHANGING, ELDEvent.StatusCode.ACTIVE);
-                        for (int i = 1; i < dutyStateLogs.size(); i++) {
-                            duration = dutyStateLogs.get(i).getEventTime() - dutyStateLogs.get(i - 1).getEventTime();
-                            dutyStateLogs.get(i - 1).setDuration(duration);
+                    for (EventLogModel log : dutyStateLogs) {
+                        int vehicleId = log.getEvent().getVehicleId();
+                        if (mVehicleIdToNameMap.containsKey(vehicleId)) {
+                            log.setVehicleName(mVehicleIdToNameMap.get(vehicleId));
+                        } else {
+                            vehicleIds.add(vehicleId);
                         }
                     }
 
@@ -203,13 +186,13 @@ public class LogsPresenter {
             }
             result[log.getEventCode() - 1] += endDayTime - log.getEventTime();
 
-            tripInfo.setSleeperBerthTime(DateUtils.convertTimeInMsToStringTime(
+            tripInfo.setSleeperBerthTime(DateUtils.convertTotalTimeInMsToStringTime(
                     result[DutyType.SLEEPER_BERTH.getValue() - 1]));
-            tripInfo.setDrivingTime(DateUtils.convertTimeInMsToStringTime(
+            tripInfo.setDrivingTime(DateUtils.convertTotalTimeInMsToStringTime(
                     result[DutyType.DRIVING.getValue() - 1]));
-            tripInfo.setOffDutyTime(DateUtils.convertTimeInMsToStringTime(
+            tripInfo.setOffDutyTime(DateUtils.convertTotalTimeInMsToStringTime(
                     result[DutyType.OFF_DUTY.getValue() - 1]));
-            tripInfo.setOnDutyTime(DateUtils.convertTimeInMsToStringTime(
+            tripInfo.setOnDutyTime(DateUtils.convertTotalTimeInMsToStringTime(
                     result[DutyType.ON_DUTY.getValue() - 1]));
 
             //TODO: convert odometer value from meters to appropriate unit
@@ -353,5 +336,47 @@ public class LogsPresenter {
         event.setBoxId(logSheetHeader.getBoxId());
         event.setMobileTime(Calendar.getInstance().getTimeInMillis());
         return event;
+    }
+
+    private List<EventLogModel> preparingLogs(List<ELDEvent> events, long startDayTime, long endDayTime) {
+        List<EventLogModel> logs = new ArrayList<>();
+        //filter events
+        ListIterator<ELDEvent> iterator = events.listIterator();
+        while (iterator.hasNext()) {
+            ELDEvent event = iterator.next();
+            if (!event.getEventType().equals(ELDEvent.EventType.DUTY_STATUS_CHANGING.getValue())
+                    && !event.getEventType().equals(ELDEvent.EventType.CHANGE_IN_DRIVER_INDICATION.getValue())) {
+                iterator.remove();
+            } else {
+                int i = iterator.nextIndex();
+                if (i < events.size() - 1) {
+                    if (events.get(i).getEventTime() < startDayTime) {
+                        iterator.remove();
+                    }
+                }
+            }
+        }
+
+        if (!events.isEmpty()) {
+            //convert to logs model
+            long duration;
+            for (int i = 0; i < events.size(); i++) {
+                ELDEvent event = events.get(i);
+                EventLogModel log = new EventLogModel(event, mTimeZone);
+                logs.add(log);
+                if (logs.get(0).getEventTime() < startDayTime) {
+                    logs.get(0).setEventTime(startDayTime);
+                }
+                if (i < events.size() - 1) {
+                    duration = events.get(i + 1).getEventTime() - events.get(i).getEventTime();
+                    logs.get(i).setDuration(duration);
+                }
+            }
+
+            //set duration for last event
+            EventLogModel lastEvent = logs.get(logs.size() - 1);
+            lastEvent.setDuration(endDayTime - lastEvent.getEventTime());
+        }
+        return logs;
     }
 }

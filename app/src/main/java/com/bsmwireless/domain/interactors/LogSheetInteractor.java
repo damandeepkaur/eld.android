@@ -19,14 +19,12 @@ import static com.bsmwireless.common.Constants.SUCCESS;
 public class LogSheetInteractor {
 
     private ServiceApi mServiceApi;
-    private UserInteractor mUserInteractor;
     private PreferencesManager mPreferencesManager;
     private AppDatabase mAppDatabase;
 
     @Inject
-    public LogSheetInteractor(ServiceApi serviceApi, UserInteractor userInteractor, PreferencesManager preferencesManager, AppDatabase appDatabase) {
+    public LogSheetInteractor(ServiceApi serviceApi, PreferencesManager preferencesManager, AppDatabase appDatabase) {
         mServiceApi = serviceApi;
-        mUserInteractor = userInteractor;
         mPreferencesManager = preferencesManager;
         mAppDatabase = appDatabase;
     }
