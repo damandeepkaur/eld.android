@@ -3,7 +3,7 @@ package com.bsmwireless.screens.login;
 import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.common.utils.SchedulerUtils;
 import com.bsmwireless.data.network.RetrofitException;
-import com.bsmwireless.domain.interactors.LoginUserInteractor;
+import com.bsmwireless.domain.interactors.UserInteractor;
 import com.bsmwireless.models.User;
 
 import javax.inject.Inject;
@@ -17,23 +17,23 @@ import timber.log.Timber;
 @ActivityScope
 public class LoginPresenter {
     private LoginView mView;
-    private LoginUserInteractor mLoginUserInteractor;
+    private UserInteractor mUserInteractor;
     private CompositeDisposable mDisposables;
 
     @Inject
-    public LoginPresenter(LoginView view, LoginUserInteractor interactor) {
+    public LoginPresenter(LoginView view, UserInteractor interactor) {
         mView = view;
-        mLoginUserInteractor = interactor;
+        mUserInteractor = interactor;
         mDisposables = new CompositeDisposable();
 
         Timber.d("CREATED");
     }
 
     public void onViewCreated() {
-        if (mLoginUserInteractor.isLoginActive()) {
+        if (mUserInteractor.isLoginActive()) {
             mView.goToNavigationScreen();
-        } else if (mLoginUserInteractor.isRememberMeEnabled()) {
-            mView.loadUserData(mLoginUserInteractor.getUserName(), mLoginUserInteractor.getDomainName());
+        } else if (mUserInteractor.isRememberMeEnabled()) {
+            mView.loadUserData(mUserInteractor.getUserName(), mUserInteractor.getDomainName());
         }
     }
 
@@ -56,7 +56,7 @@ public class LoginPresenter {
         }
         mView.setLoginButtonEnabled(false);
 
-        Disposable disposable = mLoginUserInteractor.loginUser(username, password, domain, keepToken, User.DriverType.DRIVER)
+        Disposable disposable = mUserInteractor.loginUser(username, password, domain, keepToken, User.DriverType.DRIVER)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(

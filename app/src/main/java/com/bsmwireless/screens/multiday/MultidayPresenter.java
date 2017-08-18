@@ -4,7 +4,7 @@ import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.common.utils.DateUtils;
 import com.bsmwireless.common.utils.DutyUtils;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
-import com.bsmwireless.domain.interactors.LoginUserInteractor;
+import com.bsmwireless.domain.interactors.UserInteractor;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.widgets.alerts.DutyType;
 
@@ -29,17 +29,17 @@ public class MultidayPresenter {
 
     private MultidayView mView;
     private ELDEventsInteractor mELDEventsInteractor;
-    private LoginUserInteractor mLoginUserInteractor;
+    private UserInteractor mUserInteractor;
     private CompositeDisposable mDisposables;
     private Disposable mGetEventDisposable;
 
     private String mTimeZone;
 
     @Inject
-    public MultidayPresenter(MultidayView view, ELDEventsInteractor eventsInteractor, LoginUserInteractor userInteractor) {
+    public MultidayPresenter(MultidayView view, ELDEventsInteractor eventsInteractor, UserInteractor userInteractor) {
         mView = view;
         mELDEventsInteractor = eventsInteractor;
-        mLoginUserInteractor = userInteractor;
+        mUserInteractor = userInteractor;
         mDisposables = new CompositeDisposable();
         mTimeZone = TimeZone.getDefault().getID();
 
@@ -54,7 +54,7 @@ public class MultidayPresenter {
     }
 
     public void onViewCreated() {
-        mDisposables.add(mLoginUserInteractor.getTimezone()
+        mDisposables.add(mUserInteractor.getTimezone()
                                              .subscribeOn(Schedulers.io())
                                              .subscribe(timezone -> {
                                                  if (!mTimeZone.equals(timezone)) {

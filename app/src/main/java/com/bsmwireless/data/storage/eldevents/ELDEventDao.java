@@ -28,6 +28,9 @@ public interface ELDEventDao {
     @Query("SELECT * FROM events WHERE event_time > :startTime and event_time < :endTime ORDER BY event_time")
     Flowable<List<ELDEventEntity>> getEventFromStartToEndTime(long startTime, long endTime);
 
+    @Query("DELETE FROM events WHERE mobile_time IN (:times) AND is_sync = 1")
+    int deleteDoubledEvents(List<Long> times);
+
     @Delete
     void delete(ELDEventEntity event);
 

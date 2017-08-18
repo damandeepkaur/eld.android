@@ -20,7 +20,8 @@ import com.bsmwireless.data.storage.carriers.CarrierEntity;
 import com.bsmwireless.data.storage.hometerminals.HomeTerminalEntity;
 import com.bsmwireless.data.storage.users.UserEntity;
 import com.bsmwireless.models.User;
-import com.bsmwireless.screens.common.BaseMenuActivity;
+import com.bsmwireless.screens.common.menu.BaseMenuActivity;
+import com.bsmwireless.screens.common.menu.BaseMenuPresenter;
 import com.bsmwireless.screens.driverprofile.dagger.DaggerDriverProfileComponent;
 import com.bsmwireless.screens.driverprofile.dagger.DriverProfileModule;
 import com.bsmwireless.widgets.signview.SignatureLayout;
@@ -133,6 +134,11 @@ public class DriverProfileActivity extends BaseMenuActivity implements DriverPro
         mPresenter.onDestroy();
         mSnackBarLayout.reset().hideSnackbar();
         super.onDestroy();
+    }
+
+    @Override
+    protected BaseMenuPresenter getPresenter() {
+        return mPresenter;
     }
 
     @Override

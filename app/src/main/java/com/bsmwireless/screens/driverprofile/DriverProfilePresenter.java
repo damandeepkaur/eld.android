@@ -1,12 +1,16 @@
 package com.bsmwireless.screens.driverprofile;
 
 import com.bsmwireless.common.dagger.ActivityScope;
+import com.bsmwireless.data.storage.DutyManager;
 import com.bsmwireless.data.network.RetrofitException;
 import com.bsmwireless.data.storage.carriers.CarrierEntity;
-import com.bsmwireless.data.storage.users.FullUserEntity;
 import com.bsmwireless.data.storage.hometerminals.HomeTerminalEntity;
+import com.bsmwireless.data.storage.users.FullUserEntity;
 import com.bsmwireless.data.storage.users.UserConverter;
-import com.bsmwireless.domain.interactors.LoginUserInteractor;
+import com.bsmwireless.domain.interactors.ELDEventsInteractor;
+import com.bsmwireless.domain.interactors.UserInteractor;
+import com.bsmwireless.screens.common.menu.BaseMenuPresenter;
+import com.bsmwireless.screens.common.menu.BaseMenuView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,35 +28,30 @@ import static com.bsmwireless.screens.driverprofile.DriverProfileView.Error.PASS
 import static com.bsmwireless.screens.driverprofile.DriverProfileView.Error.VALID_PASSWORD;
 
 @ActivityScope
-public class DriverProfilePresenter {
+public class DriverProfilePresenter extends BaseMenuPresenter {
 
     private static final int MAX_SIGNATURE_LENGTH = 50000;
 
-    private LoginUserInteractor mLoginUserInteractor;
+    private UserInteractor mUserInteractor;
     private DriverProfileView mView;
-    private CompositeDisposable mDisposables;
 
     private FullUserEntity mFullUserEntity;
     private List<HomeTerminalEntity> mHomeTerminals;
     private CarrierEntity mCarrier;
 
     @Inject
-    public DriverProfilePresenter(DriverProfileView view, LoginUserInteractor loginUserInteractor) {
+    public DriverProfilePresenter(DriverProfileView view, UserInteractor userInteractor, DutyManager dutyManager, ELDEventsInteractor eventsInteractor) {
         mView = view;
-        mLoginUserInteractor = loginUserInteractor;
+        mUserInteractor = userInteractor;
+        mDutyManager = dutyManager;
+        mEventsInteractor = eventsInteractor;
         mDisposables = new CompositeDisposable();
 
         Timber.d("CREATED");
     }
 
-    public void onDestroy() {
-        mDisposables.dispose();
-
-        Timber.d("DESTROYED");
-    }
-
     public void onNeedUpdateUserInfo() {
-        Disposable disposable = mLoginUserInteractor.getFullUser()
+        Disposable disposable = mUserInteractor.getFullUser()
                                                     .subscribeOn(Schedulers.io())
                                                     .observeOn(AndroidSchedulers.mainThread())
                                                     .subscribe(userEntity -> {
@@ -76,6 +75,11 @@ public class DriverProfilePresenter {
         mDisposables.add(disposable);
     }
 
+    @Override
+    protected BaseMenuView getView() {
+        return mView;
+    }
+
     public void onSaveSignatureClicked(String signature) {
         if (mFullUserEntity != null) {
             if (signature.length() > MAX_SIGNATURE_LENGTH) {
@@ -85,7 +89,7 @@ public class DriverProfilePresenter {
 
             mFullUserEntity.getUserEntity().setSignature(signature);
 
-            Disposable disposable = mLoginUserInteractor.updateDriverSignature(signature)
+            Disposable disposable = mUserInteractor.updateDriverSignature(signature)
                                                         .subscribeOn(Schedulers.io())
                                                         .observeOn(AndroidSchedulers.mainThread())
                                                         .subscribe(wasUpdated -> {
@@ -119,7 +123,7 @@ public class DriverProfilePresenter {
     public void onChangePasswordClick(String oldPwd, String newPwd, String confirmPwd) {
         DriverProfileView.Error validationError = validatePassword(oldPwd, newPwd, confirmPwd);
         if (validationError.equals(VALID_PASSWORD)) {
-            Disposable disposable = mLoginUserInteractor.updateDriverPassword(oldPwd, newPwd)
+            Disposable disposable = mUserInteractor.updateDriverPassword(oldPwd, newPwd)
                                                         .subscribeOn(Schedulers.io())
                                                         .observeOn(AndroidSchedulers.mainThread())
                                                         .subscribe(passwordUpdated -> {
@@ -147,7 +151,7 @@ public class DriverProfilePresenter {
 
             mFullUserEntity.getUserEntity().setHomeTermId(homeTerminal.getId());
 
-            Disposable disposable = mLoginUserInteractor.updateDriverHomeTerminal(homeTerminal.getId())
+            Disposable disposable = mUserInteractor.updateDriverHomeTerminal(homeTerminal.getId())
                                                         .subscribeOn(Schedulers.io())
                                                         .observeOn(AndroidSchedulers.mainThread())
                                                         .subscribe(wasUpdated -> {

@@ -2,7 +2,7 @@ package com.bsmwireless.screens.selectasset;
 
 import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.data.network.RetrofitException;
-import com.bsmwireless.domain.interactors.LoginUserInteractor;
+import com.bsmwireless.domain.interactors.UserInteractor;
 import com.bsmwireless.domain.interactors.VehiclesInteractor;
 import com.bsmwireless.models.Vehicle;
 
@@ -20,7 +20,7 @@ public class SelectAssetPresenter {
     private CompositeDisposable mDisposables;
 
     @Inject
-    public SelectAssetPresenter(SelectAssetView view, VehiclesInteractor vehiclesInteractor, LoginUserInteractor userInteractor) {
+    public SelectAssetPresenter(SelectAssetView view, VehiclesInteractor vehiclesInteractor, UserInteractor userInteractor) {
         mView = view;
         mVehiclesInteractor = vehiclesInteractor;
         mDisposables = new CompositeDisposable();
