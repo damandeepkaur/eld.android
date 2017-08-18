@@ -21,7 +21,6 @@ public class ELDEventConverter {
             event.setEngineHours(entity.getEngineHours());
             event.setLat(entity.getLat());
             event.setLng(entity.getLng());
-            event.setLatLnFlag(entity.getLatLnFlag());
             event.setDistance(entity.getDistance());
             event.setComment(entity.getComment());
             event.setLocation(entity.getLocation());
@@ -32,10 +31,8 @@ public class ELDEventConverter {
             event.setTimezone(entity.getTimezone());
             event.setMobileTime(entity.getMobileTime());
             event.setDriverId(entity.getDriverId());
-            event.setSequence(entity.getSequence());
             event.setMalfunction(entity.getMalfunction());
             event.setDiagnostic(entity.getDiagnostic());
-            event.setMalCode(entity.getMalCode());
         }
 
         return event;
@@ -56,7 +53,6 @@ public class ELDEventConverter {
             entity.setEngineHours(event.getEngineHours());
             entity.setLat(event.getLat());
             entity.setLng(event.getLng());
-            entity.setLatLnFlag(event.getLatLnFlag());
             entity.setDistance(event.getDistance());
             entity.setComment(event.getComment());
             entity.setLocation(event.getLocation());
@@ -67,10 +63,8 @@ public class ELDEventConverter {
             entity.setTimezone(event.getTimezone());
             entity.setMobileTime(event.getMobileTime());
             entity.setDriverId(event.getDriverId());
-            entity.setSequence(event.getSequence());
             entity.setMalfunction(event.getMalfunction());
             entity.setDiagnostic(event.getDiagnostic());
-            entity.setMalCode(event.getMalCode());
         }
         return entity;
     }

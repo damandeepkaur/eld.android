@@ -1,5 +1,7 @@
 package com.bsmwireless.widgets.alerts;
 
+import com.bsmwireless.models.ELDEvent;
+
 import app.bsmuniversal.com.R;
 
 public enum DutyType {
@@ -40,13 +42,26 @@ public enum DutyType {
         return R.color.offduty_light;
     }
 
-    public static DutyType getTypeByCode(int id) {
+    private static DutyType getTypeByCode(int id) {
         for (DutyType t : DutyType.values()) {
             if (t.mCode == id) {
                 return t;
             }
         }
         return DutyType.OFF_DUTY;
+    }
+
+    public static DutyType getTypeByCode(int type, int code) {
+        if (type == ELDEvent.EventType.DUTY_STATUS_CHANGING.getValue()) {
+            return DutyType.getTypeByCode(code);
+        } else if (type == ELDEvent.EventType.CHANGE_IN_DRIVER_INDICATION.getValue()) {
+            if (code == DutyType.PERSONAL_USE.getValue()) {
+                return DutyType.PERSONAL_USE;
+            } else {
+                return DutyType.YARD_MOVES;
+            }
+        }
+        return OFF_DUTY;
     }
 
     public int getValue() {

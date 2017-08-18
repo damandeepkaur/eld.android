@@ -17,9 +17,6 @@ import app.bsmuniversal.com.R;
 
 
 public class NetworkUtils {
-    //success response message
-    public static final String SUCCESS = "ACK";
-
     public static boolean isOnlineMode() {
         ConnectivityManager cm = (ConnectivityManager) App.getComponent().context().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo netInfo = cm.getActiveNetworkInfo();

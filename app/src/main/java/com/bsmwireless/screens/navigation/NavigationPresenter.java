@@ -21,8 +21,8 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
-import static com.bsmwireless.common.Constants.MS_IN_DAY;
-import static com.bsmwireless.common.Constants.MS_IN_SEC;
+import static com.bsmwireless.common.utils.DateUtils.MS_IN_DAY;
+import static com.bsmwireless.common.utils.DateUtils.MS_IN_SEC;
 
 public class NavigationPresenter extends BaseMenuPresenter {
 
@@ -88,7 +88,7 @@ public class NavigationPresenter extends BaseMenuPresenter {
                     return mEventsInteractor.getELDEvents(time[0] - MS_IN_DAY, time[1]);
                 })
                 .doOnNext(events -> resetTime(events, time[0]))
-                .doOnError(error -> mDutyManager.setDutyTypeTime(0, 0, 0))
+                .doOnError(error -> mDutyManager.setDutyTypeTime(0, 0, 0, DutyType.OFF_DUTY))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
@@ -105,11 +105,27 @@ public class NavigationPresenter extends BaseMenuPresenter {
         long currentTime = System.currentTimeMillis();
         long duration;
 
+        DutyType dutyType = null;
+        DutyType currentDutyType;
+        ELDEvent event;
+
         for (int i = events.size() - 1; i >= 0; i--) {
-            ELDEvent event = events.get(i);
+            event = events.get(i);
+
             duration = currentTime - Math.max(event.getEventTime(), startOfDay);
             currentTime = event.getEventTime();
-            switch (DutyType.getTypeByCode(event.getEventCode())) {
+
+            if (event.getEventType() == ELDEvent.EventType.DUTY_STATUS_CHANGING.getValue() || event.getEventType() == ELDEvent.EventType.CHANGE_IN_DRIVER_INDICATION.getValue()) {
+                currentDutyType = DutyType.getTypeByCode(event.getEventType(), event.getEventCode());
+            } else {
+                continue;
+            }
+
+            if (dutyType == null) {
+                dutyType = currentDutyType;
+            }
+
+            switch (currentDutyType) {
                 case ON_DUTY:
                 case YARD_MOVES:
                     onDutyTime += duration;
@@ -130,7 +146,7 @@ public class NavigationPresenter extends BaseMenuPresenter {
             }
         }
 
-        mDutyManager.setDutyTypeTime((int) (onDutyTime / MS_IN_SEC), (int) (drivingTime / MS_IN_SEC), (int) (sleeperBerthTime / MS_IN_SEC));
+        mDutyManager.setDutyTypeTime((int) (onDutyTime / MS_IN_SEC), (int) (drivingTime / MS_IN_SEC), (int) (sleeperBerthTime / MS_IN_SEC), dutyType);
     }
 
     @Override

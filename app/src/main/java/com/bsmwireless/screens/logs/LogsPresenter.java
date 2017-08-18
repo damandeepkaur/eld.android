@@ -3,6 +3,7 @@ package com.bsmwireless.screens.logs;
 import com.bsmwireless.common.Constants;
 import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.common.utils.DateUtils;
+import com.bsmwireless.data.storage.DutyManager;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
 import com.bsmwireless.domain.interactors.LogSheetInteractor;
 import com.bsmwireless.domain.interactors.UserInteractor;
@@ -32,33 +33,44 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
+import static com.bsmwireless.common.utils.DateUtils.MS_IN_DAY;
 import static com.bsmwireless.screens.logs.TripInfoModel.UnitType.KM;
 
 @ActivityScope
 public class LogsPresenter {
-    public static final long ONE_DAY_MS = 24 * 60 * 60 * 1000;
     Disposable mGetEventDisposable;
     private LogsView mView;
     private ELDEventsInteractor mELDEventsInteractor;
     private LogSheetInteractor mLogSheetInteractor;
     private VehiclesInteractor mVehiclesInteractor;
     private UserInteractor mUserInteractor;
+    private DutyManager mDutyManager;
     private CompositeDisposable mDisposables;
     private String mTimeZone;
     private TripInfoModel mTripInfo;
     private Map<Integer, String> mVehicleIdToNameMap = new HashMap<>();
 
+    private DutyManager.DutyTypeListener mListener = new DutyManager.DutyTypeListener() {
+        @Override
+        public void onDutyTypeChanged(DutyType dutyType) {
+            mView.dutyUpdated();
+        }
+    };
+
     @Inject
     public LogsPresenter(LogsView view, ELDEventsInteractor eventsInteractor, LogSheetInteractor logSheetInteractor,
-                         VehiclesInteractor vehiclesInteractor, UserInteractor userInteractor) {
+                         VehiclesInteractor vehiclesInteractor, UserInteractor userInteractor, DutyManager dutyManager) {
         mView = view;
         mELDEventsInteractor = eventsInteractor;
         mLogSheetInteractor = logSheetInteractor;
         mVehiclesInteractor = vehiclesInteractor;
         mUserInteractor = userInteractor;
+        mDutyManager = dutyManager;
         mDisposables = new CompositeDisposable();
         mTripInfo = new TripInfoModel();
         Timber.d("CREATED");
+
+        mDutyManager.addListener(mListener);
     }
 
     public void onViewCreated() {
@@ -77,7 +89,7 @@ public class LogsPresenter {
     private void getLogSheet() {
         long todayDateLong = DateUtils.convertTimeToDayNumber(mTimeZone, System.currentTimeMillis());
         long monthAgoLong = DateUtils.convertTimeToDayNumber(mTimeZone, System.currentTimeMillis()
-                - ONE_DAY_MS * Constants.DEFAULT_CALENDAR_DAYS_COUNT);
+                - MS_IN_DAY * Constants.DEFAULT_CALENDAR_DAYS_COUNT);
         mDisposables.add(mLogSheetInteractor.syncLogSheetHeader(monthAgoLong, todayDateLong)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -99,10 +111,10 @@ public class LogsPresenter {
         updateEventForDay(calendarItem.getCalendar());
     }
 
-    private void updateEventForDay(Calendar calendar) {
+    public void updateEventForDay(Calendar calendar) {
         long startDayTime = DateUtils.getStartDate(mTimeZone, calendar.get(Calendar.DAY_OF_MONTH),
                 calendar.get(Calendar.MONTH), calendar.get(Calendar.YEAR));
-        long endDayTime = startDayTime + ONE_DAY_MS;
+        long endDayTime = startDayTime + MS_IN_DAY;
 
         mELDEventsInteractor.syncELDEvents(startDayTime, endDayTime);
         if (mGetEventDisposable != null) mGetEventDisposable.dispose();
@@ -120,7 +132,9 @@ public class LogsPresenter {
                         logs.add(new EventLogModel(prevEvent, mTimeZone));
 
 
-                        for (ELDEvent event : eldEvents) {
+                        for (int i = 1; i < eldEvents.size(); i++) {
+                            ELDEvent event = eldEvents.get(i);
+
                             EventLogModel log = new EventLogModel(event, mTimeZone);
 
                             if (mVehicleIdToNameMap.containsKey(event.getVehicleId())) {
@@ -227,22 +241,52 @@ public class LogsPresenter {
     public void onSignLogsheetButtonClicked() {
     }
 
-    public void onEditEventClicked(ELDEvent event) {
+    public void onEditEventClicked(EventLogModel event) {
         mView.goToEditEventScreen(event);
     }
 
-    public void onRemovedEventClicked(ELDEvent event) {
+    public void onRemovedEventClicked(EventLogModel event) {
     }
 
-    public void onAddEventClicked() {
-        mView.goToAddEventScreen();
+    public void onAddEventClicked(CalendarItem day) {
+        mView.goToAddEventScreen(day);
     }
 
     public void onEditTripInfoClicked() {
         mView.goToEditTripInfoScreen();
     }
 
+    public void onEventAdded(ELDEvent newEvent) {
+        Disposable disposable = mELDEventsInteractor.postNewELDEvents(new ArrayList<ELDEvent>() {{ add(newEvent); }})
+                                                    .subscribeOn(Schedulers.io())
+                                                    .observeOn(AndroidSchedulers.mainThread())
+                                                    .subscribe(isUpdated -> {
+                                                        if (isUpdated) {
+                                                            mView.eventAdded();
+                                                        } else {
+                                                            mView.showError(LogsView.Error.ERROR_ADD_EVENT);
+                                                        }
+                                                    }, throwable -> mView.showError(throwable));
+        mDisposables.add(disposable);
+    }
+
+    public void onEventChanged(ELDEvent updatedEvent) {
+        Disposable disposable = mELDEventsInteractor.updateELDEvents(new ArrayList<ELDEvent>() {{ add(updatedEvent); }})
+                                                    .subscribeOn(Schedulers.io())
+                                                    .observeOn(AndroidSchedulers.mainThread())
+                                                    .subscribe(isUpdated -> {
+                                                        if (isUpdated) {
+                                                            mView.eventUpdated();
+                                                        } else {
+                                                            mView.showError(LogsView.Error.ERROR_UPDATE_EVENT);
+                                                        }
+                                                    }, throwable -> mView.showError(throwable));
+        mDisposables.add(disposable);
+    }
+
     public void onDestroy() {
+        mDutyManager.removeListener(mListener);
+
         if (mGetEventDisposable != null) {
             mGetEventDisposable.dispose();
         }

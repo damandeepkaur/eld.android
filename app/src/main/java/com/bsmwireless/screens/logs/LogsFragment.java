@@ -1,6 +1,7 @@
 package com.bsmwireless.screens.logs;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -13,12 +14,14 @@ import com.bsmwireless.common.App;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.LogSheetHeader;
 import com.bsmwireless.screens.common.BaseFragment;
+import com.bsmwireless.screens.editevent.EditEventActivity;
 import com.bsmwireless.screens.logs.LogsAdapter.OnLogsTitleStateChangeListener;
 import com.bsmwireless.screens.logs.dagger.DaggerLogsComponent;
 import com.bsmwireless.screens.logs.dagger.EventLogModel;
 import com.bsmwireless.screens.logs.dagger.LogsModule;
 import com.bsmwireless.screens.navigation.NavigateView;
 import com.bsmwireless.widgets.logs.LogsTitleView;
+import com.bsmwireless.widgets.logs.calendar.CalendarItem;
 
 import java.util.List;
 
@@ -28,8 +31,17 @@ import app.bsmuniversal.com.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import timber.log.Timber;
+
+import static android.app.Activity.RESULT_OK;
+import static com.bsmwireless.screens.editevent.EditEventActivity.DAY_TIME_EXTRA;
+import static com.bsmwireless.screens.editevent.EditEventActivity.NEW_ELD_EVENT_EXTRA;
+import static com.bsmwireless.screens.editevent.EditEventActivity.OLD_ELD_EVENT_EXTRA;
 
 public class LogsFragment extends BaseFragment implements LogsView {
+
+    private static final int REQUEST_CODE_EDIT_EVENT = 101;
+    private static final int REQUEST_CODE_ADD_EVENT = 102;
 
     @Inject
     LogsPresenter mPresenter;
@@ -102,7 +114,7 @@ public class LogsFragment extends BaseFragment implements LogsView {
             case EVENTS:
                 mNavigateView.getSnackBar()
                         .setPositiveLabel(mContext.getString(R.string.add_event),
-                                v -> mPresenter.onAddEventClicked())
+                                v -> mPresenter.onAddEventClicked(mAdapter.getCurrentItem()))
                         .showSnackbar();
                 break;
             case TRIP_INFO:
@@ -130,20 +142,88 @@ public class LogsFragment extends BaseFragment implements LogsView {
     }
 
     @Override
-    public void goToAddEventScreen() {
-        //TODO: go to add event screen
-        Toast.makeText(mContext, "Go to add event screen", Toast.LENGTH_SHORT).show();
+    public void goToAddEventScreen(CalendarItem day) {
+        Intent addEventIntent = new Intent(mContext, EditEventActivity.class);
+        addEventIntent.putExtra(DAY_TIME_EXTRA, day.getTimestamp());
+        startActivityForResult(addEventIntent, REQUEST_CODE_ADD_EVENT);
     }
 
     @Override
-    public void goToEditEventScreen(ELDEvent event) {
-        //TODO: go to edit event screen
-        Toast.makeText(mContext, "Go to edit event screen", Toast.LENGTH_SHORT).show();
+    public void goToEditEventScreen(EventLogModel event) {
+        Intent editEventIntent = new Intent(mContext, EditEventActivity.class);
+        editEventIntent.putExtra(OLD_ELD_EVENT_EXTRA, event.getEvent());
+        startActivityForResult(editEventIntent, REQUEST_CODE_EDIT_EVENT);
     }
 
     @Override
     public void goToEditTripInfoScreen() {
         //TODO: go to edit trip info screen
         Toast.makeText(mContext, "Go to edit trip info screen", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void eventAdded() {
+        //TODO: show message
+        Toast.makeText(mContext, "Event added.", Toast.LENGTH_SHORT).show();
+        CalendarItem item = mAdapter.getCurrentItem();
+        mPresenter.updateEventForDay(item.getCalendar());
+        mNavigateView.setResetTime(0);
+    }
+
+    @Override
+    public void eventUpdated() {
+        //TODO: show message
+        Toast.makeText(mContext, "Event updated.", Toast.LENGTH_SHORT).show();
+        CalendarItem item = mAdapter.getCurrentItem();
+        mPresenter.updateEventForDay(item.getCalendar());
+        mNavigateView.setResetTime(0);
+    }
+
+    @Override
+    public void dutyUpdated() {
+        if (mAdapter != null) {
+            CalendarItem item = mAdapter.getCurrentItem();
+            if (item.isCurrentDay(System.currentTimeMillis())) {
+                mPresenter.updateEventForDay(item.getCalendar());
+            }
+        }
+    }
+
+    @Override
+    public void showError(Throwable throwable) {
+        //TODO: show error message
+        Timber.e(throwable.getMessage());
+        Toast.makeText(mContext, throwable.getMessage(), Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showError(Error error) {
+        //TODO: show error message
+        Timber.e(getString(error.getStringId()));
+        Toast.makeText(mContext, getString(error.getStringId()), Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case REQUEST_CODE_ADD_EVENT: {
+                if (resultCode == RESULT_OK) {
+                    ELDEvent newEvent = data.getParcelableExtra(NEW_ELD_EVENT_EXTRA);
+                    mPresenter.onEventAdded(newEvent);
+                }
+                break;
+            }
+            case REQUEST_CODE_EDIT_EVENT: {
+                if (resultCode == RESULT_OK) {
+                    ELDEvent updatedEvent = data.getParcelableExtra(NEW_ELD_EVENT_EXTRA);
+                    mPresenter.onEventChanged(updatedEvent);
+                }
+                break;
+            }
+            default: {
+                break;
+            }
+        }
     }
 }

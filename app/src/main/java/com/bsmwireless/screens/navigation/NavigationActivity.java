@@ -272,7 +272,11 @@ public class NavigationActivity extends BaseMenuActivity implements OnNavigation
 
     public void setResetTime(long time) {
         mHandler.removeCallbacks(mResetTimeTask);
-        mHandler.postAtTime(mResetTimeTask, time);
+        if (time == 0) {
+            mHandler.post(mResetTimeTask);
+        } else {
+            mHandler.postAtTime(mResetTimeTask, time);
+        }
     }
 
     protected static class HeaderViewHolder {

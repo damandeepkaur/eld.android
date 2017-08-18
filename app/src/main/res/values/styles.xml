@@ -79,6 +79,10 @@
         <item name="color">@color/nasty_green</item>
     </style>
 
+    <style name="TimePicker" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="colorAccent">@color/accent</item>
+    </style>
+
     <style name="SpinnerLabel" parent="TextAppearance.AppCompat.Caption">
         <item name="android:paddingBottom">@dimen/spinner_label_spacing</item>
         <item name="android:paddingLeft">@dimen/spinner_label_spacing</item>

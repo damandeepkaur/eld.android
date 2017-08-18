@@ -2,7 +2,6 @@ package com.bsmwireless.screens.common.menu;
 
 import com.bsmwireless.data.storage.DutyManager;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
-import com.bsmwireless.domain.interactors.UserInteractor;
 import com.bsmwireless.widgets.alerts.DutyType;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -10,10 +9,7 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
-import static com.bsmwireless.common.utils.NetworkUtils.SUCCESS;
-
 public abstract class BaseMenuPresenter {
-    protected UserInteractor mUserInteractor;
     protected DutyManager mDutyManager;
     protected ELDEventsInteractor mEventsInteractor;
     protected CompositeDisposable mDisposables;
@@ -36,7 +32,7 @@ public abstract class BaseMenuPresenter {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(
-                        responseMessage -> responseMessage.getMessage().equals(SUCCESS),
+                        responseMessage -> {},
                         error -> Timber.e(error.getMessage())
                 )
         );

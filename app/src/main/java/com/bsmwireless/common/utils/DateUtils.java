@@ -13,7 +13,12 @@ import java.util.concurrent.TimeUnit;
 import app.bsmuniversal.com.R;
 
 public class DateUtils {
-    private final static int MINUTES_IN_HOUR = 60;
+    public static final int MS_IN_SEC = 1000;
+    public static final int SEC_IN_MIN = 60;
+    public static final int MIN_IN_HOUR = 60;
+    public static final int HOUR_IN_DAY = 24;
+    public static final int SEC_IN_DAY = HOUR_IN_DAY * MIN_IN_HOUR * SEC_IN_MIN;
+    public static final long MS_IN_DAY = MS_IN_SEC * SEC_IN_DAY;
 
     /**
      * @param zone user timezone for example "America/Los_Angeles"
@@ -87,8 +92,8 @@ public class DateUtils {
         long minutes = TimeUnit.MINUTES.convert(timeZone.getOffset(time), TimeUnit.MILLISECONDS);
 
         return String.format(Locale.US, "GMT %s.%s, %s (%s)",
-                minutes / MINUTES_IN_HOUR,
-                minutes % MINUTES_IN_HOUR,
+                minutes / MIN_IN_HOUR,
+                minutes % MIN_IN_HOUR,
                 timeZone.getDisplayName(Locale.US),
                 zone);
     }
@@ -158,5 +163,45 @@ public class DateUtils {
             e.printStackTrace();
         }
         return date.getTime();
+    }
+
+    /**
+     * @param time long unix time in ms
+     * @return string with format time like "12:35 AM"
+     */
+    public static String convertTimeToAMPMString(long time, String timezone) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm aaa");
+        TimeZone timeZone = TimeZone.getTimeZone(timezone);
+        dateFormat.setTimeZone(timeZone);
+        return dateFormat.format(time);
+    }
+
+    /**
+     * @param time string with format time like "12:35 AM"
+     * @param day current day time
+     * @return long unix time in ms
+     */
+    public static Long convertStringAMPMToTime(String time, long day, String timezone) {
+        SimpleDateFormat format = new SimpleDateFormat("hh:mm aaa", Locale.US);
+        TimeZone timeZone = TimeZone.getTimeZone(timezone);
+        format.setTimeZone(timeZone);
+        try {
+            // Parse hour of day and minute
+            Date date = format.parse(time);
+            Calendar calendar = Calendar.getInstance(timeZone);
+            calendar.setTime(date);
+
+            int hourOfDay = calendar.get(Calendar.HOUR_OF_DAY);
+            int minute = calendar.get(Calendar.MINUTE);
+
+            // Time of day
+            calendar.setTimeInMillis(day);
+            calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+            calendar.set(Calendar.MINUTE, minute);
+            return calendar.getTimeInMillis();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return 0L;
     }
 }

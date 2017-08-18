@@ -7,6 +7,7 @@ import com.bsmwireless.models.DriverLog;
 import com.bsmwireless.models.DriverProfileModel;
 import com.bsmwireless.models.DriverSignature;
 import com.bsmwireless.models.ELDEvent;
+import com.bsmwireless.models.ELDUpdate;
 import com.bsmwireless.models.EmailReport;
 import com.bsmwireless.models.Event;
 import com.bsmwireless.models.HOSAlert;
@@ -86,6 +87,15 @@ public interface ServiceApi {
     Observable<ResponseMessage> postNewELDEvents(@Body List<ELDEvent> statusList);
 
     /**
+     * Update ELD Event which already sent to server
+     *
+     * @param events driver status list.
+     * @return update events response {@link ResponseMessage}.
+     */
+    @POST("v1/app/driver/updateevents")
+    Observable<ResponseMessage> updateELDEvents(@Body List<ELDEvent> events);
+
+    /**
      * Fetch processed driver records.
      *
      * @param startTime start time.
@@ -102,7 +112,7 @@ public interface ServiceApi {
      * @return Response {@link ResponseMessage}.
      */
     @PUT("v1/sync/records/update")
-    Observable<ResponseMessage> updateELDEvents(@Body List<ELDEvent> events);
+    Observable<ResponseMessage> updateRescords(@Body List<ELDUpdate> events);
 
     /**
      * Update user profile.

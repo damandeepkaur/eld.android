@@ -21,9 +21,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
-import static com.bsmwireless.common.Constants.MIN_IN_HOUR;
-import static com.bsmwireless.common.Constants.SEC_IN_DAY;
-import static com.bsmwireless.common.Constants.SEC_IN_MIN;
+import static com.bsmwireless.common.utils.DateUtils.MIN_IN_HOUR;
+import static com.bsmwireless.common.utils.DateUtils.SEC_IN_DAY;
+import static com.bsmwireless.common.utils.DateUtils.SEC_IN_MIN;
 
 public class DutyView extends CardView {
     @BindView(R.id.duty_time_title)

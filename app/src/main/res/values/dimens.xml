@@ -102,11 +102,13 @@
     <dimen name="driver_profile_signature_height">225dp</dimen>
     <dimen name="driver_profile_signature_margin">15dp</dimen>
     <dimen name="driver_profile_shadow_size">4dp</dimen>
-    <dimen name="spinner_label_spacing">4dp</dimen>
 
     <!-- Calendar widget -->
     <dimen name="calendar_item_width">45dp</dimen>
     <dimen name="calendar_item_height">85dp</dimen>
+
+    <!-- Edit Event Fragment -->
+    <dimen name="spinner_label_spacing">4dp</dimen>
 
     <!--Logs-->
     <dimen name="calendar_layout_side_button_size">24dp</dimen>

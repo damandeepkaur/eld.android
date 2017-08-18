@@ -4,7 +4,7 @@ import android.content.SharedPreferences;
 
 import com.bsmwireless.widgets.alerts.DutyType;
 
-import static com.bsmwireless.common.Constants.MS_IN_SEC;
+import static com.bsmwireless.common.utils.DateUtils.MS_IN_SEC;
 import static com.bsmwireless.data.storage.PreferencesManager.KEY_DUTY_TYPE;
 
 public class DutyManager {
@@ -18,21 +18,18 @@ public class DutyManager {
         mDutyType = DutyType.values()[mPreferencesManager.getDutyType()];
     }
 
-    public void setDutyTypeTime(int onDuty, int driving, int sleeperBerth) {
+    public void setDutyTypeTime(int onDuty, int driving, int sleeperBerth, DutyType dutyType) {
         mPreferencesManager.setOnDutyTime(onDuty);
         mPreferencesManager.setDrivingTime(driving);
         mPreferencesManager.setSleeperBerthTime(sleeperBerth);
 
-        mPreferencesManager.setDutyType(mDutyType.ordinal());
+        mPreferencesManager.setDutyType(dutyType.ordinal());
+        mDutyType = dutyType;
+        mStart = System.currentTimeMillis();
     }
 
-    public void setDutyType(DutyType dutyType) {
-        mPreferencesManager.setDutyType(dutyType.ordinal());
-
-        long current = System.currentTimeMillis();
-        int time = (int) ((current - mStart) / MS_IN_SEC);
-
-        switch (mDutyType) {
+    private void setDutyTypeTime(DutyType dutyType, int time) {
+        switch (dutyType) {
             case ON_DUTY:
             case YARD_MOVES:
                 mPreferencesManager.setOnDutyTime(mPreferencesManager.getOnDutyTime() + time);
@@ -46,6 +43,14 @@ public class DutyManager {
                 mPreferencesManager.setSleeperBerthTime(mPreferencesManager.getSleeperBerthTime() + time);
                 break;
         }
+    }
+
+    public void setDutyType(DutyType dutyType) {
+        mPreferencesManager.setDutyType(dutyType.ordinal());
+
+        long current = System.currentTimeMillis();
+
+        setDutyTypeTime(mDutyType, (int) ((current - mStart) / MS_IN_SEC));
 
         mDutyType = dutyType;
         mStart = current;

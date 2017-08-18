@@ -12,7 +12,6 @@ import com.bsmwireless.data.storage.eldevents.ELDEventDao;
 import com.bsmwireless.data.storage.eldevents.ELDEventEntity;
 import com.bsmwireless.models.BlackBoxModel;
 import com.bsmwireless.models.ELDEvent;
-import com.bsmwireless.models.ResponseMessage;
 import com.bsmwireless.widgets.alerts.DutyType;
 
 import java.util.ArrayList;
@@ -26,8 +25,12 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
+import static com.bsmwireless.common.Constants.SUCCESS;
+
 public class ELDEventsInteractor {
+
     private Disposable mSyncEventsDisposable;
+
     private ServiceApi mServiceApi;
     private PreferencesManager mPreferencesManager;
     private BlackBoxInteractor mBlackBoxInteractor;
@@ -45,16 +48,6 @@ public class ELDEventsInteractor {
         mELDEventDao = appDatabase.ELDEventDao();
     }
 
-    public Observable<ResponseMessage> updateELDEvents(List<ELDEvent> events) {
-        if (NetworkUtils.isOnlineMode()) {
-            return mServiceApi.updateELDEvents(events)
-                    .doOnError(throwable -> storeEvents(events, false));
-        } else {
-            storeEvents(events, false);
-            return Observable.error(new NetworkErrorException("No Internet Connection"));
-        }
-    }
-
     public Flowable<List<ELDEvent>> getELDEvents(long startTime, long endTime) {
         return getELDEventsFromDB(startTime, endTime);
     }
@@ -69,24 +62,46 @@ public class ELDEventsInteractor {
             mSyncEventsDisposable.dispose();
         }
         mSyncEventsDisposable = mServiceApi.getELDEvents(startTime, endTime)
+                .doOnNext(events -> {
+                    //remove doubled records
+                    ArrayList<Long> times = new ArrayList<>();
+                    for (ELDEvent event : events) {
+                        times.add(event.getMobileTime());
+                    }
+                    mELDEventDao.deleteDoubledEvents(times);
+                })
                 .subscribeOn(Schedulers.io())
                 .subscribe(eldEvents -> storeEvents(eldEvents, false), Timber::d);
     }
 
-    public Observable<ResponseMessage> postNewELDEvent(ELDEvent event) {
+    public Observable<Boolean> updateELDEvents(List<ELDEvent> events) {
+        if (NetworkUtils.isOnlineMode()) {
+            return mServiceApi.updateELDEvents(events)
+                              .doOnError(throwable -> storeEvents(events, false))
+                              .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
+        } else {
+            storeEvents(events, false);
+            return Observable.error(new NetworkErrorException("No Internet Connection"));
+        }
+    }
+
+	public Observable<Boolean> postNewELDEvent(ELDEvent event) {
         if (NetworkUtils.isOnlineMode()) {
             return mServiceApi.postNewELDEvent(event)
-                    .doOnError(throwable -> storeEvent(event, false));
+                    .doOnError(throwable -> storeEvent(event, false))
+                    .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
         } else {
             storeEvent(event, false);
             return Observable.error(new NetworkErrorException("No Internet Connection"));
         }
     }
 
-    public Observable<ResponseMessage> postNewELDEvents(List<ELDEvent> events) {
+    public Observable<Boolean> postNewELDEvents(List<ELDEvent> events) {
         if (NetworkUtils.isOnlineMode()) {
             return mServiceApi.postNewELDEvents(events)
-                    .doOnError(throwable -> events.forEach(event -> storeEvent(event, false)));
+                    .doOnError(throwable -> storeEvents(events, false))
+                    .doOnNext(responseMessage -> storeEvents(events, true))
+                    .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
         } else {
             storeEvents(events, false);
             return Observable.error(new NetworkErrorException("No Internet Connection"));
@@ -111,41 +126,41 @@ public class ELDEventsInteractor {
         mELDEventDao.getUnsyncEvents().subscribe(eldEventEntities -> {
             List<ELDEvent> unsyncEvents = ELDEventConverter.toModelList(eldEventEntities);
             if (unsyncEvents != null && !unsyncEvents.isEmpty()) {
-                postNewELDEvents(unsyncEvents)
-                        .subscribe(responseMessage -> storeEvents(unsyncEvents, true));
+                postNewELDEvents(unsyncEvents).subscribe(responseMessage -> storeEvents(unsyncEvents, true));
             }
         });
     }
 
-    public Observable<ResponseMessage> postNewDutyTypeEvent(DutyType dutyType) {
+    public Observable<Boolean> postNewDutyTypeEvent(DutyType dutyType) {
         return mBlackBoxInteractor.getData()
-                .flatMap(blackBoxModel -> {
-                    ArrayList<ELDEvent> events = new ArrayList<>();
+                .flatMap(blackBoxModel -> postNewELDEvents(getEvents(dutyType, blackBoxModel)))
+                .doOnNext(isSuccess -> mDutyManager.setDutyType(dutyType));
+    }
 
-                    switch (dutyType) {
-                        case PERSONAL_USE:
-                            if (mDutyManager.getDutyType() != DutyType.OFF_DUTY) {
-                                events.add(getEvent(DutyType.OFF_DUTY, blackBoxModel));
-                            }
-                            events.add(getEvent(DutyType.PERSONAL_USE, blackBoxModel));
-                            break;
+    public ArrayList<ELDEvent> getEvents(DutyType dutyType, BlackBoxModel blackBoxModel) {
+        ArrayList<ELDEvent> events = new ArrayList<>();
 
-                        case YARD_MOVES:
-                            if (mDutyManager.getDutyType() != DutyType.ON_DUTY) {
-                                events.add(getEvent(DutyType.ON_DUTY, blackBoxModel));
-                            }
-                            events.add(getEvent(DutyType.YARD_MOVES, blackBoxModel));
-                            break;
+        switch (dutyType) {
+            case PERSONAL_USE:
+                if (mDutyManager.getDutyType() != DutyType.OFF_DUTY) {
+                    events.add(getEvent(DutyType.OFF_DUTY, blackBoxModel));
+                }
+                events.add(getEvent(DutyType.PERSONAL_USE, blackBoxModel));
+                break;
 
-                        default:
-                            events.add(getEvent(dutyType, blackBoxModel));
-                            break;
-                    }
+            case YARD_MOVES:
+                if (mDutyManager.getDutyType() != DutyType.ON_DUTY) {
+                    events.add(getEvent(DutyType.ON_DUTY, blackBoxModel));
+                }
+                events.add(getEvent(DutyType.YARD_MOVES, blackBoxModel));
+                break;
 
-                    mDutyManager.setDutyType(dutyType);
+            default:
+                events.add(getEvent(dutyType, blackBoxModel));
+                break;
+        }
 
-                    return postNewELDEvents(events);
-                });
+        return events;
     }
 
     private ELDEvent getEvent(DutyType dutyType, BlackBoxModel blackBoxModel) {
@@ -154,7 +169,7 @@ public class ELDEventsInteractor {
 
         ELDEvent event = new ELDEvent();
         event.setStatus(ELDEvent.StatusCode.ACTIVE.getValue());
-        event.setOrigin(ELDEvent.EventOrigin.AUTOMATIC_EDIT.getValue());
+        event.setOrigin(ELDEvent.EventOrigin.DRIVER.getValue());
         event.setEventType((dutyType == DutyType.PERSONAL_USE || dutyType == DutyType.YARD_MOVES) ?
                 ELDEvent.EventType.CHANGE_IN_DRIVER_INDICATION.getValue() :
                 ELDEvent.EventType.DUTY_STATUS_CHANGING.getValue());

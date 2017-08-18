@@ -2,14 +2,14 @@ package com.bsmwireless.domain.interactors;
 
 import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.models.LogSheetHeader;
-import com.bsmwireless.models.ResponseMessage;
 
 import java.util.List;
 
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
-import io.reactivex.schedulers.Schedulers;
+
+import static com.bsmwireless.common.Constants.SUCCESS;
 
 public class LogSheetInteractor {
 
@@ -24,7 +24,7 @@ public class LogSheetInteractor {
         return mServiceApi.getLogSheets(startLogDay, endLogDay);
     }
 
-    public Observable<ResponseMessage> updateLogSheetHeader(LogSheetHeader logSheetHeader) {
-        return mServiceApi.updateLogSheetHeader(logSheetHeader);
+    public Observable<Boolean> updateLogSheetHeader(LogSheetHeader logSheetHeader) {
+        return mServiceApi.updateLogSheetHeader(logSheetHeader).map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
     }
 }

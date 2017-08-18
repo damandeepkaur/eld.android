@@ -8,9 +8,9 @@ import android.arch.persistence.room.PrimaryKey;
 public class ELDEventEntity {
     @PrimaryKey
     @ColumnInfo(name = "id")
-    private int mId;
+    private Integer mId;
     @ColumnInfo(name = "is_sync")
-    private boolean mSync = true;
+    private Boolean mSync = true;
     @ColumnInfo(name = "event_type")
     private Integer mEventType;
     @ColumnInfo(name = "event_code")
@@ -60,19 +60,19 @@ public class ELDEventEntity {
     @ColumnInfo(name = "mal_code")
     private String mMalCode;
 
-    public int getId() {
+    public Integer getId() {
         return mId;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         mId = id;
     }
 
-    public boolean isSync() {
+    public Boolean isSync() {
         return mSync;
     }
 
-    public void setSync(boolean sync) {
+    public void setSync(Boolean sync) {
         mSync = sync;
     }
 
