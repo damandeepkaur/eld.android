@@ -9,6 +9,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -74,6 +75,8 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
     private SelectAssetAdapter mSearchAdapter;
     private SelectAssetAdapter mLastAdapter;
 
+    private boolean isBoxIdScanned = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,6 +85,8 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
 
         setContentView(R.layout.activity_select_asset);
         mUnbinder = ButterKnife.bind(this);
+
+        Log.d("SelectAssetActivity", "isBoxIdScanned: " + isBoxIdScanned);
 
         initView();
     }
@@ -197,6 +202,7 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
             String type = data.getStringExtra(BARCODE_TYPE);
             Timber.v(barcodeId + " type:" + type);
             mSearchView.setQuery(barcodeId, false);
+            isBoxIdScanned = true;
 
         } else if (data != null && data.getBooleanExtra(BarcodeScannerActivity.IS_PERMISSION_ERROR, false)) {
             showErrorMessage(Error.ERROR_PERMISSION);
@@ -205,8 +211,12 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
 
     @Override
     public void setVehicleList(List<Vehicle> vehicles, String searchText) {
-        mSearchCardView.setVisibility(View.VISIBLE);
-        mSearchAdapter.setSearchList(vehicles, searchText);
+        if (!isBoxIdScanned) {
+            mSearchCardView.setVisibility(View.VISIBLE);
+            mSearchAdapter.setSearchList(vehicles, searchText);
+        } else {
+            mPresenter.onVehicleListItemClicked(vehicles.get(0));
+        }
     }
 
     @Override
