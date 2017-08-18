@@ -13,9 +13,9 @@ public class PreferencesManager {
     private static final String KEY_FIXED_AMOUNT_ENABLED = "keep_fixed_amount_enabled";
     private static final String KEY_SELECTED_KM_UNITS = "selected_km_units";
     //TODO: validate from server
-    private static final String KEY_TIME_ON_DUTY = "time_on_duty";
-    private static final String KEY_TIME_DRIVING = "time_driving";
-    private static final String KEY_TIME_SLEEPER_BERTH = "time_sleeper_berth";
+    public static final String KEY_TIME_ON_DUTY = "time_on_duty";
+    public static final String KEY_TIME_DRIVING = "time_driving";
+    public static final String KEY_TIME_SLEEPER_BERTH = "time_sleeper_berth";
 
     public static final String KEY_DUTY_TYPE = "duty_type";
     private static final String KEY_DUTY_DAY = "duty_day";

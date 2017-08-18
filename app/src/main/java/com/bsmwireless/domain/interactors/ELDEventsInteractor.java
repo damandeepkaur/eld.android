@@ -145,40 +145,45 @@ public class ELDEventsInteractor {
     public ArrayList<ELDEvent> getEvents(DutyType dutyType, BlackBoxModel blackBoxModel) {
         ArrayList<ELDEvent> events = new ArrayList<>();
 
+        //clear PU or YM status
+        if (mDutyManager.getDutyType() == DutyType.PERSONAL_USE || mDutyManager.getDutyType() == DutyType.YARD_MOVES) {
+            events.add(getEvent(null, ELDEvent.EventType.CHANGE_IN_DRIVER_INDICATION, blackBoxModel));
+        }
+
         switch (dutyType) {
             case PERSONAL_USE:
+                //switch to off-duty if needed
                 if (mDutyManager.getDutyType() != DutyType.OFF_DUTY) {
-                    events.add(getEvent(DutyType.OFF_DUTY, blackBoxModel));
+                    events.add(getEvent(DutyType.OFF_DUTY, ELDEvent.EventType.DUTY_STATUS_CHANGING, blackBoxModel));
                 }
-                events.add(getEvent(DutyType.PERSONAL_USE, blackBoxModel));
+                events.add(getEvent(DutyType.PERSONAL_USE, ELDEvent.EventType.CHANGE_IN_DRIVER_INDICATION, blackBoxModel));
                 break;
 
             case YARD_MOVES:
+                //switch to on-duty if needed
                 if (mDutyManager.getDutyType() != DutyType.ON_DUTY) {
-                    events.add(getEvent(DutyType.ON_DUTY, blackBoxModel));
+                    events.add(getEvent(DutyType.ON_DUTY, ELDEvent.EventType.DUTY_STATUS_CHANGING, blackBoxModel));
                 }
-                events.add(getEvent(DutyType.YARD_MOVES, blackBoxModel));
+                events.add(getEvent(DutyType.YARD_MOVES, ELDEvent.EventType.CHANGE_IN_DRIVER_INDICATION, blackBoxModel));
                 break;
 
             default:
-                events.add(getEvent(dutyType, blackBoxModel));
+                events.add(getEvent(dutyType, ELDEvent.EventType.DUTY_STATUS_CHANGING, blackBoxModel));
                 break;
         }
 
         return events;
     }
 
-    private ELDEvent getEvent(DutyType dutyType, BlackBoxModel blackBoxModel) {
+    private ELDEvent getEvent(DutyType dutyType, ELDEvent.EventType eventType, BlackBoxModel blackBoxModel) {
         long currentTime = System.currentTimeMillis();
         int driverId = mUserInteractor.getDriverId();
 
         ELDEvent event = new ELDEvent();
         event.setStatus(ELDEvent.StatusCode.ACTIVE.getValue());
         event.setOrigin(ELDEvent.EventOrigin.DRIVER.getValue());
-        event.setEventType((dutyType == DutyType.PERSONAL_USE || dutyType == DutyType.YARD_MOVES) ?
-                ELDEvent.EventType.CHANGE_IN_DRIVER_INDICATION.getValue() :
-                ELDEvent.EventType.DUTY_STATUS_CHANGING.getValue());
-        event.setEventCode(dutyType.getValue());
+        event.setEventType(eventType.getValue());
+        event.setEventCode(dutyType == null ? 0 : dutyType.getValue());
         event.setEventTime(currentTime);
         event.setEngineHours(blackBoxModel.getEngineHours());
         event.setLat(blackBoxModel.getLat());

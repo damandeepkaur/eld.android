@@ -6,6 +6,9 @@ import com.bsmwireless.widgets.alerts.DutyType;
 
 import static com.bsmwireless.common.utils.DateUtils.MS_IN_SEC;
 import static com.bsmwireless.data.storage.PreferencesManager.KEY_DUTY_TYPE;
+import static com.bsmwireless.data.storage.PreferencesManager.KEY_TIME_DRIVING;
+import static com.bsmwireless.data.storage.PreferencesManager.KEY_TIME_ON_DUTY;
+import static com.bsmwireless.data.storage.PreferencesManager.KEY_TIME_SLEEPER_BERTH;
 
 public class DutyManager {
     private PreferencesManager mPreferencesManager;
@@ -99,8 +102,8 @@ public class DutyManager {
 
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-            if (KEY_DUTY_TYPE.equals(key)) {
-                onDutyTypeChanged(DutyType.values()[sharedPreferences.getInt(key, 0)]);
+            if (KEY_DUTY_TYPE.equals(key) || KEY_TIME_DRIVING.equals(key) || KEY_TIME_ON_DUTY.equals(key) || KEY_TIME_SLEEPER_BERTH.equals(key)) {
+                onDutyTypeChanged(DutyType.values()[sharedPreferences.getInt(KEY_DUTY_TYPE, 0)]);
             }
         }
     }
