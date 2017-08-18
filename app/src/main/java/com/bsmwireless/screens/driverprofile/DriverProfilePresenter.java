@@ -72,10 +72,7 @@ public class DriverProfilePresenter {
                                                                     mView.setCarrierInfo(mCarrier);
                                                                 }
                                                             },
-                                                            throwable -> {
-                                                                Timber.e(throwable.getMessage());
-                                                                mView.showError(throwable);
-                                                            });
+                                                            throwable -> Timber.e(throwable.getMessage()));
         mDisposables.add(disposable);
     }
 
@@ -103,8 +100,6 @@ public class DriverProfilePresenter {
                                                                     Timber.e(throwable.getMessage());
                                                                     if (throwable instanceof RetrofitException) {
                                                                         mView.showError((RetrofitException) throwable);
-                                                                    } else {
-                                                                        mView.showError(throwable);
                                                                     }
                                                                 });
             mDisposables.add(disposable);
@@ -138,8 +133,6 @@ public class DriverProfilePresenter {
                                                                     Timber.e(throwable.getMessage());
                                                                     if (throwable instanceof RetrofitException) {
                                                                         mView.showError((RetrofitException) throwable);
-                                                                    } else {
-                                                                        mView.showError(throwable);
                                                                     }
                                                                 });
             mDisposables.add(disposable);
@@ -165,8 +158,6 @@ public class DriverProfilePresenter {
                                                             Timber.e(throwable.getMessage());
                                                             if (throwable instanceof RetrofitException) {
                                                                 mView.showError((RetrofitException) throwable);
-                                                            } else {
-                                                                mView.showError(throwable);
                                                             }
                                                         });
             mDisposables.add(disposable);

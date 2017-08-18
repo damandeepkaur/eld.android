@@ -40,7 +40,6 @@ public interface DriverProfileView {
     void setResults(User user);
     void showSignatureChanged();
 
-    void showError(Throwable error);
     void showError(RetrofitException error);
     void showError(Error error);
 }

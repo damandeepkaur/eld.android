@@ -168,11 +168,6 @@ public class DriverProfileActivity extends BaseMenuActivity implements DriverPro
     }
 
     @Override
-    public void showError(Throwable error) {
-        showNotificationSnackBar(error.getMessage());
-    }
-
-    @Override
     public void showError(RetrofitException error) {
         showNotificationSnackBar(NetworkUtils.getErrorMessage(error, this).toString());
     }

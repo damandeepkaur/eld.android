@@ -46,6 +46,4 @@ public interface LogsView {
 
     void showError(Error error);
 
-    void showError(Throwable exception);
-
 }

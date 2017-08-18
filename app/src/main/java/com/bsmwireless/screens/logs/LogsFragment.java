@@ -229,11 +229,6 @@ public class LogsFragment extends BaseFragment implements LogsView {
     }
 
     @Override
-    public void showError(Throwable exception) {
-        showNotificationSnackBar(exception.getMessage());
-    }
-
-    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {

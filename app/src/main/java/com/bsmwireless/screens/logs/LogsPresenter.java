@@ -166,7 +166,7 @@ public class LogsPresenter {
                                 }
                             }
                             mView.setEventLogs(logs);
-                        }
+                        }, throwable -> Timber.e(throwable.getMessage())
                 ));
     }
 
@@ -232,8 +232,6 @@ public class LogsPresenter {
                                 Timber.e(throwable.getMessage());
                                 if (throwable instanceof RetrofitException) {
                                     mView.showError((RetrofitException) throwable);
-                                } else {
-                                    mView.showError(throwable);
                                 }
                             }
                     ));
@@ -256,8 +254,6 @@ public class LogsPresenter {
                             logSheetHeader.setSigned(false);
                             if (throwable instanceof RetrofitException) {
                                 mView.showError((RetrofitException) throwable);
-                            } else {
-                                mView.showError(throwable);
                             }
                         }
                 ));
@@ -294,8 +290,6 @@ public class LogsPresenter {
                     Timber.e(throwable.getMessage());
                     if (throwable instanceof RetrofitException) {
                         mView.showError((RetrofitException) throwable);
-                    } else {
-                        mView.showError(throwable);
                     }
                 });
         mDisposables.add(disposable);
@@ -317,8 +311,6 @@ public class LogsPresenter {
                     Timber.e(throwable.getMessage());
                     if (throwable instanceof RetrofitException) {
                         mView.showError((RetrofitException) throwable);
-                    } else {
-                        mView.showError(throwable);
                     }
                 });
         mDisposables.add(disposable);
