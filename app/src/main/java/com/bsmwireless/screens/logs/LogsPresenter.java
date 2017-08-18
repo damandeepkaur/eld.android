@@ -4,9 +4,8 @@ package com.bsmwireless.screens.logs;
 import com.bsmwireless.common.Constants;
 import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.common.utils.DateUtils;
-import com.bsmwireless.data.storage.DutyManager;
-import com.bsmwireless.common.utils.DutyUtils;
 import com.bsmwireless.data.network.RetrofitException;
+import com.bsmwireless.data.storage.DutyManager;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
 import com.bsmwireless.domain.interactors.LogSheetInteractor;
 import com.bsmwireless.domain.interactors.UserInteractor;
@@ -131,10 +130,11 @@ public class LogsPresenter {
 
                     HashSet<Integer> vehicleIds = new HashSet<>();
                     for (EventLogModel log : dutyStateLogs) {
-                        if (mVehicleIdToNameMap.containsKey(log.getEvent().getVehicleId())) {
-                            log.setVehicleName(mVehicleIdToNameMap.get(log.getEvent().getVehicleId()));
+                        int vehicleId = log.getEvent().getVehicleId();
+                        if (mVehicleIdToNameMap.containsKey(vehicleId)) {
+                            log.setVehicleName(mVehicleIdToNameMap.get(vehicleId));
                         } else {
-                            vehicleIds.add(log.getEvent().getVehicleId());
+                            vehicleIds.add(vehicleId);
                         }
                     }
 
@@ -340,7 +340,6 @@ public class LogsPresenter {
 
     private List<EventLogModel> preparingLogs(List<ELDEvent> events, long startDayTime, long endDayTime) {
         List<EventLogModel> logs = new ArrayList<>();
-
         //filter events
         ListIterator<ELDEvent> iterator = events.listIterator();
         while (iterator.hasNext()) {
@@ -348,39 +347,30 @@ public class LogsPresenter {
             if (!event.getEventType().equals(ELDEvent.EventType.DUTY_STATUS_CHANGING.getValue())
                     && !event.getEventType().equals(ELDEvent.EventType.CHANGE_IN_DRIVER_INDICATION.getValue())) {
                 iterator.remove();
-            }
-        }
-
-        //remove events from prev day except last event
-        iterator = events.listIterator();
-        while (iterator.hasNext()) {
-            iterator.next();
-            int i = iterator.nextIndex();
-            if (i < events.size() - 1) {
-                if (events.get(i).getEventTime() < startDayTime) {
-                    iterator.remove();
+            } else {
+                int i = iterator.nextIndex();
+                if (i < events.size() - 1) {
+                    if (events.get(i).getEventTime() < startDayTime) {
+                        iterator.remove();
+                    }
                 }
             }
         }
 
         if (!events.isEmpty()) {
             //convert to logs model
+            long duration;
             for (int i = 0; i < events.size(); i++) {
                 ELDEvent event = events.get(i);
                 EventLogModel log = new EventLogModel(event, mTimeZone);
                 logs.add(log);
-            }
-
-            //set zero time for event from prev day
-            if (logs.get(0).getEventTime() < startDayTime) {
-                logs.get(0).setEventTime(startDayTime);
-            }
-
-            //set duration
-            long duration;
-            for (int i = 0; i < logs.size() - 1; i++) {
-                duration = logs.get(i + 1).getEventTime() - logs.get(i).getEventTime();
-                logs.get(i).setDuration(duration);
+                if (logs.get(0).getEventTime() < startDayTime) {
+                    logs.get(0).setEventTime(startDayTime);
+                }
+                if (i < events.size() - 1) {
+                    duration = events.get(i + 1).getEventTime() - events.get(i).getEventTime();
+                    logs.get(i).setDuration(duration);
+                }
             }
 
             //set duration for last event

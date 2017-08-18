@@ -146,10 +146,12 @@ public class ELDGraphView extends View {
     }
 
     public void setLogs(final List<EventLogModel> logs, long startDayTime) {
-        mLogs = logs;
-        mStartDayUnixTimeInMs = startDayTime;
-        invalidateLogsData = true;
-        invalidate();
+        if (!mLogs.equals(logs)) {
+            mLogs = logs;
+            mStartDayUnixTimeInMs = startDayTime;
+            invalidateLogsData = true;
+            invalidate();
+        }
     }
 
     private void drawGridBackground(Canvas canvas) {
