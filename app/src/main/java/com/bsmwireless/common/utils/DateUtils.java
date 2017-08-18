@@ -18,6 +18,8 @@ public class DateUtils {
     public static final int MIN_IN_HOUR = 60;
     public static final int HOUR_IN_DAY = 24;
     public static final int SEC_IN_DAY = HOUR_IN_DAY * MIN_IN_HOUR * SEC_IN_MIN;
+    private final static int MS_IN_MIN = SEC_IN_MIN * MS_IN_SEC;
+    private final static int MS_IN_HOUR = MIN_IN_HOUR * MS_IN_MIN;
     public static final long MS_IN_DAY = MS_IN_SEC * SEC_IN_DAY;
 
     /**
@@ -106,6 +108,16 @@ public class DateUtils {
         Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
         calendar.setTimeInMillis(time);
         return String.format(Locale.US, "%02d:%02d", calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE));
+    }
+
+    /**
+     * @param time unix time in ms
+     * @return string with format time like "128:35"
+     */
+    public static String convertTotalTimeInMsToStringTime(long time) {
+        int hours = (int) (time / MS_IN_HOUR);
+        int minutes = (int) ((time - hours * MS_IN_HOUR) / MS_IN_MIN);
+        return String.format(Locale.US, "%02d:%02d", hours, minutes);
     }
 
     /**
@@ -204,4 +216,16 @@ public class DateUtils {
         }
         return 0L;
     }
+
+    /**
+     * @param time unix time in ms
+     * @return string with format time like "Sunday, July 4"
+     */
+    public static String convertTimeInMsToDate(String timezone, long time) {
+        SimpleDateFormat format = new SimpleDateFormat("EEEE, MMMM d", Locale.US);
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(timezone));
+        calendar.setTimeInMillis(time);
+        return format.format(calendar.getTime());
+    }
+
 }

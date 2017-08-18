@@ -4,6 +4,7 @@ import android.content.SharedPreferences;
 
 public class PreferencesManager {
     private static final String KEY_ACCOUNT_NAME = "account_name";
+    private static final String KEY_DRIVER_ID = "driver_id";
     private static final String KEY_SELECTED_VEHICLE_ID = "selected_vehicle_id";
     private static final String KEY_SELECTED_BOX_ID = "selected_box_id";
     private static final String KEY_REMEMBER_USER_ENABLED = "keep_user_enabled";
@@ -45,6 +46,16 @@ public class PreferencesManager {
 
     public String getAccountName() {
         return mPreferences.getString(KEY_ACCOUNT_NAME, null);
+    }
+
+    public void setDriverId(int driverId) {
+        SharedPreferences.Editor editor = mPreferences.edit();
+        editor.putInt(KEY_DRIVER_ID, driverId);
+        editor.apply();
+    }
+
+    public int getDriverId() {
+        return mPreferences.getInt(KEY_DRIVER_ID, NOT_FOUND_VALUE);
     }
 
     public void setVehicleId(int vehicleId) {

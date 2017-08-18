@@ -98,6 +98,8 @@ public class DriverProfilePresenter extends BaseMenuPresenter {
                                                                     Timber.d("Update signature: " + wasUpdated);
                                                                     if (!wasUpdated) {
                                                                         mView.showError(DriverProfileView.Error.ERROR_SAVE_SIGNATURE);
+                                                                    } else {
+                                                                        mView.showSignatureChanged();
                                                                     }
                                                                 },
                                                                 throwable -> {
@@ -108,8 +110,6 @@ public class DriverProfilePresenter extends BaseMenuPresenter {
         } else {
             mView.showError(DriverProfileView.Error.ERROR_INVALID_USER);
         }
-
-        mView.hideControlButtons();
     }
 
     public void onSaveUserInfo() {

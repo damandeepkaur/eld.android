@@ -30,7 +30,6 @@ import static com.bsmwireless.common.Constants.SUCCESS;
 public class ELDEventsInteractor {
 
     private Disposable mSyncEventsDisposable;
-
     private ServiceApi mServiceApi;
     private PreferencesManager mPreferencesManager;
     private BlackBoxInteractor mBlackBoxInteractor;
@@ -77,22 +76,26 @@ public class ELDEventsInteractor {
     public Observable<Boolean> updateELDEvents(List<ELDEvent> events) {
         if (NetworkUtils.isOnlineMode()) {
             return mServiceApi.updateELDEvents(events)
-                              .doOnError(throwable -> storeEvents(events, false))
-                              .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
+                    .doOnError(throwable -> storeEvents(events, false))
+                    .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
         } else {
-            storeEvents(events, false);
-            return Observable.error(new NetworkErrorException("No Internet Connection"));
+            return Observable.create(e -> {
+                storeEvents(events, false);
+                e.onError(new NetworkErrorException("No Internet Connection"));
+            });
         }
     }
 
-	public Observable<Boolean> postNewELDEvent(ELDEvent event) {
+    public Observable<Boolean> postNewELDEvent(ELDEvent event) {
         if (NetworkUtils.isOnlineMode()) {
             return mServiceApi.postNewELDEvent(event)
                     .doOnError(throwable -> storeEvent(event, false))
                     .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
         } else {
-            storeEvent(event, false);
-            return Observable.error(new NetworkErrorException("No Internet Connection"));
+            return Observable.create(e -> {
+                storeEvent(event, false);
+                e.onError(new NetworkErrorException("No Internet Connection"));
+            });
         }
     }
 
@@ -103,8 +106,10 @@ public class ELDEventsInteractor {
                     .doOnNext(responseMessage -> storeEvents(events, true))
                     .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
         } else {
-            storeEvents(events, false);
-            return Observable.error(new NetworkErrorException("No Internet Connection"));
+            return Observable.create(e -> {
+                storeEvents(events, false);
+                e.onError(new NetworkErrorException("No Internet Connection"));
+            });
         }
     }
 

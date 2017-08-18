@@ -61,6 +61,7 @@ public class UserInteractor {
                     mPreferencesManager.setAccountName(accountName);
                     mPreferencesManager.setRememberUserEnabled(keepToken);
                     mPreferencesManager.setShowHomeScreenEnabled(true);
+                    mPreferencesManager.setDriverId(user.getAuth().getDriverId());
 
                     mTokenManager.setToken(accountName, name, domain, user.getAuth());
 

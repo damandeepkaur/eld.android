@@ -262,7 +262,7 @@ public class NavigationActivity extends BaseMenuActivity implements OnNavigation
 
     @Override
     public void onPageSelected(int position) {
-        mSnackBarLayout.hideSnackbar();
+        mSnackBarLayout.reset().hideSnackbar();
     }
 
     @Override

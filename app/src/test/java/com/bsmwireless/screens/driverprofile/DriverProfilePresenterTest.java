@@ -180,7 +180,6 @@ public class DriverProfilePresenterTest {
 
         // then
         verify(mView).showError(eq(DriverProfileView.Error.ERROR_INVALID_USER));
-        verify(mView).hideControlButtons();
     }
 
     @Test
@@ -193,7 +192,6 @@ public class DriverProfilePresenterTest {
         mDriverProfilePresenter.onSaveSignatureClicked(mTestSignature);
 
         // then
-        verify(mView).hideControlButtons();
         assertTrue(mFakeFullUserEntity.getUserEntity().getSignature().equals(mTestSignature));
     }
 
