@@ -121,7 +121,7 @@ public class NavigationPresenter extends BaseMenuPresenter {
                 continue;
             }
 
-            if (dutyType == null) {
+            if (dutyType == null /*&& currentDutyType != DutyType.CLEAR*/) {
                 dutyType = currentDutyType;
             }
 

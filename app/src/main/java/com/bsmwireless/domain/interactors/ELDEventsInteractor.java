@@ -146,9 +146,9 @@ public class ELDEventsInteractor {
         ArrayList<ELDEvent> events = new ArrayList<>();
 
         //clear PU or YM status
-        if (mDutyManager.getDutyType() == DutyType.PERSONAL_USE || mDutyManager.getDutyType() == DutyType.YARD_MOVES) {
-            events.add(getEvent(null, ELDEvent.EventType.CHANGE_IN_DRIVER_INDICATION, blackBoxModel));
-        }
+        //if (mDutyManager.getDutyType() == DutyType.PERSONAL_USE || mDutyManager.getDutyType() == DutyType.YARD_MOVES) {
+        //    events.add(getEvent(null, ELDEvent.EventType.CHANGE_IN_DRIVER_INDICATION, blackBoxModel));
+        //}
 
         switch (dutyType) {
             case PERSONAL_USE:
@@ -183,7 +183,7 @@ public class ELDEventsInteractor {
         event.setStatus(ELDEvent.StatusCode.ACTIVE.getValue());
         event.setOrigin(ELDEvent.EventOrigin.DRIVER.getValue());
         event.setEventType(eventType.getValue());
-        event.setEventCode(dutyType == null ? 0 : dutyType.getValue());
+        event.setEventCode(/*dutyType == null ? 0 :*/ dutyType.getValue());
         event.setEventTime(currentTime);
         event.setEngineHours(blackBoxModel.getEngineHours());
         event.setLat(blackBoxModel.getLat());
