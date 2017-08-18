@@ -2,15 +2,10 @@ package com.bsmwireless.screens.settings;
 
 
 import android.os.Bundle;
-import android.support.annotation.IdRes;
 import android.support.v7.app.ActionBar;
-import android.support.v7.widget.AppCompatButton;
-import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.AppCompatRadioButton;
-import android.util.Log;
-import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
@@ -24,7 +19,6 @@ import javax.inject.Inject;
 import app.bsmuniversal.com.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 public class SettingsActivity extends BaseMenuActivity implements SettingsView {
 
@@ -45,10 +39,10 @@ public class SettingsActivity extends BaseMenuActivity implements SettingsView {
     @BindView(R.id.radio_group_odometer_units)
     RadioGroup mOdometerUnitsRadioGroup;
 
-    @BindView(R.id.kilometers_units_button)
+    @BindView(R.id.kilometers_unit_button)
     AppCompatRadioButton mKilometersUnitsRadioButton;
 
-    @BindView(R.id.miles_units_button)
+    @BindView(R.id.miles_unit_button)
     AppCompatRadioButton mMilesUnitsRadioButton;
 
     @Inject
@@ -78,11 +72,11 @@ public class SettingsActivity extends BaseMenuActivity implements SettingsView {
 
         mOdometerUnitsRadioGroup.setOnCheckedChangeListener((group, checkedId) -> {
             switch (checkedId) {
-                case R.id.kilometers_units_button:
-                    mPresenter.onKMOdometerUnitsSelected(true);
+                case R.id.kilometers_unit_button:
+                    mPresenter.onUnitsSelected(true);
                     break;
-                case R.id.miles_units_button:
-                    mPresenter.onKMOdometerUnitsSelected(false);
+                case R.id.miles_unit_button:
+                    mPresenter.onUnitsSelected(false);
                     break;
                 default:
                     break;

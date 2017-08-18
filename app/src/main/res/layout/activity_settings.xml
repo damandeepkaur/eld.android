@@ -113,7 +113,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/lbl_odometer_units"
+        android:layout_below="@id/lbl_odometer_units"
         android:layout_marginLeft="@dimen/default_margin"
         android:layout_marginTop="@dimen/default_margin"
         android:orientation="vertical">

@@ -40,7 +40,7 @@ public class SettingsPresenter {
         mSettingsInteractor.saveFixedAmountEnabled(isFixedAmountEnabled);
     }
 
-    public void onKMOdometerUnitsSelected(boolean isKMOdometerUnitsSelected) {
+    public void onUnitsSelected(boolean isKMOdometerUnitsSelected) {
         if (isKMOdometerUnitsSelected) {
             mView.checkOdometerUnit(SettingsView.OdometerUnits.ODOMETER_UNITS_KM);
         } else {
