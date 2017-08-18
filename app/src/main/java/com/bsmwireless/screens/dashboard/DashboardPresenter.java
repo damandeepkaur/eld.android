@@ -2,18 +2,15 @@ package com.bsmwireless.screens.dashboard;
 
 import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.data.storage.DutyManager;
-import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.widgets.alerts.DutyType;
 
 import javax.inject.Inject;
 
-import io.reactivex.disposables.CompositeDisposable;
 import timber.log.Timber;
 
 @ActivityScope
 public class DashboardPresenter {
     private DashboardView mView;
-    private CompositeDisposable mDisposables;
 
     private DutyManager mDutyManager;
 
@@ -27,7 +24,6 @@ public class DashboardPresenter {
     @Inject
     public DashboardPresenter(DashboardView view, DutyManager dutyManager) {
         mView = view;
-        mDisposables = new CompositeDisposable();
 
         mDutyManager = dutyManager;
         Timber.d("CREATED");
@@ -43,7 +39,6 @@ public class DashboardPresenter {
     }
 
     public void onDestroy() {
-        mDisposables.dispose();
         Timber.d("DESTROYED");
     }
 

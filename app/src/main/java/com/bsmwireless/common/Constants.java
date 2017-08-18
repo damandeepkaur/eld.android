@@ -11,7 +11,5 @@ public interface Constants {
     String BASE_URL = "https://develd.bsmtechnologies.com/sdmobile/rest/";
     String DEVICE_TYPE = "Android";
 
-
-
     String SUCCESS = "ACK";
 }
