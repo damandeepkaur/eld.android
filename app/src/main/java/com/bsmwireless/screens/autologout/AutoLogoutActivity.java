@@ -44,9 +44,8 @@ public class AutoLogoutActivity extends BaseActivity implements AutoLogoutView {
 
     @Override
     protected void onStop() {
-        if (App.isAppInBackground()) {
-            mHandler.removeCallbacks(mRunnable);
-        }
+        mHandler.removeCallbacks(mRunnable);
+        mAutoLogoutPresenter.rescheduleAutoLogout();
         super.onStop();
     }
 

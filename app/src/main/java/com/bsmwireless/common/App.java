@@ -60,7 +60,6 @@ public class App extends Application {
             mCurrentActivity = new WeakReference<>(activity);
             if (mIsInBackground) {
                 mIsInBackground = false;
-                onAppGoesForeground();
             }
         }
 
@@ -72,7 +71,6 @@ public class App extends Application {
             mHandler.postDelayed(() -> {
                 if (mCurrentActivity == null) {
                     mIsInBackground = true;
-                    onAppGoesBackground();
                 }
             }, ACTIVITY_LIFECYCLE_DURATION);
         }
@@ -92,14 +90,6 @@ public class App extends Application {
 
         }
     };
-
-    private void onAppGoesBackground() {
-
-    }
-
-    private void onAppGoesForeground() {
-
-    }
 
     public static boolean isAppInBackground() {
         return mIsInBackground;
