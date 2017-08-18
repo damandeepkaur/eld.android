@@ -87,13 +87,13 @@ public class NavigationPresenter extends BaseMenuPresenter {
                     //TODO: get HOS from server instead of checking events manually
                     return mEventsInteractor.getELDEvents(time[0] - MS_IN_DAY, time[1]);
                 })
-                .doOnNext(events -> resetTime(events, time[0]))
-                .doOnError(error -> mDutyManager.setDutyTypeTime(0, 0, 0, DutyType.OFF_DUTY))
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                        events -> {},
-                        error -> Timber.e("Get timezone error: %s", error)
+                        events -> resetTime(events, time[0]),
+                        error -> {
+                            mDutyManager.setDutyTypeTime(0, 0, 0, DutyType.OFF_DUTY);
+                            Timber.e("Get timezone error: %s", error);
+                        }
                 ));
     }
 
