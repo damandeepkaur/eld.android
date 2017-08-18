@@ -116,7 +116,7 @@ public class DashboardFragment extends BaseFragment implements DashboardView {
     }
 
     private void initTimer() {
-        if (mDutyType != DutyType.OFF_DUTY) {
+        if (mDutyType != DutyType.OFF_DUTY && mDutyType != DutyType.PERSONAL_USE) {
             mHandler.post(mTimerTask);
         }
     }

@@ -231,14 +231,12 @@ public class LogsFragment extends BaseFragment implements LogsView {
     }
 
     @Override
-    public void showError(Throwable throwable) {
-        Timber.e(throwable.getMessage());
-        showNotificationSnackBar(NetworkUtils.getErrorMessage((RetrofitException) throwable, mContext).toString());
+    public void showError(RetrofitException exception) {
+        showNotificationSnackBar(NetworkUtils.getErrorMessage(exception, mContext).toString());
     }
 
     @Override
     public void showError(Error error) {
-        Timber.e(getString(error.getStringId()));
         showNotificationSnackBar(getString(error.getStringId()));
     }
 

@@ -5,6 +5,7 @@ import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.common.utils.DateUtils;
 import com.bsmwireless.data.storage.DutyManager;
 import com.bsmwireless.common.utils.DutyUtils;
+import com.bsmwireless.data.network.RetrofitException;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
 import com.bsmwireless.domain.interactors.LogSheetInteractor;
 import com.bsmwireless.domain.interactors.UserInteractor;
@@ -177,7 +178,7 @@ public class LogsPresenter {
                                 }
                             }
                             mView.setEventLogs(logs);
-                        }
+                        }, throwable -> Timber.e(throwable.getMessage())
                 ));
     }
 
@@ -239,7 +240,12 @@ public class LogsPresenter {
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(logSheet -> onSignLogsheet(logSheet),
-                            error -> mView.showError(error)
+                            throwable -> {
+                                Timber.e(throwable.getMessage());
+                                if (throwable instanceof RetrofitException) {
+                                    mView.showError((RetrofitException) throwable);
+                                }
+                            }
                     ));
         } else {
             onSignLogsheet(logSheetHeader);
@@ -255,9 +261,12 @@ public class LogsPresenter {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         response -> mView.setLogSheetHeaders(mLogSheetHeaders),
-                        error -> {
+                        throwable -> {
+                            Timber.e(throwable.getMessage());
                             logSheetHeader.setSigned(false);
-                            mView.showError(error);
+                            if (throwable instanceof RetrofitException) {
+                                mView.showError((RetrofitException) throwable);
+                            }
                         }
                 ));
     }
@@ -289,7 +298,12 @@ public class LogsPresenter {
                     } else {
                         mView.showError(LogsView.Error.ERROR_ADD_EVENT);
                     }
-                }, throwable -> mView.showError(throwable));
+                }, throwable -> {
+                    Timber.e(throwable.getMessage());
+                    if (throwable instanceof RetrofitException) {
+                        mView.showError((RetrofitException) throwable);
+                    }
+                });
         mDisposables.add(disposable);
     }
 
@@ -305,7 +319,12 @@ public class LogsPresenter {
                     } else {
                         mView.showError(LogsView.Error.ERROR_UPDATE_EVENT);
                     }
-                }, throwable -> mView.showError(throwable));
+                }, throwable -> {
+                    Timber.e(throwable.getMessage());
+                    if (throwable instanceof RetrofitException) {
+                        mView.showError((RetrofitException) throwable);
+                    }
+                });
         mDisposables.add(disposable);
     }
 
