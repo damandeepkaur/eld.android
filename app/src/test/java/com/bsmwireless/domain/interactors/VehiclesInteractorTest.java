@@ -20,10 +20,14 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import app.bsmuniversal.com.RxSchedulerRule;
+import io.reactivex.Flowable;
 import io.reactivex.Observable;
+import io.reactivex.observers.TestObserver;
+import io.reactivex.subscribers.TestSubscriber;
 
 import static junit.framework.Assert.fail;
 import static org.mockito.Matchers.any;
@@ -125,7 +129,6 @@ public class VehiclesInteractorTest {
         // given
         int driverId = 90210;
         int vehicleId = 112358;
-        int prevListSize = 0;
         int expectedNewListSize = 1;
 
         when(mAppDatabase.userDao()).thenReturn(mUserDao);
@@ -183,14 +186,56 @@ public class VehiclesInteractorTest {
         verify(mUserDao).setUserLastVehicles(eq(driverId), argThat(new LastVehicleListSizeMatcher(expectedNewListSize)));
     }
 
+    @Test
+    public void testGetVehiclesFromDB() {
+        // given
+        Integer[] arrFakeVehicleIds = {111, 222, 333, 444, 555};
+        List<Integer> vehicleIds = Arrays.asList(arrFakeVehicleIds);
+        List<VehicleEntity> vehicleEntities = new ArrayList<>();
 
-    // TODO: cleanSelectedVehicle
+        when(mAppDatabase.vehicleDao()).thenReturn(mVehicleDao);
+        when(mVehicleDao.getVehicles(any(List.class))).thenReturn(Flowable.just(vehicleEntities));
+
+        TestSubscriber<List<Vehicle>> testSubscriber = TestSubscriber.create();
+
+        // when
+        mVehiclesInteractor.getVehiclesFromDB(vehicleIds).subscribe(testSubscriber);
+
+        // then
+        verify(mVehicleDao).getVehicles(eq(vehicleIds)); // verify call to dao
+    }
+
+    @Test
+    public void testCleanSelectedVehicle() {
+        // given
+        final int NOT_IN_VEHICLE_ID = -1; // if needed, extract from class
+        TestObserver testObserver = TestObserver.create();
+
+        // when
+        mVehiclesInteractor.cleanSelectedVehicle().subscribe(testObserver);
+
+        // then
+        verify(mPreferencesManager).setVehicleId(eq(NOT_IN_VEHICLE_ID));
+        verify(mPreferencesManager).setBoxId(eq(NOT_IN_VEHICLE_ID));
+    }
 
 
     // TODO: pairVehicle
+    @Test
+    public void testPairVehicleNoVehicle() {
+
+    }
+
+    // TODO: pairVehicle: success
+    // TODO: pairVehicle: black box fail
+    // TODO: pairVehicle: service API fail
+    // TODO: pairVehicle: ELDEventsInteractor fail
+    // TODO: pairVehicle -- anything else important to protect with tests?
+
     // TODO: getLastVehicles
-    // TODO: getBoxId()
+    // TODO: getBoxId
     // TODO: getAssetsNumber
+    // TODO: getVehicleId
 
 
     /**
@@ -198,7 +243,7 @@ public class VehiclesInteractorTest {
      *
      * @param numVehicles number of vehicles
      * @param startId start id for vehicles in list
-     * @return
+     * @return fake last-vehicles list string
      */
     private String buildFakeVehicleList(int numVehicles, int startId) {
         if (numVehicles < 1) return "";
@@ -220,8 +265,8 @@ public class VehiclesInteractorTest {
     /**
      * Gets a list of vehicle id from a string of last-vehicles.
      *
-     * @param lastVehicles
-     * @return
+     * @param lastVehicles list of vehicle ids compatible with output of ListConverter#toString
+     * @return list of last vehicles from a last-vehicles-list string
      */
     private List<Integer> getVehiclesFromLastVehString(String lastVehicles) {
         return ListConverter.toIntegerList(lastVehicles);
