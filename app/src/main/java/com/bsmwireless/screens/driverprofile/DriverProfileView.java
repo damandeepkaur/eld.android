@@ -5,12 +5,13 @@ import com.bsmwireless.data.storage.carriers.CarrierEntity;
 import com.bsmwireless.data.storage.hometerminals.HomeTerminalEntity;
 import com.bsmwireless.data.storage.users.UserEntity;
 import com.bsmwireless.models.User;
+import com.bsmwireless.screens.common.menu.BaseMenuView;
 
 import java.util.List;
 
 import app.bsmuniversal.com.R;
 
-public interface DriverProfileView {
+public interface DriverProfileView extends BaseMenuView {
     enum Error {
         ERROR_CHANGE_PASSWORD(R.string.driver_profile_password_not_changed),
         ERROR_SAVE_SIGNATURE(R.string.driver_profile_signature_changing_error),

@@ -3,9 +3,10 @@ package com.bsmwireless.screens.editevent;
 import android.app.TimePickerDialog;
 
 import com.bsmwireless.models.ELDEvent;
+import com.bsmwireless.screens.common.menu.BaseMenuView;
 import com.bsmwireless.widgets.alerts.DutyType;
 
-public interface EditEventView {
+public interface EditEventView extends BaseMenuView {
     void getExtrasFromIntent();
     void setStartTime(String time);
     void setStatus(DutyType type);

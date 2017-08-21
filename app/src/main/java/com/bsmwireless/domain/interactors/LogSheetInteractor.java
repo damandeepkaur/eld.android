@@ -7,7 +7,6 @@ import com.bsmwireless.data.storage.hometerminals.HomeTerminalConverter;
 import com.bsmwireless.data.storage.hometerminals.HomeTerminalEntity;
 import com.bsmwireless.models.HomeTerminal;
 import com.bsmwireless.models.LogSheetHeader;
-import com.bsmwireless.models.ResponseMessage;
 
 import java.util.List;
 
@@ -20,14 +19,12 @@ import static com.bsmwireless.common.Constants.SUCCESS;
 public class LogSheetInteractor {
 
     private ServiceApi mServiceApi;
-    private LoginUserInteractor mUserInteractor;
     private PreferencesManager mPreferencesManager;
     private AppDatabase mAppDatabase;
 
     @Inject
-    public LogSheetInteractor(ServiceApi serviceApi, LoginUserInteractor userInteractor, PreferencesManager preferencesManager, AppDatabase appDatabase) {
+    public LogSheetInteractor(ServiceApi serviceApi, PreferencesManager preferencesManager, AppDatabase appDatabase) {
         mServiceApi = serviceApi;
-        mUserInteractor = userInteractor;
         mPreferencesManager = preferencesManager;
         mAppDatabase = appDatabase;
     }

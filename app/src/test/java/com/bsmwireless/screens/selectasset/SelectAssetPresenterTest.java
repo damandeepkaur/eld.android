@@ -1,6 +1,6 @@
 package com.bsmwireless.screens.selectasset;
 
-import com.bsmwireless.domain.interactors.LoginUserInteractor;
+import com.bsmwireless.domain.interactors.UserInteractor;
 import com.bsmwireless.domain.interactors.VehiclesInteractor;
 import com.bsmwireless.models.Vehicle;
 
@@ -43,7 +43,7 @@ public class SelectAssetPresenterTest {
     VehiclesInteractor mVehiclesInteractor;
 
     @Mock
-    LoginUserInteractor mLoginUserInteractor;
+    UserInteractor mUserInteractor;
 
     private SelectAssetPresenter mSelectAssetPresenter;
 
@@ -74,7 +74,7 @@ public class SelectAssetPresenterTest {
     @Before
     public void before() throws Exception {
         MockitoAnnotations.initMocks(this);
-        mSelectAssetPresenter = new SelectAssetPresenter(mView, mVehiclesInteractor, mLoginUserInteractor);
+        mSelectAssetPresenter = new SelectAssetPresenter(mView, mVehiclesInteractor, mUserInteractor);
 
         mVehicles = buildVehicleList();
     }
