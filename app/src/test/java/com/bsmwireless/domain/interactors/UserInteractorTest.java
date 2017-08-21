@@ -51,11 +51,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit tests for LoginUserInteractor
+ * Unit tests for UserInteractor
  */
 
 @RunWith(MockitoJUnitRunner.class)
-public class LoginUserInteractorTest {
+public class UserInteractorTest {
 
     // defaults for testing //
 
@@ -145,7 +145,7 @@ public class LoginUserInteractorTest {
     ResponseMessage mResponseMessage;
 
 
-    private LoginUserInteractor mLoginUserInteractor;
+    private UserInteractor mLoginUserInteractor;
 
 
 
@@ -155,7 +155,7 @@ public class LoginUserInteractorTest {
         MockitoAnnotations.initMocks(this);
 
 
-        mLoginUserInteractor = new LoginUserInteractor(mServiceApi, mPreferencesManager, mAppDatabase, mTokenManager, mBlackBoxInteractor);
+        mLoginUserInteractor = new UserInteractor(mServiceApi, mPreferencesManager, mAppDatabase, mTokenManager, mBlackBoxInteractor);
     }
 
     /**
