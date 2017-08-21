@@ -3,6 +3,9 @@ ELD app for Android
 
 # Version history
 
+* **1.0.39** - Change inactive events view
+* **1.0.38** - Update logs graph
+* **1.0.37** - Dashboard screen
 * **1.0.36** - Multi day screen
 * **1.0.35** - Showing errors through snack bar
 * **1.0.34** - Driver’s Certification of Own Records

@@ -12,7 +12,7 @@ public class EventLogModel {
     public EventLogModel() {
     }
 
-    public EventLogModel(ELDEvent event,  String driverTimezone) {
+    public EventLogModel(ELDEvent event, String driverTimezone) {
         mEvent = event;
         mDriverTimezone = driverTimezone;
     }
@@ -41,6 +41,10 @@ public class EventLogModel {
         return mEvent.getEventTime();
     }
 
+    public void setEventTime(long time) {
+        mEvent.setEventTime(time);
+    }
+
     public Integer getEventCode() {
         return mEvent.getEventCode();
     }
@@ -63,5 +67,20 @@ public class EventLogModel {
 
     public void setVehicleName(String vehicleName) {
         mVehicleName = vehicleName;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("EventLogModel{");
+        sb.append("mEvent=").append(mEvent);
+        sb.append(", mDuration=").append(mDuration);
+        sb.append(", mDriverTimezone='").append(mDriverTimezone).append('\'');
+        sb.append(", mVehicleName='").append(mVehicleName).append('\'');
+        sb.append('}');
+        return sb.toString();
+    }
+
+    public boolean isActive() {
+        return mEvent.getStatus().equals(ELDEvent.StatusCode.ACTIVE.getValue());
     }
 }
