@@ -30,6 +30,23 @@ public class ELDEvent implements Parcelable {
         }
     }
 
+    public enum DutyStatusCode {
+        OFF_DUTY(1),
+        SLEEPER_BERTH(2),
+        DRIVING(3),
+        ON_DUTY(4);
+
+        private int mType;
+
+        DutyStatusCode(int type) {
+            mType = type;
+        }
+
+        public int getValue() {
+            return mType;
+        }
+    }
+
     public enum StatusCode {
         ACTIVE(1),
         INACTIVE_CHANGED(2),

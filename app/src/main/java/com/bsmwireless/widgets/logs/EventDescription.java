@@ -7,14 +7,8 @@ public enum EventDescription {
     SLEEPER_BERTH(1, 2, R.string.event_type_sleeping),
     DRIVING(1, 3, R.string.event_type_driving),
     ON_DUTY(1, 4, R.string.event_type_on_duty),
-    INT_LOCATION1(2, -1, R.string.event_type_int_location),
-    CERT(4, -1, R.string.event_type_cert),
-    LOGIN(5, 1, R.string.event_type_login),
-    LOGOUT(5, 2, R.string.event_type_logout),
-    SHUT_DOWN1(6, 1, R.string.event_type_shut_down),
-    SHUT_DOWN2(6, 2, R.string.event_type_shut_down),
-    POWER_UP3(6, 3, R.string.event_type_power_up),
-    POWER_UP4(6, 4, R.string.event_type_power_up);
+    PERSONAL_USE(3, 1, R.string.event_type_personal_use_title),
+    YARD_MOVES(3, 2, R.string.event_type_yard_moves_title);
 
     private int mType;
     private int mCode;
@@ -32,6 +26,6 @@ public enum EventDescription {
                 return event.mTitleResId;
             }
         }
-        return R.string.event_type_unknown_type;
+        return R.string.event_type_off_duty;
     }
 }

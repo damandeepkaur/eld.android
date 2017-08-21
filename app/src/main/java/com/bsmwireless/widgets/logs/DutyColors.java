@@ -6,6 +6,9 @@ import android.support.v4.content.ContextCompat;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.widgets.alerts.DutyType;
 
+import static com.bsmwireless.widgets.alerts.DutyType.PERSONAL_USE;
+import static com.bsmwireless.widgets.alerts.DutyType.YARD_MOVES;
+
 public class DutyColors {
     private int[] mDutyColors;
 
@@ -19,11 +22,17 @@ public class DutyColors {
     }
 
     public int getColor(int eventType, int eventCode) {
+        int color = mDutyColors[0];
         if (eventType == ELDEvent.EventType.DUTY_STATUS_CHANGING.getValue()) {
-            return mDutyColors[eventCode - 1];
-        } else {
-            return mDutyColors[0];
+            color = mDutyColors[eventCode - 1];
+        } else if (eventType == ELDEvent.EventType.CHANGE_IN_DRIVER_INDICATION.getValue()) {
+            if (eventCode == ELDEvent.DriverIndicationCode.PERSONAL_USE_ON.getValue()) {
+                color = mDutyColors[PERSONAL_USE.ordinal()];
+            } else if (eventCode == ELDEvent.DriverIndicationCode.YARD_MOVES_ON.getValue()) {
+                color = mDutyColors[YARD_MOVES.ordinal()];
+            }
         }
+        return color;
     }
 
     public int getColor(int eventCode) {

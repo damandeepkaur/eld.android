@@ -8,6 +8,8 @@ public class EventLogModel {
     private Long mDuration;
     private String mDriverTimezone;
     private String mVehicleName;
+    //only for indication off events (type 3 and code 0)
+    private int mOnIndicationCode;
 
     public EventLogModel() {
     }
@@ -67,6 +69,14 @@ public class EventLogModel {
 
     public void setVehicleName(String vehicleName) {
         mVehicleName = vehicleName;
+    }
+
+    public int getOnIndicationCode() {
+        return mOnIndicationCode;
+    }
+
+    public void setOnIndicationCode(int onIndicationCode) {
+        mOnIndicationCode = onIndicationCode;
     }
 
     @Override

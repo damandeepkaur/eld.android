@@ -49,12 +49,18 @@ public class ELDEventsInteractor {
     }
 
     public Flowable<List<ELDEvent>> getELDEvents(long startTime, long endTime) {
-        return getELDEventsFromDB(startTime, endTime);
+        return getDutyEventsFromDB(startTime, endTime);
     }
 
-    public Flowable<List<ELDEvent>> getELDEventsFromDB(long startTime, long endTime) {
+    public Flowable<List<ELDEvent>> getAllEventsFromDB(long startTime, long endTime) {
         int driverId = mPreferencesManager.getDriverId();
-        return mELDEventDao.getEventFromStartToEndTime(startTime, endTime, driverId)
+        return mELDEventDao.getEventsFromStartToEndTime(startTime, endTime, driverId)
+                .map(ELDEventConverter::toModelList);
+    }
+
+    public Flowable<List<ELDEvent>> getDutyEventsFromDB(long startTime, long endTime) {
+        int driverId = mPreferencesManager.getDriverId();
+        return mELDEventDao.getDutyEventsFromStartToEndTime(startTime, endTime, driverId)
                 .map(ELDEventConverter::toModelList);
     }
 
