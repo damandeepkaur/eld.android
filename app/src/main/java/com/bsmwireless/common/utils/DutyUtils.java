@@ -10,7 +10,7 @@ public class DutyUtils {
     public static List<EventLogModel> filterEventModelsByTypeAndStatus(List<EventLogModel> events, ELDEvent.EventType eventType, ELDEvent.StatusCode statusCode) {
         List<EventLogModel> result = new ArrayList<>();
         for (EventLogModel event : events) {
-            if (event.getEventType().equals(eventType.getValue()) && event.getEvent().getStatus().equals(statusCode.getValue())) {
+            if (event.getEventType().equals(eventType.getValue()) && (statusCode == null || event.getEvent().getStatus().equals(statusCode.getValue()))) {
                 result.add(event);
             }
         }
@@ -20,7 +20,7 @@ public class DutyUtils {
     public static List<ELDEvent> filterELDEventsByTypeAndStatus(List<ELDEvent> events, ELDEvent.EventType eventType, ELDEvent.StatusCode statusCode) {
         List<ELDEvent> result = new ArrayList<>();
         for (ELDEvent event : events) {
-            if (event.getEventType().equals(eventType.getValue()) && event.getStatus().equals(statusCode.getValue())) {
+            if (event.getEventType().equals(eventType.getValue()) && (statusCode == null || event.getStatus().equals(statusCode.getValue()))) {
                 result.add(event);
             }
         }

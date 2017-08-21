@@ -79,4 +79,8 @@ public class EventLogModel {
         sb.append('}');
         return sb.toString();
     }
+
+    public boolean isActive() {
+        return mEvent.getStatus().equals(ELDEvent.StatusCode.ACTIVE.getValue());
+    }
 }
