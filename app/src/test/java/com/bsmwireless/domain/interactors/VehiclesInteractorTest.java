@@ -58,7 +58,7 @@ public class VehiclesInteractorTest {
     PreferencesManager mPreferencesManager;
 
     @Mock
-    LoginUserInteractor mUserInteractor;
+    UserInteractor mUserInteractor;
 
     @Mock
     BlackBoxInteractor mBlackBoxInteractor;
