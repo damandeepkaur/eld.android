@@ -9,7 +9,7 @@
           local:showAsAction="always" />
 
     <item android:id="@+id/action_duty"
-          android:icon="@drawable/ic_duty_status_selector"
+          android:icon="@drawable/ic_duty_status_of"
           android:title="@string/driver_profile_menu_sign"
           local:showAsAction="always" />
 

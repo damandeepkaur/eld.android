@@ -10,13 +10,12 @@ public class DutyColors {
     private int[] mDutyColors;
 
     public DutyColors(Context context) {
-        mDutyColors = new int[4];
+        mDutyColors = new int[DutyType.values().length];
 
         //initialize duty state colors
-        mDutyColors[0] = ContextCompat.getColor(context, DutyType.OFF_DUTY.getColor());
-        mDutyColors[1] = ContextCompat.getColor(context, DutyType.SLEEPER_BERTH.getColor());
-        mDutyColors[2] = ContextCompat.getColor(context, DutyType.DRIVING.getColor());
-        mDutyColors[3] = ContextCompat.getColor(context, DutyType.ON_DUTY.getColor());
+        for (int i = 0; i < DutyType.values().length; i++) {
+            mDutyColors[i] = ContextCompat.getColor(context, DutyType.values()[i].getColor());
+        }
     }
 
     public int getColor(int eventType, int eventCode) {
@@ -32,6 +31,6 @@ public class DutyColors {
     }
 
     public int getColor(DutyType type) {
-        return mDutyColors[type.getId() - 1];
+        return mDutyColors[type.getValue() - 1];
     }
 }

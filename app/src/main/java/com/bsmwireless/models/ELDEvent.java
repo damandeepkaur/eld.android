@@ -77,6 +77,27 @@ public class ELDEvent implements Parcelable {
             return mCode;
         }
     }
+
+    /**
+     * Event Codes for event type 3 (change in driver's indication of authorized personal use of CMV
+     * or yard moves (ELD 7.25, Table 9))
+     */
+    public enum DriverIndicationCode {
+        PERSONAL_USE_ON(1),
+        YARD_MOVES_ON(2),
+        DRIVER_INDICATION_OFF(3);
+
+        private int mCode;
+
+        DriverIndicationCode(int code) {
+            mCode = code;
+        }
+
+        public int getValue() {
+            return mCode;
+        }
+    }
+
     @SerializedName("id")
     @Expose
     private Integer mId;
