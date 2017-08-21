@@ -31,6 +31,6 @@ public class DutyColors {
     }
 
     public int getColor(DutyType type) {
-        return mDutyColors[type.getId() - 1];
+        return mDutyColors[type.getValue() - 1];
     }
 }

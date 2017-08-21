@@ -56,11 +56,15 @@
     <dimen name="default_toolbar_padding">0dp</dimen>
     <dimen name="default_margin">16dp</dimen>
     <dimen name="default_margin_small">10dp</dimen>
+    <dimen name="margin_large">24dp</dimen>
+    <dimen name="margin_small">8dp</dimen>
+
     <dimen name="text_size">16sp</dimen>
     <dimen name="text_size_small">14sp</dimen>
     <dimen name="text_size_extra_small">12sp</dimen>
     <dimen name="text_size_smallest">8sp</dimen>
     <dimen name="text_size_large">20sp</dimen>
+    <dimen name="text_size_extra_large">24sp</dimen>
     <dimen name="text_size_spacing">8sp</dimen>
     <item name="text_letter_spacing" format="float" type="dimen">0.04</item>
 
@@ -138,6 +142,11 @@
     <dimen name="logs_list_item_trip_info_height">48dp</dimen>
     <dimen name="logs_list_item_trip_info_margin_left">15dp</dimen>
     <dimen name="logs_list_item_trip_info_margin_right">93dp</dimen>
+
+    <!-- Dashboard -->
+    <dimen name="duty_timer_text_size">60sp</dimen>
+    <dimen name="duty_title_size">24dp</dimen>
+    <integer name="max_duration">86400</integer>
 
     <!--Logs sign dialog-->
     <dimen name="sign_dialog_margin_top">12dp</dimen>

@@ -42,6 +42,8 @@ public interface LogsView {
 
     void eventUpdated();
 
+    void dutyUpdated();
+
     void showError(RetrofitException exception);
 
     void showError(Error error);

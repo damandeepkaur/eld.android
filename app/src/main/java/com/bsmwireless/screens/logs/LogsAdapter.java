@@ -12,7 +12,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.bsmwireless.common.utils.DateUtils;
-import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.LogSheetHeader;
 import com.bsmwireless.screens.logs.dagger.EventLogModel;
 import com.bsmwireless.widgets.logs.DutyColors;
@@ -306,8 +305,8 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
             holder.itemView.setBackgroundColor(mAdapterColors.mTransparentColor);
             holder.mEventChanged.setVisibility(GONE);
             holder.mEventStatus.setTextColor(mDutyColors.getColor(log.getEventType(), log.getEventCode()));
-            holder.mEventTime.setTextColor(mAdapterColors.mPrimeryTextColor);
-            holder.mEventDuration.setTextColor(mAdapterColors.mPrimeryTextColor);
+            holder.mEventTime.setTextColor(mAdapterColors.mPrimaryTextColor);
+            holder.mEventDuration.setTextColor(mAdapterColors.mPrimaryTextColor);
             holder.mVehicleName.setTextColor(mAdapterColors.mSecondaryTextColor);
             holder.mAddress.setTextColor(mAdapterColors.mSecondaryTextColor);
         } else {
@@ -383,14 +382,14 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
     }
 
     private static class AdapterColors {
-        private int mPrimeryTextColor;
+        private int mPrimaryTextColor;
         private int mSecondaryTextColor;
         private int mTransparentColor;
         private int mLightGrayColor;
         private int mBackgroundColor;
 
         private AdapterColors(Context context) {
-            mPrimeryTextColor = ContextCompat.getColor(context, R.color.primary_text);
+            mPrimaryTextColor = ContextCompat.getColor(context, R.color.primary_text);
             mSecondaryTextColor = ContextCompat.getColor(context, R.color.secondary_text);
             mTransparentColor = ContextCompat.getColor(context, android.R.color.transparent);
             mLightGrayColor = ContextCompat.getColor(context, R.color.light_gray_color);
