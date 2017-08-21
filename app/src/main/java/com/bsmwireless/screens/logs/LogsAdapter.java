@@ -59,6 +59,7 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
     private RecyclerView mRecyclerView;
     private OnLogsStateChangeListener mOnLogsStateChangeListener;
     private DutyColors mDutyColors;
+    private AdapterColors mAdapterColors;
     private String mNoAddressLabel;
     private LayoutInflater mLayoutInflater;
 
@@ -82,6 +83,7 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
         };
 
         mDutyColors = new DutyColors(mContext);
+        mAdapterColors = new AdapterColors(mContext);
         mNoAddressLabel = mContext.getResources().getString(R.string.no_address_available);
         mLayoutInflater = LayoutInflater.from(mContext);
     }
@@ -177,9 +179,7 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
         int viewType = holder.getViewType();
         if (viewType == VIEW_TYPE_EVENTS_ITEM) {
             EventLogModel event = mEventLogs.get(position - 2);
-            String duration = event.getDuration() != null ? DateUtils.convertTimeInMsToDurationString(event.getDuration(), mContext) : "";
-            String address = (event.getLocation() != null) ? event.getLocation() : mNoAddressLabel;
-            bindEventView(holder, event, duration, address, mOnMenuClickListener);
+            bindEventView(holder, event);
         } else if (viewType == VIEW_TYPE_TRIP_INFO_ITEM) {
             String unit = mContext.getString(mTripInfo.getUnitType() == TripInfoModel.UnitType.KM ? R.string.km : R.string.ml);
             holder.bindTripInfoView(mTripInfo, mContext.getString(R.string.odometer, unit));
@@ -285,12 +285,11 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
     }
 
     private void bindEventView(LogsHolder holder,
-                               EventLogModel log,
-                               String duration,
-                               String address,
-                               View.OnClickListener menuClickListener) {
+                               EventLogModel log) {
         String dayTime = DateUtils.convertTimeInMsToDayTime(log.getDriverTimezone(), log.getEventTime());
         String vehicleId = log.getVehicleName() != null ? String.valueOf(log.getVehicleName()) : "";
+        String duration = log.getDuration() != null ? DateUtils.convertTimeInMsToDurationString(log.getDuration(), mContext) : "";
+        String address = (log.getLocation() != null) ? log.getLocation() : mNoAddressLabel;
 
         holder.mEventStatus.setText(EventDescription.getTitle(log.getEventType(), log.getEventCode()));
         holder.mEventTime.setText(dayTime);
@@ -301,24 +300,24 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
 
         holder.mMenuButton.setVisibility(VISIBLE);
         holder.mMenuButton.setTag(log);
-        holder.mMenuButton.setOnClickListener(menuClickListener);
+        holder.mMenuButton.setOnClickListener(mOnMenuClickListener);
 
         if (log.isActive()) {
-            holder.itemView.setBackgroundColor(ContextCompat.getColor(mContext, android.R.color.transparent));
+            holder.itemView.setBackgroundColor(mAdapterColors.mTransparentColor);
             holder.mEventChanged.setVisibility(GONE);
             holder.mEventStatus.setTextColor(mDutyColors.getColor(log.getEventType(), log.getEventCode()));
-            holder.mEventTime.setTextColor(ContextCompat.getColor(mContext, R.color.primary_text));
-            holder.mEventDuration.setTextColor(ContextCompat.getColor(mContext, R.color.primary_text));
-            holder.mVehicleName.setTextColor(ContextCompat.getColor(mContext, R.color.secondary_text));
-            holder.mAddress.setTextColor(ContextCompat.getColor(mContext, R.color.secondary_text));
+            holder.mEventTime.setTextColor(mAdapterColors.mPrimeryTextColor);
+            holder.mEventDuration.setTextColor(mAdapterColors.mPrimeryTextColor);
+            holder.mVehicleName.setTextColor(mAdapterColors.mSecondaryTextColor);
+            holder.mAddress.setTextColor(mAdapterColors.mSecondaryTextColor);
         } else {
-            holder.itemView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.black_5));
+            holder.itemView.setBackgroundColor(mAdapterColors.mBackgroundColor);
             holder.mEventChanged.setVisibility(VISIBLE);
-            holder.mEventStatus.setTextColor(ContextCompat.getColor(mContext, R.color.black_38));
-            holder.mEventTime.setTextColor(ContextCompat.getColor(mContext, R.color.black_38));
-            holder.mEventDuration.setTextColor(ContextCompat.getColor(mContext, R.color.black_38));
-            holder.mVehicleName.setTextColor(ContextCompat.getColor(mContext, R.color.black_38));
-            holder.mAddress.setTextColor(ContextCompat.getColor(mContext, R.color.black_38));
+            holder.mEventStatus.setTextColor(mAdapterColors.mLightGrayColor);
+            holder.mEventTime.setTextColor(mAdapterColors.mLightGrayColor);
+            holder.mEventDuration.setTextColor(mAdapterColors.mLightGrayColor);
+            holder.mVehicleName.setTextColor(mAdapterColors.mLightGrayColor);
+            holder.mAddress.setTextColor(mAdapterColors.mLightGrayColor);
         }
     }
 
@@ -380,6 +379,22 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
             mDriveValue.setText(tripInfo.getDrivingTime());
             mOdometer.setText(odometerTitle);
             mOdometerValue.setText(String.valueOf(tripInfo.getOdometerValue()));
+        }
+    }
+
+    private static class AdapterColors {
+        private int mPrimeryTextColor;
+        private int mSecondaryTextColor;
+        private int mTransparentColor;
+        private int mLightGrayColor;
+        private int mBackgroundColor;
+
+        private AdapterColors(Context context) {
+            mPrimeryTextColor = ContextCompat.getColor(context, R.color.primary_text);
+            mSecondaryTextColor = ContextCompat.getColor(context, R.color.secondary_text);
+            mTransparentColor = ContextCompat.getColor(context, android.R.color.transparent);
+            mLightGrayColor = ContextCompat.getColor(context, R.color.light_gray_color);
+            mBackgroundColor = ContextCompat.getColor(context, R.color.black_5);
         }
     }
 
