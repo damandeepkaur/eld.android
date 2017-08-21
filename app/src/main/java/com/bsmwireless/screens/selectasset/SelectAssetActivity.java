@@ -74,7 +74,7 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
     private SelectAssetAdapter mSearchAdapter;
     private SelectAssetAdapter mLastAdapter;
 
-    private boolean isBoxIdScanned = false;
+    private boolean mIsBoxIdScanned = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,6 +107,7 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
         mSearchAdapter = new SelectAssetAdapter(view -> {
             int position = mSearchRecyclerView.getChildAdapterPosition(view);
             mPresenter.onVehicleListItemClicked(mSearchAdapter.getItem(position));
+            mIsBoxIdScanned = false;
         });
 
         LinearLayoutManager searchManager = new LinearLayoutManager(this);
@@ -132,7 +133,9 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
 
         mSnackBarLayout
                 .setHideableOnTimeout(SnackBarLayout.DURATION_LONG)
-                .setHideableOnFocusLost(true);
+                .
+
+                        setHideableOnFocusLost(true);
 
         mPresenter.onViewCreated();
     }
@@ -199,7 +202,7 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
             String type = data.getStringExtra(BARCODE_TYPE);
             Timber.v(barcodeId + " type:" + type);
             mSearchView.setQuery(barcodeId, false);
-            isBoxIdScanned = true;
+            mIsBoxIdScanned = true;
 
         } else if (data != null && data.getBooleanExtra(BarcodeScannerActivity.IS_PERMISSION_ERROR, false)) {
             showErrorMessage(Error.ERROR_PERMISSION);
@@ -208,7 +211,7 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
 
     @Override
     public void setVehicleList(List<Vehicle> vehicles, String searchText) {
-        if (!isBoxIdScanned) {
+        if (!mIsBoxIdScanned) {
             mSearchCardView.setVisibility(View.VISIBLE);
             mSearchAdapter.setSearchList(vehicles, searchText);
         } else {
