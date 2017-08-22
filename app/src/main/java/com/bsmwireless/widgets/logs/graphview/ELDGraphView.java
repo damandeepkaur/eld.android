@@ -8,6 +8,7 @@ import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.view.View;
 
+import com.bsmwireless.common.utils.DateUtils;
 import com.bsmwireless.common.utils.ViewUtils;
 import com.bsmwireless.screens.logs.dagger.EventLogModel;
 import com.bsmwireless.widgets.alerts.DutyType;
@@ -145,13 +146,14 @@ public class ELDGraphView extends View {
         }
     }
 
-    public void setLogs(final List<EventLogModel> logs, long startDayTime) {
-        if (!mLogs.equals(logs)) {
-            mLogs = logs;
-            mStartDayUnixTimeInMs = startDayTime;
-            invalidateLogsData = true;
-            invalidate();
+    public void setLogs(final List<EventLogModel> logs) {
+        mLogs = logs;
+        if (!logs.isEmpty()) {
+            EventLogModel firstLog = logs.get(0);
+            mStartDayUnixTimeInMs = DateUtils.getStartDayTimeInMs(firstLog.getDriverTimezone(), firstLog.getEventTime());
         }
+        invalidateLogsData = true;
+        invalidate();
     }
 
     private void drawGridBackground(Canvas canvas) {

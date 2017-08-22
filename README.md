@@ -3,6 +3,7 @@ ELD app for Android
 
 # Version history
 
+* **1.0.40** - Add YM and PU to logs screen (286)
 * **1.0.39** - Change inactive events view
 * **1.0.38** - Update logs graph
 * **1.0.37** - Dashboard screen
