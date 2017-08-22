@@ -8,6 +8,8 @@ import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.data.storage.users.UserDao;
 import com.bsmwireless.data.storage.vehicles.VehicleDao;
 import com.bsmwireless.data.storage.vehicles.VehicleEntity;
+import com.bsmwireless.models.BlackBoxModel;
+import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.Vehicle;
 
 import org.junit.Before;
@@ -31,6 +33,8 @@ import io.reactivex.subscribers.TestSubscriber;
 
 import static junit.framework.Assert.fail;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
@@ -219,23 +223,110 @@ public class VehiclesInteractorTest {
         verify(mPreferencesManager).setBoxId(eq(NOT_IN_VEHICLE_ID));
     }
 
-
-    // TODO: pairVehicle
     @Test
-    public void testPairVehicleNoVehicle() {
+    public void testPairVehicleSuccess() {
+        // given
+        Vehicle vehicle = new Vehicle();
+        vehicle.setId(11111);
+        vehicle.setBoxId(22222);
 
+        BlackBoxModel fakeData = new BlackBoxModel();
+
+        List<ELDEvent> events = new ArrayList<>();
+        events.add(new ELDEvent());
+        events.add(new ELDEvent());
+
+        TestObserver<List<ELDEvent>> testObserver = TestObserver.create();
+
+        when(mBlackBoxInteractor.getData()).thenReturn(Observable.just(fakeData));
+        when(mUserInteractor.getTimezoneSync(any(Integer.class))).thenReturn("fake timezone");
+        when(mServiceApi.pairVehicle(any(ELDEvent.class))).thenReturn(Observable.just(events));
+
+        when(mAppDatabase.vehicleDao()).thenReturn(mVehicleDao); // for saveVehicle
+        when(mAppDatabase.userDao()).thenReturn(mUserDao);
+        when(mUserDao.getUserLastVehiclesSync(any(Integer.class))).thenReturn("1,2");
+
+        // when
+        mVehiclesInteractor.pairVehicle(vehicle).subscribe(testObserver);
+
+        // then
+
+        verify(mBlackBoxInteractor).getData(); // might not be final...
+        verify(mServiceApi).pairVehicle(any(ELDEvent.class));
+        verify(mEldEventsInteractor).storeEvents(any(List.class), anyBoolean());
+        testObserver.assertNoErrors();
     }
 
-    // TODO: pairVehicle: success
-    // TODO: pairVehicle: black box fail
-    // TODO: pairVehicle: service API fail
-    // TODO: pairVehicle: ELDEventsInteractor fail
-    // TODO: pairVehicle -- anything else important to protect with tests?
 
-    // TODO: getLastVehicles
-    // TODO: getBoxId
-    // TODO: getAssetsNumber
-    // TODO: getVehicleId
+    // TODO: pairVehicle: black box fail - add when BlackBoxInteractor behavior is finalized
+
+
+    @Test
+    public void testGetLastVehicles() {
+        // given
+        String[] arrValidLastVehStrings = {"111,2222,333,4,5"}; // currently user dao returns one string of last vehicles in an array
+        Integer[] arrExpectedVehicles = {111,2222,333,4,5};
+        final int numVehicles = 5;
+
+
+        when(mAppDatabase.userDao()).thenReturn(mUserDao);
+        when(mUserDao.getUserLastVehicles(anyInt())).thenReturn(Flowable.just(arrValidLastVehStrings));
+        when(mUserInteractor.getDriverId()).thenReturn(11111);
+        when(mAppDatabase.vehicleDao()).thenReturn(mVehicleDao);
+        when(mVehicleDao.getVehicles(any(List.class))).thenReturn(Flowable.just(new ArrayList<VehicleEntity>())); // doesn't matter for now what we return... change if needed
+
+        TestSubscriber<List<Vehicle>> testSubscriber = TestSubscriber.create();
+
+        // when
+        mVehiclesInteractor.getLastVehicles().subscribe(testSubscriber);
+
+        // then
+        verify(mUserDao).getUserLastVehicles(anyInt());
+
+        verify(mVehicleDao).getVehicles(argThat(new ArgumentMatcher<List<Integer>>() {
+            @Override
+            public boolean matches(Object argument) {
+                boolean result = true;
+
+                List<Integer> lastVehiclesList = (List<Integer>) argument;
+
+                for(int i=0; i<numVehicles; i++) {
+                    // all expected ids from the saved string end up getting fetched from vehicle dao?
+                    result = result && lastVehiclesList.contains(arrExpectedVehicles[i]);
+                }
+
+                return result;
+            }
+        }));
+    }
+
+    @Test
+    public void testGetBoxId() {
+        // given
+        // n/a
+
+        // when
+        mVehiclesInteractor.getBoxId();
+
+        // then
+        verify(mPreferencesManager).getBoxId();
+    }
+
+
+    // TODO: getAssetsNumber - test when implemented
+
+
+    @Test
+    public void testGetVehicleId() {
+        // given
+        // n/a
+
+        // when
+        mVehiclesInteractor.getVehicleId();
+
+        // then
+        verify(mPreferencesManager).getVehicleId();
+    }
 
 
     /**
