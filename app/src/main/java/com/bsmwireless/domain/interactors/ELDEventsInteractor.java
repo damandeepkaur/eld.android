@@ -38,7 +38,9 @@ public class ELDEventsInteractor {
     private PreferencesManager mPreferencesManager;
 
     @Inject
-    public ELDEventsInteractor(ServiceApi serviceApi, PreferencesManager preferencesManager, AppDatabase appDatabase, UserInteractor userInteractor, BlackBoxInteractor blackBoxInteractor, DutyManager dutyManager) {
+    public ELDEventsInteractor(ServiceApi serviceApi, PreferencesManager preferencesManager,
+                               AppDatabase appDatabase, UserInteractor userInteractor,
+                               BlackBoxInteractor blackBoxInteractor, DutyManager dutyManager) {
         mServiceApi = serviceApi;
         mPreferencesManager = preferencesManager;
         mUserInteractor = userInteractor;
@@ -52,15 +54,20 @@ public class ELDEventsInteractor {
         return getDutyEventsFromDB(startTime, endTime);
     }
 
-    public Flowable<List<ELDEvent>> getAllEventsFromDB(long startTime, long endTime) {
-        int driverId = mPreferencesManager.getDriverId();
-        return mELDEventDao.getEventsFromStartToEndTime(startTime, endTime, driverId)
-                .map(ELDEventConverter::toModelList);
-    }
-
     public Flowable<List<ELDEvent>> getDutyEventsFromDB(long startTime, long endTime) {
         int driverId = mPreferencesManager.getDriverId();
         return mELDEventDao.getDutyEventsFromStartToEndTime(startTime, endTime, driverId)
+                .map(ELDEventConverter::toModelList);
+    }
+
+    public Flowable<ELDEvent> getLatestActiveDutyEventFromDB(long latestTime) {
+        return mELDEventDao.getLatestActiveDutyEvent(latestTime, mPreferencesManager.getDriverId())
+                .map(ELDEventConverter::toModel);
+    }
+
+    public Flowable<List<ELDEvent>> getActiveDutyEventsFromDB(long startTime, long endTime) {
+        int driverId = mPreferencesManager.getDriverId();
+        return mELDEventDao.getActiveDutyEventsAndFromStartToEndTime(startTime, endTime, driverId)
                 .map(ELDEventConverter::toModelList);
     }
 

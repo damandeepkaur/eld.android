@@ -19,6 +19,7 @@ import com.bsmwireless.widgets.logs.calendar.CalendarItem;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -107,23 +108,18 @@ public class LogsPresenter {
                 calendar.get(Calendar.MONTH), calendar.get(Calendar.YEAR));
         long endDayTime = startDayTime + MS_IN_DAY;
 
+        //clean up
+        mView.setEventLogs(Collections.EMPTY_LIST);
+        mView.setTripInfo(new TripInfoModel());
+
         mELDEventsInteractor.syncELDEvents(startDayTime - MS_IN_DAY, endDayTime);
 
         if (mGetEventsFromDBDisposable != null) mGetEventsFromDBDisposable.dispose();
-        mGetEventsFromDBDisposable = Flowable.zip(mELDEventsInteractor.getDutyEventsFromDB(startDayTime - MS_IN_DAY, startDayTime),
+        mGetEventsFromDBDisposable = Flowable.zip(mELDEventsInteractor.getLatestActiveDutyEventFromDB(startDayTime),
                 mELDEventsInteractor.getDutyEventsFromDB(startDayTime, endDayTime),
-                (prevDayEvents, selectedDayEvents) -> {
-                    if (!prevDayEvents.isEmpty()) {
-                        //get last active event from prev day
-                        for (int i = prevDayEvents.size() - 1; i >= 0; i--) {
-                            ELDEvent event = prevDayEvents.get(i);
-                            if (event.getStatus() == ELDEvent.StatusCode.ACTIVE.getValue()) {
-                                event.setEventTime(startDayTime);
-                                selectedDayEvents.add(0, event);
-                                break;
-                            }
-                        }
-                    }
+                (prevDayLatestEvent, selectedDayEvents) -> {
+                    prevDayLatestEvent.setEventTime(startDayTime);
+                    selectedDayEvents.add(0, prevDayLatestEvent);
                     return selectedDayEvents;
                 }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

@@ -77,9 +77,8 @@ public class MultidayPresenter {
             mGetEventDisposable.dispose();
         }
 
-        mGetEventDisposable = mELDEventsInteractor.getDutyEventsFromDB(startDayTime, endDayTime)
+        mGetEventDisposable = mELDEventsInteractor.getActiveDutyEventsFromDB(startDayTime, endDayTime)
                                                   .subscribeOn(Schedulers.io())
-                                                  .map(events -> DutyUtils.filterELDEventsByTypeAndStatus(events, ELDEvent.EventType.DUTY_STATUS_CHANGING, ELDEvent.StatusCode.ACTIVE))
                                                   .flatMap(eldEvents -> Flowable.fromCallable(() -> getMultidayItems(dayCount, startDayTime, eldEvents)))
                                                   .observeOn(AndroidSchedulers.mainThread())
                                                   .subscribe(items -> {
