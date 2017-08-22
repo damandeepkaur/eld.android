@@ -54,12 +54,7 @@ public class LogsPresenter {
     private Map<Integer, String> mVehicleIdToNameMap = new HashMap<>();
     private List<LogSheetHeader> mLogSheetHeaders;
     private Disposable mGetEventsFromDBDisposable;
-    private DutyManager.DutyTypeListener mListener = new DutyManager.DutyTypeListener() {
-        @Override
-        public void onDutyTypeChanged(DutyType dutyType) {
-            mView.dutyUpdated();
-        }
-    };
+    private DutyManager.DutyTypeListener mListener = dutyType -> mView.dutyUpdated();
 
     @Inject
     public LogsPresenter(LogsView view, ELDEventsInteractor eventsInteractor, LogSheetInteractor logSheetInteractor,
@@ -104,6 +99,11 @@ public class LogsPresenter {
     }
 
     public void setEventsForDay(Calendar calendar) {
+        //not yet initialized
+        if (mTimeZone == null) {
+            return;
+        }
+
         long startDayTime = DateUtils.getStartDate(mTimeZone, calendar.get(Calendar.DAY_OF_MONTH),
                 calendar.get(Calendar.MONTH), calendar.get(Calendar.YEAR));
         long endDayTime = startDayTime + MS_IN_DAY;
@@ -140,7 +140,7 @@ public class LogsPresenter {
 
                     mView.setTripInfo(mTripInfo);
                     mView.setEventLogs(dutyStateLogs);
-                    updateTripInfo(dutyStateLogs, endDayTime);
+                    updateTripInfo(dutyStateLogs, startDayTime, endDayTime);
                     updateVehicleInfo(new ArrayList<>(vehicleIds), dutyStateLogs);
                 }, throwable -> Timber.e(throwable.getMessage()));
         mDisposables.add(mGetEventsFromDBDisposable);
@@ -166,39 +166,26 @@ public class LogsPresenter {
                 ));
     }
 
-    public void updateTripInfo(final List<EventLogModel> events, final long endDayTime) {
+    public void updateTripInfo(final List<EventLogModel> events, final long startDayTime, final long endDayTime) {
         TripInfoModel tripInfo = new TripInfoModel();
 
         Disposable disposable = Observable.create((ObservableOnSubscribe<TripInfoModel>) e -> {
-            long[] result = new long[DutyType.values().length];
             int odometer = 0;
-            if (!events.isEmpty()) {
-                EventLogModel log = events.get(0);
-                for (int i = 1; i < events.size(); i++) {
-                    log = events.get(i);
-                    EventLogModel prevLog = events.get(i - 1);
-                    long logDate = log.getEventTime();
-                    long prevLogDate = prevLog.getEventTime();
-                    long timeStamp = (logDate - prevLogDate);
-                    result[prevLog.getEventCode() - 1] += timeStamp;
+            EventLogModel log;
+            for (int i = 0; i < events.size(); i++) {
+                log = events.get(i);
 
-                    if (log.getEvent().getOdometer() != null && odometer < log.getEvent().getOdometer()) {
-                        odometer = log.getEvent().getOdometer();
-                    }
+                if (log.getEvent().getOdometer() != null && odometer < log.getEvent().getOdometer()) {
+                    odometer = log.getEvent().getOdometer();
                 }
-
-                long currentTime = Calendar.getInstance().getTimeInMillis();
-                result[log.getEventCode() - 1] += (endDayTime < currentTime ? endDayTime : currentTime) - log.getEventTime();
             }
+            long currentTime = Calendar.getInstance().getTimeInMillis();
+            long[] times = DutyManager.getDutyTypeTimes(new ArrayList<>(events), startDayTime, endDayTime < currentTime ? endDayTime : currentTime);
 
-            tripInfo.setSleeperBerthTime(DateUtils.convertTotalTimeInMsToStringTime(
-                    result[DutyType.SLEEPER_BERTH.getValue() - 1]));
-            tripInfo.setDrivingTime(DateUtils.convertTotalTimeInMsToStringTime(
-                    result[DutyType.DRIVING.getValue() - 1]));
-            tripInfo.setOffDutyTime(DateUtils.convertTotalTimeInMsToStringTime(
-                    result[DutyType.OFF_DUTY.getValue() - 1]));
-            tripInfo.setOnDutyTime(DateUtils.convertTotalTimeInMsToStringTime(
-                    result[DutyType.ON_DUTY.getValue() - 1]));
+            tripInfo.setSleeperBerthTime(DateUtils.convertTotalTimeInMsToStringTime(times[DutyType.SLEEPER_BERTH.ordinal()]));
+            tripInfo.setDrivingTime(DateUtils.convertTotalTimeInMsToStringTime(times[DutyType.DRIVING.ordinal()]));
+            tripInfo.setOffDutyTime(DateUtils.convertTotalTimeInMsToStringTime(times[DutyType.OFF_DUTY.ordinal()]));
+            tripInfo.setOnDutyTime(DateUtils.convertTotalTimeInMsToStringTime(times[DutyType.ON_DUTY.ordinal()]));
 
             //TODO: convert odometer value from meters to appropriate unit
             tripInfo.setUnitType(KM);
@@ -349,12 +336,22 @@ public class LogsPresenter {
                 ELDEvent event = events.get(i);
                 EventLogModel log = new EventLogModel(event, mTimeZone);
                 if (event.getEventType() == ELDEvent.EventType.CHANGE_IN_DRIVER_INDICATION.getValue()
-                        && event.getEventCode() == ELDEvent.DriverIndicationCode.DRIVER_INDICATION_OFF.getValue()) {
+                        && event.getEventCode() == DutyType.CLEAR.getCode()) {
                     //get code of indication ON event for indication OFF event
                     for (int j = i - 1; j >= 0; j--) {
-                        if (events.get(j).getEventType() == ELDEvent.EventType.CHANGE_IN_DRIVER_INDICATION.getValue()
-                                && events.get(j).getEventCode() == ELDEvent.DriverIndicationCode.DRIVER_INDICATION_OFF.getValue()) {
-                            log.setOnIndicationCode(events.get(j).getEventCode());
+                        ELDEvent dutyEvent = events.get(j);
+
+                        if (dutyEvent.getEventType() == ELDEvent.EventType.DUTY_STATUS_CHANGING.getValue()) {
+                            log.setOnIndicationCode(dutyEvent.getEventCode());
+                            break;
+                        } else if (dutyEvent.getEventType() == ELDEvent.EventType.CHANGE_IN_DRIVER_INDICATION.getValue()) {
+                            if (dutyEvent.getEventCode() == DutyType.PERSONAL_USE.getCode()) {
+                                log.setOnIndicationCode(DutyType.OFF_DUTY.getCode());
+                                break;
+                            } else if (dutyEvent.getEventCode() == DutyType.YARD_MOVES.getCode()) {
+                                log.setOnIndicationCode(DutyType.ON_DUTY.getCode());
+                                break;
+                            }
                         }
                     }
                 }

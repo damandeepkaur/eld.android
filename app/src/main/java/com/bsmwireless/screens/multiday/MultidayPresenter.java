@@ -3,6 +3,7 @@ package com.bsmwireless.screens.multiday;
 import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.common.utils.DateUtils;
 import com.bsmwireless.common.utils.DutyUtils;
+import com.bsmwireless.data.storage.DutyManager;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
 import com.bsmwireless.domain.interactors.UserInteractor;
 import com.bsmwireless.models.ELDEvent;
@@ -22,11 +23,10 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
+import static com.bsmwireless.common.utils.DateUtils.MS_IN_DAY;
+
 @ActivityScope
 public class MultidayPresenter {
-
-    public static final long ONE_DAY_MS = 24 * 60 * 60 * 1000;
-
     private MultidayView mView;
     private ELDEventsInteractor mELDEventsInteractor;
     private UserInteractor mUserInteractor;
@@ -68,7 +68,7 @@ public class MultidayPresenter {
         Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(mTimeZone));
 
         long endDayTime = calendar.getTimeInMillis();
-        calendar.setTimeInMillis(endDayTime - (dayCount - 1) * ONE_DAY_MS);
+        calendar.setTimeInMillis(endDayTime - (dayCount - 1) * MS_IN_DAY);
         long startDayTime = DateUtils.getStartDate(mTimeZone, calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.MONTH), calendar.get(Calendar.YEAR));
 
 
@@ -96,14 +96,14 @@ public class MultidayPresenter {
     private List<MultidayItemModel> getMultidayItems(int dayCount, long startTime, List<ELDEvent> dutyEvents) {
         List<MultidayItemModel> items = new ArrayList<>();
         for (int i = dayCount - 1; i >= 0; i--) {
-            long startDay = startTime + i * ONE_DAY_MS;
-            long endDay = startDay + ONE_DAY_MS;
+            long startDay = startTime + i * MS_IN_DAY;
+            long endDay = startDay + MS_IN_DAY;
 
             List<ELDEvent> dayEvents = DutyUtils.filterEventsByTime(dutyEvents, startDay, endDay);
 
             MultidayItemModel item = new MultidayItemModel(startDay);
 
-            long[] durations = calculateDurations(dayEvents, endDay);
+            long[] durations = DutyManager.getDutyTypeTimes(new ArrayList<>(dayEvents), startDay, endDay);
 
             item.setTotalOffDuty(durations[DutyType.OFF_DUTY.ordinal()]);
             item.setTotalSleeping(durations[DutyType.SLEEPER_BERTH.ordinal()]);
@@ -116,36 +116,8 @@ public class MultidayPresenter {
         return items;
     }
 
-    private long[] calculateDurations(List<ELDEvent> events, long endTime) {
-        long[] result = new long[DutyType.values().length];
-
-        if (events.isEmpty()) {
-            return result;
-        }
-
-        for (int i = 1; i < events.size(); i++) {
-            ELDEvent log = events.get(i);
-            ELDEvent prevLog = events.get(i - 1);
-
-            long logDate = log.getEventTime();
-            long prevLogDate = prevLog.getEventTime();
-            long timeStamp = logDate - prevLogDate;
-
-            result[prevLog.getEventCode() - 1] += timeStamp;
-        }
-
-        ELDEvent log = events.get(events.size() - 1);
-
-        long logDate = log.getEventTime();
-        long timeStamp = endTime - logDate;
-
-        result[log.getEventCode() - 1] += timeStamp;
-
-        return result;
-    }
-
     private long[] calculateTotalDuration(List<MultidayItemModel> items) {
-        long[] result = new long[DutyType.values().length];
+        long[] result = new long[4];
         for (MultidayItemModel item: items) {
             result[DutyType.OFF_DUTY.ordinal()] += item.getTotalOffDutyTime();
             result[DutyType.SLEEPER_BERTH.ordinal()] += item.getTotalSleepingTime();

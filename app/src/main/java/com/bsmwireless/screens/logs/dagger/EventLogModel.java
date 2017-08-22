@@ -1,8 +1,9 @@
 package com.bsmwireless.screens.logs.dagger;
 
+import com.bsmwireless.data.storage.DutyManager;
 import com.bsmwireless.models.ELDEvent;
 
-public class EventLogModel {
+public class EventLogModel implements DutyManager.DutyCheckable {
 
     private ELDEvent mEvent;
     private Long mDuration;
@@ -48,7 +49,8 @@ public class EventLogModel {
     }
 
     public Integer getEventCode() {
-        return mEvent.getEventCode();
+        //TODO: remove after server fix
+        return mEvent.getEventCode() == null ? 0 : mEvent.getEventCode();
     }
 
     public ELDEvent getEvent() {

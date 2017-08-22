@@ -14,12 +14,7 @@ public class DashboardPresenter {
 
     private DutyManager mDutyManager;
 
-    private DutyManager.DutyTypeListener mListener = new DutyManager.DutyTypeListener() {
-        @Override
-        public void onDutyTypeChanged(DutyType dutyType) {
-            mView.setDutyType(dutyType);
-        }
-    };
+    private DutyManager.DutyTypeListener mListener = dutyType -> mView.setDutyType(dutyType);
 
     @Inject
     public DashboardPresenter(DashboardView view, DutyManager dutyManager) {
@@ -42,7 +37,7 @@ public class DashboardPresenter {
         Timber.d("DESTROYED");
     }
 
-    int getDutyTypeTime(DutyType dutyType) {
+    long getDutyTypeTime(DutyType dutyType) {
         return mDutyManager.getDutyTypeTime(dutyType);
     }
 }

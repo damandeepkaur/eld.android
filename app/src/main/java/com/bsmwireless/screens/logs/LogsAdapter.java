@@ -15,7 +15,7 @@ import com.bsmwireless.common.utils.DateUtils;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.LogSheetHeader;
 import com.bsmwireless.screens.logs.dagger.EventLogModel;
-import com.bsmwireless.widgets.logs.DutyColors;
+import com.bsmwireless.widgets.alerts.DutyType;
 import com.bsmwireless.widgets.logs.EventDescription;
 import com.bsmwireless.widgets.logs.LogsTitleView;
 import com.bsmwireless.widgets.logs.calendar.CalendarItem;
@@ -23,6 +23,7 @@ import com.bsmwireless.widgets.logs.calendar.CalendarLayout;
 import com.bsmwireless.widgets.logs.graphview.GraphLayout;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import app.bsmuniversal.com.R;
@@ -58,10 +59,11 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
     private LogsPresenter mPresenter;
     private RecyclerView mRecyclerView;
     private OnLogsStateChangeListener mOnLogsStateChangeListener;
-    private DutyColors mDutyColors;
     private AdapterColors mAdapterColors;
     private String mNoAddressLabel;
     private LayoutInflater mLayoutInflater;
+
+    private HashMap<Integer, Integer> mColors = new HashMap<>();
 
 
     public LogsAdapter(Context context, LogsPresenter presenter,
@@ -82,10 +84,13 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
             }
         };
 
-        mDutyColors = new DutyColors(mContext);
         mAdapterColors = new AdapterColors(mContext);
         mNoAddressLabel = mContext.getResources().getString(R.string.no_address_available);
         mLayoutInflater = LayoutInflater.from(mContext);
+
+        for (DutyType type : DutyType.values()) {
+            mColors.put(type.getColor(), ContextCompat.getColor(context, type.getColor()));
+        }
     }
 
     public void setEventLogs(List<EventLogModel> eventLogs) {
@@ -291,20 +296,16 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
         holder.mMenuButton.setTag(log);
         holder.mMenuButton.setOnClickListener(mOnMenuClickListener);
 
+        DutyType currentDuty;
         if (log.getEventType() == ELDEvent.EventType.CHANGE_IN_DRIVER_INDICATION.getValue()
-                && log.getEventCode() == ELDEvent.DriverIndicationCode.DRIVER_INDICATION_OFF.getValue()) {
-            holder.mEventStatus.setTextColor(mDutyColors.getColor(log.getEventType(), log.getOnIndicationCode()));
-            if (log.getOnIndicationCode() == ELDEvent.DriverIndicationCode.PERSONAL_USE_ON.getValue()) {
-                holder.mEventStatus.setText(EventDescription.getTitle(ELDEvent.EventType.DUTY_STATUS_CHANGING.getValue(),
-                        ELDEvent.DutyStatusCode.OFF_DUTY.getValue()));
-            } else if (log.getOnIndicationCode() == ELDEvent.DriverIndicationCode.YARD_MOVES_ON.getValue()) {
-                holder.mEventStatus.setText(EventDescription.getTitle(ELDEvent.EventType.DUTY_STATUS_CHANGING.getValue(),
-                        ELDEvent.DutyStatusCode.ON_DUTY.getValue()));
-            }
+                && log.getEventCode() == DutyType.CLEAR.getCode()) {
+            currentDuty = DutyType.getTypeByCode(ELDEvent.EventType.DUTY_STATUS_CHANGING.getValue(), log.getOnIndicationCode());
         } else {
-            holder.mEventStatus.setText(EventDescription.getTitle(log.getEventType(), log.getEventCode()));
-            holder.mEventStatus.setTextColor(mDutyColors.getColor(log.getEventType(), log.getEventCode()));
+            currentDuty = DutyType.getTypeByCode(log.getEventType(), log.getEventCode());
         }
+
+        holder.mEventStatus.setTextColor(mColors.get(currentDuty.getColor()));
+        holder.mEventStatus.setText(EventDescription.getTitle(currentDuty.getType(), currentDuty.getCode()));
 
         if (log.isActive()) {
             holder.itemView.setBackgroundColor(mAdapterColors.mTransparentColor);
