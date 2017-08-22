@@ -198,7 +198,7 @@ public class ELDEventsInteractor {
         event.setStatus(ELDEvent.StatusCode.ACTIVE.getValue());
         event.setOrigin(ELDEvent.EventOrigin.DRIVER.getValue());
         event.setEventType(eventType.getValue());
-        event.setEventCode(/*dutyType == null ? 0 :*/ dutyType.getCode());
+        event.setEventCode(dutyType.getCode());
         event.setEventTime(currentTime);
         event.setEngineHours(blackBoxModel.getEngineHours());
         event.setLat(blackBoxModel.getLat());
