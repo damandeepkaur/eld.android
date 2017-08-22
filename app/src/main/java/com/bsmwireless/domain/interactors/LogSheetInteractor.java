@@ -12,6 +12,8 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import io.reactivex.BackpressureStrategy;
+import io.reactivex.Flowable;
 import io.reactivex.Observable;
 
 import static com.bsmwireless.common.Constants.SUCCESS;
@@ -29,8 +31,8 @@ public class LogSheetInteractor {
         mAppDatabase = appDatabase;
     }
 
-    public Observable<List<LogSheetHeader>> getLogSheetHeaders(Long startLogDay, Long endLogDay) {
-        return mServiceApi.getLogSheets(startLogDay, endLogDay);
+    public Flowable<List<LogSheetHeader>> getLogSheetHeaders(Long startLogDay, Long endLogDay) {
+        return mServiceApi.getLogSheets(startLogDay, endLogDay).toFlowable(BackpressureStrategy.LATEST);
     }
 
     public Observable<Boolean> updateLogSheetHeader(LogSheetHeader logSheetHeader) {

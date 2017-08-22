@@ -47,28 +47,37 @@ public class GraphLayout extends LinearLayout {
         init(context);
     }
 
-    public void setELDEvents(List<EventLogModel> logs, long startDayTime) {
+    public void setELDEvents(List<EventLogModel> logs) {
         if (mELDGraphView != null) {
             List<EventLogModel> filteredLogs = DutyUtils.filterEventModelsByTypeAndStatus(logs,
                     ELDEvent.EventType.DUTY_STATUS_CHANGING, ELDEvent.StatusCode.ACTIVE);
-            mELDGraphView.setLogs(filteredLogs, startDayTime);
+            mELDGraphView.setLogs(filteredLogs);
         }
     }
 
     public void setHOSTimerOnDuty(String time) {
-        mHOSTimerOnDuty.setText(time);
+        if (mHOSTimerOnDuty != null) {
+            mHOSTimerOnDuty.setText(time);
+        }
+
     }
 
     public void setHOSTimerOffDuty(String time) {
-        mHOSTimerOffDuty.setText(time);
+        if (mHOSTimerOffDuty != null) {
+            mHOSTimerOffDuty.setText(time);
+        }
     }
 
     public void setHOSTimerSleeperBerth(String time) {
-        mHOSTimerSleeperBerth.setText(time);
+        if (mHOSTimerSleeperBerth != null) {
+            mHOSTimerSleeperBerth.setText(time);
+        }
     }
 
     public void setHOSTimerDriving(String time) {
-        mHOSTimerDriving.setText(time);
+        if (mHOSTimerDriving != null) {
+            mHOSTimerDriving.setText(time);
+        }
     }
 
     private void init(Context context) {

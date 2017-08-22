@@ -12,9 +12,10 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.bsmwireless.common.utils.DateUtils;
+import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.LogSheetHeader;
 import com.bsmwireless.screens.logs.dagger.EventLogModel;
-import com.bsmwireless.widgets.logs.DutyColors;
+import com.bsmwireless.widgets.alerts.DutyType;
 import com.bsmwireless.widgets.logs.EventDescription;
 import com.bsmwireless.widgets.logs.LogsTitleView;
 import com.bsmwireless.widgets.logs.calendar.CalendarItem;
@@ -22,6 +23,7 @@ import com.bsmwireless.widgets.logs.calendar.CalendarLayout;
 import com.bsmwireless.widgets.logs.graphview.GraphLayout;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import app.bsmuniversal.com.R;
@@ -57,10 +59,11 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
     private LogsPresenter mPresenter;
     private RecyclerView mRecyclerView;
     private OnLogsStateChangeListener mOnLogsStateChangeListener;
-    private DutyColors mDutyColors;
     private AdapterColors mAdapterColors;
     private String mNoAddressLabel;
     private LayoutInflater mLayoutInflater;
+
+    private HashMap<Integer, Integer> mColors = new HashMap<>();
 
 
     public LogsAdapter(Context context, LogsPresenter presenter,
@@ -81,16 +84,19 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
             }
         };
 
-        mDutyColors = new DutyColors(mContext);
         mAdapterColors = new AdapterColors(mContext);
         mNoAddressLabel = mContext.getResources().getString(R.string.no_address_available);
         mLayoutInflater = LayoutInflater.from(mContext);
+
+        for (DutyType type : DutyType.values()) {
+            mColors.put(type.getColor(), ContextCompat.getColor(context, type.getColor()));
+        }
     }
 
     public void setEventLogs(List<EventLogModel> eventLogs) {
         mEventLogs = eventLogs;
         if (mGraphLayout != null) {
-            mGraphLayout.setELDEvents(eventLogs, mTripInfo.getStartDayTime());
+            mGraphLayout.setELDEvents(eventLogs);
         }
         notifyDataSetChanged();
     }
@@ -148,7 +154,7 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
                         mCalendarLayout.getCurrentItem()));
 
                 mGraphLayout = (GraphLayout) view.findViewById(R.id.graphic);
-                mGraphLayout.setELDEvents(mEventLogs, mTripInfo.getStartDayTime());
+                mGraphLayout.setELDEvents(mEventLogs);
 
                 break;
             case VIEW_TYPE_EVENTS_TITLE:
@@ -275,36 +281,35 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
         return mCalendarLayout.getCurrentItem();
     }
 
-    public interface OnLogsStateChangeListener {
-        void showTitle(LogsTitleView.Type type);
-
-        void hideTitle();
-
-        void onSignButtonClicked(CalendarItem calendarItem);
-    }
-
     private void bindEventView(LogsHolder holder,
                                EventLogModel log) {
         String dayTime = DateUtils.convertTimeInMsToDayTime(log.getDriverTimezone(), log.getEventTime());
-        String vehicleId = log.getVehicleName() != null ? String.valueOf(log.getVehicleName()) : "";
+        String vehicleName = log.getVehicleName() != null ? String.valueOf(log.getVehicleName()) : "";
         String duration = log.getDuration() != null ? DateUtils.convertTimeInMsToDurationString(log.getDuration(), mContext) : "";
         String address = (log.getLocation() != null) ? log.getLocation() : mNoAddressLabel;
 
-        holder.mEventStatus.setText(EventDescription.getTitle(log.getEventType(), log.getEventCode()));
         holder.mEventTime.setText(dayTime);
         holder.mEventDuration.setText(duration);
-        //TODO: probably we need vehicle name here
-        holder.mVehicleName.setText(vehicleId);
+        holder.mVehicleName.setText(vehicleName);
         holder.mAddress.setText(address);
 
-        holder.mMenuButton.setVisibility(VISIBLE);
         holder.mMenuButton.setTag(log);
         holder.mMenuButton.setOnClickListener(mOnMenuClickListener);
+
+        DutyType currentDuty;
+        if (log.getEventType() == ELDEvent.EventType.CHANGE_IN_DRIVER_INDICATION.getValue()
+                && log.getEventCode() == DutyType.CLEAR.getCode()) {
+            currentDuty = DutyType.getTypeByCode(ELDEvent.EventType.DUTY_STATUS_CHANGING.getValue(), log.getOnIndicationCode());
+        } else {
+            currentDuty = DutyType.getTypeByCode(log.getEventType(), log.getEventCode());
+        }
+
+        holder.mEventStatus.setTextColor(mColors.get(currentDuty.getColor()));
+        holder.mEventStatus.setText(EventDescription.getTitle(currentDuty.getType(), currentDuty.getCode()));
 
         if (log.isActive()) {
             holder.itemView.setBackgroundColor(mAdapterColors.mTransparentColor);
             holder.mEventChanged.setVisibility(GONE);
-            holder.mEventStatus.setTextColor(mDutyColors.getColor(log.getEventType(), log.getEventCode()));
             holder.mEventTime.setTextColor(mAdapterColors.mPrimaryTextColor);
             holder.mEventDuration.setTextColor(mAdapterColors.mPrimaryTextColor);
             holder.mVehicleName.setTextColor(mAdapterColors.mSecondaryTextColor);
@@ -318,6 +323,14 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
             holder.mVehicleName.setTextColor(mAdapterColors.mLightGrayColor);
             holder.mAddress.setTextColor(mAdapterColors.mLightGrayColor);
         }
+    }
+
+    public interface OnLogsStateChangeListener {
+        void showTitle(LogsTitleView.Type type);
+
+        void hideTitle();
+
+        void onSignButtonClicked(CalendarItem calendarItem);
     }
 
     static class LogsHolder extends RecyclerView.ViewHolder {
