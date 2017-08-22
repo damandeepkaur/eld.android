@@ -113,7 +113,7 @@ public class DateUtils {
 
     /**
      * @param time unix time in ms
-     * @return string with format time like "128:35"
+     * @return string with format time like "128:35:11"
      */
     public static String convertTotalTimeInMsToFullStringTime(long time) {
         int hours = (int) (time / MS_IN_HOUR);

@@ -38,7 +38,9 @@ public class ELDEventsInteractor {
     private PreferencesManager mPreferencesManager;
 
     @Inject
-    public ELDEventsInteractor(ServiceApi serviceApi, PreferencesManager preferencesManager, AppDatabase appDatabase, UserInteractor userInteractor, BlackBoxInteractor blackBoxInteractor, DutyManager dutyManager) {
+    public ELDEventsInteractor(ServiceApi serviceApi, PreferencesManager preferencesManager,
+                               AppDatabase appDatabase, UserInteractor userInteractor,
+                               BlackBoxInteractor blackBoxInteractor, DutyManager dutyManager) {
         mServiceApi = serviceApi;
         mPreferencesManager = preferencesManager;
         mUserInteractor = userInteractor;
@@ -49,12 +51,23 @@ public class ELDEventsInteractor {
     }
 
     public Flowable<List<ELDEvent>> getELDEvents(long startTime, long endTime) {
-        return getELDEventsFromDB(startTime, endTime);
+        return getDutyEventsFromDB(startTime, endTime);
     }
 
-    public Flowable<List<ELDEvent>> getELDEventsFromDB(long startTime, long endTime) {
+    public Flowable<List<ELDEvent>> getDutyEventsFromDB(long startTime, long endTime) {
         int driverId = mPreferencesManager.getDriverId();
-        return mELDEventDao.getEventFromStartToEndTime(startTime, endTime, driverId)
+        return mELDEventDao.getDutyEventsFromStartToEndTime(startTime, endTime, driverId)
+                .map(ELDEventConverter::toModelList);
+    }
+
+    public Flowable<ELDEvent> getLatestActiveDutyEventFromDB(long latestTime) {
+        return mELDEventDao.getLatestActiveDutyEvent(latestTime, mPreferencesManager.getDriverId())
+                .map(ELDEventConverter::toModel);
+    }
+
+    public Flowable<List<ELDEvent>> getActiveDutyEventsFromDB(long startTime, long endTime) {
+        int driverId = mPreferencesManager.getDriverId();
+        return mELDEventDao.getActiveDutyEventsAndFromStartToEndTime(startTime, endTime, driverId)
                 .map(ELDEventConverter::toModelList);
     }
 
@@ -185,7 +198,7 @@ public class ELDEventsInteractor {
         event.setStatus(ELDEvent.StatusCode.ACTIVE.getValue());
         event.setOrigin(ELDEvent.EventOrigin.DRIVER.getValue());
         event.setEventType(eventType.getValue());
-        event.setEventCode(/*dutyType == null ? 0 :*/ dutyType.getValue());
+        event.setEventCode(/*dutyType == null ? 0 :*/ dutyType.getCode());
         event.setEventTime(currentTime);
         event.setEngineHours(blackBoxModel.getEngineHours());
         event.setLat(blackBoxModel.getLat());

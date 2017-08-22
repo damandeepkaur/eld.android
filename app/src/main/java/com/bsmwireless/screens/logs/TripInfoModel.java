@@ -1,7 +1,5 @@
 package com.bsmwireless.screens.logs;
 
-import java.util.TimeZone;
-
 public class TripInfoModel {
 
     private static final String DEFAULT_TIME = "00:00";
@@ -13,7 +11,6 @@ public class TripInfoModel {
     private String mCoDriverValue;
     private UnitType mUnitType = UnitType.KM;
     private int mOdometerValue;
-    private long mStartDayTime;
 
     public TripInfoModel() {
         mOffDutyTime = DEFAULT_TIME;
@@ -77,15 +74,6 @@ public class TripInfoModel {
 
     public void setOdometerValue(int odometerValue) {
         mOdometerValue = odometerValue;
-    }
-
-
-    public long getStartDayTime() {
-        return mStartDayTime;
-    }
-
-    public void setStartDayTime(long startDayTime) {
-        mStartDayTime = startDayTime;
     }
 
     public enum UnitType {

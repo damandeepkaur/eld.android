@@ -34,7 +34,7 @@ public enum DutyType {
         return DutyType.OFF_DUTY;
     }
 
-    public int getValue() {
+    public int getCode() {
         return mCode;
     }
 
@@ -48,5 +48,9 @@ public enum DutyType {
 
     public int getIcon() {
         return mIcon;
+    }
+
+    public int getType() {
+        return mType;
     }
 }

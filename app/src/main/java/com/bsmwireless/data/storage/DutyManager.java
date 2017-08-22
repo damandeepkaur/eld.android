@@ -158,7 +158,7 @@ public class DutyManager {
                 currentTime = event.getEventTime();
 
                 //for clear events keep the previous status
-                if (event.getEventCode() != CLEAR.getValue()) {
+                if (event.getEventCode() != CLEAR.getCode()) {
                     currentDutyType = DutyType.getTypeByCode(event.getEventType(), event.getEventCode());
                 }
 
