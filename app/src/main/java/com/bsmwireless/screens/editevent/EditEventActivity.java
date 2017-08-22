@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.AdapterView;
 
 import com.bsmwireless.common.App;
+import com.bsmwireless.data.storage.DutyManager;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.screens.common.menu.BaseMenuActivity;
 import com.bsmwireless.screens.common.menu.BaseMenuPresenter;
@@ -119,7 +120,7 @@ public class EditEventActivity extends BaseMenuActivity implements EditEventView
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         DutyType type = (DutyType) parent.getItemAtPosition(position);
-        mEventStatus.getBackground().setColorFilter(ContextCompat.getColor(this, DutyType.getColorByCode(type.getValue())), PorterDuff.Mode.SRC_ATOP);
+        mEventStatus.getBackground().setColorFilter(ContextCompat.getColor(this, type.getColor()), PorterDuff.Mode.SRC_ATOP);
     }
 
     @Override
@@ -165,7 +166,9 @@ public class EditEventActivity extends BaseMenuActivity implements EditEventView
     }
 
     private void initStatusSpinner() {
-        mEventStatus.setAdapter(new DutyTypeSpinnerAdapter(this, DutyType.values()));
+        //TODO: set correct types
+        DutyType[] types = DutyManager.DRIVER_DUTY_EXTENDED;
+        mEventStatus.setAdapter(new DutyTypeSpinnerAdapter(this, types));
         mEventStatus.setOnItemSelectedListener(this);
     }
 }

@@ -113,6 +113,17 @@ public class DateUtils {
 
     /**
      * @param time unix time in ms
+     * @return string with format time like "128:35"
+     */
+    public static String convertTotalTimeInMsToFullStringTime(long time) {
+        int hours = (int) (time / MS_IN_HOUR);
+        int minutes = (int) ((time - hours * MS_IN_HOUR) / MS_IN_MIN);
+        int seconds = (int) ((time - hours * MS_IN_HOUR - minutes * MS_IN_MIN) / MS_IN_SEC);
+        return String.format(Locale.US, "%02d:%02d:%02d", hours, minutes, seconds);
+    }
+
+    /**
+     * @param time unix time in ms
      * @return string with format time like "2 hrs 35 mins"
      */
     public static String convertTimeInMsToDurationString(long time, Context context) {

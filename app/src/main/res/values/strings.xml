@@ -461,6 +461,7 @@
     <string name="event_type_on_duty">On Duty</string>
     <string name="event_type_personal_use">Personal Use</string>
     <string name="event_type_yard_moves">Yard Moves</string>
+    <string name="event_type_clear">Clear</string>
     <string name="event_type_int_location">Int Location</string>
     <string name="event_type_cert">Cert</string>
     <string name="event_type_login">Login</string>

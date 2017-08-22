@@ -55,12 +55,7 @@ public class LogsPresenter {
     private Map<Integer, String> mVehicleIdToNameMap = new HashMap<>();
     private List<LogSheetHeader> mLogSheetHeaders;
 
-    private DutyManager.DutyTypeListener mListener = new DutyManager.DutyTypeListener() {
-        @Override
-        public void onDutyTypeChanged(DutyType dutyType) {
-            mView.dutyUpdated();
-        }
-    };
+    private DutyManager.DutyTypeListener mListener = dutyType -> mView.dutyUpdated();
 
     @Inject
     public LogsPresenter(LogsView view, ELDEventsInteractor eventsInteractor, LogSheetInteractor logSheetInteractor,
@@ -114,6 +109,11 @@ public class LogsPresenter {
     }
 
     public void setEventsForDay(Calendar calendar) {
+        //not yet initialized
+        if (mTimeZone == null) {
+            return;
+        }
+
         long startDayTime = DateUtils.getStartDate(mTimeZone, calendar.get(Calendar.DAY_OF_MONTH),
                 calendar.get(Calendar.MONTH), calendar.get(Calendar.YEAR));
         long endDayTime = startDayTime + MS_IN_DAY;
@@ -141,7 +141,7 @@ public class LogsPresenter {
                     mTripInfo.setStartDayTime(startDayTime);
                     mView.setTripInfo(mTripInfo);
                     mView.setEventLogs(dutyStateLogs);
-                    updateTripInfo(dutyStateLogs, endDayTime);
+                    updateTripInfo(dutyStateLogs, startDayTime, endDayTime);
                     updateVehicleInfo(new ArrayList<>(vehicleIds), dutyStateLogs);
                 }, throwable -> Timber.e(throwable.getMessage()));
     }
@@ -165,35 +165,26 @@ public class LogsPresenter {
                 ));
     }
 
-    public void updateTripInfo(final List<EventLogModel> events, final long endDayTime) {
+    public void updateTripInfo(final List<EventLogModel> events, final long startDayTime, final long endDayTime) {
         TripInfoModel tripInfo = new TripInfoModel();
 
         Disposable disposable = Observable.create((ObservableOnSubscribe<TripInfoModel>) e -> {
-            long[] result = new long[DutyType.values().length];
             int odometer = 0;
-            EventLogModel log = events.get(0);
-            for (int i = 1; i < events.size(); i++) {
+            EventLogModel log;
+            for (int i = 0; i < events.size(); i++) {
                 log = events.get(i);
-                EventLogModel prevLog = events.get(i - 1);
-                long logDate = log.getEventTime();
-                long prevLogDate = prevLog.getEventTime();
-                long timeStamp = (logDate - prevLogDate);
-                result[prevLog.getEventCode() - 1] += timeStamp;
 
                 if (log.getEvent().getOdometer() != null && odometer < log.getEvent().getOdometer()) {
                     odometer = log.getEvent().getOdometer();
                 }
             }
-            result[log.getEventCode() - 1] += endDayTime - log.getEventTime();
 
-            tripInfo.setSleeperBerthTime(DateUtils.convertTotalTimeInMsToStringTime(
-                    result[DutyType.SLEEPER_BERTH.getValue() - 1]));
-            tripInfo.setDrivingTime(DateUtils.convertTotalTimeInMsToStringTime(
-                    result[DutyType.DRIVING.getValue() - 1]));
-            tripInfo.setOffDutyTime(DateUtils.convertTotalTimeInMsToStringTime(
-                    result[DutyType.OFF_DUTY.getValue() - 1]));
-            tripInfo.setOnDutyTime(DateUtils.convertTotalTimeInMsToStringTime(
-                    result[DutyType.ON_DUTY.getValue() - 1]));
+            long[] times = DutyManager.getDutyTypeTimes(new ArrayList<>(events), startDayTime, endDayTime);
+
+            tripInfo.setSleeperBerthTime(DateUtils.convertTotalTimeInMsToStringTime(times[DutyType.SLEEPER_BERTH.ordinal()]));
+            tripInfo.setDrivingTime(DateUtils.convertTotalTimeInMsToStringTime(times[DutyType.DRIVING.ordinal()]));
+            tripInfo.setOffDutyTime(DateUtils.convertTotalTimeInMsToStringTime(times[DutyType.OFF_DUTY.ordinal()]));
+            tripInfo.setOnDutyTime(DateUtils.convertTotalTimeInMsToStringTime(times[DutyType.ON_DUTY.ordinal()]));
 
             //TODO: convert odometer value from meters to appropriate unit
             tripInfo.setUnitType(KM);

@@ -1,20 +1,45 @@
 package com.bsmwireless.data.storage;
 
-import android.content.SharedPreferences;
+import android.os.Handler;
+import android.support.annotation.NonNull;
 
+import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.widgets.alerts.DutyType;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static com.bsmwireless.common.utils.DateUtils.MS_IN_SEC;
-import static com.bsmwireless.data.storage.PreferencesManager.KEY_DUTY_TYPE;
-import static com.bsmwireless.data.storage.PreferencesManager.KEY_TIME_DRIVING;
-import static com.bsmwireless.data.storage.PreferencesManager.KEY_TIME_ON_DUTY;
-import static com.bsmwireless.data.storage.PreferencesManager.KEY_TIME_SLEEPER_BERTH;
+import static com.bsmwireless.widgets.alerts.DutyType.CLEAR;
+import static com.bsmwireless.widgets.alerts.DutyType.DRIVING;
+import static com.bsmwireless.widgets.alerts.DutyType.OFF_DUTY;
+import static com.bsmwireless.widgets.alerts.DutyType.ON_DUTY;
+import static com.bsmwireless.widgets.alerts.DutyType.PERSONAL_USE;
+import static com.bsmwireless.widgets.alerts.DutyType.SLEEPER_BERTH;
+import static com.bsmwireless.widgets.alerts.DutyType.YARD_MOVES;
 
 public class DutyManager {
+    public static final DutyType[] DRIVER_DUTY_EXTENDED = {OFF_DUTY, SLEEPER_BERTH, DRIVING, ON_DUTY, PERSONAL_USE, YARD_MOVES};
+    public static final DutyType[] DRIVING_DUTY = {OFF_DUTY, SLEEPER_BERTH, DRIVING, ON_DUTY};
+
+    public static final DutyType[] CO_DRIVER_DUTY_EXTENDED = {OFF_DUTY, SLEEPER_BERTH, ON_DUTY, PERSONAL_USE, YARD_MOVES};
+    public static final DutyType[] CO_DRIVER_DUTY = {OFF_DUTY, SLEEPER_BERTH, ON_DUTY};
+
     private PreferencesManager mPreferencesManager;
 
-    private DutyType mDutyType = DutyType.OFF_DUTY;
+    private DutyType mDutyType = OFF_DUTY;
     private long mStart = System.currentTimeMillis();
+
+    private final ArrayList<DutyTypeListener> mListeners = new ArrayList<>();
+
+    private Handler mHandler = new Handler();
+    private Runnable mNotifyTask = () -> {
+        synchronized (mListeners) {
+            for (DutyTypeListener listener : mListeners) {
+                listener.onDutyTypeChanged(mDutyType);
+            }
+        }
+    };
 
     public DutyManager(PreferencesManager preferencesManager) {
         mPreferencesManager = preferencesManager;
@@ -26,9 +51,7 @@ public class DutyManager {
         mPreferencesManager.setDrivingTime(driving);
         mPreferencesManager.setSleeperBerthTime(sleeperBerth);
 
-        mPreferencesManager.setDutyType(dutyType.ordinal());
-        mDutyType = dutyType;
-        mStart = System.currentTimeMillis();
+        setDutyType(dutyType, false);
     }
 
     private void setDutyTypeTime(DutyType dutyType, int time) {
@@ -48,23 +71,30 @@ public class DutyManager {
         }
     }
 
-    public void setDutyType(DutyType dutyType) {
-        mPreferencesManager.setDutyType(dutyType.ordinal());
+    public void setDutyType(DutyType dutyType, boolean setTime) {
+        if (dutyType == null) {
+            dutyType = OFF_DUTY;
+        }
 
         long current = System.currentTimeMillis();
 
-        setDutyTypeTime(mDutyType, (int) ((current - mStart) / MS_IN_SEC));
+        if (setTime) {
+            setDutyTypeTime(mDutyType, (int) ((current - mStart) / MS_IN_SEC));
+        }
 
         mDutyType = dutyType;
         mStart = current;
+        mPreferencesManager.setDutyType(dutyType.ordinal());
+
+        notifyListeners();
     }
 
     public DutyType getDutyType() {
         return mDutyType;
     }
 
-    public int getDutyTypeTime(DutyType dutyType) {
-        int time = 0;
+    public long getDutyTypeTime(DutyType dutyType) {
+        long time = 0;
 
         switch (dutyType) {
             case ON_DUTY:
@@ -82,29 +112,94 @@ public class DutyManager {
         }
 
         if (mDutyType == dutyType) {
-            time += (int) ((System.currentTimeMillis() - mStart) / MS_IN_SEC);
+            time += (System.currentTimeMillis() - mStart);
         }
 
         return time;
     }
 
-    public void addListener(DutyTypeListener listener) {
-        mPreferencesManager.addListener(listener);
-        listener.onDutyTypeChanged(mDutyType);
+    public void addListener(@NonNull DutyTypeListener listener) {
+        mHandler.post(() -> {
+            synchronized (mListeners) {
+                mListeners.add(listener);
+                listener.onDutyTypeChanged(mDutyType);
+            }
+        });
     }
 
-    public void removeListener(DutyTypeListener listener) {
-        mPreferencesManager.removeListener(listener);
+    public void removeListener(@NonNull DutyTypeListener listener) {
+        synchronized (mListeners) {
+            mListeners.remove(listener);
+        }
     }
 
-    public static abstract class DutyTypeListener implements SharedPreferences.OnSharedPreferenceChangeListener {
-        public abstract void onDutyTypeChanged(DutyType dutyType);
+    public static long[] getDutyTypeTimes(List<DutyCheckable> events, long startTime, long endTime) {
+        long offDutyTime = 0;
+        long onDutyTime = 0;
+        long drivingTime = 0;
+        long sleeperBerthTime = 0;
 
-        @Override
-        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-            if (KEY_DUTY_TYPE.equals(key) || KEY_TIME_DRIVING.equals(key) || KEY_TIME_ON_DUTY.equals(key) || KEY_TIME_SLEEPER_BERTH.equals(key)) {
-                onDutyTypeChanged(DutyType.values()[sharedPreferences.getInt(KEY_DUTY_TYPE, 0)]);
+        long currentTime = endTime;
+        long duration;
+
+        DutyType currentDutyType = OFF_DUTY;
+        DutyCheckable event;
+
+        for (int i = events.size() - 1; i >= 0; i--) {
+            // all events from current day is checked
+            if (currentTime < startTime) {
+                break;
+            }
+
+            event = events.get(i);
+
+            if (event.getEventType() == ELDEvent.EventType.DUTY_STATUS_CHANGING.getValue() || event.getEventType() == ELDEvent.EventType.CHANGE_IN_DRIVER_INDICATION.getValue()) {
+                duration = currentTime - Math.max(event.getEventTime(), startTime);
+                currentTime = event.getEventTime();
+
+                //for clear events keep the previous status
+                if (event.getEventCode() != CLEAR.getValue()) {
+                    currentDutyType = DutyType.getTypeByCode(event.getEventType(), event.getEventCode());
+                }
+
+            } else {
+                continue;
+            }
+
+            switch (currentDutyType) {
+                case ON_DUTY:
+                case YARD_MOVES:
+                    onDutyTime += duration;
+                    break;
+
+                case DRIVING:
+                    drivingTime += duration;
+                    break;
+
+                case SLEEPER_BERTH:
+                    sleeperBerthTime += duration;
+                    break;
+
+                default:
+                    offDutyTime += duration;
+                    break;
             }
         }
+
+        return new long[] {offDutyTime, sleeperBerthTime, drivingTime, onDutyTime};
+    }
+
+    private void notifyListeners() {
+        mHandler.post(mNotifyTask);
+    }
+
+    public interface DutyCheckable {
+        Long getEventTime();
+        Integer getEventType();
+        Integer getEventCode();
+    }
+
+    public interface DutyTypeListener {
+        void onDutyTypeChanged(DutyType dutyType);
     }
 }

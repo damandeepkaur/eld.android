@@ -93,13 +93,13 @@ public class ELDGraphView extends View {
 
         mHorizontalLinesPaint = new Paint();
         mHorizontalLinesPaint.setAntiAlias(true);
-        mHorizontalLinesPaint.setColor(mDutyColors.getColor(DutyType.OFF_DUTY));
+        mHorizontalLinesPaint.setColor(DutyType.OFF_DUTY.getColor());
         mHorizontalLinesPaint.setStyle(Paint.Style.STROKE);
         mHorizontalLinesPaint.setStrokeWidth(ViewUtils.convertDpToPixels(LINE_WIDTH_DP, getContext()));
 
         mVerticalLinesPaint = new Paint();
         mVerticalLinesPaint.setAntiAlias(true);
-        mVerticalLinesPaint.setColor(mDutyColors.getColor(DutyType.OFF_DUTY));
+        mVerticalLinesPaint.setColor(DutyType.OFF_DUTY.getColor());
         mVerticalLinesPaint.setStyle(Paint.Style.STROKE);
         mVerticalLinesPaint.setStrokeWidth(ViewUtils.convertDpToPixels(GRID_WIDTH_DP, getContext()));
 
