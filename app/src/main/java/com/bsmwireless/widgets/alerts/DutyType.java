@@ -9,7 +9,7 @@ public enum DutyType {
     ON_DUTY(1, 4, R.string.event_type_on_duty, R.color.onduty_light, R.drawable.ic_duty_status_on),
     PERSONAL_USE(3, 1, R.string.event_type_personal_use, R.color.offduty_light, R.drawable.ic_duty_status_pu),
     YARD_MOVES(3, 2, R.string.event_type_yard_moves, R.color.onduty_light, R.drawable.ic_duty_status_ym),
-    CLEAR(3, 0, R.string.event_type_clear, 0, 0);
+    CLEAR(3, 0, R.string.event_type_clear, R.color.offduty_light, R.drawable.ic_duty_status_of);
 
     private int mCode;
     private int mType;
