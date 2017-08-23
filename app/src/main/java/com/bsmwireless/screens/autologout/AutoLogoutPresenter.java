@@ -5,7 +5,7 @@ import android.annotation.TargetApi;
 import android.os.Build;
 
 import com.bsmwireless.common.utils.SchedulerUtils;
-import com.bsmwireless.domain.interactors.LoginUserInteractor;
+import com.bsmwireless.domain.interactors.UserInteractor;
 
 import javax.inject.Inject;
 
@@ -17,14 +17,14 @@ import timber.log.Timber;
 
 public class AutoLogoutPresenter {
 
-    private LoginUserInteractor mLoginUserInteractor;
+    private UserInteractor mUserInteractor;
     private CompositeDisposable mDisposables;
     private AutoLogoutView mView;
 
     @Inject
-    public AutoLogoutPresenter(AutoLogoutView view, LoginUserInteractor interactor) {
+    public AutoLogoutPresenter(AutoLogoutView view, UserInteractor interactor) {
         mView = view;
-        mLoginUserInteractor = interactor;
+        mUserInteractor = interactor;
         mDisposables = new CompositeDisposable();
 
         Timber.d("CREATED");
@@ -32,7 +32,7 @@ public class AutoLogoutPresenter {
 
     public void rescheduleAutoLogout() {
         SchedulerUtils.cancel();
-        if (mLoginUserInteractor.isLoginActive()) {
+        if (mUserInteractor.isLoginActive()) {
             SchedulerUtils.schedule();
         }
     }
@@ -51,7 +51,7 @@ public class AutoLogoutPresenter {
 
     @TargetApi(21)
     private void initJobSchedulerAutoLogout() {
-        Disposable disposable = mLoginUserInteractor.logoutUser()
+        Disposable disposable = mUserInteractor.logoutUser()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
@@ -72,7 +72,7 @@ public class AutoLogoutPresenter {
     }
 
     private void initAlarmManager() {
-        Disposable disposable = mLoginUserInteractor.logoutUser()
+        Disposable disposable = mUserInteractor.logoutUser()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(

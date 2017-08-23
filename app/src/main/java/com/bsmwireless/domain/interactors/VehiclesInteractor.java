@@ -24,7 +24,7 @@ public class VehiclesInteractor {
     private ServiceApi mServiceApi;
     private AppDatabase mAppDatabase;
     private PreferencesManager mPreferencesManager;
-    private LoginUserInteractor mUserInteractor;
+    private UserInteractor mUserInteractor;
     private BlackBoxInteractor mBlackBoxInteractor;
     private ELDEventsInteractor mELDEventsInteractor;
 
@@ -32,7 +32,7 @@ public class VehiclesInteractor {
     public VehiclesInteractor(ServiceApi serviceApi,
                               PreferencesManager preferencesManager,
                               AppDatabase appDatabase,
-                              LoginUserInteractor userInteractor,
+                              UserInteractor userInteractor,
                               BlackBoxInteractor blackBoxInteractor,
                               ELDEventsInteractor eventsInteractor) {
         mServiceApi = serviceApi;
@@ -129,5 +129,9 @@ public class VehiclesInteractor {
     public int getAssetsNumber() {
         //TODO: implement getting assets number
         return mPreferencesManager.getBoxId() > 0 ? 1 : 0;
+    }
+
+    public int getVehicleId() {
+        return mPreferencesManager.getVehicleId();
     }
 }

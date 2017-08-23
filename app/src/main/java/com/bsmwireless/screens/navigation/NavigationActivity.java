@@ -3,6 +3,7 @@ package com.bsmwireless.screens.navigation;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.NavigationView.OnNavigationItemSelectedListener;
@@ -21,7 +22,8 @@ import android.widget.Toast;
 
 import com.bsmwireless.common.App;
 import com.bsmwireless.models.User;
-import com.bsmwireless.screens.common.BaseMenuActivity;
+import com.bsmwireless.screens.common.menu.BaseMenuActivity;
+import com.bsmwireless.screens.common.menu.BaseMenuPresenter;
 import com.bsmwireless.screens.driverprofile.DriverProfileActivity;
 import com.bsmwireless.screens.login.LoginActivity;
 import com.bsmwireless.screens.navigation.dagger.DaggerNavigationComponent;
@@ -67,6 +69,9 @@ public class NavigationActivity extends BaseMenuActivity implements OnNavigation
     private SmoothActionBarDrawerToggle mDrawerToggle;
     private HeaderViewHolder mHeaderViewHolder;
 
+    private Handler mHandler = new Handler();
+    private Runnable mResetTimeTask = () -> mPresenter.onResetTime();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,6 +88,7 @@ public class NavigationActivity extends BaseMenuActivity implements OnNavigation
         initNavigation();
 
         mPresenter.onViewCreated();
+        mPresenter.onResetTime();
     }
 
     @Override
@@ -157,7 +163,6 @@ public class NavigationActivity extends BaseMenuActivity implements OnNavigation
         mPagerAdapter = new NavigationAdapter(getApplicationContext(), getSupportFragmentManager());
         mViewPager.setAdapter(mPagerAdapter);
         mViewPager.setOffscreenPageLimit(2);
-        mViewPager.setCurrentItem(1);
         mViewPager.addOnPageChangeListener(this);
 
         mTabLayout.setupWithViewPager(mViewPager);
@@ -221,10 +226,16 @@ public class NavigationActivity extends BaseMenuActivity implements OnNavigation
 
     @Override
     protected void onDestroy() {
+        mHandler.removeCallbacks(mResetTimeTask);
         mViewPager.removeOnPageChangeListener(this);
         mPresenter.onDestroy();
         mHeaderViewHolder.unbind();
         super.onDestroy();
+    }
+
+    @Override
+    protected BaseMenuPresenter getPresenter() {
+        return mPresenter;
     }
 
     @Override
@@ -251,12 +262,21 @@ public class NavigationActivity extends BaseMenuActivity implements OnNavigation
 
     @Override
     public void onPageSelected(int position) {
-        mSnackBarLayout.hideSnackbar();
+        mSnackBarLayout.reset().hideSnackbar();
     }
 
     @Override
     public void onPageScrollStateChanged(int state) {
 
+    }
+
+    public void setResetTime(long time) {
+        mHandler.removeCallbacks(mResetTimeTask);
+        if (time == 0) {
+            mHandler.post(mResetTimeTask);
+        } else {
+            mHandler.postAtTime(mResetTimeTask, time);
+        }
     }
 
     protected static class HeaderViewHolder {

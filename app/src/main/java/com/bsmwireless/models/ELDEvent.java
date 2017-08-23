@@ -3,13 +3,14 @@ package com.bsmwireless.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.bsmwireless.data.storage.DutyManager;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-public class ELDEvent implements Parcelable {
+public class ELDEvent implements Parcelable, DutyManager.DutyCheckable {
     public enum EventType {
         DUTY_STATUS_CHANGING(1),
         INTERMEDIATE_LOG(2),
@@ -47,12 +48,14 @@ public class ELDEvent implements Parcelable {
         }
     }
 
+    /**
+     * Event Origin as defined by ELD 7.22, Table 7.
+     */
     public enum EventOrigin {
-        AUTOMATIC_RECORD(1),
-        AUTOMATIC_EDIT(2),
-        MANUAL_ENTER(3),
-        MANUAL_ACCEPT(4),
-        UNIDENTIFIED_DRIVER(5);
+        AUTOMATIC_RECORD(1),        // ELD 7.22 Table 7: "Automatically recorded by ELD"
+        DRIVER(2),                  // ELD 7.22 Table 7: "Edited or entered by the Driver"
+        NON_DRIVER(3),              // ELD 7.22 Table 7: "Edit requested by an Authenticated User other than the Driver"
+        UNIDENTIFIED_DRIVER(4);     // ELD 7.22 Table 7: "Assumed from Unidentified Driver profile"
 
         private int mOriginCode;
 
@@ -75,6 +78,7 @@ public class ELDEvent implements Parcelable {
             return mCode;
         }
     }
+
     @SerializedName("id")
     @Expose
     private Integer mId;
@@ -105,9 +109,6 @@ public class ELDEvent implements Parcelable {
     @SerializedName("lng")
     @Expose
     private Double mLng;
-    @SerializedName("latLnFlag")
-    @Expose
-    private String mLatLnFlag;
     @SerializedName("distance")
     @Expose
     private Integer mDistance;
@@ -120,6 +121,12 @@ public class ELDEvent implements Parcelable {
     @SerializedName("checksum")
     @Expose
     private String mCheckSum;
+    @SerializedName("shippingId")
+    @Expose
+    private String mShippingId;
+    @SerializedName("coDriverId")
+    @Expose
+    private Integer mCoDriverId;
     @SerializedName("boxId")
     @Expose
     private Integer mBoxId;
@@ -138,48 +145,113 @@ public class ELDEvent implements Parcelable {
     @SerializedName("driverId")
     @Expose
     private Integer mDriverId;
-    @SerializedName("sequence")
-    @Expose
-    private Integer mSequence;
     @SerializedName("malfunction")
     @Expose
     private Boolean mMalfunction;
     @SerializedName("diagnostic")
     @Expose
     private Boolean mDiagnostic;
-    @SerializedName("malCode")
-    @Expose
-    private String mMalCode;
 
     public ELDEvent() {
     }
 
     private ELDEvent(Parcel in) {
-        this.mStatus = in.readInt();
-        this.mOrigin = in.readInt();
-        this.mEventType = in.readInt();
-        this.mEventCode = in.readInt();
-        this.mEventTime = in.readLong();
-        this.mOdometer = in.readInt();
-        this.mEngineHours = in.readInt();
-        this.mLat = in.readDouble();
-        this.mLng = in.readDouble();
-        this.mLatLnFlag = in.readString();
-        this.mDistance = in.readInt();
-        this.mComment = in.readString();
-        this.mLocation = in.readString();
-        this.mCheckSum = in.readString();
-        this.mBoxId = in.readInt();
-        this.mVehicleId = in.readInt();
-        this.mId = in.readInt();
-        this.mTzOffset = in.readDouble();
-        this.mTimezone = in.readString();
-        this.mMobileTime = in.readLong();
-        this.mDriverId = in.readInt();
-        this.mSequence = in.readInt();
-        this.mMalfunction = in.readByte() != 0;
-        this.mDiagnostic = in.readByte() != 0;
-        this.mMalCode = in.readString();
+        boolean notNull = in.readByte() == 1;
+        if (notNull) {
+            this.mStatus = in.readInt();
+        }
+        notNull = in.readByte() == 1;
+        if (notNull) {
+            this.mOrigin = in.readInt();
+        }
+        notNull = in.readByte() == 1;
+        if (notNull) {
+            this.mEventType = in.readInt();
+        }
+        notNull = in.readByte() == 1;
+        if (notNull) {
+            this.mEventCode = in.readInt();
+        }
+        notNull = in.readByte() == 1;
+        if (notNull) {
+            this.mEventTime = in.readLong();
+        }
+        notNull = in.readByte() == 1;
+        if (notNull) {
+            this.mOdometer = in.readInt();
+        }
+        notNull = in.readByte() == 1;
+        if (notNull) {
+            this.mEngineHours = in.readInt();
+        }
+        notNull = in.readByte() == 1;
+        if (notNull) {
+            this.mLat = in.readDouble();
+        }
+        notNull = in.readByte() == 1;
+        if (notNull) {
+            this.mLng = in.readDouble();
+        }
+        notNull = in.readByte() == 1;
+        if (notNull) {
+            this.mDistance = in.readInt();
+        }
+        notNull = in.readByte() == 1;
+        if (notNull) {
+            this.mComment = in.readString();
+        }
+        notNull = in.readByte() == 1;
+        if (notNull) {
+            this.mLocation = in.readString();
+        }
+        notNull = in.readByte() == 1;
+        if (notNull) {
+            this.mCheckSum = in.readString();
+        }
+        notNull = in.readByte() == 1;
+        if (notNull) {
+            this.mShippingId = in.readString();
+        }
+        notNull = in.readByte() == 1;
+        if (notNull) {
+            this.mCoDriverId = in.readInt();
+        }
+        notNull = in.readByte() == 1;
+        if (notNull) {
+            this.mBoxId = in.readInt();
+        }
+        notNull = in.readByte() == 1;
+        if (notNull) {
+            this.mVehicleId = in.readInt();
+        }
+        notNull = in.readByte() == 1;
+        if (notNull) {
+            this.mId = in.readInt();
+        }
+        notNull = in.readByte() == 1;
+        if (notNull) {
+            this.mTzOffset = in.readDouble();
+        }
+        notNull = in.readByte() == 1;
+        if (notNull) {
+            this.mTimezone = in.readString();
+        }
+        notNull = in.readByte() == 1;
+        if (notNull) {
+            this.mMobileTime = in.readLong();
+        }
+        notNull = in.readByte() == 1;
+        if (notNull) {
+            this.mDriverId = in.readInt();
+        }
+        notNull = in.readByte() == 1;
+        if (notNull) {
+            this.mMalfunction = in.readByte() != 0;
+        }
+        notNull = in.readByte() == 1;
+        if (notNull) {
+            this.mDiagnostic = in.readByte() != 0;
+        }
     }
 
     public Integer getStatus() {
@@ -207,7 +279,7 @@ public class ELDEvent implements Parcelable {
     }
 
     public Integer getEventCode() {
-        return mEventCode;
+        return mEventCode == null ? 0 : mEventCode;
     }
 
     public void setEventCode(Integer eventCode) {
@@ -258,14 +330,6 @@ public class ELDEvent implements Parcelable {
         this.mLng = lng;
     }
 
-    public String getLatLnFlag() {
-        return mLatLnFlag;
-    }
-
-    public void setLatLnFlag(String latLnFlag) {
-        this.mLatLnFlag = latLnFlag;
-    }
-
     public Integer getDistance() {
         return mDistance;
     }
@@ -296,6 +360,22 @@ public class ELDEvent implements Parcelable {
 
     public void setCheckSum(String checkSum) {
         this.mCheckSum = checkSum;
+    }
+
+    public String getShippingId() {
+        return mShippingId;
+    }
+
+    public void setShippingId(String shippingId) {
+        this.mShippingId = shippingId;
+    }
+
+    public Integer getCoDriverId() {
+        return mCoDriverId;
+    }
+
+    public void setCoDriverId(Integer coDriverId) {
+        this.mCoDriverId = coDriverId;
     }
 
     public Integer getBoxId() {
@@ -354,14 +434,6 @@ public class ELDEvent implements Parcelable {
         this.mDriverId = driverId;
     }
 
-    public Integer getSequence() {
-        return mSequence;
-    }
-
-    public void setSequence(Integer sequence) {
-        this.mSequence = sequence;
-    }
-
     public Boolean getMalfunction() {
         return mMalfunction;
     }
@@ -378,14 +450,6 @@ public class ELDEvent implements Parcelable {
         this.mDiagnostic = diagnostic;
     }
 
-    public String getMalCode() {
-        return mMalCode;
-    }
-
-    public void setMalCode(String malCode) {
-        this.mMalCode = malCode;
-    }
-
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("ELDEvent{");
@@ -399,21 +463,20 @@ public class ELDEvent implements Parcelable {
         sb.append(", mEngineHours=").append(mEngineHours);
         sb.append(", mLat=").append(mLat);
         sb.append(", mLng='").append(mLng);
-        sb.append(", mLatLnFlag='").append(mLatLnFlag);
         sb.append(", mDistance=").append(mDistance);
         sb.append(", mComment=").append(mComment).append('\'');
         sb.append(", mLocation=").append(mLocation).append('\'');
         sb.append(", mCheckSum=").append(mCheckSum).append('\'');
+        sb.append(", mShippingId=").append(mShippingId).append('\'');
+        sb.append(", mCoDriverId=").append(mCoDriverId);
         sb.append(", mBoxId=").append(mBoxId);
         sb.append(", mVehicleId=").append(mVehicleId);
         sb.append(", mTzOffset=").append(mTzOffset);
         sb.append(", mTimezone=").append(mTimezone).append('\'');
         sb.append(", mMobileTime=").append(mMobileTime);
         sb.append(", mDriverId=").append(mDriverId);
-        sb.append(", mSequence=").append(mSequence);
         sb.append(", mMalfunction=").append(mMalfunction);
         sb.append(", mDiagnostic=").append(mDiagnostic);
-        sb.append(", mMalCode=").append(mMalCode);
         sb.append('}');
         return sb.toString();
     }
@@ -439,11 +502,12 @@ public class ELDEvent implements Parcelable {
                 .append(mEngineHours, rhs.mEngineHours)
                 .append(mLat, rhs.mLat)
                 .append(mLng, rhs.mLng)
-                .append(mLatLnFlag, rhs.mLatLnFlag)
                 .append(mDistance, rhs.mDistance)
                 .append(mComment, rhs.mComment)
                 .append(mLocation, rhs.mLocation)
                 .append(mCheckSum, rhs.mCheckSum)
+                .append(mShippingId, rhs.mShippingId)
+                .append(mCoDriverId, rhs.mCoDriverId)
                 .append(mBoxId, rhs.mBoxId)
                 .append(mVehicleId, rhs.mVehicleId)
                 .append(mId, rhs.mId)
@@ -451,10 +515,8 @@ public class ELDEvent implements Parcelable {
                 .append(mTimezone, rhs.mTimezone)
                 .append(mMobileTime, rhs.mMobileTime)
                 .append(mDriverId, rhs.mDriverId)
-                .append(mSequence, rhs.mSequence)
                 .append(mMalfunction, rhs.mMalfunction)
                 .append(mDiagnostic, rhs.mDiagnostic)
-                .append(mMalCode, rhs.mMalCode)
                 .isEquals();
     }
 
@@ -470,11 +532,12 @@ public class ELDEvent implements Parcelable {
                 .append(mEngineHours)
                 .append(mLat)
                 .append(mLng)
-                .append(mLatLnFlag)
                 .append(mDistance)
                 .append(mComment)
                 .append(mLocation)
                 .append(mCheckSum)
+                .append(mShippingId)
+                .append(mCoDriverId)
                 .append(mBoxId)
                 .append(mVehicleId)
                 .append(mId)
@@ -482,10 +545,8 @@ public class ELDEvent implements Parcelable {
                 .append(mTimezone)
                 .append(mMobileTime)
                 .append(mDriverId)
-                .append(mSequence)
                 .append(mMalfunction)
                 .append(mDiagnostic)
-                .append(mMalCode)
                 .toHashCode();
     }
 
@@ -496,31 +557,125 @@ public class ELDEvent implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(this.mStatus);
-        dest.writeInt(this.mOrigin);
-        dest.writeInt(this.mEventType);
-        dest.writeInt(this.mEventCode);
-        dest.writeLong(this.mEventTime);
-        dest.writeInt(this.mOdometer);
-        dest.writeInt(this.mEngineHours);
-        dest.writeDouble(this.mLat);
-        dest.writeDouble(this.mLng);
-        dest.writeString(this.mLatLnFlag);
-        dest.writeInt(this.mDistance);
-        dest.writeString(this.mComment);
-        dest.writeString(this.mLocation);
-        dest.writeString(this.mCheckSum);
-        dest.writeInt(this.mBoxId);
-        dest.writeInt(this.mVehicleId);
-        dest.writeInt(this.mId);
-        dest.writeDouble(this.mTzOffset);
-        dest.writeString(this.mTimezone);
-        dest.writeLong(this.mMobileTime);
-        dest.writeInt(this.mDriverId);
-        dest.writeInt(this.mSequence);
-        dest.writeByte((byte) (mMalfunction ? 1 : 0));
-        dest.writeByte((byte) (mDiagnostic ? 1 : 0));
-        dest.writeString(this.mMalCode);
+        dest.writeByte(this.mStatus == null ? (byte) 0 : 1);
+        if (this.mStatus != null) {
+            dest.writeInt(this.mStatus);
+        }
+
+        dest.writeByte(this.mOrigin == null ? (byte) 0 : 1);
+        if (this.mOrigin != null) {
+            dest.writeInt(this.mOrigin);
+        }
+
+        dest.writeByte(this.mEventType == null ? (byte) 0 : 1);
+        if (this.mEventType != null) {
+            dest.writeInt(this.mEventType);
+        }
+
+        dest.writeByte(this.mEventCode == null ? (byte) 0 : 1);
+        if (this.mEventCode != null) {
+            dest.writeInt(this.mEventCode);
+        }
+
+        dest.writeByte(this.mEventTime == null ? (byte) 0 : 1);
+        if (this.mEventTime != null) {
+            dest.writeLong(this.mEventTime);
+        }
+
+        dest.writeByte(this.mOdometer == null ? (byte) 0 : 1);
+        if (this.mOdometer != null) {
+            dest.writeInt(this.mOdometer);
+        }
+
+        dest.writeByte(this.mEngineHours == null ? (byte) 0 : 1);
+        if (this.mEngineHours != null) {
+            dest.writeInt(this.mEngineHours);
+        }
+
+        dest.writeByte(this.mLat == null ? (byte) 0 : 1);
+        if (this.mLat != null) {
+            dest.writeDouble(this.mLat);
+        }
+
+        dest.writeByte(this.mLng == null ? (byte) 0 : 1);
+        if (this.mLng != null) {
+            dest.writeDouble(this.mLng);
+        }
+
+        dest.writeByte(this.mDistance == null ? (byte) 0 : 1);
+        if (this.mDistance != null) {
+            dest.writeInt(this.mDistance);
+        }
+
+        dest.writeByte(this.mComment == null ? (byte) 0 : 1);
+        if (this.mComment != null) {
+            dest.writeString(this.mComment);
+        }
+
+        dest.writeByte(this.mLocation == null ? (byte) 0 : 1);
+        if (this.mLocation != null) {
+            dest.writeString(this.mLocation);
+        }
+
+        dest.writeByte(this.mCheckSum == null ? (byte) 0 : 1);
+        if (this.mCheckSum != null) {
+            dest.writeString(this.mCheckSum);
+        }
+
+        dest.writeByte(this.mShippingId == null ? (byte) 0 : 1);
+        if (this.mShippingId != null) {
+            dest.writeString(this.mShippingId);
+        }
+
+        dest.writeByte(this.mCoDriverId == null ? (byte) 0 : 1);
+        if (this.mCoDriverId != null) {
+            dest.writeInt(this.mCoDriverId);
+        }
+
+        dest.writeByte(this.mBoxId == null ? (byte) 0 : 1);
+        if (this.mBoxId != null) {
+            dest.writeInt(this.mBoxId);
+        }
+
+        dest.writeByte(this.mVehicleId == null ? (byte) 0 : 1);
+        if (this.mVehicleId != null) {
+            dest.writeInt(this.mVehicleId);
+        }
+
+        dest.writeByte(this.mId == null ? (byte) 0 : 1);
+        if (this.mId != null) {
+            dest.writeInt(this.mId);
+        }
+
+        dest.writeByte(this.mTzOffset == null ? (byte) 0 : 1);
+        if (this.mTzOffset != null) {
+            dest.writeDouble(this.mTzOffset);
+        }
+
+        dest.writeByte(this.mTimezone == null ? (byte) 0 : 1);
+        if (this.mTimezone != null) {
+            dest.writeString(this.mTimezone);
+        }
+
+        dest.writeByte(this.mMobileTime == null ? (byte) 0 : 1);
+        if (this.mMobileTime != null) {
+            dest.writeLong(this.mMobileTime);
+        }
+
+        dest.writeByte(this.mDriverId == null ? (byte) 0 : 1);
+        if (this.mDriverId != null) {
+            dest.writeInt(this.mDriverId);
+        }
+
+        dest.writeByte(this.mMalfunction == null ? (byte) 0 : 1);
+        if (this.mMalfunction != null) {
+            dest.writeByte((byte) (mMalfunction ? 1 : 0));
+        }
+
+        dest.writeByte(this.mDiagnostic == null ? (byte) 0 : 1);
+        if (this.mDiagnostic != null) {
+            dest.writeByte((byte) (mDiagnostic ? 1 : 0));
+        }
     }
 
     public static final Creator<ELDEvent> CREATOR = new Creator<ELDEvent>() {
@@ -535,4 +690,13 @@ public class ELDEvent implements Parcelable {
         }
     };
 
+    @Override
+    public ELDEvent clone() {
+        Parcel parcel = Parcel.obtain();
+        parcel.writeValue(this);
+        parcel.setDataPosition(0);
+        ELDEvent copy = (ELDEvent) parcel.readValue(ELDEvent.class.getClassLoader());
+        parcel.recycle();
+        return copy;
+    }
 }

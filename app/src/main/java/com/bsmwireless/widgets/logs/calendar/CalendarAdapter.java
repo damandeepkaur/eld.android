@@ -20,6 +20,11 @@ import butterknife.ButterKnife;
 
 public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.ViewHolder> {
 
+    private final int mNastyGreenColor;
+    private final int mBlackColor;
+    private final int mGrayColor;
+
+
     private Context mContext;
 
     private List<CalendarItem> mItems;
@@ -32,6 +37,11 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.ViewHo
         mItems = items;
         mContext = context;
         mOnClickListener = onClickListener;
+
+        //colors
+        mNastyGreenColor = ContextCompat.getColor(mContext, R.color.nasty_green);
+        mBlackColor = ContextCompat.getColor(mContext, android.R.color.black);
+        mGrayColor = ContextCompat.getColor(mContext, R.color.secondary_text);
     }
 
     @Override
@@ -52,34 +62,20 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.ViewHo
 
         LogSheetHeader associatedLog = item.getAssociatedLogSheet();
 
-        if (associatedLog != null) {
-            if (associatedLog.getSigned() == (Boolean) true) {
-                holder.mDayOfMonthTV.setTextColor(ContextCompat.getColor(mContext, R.color.nasty_green));
-                holder.mDayOfMonthTV.setTypeface(null, Typeface.BOLD);
-            } else {
-                holder.mDayOfMonthTV.setTextColor(ContextCompat.getColor(mContext, android.R.color.black));
-                holder.mDayOfMonthTV.setTypeface(null, Typeface.NORMAL);
-            }
-            holder.mDayOfWeekTV.setTextColor(ContextCompat.getColor(mContext, R.color.secondary_text));
+        if (associatedLog != null && Boolean.TRUE.equals(associatedLog.getSigned())) {
+            holder.mDayOfMonthTV.setTextColor(mNastyGreenColor);
+            holder.mDayOfMonthTV.setTypeface(null, Typeface.BOLD);
         } else {
-            holder.mDayOfMonthTV.setTextColor(ContextCompat.getColor(mContext, R.color.disabled_calendar_item_day));
-            holder.mDayOfWeekTV.setTextColor(ContextCompat.getColor(mContext, R.color.disabled_calendar_item_week));
+            holder.mDayOfMonthTV.setTextColor(mBlackColor);
             holder.mDayOfMonthTV.setTypeface(null, Typeface.NORMAL);
         }
+
+        holder.mDayOfWeekTV.setTextColor(mGrayColor);
     }
 
     @Override
     public int getItemCount() {
         return mItems != null ? mItems.size() : 0;
-    }
-
-    public void setSelectedItem(int position) {
-        if (mSelectedPosition != position) {
-            int prevPosition = mSelectedPosition;
-            mSelectedPosition = position;
-            notifyItemChanged(prevPosition);
-            notifyItemChanged(mSelectedPosition);
-        }
     }
 
     public void updateLogs(List<LogSheetHeader> logs) {
@@ -96,6 +92,19 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.ViewHo
 
     public CalendarItem getItemByPosition(int position) {
         return mItems != null && position < mItems.size() ? mItems.get(position) : null;
+    }
+
+    public CalendarItem getSelectedItem() {
+        return mItems != null ? mItems.get(mSelectedPosition) : null;
+    }
+
+    public void setSelectedItem(int position) {
+        if (mSelectedPosition != position) {
+            int prevPosition = mSelectedPosition;
+            mSelectedPosition = position;
+            notifyItemChanged(prevPosition);
+            notifyItemChanged(mSelectedPosition);
+        }
     }
 
     private CalendarItem findItemByDate(Long date) {

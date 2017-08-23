@@ -13,7 +13,15 @@ import java.util.concurrent.TimeUnit;
 import app.bsmuniversal.com.R;
 
 public class DateUtils {
-    private final static int MINUTES_IN_HOUR = 60;
+    public static final int MS_IN_SEC = 1000;
+    public static final int SEC_IN_MIN = 60;
+    public static final int MIN_IN_HOUR = 60;
+    public static final int HOUR_IN_DAY = 24;
+    public static final int SEC_IN_DAY = HOUR_IN_DAY * MIN_IN_HOUR * SEC_IN_MIN;
+    private final static int MS_IN_MIN = SEC_IN_MIN * MS_IN_SEC;
+    private final static int MS_IN_HOUR = MIN_IN_HOUR * MS_IN_MIN;
+    public static final long MS_IN_DAY = MS_IN_SEC * SEC_IN_DAY;
+    public static final long MS_IN_WEEK = MS_IN_DAY * 7;
 
     /**
      * @param zone user timezone for example "America/Los_Angeles"
@@ -60,10 +68,21 @@ public class DateUtils {
      * @param time in Unix ms
      * @return start date in ms
      */
-    public static long getStartDayTimeInMs(long time) {
-        Calendar calendar = Calendar.getInstance();
+    public static long getStartDayTimeInMs(String zone, long time) {
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(zone));
         calendar.setTimeInMillis(time);
         calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DATE), 0, 0, 0);
+        return calendar.getTimeInMillis();
+    }
+
+    /**
+     * @param time in Unix ms
+     * @return end date in ms
+     */
+    public static long getEndDayTimeInMs(String zone, long time) {
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(zone));
+        calendar.setTimeInMillis(time);
+        calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DATE), 23, 59, 59);
         return calendar.getTimeInMillis();
     }
 
@@ -76,20 +95,31 @@ public class DateUtils {
         long minutes = TimeUnit.MINUTES.convert(timeZone.getOffset(time), TimeUnit.MILLISECONDS);
 
         return String.format(Locale.US, "GMT %s.%s, %s (%s)",
-                minutes / MINUTES_IN_HOUR,
-                minutes % MINUTES_IN_HOUR,
+                minutes / MIN_IN_HOUR,
+                minutes % MIN_IN_HOUR,
                 timeZone.getDisplayName(Locale.US),
                 zone);
     }
 
     /**
      * @param time unix time in ms
-     * @return string with format time like "12:35"
+     * @return string with format time like "128:35"
      */
-    public static String convertTimeInMsToStringTime(long time) {
-        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
-        calendar.setTimeInMillis(time);
-        return String.format(Locale.US, "%02d:%02d", calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE));
+    public static String convertTotalTimeInMsToStringTime(long time) {
+        int hours = (int) (time / MS_IN_HOUR);
+        int minutes = (int) ((time - hours * MS_IN_HOUR) / MS_IN_MIN);
+        return String.format(Locale.US, "%02d:%02d", hours, minutes);
+    }
+
+    /**
+     * @param time unix time in ms
+     * @return string with format time like "128:35:11"
+     */
+    public static String convertTotalTimeInMsToFullStringTime(long time) {
+        int hours = (int) (time / MS_IN_HOUR);
+        int minutes = (int) ((time - hours * MS_IN_HOUR) / MS_IN_MIN);
+        int seconds = (int) ((time - hours * MS_IN_HOUR - minutes * MS_IN_MIN) / MS_IN_SEC);
+        return String.format(Locale.US, "%02d:%02d:%02d", hours, minutes, seconds);
     }
 
     /**
@@ -102,10 +132,12 @@ public class DateUtils {
         Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
         calendar.setTimeInMillis(time);
         String duration = "";
-        if (calendar.get(Calendar.HOUR_OF_DAY) > 0) {
-            duration = String.format(Locale.US, "%02d " + hrs + " ", calendar.get(Calendar.HOUR_OF_DAY));
+        int hours = (int) (time / MS_IN_HOUR);
+        int minutes = (int) ((time - hours * MS_IN_HOUR) / MS_IN_MIN);
+        if (hours > 0) {
+            duration = String.format(Locale.US, "%02d " + hrs + " ", hours);
         }
-        return duration + String.format(Locale.US, "%02d " + mins, calendar.get(Calendar.MINUTE));
+        return duration + String.format(Locale.US, "%02d " + mins, minutes);
     }
 
     /**
@@ -148,4 +180,56 @@ public class DateUtils {
         }
         return date.getTime();
     }
+
+    /**
+     * @param time long unix time in ms
+     * @return string with format time like "12:35 AM"
+     */
+    public static String convertTimeToAMPMString(long time, String timezone) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm aaa");
+        TimeZone timeZone = TimeZone.getTimeZone(timezone);
+        dateFormat.setTimeZone(timeZone);
+        return dateFormat.format(time);
+    }
+
+    /**
+     * @param time string with format time like "12:35 AM"
+     * @param day current day time
+     * @return long unix time in ms
+     */
+    public static Long convertStringAMPMToTime(String time, long day, String timezone) {
+        SimpleDateFormat format = new SimpleDateFormat("hh:mm aaa", Locale.US);
+        TimeZone timeZone = TimeZone.getTimeZone(timezone);
+        format.setTimeZone(timeZone);
+        try {
+            // Parse hour of day and minute
+            Date date = format.parse(time);
+            Calendar calendar = Calendar.getInstance(timeZone);
+            calendar.setTime(date);
+
+            int hourOfDay = calendar.get(Calendar.HOUR_OF_DAY);
+            int minute = calendar.get(Calendar.MINUTE);
+
+            // Time of day
+            calendar.setTimeInMillis(day);
+            calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+            calendar.set(Calendar.MINUTE, minute);
+            return calendar.getTimeInMillis();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return 0L;
+    }
+
+    /**
+     * @param time unix time in ms
+     * @return string with format time like "Sunday, July 4"
+     */
+    public static String convertTimeInMsToDate(String timezone, long time) {
+        SimpleDateFormat format = new SimpleDateFormat("EEEE, MMMM d", Locale.US);
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(timezone));
+        calendar.setTimeInMillis(time);
+        return format.format(calendar.getTime());
+    }
+
 }

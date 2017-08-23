@@ -1,18 +1,24 @@
-package com.bsmwireless.screens.common;
+package com.bsmwireless.screens.common.menu;
 
+import android.support.v7.app.AlertDialog;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
 
+import com.bsmwireless.data.storage.DutyManager;
+import com.bsmwireless.screens.common.BaseActivity;
 import com.bsmwireless.widgets.alerts.DutyType;
 import com.bsmwireless.widgets.alerts.ELDType;
 import com.bsmwireless.widgets.alerts.OccupancyType;
 
 import app.bsmuniversal.com.R;
 
-public abstract class BaseMenuActivity extends BaseActivity {
+public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuView {
     private MenuItem mELDItem;
     private MenuItem mDutyItem;
     private MenuItem mOccupancyItem;
+
+    protected AlertDialog mDutyDialog;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -21,6 +27,10 @@ public abstract class BaseMenuActivity extends BaseActivity {
         mELDItem = menu.findItem(R.id.action_eld);
         mDutyItem = menu.findItem(R.id.action_duty);
         mOccupancyItem = menu.findItem(R.id.action_occupancy);
+
+        initDialog();
+
+        getPresenter().onMenuCreated();
 
         return true;
     }
@@ -31,6 +41,7 @@ public abstract class BaseMenuActivity extends BaseActivity {
             case R.id.action_eld:
                 break;
             case R.id.action_duty:
+                mDutyDialog.show();
                 break;
             case R.id.action_occupancy:
                 break;
@@ -42,7 +53,18 @@ public abstract class BaseMenuActivity extends BaseActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void onHomePress() {
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        if (mDutyDialog != null) {
+            mDutyDialog.dismiss();
+        }
+    }
+
+    protected abstract BaseMenuPresenter getPresenter();
+
+    protected void onHomePress() {
         onBackPressed();
     }
 
@@ -55,7 +77,7 @@ public abstract class BaseMenuActivity extends BaseActivity {
 
     public void setDutyType(DutyType type) {
         if (mDutyItem != null) {
-            mDutyItem.getIcon().setLevel(type.ordinal());
+            mDutyItem.setIcon(type.getIcon());
             mDutyItem.setTitle(getString(type.getName()));
         }
     }
@@ -65,5 +87,23 @@ public abstract class BaseMenuActivity extends BaseActivity {
             mOccupancyItem.getIcon().setLevel(type.ordinal());
             mOccupancyItem.setTitle(getString(type.getName()));
         }
+    }
+
+    @Override
+    public void showDutyDialog() {
+        if (mDutyDialog != null) {
+            mDutyDialog.show();
+        }
+    }
+
+    protected void initDialog() {
+        //TODO: set correct types
+        DutyType[] types = DutyManager.DRIVER_DUTY_EXTENDED;
+        ArrayAdapter<DutyType> arrayAdapter = new BaseMenuAdapter(this, types);
+
+        mDutyDialog = new AlertDialog.Builder(this)
+                .setAdapter(arrayAdapter, (dialog, which) -> getPresenter().onDutyChanged(types[which]))
+                .setCancelable(true)
+                .create();
     }
 }

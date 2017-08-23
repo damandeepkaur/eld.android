@@ -1,7 +1,7 @@
 package com.bsmwireless.screens.login;
 
 
-import com.bsmwireless.domain.interactors.LoginUserInteractor;
+import com.bsmwireless.domain.interactors.UserInteractor;
 import com.bsmwireless.models.User;
 
 import org.junit.Before;
@@ -35,14 +35,14 @@ public class LoginPresenterTest {
     LoginView mView;
 
     @Mock
-    LoginUserInteractor mLoginUserInteractor;
+    UserInteractor mUserInteractor;
 
     private LoginPresenter mLoginPresenter;
 
     @Before
     public void before() throws Exception {
         MockitoAnnotations.initMocks(this);
-        mLoginPresenter = new LoginPresenter(mView, mLoginUserInteractor);
+        mLoginPresenter = new LoginPresenter(mView, mUserInteractor);
     }
 
 
@@ -80,7 +80,7 @@ public class LoginPresenterTest {
         when(mView.getUsername()).thenReturn(USERNAME);
         when(mView.getPassword()).thenReturn(PASSWORD);
         when(mView.getDomain()).thenReturn(DOMAIN);
-        when(mLoginUserInteractor.loginUser(anyString(), anyString(), anyString(), anyBoolean(),
+        when(mUserInteractor.loginUser(anyString(), anyString(), anyString(), anyBoolean(),
                 eq(User.DriverType.DRIVER))).thenReturn(Observable.just(false));
 
         //when
@@ -96,7 +96,7 @@ public class LoginPresenterTest {
         when(mView.getUsername()).thenReturn(USERNAME);
         when(mView.getPassword()).thenReturn(PASSWORD);
         when(mView.getDomain()).thenReturn(DOMAIN);
-        when(mLoginUserInteractor.loginUser(anyString(), anyString(), anyString(), anyBoolean(),
+        when(mUserInteractor.loginUser(anyString(), anyString(), anyString(), anyBoolean(),
                 eq(User.DriverType.DRIVER))).thenReturn(Observable.just(true));
 
         //when

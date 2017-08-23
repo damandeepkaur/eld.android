@@ -370,8 +370,8 @@
     <string name="driver_profile_item_carrier_name">Carrier Name</string>
     <string name="driver_profile_item_terminal_time_zone">Home Terminal Time Zone</string>
     <string name="driver_profile_item_role">Role</string>
-    <string name="driver_profile_password_changed">Password was changed.</string>
-    <string name="driver_profile_password_not_changed">Password was not changed.</string>
+    <string name="driver_profile_password_changed">Password was changed</string>
+    <string name="driver_profile_password_not_changed">Password was not changed</string>
     <string-array name="driver_profile_tmp_hos_cycles">
         <item>Canadian 70h 7d</item>
     </string-array>
@@ -382,8 +382,9 @@
     <string name="driver_profile_password_not_match">Password not match</string>
     <string name="driver_profile_password_field_empty">Password field empty</string>
     <string name="driver_profile_valid_password">Valid password</string>
-    <string name="driver_profile_home_terminal_updating_error">Home terminal was not updated.</string>
-    <string name="driver_profile_signature_changing_error">Signature changing error.</string>
+    <string name="driver_profile_home_terminal_updating_error">Home terminal was not updated</string>
+    <string name="driver_profile_signature_changing_error">Signature changing error</string>
+    <string name="driver_profile_signature_changed">Signature changed</string>
 
     <!-- Navigation drawer-->
     <string name="nav_home">Home</string>
@@ -422,6 +423,18 @@
     <string name="clear">Clear</string>
     <string name="try_again">Try again</string>
 
+    <!-- Edit Event Fragment -->
+    <string name="edit_event">Edit event</string>
+    <string name="edit_event_status">Status</string>
+    <string name="edit_event_address">Address</string>
+    <string name="edit_event_start_time">Start time</string>
+    <string name="edit_event_end_time">End time</string>
+    <string name="edit_event_comment">Comment</string>
+    <string name="edit_event_default_time">0:00 AM</string>
+    <string name="edit_event_pm">PM</string>
+    <string name="edit_event_am">AM</string>
+    <string name="edit_event_save">Save</string>
+
     <!-- Logs -->
     <string name="odometer">Odometer(%1$s)</string>
     <string name="add_event">Add event</string>
@@ -430,14 +443,25 @@
     <string name="km">km</string>
     <string name="ml">ml</string>
     <string name="sign_logsheet">sign logsheet</string>
+    <string name="signed">signed</string>
     <string name="no_address_available">No address available</string>
     <string name="hours">hrs</string>
     <string name="minutes">mins</string>
-    <!-- Event description, probably should be updated -->
+
+    <string name="sign_dialog_title">Sign confirmation</string>
+    <string name="sign_dialog_confirmation_text">Are you sure you want to sign this logsheet?</string>
+    <string name="sign_dialog_visibility_note">Signed logsheets will be visible to supervisors</string>
+    <string name="decline">decline</string>
+    <string name="accept">accept</string>
+    <string name="event_changed">(CHANGED)</string>
+
     <string name="event_type_off_duty">Off Duty</string>
-    <string name="event_type_sleeping">Sleeping</string>
+    <string name="event_type_sleeping">Sleeping Berth</string>
     <string name="event_type_driving">Driving</string>
     <string name="event_type_on_duty">On Duty</string>
+    <string name="event_type_personal_use">Personal Use</string>
+    <string name="event_type_yard_moves">Yard Moves</string>
+    <string name="event_type_clear">Clear</string>
     <string name="event_type_int_location">Int Location</string>
     <string name="event_type_cert">Cert</string>
     <string name="event_type_login">Login</string>
@@ -445,6 +469,12 @@
     <string name="event_type_shut_down">Shut Down</string>
     <string name="event_type_power_up">Power Up</string>
     <string name="event_type_unknown_type">Unknown event type</string>
+    <string name="event_type_personal_use_title">Off Duty (Personal Use)</string>
+    <string name="event_type_yard_moves_title">On Duty (Yard Moves)</string>
+    <string name="update_event_error">Update event error</string>
+    <string name="add_event_error">Add event error</string>
+    <string name="event_added">Event added</string>
+    <string name="event_updated">Event updated</string>
 
     <!-- Auto Logout Activity -->
     <string name="auto_logout_message_alert_dialog">Do you want to proceed with logout?</string>
@@ -457,5 +487,18 @@
     <string name="settings_box_gps_title">Box GPS</string>
     <string name="settings_fixed_mount_title">Fixed mount</string>
     <string name="settings_odometer_units">Odometer units</string>
+
+    <!-- Dashboard -->
+    <string name="duty_hours">HOURS</string>
+    <string name="duty_minutes">MINUTES</string>
+    <string name="duty_seconds">SECONDS</string>
+    <string name="duty_tap_to_change_status">Tap to change status</string>
+
+    <!-- Multiday fragment -->
+    <string-array name="multiday_selector">
+        <item>7 days</item>
+        <item>14 days</item>
+    </string-array>
+    <string name="multiday_total_hours">Total hours</string>
 
 </resources>
