@@ -47,7 +47,7 @@ public class SettingsPresenter extends BaseMenuPresenter {
     protected BaseMenuView getView() {
         return mView;
     }
-    
+
     public void onUnitsSelected(boolean isKMOdometerUnitsSelected) {
         if (isKMOdometerUnitsSelected) {
             mView.checkOdometerUnit(SettingsView.OdometerUnits.ODOMETER_UNITS_KM);
