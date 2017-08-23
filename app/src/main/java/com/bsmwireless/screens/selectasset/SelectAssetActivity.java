@@ -133,9 +133,7 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
 
         mSnackBarLayout
                 .setHideableOnTimeout(SnackBarLayout.DURATION_LONG)
-                .
-
-                        setHideableOnFocusLost(true);
+                .setHideableOnFocusLost(true);
 
         mPresenter.onViewCreated();
     }
