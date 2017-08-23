@@ -5,6 +5,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 
+import com.bsmwireless.data.storage.DutyManager;
 import com.bsmwireless.screens.common.BaseActivity;
 import com.bsmwireless.widgets.alerts.DutyType;
 import com.bsmwireless.widgets.alerts.ELDType;
@@ -96,10 +97,12 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
     }
 
     protected void initDialog() {
-        ArrayAdapter<DutyType> arrayAdapter = new BaseMenuAdapter(this, DutyType.values());
+        //TODO: set correct types
+        DutyType[] types = DutyManager.DRIVER_DUTY_EXTENDED;
+        ArrayAdapter<DutyType> arrayAdapter = new BaseMenuAdapter(this, types);
 
         mDutyDialog = new AlertDialog.Builder(this)
-                .setAdapter(arrayAdapter, (dialog, which) -> getPresenter().onDutyChanged(DutyType.values()[which]))
+                .setAdapter(arrayAdapter, (dialog, which) -> getPresenter().onDutyChanged(types[which]))
                 .setCancelable(true)
                 .create();
     }

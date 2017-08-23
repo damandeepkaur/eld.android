@@ -14,12 +14,7 @@ public abstract class BaseMenuPresenter {
     protected ELDEventsInteractor mEventsInteractor;
     protected CompositeDisposable mDisposables;
 
-    private DutyManager.DutyTypeListener mListener = new DutyManager.DutyTypeListener() {
-        @Override
-        public void onDutyTypeChanged(DutyType dutyType) {
-            getView().setDutyType(dutyType);
-        }
-    };
+    private DutyManager.DutyTypeListener mListener = dutyType -> getView().setDutyType(dutyType);
 
     protected abstract BaseMenuView getView();
 

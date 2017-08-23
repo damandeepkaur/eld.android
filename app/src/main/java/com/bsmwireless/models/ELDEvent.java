@@ -3,13 +3,14 @@ package com.bsmwireless.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.bsmwireless.data.storage.DutyManager;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-public class ELDEvent implements Parcelable {
+public class ELDEvent implements Parcelable, DutyManager.DutyCheckable {
     public enum EventType {
         DUTY_STATUS_CHANGING(1),
         INTERMEDIATE_LOG(2),
@@ -70,26 +71,6 @@ public class ELDEvent implements Parcelable {
         private int mCode;
 
         LoginLogoutCode(int code) {
-            mCode = code;
-        }
-
-        public int getValue() {
-            return mCode;
-        }
-    }
-
-    /**
-     * Event Codes for event type 3 (change in driver's indication of authorized personal use of CMV
-     * or yard moves (ELD 7.25, Table 9))
-     */
-    public enum DriverIndicationCode {
-        PERSONAL_USE_ON(1),
-        YARD_MOVES_ON(2),
-        DRIVER_INDICATION_OFF(3);
-
-        private int mCode;
-
-        DriverIndicationCode(int code) {
             mCode = code;
         }
 
@@ -298,7 +279,7 @@ public class ELDEvent implements Parcelable {
     }
 
     public Integer getEventCode() {
-        return mEventCode;
+        return mEventCode == null ? 0 : mEventCode;
     }
 
     public void setEventCode(Integer eventCode) {
