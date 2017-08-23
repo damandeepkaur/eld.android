@@ -487,6 +487,8 @@
     <string name="settings_box_gps_title">Box GPS</string>
     <string name="settings_fixed_mount_title">Fixed mount</string>
     <string name="settings_odometer_units">Odometer units</string>
+    <string name="settings_kilometers_title">Kilometers</string>
+    <string name="settings_miles_title">Miles</string>
 
     <!-- Dashboard -->
     <string name="duty_hours">HOURS</string>
