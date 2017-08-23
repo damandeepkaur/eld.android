@@ -23,6 +23,7 @@ import com.bsmwireless.widgets.logs.calendar.CalendarLayout;
 import com.bsmwireless.widgets.logs.graphview.GraphLayout;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import app.bsmuniversal.com.R;
@@ -62,6 +63,8 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
     private String mNoAddressLabel;
     private LayoutInflater mLayoutInflater;
 
+    private HashMap<Integer, Integer> mColors = new HashMap<>();
+
 
     public LogsAdapter(Context context, LogsPresenter presenter,
                        OnLogsStateChangeListener snackBarClickListener) {
@@ -84,6 +87,10 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
         mAdapterColors = new AdapterColors(mContext);
         mNoAddressLabel = mContext.getResources().getString(R.string.no_address_available);
         mLayoutInflater = LayoutInflater.from(mContext);
+
+        for (DutyType type : DutyType.values()) {
+            mColors.put(type.getColor(), ContextCompat.getColor(context, type.getColor()));
+        }
     }
 
     public void setEventLogs(List<EventLogModel> eventLogs) {
@@ -297,7 +304,7 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
             currentDuty = DutyType.getTypeByCode(log.getEventType(), log.getEventCode());
         }
 
-        holder.mEventStatus.setTextColor(ContextCompat.getColor(mContext, currentDuty.getColor()));
+        holder.mEventStatus.setTextColor(mColors.get(currentDuty.getColor()));
         holder.mEventStatus.setText(EventDescription.getTitle(currentDuty.getType(), currentDuty.getCode()));
 
         if (log.isActive()) {
