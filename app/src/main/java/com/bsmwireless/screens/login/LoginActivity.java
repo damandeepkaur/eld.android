@@ -7,7 +7,6 @@ import android.support.v7.widget.SwitchCompat;
 import android.widget.EditText;
 
 import com.bsmwireless.common.App;
-import com.bsmwireless.common.utils.SchedulerUtils;
 import com.bsmwireless.common.utils.NetworkUtils;
 import com.bsmwireless.data.network.RetrofitException;
 import com.bsmwireless.screens.common.BaseActivity;
