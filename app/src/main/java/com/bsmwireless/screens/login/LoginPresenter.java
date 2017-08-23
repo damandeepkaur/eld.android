@@ -1,7 +1,9 @@
 package com.bsmwireless.screens.login;
 
+
 import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.common.utils.SchedulerUtils;
+import com.bsmwireless.data.network.NtpClientManager;
 import com.bsmwireless.data.network.RetrofitException;
 import com.bsmwireless.domain.interactors.UserInteractor;
 import com.bsmwireless.models.User;
@@ -14,17 +16,20 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
+
 @ActivityScope
 public class LoginPresenter {
     private LoginView mView;
     private UserInteractor mUserInteractor;
     private CompositeDisposable mDisposables;
+    private NtpClientManager mNtpClientManager;
 
     @Inject
-    public LoginPresenter(LoginView view, UserInteractor interactor) {
+    public LoginPresenter(LoginView view, UserInteractor interactor, NtpClientManager ntpClientManager) {
         mView = view;
         mUserInteractor = interactor;
         mDisposables = new CompositeDisposable();
+        mNtpClientManager = ntpClientManager;
 
         Timber.d("CREATED");
     }
@@ -64,6 +69,7 @@ public class LoginPresenter {
                             Timber.i("LoginUser status = %b", status);
 
                             if (status) {
+                                syncDeviceNtpRequest();
                                 SchedulerUtils.schedule();
                                 mView.goToSelectAssetScreen();
                             } else {
@@ -79,6 +85,16 @@ public class LoginPresenter {
                             mView.setLoginButtonEnabled(true);
                         }
                 );
+        mDisposables.add(disposable);
+    }
+
+    private void syncDeviceNtpRequest() {
+        Disposable disposable = mNtpClientManager.init()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        date -> Timber.i("TrueTime initialized: %b", date),
+                        throwable -> Timber.e("TrueTime error: %s", throwable));
         mDisposables.add(disposable);
     }
 

@@ -1,6 +1,7 @@
 package com.bsmwireless.screens.login;
 
 
+import com.bsmwireless.data.network.NtpClientManager;
 import com.bsmwireless.domain.interactors.UserInteractor;
 import com.bsmwireless.models.User;
 
@@ -37,12 +38,15 @@ public class LoginPresenterTest {
     @Mock
     UserInteractor mUserInteractor;
 
+    @Mock
+    NtpClientManager mNtpClientManager;
+
     private LoginPresenter mLoginPresenter;
 
     @Before
     public void before() throws Exception {
         MockitoAnnotations.initMocks(this);
-        mLoginPresenter = new LoginPresenter(mView, mUserInteractor);
+        mLoginPresenter = new LoginPresenter(mView, mUserInteractor, mNtpClientManager);
     }
 
 

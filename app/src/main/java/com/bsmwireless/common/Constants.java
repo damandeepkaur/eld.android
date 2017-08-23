@@ -12,4 +12,6 @@ public interface Constants {
     String DEVICE_TYPE = "Android";
 
     String SUCCESS = "ACK";
+
+    String NTP_POOL_SERVER = "time.apple.com";
 }
