@@ -36,9 +36,13 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             buildConfigField "boolean", "USE_LOG", "false"
             signingConfig signingConfigs.release
+
+            testCoverageEnabled = true
         }
         debug {
             buildConfigField "boolean", "USE_LOG", "true"
+
+            testCoverageEnabled = true
         }
     }
 
@@ -168,3 +172,6 @@ dependencies {
 
     compile 'org.apache.commons:commons-lang3:3.5'
 }
+
+
+apply from: "jacoco.gradle"
