@@ -60,9 +60,9 @@ public class ELDEventsInteractor {
                 .map(ELDEventConverter::toModelList);
     }
 
-    public Flowable<ELDEvent> getLatestActiveDutyEventFromDB(long latestTime) {
+    public Flowable<List<ELDEvent>> getLatestActiveDutyEventFromDB(long latestTime) {
         return mELDEventDao.getLatestActiveDutyEvent(latestTime, mPreferencesManager.getDriverId())
-                .map(ELDEventConverter::toModel);
+                .map(ELDEventConverter::toModelList);
     }
 
     public Flowable<List<ELDEvent>> getActiveDutyEventsFromDB(long startTime, long endTime) {
@@ -138,6 +138,7 @@ public class ELDEventsInteractor {
         ELDEventEntity[] entities = ELDEventConverter.toEntityList(events).toArray(new ELDEventEntity[events.size()]);
         for (ELDEventEntity entity : entities) {
             entity.setSync(isSynced);
+            Timber.e(DutyType.getTypeByCode(entity.getEventType(), entity.getEventCode()).name());
         }
         mELDEventDao.insertAll(entities);
     }

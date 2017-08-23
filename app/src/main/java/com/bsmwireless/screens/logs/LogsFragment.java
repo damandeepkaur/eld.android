@@ -35,7 +35,6 @@ import app.bsmuniversal.com.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
-import timber.log.Timber;
 
 import static android.app.Activity.RESULT_OK;
 import static com.bsmwireless.screens.editevent.EditEventActivity.DAY_TIME_EXTRA;
@@ -241,15 +240,15 @@ public class LogsFragment extends BaseFragment implements LogsView {
         switch (requestCode) {
             case REQUEST_CODE_ADD_EVENT: {
                 if (resultCode == RESULT_OK) {
-                    ELDEvent newEvent = data.getParcelableExtra(NEW_ELD_EVENT_EXTRA);
-                    mPresenter.onEventAdded(newEvent);
+                    List<ELDEvent> newEvents = data.getParcelableArrayListExtra(NEW_ELD_EVENT_EXTRA);
+                    mPresenter.onEventAdded(newEvents);
                 }
                 break;
             }
             case REQUEST_CODE_EDIT_EVENT: {
                 if (resultCode == RESULT_OK) {
-                    ELDEvent updatedEvent = data.getParcelableExtra(NEW_ELD_EVENT_EXTRA);
-                    mPresenter.onEventChanged(updatedEvent);
+                    List<ELDEvent> updatedEvents = data.getParcelableArrayListExtra(NEW_ELD_EVENT_EXTRA);
+                    mPresenter.onEventChanged(updatedEvents);
                 }
                 break;
             }

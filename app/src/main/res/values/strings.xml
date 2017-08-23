@@ -434,6 +434,8 @@
     <string name="edit_event_pm">PM</string>
     <string name="edit_event_am">AM</string>
     <string name="edit_event_save">Save</string>
+    <string name="edit_event_error_invalid_time">Invalid time</string>
+    <string name="edit_event_server_error">Server error</string>
 
     <!-- Logs -->
     <string name="odometer">Odometer(%1$s)</string>
