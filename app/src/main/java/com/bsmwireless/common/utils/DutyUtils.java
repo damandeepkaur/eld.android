@@ -17,16 +17,6 @@ public class DutyUtils {
         return result;
     }
 
-    public static List<ELDEvent> filterELDEventsByTypeAndStatus(List<ELDEvent> events, ELDEvent.EventType eventType, ELDEvent.StatusCode statusCode) {
-        List<ELDEvent> result = new ArrayList<>();
-        for (ELDEvent event : events) {
-            if (event.getEventType().equals(eventType.getValue()) && (statusCode == null || event.getStatus().equals(statusCode.getValue()))) {
-                result.add(event);
-            }
-        }
-        return result;
-    }
-
     public static List<ELDEvent> filterEventsByTime(List<ELDEvent> events, long startTime, long endTime) {
         List<ELDEvent> result = new ArrayList<>();
         for (ELDEvent event : events) {

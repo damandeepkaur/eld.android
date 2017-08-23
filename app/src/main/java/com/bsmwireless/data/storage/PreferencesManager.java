@@ -122,34 +122,34 @@ public class PreferencesManager {
         return mPreferences.getBoolean(KEY_FIXED_AMOUNT_ENABLED, false);
     }
 
-    public void setOnDutyTime(int time) {
+    public void setOnDutyTime(long time) {
         SharedPreferences.Editor editor = mPreferences.edit();
-        editor.putInt(KEY_TIME_ON_DUTY, time);
+        editor.putLong(KEY_TIME_ON_DUTY, time);
         editor.apply();
     }
 
-    public int getOnDutyTime() {
-        return mPreferences.getInt(KEY_TIME_ON_DUTY, 0);
+    public long getOnDutyTime() {
+        return mPreferences.getLong(KEY_TIME_ON_DUTY, 0);
     }
 
-    public void setDrivingTime(int time) {
+    public void setDrivingTime(long time) {
         SharedPreferences.Editor editor = mPreferences.edit();
-        editor.putInt(KEY_TIME_DRIVING, time);
+        editor.putLong(KEY_TIME_DRIVING, time);
         editor.apply();
     }
 
-    public int getDrivingTime() {
-        return mPreferences.getInt(KEY_TIME_DRIVING, 0);
+    public long getDrivingTime() {
+        return mPreferences.getLong(KEY_TIME_DRIVING, 0);
     }
 
-    public void setSleeperBerthTime(int time) {
+    public void setSleeperBerthTime(long time) {
         SharedPreferences.Editor editor = mPreferences.edit();
-        editor.putInt(KEY_TIME_SLEEPER_BERTH, time);
+        editor.putLong(KEY_TIME_SLEEPER_BERTH, time);
         editor.apply();
     }
 
-    public int getSleeperBerthTime() {
-        return mPreferences.getInt(KEY_TIME_SLEEPER_BERTH, 0);
+    public long getSleeperBerthTime() {
+        return mPreferences.getLong(KEY_TIME_SLEEPER_BERTH, 0);
     }
 
     //Should be used via DutyManager only

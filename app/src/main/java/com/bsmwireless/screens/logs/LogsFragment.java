@@ -222,12 +222,7 @@ public class LogsFragment extends BaseFragment implements LogsView {
 
     @Override
     public void dutyUpdated() {
-        if (mAdapter != null) {
-            CalendarItem item = mAdapter.getCurrentItem();
-            if (item.isCurrentDay(System.currentTimeMillis())) {
-                mPresenter.setEventsForDay(item.getCalendar());
-            }
-        }
+        //update from db
     }
 
     @Override

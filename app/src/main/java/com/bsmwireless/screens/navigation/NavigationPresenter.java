@@ -11,6 +11,7 @@ import com.bsmwireless.screens.common.menu.BaseMenuPresenter;
 import com.bsmwireless.screens.common.menu.BaseMenuView;
 import com.bsmwireless.widgets.alerts.DutyType;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -98,55 +99,52 @@ public class NavigationPresenter extends BaseMenuPresenter {
     }
 
     private void resetTime(List<ELDEvent> events, long startOfDay) {
-        long onDutyTime = 0;
-        long drivingTime = 0;
-        long sleeperBerthTime = 0;
-
-        long currentTime = System.currentTimeMillis();
-        long duration;
-
-        DutyType dutyType = null;
-        DutyType currentDutyType;
+        DutyType dutyType = DutyType.OFF_DUTY;
+        DutyType eventDutyType;
         ELDEvent event;
+
+        boolean isClear = false;
 
         for (int i = events.size() - 1; i >= 0; i--) {
             event = events.get(i);
 
-            duration = currentTime - Math.max(event.getEventTime(), startOfDay);
-            currentTime = event.getEventTime();
-
+            //TODO: remove is when request is updated
             if (event.getEventType() == ELDEvent.EventType.DUTY_STATUS_CHANGING.getValue() || event.getEventType() == ELDEvent.EventType.CHANGE_IN_DRIVER_INDICATION.getValue()) {
-                currentDutyType = DutyType.getTypeByCode(event.getEventType(), event.getEventCode());
-            } else {
-                continue;
-            }
+                eventDutyType = DutyType.getTypeByCode(event.getEventType(), event.getEventCode());
 
-            if (dutyType == null /*&& currentDutyType != DutyType.CLEAR*/) {
-                dutyType = currentDutyType;
-            }
+                if (eventDutyType == DutyType.CLEAR) {
+                    isClear = true;
 
-            switch (currentDutyType) {
-                case ON_DUTY:
-                case YARD_MOVES:
-                    onDutyTime += duration;
+                //find previous duty event with actual status
+                } else if (isClear) {
+                    switch (eventDutyType) {
+                        case PERSONAL_USE:
+                            dutyType = DutyType.OFF_DUTY;
+                            break;
+
+                        case YARD_MOVES:
+                            dutyType = DutyType.ON_DUTY;
+                            break;
+
+                        default:
+                            dutyType = eventDutyType;
+                            break;
+                    }
                     break;
 
-                case DRIVING:
-                    drivingTime += duration;
+                } else {
+                    dutyType = eventDutyType;
                     break;
-
-                case SLEEPER_BERTH:
-                    sleeperBerthTime += duration;
-                    break;
-            }
-
-            // all events from current day is checked
-            if (currentTime < startOfDay) {
-                break;
+                }
             }
         }
 
-        mDutyManager.setDutyTypeTime((int) (onDutyTime / MS_IN_SEC), (int) (drivingTime / MS_IN_SEC), (int) (sleeperBerthTime / MS_IN_SEC), dutyType);
+        long[] times = DutyManager.getDutyTypeTimes(new ArrayList<>(events), startOfDay, System.currentTimeMillis());
+
+        mDutyManager.setDutyTypeTime(
+                (int) (times[DutyType.ON_DUTY.ordinal()]),
+                (int) (times[DutyType.DRIVING.ordinal()]),
+                (int) (times[DutyType.SLEEPER_BERTH.ordinal()]), dutyType);
     }
 
     @Override

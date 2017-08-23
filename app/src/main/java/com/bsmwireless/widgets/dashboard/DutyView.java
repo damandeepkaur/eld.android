@@ -6,12 +6,12 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.bsmwireless.common.utils.DateUtils;
 import com.bsmwireless.widgets.alerts.DutyType;
 
 import java.util.Locale;
@@ -21,9 +21,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
-import static com.bsmwireless.common.utils.DateUtils.MIN_IN_HOUR;
-import static com.bsmwireless.common.utils.DateUtils.SEC_IN_DAY;
-import static com.bsmwireless.common.utils.DateUtils.SEC_IN_MIN;
+import static com.bsmwireless.common.utils.DateUtils.MS_IN_SEC;
 
 public class DutyView extends CardView {
     @BindView(R.id.duty_time_title)
@@ -48,7 +46,6 @@ public class DutyView extends CardView {
 
     private Unbinder mUnbinder;
     private DutyType mDutyType;
-    private int mTime;
 
     public DutyView(Context context) {
         super(context);
@@ -112,24 +109,8 @@ public class DutyView extends CardView {
         return mDutyType;
     }
 
-    public void setTime(int time) {
-        mTime = time;
-
-        time = Math.min(time, SEC_IN_DAY);
-
-        int seconds = time % SEC_IN_MIN;
-        time /= SEC_IN_MIN;
-
-        int minutes = time % MIN_IN_HOUR;
-        time /= MIN_IN_HOUR;
-
-        int hours = time;
-
-        mTimeText.setText(String.format(Locale.US, "%02d:%02d:%02d", hours, minutes, seconds));
-        mProgressBar.setProgress(mTime);
-    }
-
-    public int getTime() {
-        return mTime;
+    public void setTime(long time) {
+        mTimeText.setText(DateUtils.convertTotalTimeInMsToFullStringTime(time));
+        mProgressBar.setProgress((int) (time / MS_IN_SEC));
     }
 }

@@ -102,7 +102,7 @@ public class EditEventPresenter extends BaseMenuPresenter {
         long eventTime = DateUtils.convertStringAMPMToTime(startTime, mEventDay, mTimezone);
 
         newEvent.setStatus(ELDEvent.StatusCode.ACTIVE.getValue());
-        newEvent.setEventCode(type.getValue());
+        newEvent.setEventCode(type.getCode());
         newEvent.setEventTime(eventTime);
         newEvent.setComment(comment);
         if (mELDEvent == null) {
@@ -141,7 +141,7 @@ public class EditEventPresenter extends BaseMenuPresenter {
         event.setStatus(ELDEvent.StatusCode.ACTIVE.getValue());
         event.setOrigin(ELDEvent.EventOrigin.DRIVER.getValue());
         event.setEventType(ELDEvent.EventType.DUTY_STATUS_CHANGING.getValue());
-        event.setEventCode(DutyType.OFF_DUTY.getValue());
+        event.setEventCode(DutyType.OFF_DUTY.getCode());
         event.setEventTime(mEventDay);
         event.setLocation("");
         event.setDistance(0);

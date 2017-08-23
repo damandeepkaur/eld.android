@@ -19,15 +19,16 @@ import com.bsmwireless.widgets.logs.calendar.CalendarItem;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.TimeZone;
 
 import javax.inject.Inject;
 
+import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -41,26 +42,19 @@ import static com.bsmwireless.screens.logs.TripInfoModel.UnitType.KM;
 
 @ActivityScope
 public class LogsPresenter {
-    Disposable mGetEventDisposable;
     private LogsView mView;
     private ELDEventsInteractor mELDEventsInteractor;
     private LogSheetInteractor mLogSheetInteractor;
     private VehiclesInteractor mVehiclesInteractor;
     private UserInteractor mUserInteractor;
     private DutyManager mDutyManager;
-
     private CompositeDisposable mDisposables;
     private String mTimeZone;
     private TripInfoModel mTripInfo;
     private Map<Integer, String> mVehicleIdToNameMap = new HashMap<>();
     private List<LogSheetHeader> mLogSheetHeaders;
-
-    private DutyManager.DutyTypeListener mListener = new DutyManager.DutyTypeListener() {
-        @Override
-        public void onDutyTypeChanged(DutyType dutyType) {
-            mView.dutyUpdated();
-        }
-    };
+    private Disposable mGetEventsFromDBDisposable;
+    private DutyManager.DutyTypeListener mListener = dutyType -> mView.dutyUpdated();
 
     @Inject
     public LogsPresenter(LogsView view, ELDEventsInteractor eventsInteractor, LogSheetInteractor logSheetInteractor,
@@ -79,34 +73,25 @@ public class LogsPresenter {
     }
 
     public void onViewCreated() {
-        mDisposables.add(mUserInteractor.getTimezone()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        timeZone -> {
+        mDisposables.add(
+                mUserInteractor.getTimezone()
+                        .subscribeOn(Schedulers.io())
+                        .flatMap(timeZone -> {
                             mTimeZone = timeZone;
-                            updateCalendar();
-                        },
-                        error -> Timber.e("Get timezone error: %s", error)
-                ));
-    }
-
-    private void updateCalendar() {
-        long todayDateLong = DateUtils.convertTimeToDayNumber(mTimeZone, System.currentTimeMillis());
-        long monthAgoLong = DateUtils.convertTimeToDayNumber(mTimeZone, System.currentTimeMillis()
-                - MS_IN_DAY * Constants.DEFAULT_CALENDAR_DAYS_COUNT);
-        mDisposables.add(mLogSheetInteractor.getLogSheetHeaders(monthAgoLong, todayDateLong)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        logSheetHeaders -> {
-                            mLogSheetHeaders = logSheetHeaders;
-                            mView.setLogSheetHeaders(logSheetHeaders);
-                            Calendar currentDayCalendar = Calendar.getInstance(TimeZone.getTimeZone(mTimeZone));
-                            setEventsForDay(currentDayCalendar);
-                        },
-                        error -> Timber.e("LoginUser error: %s", error)
-                ));
+                            long currentTime = Calendar.getInstance().getTimeInMillis();
+                            long todayDateLong = DateUtils.convertTimeToDayNumber(mTimeZone, currentTime);
+                            long monthAgoLong = DateUtils.convertTimeToDayNumber(mTimeZone, currentTime
+                                    - MS_IN_DAY * Constants.DEFAULT_CALENDAR_DAYS_COUNT);
+                            return mLogSheetInteractor.getLogSheetHeaders(monthAgoLong, todayDateLong);
+                        })
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(
+                                logSheetHeaders -> {
+                                    mLogSheetHeaders = logSheetHeaders;
+                                    mView.setLogSheetHeaders(logSheetHeaders);
+                                    Calendar currentDayCalendar = Calendar.getInstance(TimeZone.getTimeZone(mTimeZone));
+                                    setEventsForDay(currentDayCalendar);
+                                }, error -> Timber.e("LoginUser error: %s", error)));
     }
 
     public void onCalendarDaySelected(CalendarItem calendarItem) {
@@ -114,14 +99,29 @@ public class LogsPresenter {
     }
 
     public void setEventsForDay(Calendar calendar) {
+        //not yet initialized
+        if (mTimeZone == null) {
+            return;
+        }
+
         long startDayTime = DateUtils.getStartDate(mTimeZone, calendar.get(Calendar.DAY_OF_MONTH),
                 calendar.get(Calendar.MONTH), calendar.get(Calendar.YEAR));
         long endDayTime = startDayTime + MS_IN_DAY;
 
+        //clean up
+        mView.setEventLogs(Collections.EMPTY_LIST);
+        mView.setTripInfo(new TripInfoModel());
+
         mELDEventsInteractor.syncELDEvents(startDayTime - MS_IN_DAY, endDayTime);
-        if (mGetEventDisposable != null) mGetEventDisposable.dispose();
-        mGetEventDisposable = mELDEventsInteractor.getELDEventsFromDB(startDayTime - MS_IN_DAY, endDayTime)
-                .subscribeOn(Schedulers.io())
+
+        if (mGetEventsFromDBDisposable != null) mGetEventsFromDBDisposable.dispose();
+        mGetEventsFromDBDisposable = Flowable.zip(mELDEventsInteractor.getLatestActiveDutyEventFromDB(startDayTime),
+                mELDEventsInteractor.getDutyEventsFromDB(startDayTime, endDayTime),
+                (prevDayLatestEvent, selectedDayEvents) -> {
+                    prevDayLatestEvent.setEventTime(startDayTime);
+                    selectedDayEvents.add(0, prevDayLatestEvent);
+                    return selectedDayEvents;
+                }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(eldEvents -> {
                     long currentTime = Calendar.getInstance().getTimeInMillis();
@@ -138,12 +138,12 @@ public class LogsPresenter {
                         }
                     }
 
-                    mTripInfo.setStartDayTime(startDayTime);
                     mView.setTripInfo(mTripInfo);
                     mView.setEventLogs(dutyStateLogs);
-                    updateTripInfo(dutyStateLogs, endDayTime);
+                    updateTripInfo(dutyStateLogs, startDayTime, endDayTime);
                     updateVehicleInfo(new ArrayList<>(vehicleIds), dutyStateLogs);
                 }, throwable -> Timber.e(throwable.getMessage()));
+        mDisposables.add(mGetEventsFromDBDisposable);
     }
 
     public void updateVehicleInfo(List<Integer> vehicleIds, List<EventLogModel> logs) {
@@ -161,39 +161,31 @@ public class LogsPresenter {
                                 }
                             }
                             mView.setEventLogs(logs);
-                        }, throwable -> Timber.e(throwable.getMessage())
+                        }
+                        , throwable -> Timber.e(throwable.getMessage())
                 ));
     }
 
-    public void updateTripInfo(final List<EventLogModel> events, final long endDayTime) {
+    public void updateTripInfo(final List<EventLogModel> events, final long startDayTime, final long endDayTime) {
         TripInfoModel tripInfo = new TripInfoModel();
 
         Disposable disposable = Observable.create((ObservableOnSubscribe<TripInfoModel>) e -> {
-            long[] result = new long[DutyType.values().length];
             int odometer = 0;
-            EventLogModel log = events.get(0);
-            for (int i = 1; i < events.size(); i++) {
+            EventLogModel log;
+            for (int i = 0; i < events.size(); i++) {
                 log = events.get(i);
-                EventLogModel prevLog = events.get(i - 1);
-                long logDate = log.getEventTime();
-                long prevLogDate = prevLog.getEventTime();
-                long timeStamp = (logDate - prevLogDate);
-                result[prevLog.getEventCode() - 1] += timeStamp;
 
                 if (log.getEvent().getOdometer() != null && odometer < log.getEvent().getOdometer()) {
                     odometer = log.getEvent().getOdometer();
                 }
             }
-            result[log.getEventCode() - 1] += endDayTime - log.getEventTime();
+            long currentTime = Calendar.getInstance().getTimeInMillis();
+            long[] times = DutyManager.getDutyTypeTimes(new ArrayList<>(events), startDayTime, endDayTime < currentTime ? endDayTime : currentTime);
 
-            tripInfo.setSleeperBerthTime(DateUtils.convertTotalTimeInMsToStringTime(
-                    result[DutyType.SLEEPER_BERTH.getValue() - 1]));
-            tripInfo.setDrivingTime(DateUtils.convertTotalTimeInMsToStringTime(
-                    result[DutyType.DRIVING.getValue() - 1]));
-            tripInfo.setOffDutyTime(DateUtils.convertTotalTimeInMsToStringTime(
-                    result[DutyType.OFF_DUTY.getValue() - 1]));
-            tripInfo.setOnDutyTime(DateUtils.convertTotalTimeInMsToStringTime(
-                    result[DutyType.ON_DUTY.getValue() - 1]));
+            tripInfo.setSleeperBerthTime(DateUtils.convertTotalTimeInMsToStringTime(times[DutyType.SLEEPER_BERTH.ordinal()]));
+            tripInfo.setDrivingTime(DateUtils.convertTotalTimeInMsToStringTime(times[DutyType.DRIVING.ordinal()]));
+            tripInfo.setOffDutyTime(DateUtils.convertTotalTimeInMsToStringTime(times[DutyType.OFF_DUTY.ordinal()]));
+            tripInfo.setOnDutyTime(DateUtils.convertTotalTimeInMsToStringTime(times[DutyType.ON_DUTY.ordinal()]));
 
             //TODO: convert odometer value from meters to appropriate unit
             tripInfo.setUnitType(KM);
@@ -313,10 +305,6 @@ public class LogsPresenter {
 
     public void onDestroy() {
         mDutyManager.removeListener(mListener);
-
-        if (mGetEventDisposable != null) {
-            mGetEventDisposable.dispose();
-        }
         mDisposables.dispose();
         Timber.d("DESTROYED");
     }
@@ -340,22 +328,6 @@ public class LogsPresenter {
 
     private List<EventLogModel> preparingLogs(List<ELDEvent> events, long startDayTime, long endDayTime) {
         List<EventLogModel> logs = new ArrayList<>();
-        //filter events
-        ListIterator<ELDEvent> iterator = events.listIterator();
-        while (iterator.hasNext()) {
-            ELDEvent event = iterator.next();
-            if (!event.getEventType().equals(ELDEvent.EventType.DUTY_STATUS_CHANGING.getValue())
-                    && !event.getEventType().equals(ELDEvent.EventType.CHANGE_IN_DRIVER_INDICATION.getValue())) {
-                iterator.remove();
-            } else {
-                int i = iterator.nextIndex();
-                if (i < events.size() - 1) {
-                    if (events.get(i).getEventTime() < startDayTime) {
-                        iterator.remove();
-                    }
-                }
-            }
-        }
 
         if (!events.isEmpty()) {
             //convert to logs model
@@ -363,6 +335,26 @@ public class LogsPresenter {
             for (int i = 0; i < events.size(); i++) {
                 ELDEvent event = events.get(i);
                 EventLogModel log = new EventLogModel(event, mTimeZone);
+                if (event.getEventType() == ELDEvent.EventType.CHANGE_IN_DRIVER_INDICATION.getValue()
+                        && event.getEventCode() == DutyType.CLEAR.getCode()) {
+                    //get code of indication ON event for indication OFF event
+                    for (int j = i - 1; j >= 0; j--) {
+                        ELDEvent dutyEvent = events.get(j);
+
+                        if (dutyEvent.getEventType() == ELDEvent.EventType.DUTY_STATUS_CHANGING.getValue()) {
+                            log.setOnIndicationCode(dutyEvent.getEventCode());
+                            break;
+                        } else if (dutyEvent.getEventType() == ELDEvent.EventType.CHANGE_IN_DRIVER_INDICATION.getValue()) {
+                            if (dutyEvent.getEventCode() == DutyType.PERSONAL_USE.getCode()) {
+                                log.setOnIndicationCode(DutyType.OFF_DUTY.getCode());
+                                break;
+                            } else if (dutyEvent.getEventCode() == DutyType.YARD_MOVES.getCode()) {
+                                log.setOnIndicationCode(DutyType.ON_DUTY.getCode());
+                                break;
+                            }
+                        }
+                    }
+                }
                 logs.add(log);
                 if (logs.get(0).getEventTime() < startDayTime) {
                     logs.get(0).setEventTime(startDayTime);

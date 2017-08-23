@@ -1,13 +1,16 @@
 package com.bsmwireless.screens.logs.dagger;
 
+import com.bsmwireless.data.storage.DutyManager;
 import com.bsmwireless.models.ELDEvent;
 
-public class EventLogModel {
+public class EventLogModel implements DutyManager.DutyCheckable {
 
     private ELDEvent mEvent;
     private Long mDuration;
     private String mDriverTimezone;
     private String mVehicleName;
+    //only for indication off events (type 3 and code 0)
+    private int mOnIndicationCode;
 
     public EventLogModel() {
     }
@@ -46,7 +49,8 @@ public class EventLogModel {
     }
 
     public Integer getEventCode() {
-        return mEvent.getEventCode();
+        //TODO: remove after server fix
+        return mEvent.getEventCode() == null ? 0 : mEvent.getEventCode();
     }
 
     public ELDEvent getEvent() {
@@ -67,6 +71,14 @@ public class EventLogModel {
 
     public void setVehicleName(String vehicleName) {
         mVehicleName = vehicleName;
+    }
+
+    public int getOnIndicationCode() {
+        return mOnIndicationCode;
+    }
+
+    public void setOnIndicationCode(int onIndicationCode) {
+        mOnIndicationCode = onIndicationCode;
     }
 
     @Override
