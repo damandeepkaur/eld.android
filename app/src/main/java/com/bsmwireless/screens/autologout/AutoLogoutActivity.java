@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
 
 import com.bsmwireless.common.App;
 import com.bsmwireless.screens.autologout.dagger.AutoLogoutModule;
