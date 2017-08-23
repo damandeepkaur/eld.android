@@ -43,13 +43,16 @@ public class AutoLogoutActivity extends BaseActivity implements AutoLogoutView {
 
     @Override
     protected void onStop() {
-        super.onStop();
         mHandler.removeCallbacks(mRunnable);
+        mAutoLogoutPresenter.rescheduleAutoLogout();
+        super.onStop();
     }
 
     @Override
     protected void onDestroy() {
-        mAlertDialog.dismiss();
+        if (mAlertDialog != null) {
+            mAlertDialog.dismiss();
+        }
         mAutoLogoutPresenter.onDestroy();
         super.onDestroy();
     }
@@ -69,8 +72,12 @@ public class AutoLogoutActivity extends BaseActivity implements AutoLogoutView {
         builder.setCancelable(false);
         builder.setPositiveButton(R.string.auto_logout_positive_button_lbl_alert_dialog, (dialog, which) ->
                 mAutoLogoutPresenter.initAutoLogout());
-        builder.setNegativeButton(R.string.auto_logout_cancel_button_lbl_alert_dialog, (dialog, which) ->
-                mAutoLogoutPresenter.rescheduleAutoLogout());
+        builder.setNegativeButton(R.string.auto_logout_cancel_button_lbl_alert_dialog, (dialog, which) -> {
+                    mAlertDialog.dismiss();
+                    mAutoLogoutPresenter.rescheduleAutoLogout();
+                    finish();
+                });
+
         mAlertDialog = builder.create();
         mAlertDialog.show();
 

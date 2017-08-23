@@ -477,7 +477,7 @@
     <string name="event_updated">Event updated</string>
 
     <!-- Auto Logout Activity -->
-    <string name="auto_logout_message_alert_dialog">Auto Logout</string>
+    <string name="auto_logout_message_alert_dialog">Do you want to proceed with logout?</string>
     <string name="auto_logout_positive_button_lbl_alert_dialog">Logout</string>
     <string name="auto_logout_cancel_button_lbl_alert_dialog">Cancel</string>
 
@@ -487,6 +487,8 @@
     <string name="settings_box_gps_title">Box GPS</string>
     <string name="settings_fixed_mount_title">Fixed mount</string>
     <string name="settings_odometer_units">Odometer units</string>
+    <string name="settings_kilometers_title">Kilometers</string>
+    <string name="settings_miles_title">Miles</string>
 
     <!-- Dashboard -->
     <string name="duty_hours">HOURS</string>
