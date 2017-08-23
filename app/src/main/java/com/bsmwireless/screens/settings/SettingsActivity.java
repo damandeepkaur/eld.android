@@ -10,7 +10,8 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.bsmwireless.common.App;
-import com.bsmwireless.screens.common.BaseMenuActivity;
+import com.bsmwireless.screens.common.menu.BaseMenuActivity;
+import com.bsmwireless.screens.common.menu.BaseMenuPresenter;
 import com.bsmwireless.screens.settings.dagger.DaggerSettingsComponent;
 import com.bsmwireless.screens.settings.dagger.SettingsModule;
 
@@ -122,5 +123,10 @@ public class SettingsActivity extends BaseMenuActivity implements SettingsView {
     protected void onDestroy() {
         mPresenter.onDestroy();
         super.onDestroy();
+    }
+
+    @Override
+    protected BaseMenuPresenter getPresenter() {
+        return mPresenter;
     }
 }

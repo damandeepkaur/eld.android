@@ -1,10 +1,13 @@
 package com.bsmwireless.domain.interactors;
 
+import com.bsmwireless.common.utils.DateUtils;
 import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.network.authenticator.TokenManager;
 import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.data.storage.carriers.CarrierConverter;
+import com.bsmwireless.data.storage.eldevents.ELDEventConverter;
+import com.bsmwireless.data.storage.eldevents.ELDEventEntity;
 import com.bsmwireless.data.storage.hometerminals.HomeTerminalConverter;
 import com.bsmwireless.data.storage.users.FullUserEntity;
 import com.bsmwireless.data.storage.users.UserConverter;
@@ -27,9 +30,10 @@ import io.reactivex.Flowable;
 import io.reactivex.Observable;
 
 import static com.bsmwireless.common.Constants.SUCCESS;
+import static com.bsmwireless.common.utils.DateUtils.MS_IN_WEEK;
 import static com.bsmwireless.models.ELDEvent.EventType.LOGIN_LOGOUT;
 
-public class LoginUserInteractor {
+public class UserInteractor {
 
     private ServiceApi mServiceApi;
     private AppDatabase mAppDatabase;
@@ -38,8 +42,8 @@ public class LoginUserInteractor {
     private BlackBoxInteractor mBlackBoxInteractor;
 
     @Inject
-    public LoginUserInteractor(ServiceApi serviceApi, PreferencesManager preferencesManager, AppDatabase appDatabase,
-                               TokenManager tokenManager, BlackBoxInteractor blackBoxInteractor) {
+    public UserInteractor(ServiceApi serviceApi, PreferencesManager preferencesManager, AppDatabase appDatabase,
+                          TokenManager tokenManager, BlackBoxInteractor blackBoxInteractor) {
         mServiceApi = serviceApi;
         mPreferencesManager = preferencesManager;
         mAppDatabase = appDatabase;
@@ -61,6 +65,7 @@ public class LoginUserInteractor {
                     mPreferencesManager.setAccountName(accountName);
                     mPreferencesManager.setRememberUserEnabled(keepToken);
                     mPreferencesManager.setShowHomeScreenEnabled(true);
+                    mPreferencesManager.setDriverId(user.getAuth().getDriverId());
 
                     mTokenManager.setToken(accountName, name, domain, user.getAuth());
 
@@ -81,7 +86,20 @@ public class LoginUserInteractor {
                     if (lastVehicles != null) {
                         mAppDatabase.userDao().setUserLastVehicles(user.getId(), lastVehicles);
                     }
-                }).map(user -> user != null);
+                }).flatMap(user -> {
+                    // get last 7 days events
+                    long current = System.currentTimeMillis();
+                    long start = DateUtils.getStartDayTimeInMs(user.getTimezone(), current - MS_IN_WEEK);
+                    long end = DateUtils.getEndDayTimeInMs(user.getTimezone(), current);
+                    return mServiceApi.getELDEvents(start, end);
+                }).map(events -> {
+                    ELDEventEntity[] entities = ELDEventConverter.toEntityList(events).toArray(new ELDEventEntity[events.size()]);
+                    for (ELDEventEntity entity : entities) {
+                        entity.setSync(true);
+                    }
+                    mAppDatabase.ELDEventDao().insertAll(entities);
+                    return true;
+                });
     }
 
     public Observable<Boolean> logoutUser() {

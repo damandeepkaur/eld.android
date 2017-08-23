@@ -15,7 +15,7 @@ public class ListConverter {
 
             for (int i = 1; i < integers.size(); i++) {
                 builder.append(",");
-                builder.append(i);
+                builder.append(integers.get(i));
             }
         }
 

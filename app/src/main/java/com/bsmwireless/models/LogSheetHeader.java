@@ -43,7 +43,7 @@ public class LogSheetHeader implements Parcelable {
     private String mDutyCycle;
     @SerializedName("home")
     @Expose
-    private HomeTerminalInfo mHomeTerminalInfo;
+    private HomeTerminal mHomeTerminal;
     @SerializedName("additions")
     @Expose
     private String mAdditions;
@@ -64,7 +64,7 @@ public class LogSheetHeader implements Parcelable {
         this.mCoDriverIds = in.readString();
         this.mComment = in.readString();
         this.mDutyCycle = in.readString();
-        this.mHomeTerminalInfo = in.readParcelable(HomeTerminalInfo.class.getClassLoader());
+        this.mHomeTerminal = in.readParcelable(HomeTerminal.class.getClassLoader());
         this.mAdditions = in.readString();
         this.mSigned = in.readByte() != 0;
     }
@@ -149,12 +149,12 @@ public class LogSheetHeader implements Parcelable {
         this.mDutyCycle = dutyCycle;
     }
 
-    public HomeTerminalInfo getHomeTerminalInfo() {
-        return mHomeTerminalInfo;
+    public HomeTerminal getHomeTerminal() {
+        return mHomeTerminal;
     }
 
-    public void setHomeTerminalInfo(HomeTerminalInfo homeTerminalInfo) {
-        this.mHomeTerminalInfo = homeTerminalInfo;
+    public void setHomeTerminal(HomeTerminal homeTerminal) {
+        this.mHomeTerminal = homeTerminal;
     }
 
     public String getAdditions() {
@@ -186,7 +186,7 @@ public class LogSheetHeader implements Parcelable {
         sb.append(", mCoDriverIds=").append(mCoDriverIds);
         sb.append(", mComment=").append(mComment);
         sb.append(", mDutyCycle=").append(mDutyCycle);
-        sb.append(", mHomeTerminalInfo=").append(mHomeTerminalInfo);
+        sb.append(", mHomeTerminal=").append(mHomeTerminal);
         sb.append(", mAdditions=").append(mAdditions);
         sb.append(", mSigned=").append(mSigned);
         sb.append('}');
@@ -205,7 +205,7 @@ public class LogSheetHeader implements Parcelable {
                 .append(mCoDriverIds)
                 .append(mComment)
                 .append(mDutyCycle)
-                .append(mHomeTerminalInfo)
+                .append(mHomeTerminal)
                 .append(mAdditions)
                 .append(mSigned)
                 .toHashCode();
@@ -233,7 +233,7 @@ public class LogSheetHeader implements Parcelable {
                 .append(mCoDriverIds, rhs.mCoDriverIds)
                 .append(mComment, rhs.mComment)
                 .append(mDutyCycle, rhs.mDutyCycle)
-                .append(mHomeTerminalInfo, rhs.mHomeTerminalInfo)
+                .append(mHomeTerminal, rhs.mHomeTerminal)
                 .append(mAdditions, rhs.mAdditions)
                 .append(mSigned, rhs.mSigned)
                 .isEquals();
@@ -263,7 +263,7 @@ public class LogSheetHeader implements Parcelable {
         dest.writeString(this.mCoDriverIds);
         dest.writeString(this.mComment);
         dest.writeString(this.mDutyCycle);
-        dest.writeParcelable(this.mHomeTerminalInfo, flags);
+        dest.writeParcelable(this.mHomeTerminal, flags);
         dest.writeString(this.mAdditions);
         dest.writeByte((byte) (mSigned ? 1 : 0));
     }

@@ -2,11 +2,15 @@ package com.bsmwireless.screens.editevent;
 
 import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.common.utils.DateUtils;
+import com.bsmwireless.data.storage.DutyManager;
 import com.bsmwireless.domain.interactors.BlackBoxInteractor;
-import com.bsmwireless.domain.interactors.LoginUserInteractor;
+import com.bsmwireless.domain.interactors.ELDEventsInteractor;
+import com.bsmwireless.domain.interactors.UserInteractor;
 import com.bsmwireless.domain.interactors.VehiclesInteractor;
 import com.bsmwireless.models.BlackBoxModel;
 import com.bsmwireless.models.ELDEvent;
+import com.bsmwireless.screens.common.menu.BaseMenuPresenter;
+import com.bsmwireless.screens.common.menu.BaseMenuView;
 import com.bsmwireless.widgets.alerts.DutyType;
 
 import java.util.Calendar;
@@ -20,7 +24,7 @@ import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
 @ActivityScope
-public class EditEventPresenter {
+public class EditEventPresenter extends BaseMenuPresenter {
 
     private EditEventView mView;
     private CompositeDisposable mDisposables;
@@ -29,19 +33,21 @@ public class EditEventPresenter {
     private long mEventDay;
     private Calendar mCalendar;
 
-    private LoginUserInteractor mLoginUserInteractor;
+    private UserInteractor mUserInteractor;
     private VehiclesInteractor mVehiclesInteractor;
     private BlackBoxInteractor mBlackBoxInteractor;
 
     private BlackBoxModel mBlackBoxModel;
 
     @Inject
-    public EditEventPresenter(EditEventView view, LoginUserInteractor loginUserInteractor, VehiclesInteractor vehiclesInteractor, BlackBoxInteractor blackBoxInteractor) {
+    public EditEventPresenter(EditEventView view, UserInteractor userInteractor, VehiclesInteractor vehiclesInteractor, BlackBoxInteractor blackBoxInteractor, ELDEventsInteractor eventsInteractor, DutyManager dutyManager) {
         mView = view;
         mDisposables = new CompositeDisposable();
-        mLoginUserInteractor = loginUserInteractor;
+        mUserInteractor = userInteractor;
         mVehiclesInteractor = vehiclesInteractor;
         mBlackBoxInteractor = blackBoxInteractor;
+        mEventsInteractor = eventsInteractor;
+        mDutyManager = dutyManager;
         mTimezone = TimeZone.getDefault().getID();
         mCalendar = Calendar.getInstance();
 
@@ -49,7 +55,7 @@ public class EditEventPresenter {
     }
 
     public void onViewCreated() {
-        mDisposables.add(mLoginUserInteractor.getTimezone()
+        mDisposables.add(mUserInteractor.getTimezone()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(timezone -> {
@@ -60,6 +66,11 @@ public class EditEventPresenter {
         mDisposables.add(mBlackBoxInteractor.getData()
                 .subscribeOn(Schedulers.io())
                 .subscribe(blackBoxModel -> mBlackBoxModel = blackBoxModel));
+    }
+
+    @Override
+    protected BaseMenuView getView() {
+        return mView;
     }
 
     public void onDestroy() {
@@ -91,7 +102,7 @@ public class EditEventPresenter {
         long eventTime = DateUtils.convertStringAMPMToTime(startTime, mEventDay, mTimezone);
 
         newEvent.setStatus(ELDEvent.StatusCode.ACTIVE.getValue());
-        newEvent.setEventCode(type.getId());
+        newEvent.setEventCode(type.getCode());
         newEvent.setEventTime(eventTime);
         newEvent.setComment(comment);
         if (mELDEvent == null) {
@@ -105,7 +116,7 @@ public class EditEventPresenter {
     public void setEvent(ELDEvent event) {
         mELDEvent = event;
         if (mELDEvent != null) {
-            DutyType type = DutyType.getTypeById(event.getEventCode());
+            DutyType type = DutyType.getTypeByCode(event.getEventType(), event.getEventCode());
             mView.setStatus(type);
 
             Long time = mELDEvent.getEventTime();
@@ -128,16 +139,16 @@ public class EditEventPresenter {
     private ELDEvent prepareNewELDEvent() {
         ELDEvent event = new ELDEvent();
         event.setStatus(ELDEvent.StatusCode.ACTIVE.getValue());
-        event.setOrigin(2);
+        event.setOrigin(ELDEvent.EventOrigin.DRIVER.getValue());
         event.setEventType(ELDEvent.EventType.DUTY_STATUS_CHANGING.getValue());
-        event.setEventCode(DutyType.OFF_DUTY.getId());
+        event.setEventCode(DutyType.OFF_DUTY.getCode());
         event.setEventTime(mEventDay);
         event.setLocation("");
         event.setDistance(0);
         event.setMalfunction(false);
         event.setDiagnostic(false);
         event.setTimezone(mTimezone);
-        event.setDriverId(mLoginUserInteractor.getDriverId());
+        event.setDriverId(mUserInteractor.getDriverId());
         event.setBoxId(mVehiclesInteractor.getBoxId());
         event.setVehicleId(mVehiclesInteractor.getVehicleId());
         event.setMobileTime(mEventDay);

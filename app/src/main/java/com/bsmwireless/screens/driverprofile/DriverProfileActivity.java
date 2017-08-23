@@ -2,9 +2,7 @@ package com.bsmwireless.screens.driverprofile;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputEditText;
-import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.AppCompatSpinner;
@@ -14,14 +12,16 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ScrollView;
-import android.widget.Toast;
 
 import com.bsmwireless.common.App;
+import com.bsmwireless.common.utils.NetworkUtils;
+import com.bsmwireless.data.network.RetrofitException;
 import com.bsmwireless.data.storage.carriers.CarrierEntity;
 import com.bsmwireless.data.storage.hometerminals.HomeTerminalEntity;
 import com.bsmwireless.data.storage.users.UserEntity;
 import com.bsmwireless.models.User;
-import com.bsmwireless.screens.common.BaseMenuActivity;
+import com.bsmwireless.screens.common.menu.BaseMenuActivity;
+import com.bsmwireless.screens.common.menu.BaseMenuPresenter;
 import com.bsmwireless.screens.driverprofile.dagger.DaggerDriverProfileComponent;
 import com.bsmwireless.screens.driverprofile.dagger.DriverProfileModule;
 import com.bsmwireless.widgets.signview.SignatureLayout;
@@ -38,8 +38,6 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import timber.log.Timber;
 
-import static android.support.design.widget.BottomSheetBehavior.STATE_EXPANDED;
-import static android.support.design.widget.BottomSheetBehavior.STATE_HIDDEN;
 import static com.bsmwireless.common.utils.DateUtils.getFullTimeZone;
 
 public class DriverProfileActivity extends BaseMenuActivity implements DriverProfileView, SignatureLayout.OnSaveSignatureListener, AdapterView.OnItemSelectedListener {
@@ -119,7 +117,6 @@ public class DriverProfileActivity extends BaseMenuActivity implements DriverPro
         mUnbinder = ButterKnife.bind(this);
 
         initToolbar();
-        initSnackbar();
 
         mPresenter.onNeedUpdateUserInfo();
 
@@ -135,7 +132,13 @@ public class DriverProfileActivity extends BaseMenuActivity implements DriverPro
     @Override
     protected void onDestroy() {
         mPresenter.onDestroy();
+        mSnackBarLayout.reset().hideSnackbar();
         super.onDestroy();
+    }
+
+    @Override
+    protected BaseMenuPresenter getPresenter() {
+        return mPresenter;
     }
 
     @Override
@@ -171,37 +174,18 @@ public class DriverProfileActivity extends BaseMenuActivity implements DriverPro
     }
 
     @Override
-    public void showError(Throwable error) {
-        // TODO: show notification to user
-        Timber.e(error.getMessage());
-        Toast.makeText(this, error.getMessage(), Toast.LENGTH_SHORT).show();
+    public void showError(RetrofitException error) {
+        showNotificationSnackBar(NetworkUtils.getErrorMessage(error, this).toString());
     }
 
     @Override
     public void showError(Error error) {
-        Timber.e(getString(error.getStringId()));
-        Toast.makeText(this, getString(error.getStringId()), Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void showError(PasswordError error) {
-        Timber.e(getString(error.getStringId()));
-        setPasswordChangeError(getString(error.getStringId()));
+        showNotificationSnackBar(getString(error.getStringId()));
     }
 
     @Override
     public void onChangeClicked() {
-        showControlButtons();
-    }
-
-    @Override
-    public void hideControlButtons() {
-        mSnackBarLayout.hideSnackbar();
-    }
-
-    @Override
-    public void showControlButtons() {
-        mSnackBarLayout.showSnackbar();
+        showChangeSignSnackBar();
     }
 
     @Override
@@ -212,10 +196,14 @@ public class DriverProfileActivity extends BaseMenuActivity implements DriverPro
     }
 
     @Override
+    public void showSignatureChanged() {
+        Timber.e(getString(R.string.driver_profile_signature_changed));
+        showNotificationSnackBar(getString(R.string.driver_profile_signature_changed));
+    }
+
+    @Override
     public void showPasswordChanged() {
-        // TODO: show notification to user
-        Toast.makeText(this, getString(R.string.driver_profile_password_changed), Toast.LENGTH_SHORT).show();
-        setPasswordChangeError(null);
+        showNotificationSnackBar(getString(R.string.driver_profile_password_changed));
     }
 
     @OnClick(R.id.change_password_button)
@@ -234,39 +222,30 @@ public class DriverProfileActivity extends BaseMenuActivity implements DriverPro
         }
     }
 
-    private void initSnackbar() {
-        mSnackBarLayout.setPositiveLabel(getString(R.string.ok), v -> mPresenter.onSaveSignatureClicked(mSignatureLayout.getImageData()))
-                       .setNegativeLabel(getString(R.string.clear), v -> mSignatureLayout.clear())
-                       .setHideableOnFocusLost(true)
-                       .setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
-                            @Override
-                            public void onStateChanged(@NonNull View bottomSheet, int newState) {
-                                switch (newState) {
-                                    case STATE_HIDDEN: {
-                                        mSignatureLayout.setEditable(false);
-                                        break;
-                                    }
-                                    case STATE_EXPANDED: {
-                                        mSignatureLayout.setEditable(true);
-                                        break;
-                                    }
-                                    default: {
-                                        break;
-                                    }
-                                }
-                            }
+    private void showChangeSignSnackBar() {
+        mSnackBarLayout.setOnReadyListener(snackBar -> {
+                           snackBar.reset()
+                                   .setPositiveLabel(getString(R.string.ok), v -> mPresenter.onSaveSignatureClicked(mSignatureLayout.getImageData()))
+                                   .setNegativeLabel(getString(R.string.clear), v -> mSignatureLayout.clear())
+                                   .setHideableOnFocusLost(true)
+                                   .setOnCloseListener(new SnackBarLayout.OnCloseListener() {
+                                       @Override
+                                       public void onClose(SnackBarLayout snackBar) {
+                                           mSignatureLayout.setEditable(false);
+                                       }
 
-                           @Override
-                           public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-
-                           }
-                       });
+                                       @Override
+                                       public void onOpen(SnackBarLayout snackBar) {
+                                           mSignatureLayout.setEditable(true);
+                                       }
+                                   });
+                       })
+                       .showSnackbar();
     }
 
-    private void setPasswordChangeError(String error) {
-        mCurrentPasswordLayout.setError(error);
-        mNewPasswordLayout.setError(error);
-        mConfirmPasswordLayout.setError(error);
+    private void showNotificationSnackBar(String message) {
+        mSnackBarLayout.setOnReadyListener(snackBar -> snackBar.reset().setMessage(message).setHideableOnTimeout(SnackBarLayout.DURATION_LONG))
+                       .showSnackbar();
     }
 
     @Override

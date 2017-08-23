@@ -2,11 +2,14 @@ package com.bsmwireless.screens.driverprofile;
 
 import android.content.res.Resources;
 
+import com.bsmwireless.data.storage.DutyManager;
+import com.bsmwireless.data.network.RetrofitException;
 import com.bsmwireless.data.storage.carriers.CarrierEntity;
 import com.bsmwireless.data.storage.hometerminals.HomeTerminalEntity;
 import com.bsmwireless.data.storage.users.FullUserEntity;
 import com.bsmwireless.data.storage.users.UserConverter;
-import com.bsmwireless.domain.interactors.LoginUserInteractor;
+import com.bsmwireless.domain.interactors.ELDEventsInteractor;
+import com.bsmwireless.domain.interactors.UserInteractor;
 
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -19,6 +22,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,7 +56,13 @@ public class DriverProfilePresenterTest {
     DriverProfileView mView;
 
     @Mock
-    LoginUserInteractor mLoginUserInteractor;
+    UserInteractor mUserInteractor;
+
+    @Mock
+    DutyManager mDutyManager;
+
+    @Mock
+    ELDEventsInteractor mEventsInteractor;
 
     private static final int MAX_SIGNATURE_LENGTH = 50000; // defined here explicitly because number is defined in API
 
@@ -72,13 +82,13 @@ public class DriverProfilePresenterTest {
         MockitoAnnotations.initMocks(this);
 
         mFakeFullUserEntity = new FullUserEntity();
-        mDriverProfilePresenter = new DriverProfilePresenter(mView, mLoginUserInteractor);
+        mDriverProfilePresenter = new DriverProfilePresenter(mView, mUserInteractor, mDutyManager, mEventsInteractor);
     }
 
     @Test
     public void testOnNeedUpdateUserInfo() {
         // given
-        when(mLoginUserInteractor.getFullUser()).thenReturn(Flowable.just(mFakeFullUserEntity));
+        when(mUserInteractor.getFullUser()).thenReturn(Flowable.just(mFakeFullUserEntity));
 
         // when
         mDriverProfilePresenter.onNeedUpdateUserInfo();
@@ -91,13 +101,10 @@ public class DriverProfilePresenterTest {
     public void testOnNeedUpdateUserInfoError() {
         // given
         final Throwable error = new RuntimeException("error!");
-        when(mLoginUserInteractor.getFullUser()).thenReturn(Flowable.error(error));
+        when(mUserInteractor.getFullUser()).thenReturn(Flowable.error(error));
 
         // when
         mDriverProfilePresenter.onNeedUpdateUserInfo();
-
-        // then
-        verify(mView).showError(eq(error));
     }
 
     @Test
@@ -127,7 +134,7 @@ public class DriverProfilePresenterTest {
         mFakeFullUserEntity.getUserEntity().setHomeTermId(selectedHomeTerminalId);
         mFakeFullUserEntity.setHomeTerminalEntities(homeTerminals);
 
-        when(mLoginUserInteractor.getFullUser()).thenReturn(Flowable.just(mFakeFullUserEntity));
+        when(mUserInteractor.getFullUser()).thenReturn(Flowable.just(mFakeFullUserEntity));
 
         // when
         mDriverProfilePresenter.onNeedUpdateUserInfo();
@@ -153,7 +160,7 @@ public class DriverProfilePresenterTest {
 
         mFakeFullUserEntity.setCarriers(carriers);
 
-        when(mLoginUserInteractor.getFullUser()).thenReturn(Flowable.just(mFakeFullUserEntity));
+        when(mUserInteractor.getFullUser()).thenReturn(Flowable.just(mFakeFullUserEntity));
 
         // when
         mDriverProfilePresenter.onNeedUpdateUserInfo();
@@ -172,20 +179,18 @@ public class DriverProfilePresenterTest {
 
         // then
         verify(mView).showError(eq(DriverProfileView.Error.ERROR_INVALID_USER));
-        verify(mView).hideControlButtons();
     }
 
     @Test
     public void testOnSaveSignatureClickedValidUserShortSigSuccess() {
         // given
         setUserToNotNull();
-        when(mLoginUserInteractor.updateDriverSignature(anyString())).thenReturn(Observable.just(true));
+        when(mUserInteractor.updateDriverSignature(anyString())).thenReturn(Observable.just(true));
 
         // when
         mDriverProfilePresenter.onSaveSignatureClicked(mTestSignature);
 
         // then
-        verify(mView).hideControlButtons();
         assertTrue(mFakeFullUserEntity.getUserEntity().getSignature().equals(mTestSignature));
     }
 
@@ -193,7 +198,7 @@ public class DriverProfilePresenterTest {
     public void testOnSaveSignatureClickedApiFailed() {
         // given
         setUserToNotNull();
-        when(mLoginUserInteractor.updateDriverSignature(anyString())).thenReturn(Observable.just(false));
+        when(mUserInteractor.updateDriverSignature(anyString())).thenReturn(Observable.just(false));
 
         // when
         mDriverProfilePresenter.onSaveSignatureClicked(mTestSignature);
@@ -206,20 +211,21 @@ public class DriverProfilePresenterTest {
     public void testOnSaveSignatureClickedApiError() {
         // given
         setUserToNotNull();
-        when(mLoginUserInteractor.updateDriverSignature(anyString())).thenReturn(Observable.error(new Exception("broken :(")));
+
+        when(mUserInteractor.updateDriverSignature(anyString())).thenReturn(Observable.error(RetrofitException.networkError(new ConnectException())));
 
         // when
         mDriverProfilePresenter.onSaveSignatureClicked(mTestSignature);
 
         // then
-        verify(mView).showError(any(Throwable.class));
+        verify(mView).showError(any(RetrofitException.class));
     }
 
     @Test
     public void testOnSaveSignatureClickedValidUserLongSig() {
         // given
         setUserToNotNull(); // sets to mFakeUserEntity
-        when(mLoginUserInteractor.updateDriverSignature(anyString())).thenReturn(Observable.just(true)); // API success
+        when(mUserInteractor.updateDriverSignature(anyString())).thenReturn(Observable.just(true)); // API success
 
         // when
         mDriverProfilePresenter.onSaveSignatureClicked(mTooLongTestSignature);
@@ -261,7 +267,7 @@ public class DriverProfilePresenterTest {
         String newPwd = "newPwd";
         String confirmPwd = newPwd;
 
-        when(mLoginUserInteractor.updateDriverPassword(anyString(), anyString())).thenReturn(Observable.just(true));
+        when(mUserInteractor.updateDriverPassword(anyString(), anyString())).thenReturn(Observable.just(true));
 
         // when
         mDriverProfilePresenter.onChangePasswordClick(oldPwd, newPwd, confirmPwd);
@@ -277,14 +283,14 @@ public class DriverProfilePresenterTest {
         String newPwd = "newPwd";
         String confirmPwd = newPwd;
 
-        when(mLoginUserInteractor.updateDriverPassword(anyString(), anyString())).thenReturn(Observable.just(true));
+        when(mUserInteractor.updateDriverPassword(anyString(), anyString())).thenReturn(Observable.just(true));
 
 
         // when
         mDriverProfilePresenter.onChangePasswordClick(oldPwd, newPwd, confirmPwd);
 
         // then
-        verify(mView).showError(eq(DriverProfileView.PasswordError.PASSWORD_FIELD_EMPTY));
+        verify(mView).showError(eq(DriverProfileView.Error.PASSWORD_FIELD_EMPTY));
     }
 
     @Test
@@ -294,14 +300,14 @@ public class DriverProfilePresenterTest {
         String newPwd = "";
         String confirmPwd = "confirmPwd";
 
-        when(mLoginUserInteractor.updateDriverPassword(anyString(), anyString())).thenReturn(Observable.just(true));
+        when(mUserInteractor.updateDriverPassword(anyString(), anyString())).thenReturn(Observable.just(true));
 
 
         // when
         mDriverProfilePresenter.onChangePasswordClick(oldPwd, newPwd, confirmPwd);
 
         // then
-        verify(mView).showError(eq(DriverProfileView.PasswordError.PASSWORD_FIELD_EMPTY));
+        verify(mView).showError(eq(DriverProfileView.Error.PASSWORD_FIELD_EMPTY));
     }
 
     @Test
@@ -311,14 +317,14 @@ public class DriverProfilePresenterTest {
         String newPwd = "newPwd";
         String confirmPwd = "confirmPwd";
 
-        when(mLoginUserInteractor.updateDriverPassword(anyString(), anyString())).thenReturn(Observable.just(true));
+        when(mUserInteractor.updateDriverPassword(anyString(), anyString())).thenReturn(Observable.just(true));
 
 
         // when
         mDriverProfilePresenter.onChangePasswordClick(oldPwd, newPwd, confirmPwd);
 
         // then
-        verify(mView).showError(eq(DriverProfileView.PasswordError.PASSWORD_NOT_MATCH));
+        verify(mView).showError(eq(DriverProfileView.Error.PASSWORD_NOT_MATCH));
     }
 
     @Test
@@ -328,7 +334,7 @@ public class DriverProfilePresenterTest {
         String newPwd = "newPwd";
         String confirmPwd = newPwd;
 
-        when(mLoginUserInteractor.updateDriverPassword(anyString(), anyString())).thenReturn(Observable.just(false));
+        when(mUserInteractor.updateDriverPassword(anyString(), anyString())).thenReturn(Observable.just(false));
 
 
         // when
@@ -345,14 +351,13 @@ public class DriverProfilePresenterTest {
         String newPwd = "newPwd";
         String confirmPwd = newPwd;
 
-        when(mLoginUserInteractor.updateDriverPassword(anyString(), anyString())).thenReturn(Observable.error(new Exception("didn't work")));
-
+        when(mUserInteractor.updateDriverPassword(anyString(), anyString())).thenReturn(Observable.error(RetrofitException.networkError(new ConnectException())));
 
         // when
         mDriverProfilePresenter.onChangePasswordClick(oldPwd, newPwd, confirmPwd);
 
         // then
-        verify(mView).showError(any(Exception.class));
+        verify(mView).showError(any(RetrofitException.class));
     }
 
     // TODO: move cropSignature tests if cropSignature is moved to a class for signatures or utility class

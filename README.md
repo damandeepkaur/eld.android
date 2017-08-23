@@ -3,6 +3,14 @@ ELD app for Android
 
 # Version history
 
+* **1.0.41** - Fix crash on incorrent events loading (_EA-313_)
+* **1.0.40** - Add YM and PU to logs screen (286)
+* **1.0.39** - Change inactive events view
+* **1.0.38** - Update logs graph
+* **1.0.37** - Dashboard screen
+* **1.0.36** - Multi day screen
+* **1.0.35** - Showing errors through snack bar
+* **1.0.34** - Driver’s Certification of Own Records
 * **1.0.33** - Fix crash when open QR scanner first time
 * **1.0.32** - Add/edit duty events screen
 * **1.0.31** - Updated driver profile screen

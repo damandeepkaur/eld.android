@@ -3,13 +3,14 @@ package com.bsmwireless.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.bsmwireless.data.storage.DutyManager;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-public class ELDEvent implements Parcelable {
+public class ELDEvent implements Parcelable, DutyManager.DutyCheckable {
     public enum EventType {
         DUTY_STATUS_CHANGING(1),
         INTERMEDIATE_LOG(2),
@@ -77,6 +78,7 @@ public class ELDEvent implements Parcelable {
             return mCode;
         }
     }
+
     @SerializedName("id")
     @Expose
     private Integer mId;
@@ -277,7 +279,7 @@ public class ELDEvent implements Parcelable {
     }
 
     public Integer getEventCode() {
-        return mEventCode;
+        return mEventCode == null ? 0 : mEventCode;
     }
 
     public void setEventCode(Integer eventCode) {
