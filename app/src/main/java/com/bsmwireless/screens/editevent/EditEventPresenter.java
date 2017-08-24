@@ -17,6 +17,8 @@ import com.bsmwireless.widgets.alerts.DutyType;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.TimeZone;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
@@ -102,6 +104,12 @@ public class EditEventPresenter extends BaseMenuPresenter {
             return;
         }
 
+        EditEventView.Error commentValidation = validateComment(comment);
+        if (!commentValidation.equals(EditEventView.Error.VALID_COMMENT)) {
+            mView.showError(commentValidation);
+            return;
+        }
+
         if (mELDEvent != null) {
             newEvent = mELDEvent.clone();
         } else {
@@ -130,6 +138,7 @@ public class EditEventPresenter extends BaseMenuPresenter {
                 indicationDutyEvent.setMobileTime(mELDEvent.getMobileTime());
             }
 
+            // TODO: remove if we need not auto generate clear event
             // Auto generating clear event
             /*mDisposables.add(mEventsInteractor.getLatestActiveDutyEventFromDB(eventTime)
                                               .subscribeOn(Schedulers.io())
@@ -176,6 +185,7 @@ public class EditEventPresenter extends BaseMenuPresenter {
                 newEvent.setMobileTime(eventTime);
             }
 
+            // TODO: remove if we need not auto generate clear event
             // Auto generating clear event
             /*mDisposables.add(mEventsInteractor.getLatestActiveDutyEventFromDB(eventTime)
                                               .subscribeOn(Schedulers.io())
@@ -257,5 +267,17 @@ public class EditEventPresenter extends BaseMenuPresenter {
         event.setLng(mBlackBoxModel != null ? mBlackBoxModel.getLon() : 0d);
         event.setOdometer(mBlackBoxModel != null ? mBlackBoxModel.getOdometer() : 0);
         return event;
+    }
+
+    private EditEventView.Error validateComment(String comment) {
+        if (comment.length() < 4) {
+            return EditEventView.Error.INVALID_COMMENT_LENGTH;
+        }
+        Pattern pattern = Pattern.compile("[^A-Za-z0-9]", Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(comment);
+        if (matcher.find()) {
+            return EditEventView.Error.INVALID_COMMENT;
+        }
+        return EditEventView.Error.VALID_COMMENT;
     }
 }
