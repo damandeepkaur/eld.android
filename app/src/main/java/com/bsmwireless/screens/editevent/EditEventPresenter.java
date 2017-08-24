@@ -138,6 +138,7 @@ public class EditEventPresenter extends BaseMenuPresenter {
                 indicationDutyEvent.setMobileTime(mELDEvent.getMobileTime());
             }
 
+            // TODO: remove if we need not auto generate clear event
             // Auto generating clear event
             /*mDisposables.add(mEventsInteractor.getLatestActiveDutyEventFromDB(eventTime)
                                               .subscribeOn(Schedulers.io())
@@ -184,6 +185,7 @@ public class EditEventPresenter extends BaseMenuPresenter {
                 newEvent.setMobileTime(eventTime);
             }
 
+            // TODO: remove if we need not auto generate clear event
             // Auto generating clear event
             /*mDisposables.add(mEventsInteractor.getLatestActiveDutyEventFromDB(eventTime)
                                               .subscribeOn(Schedulers.io())
