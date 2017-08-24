@@ -1,11 +1,13 @@
 package com.bsmwireless.screens.autologout;
 
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
+import android.widget.Button;
 
 import com.bsmwireless.common.App;
 import com.bsmwireless.screens.autologout.dagger.AutoLogoutModule;
@@ -32,6 +34,8 @@ public class AutoLogoutActivity extends BaseActivity implements AutoLogoutView {
     private Handler mHandler;
     private Runnable mRunnable;
 
+    private boolean mIsDialogShown = false;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,8 +47,9 @@ public class AutoLogoutActivity extends BaseActivity implements AutoLogoutView {
 
     @Override
     protected void onStop() {
-        mHandler.removeCallbacks(mRunnable);
-        mAutoLogoutPresenter.rescheduleAutoLogout();
+        if (!mIsDialogShown) {
+            mAutoLogoutPresenter.rescheduleAutoLogout();
+        }
         super.onStop();
     }
 
@@ -53,6 +58,8 @@ public class AutoLogoutActivity extends BaseActivity implements AutoLogoutView {
         if (mAlertDialog != null) {
             mAlertDialog.dismiss();
         }
+        mIsDialogShown = false;
+        mHandler.removeCallbacks(mRunnable);
         mAutoLogoutPresenter.onDestroy();
         super.onDestroy();
     }
@@ -68,18 +75,29 @@ public class AutoLogoutActivity extends BaseActivity implements AutoLogoutView {
     @Override
     public void showAutoLogoutDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.auto_logout_title_alert_dialog);
         builder.setMessage(R.string.auto_logout_message_alert_dialog);
         builder.setCancelable(false);
-        builder.setPositiveButton(R.string.auto_logout_positive_button_lbl_alert_dialog, (dialog, which) ->
-                mAutoLogoutPresenter.initAutoLogout());
-        builder.setNegativeButton(R.string.auto_logout_cancel_button_lbl_alert_dialog, (dialog, which) -> {
-                    mAlertDialog.dismiss();
-                    mAutoLogoutPresenter.rescheduleAutoLogout();
-                    finish();
-                });
+        builder.setPositiveButton(R.string.auto_logout_continue_button_lbl_alert_dialog, (dialog, which) -> {
+            mAlertDialog.dismiss();
+            mIsDialogShown = false;
+            mAutoLogoutPresenter.rescheduleAutoLogout();
+            finish();
+        });
+        builder.setNegativeButton(R.string.auto_logout_log_out_button_lbl_alert_dialog, (dialog, which) -> {
+            mAlertDialog.dismiss();
+            mIsDialogShown = false;
+            mAutoLogoutPresenter.initAutoLogout();
+        });
 
         mAlertDialog = builder.create();
         mAlertDialog.show();
+        mIsDialogShown = true;
+
+        Button negativeButton = mAlertDialog.getButton(DialogInterface.BUTTON_NEGATIVE);
+        negativeButton.setTextColor(getResources().getColor(R.color.coral));
+        Button positiveButton = mAlertDialog.getButton(DialogInterface.BUTTON_POSITIVE);
+        positiveButton.setTextColor(getResources().getColor(R.color.nasty_green));
 
         mAutoLogoutPresenter.initAutoLogoutIfNoUserInteraction();
     }

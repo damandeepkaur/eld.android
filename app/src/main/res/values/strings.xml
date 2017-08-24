@@ -477,9 +477,10 @@
     <string name="event_updated">Event updated</string>
 
     <!-- Auto Logout Activity -->
-    <string name="auto_logout_message_alert_dialog">Do you want to proceed with logout?</string>
-    <string name="auto_logout_positive_button_lbl_alert_dialog">Logout</string>
-    <string name="auto_logout_cancel_button_lbl_alert_dialog">Cancel</string>
+    <string name="auto_logout_message_alert_dialog">Your session will expire in 1 minute. Please tap \"Continue\" to keep working or Log out to end your session now.</string>
+    <string name="auto_logout_log_out_button_lbl_alert_dialog">LOG OUT</string>
+    <string name="auto_logout_continue_button_lbl_alert_dialog">CONTINUE</string>
+    <string name="auto_logout_title_alert_dialog">Expiration Warning</string>
 
     <!-- Settings Activity -->
     <string name="settings">Settings</string>

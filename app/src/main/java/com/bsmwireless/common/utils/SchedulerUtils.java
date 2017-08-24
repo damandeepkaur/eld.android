@@ -96,7 +96,6 @@ public class SchedulerUtils {
             return;
         }
 
-
         JobInfo.Builder builder = new JobInfo.Builder(mJobId++,
                 new ComponentName(App.getComponent().context(), AutoLogoutJobService.class))
                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
