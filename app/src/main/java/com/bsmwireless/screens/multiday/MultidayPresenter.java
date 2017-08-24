@@ -55,13 +55,13 @@ public class MultidayPresenter {
 
     public void onViewCreated() {
         mDisposables.add(mUserInteractor.getTimezone()
-                                             .subscribeOn(Schedulers.io())
-                                             .subscribe(timezone -> {
-                                                 if (!mTimeZone.equals(timezone)) {
-                                                     mTimeZone = timezone;
-                                                     getItems(mView.getDayCount());
-                                                 }
-                                             }, Timber::e));
+                .subscribeOn(Schedulers.io())
+                .subscribe(timezone -> {
+                    if (!mTimeZone.equals(timezone)) {
+                        mTimeZone = timezone;
+                        getItems(mView.getDayCount());
+                    }
+                }, Timber::e));
     }
 
     public void getItems(int dayCount) {
@@ -72,25 +72,26 @@ public class MultidayPresenter {
         long startDayTime = DateUtils.getStartDate(mTimeZone, calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.MONTH), calendar.get(Calendar.YEAR));
 
 
-        mELDEventsInteractor.syncELDEvents(startDayTime, endDayTime);
+        mELDEventsInteractor.getELDEventsFromServer(startDayTime, endDayTime);
+
         if (mGetEventDisposable != null) {
             mGetEventDisposable.dispose();
         }
 
         mGetEventDisposable = mELDEventsInteractor.getActiveDutyEventsFromDB(startDayTime, endDayTime)
-                                                  .subscribeOn(Schedulers.io())
-                                                  .flatMap(eldEvents -> Flowable.fromCallable(() -> getMultidayItems(dayCount, startDayTime, eldEvents)))
-                                                  .observeOn(AndroidSchedulers.mainThread())
-                                                  .subscribe(items -> {
-                                                      mView.setItems(items);
+                .subscribeOn(Schedulers.io())
+                .flatMap(eldEvents -> Flowable.fromCallable(() -> getMultidayItems(dayCount, startDayTime, eldEvents)))
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(items -> {
+                    mView.setItems(items);
 
-                                                      long[] totalDurations = calculateTotalDuration(items);
+                    long[] totalDurations = calculateTotalDuration(items);
 
-                                                      mView.setTotalOnDuty(DateUtils.convertTotalTimeInMsToStringTime(totalDurations[DutyType.ON_DUTY.ordinal()]));
-                                                      mView.setTotalSleeping(DateUtils.convertTotalTimeInMsToStringTime(totalDurations[DutyType.SLEEPER_BERTH.ordinal()]));
-                                                      mView.setTotalDriving(DateUtils.convertTotalTimeInMsToStringTime(totalDurations[DutyType.DRIVING.ordinal()]));
-                                                      mView.setTotalOffDuty(DateUtils.convertTotalTimeInMsToStringTime(totalDurations[DutyType.OFF_DUTY.ordinal()]));
-                                                  }, Timber::e);
+                    mView.setTotalOnDuty(DateUtils.convertTotalTimeInMsToStringTime(totalDurations[DutyType.ON_DUTY.ordinal()]));
+                    mView.setTotalSleeping(DateUtils.convertTotalTimeInMsToStringTime(totalDurations[DutyType.SLEEPER_BERTH.ordinal()]));
+                    mView.setTotalDriving(DateUtils.convertTotalTimeInMsToStringTime(totalDurations[DutyType.DRIVING.ordinal()]));
+                    mView.setTotalOffDuty(DateUtils.convertTotalTimeInMsToStringTime(totalDurations[DutyType.OFF_DUTY.ordinal()]));
+                }, Timber::e);
     }
 
     private List<MultidayItemModel> getMultidayItems(int dayCount, long startTime, List<ELDEvent> dutyEvents) {
@@ -118,7 +119,7 @@ public class MultidayPresenter {
 
     private long[] calculateTotalDuration(List<MultidayItemModel> items) {
         long[] result = new long[4];
-        for (MultidayItemModel item: items) {
+        for (MultidayItemModel item : items) {
             result[DutyType.OFF_DUTY.ordinal()] += item.getTotalOffDutyTime();
             result[DutyType.SLEEPER_BERTH.ordinal()] += item.getTotalSleepingTime();
             result[DutyType.DRIVING.ordinal()] += item.getTotalDrivingTime();

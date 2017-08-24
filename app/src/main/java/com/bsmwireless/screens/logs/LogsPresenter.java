@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
@@ -111,8 +112,6 @@ public class LogsPresenter {
         //clean up
         mView.setEventLogs(Collections.EMPTY_LIST);
         mView.setTripInfo(new TripInfoModel());
-
-        mELDEventsInteractor.syncELDEvents(startDayTime - MS_IN_DAY, endDayTime);
 
         if (mGetEventsFromDBDisposable != null) mGetEventsFromDBDisposable.dispose();
         mGetEventsFromDBDisposable = Flowable.zip(mELDEventsInteractor.getLatestActiveDutyEventFromDB(startDayTime),
@@ -267,18 +266,11 @@ public class LogsPresenter {
         }})
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(isUpdated -> {
-                    if (isUpdated) {
-                        mView.eventAdded();
-                    } else {
-                        mView.showError(LogsView.Error.ERROR_ADD_EVENT);
-                    }
-                }, throwable -> {
-                    Timber.e(throwable.getMessage());
-                    if (throwable instanceof RetrofitException) {
-                        mView.showError((RetrofitException) throwable);
-                    }
-                });
+                .subscribe(result -> mView.eventAdded(),
+                        throwable -> {
+                            Timber.e(throwable.getMessage());
+                            mView.showError(LogsView.Error.ERROR_ADD_EVENT);
+                        });
         mDisposables.add(disposable);
     }
 
@@ -288,18 +280,12 @@ public class LogsPresenter {
         }})
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(isUpdated -> {
-                    if (isUpdated) {
-                        mView.eventUpdated();
-                    } else {
-                        mView.showError(LogsView.Error.ERROR_UPDATE_EVENT);
-                    }
-                }, throwable -> {
-                    Timber.e(throwable.getMessage());
-                    if (throwable instanceof RetrofitException) {
-                        mView.showError((RetrofitException) throwable);
-                    }
-                });
+                .subscribe(result -> mView.eventUpdated(),
+                        throwable -> {
+                            Timber.e(throwable.getMessage());
+                            mView.showError(LogsView.Error.ERROR_UPDATE_EVENT);
+
+                        });
         mDisposables.add(disposable);
     }
 
@@ -370,5 +356,13 @@ public class LogsPresenter {
             lastEvent.setDuration(endDayTime - lastEvent.getEventTime());
         }
         return logs;
+    }
+
+    public void onWeekChanged(CalendarItem startWeekDay) {
+        Calendar calendar = startWeekDay.getCalendar();
+        long startWeekTime = DateUtils.getStartDate(mTimeZone, calendar.get(Calendar.DAY_OF_MONTH),
+                calendar.get(Calendar.MONTH), calendar.get(Calendar.YEAR));
+        long endWeekTime = startWeekTime + MS_IN_DAY * 7;
+        mELDEventsInteractor.getELDEventsFromServer(startWeekTime, endWeekTime);
     }
 }

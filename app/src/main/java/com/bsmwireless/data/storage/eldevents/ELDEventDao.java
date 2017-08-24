@@ -16,8 +16,11 @@ public interface ELDEventDao {
     @Query("SELECT * FROM events")
     List<ELDEventEntity> getAll();
 
-    @Query("SELECT * FROM events WHERE is_sync = 0")
-    Flowable<List<ELDEventEntity>> getUnsyncEvents();
+    @Query("SELECT * FROM events WHERE sync = 1 ORDER BY event_time")
+    List<ELDEventEntity> getUpdateUnsyncEvents();
+
+    @Query("SELECT * FROM events WHERE sync = 2 ORDER BY event_time")
+    List<ELDEventEntity> getNewUnsyncEvents();
 
     @Query("SELECT * FROM events WHERE event_time > :startTime AND event_time < :endTime")
     List<ELDEventEntity> getEventsForInterval(long startTime, long endTime);
@@ -41,15 +44,15 @@ public interface ELDEventDao {
             "and driver_id = :driverId and event_type = 1 and status = 1 ORDER BY event_time")
     Flowable<List<ELDEventEntity>> getActiveDutyEventsAndFromStartToEndTime(long startTime, long endTime, int driverId);
 
-    @Query("DELETE FROM events WHERE mobile_time IN (:times) AND is_sync = 1")
-    int deleteDoubledEvents(List<Long> times);
-
     @Delete
     void delete(ELDEventEntity event);
+
+    @Delete
+    void deleteAll(ELDEventEntity... event);
 
     @Insert(onConflict = REPLACE)
     long insertEvent(ELDEventEntity event);
 
     @Insert(onConflict = REPLACE)
-    void insertAll(ELDEventEntity... events);
+    long[] insertAll(ELDEventEntity... events);
 }

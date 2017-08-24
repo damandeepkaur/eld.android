@@ -39,11 +39,16 @@ public class ELDEventConverter {
     }
 
     public static ELDEventEntity toEntity(ELDEvent event) {
+        return toEntity(event, ELDEventEntity.SyncType.SYNC);
+    }
+
+    public static ELDEventEntity toEntity(ELDEvent event, ELDEventEntity.SyncType syncType) {
         ELDEventEntity entity = null;
 
         if (event != null) {
             entity = new ELDEventEntity();
             entity.setId(event.getId());
+            entity.setSync(syncType.ordinal());
             entity.setEventType(event.getEventType());
             entity.setEventCode(event.getEventCode());
             entity.setStatus(event.getStatus());
@@ -87,5 +92,23 @@ public class ELDEventConverter {
             }
         }
         return entities;
+    }
+
+    public static List<ELDEventEntity> toEntityList(List<ELDEvent> models, ELDEventEntity.SyncType syncType) {
+        List<ELDEventEntity> entities = new ArrayList<>();
+        if (models != null && !models.isEmpty()) {
+            for (ELDEvent model : models) {
+                entities.add(toEntity(model, syncType));
+            }
+        }
+        return entities;
+    }
+
+    public static ELDEventEntity[] toEntityArray(List<ELDEvent> models, ELDEventEntity.SyncType syncType) {
+        return ELDEventConverter.toEntityList(models, syncType).toArray(new ELDEventEntity[models.size()]);
+    }
+
+    public static ELDEventEntity[] toEntityArray(List<ELDEvent> models) {
+        return ELDEventConverter.toEntityList(models).toArray(new ELDEventEntity[models.size()]);
     }
 }
