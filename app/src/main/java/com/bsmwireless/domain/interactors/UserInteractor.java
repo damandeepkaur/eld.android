@@ -1,5 +1,6 @@
 package com.bsmwireless.domain.interactors;
 
+import com.bsmwireless.common.utils.SchedulerUtils;
 import com.bsmwireless.common.utils.DateUtils;
 import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.network.authenticator.TokenManager;
@@ -132,7 +133,10 @@ public class UserInteractor {
                                 } else {
                                     mTokenManager.clearToken(mTokenManager.getToken(mPreferencesManager.getAccountName()));
                                 }
+                                // Cancel auto logout in any case if user is logged out
+                                SchedulerUtils.cancel();
                             })
+                            .doOnError(throwable -> SchedulerUtils.cancel())
                             .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
                 });
     }

@@ -32,7 +32,9 @@ public class AutoLogoutPresenter {
 
     public void rescheduleAutoLogout() {
         SchedulerUtils.cancel();
-        SchedulerUtils.schedule();
+        if (mUserInteractor.isLoginActive()) {
+            SchedulerUtils.schedule();
+        }
     }
 
     public void initAutoLogoutIfNoUserInteraction() {
