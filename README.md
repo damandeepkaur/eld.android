@@ -3,6 +3,7 @@ ELD app for Android
 
 # Version history
 
+* **1.0.45** - Update multiday screen
 * **1.0.44** - Update graph drawing and add ability create special events
 * **1.0.43** - Add dashboard indicators (_EA-280_)
 * **1.0.41** - Fix crash on incorrent events loading (_EA-313_)
