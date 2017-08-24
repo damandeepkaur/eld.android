@@ -81,7 +81,7 @@ public class MultidayPresenter {
                                             mELDEventsInteractor.getLatestActiveDutyEventFromDB(startDayTime),
                                             (activeDutyEvents, latestActiveDutyEvents) -> {
                                                 if (!latestActiveDutyEvents.isEmpty()) {
-                                                    activeDutyEvents.add(latestActiveDutyEvents.get(latestActiveDutyEvents.size() - 1));
+                                                    activeDutyEvents.add(0, latestActiveDutyEvents.get(latestActiveDutyEvents.size() - 1));
                                                 }
                                                 return activeDutyEvents;
                                             })

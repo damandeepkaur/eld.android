@@ -154,7 +154,9 @@ public class DutyManager {
 
             event = events.get(i);
 
-            if (event.getEventType() == ELDEvent.EventType.DUTY_STATUS_CHANGING.getValue() || event.getEventType() == ELDEvent.EventType.CHANGE_IN_DRIVER_INDICATION.getValue()) {
+            if ((event.getEventType() == ELDEvent.EventType.DUTY_STATUS_CHANGING.getValue()
+                    || event.getEventType() == ELDEvent.EventType.CHANGE_IN_DRIVER_INDICATION.getValue()) &&
+                    event.isActive()) {
                 duration = currentTime - Math.max(event.getEventTime(), startTime);
                 currentTime = event.getEventTime();
 
@@ -198,6 +200,7 @@ public class DutyManager {
         Long getEventTime();
         Integer getEventType();
         Integer getEventCode();
+        Boolean isActive();
     }
 
     public interface DutyTypeListener {

@@ -81,8 +81,8 @@ public class EventLogModel implements DutyManager.DutyCheckable {
         mOnIndicationCode = onIndicationCode;
     }
 
-    public boolean isActive() {
-        return mEvent.getStatus().equals(ELDEvent.StatusCode.ACTIVE.getValue());
+    public Boolean isActive() {
+        return mEvent.isActive();
     }
 
     public boolean isDutyEvent() {
