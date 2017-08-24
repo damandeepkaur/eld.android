@@ -77,20 +77,27 @@ public class MultidayPresenter {
             mGetEventDisposable.dispose();
         }
 
-        mGetEventDisposable = mELDEventsInteractor.getActiveDutyEventsFromDB(startDayTime, endDayTime)
-                                                  .subscribeOn(Schedulers.io())
-                                                  .flatMap(eldEvents -> Flowable.fromCallable(() -> getMultidayItems(dayCount, startDayTime, eldEvents)))
-                                                  .observeOn(AndroidSchedulers.mainThread())
-                                                  .subscribe(items -> {
-                                                      mView.setItems(items);
+        mGetEventDisposable = Flowable.zip(mELDEventsInteractor.getActiveDutyEventsFromDB(startDayTime, endDayTime),
+                                            mELDEventsInteractor.getLatestActiveDutyEventFromDB(startDayTime),
+                                            (activeDutyEvents, latestActiveDutyEvents) -> {
+                                                if (!latestActiveDutyEvents.isEmpty()) {
+                                                    activeDutyEvents.add(latestActiveDutyEvents.get(latestActiveDutyEvents.size() - 1));
+                                                }
+                                                return activeDutyEvents;
+                                            })
+                                      .subscribeOn(Schedulers.io())
+                                      .flatMap(eldEvents -> Flowable.fromCallable(() -> getMultidayItems(dayCount, startDayTime, eldEvents)))
+                                      .observeOn(AndroidSchedulers.mainThread())
+                                      .subscribe(items -> {
+                                          mView.setItems(items);
 
-                                                      long[] totalDurations = calculateTotalDuration(items);
+                                          long[] totalDurations = calculateTotalDuration(items);
 
-                                                      mView.setTotalOnDuty(DateUtils.convertTotalTimeInMsToStringTime(totalDurations[DutyType.ON_DUTY.ordinal()]));
-                                                      mView.setTotalSleeping(DateUtils.convertTotalTimeInMsToStringTime(totalDurations[DutyType.SLEEPER_BERTH.ordinal()]));
-                                                      mView.setTotalDriving(DateUtils.convertTotalTimeInMsToStringTime(totalDurations[DutyType.DRIVING.ordinal()]));
-                                                      mView.setTotalOffDuty(DateUtils.convertTotalTimeInMsToStringTime(totalDurations[DutyType.OFF_DUTY.ordinal()]));
-                                                  }, Timber::e);
+                                          mView.setTotalOnDuty(DateUtils.convertTotalTimeInMsToStringTime(totalDurations[DutyType.ON_DUTY.ordinal()]));
+                                          mView.setTotalSleeping(DateUtils.convertTotalTimeInMsToStringTime(totalDurations[DutyType.SLEEPER_BERTH.ordinal()]));
+                                          mView.setTotalDriving(DateUtils.convertTotalTimeInMsToStringTime(totalDurations[DutyType.DRIVING.ordinal()]));
+                                          mView.setTotalOffDuty(DateUtils.convertTotalTimeInMsToStringTime(totalDurations[DutyType.OFF_DUTY.ordinal()]));
+                                      }, Timber::e);
     }
 
     private List<MultidayItemModel> getMultidayItems(int dayCount, long startTime, List<ELDEvent> dutyEvents) {
@@ -98,8 +105,22 @@ public class MultidayPresenter {
         for (int i = dayCount - 1; i >= 0; i--) {
             long startDay = startTime + i * MS_IN_DAY;
             long endDay = startDay + MS_IN_DAY;
+            endDay = endDay < System.currentTimeMillis() ? endDay : System.currentTimeMillis();
 
             List<ELDEvent> dayEvents = DutyUtils.filterEventsByTime(dutyEvents, startDay, endDay);
+
+            if (!dayEvents.isEmpty()) {
+                int indexOfEvent = dutyEvents.indexOf(dayEvents.get(0));
+                if (indexOfEvent > 0) {
+                    ELDEvent prevEvent = dutyEvents.get(indexOfEvent - 1);
+                    dayEvents.add(0, prevEvent);
+                }
+            } else {
+                ELDEvent prevEvent = DutyUtils.getNearestEvent(dutyEvents, startDay);
+                if (prevEvent != null) {
+                    dayEvents.add(0, prevEvent);
+                }
+            }
 
             MultidayItemModel item = new MultidayItemModel(startDay);
 
