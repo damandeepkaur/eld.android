@@ -118,8 +118,8 @@ public class LogsPresenter {
         mGetEventsFromDBDisposable = Flowable.zip(mELDEventsInteractor.getLatestActiveDutyEventFromDB(startDayTime),
                 mELDEventsInteractor.getDutyEventsFromDB(startDayTime, endDayTime),
                 (prevDayLatestEvent, selectedDayEvents) -> {
-                    prevDayLatestEvent.setEventTime(startDayTime);
-                    selectedDayEvents.add(0, prevDayLatestEvent);
+                    prevDayLatestEvent.get(prevDayLatestEvent.size() - 1).setEventTime(startDayTime);
+                    selectedDayEvents.add(0, prevDayLatestEvent.get(prevDayLatestEvent.size() - 1));
                     return selectedDayEvents;
                 }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -261,10 +261,8 @@ public class LogsPresenter {
         mView.goToEditTripInfoScreen();
     }
 
-    public void onEventAdded(ELDEvent newEvent) {
-        Disposable disposable = mELDEventsInteractor.postNewELDEvents(new ArrayList<ELDEvent>() {{
-            add(newEvent);
-        }})
+    public void onEventAdded(List<ELDEvent> newEvents) {
+        Disposable disposable = mELDEventsInteractor.postNewELDEvents(newEvents)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(isUpdated -> {
@@ -282,10 +280,8 @@ public class LogsPresenter {
         mDisposables.add(disposable);
     }
 
-    public void onEventChanged(ELDEvent updatedEvent) {
-        Disposable disposable = mELDEventsInteractor.updateELDEvents(new ArrayList<ELDEvent>() {{
-            add(updatedEvent);
-        }})
+    public void onEventChanged(List<ELDEvent> updatedEvents) {
+        Disposable disposable = mELDEventsInteractor.updateELDEvents(updatedEvents)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(isUpdated -> {
