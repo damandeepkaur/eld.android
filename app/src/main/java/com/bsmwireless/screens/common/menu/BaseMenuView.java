@@ -9,4 +9,5 @@ public interface BaseMenuView {
     void setDutyType(DutyType type);
     void setOccupancyType(OccupancyType type);
     void showDutyDialog();
+    void changeDutyType(DutyType dutyType);
 }

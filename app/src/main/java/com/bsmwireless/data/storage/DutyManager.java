@@ -20,6 +20,7 @@ import static com.bsmwireless.widgets.alerts.DutyType.YARD_MOVES;
 
 public class DutyManager {
     public static final DutyType[] DRIVER_DUTY_EXTENDED = {OFF_DUTY, SLEEPER_BERTH, DRIVING, ON_DUTY, PERSONAL_USE, YARD_MOVES};
+    public static final DutyType[] DRIVER_DUTY_EXTENDED_WITH_CLEAR = {ON_DUTY, OFF_DUTY, SLEEPER_BERTH, DRIVING, YARD_MOVES, PERSONAL_USE, CLEAR};
     public static final DutyType[] DRIVING_DUTY = {OFF_DUTY, SLEEPER_BERTH, DRIVING, ON_DUTY};
 
     public static final DutyType[] CO_DRIVER_DUTY_EXTENDED = {OFF_DUTY, SLEEPER_BERTH, ON_DUTY, PERSONAL_USE, YARD_MOVES};
@@ -109,6 +110,10 @@ public class DutyManager {
             case SLEEPER_BERTH:
                 time = mPreferencesManager.getSleeperBerthTime();
                 break;
+
+            default:
+                //TODO: return cycle time
+                break;
         }
 
         if (mDutyType == dutyType) {
@@ -157,10 +162,11 @@ public class DutyManager {
                 duration = currentTime - Math.max(event.getEventTime(), startTime);
                 currentTime = event.getEventTime();
 
-                //for clear events keep the previous status
-                if (event.getEventCode() != CLEAR.getCode()) {
-                    currentDutyType = DutyType.getTypeByCode(event.getEventType(), event.getEventCode());
+                //for clear events keep the next status
+                if (event.getEventCode() == CLEAR.getCode() && i > 0) {
+                    event = events.get(i - 1);
                 }
+                currentDutyType = DutyType.getTypeByCode(event.getEventType(), event.getEventCode());
 
             } else {
                 continue;
@@ -186,7 +192,7 @@ public class DutyManager {
             }
         }
 
-        return new long[] {offDutyTime, sleeperBerthTime, drivingTime, onDutyTime};
+        return new long[] {onDutyTime, offDutyTime, sleeperBerthTime, drivingTime};
     }
 
     private void notifyListeners() {
