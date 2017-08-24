@@ -16,16 +16,4 @@ public class DutyUtils {
         }
         return result;
     }
-
-    public static ELDEvent getNearestEvent(List<ELDEvent> events, long startTime) {
-        ELDEvent result = null;
-        long delta = Long.MAX_VALUE;
-        for (ELDEvent event : events) {
-            long eventTime = event.getEventTime();
-            if (startTime >= eventTime && delta > eventTime - startTime) {
-                result = event;
-            }
-        }
-        return result;
-    }
 }
