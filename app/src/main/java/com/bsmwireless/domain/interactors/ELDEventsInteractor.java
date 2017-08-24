@@ -60,9 +60,9 @@ public class ELDEventsInteractor {
                 .map(ELDEventConverter::toModelList);
     }
 
-    public Flowable<ELDEvent> getLatestActiveDutyEventFromDB(long latestTime) {
+    public Flowable<List<ELDEvent>> getLatestActiveDutyEventFromDB(long latestTime) {
         return mELDEventDao.getLatestActiveDutyEvent(latestTime, mPreferencesManager.getDriverId())
-                .map(ELDEventConverter::toModel);
+                .map(ELDEventConverter::toModelList);
     }
 
     public Flowable<List<ELDEvent>> getActiveDutyEventsFromDB(long startTime, long endTime) {
