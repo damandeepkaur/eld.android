@@ -138,7 +138,6 @@ public class ELDEventsInteractor {
         ELDEventEntity[] entities = ELDEventConverter.toEntityList(events).toArray(new ELDEventEntity[events.size()]);
         for (ELDEventEntity entity : entities) {
             entity.setSync(isSynced);
-            Timber.e(DutyType.getTypeByCode(entity.getEventType(), entity.getEventCode()).name());
         }
         mELDEventDao.insertAll(entities);
     }

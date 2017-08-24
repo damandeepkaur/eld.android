@@ -77,6 +77,7 @@ public class EditEventActivity extends BaseMenuActivity implements EditEventView
     @Override
     protected void onDestroy() {
         mPresenter.onDestroy();
+        mSnackBarLayout.reset();
         super.onDestroy();
     }
 

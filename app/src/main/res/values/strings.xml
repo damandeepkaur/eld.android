@@ -436,6 +436,9 @@
     <string name="edit_event_save">Save</string>
     <string name="edit_event_error_invalid_time">Invalid time</string>
     <string name="edit_event_server_error">Server error</string>
+    <string name="edit_event_comment_length_error">Comment should be at least 4 symbols</string>
+    <string name="edit_event_comment_error">Comment should not include special characters</string>
+    <string name="edit_event_valid_comment">Valid comment</string>
 
     <!-- Logs -->
     <string name="odometer">Odometer(%1$s)</string>
