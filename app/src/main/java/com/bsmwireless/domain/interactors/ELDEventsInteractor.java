@@ -60,9 +60,9 @@ public class ELDEventsInteractor {
                 .map(ELDEventConverter::toModelList);
     }
 
-    public Flowable<ELDEvent> getLatestActiveDutyEventFromDB(long latestTime) {
+    public Flowable<List<ELDEvent>> getLatestActiveDutyEventFromDB(long latestTime) {
         return mELDEventDao.getLatestActiveDutyEvent(latestTime, mPreferencesManager.getDriverId())
-                .map(ELDEventConverter::toModel);
+                .map(ELDEventConverter::toModelList);
     }
 
     public Flowable<List<ELDEvent>> getActiveDutyEventsFromDB(long startTime, long endTime) {
@@ -160,15 +160,30 @@ public class ELDEventsInteractor {
     public ArrayList<ELDEvent> getEvents(DutyType dutyType, BlackBoxModel blackBoxModel) {
         ArrayList<ELDEvent> events = new ArrayList<>();
 
-        //clear PU or YM status
-        if (mDutyManager.getDutyType() == DutyType.PERSONAL_USE || mDutyManager.getDutyType() == DutyType.YARD_MOVES) {
+        DutyType current = mDutyManager.getDutyType();
+
+        //clear PU status
+        if (current == DutyType.PERSONAL_USE) {
             events.add(getEvent(DutyType.CLEAR, ELDEvent.EventType.CHANGE_IN_DRIVER_INDICATION, blackBoxModel));
+
+            if (dutyType == DutyType.OFF_DUTY) {
+                return events;
+            }
+        }
+
+        //clear YM status
+        if (current == DutyType.YARD_MOVES) {
+            events.add(getEvent(DutyType.CLEAR, ELDEvent.EventType.CHANGE_IN_DRIVER_INDICATION, blackBoxModel));
+
+            if (dutyType == DutyType.ON_DUTY) {
+                return events;
+            }
         }
 
         switch (dutyType) {
             case PERSONAL_USE:
                 //switch to off-duty if needed
-                if (mDutyManager.getDutyType() != DutyType.OFF_DUTY) {
+                if (current != DutyType.OFF_DUTY) {
                     events.add(getEvent(DutyType.OFF_DUTY, ELDEvent.EventType.DUTY_STATUS_CHANGING, blackBoxModel));
                 }
                 events.add(getEvent(DutyType.PERSONAL_USE, ELDEvent.EventType.CHANGE_IN_DRIVER_INDICATION, blackBoxModel));
@@ -176,7 +191,7 @@ public class ELDEventsInteractor {
 
             case YARD_MOVES:
                 //switch to on-duty if needed
-                if (mDutyManager.getDutyType() != DutyType.ON_DUTY) {
+                if (current != DutyType.ON_DUTY) {
                     events.add(getEvent(DutyType.ON_DUTY, ELDEvent.EventType.DUTY_STATUS_CHANGING, blackBoxModel));
                 }
                 events.add(getEvent(DutyType.YARD_MOVES, ELDEvent.EventType.CHANGE_IN_DRIVER_INDICATION, blackBoxModel));

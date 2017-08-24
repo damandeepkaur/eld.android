@@ -15,6 +15,7 @@ import app.bsmuniversal.com.base.BaseTestClass;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.intent.Intents.intended;
+import static android.support.test.espresso.intent.Intents.times;
 import static android.support.test.espresso.intent.matcher.IntentMatchers.hasComponent;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 
@@ -22,7 +23,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.withId;
 /**
  * Automation test class to verify Login implementation
  */
-public class LoginActivityTest extends BaseTestClass {
+public class LoginTest extends BaseTestClass {
 
     @Rule
     public ActivityTestRule<LoginActivity> mLoginActivityTestRule = new IntentsTestRule<>(LoginActivity.class);
@@ -31,6 +32,17 @@ public class LoginActivityTest extends BaseTestClass {
     public void test_firstLoginSuccessful() throws InterruptedException {
         fillLoginDataAndDoLogin("mera2", "pass789", "mera", false);
         intended(hasComponent(SelectAssetActivity.class.getName()));
+        onView(withId(R.id.select_asset_not_in_vehicle_button)).perform(click());
+        doLogout();
+    }
+
+    @Test
+    public void test_secondLoginSuccessful() throws InterruptedException {
+        fillLoginDataAndDoLogin("mera2", "pass789", "mera", false);
+        onView(withId(R.id.select_asset_not_in_vehicle_button)).perform(click());
+        doLogout();
+        fillLoginDataAndDoLogin("mera2", "pass789", "mera", true);
+        intended(hasComponent(SelectAssetActivity.class.getName()), times(2));
         onView(withId(R.id.select_asset_not_in_vehicle_button)).perform(click());
         doLogout();
     }

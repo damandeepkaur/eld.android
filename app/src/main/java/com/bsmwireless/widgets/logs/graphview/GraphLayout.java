@@ -49,9 +49,7 @@ public class GraphLayout extends LinearLayout {
 
     public void setELDEvents(List<EventLogModel> logs) {
         if (mELDGraphView != null) {
-            List<EventLogModel> filteredLogs = DutyUtils.filterEventModelsByTypeAndStatus(logs,
-                    ELDEvent.EventType.DUTY_STATUS_CHANGING, ELDEvent.StatusCode.ACTIVE);
-            mELDGraphView.setLogs(filteredLogs);
+            mELDGraphView.setLogs(logs);
         }
     }
 
