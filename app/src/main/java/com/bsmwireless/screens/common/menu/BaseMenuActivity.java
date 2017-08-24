@@ -102,8 +102,12 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
         ArrayAdapter<DutyType> arrayAdapter = new BaseMenuAdapter(this, types);
 
         mDutyDialog = new AlertDialog.Builder(this)
-                .setAdapter(arrayAdapter, (dialog, which) -> getPresenter().onDutyChanged(types[which]))
+                .setAdapter(arrayAdapter, (dialog, which) -> changeDutyType(types[which]))
                 .setCancelable(true)
                 .create();
+    }
+
+    public void changeDutyType(DutyType dutyType) {
+        getPresenter().onDutyChanged(dutyType);
     }
 }

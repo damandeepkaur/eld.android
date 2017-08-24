@@ -496,6 +496,14 @@
     <string name="duty_seconds">SECONDS</string>
     <string name="duty_tap_to_change_status">Tap to change status</string>
 
+    <string name="duty_driving_time">Driving time</string>
+    <string name="duty_sleeper_berth_time">Time to break</string>
+    <string name="duty_on_duty_time">Workday time</string>
+    <string name="duty_cycle_time">Cycle time</string>
+
+    <string name="duty_indicator">Change to \n %s</string>
+    <string name="duty_indicator_title">You are currently working in %s mode</string>
+
     <!-- Multiday fragment -->
     <string-array name="multiday_selector">
         <item>7 days</item>
