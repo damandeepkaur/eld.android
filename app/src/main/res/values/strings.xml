@@ -513,6 +513,7 @@
     <!-- Multiday fragment -->
     <string-array name="multiday_selector">
         <item>7 days</item>
+        <item>8 days</item>
         <item>14 days</item>
     </string-array>
     <string name="multiday_total_hours">Total hours</string>
