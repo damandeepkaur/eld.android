@@ -81,13 +81,14 @@ public class EventLogModel implements DutyManager.DutyCheckable {
         mOnIndicationCode = onIndicationCode;
     }
 
-    public boolean isActive() {
-        return mEvent.getStatus().equals(ELDEvent.StatusCode.ACTIVE.getValue());
+    @Override
+    public Boolean isActive() {
+        return mEvent.isActive();
     }
 
-    public boolean isDutyEvent() {
-        return mEvent.getEventType().equals(ELDEvent.EventType.DUTY_STATUS_CHANGING.getValue()) ||
-                mEvent.getEventType().equals(ELDEvent.EventType.CHANGE_IN_DRIVER_INDICATION.getValue());
+    @Override
+    public Boolean isDutyEvent() {
+        return mEvent.isDutyEvent();
     }
 
     @Override
