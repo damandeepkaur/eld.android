@@ -30,6 +30,11 @@ public class AutoLogoutPresenter {
         Timber.d("CREATED");
     }
 
+    public void onViewCreated() {
+        mView.initAutoLogoutDialog();
+        mView.showAutoLogoutDialog();
+    }
+
     public void rescheduleAutoLogout() {
         SchedulerUtils.cancel();
         if (mUserInteractor.isLoginActive()) {

@@ -42,7 +42,7 @@ public class AutoLogoutActivity extends BaseActivity implements AutoLogoutView {
 
         DaggerAutoLogoutComponent.builder().appComponent(App.getComponent()).autoLogoutModule(new AutoLogoutModule(this)).build().inject(this);
 
-        this.showAutoLogoutDialog();
+        mAutoLogoutPresenter.onViewCreated();
     }
 
     @Override
@@ -73,31 +73,30 @@ public class AutoLogoutActivity extends BaseActivity implements AutoLogoutView {
     }
 
     @Override
-    public void showAutoLogoutDialog() {
+    public void initAutoLogoutDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.auto_logout_title_alert_dialog);
         builder.setMessage(R.string.auto_logout_message_alert_dialog);
         builder.setCancelable(false);
         builder.setPositiveButton(R.string.auto_logout_continue_button_lbl_alert_dialog, (dialog, which) -> {
-            mAlertDialog.dismiss();
             mIsDialogShown = false;
             mAutoLogoutPresenter.rescheduleAutoLogout();
             finish();
         });
         builder.setNegativeButton(R.string.auto_logout_log_out_button_lbl_alert_dialog, (dialog, which) -> {
-            mAlertDialog.dismiss();
             mIsDialogShown = false;
             mAutoLogoutPresenter.initAutoLogout();
         });
 
         mAlertDialog = builder.create();
-        mAlertDialog.show();
-        mIsDialogShown = true;
+    }
 
-        Button negativeButton = mAlertDialog.getButton(DialogInterface.BUTTON_NEGATIVE);
-        negativeButton.setTextColor(getResources().getColor(R.color.coral));
-        Button positiveButton = mAlertDialog.getButton(DialogInterface.BUTTON_POSITIVE);
-        positiveButton.setTextColor(getResources().getColor(R.color.nasty_green));
+    @Override
+    public void showAutoLogoutDialog() {
+        if (mAlertDialog != null) {
+            mAlertDialog.show();
+            mIsDialogShown = true;
+        }
 
         mAutoLogoutPresenter.initAutoLogoutIfNoUserInteraction();
     }

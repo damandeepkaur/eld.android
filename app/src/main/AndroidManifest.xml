@@ -68,7 +68,7 @@
             android:windowSoftInputMode="stateAlwaysHidden"/>
 
         <activity android:name="com.bsmwireless.screens.autologout.AutoLogoutActivity"
-            android:theme="@style/custom_dialog"/>
+            android:theme="@style/AlertDialogTheme"/>
 
         <activity
             android:name="com.bsmwireless.screens.editevent.EditEventActivity"
