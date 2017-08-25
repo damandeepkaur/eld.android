@@ -86,4 +86,11 @@ public class LoginTest extends BaseTestClass {
                 mLoginActivityTestRule.getActivity().getString(R.string.error_domain));
     }
 
+    @Test
+    public void test_emptyFields() throws InterruptedException {
+        fillLoginDataAndDoLogin("", "", "", false);
+        checkIfSnackBarWithMessageIsDisplayed(R.id.login_snackbar,
+                mLoginActivityTestRule.getActivity().getString(R.string.error_username));
+    }
+
 }
