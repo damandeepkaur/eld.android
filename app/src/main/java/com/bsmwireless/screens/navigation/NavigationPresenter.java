@@ -108,7 +108,7 @@ public class NavigationPresenter extends BaseMenuPresenter {
         for (int i = events.size() - 1; i >= 0; i--) {
             event = events.get(i);
 
-            //TODO: remove is when request is updated
+            //TODO: remove if when request is updated
             if (event.getEventType() == ELDEvent.EventType.DUTY_STATUS_CHANGING.getValue() || event.getEventType() == ELDEvent.EventType.CHANGE_IN_DRIVER_INDICATION.getValue()) {
                 eventDutyType = DutyType.getTypeByCode(event.getEventType(), event.getEventCode());
 

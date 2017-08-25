@@ -23,15 +23,17 @@ public abstract class BaseMenuPresenter {
     }
 
     void onDutyChanged(DutyType dutyType) {
-        mDisposables.add(mEventsInteractor.postNewDutyTypeEvent(dutyType)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .subscribe(
-                        responseMessage -> {},
-                        error -> Timber.e(error.getMessage())
-                )
-        );
-
+        // don't set the same type
+        if (dutyType != mDutyManager.getDutyType()) {
+            mDisposables.add(mEventsInteractor.postNewDutyTypeEvent(dutyType)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(Schedulers.io())
+                    .subscribe(
+                            responseMessage -> {},
+                            error -> Timber.e(error.getMessage())
+                    )
+            );
+        }
     }
 
     public void onDestroy() {
