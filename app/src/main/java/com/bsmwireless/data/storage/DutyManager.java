@@ -3,7 +3,6 @@ package com.bsmwireless.data.storage;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 
-import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.widgets.alerts.DutyType;
 
 import java.util.ArrayList;
@@ -158,7 +157,7 @@ public class DutyManager {
 
             event = events.get(i);
 
-            if (event.getEventType() == ELDEvent.EventType.DUTY_STATUS_CHANGING.getValue() || event.getEventType() == ELDEvent.EventType.CHANGE_IN_DRIVER_INDICATION.getValue()) {
+            if (event.isDutyEvent() && event.isActive()) {
                 duration = currentTime - Math.max(event.getEventTime(), startTime);
                 currentTime = event.getEventTime();
 
@@ -167,7 +166,6 @@ public class DutyManager {
                     event = events.get(i - 1);
                 }
                 currentDutyType = DutyType.getTypeByCode(event.getEventType(), event.getEventCode());
-
             } else {
                 continue;
             }
@@ -203,6 +201,8 @@ public class DutyManager {
         Long getEventTime();
         Integer getEventType();
         Integer getEventCode();
+        Boolean isActive();
+        Boolean isDutyEvent();
     }
 
     public interface DutyTypeListener {
