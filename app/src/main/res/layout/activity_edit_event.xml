@@ -101,6 +101,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/edit_event_comment"
+                    android:maxLength="@integer/max_comment_length"
                     style="@style/DriverProfileTheme.EditView"
                     android:imeOptions="actionDone"/>
 
