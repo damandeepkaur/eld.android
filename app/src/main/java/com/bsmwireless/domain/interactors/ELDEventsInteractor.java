@@ -20,6 +20,7 @@ import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+import timber.log.Timber;
 
 public class ELDEventsInteractor {
 
@@ -48,9 +49,12 @@ public class ELDEventsInteractor {
         mServiceApi.getELDEvents(startTime, endTime)
                 .subscribeOn(Schedulers.io())
                 .subscribe(eldEvents -> {
-                    ELDEventEntity[] entities = ELDEventConverter.toEntityArray(eldEvents);
-                    mELDEventDao.insertAll(entities);
-                });
+                            ELDEventEntity[] entities = ELDEventConverter.toEntityArray(eldEvents);
+                            mELDEventDao.insertAll(entities);
+                        },
+                        error -> {
+                            Timber.e(error);
+                        });
     }
 
     public Flowable<List<ELDEvent>> getELDEvents(long startTime, long endTime) {

@@ -105,10 +105,12 @@ public class ELDEventConverter {
     }
 
     public static ELDEventEntity[] toEntityArray(List<ELDEvent> models, ELDEventEntity.SyncType syncType) {
-        return ELDEventConverter.toEntityList(models, syncType).toArray(new ELDEventEntity[models.size()]);
+        List<ELDEventEntity> entities = ELDEventConverter.toEntityList(models, syncType);
+        return entities.toArray(new ELDEventEntity[entities.size()]);
     }
 
     public static ELDEventEntity[] toEntityArray(List<ELDEvent> models) {
-        return ELDEventConverter.toEntityList(models).toArray(new ELDEventEntity[models.size()]);
+        List<ELDEventEntity> entities = ELDEventConverter.toEntityList(models);
+        return entities.toArray(new ELDEventEntity[entities.size()]);
     }
 }

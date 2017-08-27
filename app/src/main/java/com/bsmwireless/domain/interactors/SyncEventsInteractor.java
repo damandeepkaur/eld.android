@@ -31,7 +31,7 @@ public class SyncEventsInteractor {
     private ServiceApi mServiceApi;
     private PreferencesManager mPreferencesManager;
     private ELDEventDao mELDEventDao;
-    private boolean mIsSyncActive;
+    private volatile boolean mIsSyncActive;
     private ResponseMessage mErrorResponse;
 
 
@@ -126,8 +126,7 @@ public class SyncEventsInteractor {
             list.add(events);
         } else {
             for (int i = 0; i < events.size(); i += MAX_EVENTS_IN_REQUEST) {
-                int toIndex = (i + MAX_EVENTS_IN_REQUEST) < events.size() - 1 ? (i + MAX_EVENTS_IN_REQUEST) : events.size() - 1;
-                list.add(events.subList(i, toIndex));
+                list.add(events.subList(i, Math.min(i + MAX_EVENTS_IN_REQUEST, events.size() - 1)));
             }
         }
         return list;
