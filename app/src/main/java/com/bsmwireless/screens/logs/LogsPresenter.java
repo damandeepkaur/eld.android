@@ -19,13 +19,11 @@ import com.bsmwireless.widgets.logs.calendar.CalendarItem;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
-import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
@@ -56,6 +54,7 @@ public class LogsPresenter {
     private List<LogSheetHeader> mLogSheetHeaders;
     private Disposable mGetEventsFromDBDisposable;
     private DutyManager.DutyTypeListener mListener = dutyType -> mView.dutyUpdated();
+    private Calendar mSelectedDayCalendar;
 
     @Inject
     public LogsPresenter(LogsView view, ELDEventsInteractor eventsInteractor, LogSheetInteractor logSheetInteractor,
@@ -90,8 +89,10 @@ public class LogsPresenter {
                                 logSheetHeaders -> {
                                     mLogSheetHeaders = logSheetHeaders;
                                     mView.setLogSheetHeaders(logSheetHeaders);
-                                    Calendar currentDayCalendar = Calendar.getInstance(TimeZone.getTimeZone(mTimeZone));
-                                    setEventsForDay(currentDayCalendar);
+                                    if (mSelectedDayCalendar == null) {
+                                        mSelectedDayCalendar = Calendar.getInstance(TimeZone.getTimeZone(mTimeZone));
+                                    }
+                                    setEventsForDay(mSelectedDayCalendar);
                                 }, error -> Timber.e("LoginUser error: %s", error)));
     }
 
@@ -105,20 +106,22 @@ public class LogsPresenter {
             return;
         }
 
+        mSelectedDayCalendar = calendar;
+
         long startDayTime = DateUtils.getStartDate(mTimeZone, calendar.get(Calendar.DAY_OF_MONTH),
                 calendar.get(Calendar.MONTH), calendar.get(Calendar.YEAR));
         long endDayTime = startDayTime + MS_IN_DAY;
 
-        //clean up
-        mView.setEventLogs(Collections.EMPTY_LIST);
-        mView.setTripInfo(new TripInfoModel());
+        mELDEventsInteractor.syncELDEventsWithServer(startDayTime - MS_IN_DAY, endDayTime);
 
         if (mGetEventsFromDBDisposable != null) mGetEventsFromDBDisposable.dispose();
         mGetEventsFromDBDisposable = Flowable.zip(mELDEventsInteractor.getLatestActiveDutyEventFromDB(startDayTime),
                 mELDEventsInteractor.getDutyEventsFromDB(startDayTime, endDayTime),
                 (prevDayLatestEvent, selectedDayEvents) -> {
-                    prevDayLatestEvent.get(prevDayLatestEvent.size() - 1).setEventTime(startDayTime);
-                    selectedDayEvents.add(0, prevDayLatestEvent.get(prevDayLatestEvent.size() - 1));
+                    if (!prevDayLatestEvent.isEmpty()) {
+                        prevDayLatestEvent.get(prevDayLatestEvent.size() - 1).setEventTime(startDayTime);
+                        selectedDayEvents.add(0, prevDayLatestEvent.get(prevDayLatestEvent.size() - 1));
+                    }
                     return selectedDayEvents;
                 }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -234,7 +237,10 @@ public class LogsPresenter {
                 .flatMap(isCreated -> mLogSheetInteractor.updateLogSheetHeader(logSheetHeader))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                        response -> mView.setLogSheetHeaders(mLogSheetHeaders),
+                        response -> {
+                            mLogSheetHeaders.add(logSheetHeader);
+                            mView.setLogSheetHeaders(mLogSheetHeaders);
+                        },
                         throwable -> {
                             Timber.e(throwable.getMessage());
                             logSheetHeader.setSigned(false);
@@ -359,6 +365,6 @@ public class LogsPresenter {
         long startWeekTime = DateUtils.getStartDate(mTimeZone, calendar.get(Calendar.DAY_OF_MONTH),
                 calendar.get(Calendar.MONTH), calendar.get(Calendar.YEAR));
         long endWeekTime = startWeekTime + MS_IN_DAY * 7;
-        mELDEventsInteractor.getELDEventsFromServer(startWeekTime, endWeekTime);
+        mELDEventsInteractor.syncELDEventsWithServer(startWeekTime, endWeekTime);
     }
 }

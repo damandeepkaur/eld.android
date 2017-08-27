@@ -71,7 +71,7 @@ public class MultidayPresenter {
         long startDayTime = DateUtils.getStartDate(mTimeZone, calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.MONTH), calendar.get(Calendar.YEAR));
 
 
-        mELDEventsInteractor.getELDEventsFromServer(startDayTime, endDayTime);
+        mELDEventsInteractor.syncELDEventsWithServer(startDayTime, endDayTime);
 
         if (mGetEventDisposable != null) {
             mGetEventDisposable.dispose();

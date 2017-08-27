@@ -45,12 +45,17 @@ public class ELDEventsInteractor {
         mPreferencesManager = preferencesManager;
     }
 
-    public void getELDEventsFromServer(Long startTime, Long endTime) {
+    public void syncELDEventsWithServer(Long startTime, Long endTime) {
         mServiceApi.getELDEvents(startTime, endTime)
                 .subscribeOn(Schedulers.io())
-                .subscribe(eldEvents -> {
-                            ELDEventEntity[] entities = ELDEventConverter.toEntityArray(eldEvents);
-                            mELDEventDao.insertAll(entities);
+                .subscribe(eldEventsFromServer -> {
+                            List<ELDEventEntity> entities = mELDEventDao.getEventsFromStartToEndTimeSync(
+                                    startTime, endTime, mPreferencesManager.getDriverId());
+                            List<ELDEvent> eventsFromDB = ELDEventConverter.toModelList(entities);
+                            if (!eldEventsFromServer.equals(eventsFromDB)) {
+                                ELDEventEntity[] entitiesArray = ELDEventConverter.toEntityArray(eldEventsFromServer);
+                                mELDEventDao.insertAll(entitiesArray);
+                            }
                         },
                         error -> {
                             Timber.e(error);
@@ -62,29 +67,23 @@ public class ELDEventsInteractor {
     }
 
     public Flowable<List<ELDEvent>> getDutyEventsFromDB(long startTime, long endTime) {
-        int driverId = mPreferencesManager.getDriverId();
-        return mELDEventDao.getDutyEventsFromStartToEndTime(startTime, endTime, driverId)
+        return mELDEventDao.getDutyEventsFromStartToEndTime(startTime, endTime, mPreferencesManager.getDriverId())
                 .map(ELDEventConverter::toModelList);
     }
 
     public Flowable<List<ELDEvent>> getLatestActiveDutyEventFromDB(long latestTime) {
-        return mELDEventDao.getLatestActiveDutyEvent(latestTime, mPreferencesManager.getDriverId())
-                .map(ELDEventConverter::toModelList);
+        return Flowable.fromCallable(() -> ELDEventConverter.toModelList(mELDEventDao.getLatestActiveDutyEventSync(latestTime,
+                mPreferencesManager.getDriverId())));
     }
 
     public List<ELDEvent> getLatestActiveDutyEventFromDBSync(long latestTime) {
-        return ELDEventConverter.toModelList(mELDEventDao.getLatestActiveDutyEventSync(latestTime, mPreferencesManager.getDriverId()));
+        return ELDEventConverter.toModelList(mELDEventDao.getLatestActiveDutyEventSync(latestTime,
+                mPreferencesManager.getDriverId()));
     }
-    
+
     public List<ELDEvent> getActiveEventsFromDBSync(long startTime, long endTime) {
         int driverId = mPreferencesManager.getDriverId();
         return ELDEventConverter.toModelList(mELDEventDao.getActiveEventsFromStartToEndTimeSync(startTime, endTime, driverId));
-    }
-
-    public Flowable<List<ELDEvent>> getActiveDutyEventsFromDB(long startTime, long endTime) {
-        int driverId = mPreferencesManager.getDriverId();
-        return mELDEventDao.getActiveDutyEventsAndFromStartToEndTime(startTime, endTime, driverId)
-                .map(ELDEventConverter::toModelList);
     }
 
     public Observable<long[]> updateELDEvents(List<ELDEvent> events) {
@@ -110,7 +109,7 @@ public class ELDEventsInteractor {
     public Observable<long[]> postNewDutyTypeEvent(DutyType dutyType) {
         return mBlackBoxInteractor.getData()
                 .flatMap(blackBoxModel -> postNewELDEvents(getEvents(dutyType, blackBoxModel)))
-                .doOnNext(isSuccess -> mDutyManager.setDutyType(dutyType, true));
+                .doOnNext(result -> mDutyManager.setDutyType(dutyType, true));
     }
 
     public ArrayList<ELDEvent> getEvents(DutyType dutyType, BlackBoxModel blackBoxModel) {
