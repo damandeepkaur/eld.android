@@ -5,6 +5,7 @@ import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.data.storage.hometerminals.HomeTerminalConverter;
 import com.bsmwireless.data.storage.hometerminals.HomeTerminalEntity;
+import com.bsmwireless.data.storage.logsheets.LogSheetConverter;
 import com.bsmwireless.models.HomeTerminal;
 import com.bsmwireless.models.LogSheetHeader;
 
@@ -32,7 +33,9 @@ public class LogSheetInteractor {
     }
 
     public Flowable<List<LogSheetHeader>> getLogSheetHeaders(Long startLogDay, Long endLogDay) {
-        return mServiceApi.getLogSheets(startLogDay, endLogDay).toFlowable(BackpressureStrategy.LATEST);
+        return mServiceApi.getLogSheets(startLogDay, endLogDay)
+                .doOnNext(logSheetHeaders -> mAppDatabase.logSheetDao().insert(LogSheetConverter.toEntityList(logSheetHeaders)))
+                .toFlowable(BackpressureStrategy.LATEST);
     }
 
     public Observable<Boolean> updateLogSheetHeader(LogSheetHeader logSheetHeader) {
