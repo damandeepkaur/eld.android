@@ -434,6 +434,11 @@
     <string name="edit_event_pm">PM</string>
     <string name="edit_event_am">AM</string>
     <string name="edit_event_save">Save</string>
+    <string name="edit_event_error_invalid_time">Invalid time</string>
+    <string name="edit_event_server_error">Server error</string>
+    <string name="edit_event_comment_length_error">Comment should be at least 4 symbols</string>
+    <string name="edit_event_comment_error">Comment should not include special characters</string>
+    <string name="edit_event_valid_comment">Valid comment</string>
 
     <!-- Logs -->
     <string name="odometer">Odometer(%1$s)</string>
@@ -461,7 +466,7 @@
     <string name="event_type_on_duty">On Duty</string>
     <string name="event_type_personal_use">Personal Use</string>
     <string name="event_type_yard_moves">Yard Moves</string>
-    <string name="event_type_clear">Clear</string>
+    <string name="event_type_clear">End of special driving event</string>
     <string name="event_type_int_location">Int Location</string>
     <string name="event_type_cert">Cert</string>
     <string name="event_type_login">Login</string>
@@ -477,7 +482,7 @@
     <string name="event_updated">Event updated</string>
 
     <!-- Auto Logout Activity -->
-    <string name="auto_logout_message_alert_dialog">Auto Logout</string>
+    <string name="auto_logout_message_alert_dialog">Do you want to proceed with logout?</string>
     <string name="auto_logout_positive_button_lbl_alert_dialog">Logout</string>
     <string name="auto_logout_cancel_button_lbl_alert_dialog">Cancel</string>
 
@@ -487,6 +492,8 @@
     <string name="settings_box_gps_title">Box GPS</string>
     <string name="settings_fixed_mount_title">Fixed mount</string>
     <string name="settings_odometer_units">Odometer units</string>
+    <string name="settings_kilometers_title">Kilometers</string>
+    <string name="settings_miles_title">Miles</string>
 
     <!-- Dashboard -->
     <string name="duty_hours">HOURS</string>
@@ -494,9 +501,18 @@
     <string name="duty_seconds">SECONDS</string>
     <string name="duty_tap_to_change_status">Tap to change status</string>
 
+    <string name="duty_driving_time">Driving time</string>
+    <string name="duty_sleeper_berth_time">Time to break</string>
+    <string name="duty_on_duty_time">Workday time</string>
+    <string name="duty_cycle_time">Cycle time</string>
+
+    <string name="duty_indicator">Change to \n %s</string>
+    <string name="duty_indicator_title">You are currently working in %s mode</string>
+
     <!-- Multiday fragment -->
     <string-array name="multiday_selector">
         <item>7 days</item>
+        <item>8 days</item>
         <item>14 days</item>
     </string-array>
     <string name="multiday_total_hours">Total hours</string>

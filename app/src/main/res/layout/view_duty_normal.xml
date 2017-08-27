@@ -8,19 +8,14 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingStart="@dimen/default_margin"
-        android:paddingEnd="@dimen/default_margin"
-        android:paddingTop="@dimen/margin_large"
-        android:paddingBottom="@dimen/margin_large">
+        android:paddingTop="@dimen/default_margin"
+        android:paddingBottom="@dimen/default_margin">
 
         <TextView
             android:id="@+id/duty_time_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_toStartOf="@+id/duty_status"
-            android:layout_toLeftOf="@+id/duty_status"
-            android:minHeight="@dimen/duty_title_size"
-            android:gravity="center_vertical"
+            android:gravity="center"
             android:lines="1"
             android:singleLine="true"
             android:ellipsize="end"
@@ -28,33 +23,16 @@
             android:textColor="@color/black"
             tools:text="Driving time left"/>
 
-        <ImageView
-            android:id="@+id/duty_status"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:src="@drawable/ic_duty_status_of"/>
-
         <TextView
             android:id="@+id/duty_time"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/duty_status"
-            android:layout_marginTop="@dimen/default_margin"
+            android:layout_below="@+id/duty_time_title"
+            android:layout_marginTop="@dimen/margin_small"
+            android:gravity="center"
             android:textSize="@dimen/text_size_extra_large"
             android:textColor="@color/black"
             tools:text="00:12:24"/>
-
-        <ProgressBar
-            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-            android:id="@+id/duty_progress"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/duty_time"
-            android:layout_marginTop="@dimen/margin_small"
-            android:max="@integer/max_duration"
-            tools:progress="56"/>
 
     </RelativeLayout>
 

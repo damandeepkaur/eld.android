@@ -14,6 +14,8 @@ import android.view.View;
 import android.widget.AdapterView;
 
 import com.bsmwireless.common.App;
+import com.bsmwireless.common.utils.NetworkUtils;
+import com.bsmwireless.data.network.RetrofitException;
 import com.bsmwireless.data.storage.DutyManager;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.screens.common.menu.BaseMenuActivity;
@@ -22,6 +24,8 @@ import com.bsmwireless.screens.editevent.dagger.DaggerEditEventComponent;
 import com.bsmwireless.screens.editevent.dagger.EditEventModule;
 import com.bsmwireless.widgets.alerts.DutyType;
 import com.bsmwireless.widgets.snackbar.SnackBarLayout;
+
+import java.util.ArrayList;
 
 import javax.inject.Inject;
 
@@ -60,7 +64,7 @@ public class EditEventActivity extends BaseMenuActivity implements EditEventView
         mUnbinder = ButterKnife.bind(this);
 
         initToolbar();
-        initSnackbar();
+        showSnackbar();
         initStatusSpinner();
     }
 
@@ -68,6 +72,13 @@ public class EditEventActivity extends BaseMenuActivity implements EditEventView
     protected void onPostCreate(@Nullable Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         mPresenter.onViewCreated();
+    }
+
+    @Override
+    protected void onDestroy() {
+        mPresenter.onDestroy();
+        mSnackBarLayout.reset();
+        super.onDestroy();
     }
 
     @Override
@@ -102,19 +113,51 @@ public class EditEventActivity extends BaseMenuActivity implements EditEventView
     }
 
     @Override
-    public void addEvent(ELDEvent newELDEvent) {
+    public void changeEvent(ArrayList<ELDEvent> newELDEvent) {
         Intent result = new Intent();
-        result.putExtra(NEW_ELD_EVENT_EXTRA, newELDEvent);
+        result.putParcelableArrayListExtra(NEW_ELD_EVENT_EXTRA, newELDEvent);
         setResult(RESULT_OK, result);
         finish();
     }
 
     @Override
-    public void changeEvent(ELDEvent oldEvent, ELDEvent newELDEvent) {
-        Intent result = new Intent();
-        result.putExtra(NEW_ELD_EVENT_EXTRA, newELDEvent);
-        setResult(RESULT_OK, result);
-        finish();
+    public void showError(Error error) {
+        mSnackBarLayout.setOnReadyListener(snackBar -> {
+            snackBar.reset()
+                    .setMessage(getString(error.getStringId()))
+                    .setHideableOnTimeout(SnackBarLayout.DURATION_LONG)
+                    .setOnCloseListener(new SnackBarLayout.OnCloseListener() {
+                        @Override
+                        public void onClose(SnackBarLayout snackBar) {
+                            showSnackbar();
+                        }
+
+                        @Override
+                        public void onOpen(SnackBarLayout snackBar) {
+
+                        }
+                    });
+        }).showSnackbar();
+    }
+
+    @Override
+    public void showError(RetrofitException error) {
+        mSnackBarLayout.setOnReadyListener(snackBar -> {
+            snackBar.reset()
+                    .setMessage(NetworkUtils.getErrorMessage(error, this))
+                    .setHideableOnTimeout(SnackBarLayout.DURATION_LONG)
+                    .setOnCloseListener(new SnackBarLayout.OnCloseListener() {
+                        @Override
+                        public void onClose(SnackBarLayout snackBar) {
+                            showSnackbar();
+                        }
+
+                        @Override
+                        public void onOpen(SnackBarLayout snackBar) {
+
+                        }
+                    });
+        }).showSnackbar();
     }
 
     @Override
@@ -154,20 +197,22 @@ public class EditEventActivity extends BaseMenuActivity implements EditEventView
         }
     }
 
-    private void initSnackbar() {
-        mSnackBarLayout.setPositiveLabel(getString(R.string.edit_event_save), v -> {
-            DutyType type = (DutyType) mEventStatus.getSelectedItem();
-            String startTime = mStartTime.getText().toString();
-            String comment = mComment.getText().toString();
+    private void showSnackbar() {
+        mSnackBarLayout.setOnReadyListener(snackBar -> {
+            snackBar.reset()
+                    .setPositiveLabel(getString(R.string.edit_event_save), v -> {
+                        DutyType type = (DutyType) mEventStatus.getSelectedItem();
+                        String startTime = mStartTime.getText().toString();
+                        String comment = mComment.getText().toString();
 
-            mPresenter.onSaveClick(type, startTime, comment);
-        }).setHideableOnTouch(false)
-        .showSnackbar();
+                        mPresenter.onSaveClick(type, startTime, comment);
+                    }).setHideableOnTouch(false);
+        }).showSnackbar();
     }
 
     private void initStatusSpinner() {
         //TODO: set correct types
-        DutyType[] types = DutyManager.DRIVER_DUTY_EXTENDED;
+        DutyType[] types = DutyManager.DRIVER_DUTY_EXTENDED_WITH_CLEAR;
         mEventStatus.setAdapter(new DutyTypeSpinnerAdapter(this, types));
         mEventStatus.setOnItemSelectedListener(this);
     }

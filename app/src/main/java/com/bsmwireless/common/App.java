@@ -9,7 +9,6 @@ import com.bsmwireless.common.dagger.AppComponent;
 import com.bsmwireless.common.dagger.ContextModule;
 import com.bsmwireless.common.dagger.DaggerAppComponent;
 import com.bsmwireless.common.logger.ReleaseTree;
-import com.bsmwireless.common.utils.SchedulerUtils;
 
 import java.lang.ref.WeakReference;
 
@@ -22,7 +21,7 @@ public class App extends Application {
 
     private static final int ACTIVITY_LIFECYCLE_DURATION = 500;
 
-    private boolean mIsInBackground = false;
+    private static boolean mIsInBackground = false;
 
     public static AppComponent getComponent() {
         return mComponent;
@@ -41,7 +40,7 @@ public class App extends Application {
     }
 
     protected AppComponent buildComponent() {
-         return DaggerAppComponent.builder().contextModule(new ContextModule(this)).build();
+        return DaggerAppComponent.builder().contextModule(new ContextModule(this)).build();
     }
 
     private ActivityLifecycleCallbacks mActivityLifecycleCallbacks = new ActivityLifecycleCallbacks() {
@@ -61,7 +60,6 @@ public class App extends Application {
             mCurrentActivity = new WeakReference<>(activity);
             if (mIsInBackground) {
                 mIsInBackground = false;
-                onAppGoesForeground();
             }
         }
 
@@ -73,7 +71,6 @@ public class App extends Application {
             mHandler.postDelayed(() -> {
                 if (mCurrentActivity == null) {
                     mIsInBackground = true;
-                    onAppGoesBackground();
                 }
             }, ACTIVITY_LIFECYCLE_DURATION);
         }
@@ -94,15 +91,7 @@ public class App extends Application {
         }
     };
 
-    private void onAppGoesBackground() {
-        SchedulerUtils.cancel();
-    }
-
-    private void onAppGoesForeground() {
-        SchedulerUtils.schedule();
-    }
-
-    public boolean isAppInBackground() {
+    public static boolean isAppInBackground() {
         return mIsInBackground;
     }
 }

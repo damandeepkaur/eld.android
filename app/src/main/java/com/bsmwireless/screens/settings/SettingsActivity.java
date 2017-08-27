@@ -3,9 +3,10 @@ package com.bsmwireless.screens.settings;
 
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
-import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.AppCompatRadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.bsmwireless.common.App;
@@ -19,7 +20,6 @@ import javax.inject.Inject;
 import app.bsmuniversal.com.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 public class SettingsActivity extends BaseMenuActivity implements SettingsView {
 
@@ -37,8 +37,14 @@ public class SettingsActivity extends BaseMenuActivity implements SettingsView {
     @BindView(R.id.lbl_odometer_units)
     TextView mOdometerUnitsTextView;
 
-    @BindView(R.id.lbl_odometer_units_value)
-    TextView mOdometerUnitsValueTextView;
+    @BindView(R.id.radio_group_odometer_units)
+    RadioGroup mOdometerUnitsRadioGroup;
+
+    @BindView(R.id.kilometers_unit_button)
+    AppCompatRadioButton mKilometersUnitsRadioButton;
+
+    @BindView(R.id.miles_unit_button)
+    AppCompatRadioButton mMilesUnitsRadioButton;
 
     @Inject
     SettingsPresenter mPresenter;
@@ -65,12 +71,20 @@ public class SettingsActivity extends BaseMenuActivity implements SettingsView {
             actionBar.setTitle(R.string.settings_title);
         }
 
-        mPresenter.onViewCreated();
-    }
+        mOdometerUnitsRadioGroup.setOnCheckedChangeListener((group, checkedId) -> {
+            switch (checkedId) {
+                case R.id.kilometers_unit_button:
+                    mPresenter.onUnitsSelected(true);
+                    break;
+                case R.id.miles_unit_button:
+                    mPresenter.onUnitsSelected(false);
+                    break;
+                default:
+                    break;
+            }
+        });
 
-    @OnClick(R.id.lbl_odometer_units)
-    void executePopupMenu() {
-        this.showPopupMenu();
+        mPresenter.onViewCreated();
     }
 
     @Override
@@ -84,44 +98,18 @@ public class SettingsActivity extends BaseMenuActivity implements SettingsView {
     }
 
     @Override
-    public void showPopupMenu() {
-        PopupMenu popupMenu = new PopupMenu(this, mOdometerUnitsTextView);
-        popupMenu.inflate(R.menu.menu_odometer_units);
-
-        popupMenu.setOnMenuItemClickListener(menuItem -> {
-            switch (menuItem.getItemId()) {
-                case R.id.menu_odometer_units_km:
-                    mPresenter.onKMOdometerUnitsSelected(true);
-                    return true;
-                case R.id.menu_odometer_units_mi:
-                    mPresenter.onKMOdometerUnitsSelected(false);
-                    return true;
-            }
-            return false;
-        });
-
-        popupMenu.show();
-    }
-
-    @Override
-    public void showOdometerUnits(OdometerUnits odometerUnits) {
-        int id;
-
+    public void checkOdometerUnit(OdometerUnits odometerUnits) {
         switch (odometerUnits) {
             case ODOMETER_UNITS_KM:
-                id = R.string.logs_km_set;
+                mKilometersUnitsRadioButton.setChecked(true);
                 break;
-
             case ODOMETER_UNITS_MI:
-                id = R.string.logs_mi_set;
+                mMilesUnitsRadioButton.setChecked(true);
                 break;
-
             default:
-                id = R.string.logs_km_set;
+                mKilometersUnitsRadioButton.setChecked(true);
                 break;
         }
-
-        mOdometerUnitsValueTextView.setText(getString(id));
     }
 
     @Override
