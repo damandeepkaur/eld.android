@@ -2,7 +2,6 @@ package com.bsmwireless.data.storage;
 
 import android.os.Handler;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.bsmwireless.common.utils.SchedulerUtils;
 import com.bsmwireless.domain.interactors.BlackBoxInteractor;
@@ -32,10 +31,15 @@ public class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListener {
     private final ArrayList<AutoDutyTypeListener> mListeners = new ArrayList<>();
 
     private Handler mHandler = new Handler();
-    private Runnable mAutoOnDutyTask = () -> {
-        synchronized (mListeners) {
-            for (AutoDutyTypeListener listener : mListeners) {
-                listener.onAutoOnDuty();
+    private Runnable mAutoOnDutyTask = new Runnable() {
+        @Override
+        public void run() {
+            synchronized (mListeners) {
+                for (AutoDutyTypeListener listener : mListeners) {
+                    listener.onAutoOnDuty();
+                }
+
+                mHandler.postDelayed(this, AUTO_ON_DUTY_DELAY);
             }
         }
     };
@@ -110,6 +114,8 @@ public class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListener {
             case MOVING:
                 SchedulerUtils.cancel();
 
+                mHandler.removeCallbacks(mAutoOnDutyTask);
+
                 if (mDutyTypeManager.getDutyType() != DutyType.PERSONAL_USE && mDutyTypeManager.getDutyType() != DutyType.YARD_MOVES) {
                     events.add(mEventsInteractor.getEvent(DutyType.DRIVING, true));
                 }
@@ -147,6 +153,11 @@ public class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListener {
     public void removeListener(@NonNull AutoDutyTypeListener listener) {
         synchronized (mListeners) {
             mListeners.remove(listener);
+
+            if (mListeners.isEmpty()) {
+                mHandler.removeCallbacks(mAutoOnDutyTask);
+                mHandler.removeCallbacks(mAutoDrivingTask);
+            }
         }
     }
 
