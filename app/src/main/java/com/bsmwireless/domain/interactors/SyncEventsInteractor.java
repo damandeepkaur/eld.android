@@ -61,6 +61,7 @@ public class SyncEventsInteractor {
                 .map(t -> ELDEventConverter.toModelList(mELDEventDao.getNewUnsyncEvents()))
                 .filter(eldEvents -> !eldEvents.isEmpty())
                 .doOnNext(events -> filterIncorrectEvents(events))
+                .filter(eldEvents -> !eldEvents.isEmpty())
                 .flatMap(events -> Observable.fromIterable(parseELDEventsList(events)))
                 .flatMap(events -> mServiceApi.postNewELDEvents(events)
                         .onErrorResumeNext(Observable.just(mErrorResponse))
@@ -68,16 +69,14 @@ public class SyncEventsInteractor {
                         .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS) ? events : new ArrayList<ELDEvent>())
                 )
                 .filter(events -> !events.isEmpty())
-                .flatMap(events -> mServiceApi.getELDEvents(events.get(0).getEventTime(), events.get(events.size() - 1).getEventTime())
-                        .doOnNext(eldEvents -> {
-                            ELDEventEntity[] entities = ELDEventConverter.toEntityArray(eldEvents);
+                .flatMap(dbEvents -> mServiceApi.getELDEvents(dbEvents.get(0).getEventTime(), dbEvents.get(dbEvents.size() - 1).getEventTime())
+                        .doOnNext(serverEvents -> {
+                            ELDEventEntity[] oldEntities = ELDEventConverter.toEntityArray(dbEvents);
+                            mELDEventDao.deleteAll(oldEntities);
+                            ELDEventEntity[] entities = ELDEventConverter.toEntityArray(serverEvents);
                             mELDEventDao.insertAll(entities);
-                        })
-                        .map(eldEvents -> events))
-                .subscribe(events -> {
-                            ELDEventEntity[] entities = ELDEventConverter.toEntityList(events).toArray(new ELDEventEntity[events.size()]);
-                            mELDEventDao.deleteAll(entities);
-                        },
+                        }))
+                .subscribe(events -> Timber.d("Added events:" + events),
                         error -> Timber.e(error))
         );
     }
@@ -90,6 +89,7 @@ public class SyncEventsInteractor {
                 .map(t -> ELDEventConverter.toModelList(mELDEventDao.getUpdateUnsyncEvents()))
                 .filter(events -> !events.isEmpty())
                 .doOnNext(events -> filterIncorrectEvents(events))
+                .filter(eldEvents -> !eldEvents.isEmpty())
                 .flatMap(events -> Observable.fromIterable(parseELDEventsList(events)))
                 .flatMap(events -> mServiceApi.updateELDEvents(events)
                         .onErrorResumeNext(Observable.just(mErrorResponse))

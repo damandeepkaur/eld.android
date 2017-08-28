@@ -97,14 +97,8 @@ public class ELDEventsInteractor {
     }
 
     public Observable<long[]> postNewELDEvents(List<ELDEvent> events) {
-        return Observable.create(e -> {
-            for (ELDEvent event : events) {
-                if (event.getVehicleId() < 0 || event.getBoxId() < 0) {
-                    e.onError(new Exception("Incorrect new event"));
-                }
-            }
-            e.onNext(mELDEventDao.insertAll(ELDEventConverter.toEntityArray(events, ELDEventEntity.SyncType.NEW_UNSYNC)));
-        });
+        return Observable.fromCallable(() ->
+                mELDEventDao.insertAll(ELDEventConverter.toEntityArray(events, ELDEventEntity.SyncType.NEW_UNSYNC)));
     }
 
     public void storeUnidentifiedEvents(List<ELDEvent> events) {
