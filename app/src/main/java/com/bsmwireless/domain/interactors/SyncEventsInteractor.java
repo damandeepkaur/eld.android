@@ -54,7 +54,7 @@ public class SyncEventsInteractor {
     }
 
     private void syncNewEvents() {
-        mSyncEventsDisposable.add(Observable.interval(10, TimeUnit.SECONDS)
+        mSyncEventsDisposable.add(Observable.interval(Constants.SYNC_TIMEOUT_IN_MIN, TimeUnit.MINUTES)
                 .subscribeOn(Schedulers.io())
                 .filter(t -> NetworkUtils.isOnlineMode())
                 .filter(t -> mPreferencesManager.getBoxId() != PreferencesManager.NOT_FOUND_VALUE)
@@ -69,6 +69,7 @@ public class SyncEventsInteractor {
                         .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS) ? events : new ArrayList<ELDEvent>())
                 )
                 .filter(events -> !events.isEmpty())
+                .delay(1, TimeUnit.SECONDS)
                 .flatMap(dbEvents -> mServiceApi.getELDEvents(dbEvents.get(0).getEventTime(), dbEvents.get(dbEvents.size() - 1).getEventTime())
                         .doOnNext(serverEvents -> {
                             ELDEventEntity[] oldEntities = ELDEventConverter.toEntityArray(dbEvents);
