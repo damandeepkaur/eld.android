@@ -1,10 +1,11 @@
 package com.bsmwireless.domain.interactors;
 
 import com.bsmwireless.common.Constants;
+import com.bsmwireless.common.utils.ListConverter;
 import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.storage.AppDatabase;
+import com.bsmwireless.data.storage.AutoDutyTypeManager;
 import com.bsmwireless.data.storage.PreferencesManager;
-import com.bsmwireless.common.utils.ListConverter;
 import com.bsmwireless.data.storage.vehicles.VehicleConverter;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.Vehicle;
@@ -27,6 +28,7 @@ public class VehiclesInteractor {
     private UserInteractor mUserInteractor;
     private BlackBoxInteractor mBlackBoxInteractor;
     private ELDEventsInteractor mELDEventsInteractor;
+    private AutoDutyTypeManager mAutoDutyTypeManager;
 
     @Inject
     public VehiclesInteractor(ServiceApi serviceApi,
@@ -34,13 +36,15 @@ public class VehiclesInteractor {
                               AppDatabase appDatabase,
                               UserInteractor userInteractor,
                               BlackBoxInteractor blackBoxInteractor,
-                              ELDEventsInteractor eventsInteractor) {
+                              ELDEventsInteractor eventsInteractor,
+                              AutoDutyTypeManager autoDutyTypeManager) {
         mServiceApi = serviceApi;
         mPreferencesManager = preferencesManager;
         mAppDatabase = appDatabase;
         mUserInteractor = userInteractor;
         mBlackBoxInteractor = blackBoxInteractor;
         mELDEventsInteractor = eventsInteractor;
+        mAutoDutyTypeManager = autoDutyTypeManager;
     }
 
     public Observable<List<Vehicle>> searchVehicles(String searchText) {
@@ -91,21 +95,21 @@ public class VehiclesInteractor {
         ELDEvent event = new ELDEvent();
         int id = mUserInteractor.getDriverId();
 
-        //TODO: get real data for hos
-        event.setEngineHours(50);
-
         event.setMobileTime(System.currentTimeMillis());
         event.setDriverId(id);
         event.setVehicleId(vehicle.getId());
         event.setBoxId(vehicle.getBoxId());
 
-        return mBlackBoxInteractor.getData()
+        return mBlackBoxInteractor.getData(vehicle.getBoxId())
                 .doOnNext(blackBox -> saveVehicle(vehicle))
+                .doOnNext(blackBox -> mAutoDutyTypeManager.validateBlackBoxState(vehicle.getBoxId()))
                 .flatMap(blackBox -> {
                     event.setTimezone(mUserInteractor.getTimezoneSync(id));
                     event.setOdometer(blackBox.getOdometer());
                     event.setLat(blackBox.getLat());
                     event.setLng(blackBox.getLon());
+                    event.setEngineHours(blackBox.getEngineHours());
+                    event.setComment(mBlackBoxInteractor.getVinNumber());
 
                     return mServiceApi.pairVehicle(event);
                 })

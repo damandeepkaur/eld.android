@@ -23,8 +23,7 @@ import android.os.SystemClock;
 
 public class SchedulerUtils {
 
-    private static int mJobId = 0;
-
+    private static final int JOB_ID = 111;
     private static final int AUTO_LOGOUT_TRIGGER_DURATION = 60;
 
     private static PendingIntent mPendingIntent;
@@ -82,8 +81,7 @@ public class SchedulerUtils {
 
     @TargetApi(21)
     private static void scheduleExactJobScheduler() {
-        JobInfo.Builder builder = new JobInfo.Builder(mJobId++,
-                new ComponentName(App.getComponent().context(), AutoLogoutJobService.class))
+        JobInfo.Builder builder = new JobInfo.Builder(JOB_ID, new ComponentName(App.getComponent().context(), AutoLogoutJobService.class))
                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
                 .setOverrideDeadline(TimeUnit.MINUTES.toMillis(AUTO_LOGOUT_TRIGGER_DURATION))
                 .setPersisted(true)

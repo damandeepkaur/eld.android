@@ -1,37 +1,44 @@
 package com.bsmwireless.domain.interactors;
 
-import com.bsmwireless.data.storage.PreferencesManager;
+import com.bsmwireless.data.network.blackbox.BlackBox;
+import com.bsmwireless.data.network.blackbox.BlackBoxConnectionManager;
 import com.bsmwireless.models.BlackBoxModel;
 
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
 
-//TODO: return real data
 public class BlackBoxInteractor {
 
-    private PreferencesManager mPreferencesManager;
+    private BlackBoxConnectionManager mConnectionManager;
 
     @Inject
-    public BlackBoxInteractor(PreferencesManager preferencesManager) {
-        mPreferencesManager = preferencesManager;
+    public BlackBoxInteractor(BlackBoxConnectionManager connectionManager) {
+        mConnectionManager = connectionManager;
     }
 
-    public Observable<BlackBoxModel> getData() {
-        BlackBoxModel model = new BlackBoxModel();
-
-        if (mPreferencesManager.getBoxId() == PreferencesManager.NOT_FOUND_VALUE) {
-            model.setOdometer(-1);
-            model.setEngineHours(-1);
-            model.setLat(0);
-            model.setLon(0);
-        } else {
-            model.setOdometer(111222);
-            model.setEngineHours(50);
-            model.setLat(70.333);
-            model.setLon(-40.1128);
+    public Observable<BlackBoxModel> getData(int boxId) {
+        if (!mConnectionManager.isConnected()) {
+            return mConnectionManager.connectBlackBox(boxId)
+                    .switchMap(connectionManager ->  connectionManager.getDataObservable())
+                    .doOnError(error -> mConnectionManager.disconnectBlackBox());
         }
 
-        return Observable.just(model);
+        return mConnectionManager.getDataObservable();
+    }
+
+    public BlackBoxModel getLastData() {
+        BlackBox blackBox = mConnectionManager.getBlackBox();
+        return blackBox == null ? new BlackBoxModel() : blackBox.getBlackBoxState();
+    }
+
+    public <T> Observable<T> shutdown(T item) {
+        return Observable.zip(Observable.just(item), mConnectionManager.disconnectBlackBox(),
+                (tItem, manager) -> tItem);
+    }
+
+    public String getVinNumber() {
+        BlackBox blackBox = mConnectionManager.getBlackBox();
+        return blackBox == null ? "" : blackBox.getVinNumber();
     }
 }

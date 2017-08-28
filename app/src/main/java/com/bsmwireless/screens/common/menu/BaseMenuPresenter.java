@@ -1,6 +1,6 @@
 package com.bsmwireless.screens.common.menu;
 
-import com.bsmwireless.data.storage.DutyManager;
+import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
 import com.bsmwireless.widgets.alerts.DutyType;
 
@@ -10,21 +10,21 @@ import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
 public abstract class BaseMenuPresenter {
-    protected DutyManager mDutyManager;
+    protected DutyTypeManager mDutyTypeManager;
     protected ELDEventsInteractor mEventsInteractor;
     protected CompositeDisposable mDisposables;
 
-    private DutyManager.DutyTypeListener mListener = dutyType -> getView().setDutyType(dutyType);
+    private DutyTypeManager.DutyTypeListener mListener = dutyType -> getView().setDutyType(dutyType);
 
     protected abstract BaseMenuView getView();
 
     void onMenuCreated() {
-        mDutyManager.addListener(mListener);
+        mDutyTypeManager.addListener(mListener);
     }
 
     void onDutyChanged(DutyType dutyType) {
         // don't set the same type
-        if (dutyType != mDutyManager.getDutyType()) {
+        if (dutyType != mDutyTypeManager.getDutyType()) {
             mDisposables.add(mEventsInteractor.postNewDutyTypeEvent(dutyType)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeOn(Schedulers.io())
@@ -36,8 +36,16 @@ public abstract class BaseMenuPresenter {
         }
     }
 
+    public void onChangeDutyClick() {
+        if (mEventsInteractor.isConnected()) {
+            getView().showDutyTypeDialog(mDutyTypeManager.getDutyType());
+        } else {
+            getView().showNotInVehicleDialog();
+        }
+    }
+
     public void onDestroy() {
-        mDutyManager.removeListener(mListener);
+        mDutyTypeManager.removeListener(mListener);
         mDisposables.dispose();
 
         Timber.d("DESTROYED");

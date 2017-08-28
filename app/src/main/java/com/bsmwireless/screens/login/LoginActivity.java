@@ -130,6 +130,9 @@ public class LoginActivity extends BaseActivity implements LoginView {
 
     @Override
     public void goToSelectAssetScreen() {
+        SchedulerUtils.cancel();
+        SchedulerUtils.schedule();
+
         startActivity(new Intent(this, SelectAssetActivity.class));
         finish();
     }

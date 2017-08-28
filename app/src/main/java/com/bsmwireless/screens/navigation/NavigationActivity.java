@@ -22,6 +22,7 @@ import android.widget.Toast;
 
 import com.bsmwireless.common.App;
 import com.bsmwireless.models.User;
+import com.bsmwireless.screens.autologout.AutoDutyDialogActivity;
 import com.bsmwireless.screens.common.menu.BaseMenuActivity;
 import com.bsmwireless.screens.common.menu.BaseMenuPresenter;
 import com.bsmwireless.screens.driverprofile.DriverProfileActivity;
@@ -38,6 +39,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
+import static com.bsmwireless.screens.autologout.AutoDutyDialogActivity.EXTRA_AUTO_DRIVING;
+import static com.bsmwireless.screens.autologout.AutoDutyDialogActivity.EXTRA_AUTO_ON_DUTY;
 import static com.bsmwireless.screens.driverprofile.DriverProfileActivity.EXTRA_USER;
 
 public class NavigationActivity extends BaseMenuActivity implements OnNavigationItemSelectedListener, NavigateView, ViewPager.OnPageChangeListener {
@@ -277,6 +280,22 @@ public class NavigationActivity extends BaseMenuActivity implements OnNavigation
         } else {
             mHandler.postAtTime(mResetTimeTask, time);
         }
+    }
+
+    @Override
+    public void showAutoOnDutyDialog() {
+        Intent dialogIntent = new Intent(this, AutoDutyDialogActivity.class);
+        dialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        dialogIntent.putExtra(EXTRA_AUTO_ON_DUTY, true);
+        startActivity(dialogIntent);
+    }
+
+    @Override
+    public void showAutoDrivingDialog() {
+        Intent dialogIntent = new Intent(this, AutoDutyDialogActivity.class);
+        dialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        dialogIntent.putExtra(EXTRA_AUTO_DRIVING, true);
+        startActivity(dialogIntent);
     }
 
     protected static class HeaderViewHolder {

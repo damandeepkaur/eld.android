@@ -1,9 +1,9 @@
 package com.bsmwireless.screens.logs.dagger;
 
-import com.bsmwireless.data.storage.DutyManager;
+import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.models.ELDEvent;
 
-public class EventLogModel implements DutyManager.DutyCheckable {
+public class EventLogModel implements DutyTypeManager.DutyTypeCheckable {
 
     private ELDEvent mEvent;
     private Long mDuration;

@@ -3,8 +3,9 @@ package com.bsmwireless.schedulers.alarmmanager;
 import android.app.IntentService;
 import android.content.Intent;
 
-import com.bsmwireless.common.App;
-import com.bsmwireless.screens.autologout.AutoLogoutActivity;
+import com.bsmwireless.screens.autologout.AutoDutyDialogActivity;
+
+import static com.bsmwireless.screens.autologout.AutoDutyDialogActivity.EXTRA_AUTO_LOGOUT;
 
 public class AutoLogoutService extends IntentService {
 
@@ -16,8 +17,10 @@ public class AutoLogoutService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        Intent dialogIntent = new Intent(App.getComponent().context(), AutoLogoutActivity.class);
+        Intent dialogIntent = new Intent(this, AutoDutyDialogActivity.class);
         dialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        App.getComponent().context().startActivity(dialogIntent);
+        dialogIntent.putExtra(EXTRA_AUTO_LOGOUT, true);
+
+        startActivity(dialogIntent);
     }
 }

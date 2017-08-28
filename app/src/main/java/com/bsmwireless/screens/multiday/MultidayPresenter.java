@@ -3,7 +3,7 @@ package com.bsmwireless.screens.multiday;
 import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.common.utils.DateUtils;
 import com.bsmwireless.common.utils.DutyUtils;
-import com.bsmwireless.data.storage.DutyManager;
+import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
 import com.bsmwireless.domain.interactors.UserInteractor;
 import com.bsmwireless.models.ELDEvent;
@@ -103,7 +103,7 @@ public class MultidayPresenter {
 
             MultidayItemModel item = new MultidayItemModel(startDay);
 
-            long[] durations = DutyManager.getDutyTypeTimes(new ArrayList<>(dayEvents), startDay, endDay);
+            long[] durations = DutyTypeManager.getDutyTypeTimes(new ArrayList<>(dayEvents), startDay, endDay);
 
             item.setTotalOffDuty(durations[DutyType.OFF_DUTY.ordinal()]);
             item.setTotalSleeping(durations[DutyType.SLEEPER_BERTH.ordinal()]);

@@ -2,6 +2,7 @@ package com.bsmwireless.screens.selectasset;
 
 import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.data.network.RetrofitException;
+import com.bsmwireless.data.network.blackbox.BlackBoxConnectionException;
 import com.bsmwireless.domain.interactors.UserInteractor;
 import com.bsmwireless.domain.interactors.VehiclesInteractor;
 import com.bsmwireless.models.Vehicle;
@@ -92,6 +93,10 @@ public class SelectAssetPresenter {
                                 Timber.e("SelectAsset error: %s", error);
                                 if (error instanceof RetrofitException) {
                                     mView.showErrorMessage((RetrofitException) error);
+                                }
+
+                                if (error instanceof BlackBoxConnectionException) {
+                                    mView.showErrorMessage(SelectAssetView.Error.ERROR_BLACKBOX);
                                 }
                             }));
         }
