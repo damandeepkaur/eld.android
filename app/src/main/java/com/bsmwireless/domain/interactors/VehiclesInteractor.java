@@ -4,7 +4,6 @@ import com.bsmwireless.common.Constants;
 import com.bsmwireless.common.utils.ListConverter;
 import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.storage.AppDatabase;
-import com.bsmwireless.data.storage.AutoDutyTypeManager;
 import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.data.storage.vehicles.VehicleConverter;
 import com.bsmwireless.models.ELDEvent;
@@ -28,7 +27,6 @@ public class VehiclesInteractor {
     private UserInteractor mUserInteractor;
     private BlackBoxInteractor mBlackBoxInteractor;
     private ELDEventsInteractor mELDEventsInteractor;
-    private AutoDutyTypeManager mAutoDutyTypeManager;
 
     @Inject
     public VehiclesInteractor(ServiceApi serviceApi,
@@ -36,15 +34,13 @@ public class VehiclesInteractor {
                               AppDatabase appDatabase,
                               UserInteractor userInteractor,
                               BlackBoxInteractor blackBoxInteractor,
-                              ELDEventsInteractor eventsInteractor,
-                              AutoDutyTypeManager autoDutyTypeManager) {
+                              ELDEventsInteractor eventsInteractor) {
         mServiceApi = serviceApi;
         mPreferencesManager = preferencesManager;
         mAppDatabase = appDatabase;
         mUserInteractor = userInteractor;
         mBlackBoxInteractor = blackBoxInteractor;
         mELDEventsInteractor = eventsInteractor;
-        mAutoDutyTypeManager = autoDutyTypeManager;
     }
 
     public Observable<List<Vehicle>> searchVehicles(String searchText) {
@@ -102,7 +98,6 @@ public class VehiclesInteractor {
 
         return mBlackBoxInteractor.getData(vehicle.getBoxId())
                 .doOnNext(blackBox -> saveVehicle(vehicle))
-                .doOnNext(blackBox -> mAutoDutyTypeManager.validateBlackBoxState(vehicle.getBoxId()))
                 .flatMap(blackBox -> {
                     event.setTimezone(mUserInteractor.getTimezoneSync(id));
                     event.setOdometer(blackBox.getOdometer());

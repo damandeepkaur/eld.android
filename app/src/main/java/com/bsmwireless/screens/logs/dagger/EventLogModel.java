@@ -82,6 +82,16 @@ public class EventLogModel implements DutyTypeManager.DutyTypeCheckable {
     }
 
     @Override
+    public Boolean isActive() {
+        return mEvent.isActive();
+    }
+
+    @Override
+    public Boolean isDutyEvent() {
+        return mEvent.isDutyEvent();
+    }
+
+    @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("EventLogModel{");
         sb.append("mEvent=").append(mEvent);
@@ -90,9 +100,5 @@ public class EventLogModel implements DutyTypeManager.DutyTypeCheckable {
         sb.append(", mVehicleName='").append(mVehicleName).append('\'');
         sb.append('}');
         return sb.toString();
-    }
-
-    public boolean isActive() {
-        return mEvent.getStatus().equals(ELDEvent.StatusCode.ACTIVE.getValue());
     }
 }

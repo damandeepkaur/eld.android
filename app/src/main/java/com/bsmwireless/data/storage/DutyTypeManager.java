@@ -3,7 +3,6 @@ package com.bsmwireless.data.storage;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 
-import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.widgets.alerts.DutyType;
 
 import java.util.ArrayList;
@@ -20,6 +19,7 @@ import static com.bsmwireless.widgets.alerts.DutyType.YARD_MOVES;
 
 public class DutyTypeManager {
     public static final DutyType[] DRIVER_DUTY_EXTENDED = {OFF_DUTY, SLEEPER_BERTH, DRIVING, ON_DUTY, PERSONAL_USE, YARD_MOVES};
+    public static final DutyType[] DRIVER_DUTY_EXTENDED_WITH_CLEAR = {ON_DUTY, OFF_DUTY, SLEEPER_BERTH, DRIVING, YARD_MOVES, PERSONAL_USE, CLEAR};
     public static final DutyType[] DRIVING_DUTY = {OFF_DUTY, SLEEPER_BERTH, DRIVING, ON_DUTY};
 
     public static final DutyType[] CO_DRIVER_DUTY_EXTENDED = {OFF_DUTY, SLEEPER_BERTH, ON_DUTY, PERSONAL_USE, YARD_MOVES};
@@ -157,15 +157,15 @@ public class DutyTypeManager {
 
             event = events.get(i);
 
-            if (event.getEventType() == ELDEvent.EventType.DUTY_STATUS_CHANGING.getValue() || (event.getEventType() == ELDEvent.EventType.CHANGE_IN_DRIVER_INDICATION.getValue() && event.getEventType() != CLEAR.getCode())) {
+            if (event.isDutyEvent() && event.isActive()) {
+                currentDutyType = DutyType.getTypeByCode(event.getEventType(), event.getEventCode());
+
+                if (currentDutyType == CLEAR) {
+                    continue;
+                }
+
                 duration = currentTime - Math.max(event.getEventTime(), startTime);
                 currentTime = event.getEventTime();
-
-                //for clear events keep the next status
-                /*if (event.getEventCode() == CLEAR.getCode() && i > 0) {
-                    event = events.get(i - 1);
-                }*/
-                currentDutyType = DutyType.getTypeByCode(event.getEventType(), event.getEventCode());
 
             } else {
                 continue;
@@ -202,6 +202,8 @@ public class DutyTypeManager {
         Long getEventTime();
         Integer getEventType();
         Integer getEventCode();
+        Boolean isActive();
+        Boolean isDutyEvent();
     }
 
     public interface DutyTypeListener {

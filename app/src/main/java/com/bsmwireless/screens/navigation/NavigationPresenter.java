@@ -87,6 +87,8 @@ public class NavigationPresenter extends BaseMenuPresenter {
         mView.setCoDriversNumber(mUserInteractor.getCoDriversNumber());
         mView.setBoxId(mVehiclesInteractor.getBoxId());
         mView.setAssetsNumber(mVehiclesInteractor.getAssetsNumber());
+
+        mAutoDutyTypeManager.validateBlackBoxState();
     }
 
     public void onResetTime() {
@@ -103,7 +105,7 @@ public class NavigationPresenter extends BaseMenuPresenter {
 
                     return Flowable.zip(mEventsInteractor.getLatestActiveDutyEventFromDB(time[0]), mEventsInteractor.getDutyEventsFromDB(time[0], time[1]),
                             (prevDayLatestEvent, selectedDayEvents) -> {
-                                selectedDayEvents.add(0, prevDayLatestEvent);
+                                selectedDayEvents.add(0, prevDayLatestEvent.get(prevDayLatestEvent.size() - 1));
                                 return selectedDayEvents;
                             });
                 })

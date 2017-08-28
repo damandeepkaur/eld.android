@@ -25,6 +25,8 @@ public class SchedulerUtils {
 
     private static final int JOB_ID = 111;
     private static final int AUTO_LOGOUT_TRIGGER_DURATION = 60;
+    private static final int AUTO_LOGOUT_TRIGGER_DURATION_MIN = 55;
+    private static final int AUTO_LOGOUT_TRIGGER_DURATION_MAX = 65;
 
     private static PendingIntent mPendingIntent;
 
@@ -37,6 +39,11 @@ public class SchedulerUtils {
     }
 
     public static void scheduleExactAlarmManager() {
+        // If the alarm is set up, don't set it again.
+        if (isAlarmSetUp()) {
+            return;
+        }
+
         Intent intent = new Intent(App.getComponent().context(), AlarmReceiver.class);
         mPendingIntent = PendingIntent.getBroadcast(App.getComponent().context(), 0, intent, 0);
         AlarmManager alarmManager = (AlarmManager) App.getComponent().context().getSystemService(Context.ALARM_SERVICE);
@@ -67,6 +74,7 @@ public class SchedulerUtils {
         // If the alarm has been set, cancel it.
         if (alarmManager != null) {
             alarmManager.cancel(mPendingIntent);
+            mPendingIntent.cancel();
         }
 
         // Disable {@code AlarmBootReceiver} so that it doesn't automatically restart the
@@ -81,9 +89,16 @@ public class SchedulerUtils {
 
     @TargetApi(21)
     private static void scheduleExactJobScheduler() {
+        // Don't schedule new job if there is pending one.
+        List<JobInfo> allPendingJobs = getAllPendingJobs();
+        if (allPendingJobs.size() > 0) {
+            return;
+        }
+
         JobInfo.Builder builder = new JobInfo.Builder(JOB_ID, new ComponentName(App.getComponent().context(), AutoLogoutJobService.class))
                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
-                .setOverrideDeadline(TimeUnit.MINUTES.toMillis(AUTO_LOGOUT_TRIGGER_DURATION))
+                .setMinimumLatency(TimeUnit.MINUTES.toMillis(AUTO_LOGOUT_TRIGGER_DURATION_MIN))
+                .setOverrideDeadline(TimeUnit.MINUTES.toMillis(AUTO_LOGOUT_TRIGGER_DURATION_MAX))
                 .setPersisted(true)
                 .setRequiresDeviceIdle(true);
 
@@ -92,19 +107,31 @@ public class SchedulerUtils {
     }
 
     @TargetApi(21)
-    public static void cancelAllJobs() {
+    private static void cancelAllJobs() {
         JobScheduler jobScheduler = (JobScheduler) App.getComponent().context().getSystemService(Context.JOB_SCHEDULER_SERVICE);
         jobScheduler.cancelAll();
     }
 
     @TargetApi(21)
-    private static void cancelJob() {
+    public static void cancelJob() {
         JobScheduler jobScheduler = (JobScheduler) App.getComponent().context().getSystemService(Context.JOB_SCHEDULER_SERVICE);
-        List<JobInfo> allPendingJobs = jobScheduler.getAllPendingJobs();
+        List<JobInfo> allPendingJobs = getAllPendingJobs();
         if (allPendingJobs.size() > 0) {
             // Finish the last one
             int jobId = allPendingJobs.get(0).getId();
             jobScheduler.cancel(jobId);
         }
+    }
+
+    @TargetApi(21)
+    private static List<JobInfo> getAllPendingJobs() {
+        JobScheduler jobScheduler = (JobScheduler) App.getComponent().context().getSystemService(Context.JOB_SCHEDULER_SERVICE);
+        return jobScheduler.getAllPendingJobs();
+    }
+
+    private static boolean isAlarmSetUp() {
+        return (PendingIntent.getBroadcast(App.getComponent().context(), 0,
+                new Intent(App.getComponent().context(), AlarmReceiver.class),
+                PendingIntent.FLAG_NO_CREATE) != null);
     }
 }

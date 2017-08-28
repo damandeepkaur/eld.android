@@ -56,6 +56,7 @@
     <dimen name="default_toolbar_padding">0dp</dimen>
     <dimen name="default_margin">16dp</dimen>
     <dimen name="default_margin_small">10dp</dimen>
+    <dimen name="default_divider">2dp</dimen>
     <dimen name="margin_large">24dp</dimen>
     <dimen name="margin_small">8dp</dimen>
 

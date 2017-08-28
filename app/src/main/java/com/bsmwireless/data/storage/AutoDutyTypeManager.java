@@ -2,6 +2,7 @@ package com.bsmwireless.data.storage;
 
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.bsmwireless.common.utils.SchedulerUtils;
 import com.bsmwireless.domain.interactors.BlackBoxInteractor;
@@ -24,6 +25,7 @@ public class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListener {
     private BlackBoxInteractor mBlackBoxInteractor;
     private ELDEventsInteractor mEventsInteractor;
     private DutyTypeManager mDutyTypeManager;
+    private PreferencesManager mPreferencesManager;
 
     private Disposable mBlackBoxDisposable;
 
@@ -46,15 +48,18 @@ public class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListener {
         }
     };
 
-    public AutoDutyTypeManager(BlackBoxInteractor blackBoxInteractor, ELDEventsInteractor eventsInteractor, DutyTypeManager dutyTypeManager) {
+    public AutoDutyTypeManager(BlackBoxInteractor blackBoxInteractor, PreferencesManager preferencesManager, ELDEventsInteractor eventsInteractor, DutyTypeManager dutyTypeManager) {
         mBlackBoxInteractor = blackBoxInteractor;
         mEventsInteractor = eventsInteractor;
         mDutyTypeManager = dutyTypeManager;
+        mPreferencesManager = preferencesManager;
 
         mDutyTypeManager.addListener(this);
         SchedulerUtils.schedule();
+    }
 
-        int boxId = (int) mBlackBoxInteractor.getLastData().getBoxId();
+    public void validateBlackBoxState() {
+        int boxId = mPreferencesManager.getBoxId();
         if (boxId != 0) {
             validateBlackBoxState(boxId);
         }

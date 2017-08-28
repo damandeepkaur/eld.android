@@ -141,6 +141,7 @@ public class DashboardFragment extends BaseFragment implements DashboardView {
     }
 
     private void initTimer() {
+        //TODO: set timer for cycle when cycle time is read
         if (mDutyType != DutyType.OFF_DUTY && mDutyType != DutyType.PERSONAL_USE) {
             mHandler.post(mTimerTask);
         }

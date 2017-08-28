@@ -65,15 +65,24 @@ public class ELDEventsInteractor {
                 .map(ELDEventConverter::toModelList);
     }
 
-    public Flowable<ELDEvent> getLatestActiveDutyEventFromDB(long latestTime) {
+    public Flowable<List<ELDEvent>> getLatestActiveDutyEventFromDB(long latestTime) {
         return mELDEventDao.getLatestActiveDutyEvent(latestTime, mPreferencesManager.getDriverId())
-                .map(ELDEventConverter::toModel);
+                .map(ELDEventConverter::toModelList);
+    }
+
+    public List<ELDEvent> getLatestActiveDutyEventFromDBSync(long latestTime) {
+        return ELDEventConverter.toModelList(mELDEventDao.getLatestActiveDutyEventSync(latestTime, mPreferencesManager.getDriverId()));
     }
 
     public Flowable<List<ELDEvent>> getActiveDutyEventsFromDB(long startTime, long endTime) {
         int driverId = mPreferencesManager.getDriverId();
         return mELDEventDao.getActiveDutyEventsAndFromStartToEndTime(startTime, endTime, driverId)
                 .map(ELDEventConverter::toModelList);
+    }
+
+    public List<ELDEvent> getActiveEventsFromDBSync(long startTime, long endTime) {
+        int driverId = mPreferencesManager.getDriverId();
+        return ELDEventConverter.toModelList(mELDEventDao.getActiveEventsFromStartToEndTimeSync(startTime, endTime, driverId));
     }
 
     public void syncELDEvents(Long startTime, Long endTime) {

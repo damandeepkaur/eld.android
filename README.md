@@ -3,7 +3,10 @@ ELD app for Android
 
 # Version history
 
-* **1.0.42** - Add dashboard indicators (_EA-280_)
+* **1.0.46** - Add black box connection
+* **1.0.45** - Update multiday screen
+* **1.0.44** - Update graph drawing and add ability create special events
+* **1.0.43** - Add dashboard indicators (_EA-280_)
 * **1.0.41** - Fix crash on incorrent events loading (_EA-313_)
 * **1.0.40** - Add YM and PU to logs screen (286)
 * **1.0.39** - Change inactive events view

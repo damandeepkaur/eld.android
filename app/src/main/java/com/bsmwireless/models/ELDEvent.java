@@ -468,6 +468,17 @@ public class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheckable {
     }
 
     @Override
+    public Boolean isActive() {
+        return mStatus.equals(ELDEvent.StatusCode.ACTIVE.getValue());
+    }
+
+    @Override
+    public Boolean isDutyEvent() {
+        return mEventType.equals(ELDEvent.EventType.DUTY_STATUS_CHANGING.getValue()) ||
+                mEventType.equals(ELDEvent.EventType.CHANGE_IN_DRIVER_INDICATION.getValue());
+    }
+
+    @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("ELDEvent{");
         sb.append("mId=").append(mId);
