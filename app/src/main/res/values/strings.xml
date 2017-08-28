@@ -517,4 +517,42 @@
     </string-array>
     <string name="multiday_total_hours">Total hours</string>
 
+    <!-- Geo location enum direction description -->
+    <string name="geo_location_at_description">At indicated geo-location</string>
+    <string name="geo_location_north_description">North of indicated geo-location</string>
+    <string name="geo_location_north_north_east_description">North – North East of indicated geo-location</string>
+    <string name="geo_location_north_east_description">North East of indicated geo-location</string>
+    <string name="geo_location_east_north_east_description">East – North East of indicated geo-location</string>
+    <string name="geo_location_east_description">East of indicated geo-location</string>
+    <string name="geo_location_east_south_east_description">East – South East of indicated geo-location</string>
+    <string name="geo_location_south_east_description">South East of indicated geo-location</string>
+    <string name="geo_location_south_south_east_description">South – South East of indicated geo-location</string>
+    <string name="geo_location_south_description">South of indicated geo-location</string>
+    <string name="geo_location_south_south_west_description">South – South West of indicated geo-location</string>
+    <string name="geo_location_south_west_description">South West of indicated geo-location</string>
+    <string name="geo_location_west_south_west_description">West – South West of indicated geo-location</string>
+    <string name="geo_location_west_description">West of indicated geo-location</string>
+    <string name="geo_location_west_north_west_description">West – North West of indicated geo-location</string>
+    <string name="geo_location_north_west_description">North West of indicated geo-location</string>
+    <string name="geo_location_north_north_west_description">North – North West of indicated geo-location</string>
+
+    <!-- Geo location enum direction codes -->
+    <string name="geo_location_at_code">&#160;</string>
+    <string name="geo_location_north_code">N</string>
+    <string name="geo_location_north_north_east_code">NNE</string>
+    <string name="geo_location_north_east_code">NE</string>
+    <string name="geo_location_east_north_east_code">ENE</string>
+    <string name="geo_location_east_code">E</string>
+    <string name="geo_location_east_south_east_code">ESE</string>
+    <string name="geo_location_south_east_code">SE</string>
+    <string name="geo_location_south_south_east_code">SSE</string>
+    <string name="geo_location_south_code">S</string>
+    <string name="geo_location_south_south_west_code">SSW</string>
+    <string name="geo_location_south_west_code">SW</string>
+    <string name="geo_location_west_south_west_code">WSW</string>
+    <string name="geo_location_west_code">W</string>
+    <string name="geo_location_west_north_west_code">WNW</string>
+    <string name="geo_location_north_west_code">NW</string>
+    <string name="geo_location_north_north_west_code">NNW</string>
+
 </resources>
