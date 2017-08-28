@@ -97,6 +97,11 @@ public class SelectAssetPresenter {
         }
     }
 
+    public void onBackButtonPressed() {
+        mView.initConfirmationDialog();
+        mView.showConfirmationDialog();
+    }
+
     public void onDestroy() {
         mDisposables.dispose();
 

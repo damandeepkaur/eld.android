@@ -9,6 +9,7 @@
     <string name="select_asset_find_nothing">Sorry we couldn\'t find anything</string>
     <string name="select_asset_characters">Enter at least 3 characters</string>
     <string name="select_asset_error">Select asset error</string>
+    <string name="select_asset_information_no_selected_assets">You didn\'t select any asset. The app will be closed.</string>
 
     <!--Alerts-->
     <string name="eld_green">Green notification</string>

@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -73,6 +74,8 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
 
     private SelectAssetAdapter mSearchAdapter;
     private SelectAssetAdapter mLastAdapter;
+
+    private AlertDialog mAlertDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -185,6 +188,9 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
 
     @Override
     protected void onDestroy() {
+        if (mAlertDialog != null) {
+            mAlertDialog.dismiss();
+        }
         mPresenter.onDestroy();
         super.onDestroy();
     }
@@ -245,6 +251,22 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
     }
 
     @Override
+    public void initConfirmationDialog() {
+        mAlertDialog = new AlertDialog.Builder(this)
+                .setCancelable(true)
+                .setMessage(R.string.select_asset_information_no_selected_assets)
+                .setOnCancelListener(dialog -> finish())
+                .create();
+    }
+
+    @Override
+    public void showConfirmationDialog() {
+        if (mAlertDialog != null) {
+            mAlertDialog.show();
+        }
+    }
+
+    @Override
     public void showErrorMessage(Error error) {
         ViewUtils.hideSoftKeyboard(this);
 
@@ -262,6 +284,14 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
         mSnackBarLayout
                 .setMessage(getString(id))
                 .showSnackbar();
+    }
+
+    @Override
+    public void onBackPressed() {
+        mPresenter.onBackButtonPressed();
+        if (this.isFinishing()) {
+            super.onBackPressed();
+        }
     }
 
     @Override

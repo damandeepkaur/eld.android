@@ -3,6 +3,7 @@ ELD app for Android
 
 # Version history
 
+* **1.0.46** - Added confirmation dialog
 * **1.0.45** - Update multiday screen
 * **1.0.44** - Update graph drawing and add ability create special events
 * **1.0.43** - Add dashboard indicators (_EA-280_)
