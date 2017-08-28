@@ -27,7 +27,6 @@ import java.util.TimeZone;
 
 import javax.inject.Inject;
 
-import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -115,15 +114,16 @@ public class LogsPresenter {
         mELDEventsInteractor.syncELDEventsWithServer(startDayTime - MS_IN_DAY, endDayTime);
 
         if (mGetEventsFromDBDisposable != null) mGetEventsFromDBDisposable.dispose();
-        mGetEventsFromDBDisposable = Flowable.zip(mELDEventsInteractor.getLatestActiveDutyEventFromDB(startDayTime),
-                mELDEventsInteractor.getDutyEventsFromDB(startDayTime, endDayTime),
-                (prevDayLatestEvent, selectedDayEvents) -> {
-                    if (!prevDayLatestEvent.isEmpty()) {
-                        prevDayLatestEvent.get(prevDayLatestEvent.size() - 1).setEventTime(startDayTime);
-                        selectedDayEvents.add(0, prevDayLatestEvent.get(prevDayLatestEvent.size() - 1));
+        mGetEventsFromDBDisposable = mELDEventsInteractor.getDutyEventsFromDB(startDayTime, endDayTime)
+                .map(selectedDayEvents -> {
+                    List<ELDEvent> prevDayLatestEvents = mELDEventsInteractor.getLatestActiveDutyEventFromDB(startDayTime);
+                    if (!prevDayLatestEvents.isEmpty()) {
+                        prevDayLatestEvents.get(prevDayLatestEvents.size() - 1).setEventTime(startDayTime);
+                        selectedDayEvents.add(0, prevDayLatestEvents.get(prevDayLatestEvents.size() - 1));
                     }
                     return selectedDayEvents;
-                }).subscribeOn(Schedulers.io())
+                })
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(eldEvents -> {
                     long currentTime = Calendar.getInstance().getTimeInMillis();

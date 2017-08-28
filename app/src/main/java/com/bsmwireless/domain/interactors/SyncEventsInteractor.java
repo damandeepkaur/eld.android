@@ -54,27 +54,29 @@ public class SyncEventsInteractor {
     }
 
     private void syncNewEvents() {
-        mSyncEventsDisposable.add(Observable.interval(Constants.SYNC_TIMEOUT_IN_MIN, TimeUnit.MINUTES)
+        mSyncEventsDisposable.add(Observable.interval(10, TimeUnit.SECONDS)
                 .subscribeOn(Schedulers.io())
                 .filter(t -> NetworkUtils.isOnlineMode())
                 .filter(t -> mPreferencesManager.getBoxId() != PreferencesManager.NOT_FOUND_VALUE)
-                .map(t -> filterIncorrectEvents(ELDEventConverter.toModelList(mELDEventDao.getNewUnsyncEvents())))
+                .map(t -> ELDEventConverter.toModelList(mELDEventDao.getNewUnsyncEvents()))
                 .filter(eldEvents -> !eldEvents.isEmpty())
+                .doOnNext(events -> filterIncorrectEvents(events))
                 .flatMap(events -> Observable.fromIterable(parseELDEventsList(events)))
                 .flatMap(events -> mServiceApi.postNewELDEvents(events)
                         .onErrorResumeNext(Observable.just(mErrorResponse))
                         .onExceptionResumeNext(Observable.just(mErrorResponse))
                         .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS) ? events : new ArrayList<ELDEvent>())
                 )
-                .filter(eldEvents -> !eldEvents.isEmpty())
-                .flatMap(events -> {
-                    ELDEventEntity[] entities = ELDEventConverter.toEntityList(events).toArray(new ELDEventEntity[events.size()]);
-                    mELDEventDao.deleteAll(entities);
-                    return mServiceApi.getELDEvents(events.get(0).getEventTime(), events.get(events.size() - 1).getEventTime());
-                })
-                .subscribe(events -> {
-                            ELDEventEntity[] entities = ELDEventConverter.toEntityArray(events);
+                .filter(events -> !events.isEmpty())
+                .flatMap(events -> mServiceApi.getELDEvents(events.get(0).getEventTime(), events.get(events.size() - 1).getEventTime())
+                        .doOnNext(eldEvents -> {
+                            ELDEventEntity[] entities = ELDEventConverter.toEntityArray(eldEvents);
                             mELDEventDao.insertAll(entities);
+                        })
+                        .map(eldEvents -> events))
+                .subscribe(events -> {
+                            ELDEventEntity[] entities = ELDEventConverter.toEntityList(events).toArray(new ELDEventEntity[events.size()]);
+                            mELDEventDao.deleteAll(entities);
                         },
                         error -> Timber.e(error))
         );
@@ -85,8 +87,9 @@ public class SyncEventsInteractor {
                 .subscribeOn(Schedulers.io())
                 .filter(t -> NetworkUtils.isOnlineMode())
                 .filter(t -> mPreferencesManager.getBoxId() != PreferencesManager.NOT_FOUND_VALUE)
-                .map(t -> filterIncorrectEvents(ELDEventConverter.toModelList(mELDEventDao.getUpdateUnsyncEvents())))
+                .map(t -> ELDEventConverter.toModelList(mELDEventDao.getUpdateUnsyncEvents()))
                 .filter(events -> !events.isEmpty())
+                .doOnNext(events -> filterIncorrectEvents(events))
                 .flatMap(events -> Observable.fromIterable(parseELDEventsList(events)))
                 .flatMap(events -> mServiceApi.updateELDEvents(events)
                         .onErrorResumeNext(Observable.just(mErrorResponse))
