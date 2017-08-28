@@ -7,6 +7,8 @@ import com.bsmwireless.domain.interactors.UserInteractor;
 import com.bsmwireless.domain.interactors.VehiclesInteractor;
 import com.bsmwireless.models.Vehicle;
 
+import java.net.ConnectException;
+
 import javax.inject.Inject;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -95,7 +97,7 @@ public class SelectAssetPresenter {
                                     mView.showErrorMessage((RetrofitException) error);
                                 }
 
-                                if (error instanceof BlackBoxConnectionException) {
+                                if (error instanceof BlackBoxConnectionException || error instanceof ConnectException) {
                                     mView.showErrorMessage(SelectAssetView.Error.ERROR_BLACKBOX);
                                 }
                             }));
