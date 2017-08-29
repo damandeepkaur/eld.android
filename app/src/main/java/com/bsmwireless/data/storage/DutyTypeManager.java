@@ -54,7 +54,7 @@ public class DutyTypeManager {
         setDutyType(dutyType, false);
     }
 
-    public void setDutyTypeTime(DutyType dutyType, int time) {
+    private void setDutyTypeTime(DutyType dutyType, int time) {
         switch (dutyType) {
             case ON_DUTY:
             case YARD_MOVES:
