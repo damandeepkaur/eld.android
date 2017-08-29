@@ -152,7 +152,7 @@ public class PreferencesManager {
         return mPreferences.getLong(KEY_TIME_SLEEPER_BERTH, 0);
     }
 
-    //Should be used via DutyManager only
+    //Should be used via DutyTypeManager only
     public void setDutyType(int dutyType) {
         SharedPreferences.Editor editor = mPreferences.edit();
         editor.putInt(KEY_DUTY_TYPE, dutyType);

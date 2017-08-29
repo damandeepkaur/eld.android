@@ -40,6 +40,7 @@
     <string name="error_username">Username Required</string>
     <string name="error_password">Password Required</string>
     <string name="error_domain">Domain Required</string>
+    <string name="error_pair">Pair error</string>
 
     <!--Logs-->
     <string name="logs_sign_logsheet">SIGN LOGSHEET</string>
@@ -482,9 +483,24 @@
     <string name="event_updated">Event updated</string>
 
     <!-- Auto Logout Activity -->
-    <string name="auto_logout_message_alert_dialog">Do you want to proceed with logout?</string>
-    <string name="auto_logout_positive_button_lbl_alert_dialog">Logout</string>
-    <string name="auto_logout_cancel_button_lbl_alert_dialog">Cancel</string>
+    <string name="logout_dialog_title">Expiration Warning</string>
+    <string name="logout_dialog_message">Your session will expire in 1 minutes. Please tap "Continue" to keep working or "Log out" to end your session now</string>
+    <string name="logout_accept">Continue</string>
+    <string name="logout_cancel">Log out</string>
+
+    <string name="driving_dialog_title">Confirmation required</string>
+    <string name="driving_dialog_message">You are still in Personal Use (Off Duty) mode. Please confirm your status or switch to the proper duty status.</string>
+    <string name="driving_cancel">Switch to Driving</string>
+    <string name="driving_accept">Confirm</string>
+
+    <string name="on_duty_dialog_title">Confirmation required</string>
+    <string name="on_duty_dialog_message">Your vehicle hasn\'t been in-motion for 5 minutes. Please confirm your driving status or switch to the proper duty status.</string>
+    <string name="on_duty_cancel">Switch to On Duty</string>
+    <string name="on_duty_accept">Confirm</string>
+
+    <string name="not_in_vehicle_dialog_title">Warning</string>
+    <string name="not_in_vehicle_dialog_message">You can\'t change duty status while not in vehicle.</string>
+    <string name="not_in_vehicle_accept">OK</string>
 
     <!-- Settings Activity -->
     <string name="settings">Settings</string>

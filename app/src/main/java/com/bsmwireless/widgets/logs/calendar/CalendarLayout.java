@@ -2,7 +2,6 @@ package com.bsmwireless.widgets.logs.calendar;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.Canvas;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -19,7 +18,6 @@ import java.util.Date;
 import java.util.List;
 
 import app.bsmuniversal.com.R;
-import butterknife.OnClick;
 
 public class CalendarLayout extends LinearLayout implements View.OnClickListener {
 
@@ -32,7 +30,8 @@ public class CalendarLayout extends LinearLayout implements View.OnClickListener
     private CalendarAdapter mAdapter;
     private int mDaysCount;
     private LinearLayoutManager mLayoutManager;
-    private OnItemSelectListener mListener;
+    private OnItemSelectListener mOnItemSelectListener;
+    private OnWeekChangedListener mOnWeekChangedListener;
     private List<LogSheetHeader> mLogSheetHeaders;
 
     public CalendarLayout(Context context) {
@@ -96,9 +95,9 @@ public class CalendarLayout extends LinearLayout implements View.OnClickListener
     public void onClick(View v) {
         int position = mRecyclerView.getChildAdapterPosition(v);
         mAdapter.setSelectedItem(position);
-        if (mListener != null) {
+        if (mOnItemSelectListener != null) {
             CalendarItem item = mAdapter.getItemByPosition(position);
-            mListener.onItemSelected(item);
+            mOnItemSelectListener.onItemSelected(item);
         }
     }
 
@@ -107,6 +106,9 @@ public class CalendarLayout extends LinearLayout implements View.OnClickListener
         int lastPosition = mLayoutManager.findLastVisibleItemPosition();
         int newPosition = lastPosition + (lastPosition - firstPosition) - 1;
         mRecyclerView.smoothScrollToPosition(newPosition < mAdapter.getItemCount() ? newPosition : mAdapter.getItemCount() - 1);
+        if (mOnWeekChangedListener != null) {
+            mOnWeekChangedListener.onWeekChanged(mAdapter.getItemByPosition(firstPosition));
+        }
     }
 
     private void onRightClicked() {
@@ -114,6 +116,9 @@ public class CalendarLayout extends LinearLayout implements View.OnClickListener
         int lastPosition = mLayoutManager.findLastVisibleItemPosition();
         int newPosition = firstPosition - (lastPosition - firstPosition) + 1;
         mRecyclerView.smoothScrollToPosition(newPosition > 0 ? newPosition : 0);
+        if (mOnWeekChangedListener != null) {
+            mOnWeekChangedListener.onWeekChanged(mAdapter.getItemByPosition(firstPosition));
+        }
     }
 
     public void setLogs(List<LogSheetHeader> logsSheetHeaders) {
@@ -125,7 +130,11 @@ public class CalendarLayout extends LinearLayout implements View.OnClickListener
     }
 
     public void setOnItemSelectedListener(OnItemSelectListener listener) {
-        mListener = listener;
+        mOnItemSelectListener = listener;
+    }
+
+    public void setOnWeekChangedListener(OnWeekChangedListener listener) {
+        mOnWeekChangedListener = listener;
     }
 
     private List<CalendarItem> getItems() {
@@ -149,5 +158,9 @@ public class CalendarLayout extends LinearLayout implements View.OnClickListener
 
     public interface OnItemSelectListener {
         void onItemSelected(CalendarItem log);
+    }
+
+    public interface OnWeekChangedListener {
+        void onWeekChanged(CalendarItem startWeekDay);
     }
 }

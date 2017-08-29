@@ -1,6 +1,5 @@
 package com.bsmwireless.domain.interactors;
 
-import com.bsmwireless.common.utils.SchedulerUtils;
 import com.bsmwireless.common.utils.DateUtils;
 import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.network.authenticator.TokenManager;
@@ -16,7 +15,6 @@ import com.bsmwireless.data.storage.users.UserEntity;
 import com.bsmwireless.models.DriverHomeTerminal;
 import com.bsmwireless.models.DriverProfileModel;
 import com.bsmwireless.models.DriverSignature;
-import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.LoginModel;
 import com.bsmwireless.models.PasswordModel;
 import com.bsmwireless.models.ResponseMessage;
@@ -27,12 +25,12 @@ import java.util.Calendar;
 
 import javax.inject.Inject;
 
+import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
 
 import static com.bsmwireless.common.Constants.SUCCESS;
 import static com.bsmwireless.common.utils.DateUtils.MS_IN_WEEK;
-import static com.bsmwireless.models.ELDEvent.EventType.LOGIN_LOGOUT;
 
 public class UserInteractor {
 
@@ -40,16 +38,14 @@ public class UserInteractor {
     private AppDatabase mAppDatabase;
     private TokenManager mTokenManager;
     private PreferencesManager mPreferencesManager;
-    private BlackBoxInteractor mBlackBoxInteractor;
 
     @Inject
     public UserInteractor(ServiceApi serviceApi, PreferencesManager preferencesManager, AppDatabase appDatabase,
-                          TokenManager tokenManager, BlackBoxInteractor blackBoxInteractor) {
+                          TokenManager tokenManager) {
         mServiceApi = serviceApi;
         mPreferencesManager = preferencesManager;
         mAppDatabase = appDatabase;
         mTokenManager = tokenManager;
-        mBlackBoxInteractor = blackBoxInteractor;
     }
 
     public Observable<Boolean> loginUser(final String name, final String password, final String domain, boolean keepToken, User.DriverType driverType) {
@@ -94,84 +90,53 @@ public class UserInteractor {
                     long end = DateUtils.getEndDayTimeInMs(user.getTimezone(), current);
                     return mServiceApi.getELDEvents(start, end);
                 }).map(events -> {
-                    ELDEventEntity[] entities = ELDEventConverter.toEntityList(events).toArray(new ELDEventEntity[events.size()]);
-                    for (ELDEventEntity entity : entities) {
-                        entity.setSync(true);
-                    }
+                    ELDEventEntity[] entities = ELDEventConverter.toEntityArray(events);
                     mAppDatabase.ELDEventDao().insertAll(entities);
                     return true;
                 });
     }
 
-    public Observable<Boolean> logoutUser() {
-        ELDEvent logoutEvent = new ELDEvent();
-        int driverId = getDriverId();
-        logoutEvent.setStatus(ELDEvent.StatusCode.ACTIVE.getValue());
-        logoutEvent.setOrigin(ELDEvent.EventOrigin.DRIVER.getValue());
-        logoutEvent.setEventType(LOGIN_LOGOUT.getValue());
-        logoutEvent.setEventCode(ELDEvent.LoginLogoutCode.LOGOUT.getValue());
-        logoutEvent.setEventTime(System.currentTimeMillis());
-        logoutEvent.setMobileTime(System.currentTimeMillis());
-        logoutEvent.setDriverId(getDriverId());
-        logoutEvent.setBoxId(mPreferencesManager.getBoxId());
-        logoutEvent.setVehicleId(mPreferencesManager.getVehicleId());
-
-        return mBlackBoxInteractor.getData()
-                .flatMap(blackBox -> {
-                    logoutEvent.setTimezone(getTimezoneSync(driverId));
-                    logoutEvent.setEngineHours(blackBox.getEngineHours());
-                    logoutEvent.setOdometer(blackBox.getOdometer());
-                    logoutEvent.setLat(blackBox.getLat());
-                    logoutEvent.setLng(blackBox.getLon());
-
-                    return mServiceApi.logout(logoutEvent)
-                            .doOnNext(responseMessage -> {
-                                if (!mPreferencesManager.isRememberUserEnabled()) {
-                                    mAppDatabase.userDao().deleteUser(getDriverId());
-                                    mTokenManager.removeAccount(mPreferencesManager.getAccountName());
-                                    mPreferencesManager.clearValues();
-                                } else {
-                                    mTokenManager.clearToken(mTokenManager.getToken(mPreferencesManager.getAccountName()));
-                                }
-                                // Cancel auto logout in any case if user is logged out
-                                SchedulerUtils.cancel();
-                            })
-                            .doOnError(throwable -> SchedulerUtils.cancel())
-                            .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
-                });
+    public void deleteUser() {
+        if (!mPreferencesManager.isRememberUserEnabled()) {
+            mAppDatabase.userDao().deleteUser(getDriverId());
+            mTokenManager.removeAccount(mPreferencesManager.getAccountName());
+            mPreferencesManager.clearValues();
+        } else {
+            mTokenManager.clearToken(mTokenManager.getToken(mPreferencesManager.getAccountName()));
+        };
     }
 
     public Observable<Boolean> syncDriverProfile(User user) {
         UserEntity userEntity = UserConverter.toEntity(user);
         return Observable.fromCallable(() -> mAppDatabase.userDao().insertUser(userEntity))
-                         .map(userId -> userId > 0)
-                         .flatMap(userInserted -> {
-                             if (userInserted) {
-                                 return mServiceApi.updateDriverProfile(new DriverProfileModel(userEntity));
-                             }
-                             return Observable.just(new ResponseMessage(""));
-                         })
-                         .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
+                .map(userId -> userId > 0)
+                .flatMap(userInserted -> {
+                    if (userInserted) {
+                        return mServiceApi.updateDriverProfile(new DriverProfileModel(userEntity));
+                    }
+                    return Observable.just(new ResponseMessage(""));
+                })
+                .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
     }
 
     public Observable<Boolean> updateDriverPassword(String oldPassword, String newPassword) {
         return mServiceApi.updateDriverPassword(getPasswordModel(oldPassword, newPassword))
-                          .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
+                .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
     }
 
     public Observable<Boolean> updateDriverSignature(String signature) {
         return mServiceApi.updateDriverSignature(getDriverSignature(signature))
-                          .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
+                .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
     }
 
     public Observable<Boolean> updateDriverRule(String ruleException) {
         return mServiceApi.updateDriverRule(getRuleSelectionModel(ruleException))
-                          .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
+                .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
     }
 
     public Observable<Boolean> updateDriverHomeTerminal(Integer homeTerminalId) {
         return mServiceApi.updateDriverHomeTerminal(getHomeTerminal(homeTerminalId))
-                          .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
+                .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
     }
 
     public String getUserName() {

@@ -2,7 +2,6 @@ package com.bsmwireless.widgets.logs.calendar;
 
 import android.support.annotation.Nullable;
 
-import com.bsmwireless.common.utils.DateUtils;
 import com.bsmwireless.models.LogSheetHeader;
 
 import java.text.SimpleDateFormat;
@@ -14,7 +13,6 @@ public class CalendarItem {
 
     public static final int ONE_DAY_MS = 24 * 60 * 60 * 1000;
 
-    private static final SimpleDateFormat mMonthFormat = new SimpleDateFormat("MMMM", Locale.US);
     private static final SimpleDateFormat mDayFormat = new SimpleDateFormat("EEEE", Locale.US);
 
     private Calendar mCalendar = Calendar.getInstance();
@@ -22,7 +20,6 @@ public class CalendarItem {
     private LogSheetHeader mAssociatedLog;
     private Long mTimestamp;
 
-    private String mMonth;
     private String mDay;
     private String mDayOfWeek;
 
@@ -32,12 +29,7 @@ public class CalendarItem {
         mCalendar.setTime(new Date(mTimestamp));
 
         mDay = String.valueOf(mCalendar.get(Calendar.DAY_OF_MONTH));
-        mMonth = mMonthFormat.format(mCalendar.getTime());
         mDayOfWeek = mDayFormat.format(mCalendar.getTime()).substring(0, 3).toUpperCase();
-    }
-
-    public String getMonth() {
-        return mMonth;
     }
 
     public String getDay() {
@@ -77,7 +69,6 @@ public class CalendarItem {
         sb.append("mCalendar=").append(mCalendar);
         sb.append(", mAssociatedLog=").append(mAssociatedLog);
         sb.append(", mTimestamp=").append(mTimestamp);
-        sb.append(", mMonth='").append(mMonth).append('\'');
         sb.append(", mDay='").append(mDay).append('\'');
         sb.append(", mDayOfWeek='").append(mDayOfWeek).append('\'');
         sb.append('}');
