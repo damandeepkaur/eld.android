@@ -11,16 +11,18 @@ import android.widget.TextView;
 
 import com.bsmwireless.widgets.alerts.DutyType;
 
+import java.util.ArrayList;
+
 import app.bsmuniversal.com.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class BaseMenuAdapter extends ArrayAdapter<DutyType> {
-    private DutyType[] mDutyTypes = new DutyType[0];
+public class BaseMenuAdapter extends ArrayAdapter<BaseMenuAdapter.DutyItem> {
+    private ArrayList<DutyItem> mDutyItems = new ArrayList<>();
 
-    BaseMenuAdapter(@NonNull Context context, @NonNull DutyType[] dutyTypes) {
-        super(context, R.layout.view_item_dashboard, dutyTypes);
-        mDutyTypes = dutyTypes;
+    BaseMenuAdapter(@NonNull Context context, @NonNull ArrayList<DutyItem> dutyItems) {
+        super(context, R.layout.view_item_dashboard, dutyItems);
+        mDutyItems = dutyItems;
     }
 
     @NonNull
@@ -35,7 +37,7 @@ public class BaseMenuAdapter extends ArrayAdapter<DutyType> {
         } else {
             holder = (Holder) convertView.getTag();
         }
-        holder.bind(mDutyTypes[position]);
+        holder.bind(mDutyItems.get(position));
 
         return convertView;
     }
@@ -48,9 +50,30 @@ public class BaseMenuAdapter extends ArrayAdapter<DutyType> {
             ButterKnife.bind(this, view);
         }
 
-        void bind(DutyType dutyType) {
-            mTitleText.setText(dutyType.getName());
-            mTitleText.setCompoundDrawablesWithIntrinsicBounds(dutyType.getIcon(), 0, 0, 0);
+        void bind(DutyItem dutyItem) {
+            mTitleText.setText(dutyItem.getDutyType().getName());
+            mTitleText.setCompoundDrawablesWithIntrinsicBounds(dutyItem.getDutyType().getIcon(), 0, 0, 0);
+            mTitleText.setEnabled(dutyItem.isEnabled());
+            mTitleText.setFocusable(!dutyItem.isEnabled());
+            mTitleText.setFocusableInTouchMode(!dutyItem.isEnabled());
+        }
+    }
+
+    public static class DutyItem {
+        private DutyType mDutyType;
+        private boolean mIsEnabled;
+
+        public DutyItem(DutyType dutyType, boolean isEnabled) {
+            mDutyType = dutyType;
+            mIsEnabled = isEnabled;
+        }
+
+        public DutyType getDutyType() {
+            return mDutyType;
+        }
+
+        public boolean isEnabled() {
+            return mIsEnabled;
         }
     }
 }

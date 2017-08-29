@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import app.bsmuniversal.com.RxSchedulerRule;
+import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.observers.TestObserver;
@@ -155,7 +156,7 @@ public class UserInteractorTest {
         MockitoAnnotations.initMocks(this);
 
 
-        mLoginUserInteractor = new UserInteractor(mServiceApi, mPreferencesManager, mAppDatabase, mTokenManager, mBlackBoxInteractor);
+        mLoginUserInteractor = new UserInteractor(mServiceApi, mPreferencesManager, mAppDatabase, mTokenManager);
     }
 
     /**
@@ -319,7 +320,6 @@ public class UserInteractorTest {
         when(mServiceApi.loginUser(any(LoginModel.class))).thenReturn(Observable.just(user));
 
         // when
-
         mLoginUserInteractor.loginUser(mName, mPassword, mDomain, mKeepToken, mDriverType)
                 .subscribe(testObserver);
 
@@ -332,18 +332,14 @@ public class UserInteractorTest {
 
 
     @Test
-    public void testLogoutUserSuccessNoRemember() {
+    public void testDeleteUserSuccessNoRemember() {
         // given
         final String accountName = "mock account name";
         final String driver = "90210"; // parsable to int
         final int driverInt = 90210; // int version of driver
 
-        TestObserver<Boolean> isLogoutTestObserver = new TestObserver<>();
-        BlackBoxModel blackBoxModel = new BlackBoxModel();
-
         when(mPreferencesManager.getAccountName()).thenReturn(accountName);
         when(mTokenManager.getDriver(anyString())).thenReturn(driver);
-        when(mBlackBoxInteractor.getData()).thenReturn(Observable.just(blackBoxModel));
         when(mAppDatabase.userDao()).thenReturn(mUserDao);
 
         when(mPreferencesManager.isRememberUserEnabled()).thenReturn(false);
@@ -351,33 +347,23 @@ public class UserInteractorTest {
         when(mResponseMessage.getMessage()).thenReturn(mSuccessResponse);
 
         // when
-        Observable<Boolean> isLogout = mLoginUserInteractor.logoutUser();
-        isLogout.subscribeWith(isLogoutTestObserver);
+        mLoginUserInteractor.deleteUser();
 
         // then
-        verify(mServiceApi).logout(any(ELDEvent.class));
         verify(mUserDao).deleteUser(eq(driverInt));
         verify(mTokenManager).removeAccount(eq(accountName));
         verify(mPreferencesManager).clearValues();
-        verify(mServiceApi).logout(argThat(mEldEventLogoutCodeMatcher)); // validates ELD logout event against ELD 7.20 Table 6
-        verify(mServiceApi).logout(argThat(mEldEventActiveStatusCodeMatcher)); // validates ELD 7.23
-        verify(mServiceApi).logout(argThat(mEldEventDriverEditOriginCodeMatcher)); // validates ELD 7.22
-        isLogoutTestObserver.assertResult(true);
     }
 
     @Test
-    public void testLogoutUserSuccessRemember() {
+    public void testDeleteUserSuccessRemember() {
         // given
         final String accountName = "mock account name";
         final String driver = "90210"; // parsable to int
         final String fakeToken = "314159265";
 
-        TestObserver<Boolean> isLogoutTestObserver = new TestObserver<>();
-        BlackBoxModel blackBoxModel = new BlackBoxModel();
-
         when(mPreferencesManager.getAccountName()).thenReturn(accountName);
         when(mTokenManager.getDriver(anyString())).thenReturn(driver);
-        when(mBlackBoxInteractor.getData()).thenReturn(Observable.just(blackBoxModel));
         when(mAppDatabase.userDao()).thenReturn(mUserDao);
         when(mTokenManager.getToken(anyString())).thenReturn(fakeToken);
 
@@ -386,42 +372,10 @@ public class UserInteractorTest {
         when(mResponseMessage.getMessage()).thenReturn(mSuccessResponse);
 
         // when
-        Observable<Boolean> isLogout = mLoginUserInteractor.logoutUser();
-        isLogout.subscribeWith(isLogoutTestObserver);
+        mLoginUserInteractor.deleteUser();
 
         // then
-        verify(mServiceApi).logout(any(ELDEvent.class));
         verify(mTokenManager).clearToken(eq(fakeToken));
-        verify(mServiceApi).logout(argThat(mEldEventLogoutCodeMatcher)); // validates ELD logout event against ELD 7.20 Table 6
-        verify(mServiceApi).logout(argThat(mEldEventActiveStatusCodeMatcher)); // validates ELD 7.23
-        verify(mServiceApi).logout(argThat(mEldEventDriverEditOriginCodeMatcher)); // validates ELD 7.22
-        isLogoutTestObserver.assertResult(true);
-    }
-
-    @Test
-    public void testLogoutUserFailure() {
-        // given
-        ResponseMessage failMessage = new ResponseMessage();
-        failMessage.setMessage("not success");  // at this time, anything but "ACK"
-
-        BlackBoxModel fakeBlackBoxModel = new BlackBoxModel();
-
-        when(mServiceApi.logout(any(ELDEvent.class))).thenReturn(Observable.just(failMessage));
-        when(mPreferencesManager.isRememberUserEnabled()).thenReturn(false); // either is ok
-        when(mBlackBoxInteractor.getData()).thenReturn(Observable.just(fakeBlackBoxModel));
-        when(mAppDatabase.userDao()).thenReturn(mUserDao);
-        when(mUserDao.getUserTimezoneSync(any(Integer.class))).thenReturn("Etc/UTC");
-
-        TestObserver<Boolean> testObserver = TestObserver.create();
-
-        // when
-        mLoginUserInteractor.logoutUser().subscribe(testObserver);
-
-        // then
-        testObserver.assertResult(false);
-        verify(mServiceApi).logout(argThat(mEldEventLogoutCodeMatcher)); // validates ELD logout event against ELD 7.20 Table 6
-        verify(mServiceApi).logout(argThat(mEldEventActiveStatusCodeMatcher)); // validates ELD 7.23
-        verify(mServiceApi).logout(argThat(mEldEventDriverEditOriginCodeMatcher)); // validates ELD 7.22
     }
 
     @Test
