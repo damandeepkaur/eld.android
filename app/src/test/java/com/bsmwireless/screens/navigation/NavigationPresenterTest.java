@@ -1,6 +1,7 @@
 package com.bsmwireless.screens.navigation;
 
-import com.bsmwireless.data.storage.DutyManager;
+import com.bsmwireless.data.storage.AutoDutyTypeManager;
+import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
 import com.bsmwireless.domain.interactors.SyncEventsInteractor;
 import com.bsmwireless.domain.interactors.UserInteractor;
@@ -46,10 +47,13 @@ public class NavigationPresenterTest {
     VehiclesInteractor mVehiclesInteractor;
 
     @Mock
-    DutyManager mDutyManager;
+    DutyTypeManager mDutyTypeManager;
 
     @Mock
     ELDEventsInteractor mEventsInteractor;
+
+    @Mock
+    AutoDutyTypeManager mAutoDutyTypeManager;
 
     @Mock
     SyncEventsInteractor mSyncEventsInteractor;
@@ -62,7 +66,7 @@ public class NavigationPresenterTest {
     public void before() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        mNavigationPresenter = new NavigationPresenter(mView, mUserInteractor, mVehiclesInteractor, mEventsInteractor, mDutyManager, mSyncEventsInteractor);
+        mNavigationPresenter = new NavigationPresenter(mView, mUserInteractor, mVehiclesInteractor, mEventsInteractor, mDutyTypeManager, mAutoDutyTypeManager, mSyncEventsInteractor);
     }
 
     /**
@@ -71,13 +75,14 @@ public class NavigationPresenterTest {
     @Test
     public void testOnLogoutInteractorCall() {
         // given
-        when(mUserInteractor.logoutUser()).thenReturn(Observable.just(true));
+        when(mEventsInteractor.postLogoutEvent()).thenReturn(Observable.just(true));
 
         // when
         mNavigationPresenter.onLogoutItemSelected();
 
         // then
-        verify(mUserInteractor).logoutUser();
+        verify(mEventsInteractor).postLogoutEvent();
+        verify(mUserInteractor).deleteUser();
     }
 
     /**
@@ -86,7 +91,7 @@ public class NavigationPresenterTest {
     @Test
     public void testOnLogoutFailed() {
         // given
-        when(mUserInteractor.logoutUser()).thenReturn(Observable.just(false));
+        when(mEventsInteractor.postLogoutEvent()).thenReturn(Observable.just(false));
 
         // when
         mNavigationPresenter.onLogoutItemSelected();
@@ -104,7 +109,7 @@ public class NavigationPresenterTest {
     @Test
     public void testOnLogoutError() {
         // given
-        when(mUserInteractor.logoutUser()).thenReturn(Observable.error(new RuntimeException("it broke.")));
+        when(mEventsInteractor.postLogoutEvent()).thenReturn(Observable.error(new RuntimeException("it broke.")));
 
         // when
         mNavigationPresenter.onLogoutItemSelected();

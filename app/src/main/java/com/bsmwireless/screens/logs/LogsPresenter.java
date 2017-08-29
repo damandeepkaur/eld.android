@@ -5,7 +5,7 @@ import com.bsmwireless.common.Constants;
 import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.common.utils.DateUtils;
 import com.bsmwireless.data.network.RetrofitException;
-import com.bsmwireless.data.storage.DutyManager;
+import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
 import com.bsmwireless.domain.interactors.LogSheetInteractor;
 import com.bsmwireless.domain.interactors.UserInteractor;
@@ -45,30 +45,31 @@ public class LogsPresenter {
     private LogSheetInteractor mLogSheetInteractor;
     private VehiclesInteractor mVehiclesInteractor;
     private UserInteractor mUserInteractor;
-    private DutyManager mDutyManager;
+    private DutyTypeManager mDutyTypeManager;
     private CompositeDisposable mDisposables;
     private String mTimeZone;
     private TripInfoModel mTripInfo;
     private Map<Integer, String> mVehicleIdToNameMap = new HashMap<>();
     private List<LogSheetHeader> mLogSheetHeaders;
     private Disposable mGetEventsFromDBDisposable;
-    private DutyManager.DutyTypeListener mListener = dutyType -> mView.dutyUpdated();
     private Calendar mSelectedDayCalendar;
+
+    private DutyTypeManager.DutyTypeListener mListener = dutyType -> mView.dutyUpdated();
 
     @Inject
     public LogsPresenter(LogsView view, ELDEventsInteractor eventsInteractor, LogSheetInteractor logSheetInteractor,
-                         VehiclesInteractor vehiclesInteractor, UserInteractor userInteractor, DutyManager dutyManager) {
+                         VehiclesInteractor vehiclesInteractor, UserInteractor userInteractor, DutyTypeManager dutyTypeManager) {
         mView = view;
         mELDEventsInteractor = eventsInteractor;
         mLogSheetInteractor = logSheetInteractor;
         mVehiclesInteractor = vehiclesInteractor;
         mUserInteractor = userInteractor;
-        mDutyManager = dutyManager;
+        mDutyTypeManager = dutyTypeManager;
         mDisposables = new CompositeDisposable();
         mTripInfo = new TripInfoModel();
         Timber.d("CREATED");
 
-        mDutyManager.addListener(mListener);
+        mDutyTypeManager.addListener(mListener);
     }
 
     public void onViewCreated() {
@@ -182,7 +183,7 @@ public class LogsPresenter {
                 }
             }
             long currentTime = Calendar.getInstance().getTimeInMillis();
-            long[] times = DutyManager.getDutyTypeTimes(new ArrayList<>(events), startDayTime, endDayTime < currentTime ? endDayTime : currentTime);
+            long[] times = DutyTypeManager.getDutyTypeTimes(new ArrayList<>(events), startDayTime, endDayTime < currentTime ? endDayTime : currentTime);
 
             tripInfo.setSleeperBerthTime(DateUtils.convertTotalTimeInMsToStringTime(times[DutyType.SLEEPER_BERTH.ordinal()]));
             tripInfo.setDrivingTime(DateUtils.convertTotalTimeInMsToStringTime(times[DutyType.DRIVING.ordinal()]));
@@ -292,7 +293,7 @@ public class LogsPresenter {
     }
 
     public void onDestroy() {
-        mDutyManager.removeListener(mListener);
+        mDutyTypeManager.removeListener(mListener);
         mDisposables.dispose();
         Timber.d("DESTROYED");
     }

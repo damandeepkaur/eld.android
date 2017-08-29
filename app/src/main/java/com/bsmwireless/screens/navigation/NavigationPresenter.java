@@ -1,7 +1,8 @@
 package com.bsmwireless.screens.navigation;
 
 import com.bsmwireless.common.utils.DateUtils;
-import com.bsmwireless.data.storage.DutyManager;
+import com.bsmwireless.data.storage.AutoDutyTypeManager;
+import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
 import com.bsmwireless.domain.interactors.SyncEventsInteractor;
 import com.bsmwireless.domain.interactors.UserInteractor;
@@ -23,29 +24,49 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
-import static com.bsmwireless.common.utils.DateUtils.MS_IN_DAY;
-
 public class NavigationPresenter extends BaseMenuPresenter {
 
     private NavigateView mView;
     private UserInteractor mUserInteractor;
     private VehiclesInteractor mVehiclesInteractor;
     private SyncEventsInteractor mSyncEventsInteractor;
+    private AutoDutyTypeManager mAutoDutyTypeManager;
+
+    private AutoDutyTypeManager.AutoDutyTypeListener mListener = new AutoDutyTypeManager.AutoDutyTypeListener() {
+        @Override
+        public void onAutoOnDuty() {
+            mView.setAutoOnDuty();
+        }
+
+        @Override
+        public void onAutoDriving() {
+            mView.setAutoDriving();
+        }
+
+        @Override
+        public void onAutoDrivingWithoutConfirm() {
+            mView.setAutoDrivingWithoutConfirm();
+        }
+    };
 
     @Inject
-    public NavigationPresenter(NavigateView view, UserInteractor userInteractor, VehiclesInteractor vehiclesInteractor,
-                               ELDEventsInteractor eventsInteractor, DutyManager dutyManager, SyncEventsInteractor syncEventsInteractor) {
+    public NavigationPresenter(NavigateView view, UserInteractor userInteractor, VehiclesInteractor vehiclesInteractor, ELDEventsInteractor eventsInteractor,
+                               DutyTypeManager dutyTypeManager, AutoDutyTypeManager autoDutyTypeManager, SyncEventsInteractor syncEventsInteractor) {
         mView = view;
         mUserInteractor = userInteractor;
         mVehiclesInteractor = vehiclesInteractor;
         mEventsInteractor = eventsInteractor;
-        mDutyManager = dutyManager;
+        mDutyTypeManager = dutyTypeManager;
+        mAutoDutyTypeManager = autoDutyTypeManager;
         mSyncEventsInteractor = syncEventsInteractor;
         mDisposables = new CompositeDisposable();
+
+        mAutoDutyTypeManager.setListener(mListener);
     }
 
     public void onLogoutItemSelected() {
-        Disposable disposable = mUserInteractor.logoutUser()
+        Disposable disposable = mEventsInteractor.postLogoutEvent()
+                .doOnNext(isSuccess -> mUserInteractor.deleteUser())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
@@ -74,6 +95,7 @@ public class NavigationPresenter extends BaseMenuPresenter {
         mView.setCoDriversNumber(mUserInteractor.getCoDriversNumber());
         mView.setBoxId(mVehiclesInteractor.getBoxId());
         mView.setAssetsNumber(mVehiclesInteractor.getAssetsNumber());
+        mAutoDutyTypeManager.validateBlackBoxState();
         mSyncEventsInteractor.startSync();
     }
 
@@ -89,14 +111,20 @@ public class NavigationPresenter extends BaseMenuPresenter {
 
                     mView.setResetTime(time[1]);
 
-                    //TODO: get HOS from server instead of checking events manually
-                    return mEventsInteractor.getELDEvents(time[0] - MS_IN_DAY, time[1]);
+                    return mEventsInteractor.getDutyEventsFromDB(time[0], time[1])
+                            .map(selectedDayEvents -> {
+                                List<ELDEvent> prevDayLatestEvents = mEventsInteractor.getLatestActiveDutyEventFromDB(time[0]);
+                                if (!prevDayLatestEvents.isEmpty()) {
+                                    selectedDayEvents.add(0, prevDayLatestEvents.get(prevDayLatestEvents.size() - 1));
+                                }
+                                return selectedDayEvents;
+                            });
                 })
                 .subscribeOn(Schedulers.io())
                 .subscribe(
                         events -> resetTime(events, time[0]),
                         error -> {
-                            mDutyManager.setDutyTypeTime(0, 0, 0, DutyType.OFF_DUTY);
+                            mDutyTypeManager.setDutyTypeTime(0, 0, 0, DutyType.OFF_DUTY);
                             Timber.e("Get timezone error: %s", error);
                         }
                 ));
@@ -143,9 +171,9 @@ public class NavigationPresenter extends BaseMenuPresenter {
             }
         }
 
-        long[] times = DutyManager.getDutyTypeTimes(new ArrayList<>(events), startOfDay, System.currentTimeMillis());
+        long[] times = DutyTypeManager.getDutyTypeTimes(new ArrayList<>(events), startOfDay, System.currentTimeMillis());
 
-        mDutyManager.setDutyTypeTime(
+        mDutyTypeManager.setDutyTypeTime(
                 (int) (times[DutyType.ON_DUTY.ordinal()]),
                 (int) (times[DutyType.DRIVING.ordinal()]),
                 (int) (times[DutyType.SLEEPER_BERTH.ordinal()]), dutyType);
@@ -155,6 +183,7 @@ public class NavigationPresenter extends BaseMenuPresenter {
     public void onDestroy() {
         super.onDestroy();
         mSyncEventsInteractor.stopSync();
+        mAutoDutyTypeManager.removeListener();
     }
 
     @Override

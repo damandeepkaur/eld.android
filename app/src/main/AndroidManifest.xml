@@ -67,8 +67,10 @@
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="stateAlwaysHidden"/>
 
-        <activity android:name="com.bsmwireless.screens.autologout.AutoLogoutActivity"
-            android:theme="@style/custom_dialog"/>
+        <activity
+            android:name="com.bsmwireless.screens.autologout.AutoDutyDialogActivity"
+            android:launchMode="singleTask"
+            android:theme="@style/Theme.Dialog"/>
 
         <activity
             android:name="com.bsmwireless.screens.editevent.EditEventActivity"
@@ -98,7 +100,7 @@
             android:name="com.bsmwireless.schedulers.alarmmanager.AlarmBootReceiver"
             android:enabled="false">
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"></action>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
         </receiver>
 
