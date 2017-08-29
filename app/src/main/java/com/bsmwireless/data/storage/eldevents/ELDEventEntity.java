@@ -6,11 +6,17 @@ import android.arch.persistence.room.PrimaryKey;
 
 @Entity(tableName = "events")
 public class ELDEventEntity {
+    public enum SyncType {
+        SYNC,
+        UPDATE_UNSYNC,
+        NEW_UNSYNC
+    }
+
     @PrimaryKey
     @ColumnInfo(name = "id")
     private Integer mId;
-    @ColumnInfo(name = "is_sync")
-    private Boolean mSync = true;
+    @ColumnInfo(name = "sync")
+    private Integer mSync;
     @ColumnInfo(name = "event_type")
     private Integer mEventType;
     @ColumnInfo(name = "event_code")
@@ -68,11 +74,11 @@ public class ELDEventEntity {
         mId = id;
     }
 
-    public Boolean isSync() {
+    public Integer getSync() {
         return mSync;
     }
 
-    public void setSync(Boolean sync) {
+    public void setSync(Integer sync) {
         mSync = sync;
     }
 

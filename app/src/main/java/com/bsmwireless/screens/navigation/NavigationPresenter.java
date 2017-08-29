@@ -3,6 +3,7 @@ package com.bsmwireless.screens.navigation;
 import com.bsmwireless.common.utils.DateUtils;
 import com.bsmwireless.data.storage.DutyManager;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
+import com.bsmwireless.domain.interactors.SyncEventsInteractor;
 import com.bsmwireless.domain.interactors.UserInteractor;
 import com.bsmwireless.domain.interactors.VehiclesInteractor;
 import com.bsmwireless.models.ELDEvent;
@@ -23,21 +24,23 @@ import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
 import static com.bsmwireless.common.utils.DateUtils.MS_IN_DAY;
-import static com.bsmwireless.common.utils.DateUtils.MS_IN_SEC;
 
 public class NavigationPresenter extends BaseMenuPresenter {
 
     private NavigateView mView;
     private UserInteractor mUserInteractor;
     private VehiclesInteractor mVehiclesInteractor;
+    private SyncEventsInteractor mSyncEventsInteractor;
 
     @Inject
-    public NavigationPresenter(NavigateView view, UserInteractor userInteractor, VehiclesInteractor vehiclesInteractor, ELDEventsInteractor eventsInteractor, DutyManager dutyManager) {
+    public NavigationPresenter(NavigateView view, UserInteractor userInteractor, VehiclesInteractor vehiclesInteractor,
+                               ELDEventsInteractor eventsInteractor, DutyManager dutyManager, SyncEventsInteractor syncEventsInteractor) {
         mView = view;
         mUserInteractor = userInteractor;
         mVehiclesInteractor = vehiclesInteractor;
         mEventsInteractor = eventsInteractor;
         mDutyManager = dutyManager;
+        mSyncEventsInteractor = syncEventsInteractor;
         mDisposables = new CompositeDisposable();
     }
 
@@ -71,6 +74,7 @@ public class NavigationPresenter extends BaseMenuPresenter {
         mView.setCoDriversNumber(mUserInteractor.getCoDriversNumber());
         mView.setBoxId(mVehiclesInteractor.getBoxId());
         mView.setAssetsNumber(mVehiclesInteractor.getAssetsNumber());
+        mSyncEventsInteractor.startSync();
     }
 
     public void onResetTime() {
@@ -145,6 +149,12 @@ public class NavigationPresenter extends BaseMenuPresenter {
                 (int) (times[DutyType.ON_DUTY.ordinal()]),
                 (int) (times[DutyType.DRIVING.ordinal()]),
                 (int) (times[DutyType.SLEEPER_BERTH.ordinal()]), dutyType);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mSyncEventsInteractor.stopSync();
     }
 
     @Override

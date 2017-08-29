@@ -94,10 +94,7 @@ public class UserInteractor {
                     long end = DateUtils.getEndDayTimeInMs(user.getTimezone(), current);
                     return mServiceApi.getELDEvents(start, end);
                 }).map(events -> {
-                    ELDEventEntity[] entities = ELDEventConverter.toEntityList(events).toArray(new ELDEventEntity[events.size()]);
-                    for (ELDEventEntity entity : entities) {
-                        entity.setSync(true);
-                    }
+                    ELDEventEntity[] entities = ELDEventConverter.toEntityArray(events);
                     mAppDatabase.ELDEventDao().insertAll(entities);
                     return true;
                 });
