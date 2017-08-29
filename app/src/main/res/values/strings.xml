@@ -462,7 +462,7 @@
     <string name="event_changed">(CHANGED)</string>
 
     <string name="event_type_off_duty">Off Duty</string>
-    <string name="event_type_sleeping">Sleeping Berth</string>
+    <string name="event_type_sleeping">Sleeper Berth</string>
     <string name="event_type_driving">Driving</string>
     <string name="event_type_on_duty">On Duty</string>
     <string name="event_type_personal_use">Personal Use</string>
@@ -475,8 +475,10 @@
     <string name="event_type_shut_down">Shut Down</string>
     <string name="event_type_power_up">Power Up</string>
     <string name="event_type_unknown_type">Unknown event type</string>
-    <string name="event_type_personal_use_title">Off Duty (Personal Use)</string>
-    <string name="event_type_yard_moves_title">On Duty (Yard Moves)</string>
+    <string name="event_type_personal_use_title">Off Duty (Start of Personal Use)</string>
+    <string name="event_type_yard_moves_title">On Duty (Start of Yard Moves)</string>
+    <string name="event_type_personal_use_end_title">Off Duty (End of Personal Use)</string>
+    <string name="event_type_yard_moves_end_title">On Duty (End of Yard Moves)</string>
     <string name="update_event_error">Update event error</string>
     <string name="add_event_error">Add event error</string>
     <string name="event_added">Event added</string>

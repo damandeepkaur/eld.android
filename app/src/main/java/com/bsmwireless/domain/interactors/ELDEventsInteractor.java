@@ -11,7 +11,6 @@ import com.bsmwireless.models.BlackBoxModel;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.widgets.alerts.DutyType;
 
-import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.List;
 

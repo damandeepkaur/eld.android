@@ -2,6 +2,7 @@ package com.bsmwireless.screens.logs.dagger;
 
 import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.models.ELDEvent;
+import com.bsmwireless.widgets.alerts.DutyType;
 
 public class EventLogModel implements DutyTypeManager.DutyTypeCheckable {
 
@@ -9,8 +10,7 @@ public class EventLogModel implements DutyTypeManager.DutyTypeCheckable {
     private Long mDuration;
     private String mDriverTimezone;
     private String mVehicleName;
-    //only for indication off events (type 3 and code 0)
-    private int mOnIndicationCode;
+    private DutyType mDutyType;
 
     public EventLogModel() {
     }
@@ -73,12 +73,12 @@ public class EventLogModel implements DutyTypeManager.DutyTypeCheckable {
         mVehicleName = vehicleName;
     }
 
-    public int getOnIndicationCode() {
-        return mOnIndicationCode;
+    public DutyType getDutyType() {
+        return mDutyType;
     }
 
-    public void setOnIndicationCode(int onIndicationCode) {
-        mOnIndicationCode = onIndicationCode;
+    public void setDutyType(DutyType dutyType) {
+        mDutyType = dutyType;
     }
 
     @Override

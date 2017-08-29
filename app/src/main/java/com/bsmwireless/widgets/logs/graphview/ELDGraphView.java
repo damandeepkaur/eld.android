@@ -11,7 +11,6 @@ import android.view.View;
 
 import com.bsmwireless.common.utils.DateUtils;
 import com.bsmwireless.common.utils.ViewUtils;
-import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.screens.logs.dagger.EventLogModel;
 import com.bsmwireless.widgets.alerts.DutyType;
 
@@ -223,7 +222,7 @@ public class ELDGraphView extends View {
             if (prevEvent.isSpecialStatus()) {
                 mHorizontalLinesPaint.setPathEffect(
                         new DashPathEffect(
-                                new float[] {ViewUtils.convertPixelsToDp(DOTTED_LINE_WIDTH_DP,
+                                new float[]{ViewUtils.convertPixelsToDp(DOTTED_LINE_WIDTH_DP,
                                         getContext()),
                                         ViewUtils.convertPixelsToDp(DOTTED_LINE_WIDTH_DP, getContext())
                                 }, 0));
@@ -248,7 +247,7 @@ public class ELDGraphView extends View {
         if (log.isSpecialStatus()) {
             mHorizontalLinesPaint.setPathEffect(
                     new DashPathEffect(
-                            new float[] {ViewUtils.convertPixelsToDp(DOTTED_LINE_WIDTH_DP,
+                            new float[]{ViewUtils.convertPixelsToDp(DOTTED_LINE_WIDTH_DP,
                                     getContext()),
                                     ViewUtils.convertPixelsToDp(DOTTED_LINE_WIDTH_DP, getContext())
                             }, 0));
@@ -274,10 +273,7 @@ public class ELDGraphView extends View {
             DrawableLog log;
             if (event.isActive() && event.isDutyEvent()) {
                 if (dutyType.equals(DutyType.CLEAR)) {
-                    DutyType type = DutyType.getTypeByCode(
-                            ELDEvent.EventType.DUTY_STATUS_CHANGING.getValue(),
-                            event.getOnIndicationCode()
-                    );
+                    DutyType type = event.getDutyType();
                     log = new DrawableLog(type, event.getEventTime(), event.getDuration());
                 } else {
                     log = new DrawableLog(dutyType, event.getEventTime(), event.getDuration());
@@ -293,7 +289,8 @@ public class ELDGraphView extends View {
         private long mTime;
         private long mDuration;
 
-        public DrawableLog() {}
+        public DrawableLog() {
+        }
 
         public DrawableLog(DutyType type, long time, long duration) {
             mType = type;
