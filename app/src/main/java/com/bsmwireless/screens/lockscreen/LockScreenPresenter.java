@@ -1,7 +1,7 @@
 package com.bsmwireless.screens.lockscreen;
 
 import com.bsmwireless.common.dagger.ActivityScope;
-import com.bsmwireless.data.storage.DutyManager;
+import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.widgets.alerts.DutyType;
 
 import java.util.concurrent.TimeUnit;
@@ -19,12 +19,12 @@ import timber.log.Timber;
 public class LockScreenPresenter {
 
     final LockScreenView mView;
-    final DutyManager mDutyManager;
+    final DutyTypeManager mDutyManager;
     final AtomicLong drivingTime;
     private final CompositeDisposable mCompositeDisposable;
 
     @Inject
-    public LockScreenPresenter(LockScreenView view, DutyManager dutyManager) {
+    public LockScreenPresenter(LockScreenView view, DutyTypeManager dutyManager) {
         mView = view;
         mDutyManager = dutyManager;
         mCompositeDisposable = new CompositeDisposable();

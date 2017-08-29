@@ -6,7 +6,6 @@
               android:layout_height="wrap_content"
               android:orientation="vertical"
               tools:backgroundTint="@color/black"
-              android:layout_margin="@dimen/margin_small"
 
     >
 
@@ -14,7 +13,7 @@
         android:id="@+id/dashboard_current"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/margin_small"
+        android:layout_margin="@dimen/margin_small"
         app:size="large"
         />
 
@@ -28,6 +27,7 @@
             android:id="@+id/dashboard_break"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_margin="@dimen/margin_small"
             android:layout_weight="1"
             app:size="normal"
             />
@@ -36,8 +36,7 @@
             android:id="@+id/dashboard_workday"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/margin_small"
-            android:layout_marginRight="@dimen/margin_small"
+            android:layout_margin="@dimen/margin_small"
             android:layout_weight="1"
             app:size="normal"
             />
@@ -46,6 +45,7 @@
             android:id="@+id/dashboard_cycle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_margin="@dimen/margin_small"
             android:layout_weight="1"
             app:size="normal"
             />
