@@ -3,6 +3,7 @@ ELD app for Android
 
 # Version history
 
+* **1.0.48** - Add progress bar
 * **1.0.47** - Implement event synchronization (_EA-311_)
 * **1.0.46** - Added geo-location enum
 * **1.0.45** - Update multiday screen
