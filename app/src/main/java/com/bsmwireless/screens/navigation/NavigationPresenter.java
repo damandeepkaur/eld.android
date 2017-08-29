@@ -4,6 +4,7 @@ import com.bsmwireless.common.utils.DateUtils;
 import com.bsmwireless.data.storage.AutoDutyTypeManager;
 import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
+import com.bsmwireless.domain.interactors.SyncEventsInteractor;
 import com.bsmwireless.domain.interactors.UserInteractor;
 import com.bsmwireless.domain.interactors.VehiclesInteractor;
 import com.bsmwireless.models.ELDEvent;
@@ -17,7 +18,6 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import io.reactivex.Flowable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
@@ -29,6 +29,7 @@ public class NavigationPresenter extends BaseMenuPresenter {
     private NavigateView mView;
     private UserInteractor mUserInteractor;
     private VehiclesInteractor mVehiclesInteractor;
+    private SyncEventsInteractor mSyncEventsInteractor;
     private AutoDutyTypeManager mAutoDutyTypeManager;
 
     private AutoDutyTypeManager.AutoDutyTypeListener mListener = new AutoDutyTypeManager.AutoDutyTypeListener() {
@@ -49,13 +50,15 @@ public class NavigationPresenter extends BaseMenuPresenter {
     };
 
     @Inject
-    public NavigationPresenter(NavigateView view, UserInteractor userInteractor, VehiclesInteractor vehiclesInteractor, ELDEventsInteractor eventsInteractor, DutyTypeManager dutyTypeManager, AutoDutyTypeManager autoDutyTypeManager) {
+    public NavigationPresenter(NavigateView view, UserInteractor userInteractor, VehiclesInteractor vehiclesInteractor, ELDEventsInteractor eventsInteractor,
+                               DutyTypeManager dutyTypeManager, AutoDutyTypeManager autoDutyTypeManager, SyncEventsInteractor syncEventsInteractor) {
         mView = view;
         mUserInteractor = userInteractor;
         mVehiclesInteractor = vehiclesInteractor;
         mEventsInteractor = eventsInteractor;
         mDutyTypeManager = dutyTypeManager;
         mAutoDutyTypeManager = autoDutyTypeManager;
+        mSyncEventsInteractor = syncEventsInteractor;
         mDisposables = new CompositeDisposable();
 
         mAutoDutyTypeManager.setListener(mListener);
@@ -92,8 +95,8 @@ public class NavigationPresenter extends BaseMenuPresenter {
         mView.setCoDriversNumber(mUserInteractor.getCoDriversNumber());
         mView.setBoxId(mVehiclesInteractor.getBoxId());
         mView.setAssetsNumber(mVehiclesInteractor.getAssetsNumber());
-
         mAutoDutyTypeManager.validateBlackBoxState();
+        mSyncEventsInteractor.startSync();
     }
 
     public void onResetTime() {
@@ -108,9 +111,12 @@ public class NavigationPresenter extends BaseMenuPresenter {
 
                     mView.setResetTime(time[1]);
 
-                    return Flowable.zip(mEventsInteractor.getLatestActiveDutyEventFromDB(time[0]), mEventsInteractor.getDutyEventsFromDB(time[0], time[1]),
-                            (prevDayLatestEvent, selectedDayEvents) -> {
-                                selectedDayEvents.add(0, prevDayLatestEvent.get(prevDayLatestEvent.size() - 1));
+                    return mEventsInteractor.getDutyEventsFromDB(time[0], time[1])
+                            .map(selectedDayEvents -> {
+                                List<ELDEvent> prevDayLatestEvents = mEventsInteractor.getLatestActiveDutyEventFromDB(time[0]);
+                                if (!prevDayLatestEvents.isEmpty()) {
+                                    selectedDayEvents.add(0, prevDayLatestEvents.get(prevDayLatestEvents.size() - 1));
+                                }
                                 return selectedDayEvents;
                             });
                 })
@@ -174,6 +180,13 @@ public class NavigationPresenter extends BaseMenuPresenter {
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mSyncEventsInteractor.stopSync();
+        mAutoDutyTypeManager.removeListener();
+    }
+
+    @Override
     protected BaseMenuView getView() {
         return mView;
     }
@@ -186,11 +199,5 @@ public class NavigationPresenter extends BaseMenuPresenter {
                                                  .subscribe(userUpdated -> {},
                                                             throwable -> mView.showErrorMessage(throwable.getMessage())));
         }
-    }
-
-    @Override
-    public void onDestroy() {
-        mAutoDutyTypeManager.removeListener();
-        super.onDestroy();
     }
 }

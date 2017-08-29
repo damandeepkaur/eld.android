@@ -110,7 +110,7 @@ public class VehiclesInteractor {
                 })
                 .doOnNext(events -> {
                     saveLastVehicle(id, vehicle.getId());
-                    mELDEventsInteractor.storeEvents(events, true);
+                    mELDEventsInteractor.storeUnidentifiedEvents(events);
                 })
                 .doOnError(error -> cleanSelectedVehicle().blockingAwait());
     }

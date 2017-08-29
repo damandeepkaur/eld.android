@@ -1,7 +1,5 @@
 package com.bsmwireless.domain.interactors;
 
-import com.bsmwireless.common.utils.NetworkUtils;
-import com.bsmwireless.data.network.RetrofitException;
 import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.DutyTypeManager;
@@ -55,29 +53,40 @@ public class ELDEventsInteractor {
         mUserInteractor.getTimezone().subscribe(timezone -> mTimezone = timezone);
     }
 
+    public void syncELDEventsWithServer(Long startTime, Long endTime) {
+        mServiceApi.getELDEvents(startTime, endTime)
+                .subscribeOn(Schedulers.io())
+                .subscribe(eldEventsFromServer -> {
+                            List<ELDEventEntity> entities = mELDEventDao.getEventsFromStartToEndTimeSync(
+                                    startTime, endTime, mPreferencesManager.getDriverId());
+                            List<ELDEvent> eventsFromDB = ELDEventConverter.toModelList(entities);
+                            if (!eldEventsFromServer.equals(eventsFromDB)) {
+                                ELDEventEntity[] entitiesArray = ELDEventConverter.toEntityArray(eldEventsFromServer);
+                                mELDEventDao.insertAll(entitiesArray);
+                            }
+                        },
+                        error -> {
+                            Timber.e(error);
+                        });
+    }
+
     public Flowable<List<ELDEvent>> getELDEvents(long startTime, long endTime) {
         return getDutyEventsFromDB(startTime, endTime);
     }
 
     public Flowable<List<ELDEvent>> getDutyEventsFromDB(long startTime, long endTime) {
-        int driverId = mPreferencesManager.getDriverId();
-        return mELDEventDao.getDutyEventsFromStartToEndTime(startTime, endTime, driverId)
+        return mELDEventDao.getDutyEventsFromStartToEndTime(startTime, endTime, mPreferencesManager.getDriverId())
                 .map(ELDEventConverter::toModelList);
     }
 
-    public Flowable<List<ELDEvent>> getLatestActiveDutyEventFromDB(long latestTime) {
-        return mELDEventDao.getLatestActiveDutyEvent(latestTime, mPreferencesManager.getDriverId())
-                .map(ELDEventConverter::toModelList);
+    public List<ELDEvent> getLatestActiveDutyEventFromDB(long latestTime) {
+        return ELDEventConverter.toModelList(mELDEventDao.getLatestActiveDutyEventSync(latestTime,
+                mPreferencesManager.getDriverId()));
     }
 
     public List<ELDEvent> getLatestActiveDutyEventFromDBSync(long latestTime) {
-        return ELDEventConverter.toModelList(mELDEventDao.getLatestActiveDutyEventSync(latestTime, mPreferencesManager.getDriverId()));
-    }
-
-    public Flowable<List<ELDEvent>> getActiveDutyEventsFromDB(long startTime, long endTime) {
-        int driverId = mPreferencesManager.getDriverId();
-        return mELDEventDao.getActiveDutyEventsAndFromStartToEndTime(startTime, endTime, driverId)
-                .map(ELDEventConverter::toModelList);
+        return ELDEventConverter.toModelList(mELDEventDao.getLatestActiveDutyEventSync(latestTime,
+                mPreferencesManager.getDriverId()));
     }
 
     public List<ELDEvent> getActiveEventsFromDBSync(long startTime, long endTime) {
@@ -85,87 +94,27 @@ public class ELDEventsInteractor {
         return ELDEventConverter.toModelList(mELDEventDao.getActiveEventsFromStartToEndTimeSync(startTime, endTime, driverId));
     }
 
-    public void syncELDEvents(Long startTime, Long endTime) {
-        if (mSyncEventsDisposable != null) {
-            mSyncEventsDisposable.dispose();
-        }
-        mSyncEventsDisposable = mServiceApi.getELDEvents(startTime, endTime)
-                .doOnNext(events -> {
-                    //remove doubled records
-                    ArrayList<Long> times = new ArrayList<>();
-                    for (ELDEvent event : events) {
-                        times.add(event.getMobileTime());
-                    }
-                    mELDEventDao.deleteDoubledEvents(times);
-                })
-                .subscribeOn(Schedulers.io())
-                .subscribe(eldEvents -> storeEvents(eldEvents, false), Timber::d);
+    public Observable<long[]> updateELDEvents(List<ELDEvent> events) {
+        return Observable.fromCallable(() ->
+                mELDEventDao.insertAll(ELDEventConverter.toEntityArray(events, ELDEventEntity.SyncType.UPDATE_UNSYNC)));
     }
 
-    public Observable<Boolean> updateELDEvents(List<ELDEvent> events) {
-        if (NetworkUtils.isOnlineMode()) {
-            return mServiceApi.updateELDEvents(events)
-                    .doOnError(throwable -> storeEvents(events, false))
-                    .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
-        } else {
-            return Observable.create(e -> {
-                storeEvents(events, false);
-                e.onError(RetrofitException.networkError(new ConnectException()));
-            });
-        }
+    public Observable<Long> postNewELDEvent(ELDEvent event) {
+        return Observable.fromCallable(() ->
+                mELDEventDao.insertEvent(ELDEventConverter.toEntity(event, ELDEventEntity.SyncType.NEW_UNSYNC)));
     }
 
-    public Observable<Boolean> postNewELDEvent(ELDEvent event) {
-        if (NetworkUtils.isOnlineMode()) {
-            return mServiceApi.postNewELDEvent(event)
-                    .doOnError(throwable -> storeEvent(event, false))
-                    .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
-        } else {
-            return Observable.create(e -> {
-                storeEvent(event, false);
-                e.onError(RetrofitException.networkError(new ConnectException()));
-            });
-        }
+    public Observable<long[]> postNewELDEvents(List<ELDEvent> events) {
+        return Observable.fromCallable(() ->
+                mELDEventDao.insertAll(ELDEventConverter.toEntityArray(events, ELDEventEntity.SyncType.NEW_UNSYNC)));
     }
 
-    public Observable<Boolean> postNewELDEvents(List<ELDEvent> events) {
-        if (NetworkUtils.isOnlineMode()) {
-            return mServiceApi.postNewELDEvents(events)
-                    .doOnError(throwable -> storeEvents(events, false))
-                    .doOnNext(responseMessage -> storeEvents(events, true))
-                    .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
-        } else {
-            return Observable.create(e -> {
-                storeEvents(events, false);
-                e.onError(RetrofitException.networkError(new ConnectException()));
-            });
-        }
+    public void storeUnidentifiedEvents(List<ELDEvent> events) {
+        //TODO: probably additional action with unidentified records is required.
+        mELDEventDao.insertAll(ELDEventConverter.toEntityArray(events));
     }
 
-    public void storeEvent(ELDEvent event, boolean isSynced) {
-        ELDEventEntity entity = ELDEventConverter.toEntity(event);
-        entity.setSync(isSynced);
-        mELDEventDao.insertEvent(entity);
-    }
-
-    public void storeEvents(List<ELDEvent> events, boolean isSynced) {
-        ELDEventEntity[] entities = ELDEventConverter.toEntityList(events).toArray(new ELDEventEntity[events.size()]);
-        for (ELDEventEntity entity : entities) {
-            entity.setSync(isSynced);
-        }
-        mELDEventDao.insertAll(entities);
-    }
-
-    public void sendUnsyncEventsIfExist() {
-        mELDEventDao.getUnsyncEvents().subscribe(eldEventEntities -> {
-            List<ELDEvent> unsyncEvents = ELDEventConverter.toModelList(eldEventEntities);
-            if (unsyncEvents != null && !unsyncEvents.isEmpty()) {
-                postNewELDEvents(unsyncEvents).subscribe(responseMessage -> storeEvents(unsyncEvents, true));
-            }
-        });
-    }
-
-    public Observable<Boolean> postNewDutyTypeEvent(DutyType dutyType) {
+    public Observable<long[]> postNewDutyTypeEvent(DutyType dutyType) {
         return postNewELDEvents(getEvents(dutyType))
                 .doOnNext(isSuccess -> mDutyTypeManager.setDutyType(dutyType, true));
     }

@@ -3,6 +3,7 @@ package com.bsmwireless.screens.navigation;
 import com.bsmwireless.data.storage.AutoDutyTypeManager;
 import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
+import com.bsmwireless.domain.interactors.SyncEventsInteractor;
 import com.bsmwireless.domain.interactors.UserInteractor;
 import com.bsmwireless.domain.interactors.VehiclesInteractor;
 import com.bsmwireless.models.User;
@@ -54,6 +55,9 @@ public class NavigationPresenterTest {
     @Mock
     AutoDutyTypeManager mAutoDutyTypeManager;
 
+    @Mock
+    SyncEventsInteractor mSyncEventsInteractor;
+
 
     private NavigationPresenter mNavigationPresenter;
 
@@ -62,7 +66,7 @@ public class NavigationPresenterTest {
     public void before() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        mNavigationPresenter = new NavigationPresenter(mView, mUserInteractor, mVehiclesInteractor, mEventsInteractor, mDutyTypeManager, mAutoDutyTypeManager);
+        mNavigationPresenter = new NavigationPresenter(mView, mUserInteractor, mVehiclesInteractor, mEventsInteractor, mDutyTypeManager, mAutoDutyTypeManager, mSyncEventsInteractor);
     }
 
     /**
