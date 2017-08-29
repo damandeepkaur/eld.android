@@ -33,7 +33,6 @@ import io.reactivex.subscribers.TestSubscriber;
 
 import static junit.framework.Assert.fail;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
@@ -238,7 +237,7 @@ public class VehiclesInteractorTest {
 
         TestObserver<List<ELDEvent>> testObserver = TestObserver.create();
 
-        when(mBlackBoxInteractor.getData()).thenReturn(Observable.just(fakeData));
+        when(mBlackBoxInteractor.getData(anyInt())).thenReturn(Observable.just(fakeData));
         when(mUserInteractor.getTimezoneSync(any(Integer.class))).thenReturn("fake timezone");
         when(mServiceApi.pairVehicle(any(ELDEvent.class))).thenReturn(Observable.just(events));
 
@@ -251,9 +250,9 @@ public class VehiclesInteractorTest {
 
         // then
 
-        verify(mBlackBoxInteractor).getData(); // might not be final...
+        verify(mBlackBoxInteractor).getData(anyInt());
         verify(mServiceApi).pairVehicle(any(ELDEvent.class));
-        verify(mEldEventsInteractor).storeEvents(any(List.class), anyBoolean());
+        verify(mEldEventsInteractor).storeUnidentifiedEvents(any(List.class));
         testObserver.assertNoErrors();
     }
 

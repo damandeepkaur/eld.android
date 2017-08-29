@@ -2,7 +2,7 @@ package com.bsmwireless.domain.interactors;
 
 import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.storage.AppDatabase;
-import com.bsmwireless.data.storage.DutyManager;
+import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.data.storage.eldevents.ELDEventDao;
 import com.bsmwireless.data.storage.eldevents.ELDEventEntity;
@@ -13,6 +13,7 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -21,11 +22,14 @@ import java.util.List;
 
 import app.bsmuniversal.com.RxSchedulerRule;
 import io.reactivex.Flowable;
+import io.reactivex.Observable;
 import io.reactivex.subscribers.TestSubscriber;
 
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -34,6 +38,8 @@ import static org.mockito.Mockito.when;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class ELDEventsInteractorTest {
+
+    private final String mfakeTimezone = "fake timezone";
 
 
     @ClassRule
@@ -55,7 +61,7 @@ public class ELDEventsInteractorTest {
     private BlackBoxInteractor mBlackBoxInteractor;
 
     @Mock
-    private DutyManager mDutyManager;
+    private DutyTypeManager mDutyTypeManager;
 
     @Mock
     private ELDEventDao mEldEventDao;
@@ -69,13 +75,109 @@ public class ELDEventsInteractorTest {
         MockitoAnnotations.initMocks(this);
 
         when(mAppDatabase.ELDEventDao()).thenReturn(mEldEventDao);
+        when(mUserInteractor.getTimezone()).thenReturn(Flowable.just(mfakeTimezone));
 
         mEldEventsInteractor = new ELDEventsInteractor(mServiceApi, mPreferencesManager,
-                mAppDatabase, mUserInteractor, mBlackBoxInteractor, mDutyManager);
+                mAppDatabase, mUserInteractor, mBlackBoxInteractor, mDutyTypeManager);
 
     }
 
-    // TODO: getELDEvents
+    @Test
+    public void testSyncEldEventsWithServerEmptyListEqual() {
+        // given
+        final long startTime = 1234567890;
+        final long endTime = 1235555555;
+        final int driverId = 999;
+
+        List<ELDEvent> eldEventsFromApi = new ArrayList<>();
+        List<ELDEventEntity> eldEventsFromDb = new ArrayList<>();
+
+        ELDEvent eldEvent1 = new ELDEvent();
+        ELDEvent eldEvent2 = new ELDEvent();
+        eldEvent1.setId(1);
+        eldEvent2.setId(2);
+
+        eldEventsFromApi.add(eldEvent1);
+        eldEventsFromApi.add(eldEvent2);
+
+        ELDEventEntity eldEventEntity1 = new ELDEventEntity();
+        ELDEventEntity eldEventEntity2 = new ELDEventEntity();
+        eldEventEntity1.setId(1);
+        eldEventEntity2.setId(2);
+
+        eldEventsFromDb.add(eldEventEntity1);
+        eldEventsFromDb.add(eldEventEntity2);
+
+        when(mServiceApi.getELDEvents(anyLong(), anyLong())).thenReturn(Observable.just(eldEventsFromApi));
+        when(mEldEventDao.getEventsFromStartToEndTimeSync(anyLong(), anyLong(), anyInt())).thenReturn(eldEventsFromDb);
+        when(mPreferencesManager.getDriverId()).thenReturn(driverId);
+
+        // when
+        mEldEventsInteractor.syncELDEventsWithServer(startTime, endTime);
+
+        // then
+        verify(mServiceApi).getELDEvents(eq(startTime), eq(endTime));
+        verify(mEldEventDao).getEventsFromStartToEndTimeSync(eq(startTime), eq(endTime), anyInt());
+        verify(mEldEventDao, never()).insertAll(any()); // no insert if not needed
+    }
+
+    @Test
+    public void testSyncEldEventsWithServerEmptyListNotEqual() {
+        // given
+        final long startTime = 1234567890;
+        final long endTime = 1235555555;
+        final int driverId = 999;
+
+        List<ELDEvent> eldEventsFromApi = new ArrayList<>();
+        List<ELDEventEntity> eldEventsFromDb = new ArrayList<>();
+
+        ELDEvent eldEvent1 = new ELDEvent();
+        eldEvent1.setId(1);
+        eldEventsFromApi.add(eldEvent1);
+
+        ELDEventEntity eldEventEntity1 = new ELDEventEntity();
+        ELDEventEntity eldEventEntity2 = new ELDEventEntity();
+        eldEventEntity1.setId(1);
+        eldEventEntity2.setId(2);
+
+        eldEventsFromDb.add(eldEventEntity1);
+        eldEventsFromDb.add(eldEventEntity2);
+
+        when(mServiceApi.getELDEvents(anyLong(), anyLong())).thenReturn(Observable.just(eldEventsFromApi));
+        when(mEldEventDao.getEventsFromStartToEndTimeSync(anyLong(), anyLong(), anyInt())).thenReturn(eldEventsFromDb);
+        when(mPreferencesManager.getDriverId()).thenReturn(driverId);
+
+        // when
+        mEldEventsInteractor.syncELDEventsWithServer(startTime, endTime);
+
+        // then
+        verify(mServiceApi).getELDEvents(eq(startTime), eq(endTime));
+        verify(mEldEventDao).getEventsFromStartToEndTimeSync(eq(startTime), eq(endTime), anyInt());
+        verify(mEldEventDao).insertAll(any()); // note: insert-all is only valid if we assume API sends full vs. incremental, and if ELD events are never deleted server-side
+    }
+
+    // TODO: test syncELDEventsWithServer error case when testable
+
+    @Test
+    public void testGetEldEvents() {
+        // given
+        long startTime = 1234567890;
+        long endTime = 1235555555;
+
+        List<ELDEventEntity> eldEventEntities = new ArrayList<>();
+
+        ELDEventsInteractor eldEventsInteractorSpy = Mockito.spy(mEldEventsInteractor); // (to verify call to non-mocked method)
+
+        when(mPreferencesManager.getDriverId()).thenReturn(12345);
+        when(mEldEventDao.getDutyEventsFromStartToEndTime(anyLong(), anyLong(), anyInt()))
+                .thenReturn(Flowable.just(eldEventEntities));
+
+        // when
+        eldEventsInteractorSpy.getELDEvents(startTime, endTime);
+
+        // then
+        verify(eldEventsInteractorSpy).getDutyEventsFromDB(eq(startTime), eq(endTime));
+    }
 
     @Test
     public void testGetDutyEventsFromDbSuccess() {
@@ -127,81 +229,20 @@ public class ELDEventsInteractorTest {
 
         List<ELDEventEntity> eldEventEntities = new ArrayList<>();
 
-        when(mEldEventDao.getLatestActiveDutyEvent(anyLong(), anyInt()))
-                .thenReturn(Flowable.just(eldEventEntities));
-
-        TestSubscriber<List<ELDEvent>> testSubscriber = TestSubscriber.create();
+        when(mEldEventDao.getLatestActiveDutyEventSync(anyLong(), anyInt()))
+                .thenReturn(eldEventEntities);
 
         // when
-        mEldEventsInteractor.getLatestActiveDutyEventFromDB(latestTime).subscribe(testSubscriber);
+        mEldEventsInteractor.getLatestActiveDutyEventFromDB(latestTime);
 
         // then
         verify(mPreferencesManager).getDriverId();
-        verify(mEldEventDao).getLatestActiveDutyEvent(eq(latestTime), anyInt());
+        verify(mEldEventDao).getLatestActiveDutyEventSync(eq(latestTime), anyInt());
     }
 
-    @Test
-    public void testGetLatestActiveDutyEventFromDbError() {
-        // given
-        long latestTime = 1503963474;
-        Exception fakeDbException = new RuntimeException("fake db exception");
+    // TODO: getLatestActiveDutyEventsFromDBSync
 
-        when(mEldEventDao.getLatestActiveDutyEvent(anyLong(), anyInt()))
-                .thenReturn(Flowable.error(fakeDbException));
 
-        TestSubscriber<List<ELDEvent>> testSubscriber = TestSubscriber.create();
 
-        // when
-        mEldEventsInteractor.getLatestActiveDutyEventFromDB(latestTime).subscribe(testSubscriber);
-
-        // then
-        testSubscriber.assertError(Throwable.class);
-    }
-
-    @Test
-    public void testGetActiveDutyEventsFromDb() {
-        // given
-        long startTime = 10000;
-        long endTime = 20000;
-
-        List<ELDEventEntity> eldEvents = new ArrayList<>();
-
-        when(mPreferencesManager.getDriverId()).thenReturn(1234);
-        when(mEldEventDao.getActiveDutyEventsAndFromStartToEndTime(anyLong(), anyLong(), anyInt()))
-                .thenReturn(Flowable.just(eldEvents));
-
-        TestSubscriber<List<ELDEvent>> testSubscriber = TestSubscriber.create();
-
-        // when
-        mEldEventsInteractor.getActiveDutyEventsFromDB(startTime, endTime).subscribe(testSubscriber);
-
-        // then
-        verify(mPreferencesManager).getDriverId();
-        verify(mEldEventDao).getActiveDutyEventsAndFromStartToEndTime(eq(startTime), eq(endTime), anyInt());
-    }
-
-    @Test
-    public void testGetActiveDutyEventsFromDbError() {
-        // given
-        long startTime = 10000;
-        long endTime = 20000;
-
-        Exception fakeDbException = new RuntimeException("no.");
-
-        when(mPreferencesManager.getDriverId()).thenReturn(1234);
-        when(mEldEventDao.getActiveDutyEventsAndFromStartToEndTime(anyLong(), anyLong(), anyInt()))
-                .thenReturn(Flowable.error(fakeDbException));
-
-        TestSubscriber<List<ELDEvent>> testSubscriber = TestSubscriber.create();
-
-        // when
-        mEldEventsInteractor.getActiveDutyEventsFromDB(startTime, endTime).subscribe(testSubscriber);
-
-        // then
-        testSubscriber.assertError(fakeDbException);
-    }
-
-    // TODO: getActiveEventsFromDBSync success
-    // TODO: getActiveEventsFromDBSync error
 
 }
