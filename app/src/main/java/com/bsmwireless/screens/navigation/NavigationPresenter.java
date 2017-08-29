@@ -23,7 +23,6 @@ import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
 import static com.bsmwireless.common.utils.DateUtils.MS_IN_DAY;
-import static com.bsmwireless.common.utils.DateUtils.MS_IN_SEC;
 
 public class NavigationPresenter extends BaseMenuPresenter {
 

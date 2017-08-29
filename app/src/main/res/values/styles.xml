@@ -105,6 +105,11 @@
         <item name="android:textColor">@color/nasty_green</item>
     </style>
 
+    <style name="AppTheme.Widget.ButtonBordered" parent="Widget.AppCompat.Button.Borderless.Colored">
+        <item name="android:background">@drawable/button_border</item>
+        <item name="android:textAppearance">@style/AppTheme.TextAppearance.Button.Borderless.Colored</item>
+    </style>
+
     <!-- START OLD STYLES -->
     <style name="Theme.Splash" parent="MyTheme.Base">
         <item name="android:windowBackground">@drawable/background</item>
@@ -230,4 +235,16 @@
         <item name="app.bsmuniversal.com:font">fonty</item>
     </style>
     <!-- END OLD STYLES -->
+
+
+    <!-- Text Appearance-->
+    <style name="AppTheme.TextAppearance.Caption" parent="TextAppearance.AppCompat.Caption">
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">@color/black_38</item>
+    </style>
+
+    <style name="AppTheme.TextAppearance.Button.Borderless.Colored" parent="@style/TextAppearance.AppCompat.Widget.Button.Borderless.Colored">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">normal</item>
+    </style>
 </resources>

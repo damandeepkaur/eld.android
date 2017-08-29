@@ -516,5 +516,9 @@
         <item>14 days</item>
     </string-array>
     <string name="multiday_total_hours">Total hours</string>
+    
+    <!-- Lock screen -->
+    <string name="lock_screen_switch_co_driver_message">You can switch to co-driver view to continue work in application</string>
+    <string name="switch_to_co_driver_view">SWITCH TO CO-DRIVER VIEW</string>
 
 </resources>

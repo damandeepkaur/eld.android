@@ -1,19 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="app.bsmuniversal.com">
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    package="app.bsmuniversal.com"
+    >
 
     <uses-permission
         android:name="android.permission.GET_ACCOUNTS"
-        android:maxSdkVersion="22"/>
-
+        android:maxSdkVersion="22"
+        />
     <uses-permission
         android:name="android.permission.MANAGE_ACCOUNTS"
-        android:maxSdkVersion="22"/>
-
+        android:maxSdkVersion="22"
+        />
     <uses-permission
         android:name="android.permission.AUTHENTICATE_ACCOUNTS"
-        android:maxSdkVersion="22"/>
-
+        android:maxSdkVersion="22"
+        />
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.CAMERA"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
@@ -26,82 +28,94 @@
         android:icon="@drawable/icon"
         android:label="@string/app_name"
         android:roundIcon="@drawable/icon"
-        android:theme="@style/AppTheme">
-
+        android:theme="@style/AppTheme"
+        >
         <activity
             android:name="com.bsmwireless.screens.login.LoginActivity"
             android:label="@string/app_name"
-            android:theme="@style/Theme.BsmAppWithBGFullScreen">
+            android:theme="@style/Theme.BsmAppWithBGFullScreen"
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
+
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-
         <activity
             android:name="com.bsmwireless.screens.selectasset.SelectAssetActivity"
             android:theme="@style/AppTheme"
-            android:windowSoftInputMode="stateHidden|adjustResize"/>
-
+            android:windowSoftInputMode="stateHidden|adjustResize"
+            />
         <activity
             android:name="com.bsmwireless.screens.navigation.NavigationActivity"
             android:theme="@style/AppTheme"
-            android:windowSoftInputMode="stateHidden|adjustResize">
+            android:windowSoftInputMode="stateHidden|adjustResize"
+            >
         </activity>
-
         <activity
             android:name="com.bsmwireless.screens.help.HelpActivity"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            />
         <activity
             android:name="com.bsmwireless.screens.barcode.BarcodeScannerActivity"
-            android:theme="@style/AppTheme.Transparent"/>
-
+            android:theme="@style/AppTheme.Transparent"
+            />
         <activity
             android:name="com.bsmwireless.screens.driverprofile.DriverProfileActivity"
             android:label="@string/driver_profile"
             android:theme="@style/DriverProfileTheme"
-            android:windowSoftInputMode="stateHidden"/>
-
+            android:windowSoftInputMode="stateHidden"
+            />
         <activity
             android:name="com.bsmwireless.screens.settings.SettingsActivity"
             android:theme="@style/AppTheme"
-            android:windowSoftInputMode="stateAlwaysHidden"/>
-
-        <activity android:name="com.bsmwireless.screens.autologout.AutoLogoutActivity"
-            android:theme="@style/custom_dialog"/>
-
+            android:windowSoftInputMode="stateAlwaysHidden"
+            />
+        <activity
+            android:name="com.bsmwireless.screens.autologout.AutoLogoutActivity"
+            android:theme="@style/custom_dialog"
+            />
         <activity
             android:name="com.bsmwireless.screens.editevent.EditEventActivity"
             android:label="@string/edit_event"
             android:theme="@style/AppTheme"
-            android:windowSoftInputMode="stateAlwaysHidden"/>
+            android:windowSoftInputMode="stateAlwaysHidden"
+            />
 
         <service android:name="com.bsmwireless.data.network.authenticator.BsmAuthenticatorService">
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator"/>
             </intent-filter>
+
             <meta-data
                 android:name="android.accounts.AccountAuthenticator"
-                android:resource="@xml/authenticator"/>
+                android:resource="@xml/authenticator"
+                />
         </service>
-
         <service
             android:name="com.bsmwireless.schedulers.jobscheduler.AutoLogoutJobService"
             android:exported="false"
-            android:permission="android.permission.BIND_JOB_SERVICE"/>
-
+            android:permission="android.permission.BIND_JOB_SERVICE"
+            />
         <service android:name="com.bsmwireless.schedulers.alarmmanager.AutoLogoutService"/>
 
         <receiver android:name="com.bsmwireless.schedulers.alarmmanager.AlarmReceiver"/>
-
         <receiver
             android:name="com.bsmwireless.schedulers.alarmmanager.AlarmBootReceiver"
-            android:enabled="false">
+            android:enabled="false"
+            >
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"></action>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
         </receiver>
 
+        <activity android:name="com.bsmwireless.screens.lockscreen.LockScreenActivity">
+            <!--<intent-filter>-->
+            <!--<action android:name="android.intent.action.MAIN"/>-->
+
+            <!--<category android:name="android.intent.category.LAUNCHER"/>-->
+            <!--</intent-filter>-->
+        </activity>
     </application>
 
 </manifest>

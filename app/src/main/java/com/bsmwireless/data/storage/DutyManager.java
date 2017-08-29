@@ -54,7 +54,7 @@ public class DutyManager {
         setDutyType(dutyType, false);
     }
 
-    private void setDutyTypeTime(DutyType dutyType, int time) {
+    public void setDutyTypeTime(DutyType dutyType, int time) {
         switch (dutyType) {
             case ON_DUTY:
             case YARD_MOVES:
@@ -190,7 +190,7 @@ public class DutyManager {
             }
         }
 
-        return new long[] {onDutyTime, offDutyTime, sleeperBerthTime, drivingTime};
+        return new long[]{onDutyTime, offDutyTime, sleeperBerthTime, drivingTime};
     }
 
     private void notifyListeners() {
@@ -199,9 +199,13 @@ public class DutyManager {
 
     public interface DutyCheckable {
         Long getEventTime();
+
         Integer getEventType();
+
         Integer getEventCode();
+
         Boolean isActive();
+
         Boolean isDutyEvent();
     }
 

@@ -161,4 +161,8 @@
     <dimen name="divider_height">1dp</dimen>
     <dimen name="text_view_line_spacing_extra_smaller">6sp</dimen>
 
+    <!-- Lock Screen Activity -->
+    <dimen name="margin_between_views">8dp</dimen>
+    <dimen name="button_corners">5dp</dimen>
+
 </resources>

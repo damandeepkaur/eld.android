@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#80323232"
+    tools:context="com.bsmwireless.screens.lockscreen.LockScreenActivity"
+    android:fitsSystemWindows="false"
+    >
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="24dp"
+            >
+
+            <include layout="@layout/layout_dashboard"/>
+
+            <android.support.v7.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/margin_small"
+                android:layout_marginRight="@dimen/margin_small"
+                android:layout_marginBottom="@dimen/default_margin"
+                >
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/default_margin"
+                    >
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        >
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical|start"
+                            android:layout_margin="2dp"
+                            android:src="@drawable/ic_info"
+                            android:tint="?attr/colorAccent"
+                            />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="46dp"
+                            android:layout_marginStart="46dp"
+                            android:text="@string/lock_screen_switch_co_driver_message"
+                            android:textAppearance="@style/AppTheme.TextAppearance.Caption"
+                            />
+
+                    </FrameLayout>
+
+
+                    <Button
+                        android:id="@+id/switch_co_driver_button"
+                        style="@style/AppTheme.Widget.ButtonBordered"
+                        android:layout_width="match_parent"
+                        android:layout_height="43dp"
+                        android:layout_marginLeft="46dp"
+                        android:layout_marginStart="46dp"
+                        android:layout_marginTop="16dp"
+                        android:text="@string/switch_to_co_driver_view"
+                        />
+
+                </LinearLayout>
+
+            </android.support.v7.widget.CardView>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+
+</android.support.design.widget.CoordinatorLayout>
