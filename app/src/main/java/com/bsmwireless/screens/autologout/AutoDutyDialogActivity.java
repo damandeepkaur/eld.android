@@ -26,6 +26,7 @@ public class AutoDutyDialogActivity extends BaseActivity implements AutoDutyDial
     public static final String EXTRA_AUTO_LOGOUT = "auto_logout";
     public static final String EXTRA_AUTO_ON_DUTY = "auto_on_duty";
     public static final String EXTRA_AUTO_DRIVING = "auto_driving";
+    public static final String EXTRA_AUTO_DRIVING_WITHOUT_CONFIRM = "auto_driving_without_confirm";
 
     @Inject
     AutoDutyDialogPresenter mPresenter;
@@ -36,9 +37,9 @@ public class AutoDutyDialogActivity extends BaseActivity implements AutoDutyDial
 
     private Runnable mAutoLogoutTask = () -> mPresenter.onAutoLogoutClick();
 
-    private Runnable mAutoDrivingTask = () -> mPresenter.onDrivingClick();
-
     private Runnable mAutoOnDutyTask = () -> mPresenter.onOnDutyClick();
+
+    private boolean mIsAutoDrivingDialogShown = false;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -57,6 +58,12 @@ public class AutoDutyDialogActivity extends BaseActivity implements AutoDutyDial
 
             } else if (intent.hasExtra(EXTRA_AUTO_ON_DUTY)) {
                 showAutoOnDutyDialog();
+
+            } else if (intent.hasExtra(EXTRA_AUTO_DRIVING_WITHOUT_CONFIRM) && mIsAutoDrivingDialogShown) {
+                mPresenter.onDrivingClick();
+
+            } else {
+                onActionDone();
             }
         }
     }
@@ -106,7 +113,7 @@ public class AutoDutyDialogActivity extends BaseActivity implements AutoDutyDial
             mAlertDialog.dismiss();
         }
 
-        mAlertDialog = new AlertDialog.Builder(this)
+        mAlertDialog = new AlertDialog.Builder(this, R.style.AlertDialogTheme_Positive)
                 .setTitle(R.string.driving_dialog_title)
                 .setMessage(R.string.driving_dialog_message)
                 .setCancelable(false)
@@ -114,8 +121,7 @@ public class AutoDutyDialogActivity extends BaseActivity implements AutoDutyDial
                 .setNegativeButton(R.string.driving_cancel, (dialog, which) -> mPresenter.onDrivingClick())
                 .show();
 
-        mHandler.removeCallbacks(mAutoDrivingTask);
-        mHandler.postDelayed(mAutoDrivingTask, MS_IN_MIN);
+        mIsAutoDrivingDialogShown = true;
     }
 
     private void showAutoOnDutyDialog() {
@@ -123,7 +129,7 @@ public class AutoDutyDialogActivity extends BaseActivity implements AutoDutyDial
             mAlertDialog.dismiss();
         }
 
-        mAlertDialog = new AlertDialog.Builder(this)
+        mAlertDialog = new AlertDialog.Builder(this, R.style.AlertDialogTheme_Positive)
                 .setTitle(R.string.on_duty_dialog_title)
                 .setMessage(R.string.on_duty_dialog_message)
                 .setCancelable(false)

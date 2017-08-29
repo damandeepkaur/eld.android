@@ -97,6 +97,10 @@
         <item name="buttonBarPositiveButtonStyle">@style/PositiveButtonStyle</item>
     </style>
 
+    <style name="AlertDialogTheme.Positive" parent="AlertDialogTheme">
+        <item name="buttonBarNegativeButtonStyle">@style/PositiveButtonStyle</item>
+    </style>
+
     <style name="NegativeButtonStyle" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
         <item name="android:textColor">@color/coral</item>
     </style>

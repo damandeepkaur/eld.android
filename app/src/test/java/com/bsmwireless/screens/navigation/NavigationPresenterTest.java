@@ -5,7 +5,6 @@ import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
 import com.bsmwireless.domain.interactors.UserInteractor;
 import com.bsmwireless.domain.interactors.VehiclesInteractor;
-import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.User;
 
 import org.junit.Before;
@@ -73,7 +72,6 @@ public class NavigationPresenterTest {
     public void testOnLogoutInteractorCall() {
         // given
         when(mEventsInteractor.postLogoutEvent()).thenReturn(Observable.just(true));
-        when(mUserInteractor.deleteUser()).thenReturn(Observable.just(true));
 
         // when
         mNavigationPresenter.onLogoutItemSelected();
@@ -90,7 +88,6 @@ public class NavigationPresenterTest {
     public void testOnLogoutFailed() {
         // given
         when(mEventsInteractor.postLogoutEvent()).thenReturn(Observable.just(false));
-        when(mUserInteractor.deleteUser()).thenReturn(Observable.just(false));
 
         // when
         mNavigationPresenter.onLogoutItemSelected();
@@ -109,7 +106,6 @@ public class NavigationPresenterTest {
     public void testOnLogoutError() {
         // given
         when(mEventsInteractor.postLogoutEvent()).thenReturn(Observable.error(new RuntimeException("it broke.")));
-        when(mUserInteractor.deleteUser()).thenReturn(Observable.error(new RuntimeException("it broke.")));
 
         // when
         mNavigationPresenter.onLogoutItemSelected();

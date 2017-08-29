@@ -25,6 +25,7 @@ import java.util.Calendar;
 
 import javax.inject.Inject;
 
+import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
 
@@ -98,17 +99,14 @@ public class UserInteractor {
                 });
     }
 
-    public Observable<Boolean> deleteUser() {
-        return Observable.fromCallable(() -> {
-            if (!mPreferencesManager.isRememberUserEnabled()) {
-                mAppDatabase.userDao().deleteUser(getDriverId());
-                mTokenManager.removeAccount(mPreferencesManager.getAccountName());
-                mPreferencesManager.clearValues();
-            } else {
-                mTokenManager.clearToken(mTokenManager.getToken(mPreferencesManager.getAccountName()));
-            }
-            return true;
-        });
+    public void deleteUser() {
+        if (!mPreferencesManager.isRememberUserEnabled()) {
+            mAppDatabase.userDao().deleteUser(getDriverId());
+            mTokenManager.removeAccount(mPreferencesManager.getAccountName());
+            mPreferencesManager.clearValues();
+        } else {
+            mTokenManager.clearToken(mTokenManager.getToken(mPreferencesManager.getAccountName()));
+        };
     }
 
     public Observable<Boolean> syncDriverProfile(User user) {

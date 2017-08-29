@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
@@ -36,7 +37,7 @@ public final class BlackBoxImpl implements BlackBox {
     private int mBoxId;
     private String mVinNumber;
     private Disposable mDisposable;
-    private static BlackBoxModel mBlackBoxModel = new BlackBoxModel();
+    private AtomicReference<BlackBoxModel> mBlackBoxModel = new AtomicReference<>(new BlackBoxModel());
 
     @Override
     public void connect(int boxId) throws Exception {
@@ -62,7 +63,7 @@ public final class BlackBoxImpl implements BlackBox {
     @Override
     public void disconnect() throws IOException {
         Timber.d("disconnect");
-        mBlackBoxModel = new BlackBoxModel();
+        mBlackBoxModel.set(new BlackBoxModel());
         if (isConnected()) {
             mDisposable.dispose();
             mEmitter = null;
@@ -88,7 +89,7 @@ public final class BlackBoxImpl implements BlackBox {
 
     @Override
     public BlackBoxModel getBlackBoxState() {
-        return mBlackBoxModel;
+        return mBlackBoxModel.get();
     }
 
     private boolean initializeCommunication(long retryIndex) throws Exception {
@@ -120,7 +121,7 @@ public final class BlackBoxImpl implements BlackBox {
                 .map(bytes -> BlackBoxParser.parseVehicleStatus(bytes).getBoxData())
                 .distinctUntilChanged()
                 .doOnNext(model -> {
-                    mBlackBoxModel = model;
+                    mBlackBoxModel.set(model);
                     Timber.v("Box Model processed:" + model.toString());
                 });
     }

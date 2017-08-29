@@ -20,7 +20,7 @@ public class BlackBoxInteractor {
     public Observable<BlackBoxModel> getData(int boxId) {
         if (!mConnectionManager.isConnected()) {
             return mConnectionManager.connectBlackBox(boxId)
-                    .switchMap(connectionManager ->  connectionManager.getDataObservable())
+                    .flatMap(connectionManager ->  connectionManager.getDataObservable())
                     .doOnError(error -> mConnectionManager.disconnectBlackBox());
         }
 
@@ -33,8 +33,8 @@ public class BlackBoxInteractor {
     }
 
     public <T> Observable<T> shutdown(T item) {
-        return Observable.zip(Observable.just(item), mConnectionManager.disconnectBlackBox(),
-                (tItem, manager) -> tItem);
+        return mConnectionManager.disconnectBlackBox()
+                .flatMap(blackBoxConnectionManager -> Observable.just(item));
     }
 
     public String getVinNumber() {

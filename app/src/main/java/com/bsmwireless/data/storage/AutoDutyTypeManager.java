@@ -28,27 +28,22 @@ public class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListener {
 
     private Disposable mBlackBoxDisposable;
 
-    private final ArrayList<AutoDutyTypeListener> mListeners = new ArrayList<>();
+    private AutoDutyTypeListener mListener = null;
 
     private Handler mHandler = new Handler();
     private Runnable mAutoOnDutyTask = new Runnable() {
         @Override
         public void run() {
-            synchronized (mListeners) {
-                for (AutoDutyTypeListener listener : mListeners) {
-                    listener.onAutoOnDuty();
-                }
-
+            if (mListener != null) {
+                mListener.onAutoOnDuty();
                 mHandler.postDelayed(this, AUTO_ON_DUTY_DELAY);
             }
         }
     };
 
     private Runnable mAutoDrivingTask = () -> {
-        synchronized (mListeners) {
-            for (AutoDutyTypeListener listener : mListeners) {
-                listener.onAutoDriving();
-            }
+        if (mListener != null) {
+            mListener.onAutoDriving();
         }
     };
 
@@ -58,8 +53,11 @@ public class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListener {
         mDutyTypeManager = dutyTypeManager;
         mPreferencesManager = preferencesManager;
 
-        mDutyTypeManager.addListener(this);
         SchedulerUtils.schedule();
+    }
+
+    public void doSubscribe() {
+        mDutyTypeManager.addListener(this);
     }
 
     public void validateBlackBoxState() {
@@ -118,6 +116,11 @@ public class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListener {
 
                 if (mDutyTypeManager.getDutyType() != DutyType.PERSONAL_USE && mDutyTypeManager.getDutyType() != DutyType.YARD_MOVES) {
                     events.add(mEventsInteractor.getEvent(DutyType.DRIVING, true));
+
+                } else if (mDutyTypeManager.getDutyType() == DutyType.PERSONAL_USE) {
+                    if (mListener != null) {
+                        mListener.onAutoDrivingWithoutConfirm();
+                    }
                 }
                 break;
 
@@ -144,21 +147,15 @@ public class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListener {
         }
     }
 
-    public void addListener(@NonNull AutoDutyTypeListener listener) {
-        synchronized (mListeners) {
-            mListeners.add(listener);
-        }
+    public void setListener(@NonNull AutoDutyTypeListener listener) {
+        mListener = listener;
     }
 
-    public void removeListener(@NonNull AutoDutyTypeListener listener) {
-        synchronized (mListeners) {
-            mListeners.remove(listener);
+    public void removeListener() {
+        mListener = null;
 
-            if (mListeners.isEmpty()) {
-                mHandler.removeCallbacks(mAutoOnDutyTask);
-                mHandler.removeCallbacks(mAutoDrivingTask);
-            }
-        }
+        mHandler.removeCallbacks(mAutoOnDutyTask);
+        mHandler.removeCallbacks(mAutoDrivingTask);
     }
 
     @Override
@@ -174,5 +171,6 @@ public class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListener {
     public interface AutoDutyTypeListener {
         void onAutoOnDuty();
         void onAutoDriving();
+        void onAutoDrivingWithoutConfirm();
     }
 }

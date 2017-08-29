@@ -16,6 +16,8 @@ class AutoDutyModule {
     @Singleton
     @Provides
     AutoDutyTypeManager provideAutoDutyTypeManager(BlackBoxInteractor blackBoxInteractor, PreferencesManager preferencesManager, ELDEventsInteractor eventsInteractor, DutyTypeManager dutyTypeManager) {
-        return new AutoDutyTypeManager(blackBoxInteractor, preferencesManager, eventsInteractor, dutyTypeManager);
+        AutoDutyTypeManager manager = new AutoDutyTypeManager(blackBoxInteractor, preferencesManager, eventsInteractor, dutyTypeManager);
+        manager.doSubscribe();
+        return manager;
     }
 }

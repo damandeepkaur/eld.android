@@ -34,12 +34,17 @@ public class NavigationPresenter extends BaseMenuPresenter {
     private AutoDutyTypeManager.AutoDutyTypeListener mListener = new AutoDutyTypeManager.AutoDutyTypeListener() {
         @Override
         public void onAutoOnDuty() {
-            mView.showAutoOnDutyDialog();
+            mView.setAutoOnDuty();
         }
 
         @Override
         public void onAutoDriving() {
-            mView.showAutoDrivingDialog();
+            mView.setAutoDriving();
+        }
+
+        @Override
+        public void onAutoDrivingWithoutConfirm() {
+            mView.setAutoDrivingWithoutConfirm();
         }
     };
 
@@ -53,12 +58,12 @@ public class NavigationPresenter extends BaseMenuPresenter {
         mAutoDutyTypeManager = autoDutyTypeManager;
         mDisposables = new CompositeDisposable();
 
-        mAutoDutyTypeManager.addListener(mListener);
+        mAutoDutyTypeManager.setListener(mListener);
     }
 
     public void onLogoutItemSelected() {
         Disposable disposable = mEventsInteractor.postLogoutEvent()
-                .flatMap(isSuccess -> mUserInteractor.deleteUser())
+                .doOnNext(isSuccess -> mUserInteractor.deleteUser())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
@@ -185,7 +190,7 @@ public class NavigationPresenter extends BaseMenuPresenter {
 
     @Override
     public void onDestroy() {
-        mAutoDutyTypeManager.removeListener(mListener);
+        mAutoDutyTypeManager.removeListener();
         super.onDestroy();
     }
 }

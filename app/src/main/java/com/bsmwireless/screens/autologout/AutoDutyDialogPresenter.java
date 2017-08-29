@@ -39,7 +39,7 @@ public class AutoDutyDialogPresenter {
 
     public void onAutoLogoutClick() {
         mDisposables.add(mEventsInteractor.postLogoutEvent()
-                .flatMap(isSuccess -> mUserInteractor.deleteUser())
+                .doOnNext(isSuccess -> mUserInteractor.deleteUser())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnTerminate(() -> {

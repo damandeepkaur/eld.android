@@ -6,7 +6,6 @@ import javax.inject.Inject;
 
 import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
-import io.reactivex.subjects.BehaviorSubject;
 
 public class BlackBoxConnectionManagerImpl implements BlackBoxConnectionManager {
 

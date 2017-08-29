@@ -40,6 +40,7 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
 import static com.bsmwireless.screens.autologout.AutoDutyDialogActivity.EXTRA_AUTO_DRIVING;
+import static com.bsmwireless.screens.autologout.AutoDutyDialogActivity.EXTRA_AUTO_DRIVING_WITHOUT_CONFIRM;
 import static com.bsmwireless.screens.autologout.AutoDutyDialogActivity.EXTRA_AUTO_ON_DUTY;
 import static com.bsmwireless.screens.driverprofile.DriverProfileActivity.EXTRA_USER;
 
@@ -283,7 +284,7 @@ public class NavigationActivity extends BaseMenuActivity implements OnNavigation
     }
 
     @Override
-    public void showAutoOnDutyDialog() {
+    public void setAutoOnDuty() {
         Intent dialogIntent = new Intent(this, AutoDutyDialogActivity.class);
         dialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         dialogIntent.putExtra(EXTRA_AUTO_ON_DUTY, true);
@@ -291,10 +292,18 @@ public class NavigationActivity extends BaseMenuActivity implements OnNavigation
     }
 
     @Override
-    public void showAutoDrivingDialog() {
+    public void setAutoDriving() {
         Intent dialogIntent = new Intent(this, AutoDutyDialogActivity.class);
         dialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         dialogIntent.putExtra(EXTRA_AUTO_DRIVING, true);
+        startActivity(dialogIntent);
+    }
+
+    @Override
+    public void setAutoDrivingWithoutConfirm() {
+        Intent dialogIntent = new Intent(this, AutoDutyDialogActivity.class);
+        dialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        dialogIntent.putExtra(EXTRA_AUTO_DRIVING_WITHOUT_CONFIRM, true);
         startActivity(dialogIntent);
     }
 
