@@ -284,6 +284,10 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
                 id = R.string.barcode_scanner_error;
                 break;
 
+            case ERROR_BLACKBOX:
+                id = R.string.error_pair;
+                break;
+
             default:
                 id = R.string.error_unexpected;
                 break;

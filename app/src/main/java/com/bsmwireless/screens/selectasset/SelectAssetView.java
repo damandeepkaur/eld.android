@@ -11,7 +11,8 @@ public interface SelectAssetView {
 
     enum Error {
         ERROR_UNEXPECTED,
-        ERROR_PERMISSION
+        ERROR_PERMISSION,
+        ERROR_BLACKBOX
     }
 
     void setVehicleList(@Nullable List<Vehicle> vehicles, @Nullable String searchText);

@@ -1,6 +1,6 @@
 package com.bsmwireless.common.dagger;
 
-import com.bsmwireless.data.storage.DutyManager;
+import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.data.storage.PreferencesManager;
 
 import javax.inject.Singleton;
@@ -12,7 +12,7 @@ import dagger.Provides;
 class DutyModule {
     @Singleton
     @Provides
-    DutyManager provideDutyManager(PreferencesManager preferencesManager) {
-        return new DutyManager(preferencesManager);
+    DutyTypeManager provideDutyTypeManager(PreferencesManager preferencesManager) {
+        return new DutyTypeManager(preferencesManager);
     }
 }

@@ -3,7 +3,7 @@ package com.bsmwireless.screens.autologout.dagger;
 import android.support.annotation.NonNull;
 
 import com.bsmwireless.common.dagger.ActivityScope;
-import com.bsmwireless.screens.autologout.AutoLogoutView;
+import com.bsmwireless.screens.autologout.AutoDutyDialogView;
 
 import dagger.Module;
 import dagger.Provides;
@@ -11,15 +11,15 @@ import dagger.Provides;
 @Module
 public class AutoLogoutModule {
 
-    private final AutoLogoutView mAutoLogoutView;
+    private final AutoDutyDialogView mAutoDutyDialogView;
 
-    public AutoLogoutModule(@NonNull AutoLogoutView view) {
-        mAutoLogoutView = view;
+    public AutoLogoutModule(@NonNull AutoDutyDialogView view) {
+        mAutoDutyDialogView = view;
     }
 
     @ActivityScope
     @Provides
-    AutoLogoutView provideView() {
-        return mAutoLogoutView;
+    AutoDutyDialogView provideView() {
+        return mAutoDutyDialogView;
     }
 }

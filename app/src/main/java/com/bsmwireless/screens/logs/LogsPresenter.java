@@ -5,7 +5,7 @@ import com.bsmwireless.common.Constants;
 import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.common.utils.DateUtils;
 import com.bsmwireless.data.network.RetrofitException;
-import com.bsmwireless.data.storage.DutyManager;
+import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
 import com.bsmwireless.domain.interactors.LogSheetInteractor;
 import com.bsmwireless.domain.interactors.UserInteractor;
@@ -19,7 +19,6 @@ import com.bsmwireless.widgets.logs.calendar.CalendarItem;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -28,7 +27,6 @@ import java.util.TimeZone;
 
 import javax.inject.Inject;
 
-import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -47,29 +45,31 @@ public class LogsPresenter {
     private LogSheetInteractor mLogSheetInteractor;
     private VehiclesInteractor mVehiclesInteractor;
     private UserInteractor mUserInteractor;
-    private DutyManager mDutyManager;
+    private DutyTypeManager mDutyTypeManager;
     private CompositeDisposable mDisposables;
     private String mTimeZone;
     private TripInfoModel mTripInfo;
     private Map<Integer, String> mVehicleIdToNameMap = new HashMap<>();
     private List<LogSheetHeader> mLogSheetHeaders;
     private Disposable mGetEventsFromDBDisposable;
-    private DutyManager.DutyTypeListener mListener = dutyType -> mView.dutyUpdated();
+    private Calendar mSelectedDayCalendar;
+
+    private DutyTypeManager.DutyTypeListener mListener = dutyType -> mView.dutyUpdated();
 
     @Inject
     public LogsPresenter(LogsView view, ELDEventsInteractor eventsInteractor, LogSheetInteractor logSheetInteractor,
-                         VehiclesInteractor vehiclesInteractor, UserInteractor userInteractor, DutyManager dutyManager) {
+                         VehiclesInteractor vehiclesInteractor, UserInteractor userInteractor, DutyTypeManager dutyTypeManager) {
         mView = view;
         mELDEventsInteractor = eventsInteractor;
         mLogSheetInteractor = logSheetInteractor;
         mVehiclesInteractor = vehiclesInteractor;
         mUserInteractor = userInteractor;
-        mDutyManager = dutyManager;
+        mDutyTypeManager = dutyTypeManager;
         mDisposables = new CompositeDisposable();
         mTripInfo = new TripInfoModel();
         Timber.d("CREATED");
 
-        mDutyManager.addListener(mListener);
+        mDutyTypeManager.addListener(mListener);
     }
 
     public void onViewCreated() {
@@ -89,8 +89,10 @@ public class LogsPresenter {
                                 logSheetHeaders -> {
                                     mLogSheetHeaders = logSheetHeaders;
                                     mView.setLogSheetHeaders(logSheetHeaders);
-                                    Calendar currentDayCalendar = Calendar.getInstance(TimeZone.getTimeZone(mTimeZone));
-                                    setEventsForDay(currentDayCalendar);
+                                    if (mSelectedDayCalendar == null) {
+                                        mSelectedDayCalendar = Calendar.getInstance(TimeZone.getTimeZone(mTimeZone));
+                                    }
+                                    setEventsForDay(mSelectedDayCalendar);
                                 }, error -> Timber.e("LoginUser error: %s", error)));
     }
 
@@ -104,24 +106,25 @@ public class LogsPresenter {
             return;
         }
 
+        mSelectedDayCalendar = calendar;
+
         long startDayTime = DateUtils.getStartDate(mTimeZone, calendar.get(Calendar.DAY_OF_MONTH),
                 calendar.get(Calendar.MONTH), calendar.get(Calendar.YEAR));
         long endDayTime = startDayTime + MS_IN_DAY;
 
-        //clean up
-        mView.setEventLogs(Collections.EMPTY_LIST);
-        mView.setTripInfo(new TripInfoModel());
-
-        mELDEventsInteractor.syncELDEvents(startDayTime - MS_IN_DAY, endDayTime);
+        mELDEventsInteractor.syncELDEventsWithServer(startDayTime - MS_IN_DAY, endDayTime);
 
         if (mGetEventsFromDBDisposable != null) mGetEventsFromDBDisposable.dispose();
-        mGetEventsFromDBDisposable = Flowable.zip(mELDEventsInteractor.getLatestActiveDutyEventFromDB(startDayTime),
-                mELDEventsInteractor.getDutyEventsFromDB(startDayTime, endDayTime),
-                (prevDayLatestEvent, selectedDayEvents) -> {
-                    prevDayLatestEvent.get(prevDayLatestEvent.size() - 1).setEventTime(startDayTime);
-                    selectedDayEvents.add(0, prevDayLatestEvent.get(prevDayLatestEvent.size() - 1));
+        mGetEventsFromDBDisposable = mELDEventsInteractor.getDutyEventsFromDB(startDayTime, endDayTime)
+                .map(selectedDayEvents -> {
+                    List<ELDEvent> prevDayLatestEvents = mELDEventsInteractor.getLatestActiveDutyEventFromDB(startDayTime);
+                    if (!prevDayLatestEvents.isEmpty()) {
+                        prevDayLatestEvents.get(prevDayLatestEvents.size() - 1).setEventTime(startDayTime);
+                        selectedDayEvents.add(0, prevDayLatestEvents.get(prevDayLatestEvents.size() - 1));
+                    }
                     return selectedDayEvents;
-                }).subscribeOn(Schedulers.io())
+                })
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(eldEvents -> {
                     long currentTime = Calendar.getInstance().getTimeInMillis();
@@ -180,7 +183,7 @@ public class LogsPresenter {
                 }
             }
             long currentTime = Calendar.getInstance().getTimeInMillis();
-            long[] times = DutyManager.getDutyTypeTimes(new ArrayList<>(events), startDayTime, endDayTime < currentTime ? endDayTime : currentTime);
+            long[] times = DutyTypeManager.getDutyTypeTimes(new ArrayList<>(events), startDayTime, endDayTime < currentTime ? endDayTime : currentTime);
 
             tripInfo.setSleeperBerthTime(DateUtils.convertTotalTimeInMsToStringTime(times[DutyType.SLEEPER_BERTH.ordinal()]));
             tripInfo.setDrivingTime(DateUtils.convertTotalTimeInMsToStringTime(times[DutyType.DRIVING.ordinal()]));
@@ -235,7 +238,10 @@ public class LogsPresenter {
                 .flatMap(isCreated -> mLogSheetInteractor.updateLogSheetHeader(logSheetHeader))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                        response -> mView.setLogSheetHeaders(mLogSheetHeaders),
+                        response -> {
+                            mLogSheetHeaders.add(logSheetHeader);
+                            mView.setLogSheetHeaders(mLogSheetHeaders);
+                        },
                         throwable -> {
                             Timber.e(throwable.getMessage());
                             logSheetHeader.setSigned(false);
@@ -265,18 +271,11 @@ public class LogsPresenter {
         Disposable disposable = mELDEventsInteractor.postNewELDEvents(newEvents)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(isUpdated -> {
-                    if (isUpdated) {
-                        mView.eventAdded();
-                    } else {
-                        mView.showError(LogsView.Error.ERROR_ADD_EVENT);
-                    }
-                }, throwable -> {
-                    Timber.e(throwable.getMessage());
-                    if (throwable instanceof RetrofitException) {
-                        mView.showError((RetrofitException) throwable);
-                    }
-                });
+                .subscribe(result -> mView.eventAdded(),
+                        throwable -> {
+                            Timber.e(throwable.getMessage());
+                            mView.showError(LogsView.Error.ERROR_ADD_EVENT);
+                        });
         mDisposables.add(disposable);
     }
 
@@ -284,23 +283,17 @@ public class LogsPresenter {
         Disposable disposable = mELDEventsInteractor.updateELDEvents(updatedEvents)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(isUpdated -> {
-                    if (isUpdated) {
-                        mView.eventUpdated();
-                    } else {
-                        mView.showError(LogsView.Error.ERROR_UPDATE_EVENT);
-                    }
-                }, throwable -> {
-                    Timber.e(throwable.getMessage());
-                    if (throwable instanceof RetrofitException) {
-                        mView.showError((RetrofitException) throwable);
-                    }
-                });
+                .subscribe(result -> mView.eventUpdated(),
+                        throwable -> {
+                            Timber.e(throwable.getMessage());
+                            mView.showError(LogsView.Error.ERROR_UPDATE_EVENT);
+
+                        });
         mDisposables.add(disposable);
     }
 
     public void onDestroy() {
-        mDutyManager.removeListener(mListener);
+        mDutyTypeManager.removeListener(mListener);
         mDisposables.dispose();
         Timber.d("DESTROYED");
     }
@@ -366,5 +359,13 @@ public class LogsPresenter {
             lastEvent.setDuration(endDayTime - lastEvent.getEventTime());
         }
         return logs;
+    }
+
+    public void onWeekChanged(CalendarItem startWeekDay) {
+        Calendar calendar = startWeekDay.getCalendar();
+        long startWeekTime = DateUtils.getStartDate(mTimeZone, calendar.get(Calendar.DAY_OF_MONTH),
+                calendar.get(Calendar.MONTH), calendar.get(Calendar.YEAR));
+        long endWeekTime = startWeekTime + MS_IN_DAY * 7;
+        mELDEventsInteractor.syncELDEventsWithServer(startWeekTime, endWeekTime);
     }
 }
