@@ -37,6 +37,8 @@ import timber.log.Timber;
 
 import static com.bsmwireless.common.utils.DateUtils.MS_IN_DAY;
 import static com.bsmwireless.screens.logs.TripInfoModel.UnitType.KM;
+import static com.bsmwireless.widgets.alerts.DutyType.CLEAR_PU;
+import static com.bsmwireless.widgets.alerts.DutyType.CLEAR_YM;
 
 @ActivityScope
 public class LogsPresenter {
@@ -326,23 +328,23 @@ public class LogsPresenter {
                 EventLogModel log = new EventLogModel(event, mTimeZone);
                 if (event.getEventType() == ELDEvent.EventType.CHANGE_IN_DRIVER_INDICATION.getValue()
                         && event.getEventCode() == DutyType.CLEAR.getCode()) {
+                    log.setDutyType(DutyType.CLEAR);
                     //get code of indication ON event for indication OFF event
                     for (int j = i - 1; j >= 0; j--) {
                         ELDEvent dutyEvent = events.get(j);
 
-                        if (dutyEvent.getEventType() == ELDEvent.EventType.DUTY_STATUS_CHANGING.getValue()) {
-                            log.setOnIndicationCode(dutyEvent.getEventCode());
-                            break;
-                        } else if (dutyEvent.getEventType() == ELDEvent.EventType.CHANGE_IN_DRIVER_INDICATION.getValue()) {
+                        if (dutyEvent.getEventType() == ELDEvent.EventType.CHANGE_IN_DRIVER_INDICATION.getValue()) {
                             if (dutyEvent.getEventCode() == DutyType.PERSONAL_USE.getCode()) {
-                                log.setOnIndicationCode(DutyType.OFF_DUTY.getCode());
+                                log.setDutyType(CLEAR_PU);
                                 break;
                             } else if (dutyEvent.getEventCode() == DutyType.YARD_MOVES.getCode()) {
-                                log.setOnIndicationCode(DutyType.ON_DUTY.getCode());
+                                log.setDutyType(CLEAR_YM);
                                 break;
                             }
                         }
                     }
+                } else {
+                    log.setDutyType(DutyType.getTypeByCode(log.getEventType(), log.getEventCode()));
                 }
                 logs.add(log);
                 if (logs.get(0).getEventTime() < startDayTime) {

@@ -191,7 +191,7 @@ public class DutyTypeManager {
             }
         }
 
-        return new long[] {onDutyTime, offDutyTime, sleeperBerthTime, drivingTime};
+        return new long[]{onDutyTime, offDutyTime, sleeperBerthTime, drivingTime};
     }
 
     private void notifyListeners() {
@@ -200,9 +200,13 @@ public class DutyTypeManager {
 
     public interface DutyTypeCheckable {
         Long getEventTime();
+
         Integer getEventType();
+
         Integer getEventCode();
+
         Boolean isActive();
+
         Boolean isDutyEvent();
     }
 

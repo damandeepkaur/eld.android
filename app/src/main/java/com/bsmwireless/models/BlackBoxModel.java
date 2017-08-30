@@ -120,7 +120,7 @@ public class BlackBoxModel {
     }
 
     public boolean getSensorState(BlackBoxSensorState state) {
-        return (mSensorState & state.getMask()) == 0 ? false : true;
+        return (mSensorState & state.getMask()) != 0;
     }
 
     public void setSensorState(int sensorState) {

@@ -14,7 +14,7 @@ import com.bsmwireless.data.storage.users.UserEntity;
 import com.bsmwireless.data.storage.vehicles.VehicleDao;
 import com.bsmwireless.data.storage.vehicles.VehicleEntity;
 
-@Database(entities = {UserEntity.class, VehicleEntity.class, ELDEventEntity.class, CarrierEntity.class, HomeTerminalEntity.class}, version = 10)
+@Database(entities = {UserEntity.class, VehicleEntity.class, ELDEventEntity.class, CarrierEntity.class, HomeTerminalEntity.class}, version = 11)
 public abstract class AppDatabase extends RoomDatabase {
     public abstract UserDao userDao();
     public abstract VehicleDao vehicleDao();
