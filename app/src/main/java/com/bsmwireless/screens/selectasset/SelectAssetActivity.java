@@ -263,7 +263,7 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
         mAlertDialog = new AlertDialog.Builder(this)
                 .setCancelable(true)
                 .setMessage(R.string.select_asset_information_no_selected_assets)
-                .setOnCancelListener(dialog -> finish())
+                .setPositiveButton(R.string.select_asset_confirm_button, (dialog, which) -> finish())
                 .create();
     }
 
