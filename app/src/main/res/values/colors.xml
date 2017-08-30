@@ -63,7 +63,7 @@
 
     <color name="light_gray_color">#61000000</color>
 
-
-
+    <!-- Lock Screen -->
+    <color name="lock_screen_background">#80323232</color>
 
 </resources>
