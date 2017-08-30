@@ -157,8 +157,9 @@ public class UserInteractor {
         return mTokenManager.getDomain(mPreferencesManager.getAccountName());
     }
 
-    public Flowable<UserEntity> getUser() {
-        return mAppDatabase.userDao().getUser(getDriverId());
+    public Flowable<User> getUser() {
+        return mAppDatabase.userDao().getUser(getDriverId())
+                .map(userEntity -> UserConverter.toUser(userEntity));
     }
 
     public Flowable<FullUserEntity> getFullUser() {

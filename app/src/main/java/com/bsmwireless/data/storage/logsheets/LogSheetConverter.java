@@ -34,18 +34,18 @@ public class LogSheetConverter {
 
         if (model != null) {
             entity = new LogSheetEntity();
-            entity.setLogDay(entity.getLogDay());
-            entity.setVehicleId(entity.getVehicleId());
-            entity.setBoxId(entity.getBoxId());
-            entity.setStartOfDay(entity.getStartOfDay());
-            entity.setShippingId(entity.getShippingId());
-            entity.setTrailerIds(entity.getTrailerIds());
-            entity.setCoDriverIds(entity.getCoDriverIds());
-            entity.setComment(entity.getComment());
-            entity.setDutyCycle(entity.getDutyCycle());
+            entity.setLogDay(model.getLogDay());
+            entity.setVehicleId(model.getVehicleId());
+            entity.setBoxId(model.getBoxId());
+            entity.setStartOfDay(model.getStartOfDay());
+            entity.setShippingId(model.getShippingId());
+            entity.setTrailerIds(model.getTrailerIds());
+            entity.setCoDriverIds(model.getCoDriverIds());
+            entity.setComment(model.getComment());
+            entity.setDutyCycle(model.getDutyCycle());
             entity.setHomeTerminal(HomeTerminalConverter.toEntity(model.getHomeTerminal(), null));
-            entity.setAdditions(entity.getAdditions());
-            entity.setSigned(entity.getSigned());
+            entity.setAdditions(model.getAdditions());
+            entity.setSigned(model.getSigned());
         }
 
         return entity;

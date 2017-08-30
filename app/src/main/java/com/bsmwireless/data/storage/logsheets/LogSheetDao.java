@@ -10,7 +10,6 @@ import static android.arch.persistence.room.OnConflictStrategy.REPLACE;
 
 @Dao
 public interface LogSheetDao {
-
     @Query("DELETE FROM log_sheet_header WHERE log_day = :logDay")
     int delete(long logDay);
 
@@ -21,5 +20,5 @@ public interface LogSheetDao {
     void insert(LogSheetEntity logSheetHeader);
 
     @Query("SELECT * FROM log_sheet_header WHERE log_day = :logDay LIMIT 1")
-    LogSheetEntity getByLogDay(long logDay);
+    LogSheetEntity getByLogDaySync(Long logDay);
 }

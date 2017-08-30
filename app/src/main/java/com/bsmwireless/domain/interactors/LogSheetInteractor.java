@@ -1,11 +1,16 @@
 package com.bsmwireless.domain.interactors;
 
+import android.util.Log;
+
 import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.data.storage.hometerminals.HomeTerminalConverter;
 import com.bsmwireless.data.storage.hometerminals.HomeTerminalEntity;
 import com.bsmwireless.data.storage.logsheets.LogSheetConverter;
+import com.bsmwireless.data.storage.logsheets.LogSheetDao;
+import com.bsmwireless.data.storage.logsheets.LogSheetEntity;
+import com.bsmwireless.data.storage.users.UserEntity;
 import com.bsmwireless.models.HomeTerminal;
 import com.bsmwireless.models.LogSheetHeader;
 
@@ -16,6 +21,8 @@ import javax.inject.Inject;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
+import io.reactivex.schedulers.Schedulers;
+import timber.log.Timber;
 
 import static com.bsmwireless.common.Constants.SUCCESS;
 
@@ -38,44 +45,67 @@ public class LogSheetInteractor {
                 .toFlowable(BackpressureStrategy.LATEST);
     }
 
+    public Observable<LogSheetHeader> getLogSheet(Long logDay) {
+
+        return Observable.fromCallable(() -> {
+            LogSheetEntity entity = mAppDatabase.logSheetDao().getByLogDaySync(logDay);
+            if (entity == null) {
+                LogSheetHeader logSheetHeader = createLogSheetHeaderModel(logDay);
+                mAppDatabase.logSheetDao().insert(LogSheetConverter.toEntity(logSheetHeader));
+                createLogSheetHeader(logSheetHeader);
+                return logSheetHeader;
+            } else {
+                return LogSheetConverter.toModel(entity);
+            }
+        });
+    }
+
     public Observable<Boolean> updateLogSheetHeader(LogSheetHeader logSheetHeader) {
         return mServiceApi.updateLogSheetHeader(logSheetHeader)
                 .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
     }
 
     public Observable<LogSheetHeader> createLogSheetHeader(long logday) {
+        return Observable.fromCallable(() -> createLogSheetHeaderModel(logday))
+                .flatMap(logSheetHeader -> updateLogSheetHeader(logSheetHeader).map(updated -> (updated) ? logSheetHeader : null
+                ));
+    }
+
+    public void createLogSheetHeader(LogSheetHeader logSheetHeader) {
+        updateLogSheetHeader(logSheetHeader)
+                .observeOn(Schedulers.io())
+                .subscribe(isCreated -> {
+                        },
+                        throwable -> Timber.e(throwable));
+    }
+
+
+    private LogSheetHeader createLogSheetHeaderModel(long logday) {
         LogSheetHeader logSheetHeader = new LogSheetHeader();
-        return Observable.fromCallable(() -> {
-            int driverId = mPreferencesManager.getDriverId();
-            int boxId = mPreferencesManager.getBoxId();
-            int vehicleId = mPreferencesManager.getVehicleId();
+        int driverId = mPreferencesManager.getDriverId();
+        int boxId = mPreferencesManager.getBoxId();
+        int vehicleId = mPreferencesManager.getVehicleId();
 
-            int homeTermId = mAppDatabase.userDao().getUserSync(driverId).getHomeTermId();
-            HomeTerminalEntity entity = mAppDatabase.homeTerminalDao().getHomeTerminalSync(homeTermId);
+        UserEntity userEntity = mAppDatabase.userDao().getUserSync(driverId);
+        if (userEntity != null && userEntity.getHomeTermId() != null) {
+            HomeTerminalEntity entity = mAppDatabase.homeTerminalDao().getHomeTerminalSync(userEntity.getHomeTermId());
             HomeTerminal homeTerminal = HomeTerminalConverter.toHomeTerminal(entity);
-
             logSheetHeader.setHomeTerminal(homeTerminal);
-            logSheetHeader.setBoxId(boxId);
-            logSheetHeader.setDriverId(driverId);
-            logSheetHeader.setVehicleId(vehicleId);
+        }
 
-            logSheetHeader.setLogDay(logday);
-            logSheetHeader.setSigned(false);
+        logSheetHeader.setBoxId(boxId);
+        logSheetHeader.setDriverId(driverId);
+        logSheetHeader.setVehicleId(vehicleId);
 
-            //TODO: fill appropriate fields to real data
-            logSheetHeader.setDutyCycle("");
-            logSheetHeader.setCoDriverIds("");
-            logSheetHeader.setTrailerIds("");
-            logSheetHeader.setStartOfDay(0L);
-            return logSheetHeader;
-        })
-                .flatMap(this::updateLogSheetHeader)
-                .map(updated -> {
-                    if (updated) {
-                        return logSheetHeader;
-                    }
-                    return null;
-                });
+        logSheetHeader.setLogDay(logday);
+        logSheetHeader.setSigned(false);
+
+        //TODO: fill appropriate fields to real data
+        logSheetHeader.setDutyCycle("");
+        logSheetHeader.setCoDriverIds("");
+        logSheetHeader.setTrailerIds("");
+        logSheetHeader.setStartOfDay(0L);
+        return logSheetHeader;
     }
 
 }

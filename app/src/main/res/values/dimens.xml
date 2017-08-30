@@ -137,12 +137,9 @@
     <dimen name="logs_list_item_header_sign_graph_margin_left">8dp</dimen>
     <dimen name="logs_list_item_header_sign_graph_margin_right">8dp</dimen>
     <dimen name="logs_list_item_title_height">52dp</dimen>
-    <dimen name="logs_list_item_title_margin_left">15dp</dimen>
+    <dimen name="logs_list_item_title_margin_left">16dp</dimen>
     <dimen name="logs_list_item_title_margin_right">16dp</dimen>
-    <dimen name="logs_list_item_trip_info_margin_top">8dp</dimen>
-    <dimen name="logs_list_item_trip_info_height">48dp</dimen>
-    <dimen name="logs_list_item_trip_info_margin_left">15dp</dimen>
-    <dimen name="logs_list_item_trip_info_margin_right">93dp</dimen>
+    <dimen name="logs_list_item_log_header_field_height">72dp</dimen>
 
     <!-- Dashboard -->
     <dimen name="duty_timer_text_size">60sp</dimen>
@@ -160,5 +157,7 @@
     <!-- Settings Activity -->
     <dimen name="divider_height">1dp</dimen>
     <dimen name="text_view_line_spacing_extra_smaller">6sp</dimen>
+    <dimen name="logs_list_item_log_header_field_margin_top">17dp</dimen>
+    <dimen name="logs_list_item_log_header_margin_left">12dp</dimen>
 
 </resources>
