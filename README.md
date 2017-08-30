@@ -3,6 +3,7 @@ ELD app for Android
 
 # Version history
 
+* **1.0.50** - Added UI for Lock Screen(_EA-206_)
 * **1.0.49** - Improve wording of PU and YM events (_EA-337_)
 * **1.0.48** - Add black box connection
 * **1.0.47** - Implement event synchronization (_EA-311_)
