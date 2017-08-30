@@ -1,6 +1,6 @@
 package com.bsmwireless.screens.lockscreen;
 
-import com.bsmwireless.data.storage.DutyManager;
+import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.widgets.alerts.DutyType;
 
 import org.junit.Before;
@@ -19,7 +19,7 @@ public class LockScreenPresenterTest {
     @Mock
     LockScreenView lockScreenView;
     @Mock
-    DutyManager dutyManager;
+    DutyTypeManager dutyManager;
     LockScreenPresenter presenter;
 
     @Before
