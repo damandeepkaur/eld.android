@@ -14,9 +14,9 @@ import android.view.View;
 import android.widget.AdapterView;
 
 import com.bsmwireless.common.App;
+import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.common.utils.NetworkUtils;
 import com.bsmwireless.data.network.RetrofitException;
-import com.bsmwireless.data.storage.DutyManager;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.screens.common.menu.BaseMenuActivity;
 import com.bsmwireless.screens.common.menu.BaseMenuPresenter;
@@ -212,7 +212,7 @@ public class EditEventActivity extends BaseMenuActivity implements EditEventView
 
     private void initStatusSpinner() {
         //TODO: set correct types
-        DutyType[] types = DutyManager.DRIVER_DUTY_EXTENDED_WITH_CLEAR;
+        DutyType[] types = DutyTypeManager.DRIVER_DUTY_EXTENDED_WITH_CLEAR;
         mEventStatus.setAdapter(new DutyTypeSpinnerAdapter(this, types));
         mEventStatus.setOnItemSelectedListener(this);
     }

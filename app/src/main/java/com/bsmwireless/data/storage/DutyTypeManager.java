@@ -17,7 +17,7 @@ import static com.bsmwireless.widgets.alerts.DutyType.PERSONAL_USE;
 import static com.bsmwireless.widgets.alerts.DutyType.SLEEPER_BERTH;
 import static com.bsmwireless.widgets.alerts.DutyType.YARD_MOVES;
 
-public class DutyManager {
+public class DutyTypeManager {
     public static final DutyType[] DRIVER_DUTY_EXTENDED = {OFF_DUTY, SLEEPER_BERTH, DRIVING, ON_DUTY, PERSONAL_USE, YARD_MOVES};
     public static final DutyType[] DRIVER_DUTY_EXTENDED_WITH_CLEAR = {ON_DUTY, OFF_DUTY, SLEEPER_BERTH, DRIVING, YARD_MOVES, PERSONAL_USE, CLEAR};
     public static final DutyType[] DRIVING_DUTY = {OFF_DUTY, SLEEPER_BERTH, DRIVING, ON_DUTY};
@@ -41,7 +41,7 @@ public class DutyManager {
         }
     };
 
-    public DutyManager(PreferencesManager preferencesManager) {
+    public DutyTypeManager(PreferencesManager preferencesManager) {
         mPreferencesManager = preferencesManager;
         mDutyType = DutyType.values()[mPreferencesManager.getDutyType()];
     }
@@ -137,7 +137,7 @@ public class DutyManager {
         }
     }
 
-    public static long[] getDutyTypeTimes(List<DutyCheckable> events, long startTime, long endTime) {
+    public static long[] getDutyTypeTimes(List<DutyTypeCheckable> events, long startTime, long endTime) {
         long offDutyTime = 0;
         long onDutyTime = 0;
         long drivingTime = 0;
@@ -146,8 +146,8 @@ public class DutyManager {
         long currentTime = endTime;
         long duration;
 
-        DutyType currentDutyType = OFF_DUTY;
-        DutyCheckable event;
+        DutyType currentDutyType;
+        DutyTypeCheckable event;
 
         for (int i = events.size() - 1; i >= 0; i--) {
             // all events from current day is checked
@@ -158,14 +158,15 @@ public class DutyManager {
             event = events.get(i);
 
             if (event.isDutyEvent() && event.isActive()) {
+                currentDutyType = DutyType.getTypeByCode(event.getEventType(), event.getEventCode());
+
+                if (currentDutyType == CLEAR) {
+                    continue;
+                }
+
                 duration = currentTime - Math.max(event.getEventTime(), startTime);
                 currentTime = event.getEventTime();
 
-                //for clear events keep the next status
-                if (event.getEventCode() == CLEAR.getCode() && i > 0) {
-                    event = events.get(i - 1);
-                }
-                currentDutyType = DutyType.getTypeByCode(event.getEventType(), event.getEventCode());
             } else {
                 continue;
             }
@@ -190,18 +191,22 @@ public class DutyManager {
             }
         }
 
-        return new long[] {onDutyTime, offDutyTime, sleeperBerthTime, drivingTime};
+        return new long[]{onDutyTime, offDutyTime, sleeperBerthTime, drivingTime};
     }
 
     private void notifyListeners() {
         mHandler.post(mNotifyTask);
     }
 
-    public interface DutyCheckable {
+    public interface DutyTypeCheckable {
         Long getEventTime();
+
         Integer getEventType();
+
         Integer getEventCode();
+
         Boolean isActive();
+
         Boolean isDutyEvent();
     }
 
