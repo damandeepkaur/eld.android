@@ -1,7 +1,7 @@
 package com.bsmwireless.screens.driverprofile;
 
 import com.bsmwireless.common.dagger.ActivityScope;
-import com.bsmwireless.data.storage.DutyManager;
+import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.data.network.RetrofitException;
 import com.bsmwireless.data.storage.carriers.CarrierEntity;
 import com.bsmwireless.data.storage.hometerminals.HomeTerminalEntity;
@@ -40,10 +40,10 @@ public class DriverProfilePresenter extends BaseMenuPresenter {
     private CarrierEntity mCarrier;
 
     @Inject
-    public DriverProfilePresenter(DriverProfileView view, UserInteractor userInteractor, DutyManager dutyManager, ELDEventsInteractor eventsInteractor) {
+    public DriverProfilePresenter(DriverProfileView view, UserInteractor userInteractor, DutyTypeManager dutyTypeManager, ELDEventsInteractor eventsInteractor) {
         mView = view;
         mUserInteractor = userInteractor;
-        mDutyManager = dutyManager;
+        mDutyTypeManager = dutyTypeManager;
         mEventsInteractor = eventsInteractor;
         mDisposables = new CompositeDisposable();
 

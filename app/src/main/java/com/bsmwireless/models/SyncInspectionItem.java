@@ -166,7 +166,7 @@ public class SyncInspectionItem implements Parcelable {
     protected SyncInspectionItem(Parcel in) {
         this.mDefectLevel = (Integer) in.readValue(Integer.class.getClassLoader());
         this.mDesc = in.readParcelable(SyncDescription.class.getClassLoader());
-        this.mSubItems = new ArrayList<SyncInspectionItem>();
+        this.mSubItems = new ArrayList<>();
         in.readList(this.mSubItems, SyncInspectionItem.class.getClassLoader());
         this.mCategory = (Integer) in.readValue(Integer.class.getClassLoader());
         this.mId = (Integer) in.readValue(Integer.class.getClassLoader());

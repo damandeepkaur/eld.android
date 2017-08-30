@@ -12,5 +12,9 @@ public interface NavigateView extends BaseMenuView {
     void setAssetsNumber(int assetsNum);
     void setResetTime(long time);
 
+    void setAutoOnDuty();
+    void setAutoDriving();
+    void setAutoDrivingWithoutConfirm();
+
     SnackBarLayout getSnackBar();
 }

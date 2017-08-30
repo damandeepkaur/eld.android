@@ -17,9 +17,10 @@ public class DateUtils {
     public static final int SEC_IN_MIN = 60;
     public static final int MIN_IN_HOUR = 60;
     public static final int HOUR_IN_DAY = 24;
+    public static final int SEC_IN_HOUR = MIN_IN_HOUR * SEC_IN_MIN;
     public static final int SEC_IN_DAY = HOUR_IN_DAY * MIN_IN_HOUR * SEC_IN_MIN;
-    private final static int MS_IN_MIN = SEC_IN_MIN * MS_IN_SEC;
-    private final static int MS_IN_HOUR = MIN_IN_HOUR * MS_IN_MIN;
+    public final static int MS_IN_MIN = SEC_IN_MIN * MS_IN_SEC;
+    public final static int MS_IN_HOUR = MIN_IN_HOUR * MS_IN_MIN;
     public static final long MS_IN_DAY = MS_IN_SEC * SEC_IN_DAY;
     public static final long MS_IN_WEEK = MS_IN_DAY * 7;
 
