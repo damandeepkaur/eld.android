@@ -1,0 +1,41 @@
+// Jacoco config
+apply plugin: 'jacoco'
+
+jacoco {
+    toolVersion = "0.7.5.201505241946"
+}
+
+def coverageSourceDirs = [
+        'src/main/java'
+]
+
+
+// TODO: generalize coverage report for both debug + release
+// To run in CLI (Windows): gradlew clean jacocoTestReport
+// can be found in: <build_dir>/jacocoDebugHtml -- (see html.destination)
+task jacocoTestReport(type: JacocoReport, dependsOn: ["testDebugUnitTest"]) {
+    group = "Reporting"
+
+    description = "Generate Jacoco coverage reports"
+
+    classDirectories = fileTree(
+            dir: "${buildDir}/intermediates/classes",
+            excludes: ['**/R.class',
+                       '**/R$*.class',
+                       '**/*$ViewInjector*.*',
+                       '**/BuildConfig.*',
+                       '**/Manifest*.*']
+    )
+
+    additionalSourceDirs = files(coverageSourceDirs)
+    sourceDirectories = files(coverageSourceDirs)
+    executionData = files("${buildDir}/jacoco/testDebugUnitTest.exec")
+
+    reports {
+        xml.enabled true
+        csv.enabled true
+        html.destination "${buildDir}/jacocoDebugHtml"
+    }
+
+}
+//end Jacoco config
