@@ -5,23 +5,19 @@
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
               android:orientation="vertical"
-              tools:backgroundTint="@color/black"
-
-    >
+              tools:backgroundTint="@color/black">
 
     <com.bsmwireless.widgets.dashboard.DutyView
         android:id="@+id/dashboard_current"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/margin_small"
-        app:size="large"
-        />
+        app:size="large"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        >
+        android:orientation="horizontal">
 
         <com.bsmwireless.widgets.dashboard.DutyView
             android:id="@+id/dashboard_break"
@@ -29,8 +25,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/margin_small"
             android:layout_weight="1"
-            app:size="normal"
-            />
+            app:size="normal"/>
 
         <com.bsmwireless.widgets.dashboard.DutyView
             android:id="@+id/dashboard_workday"
@@ -38,8 +33,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/margin_small"
             android:layout_weight="1"
-            app:size="normal"
-            />
+            app:size="normal"/>
 
         <com.bsmwireless.widgets.dashboard.DutyView
             android:id="@+id/dashboard_cycle"
@@ -47,8 +41,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/margin_small"
             android:layout_weight="1"
-            app:size="normal"
-            />
+            app:size="normal"/>
 
     </LinearLayout>
 
