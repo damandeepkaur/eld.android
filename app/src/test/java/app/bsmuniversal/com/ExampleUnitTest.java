@@ -1,14 +1,8 @@
 package app.bsmuniversal.com;
 
-import com.bsmwireless.data.storage.eldevents.ELDEventConverter;
-import com.bsmwireless.data.storage.eldevents.ELDEventEntity;
-import com.bsmwireless.models.ELDEvent;
-
 import org.junit.Test;
 
-import java.util.List;
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Example local unit test, which will execute on the development machine (host).
