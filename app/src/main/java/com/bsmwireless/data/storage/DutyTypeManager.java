@@ -3,7 +3,6 @@ package com.bsmwireless.data.storage;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 
-import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.widgets.alerts.DutyType;
 
 import java.util.ArrayList;
@@ -18,8 +17,9 @@ import static com.bsmwireless.widgets.alerts.DutyType.PERSONAL_USE;
 import static com.bsmwireless.widgets.alerts.DutyType.SLEEPER_BERTH;
 import static com.bsmwireless.widgets.alerts.DutyType.YARD_MOVES;
 
-public class DutyManager {
+public class DutyTypeManager {
     public static final DutyType[] DRIVER_DUTY_EXTENDED = {OFF_DUTY, SLEEPER_BERTH, DRIVING, ON_DUTY, PERSONAL_USE, YARD_MOVES};
+    public static final DutyType[] DRIVER_DUTY_EXTENDED_WITH_CLEAR = {ON_DUTY, OFF_DUTY, SLEEPER_BERTH, DRIVING, YARD_MOVES, PERSONAL_USE, CLEAR};
     public static final DutyType[] DRIVING_DUTY = {OFF_DUTY, SLEEPER_BERTH, DRIVING, ON_DUTY};
 
     public static final DutyType[] CO_DRIVER_DUTY_EXTENDED = {OFF_DUTY, SLEEPER_BERTH, ON_DUTY, PERSONAL_USE, YARD_MOVES};
@@ -41,7 +41,7 @@ public class DutyManager {
         }
     };
 
-    public DutyManager(PreferencesManager preferencesManager) {
+    public DutyTypeManager(PreferencesManager preferencesManager) {
         mPreferencesManager = preferencesManager;
         mDutyType = DutyType.values()[mPreferencesManager.getDutyType()];
     }
@@ -109,6 +109,10 @@ public class DutyManager {
             case SLEEPER_BERTH:
                 time = mPreferencesManager.getSleeperBerthTime();
                 break;
+
+            default:
+                //TODO: return cycle time
+                break;
         }
 
         if (mDutyType == dutyType) {
@@ -133,7 +137,7 @@ public class DutyManager {
         }
     }
 
-    public static long[] getDutyTypeTimes(List<DutyCheckable> events, long startTime, long endTime) {
+    public static long[] getDutyTypeTimes(List<DutyTypeCheckable> events, long startTime, long endTime) {
         long offDutyTime = 0;
         long onDutyTime = 0;
         long drivingTime = 0;
@@ -142,8 +146,8 @@ public class DutyManager {
         long currentTime = endTime;
         long duration;
 
-        DutyType currentDutyType = OFF_DUTY;
-        DutyCheckable event;
+        DutyType currentDutyType;
+        DutyTypeCheckable event;
 
         for (int i = events.size() - 1; i >= 0; i--) {
             // all events from current day is checked
@@ -153,14 +157,15 @@ public class DutyManager {
 
             event = events.get(i);
 
-            if (event.getEventType() == ELDEvent.EventType.DUTY_STATUS_CHANGING.getValue() || event.getEventType() == ELDEvent.EventType.CHANGE_IN_DRIVER_INDICATION.getValue()) {
+            if (event.isDutyEvent() && event.isActive()) {
+                currentDutyType = DutyType.getTypeByCode(event.getEventType(), event.getEventCode());
+
+                if (currentDutyType == CLEAR) {
+                    continue;
+                }
+
                 duration = currentTime - Math.max(event.getEventTime(), startTime);
                 currentTime = event.getEventTime();
-
-                //for clear events keep the previous status
-                if (event.getEventCode() != CLEAR.getCode()) {
-                    currentDutyType = DutyType.getTypeByCode(event.getEventType(), event.getEventCode());
-                }
 
             } else {
                 continue;
@@ -186,17 +191,23 @@ public class DutyManager {
             }
         }
 
-        return new long[] {offDutyTime, sleeperBerthTime, drivingTime, onDutyTime};
+        return new long[]{onDutyTime, offDutyTime, sleeperBerthTime, drivingTime};
     }
 
     private void notifyListeners() {
         mHandler.post(mNotifyTask);
     }
 
-    public interface DutyCheckable {
+    public interface DutyTypeCheckable {
         Long getEventTime();
+
         Integer getEventType();
+
         Integer getEventCode();
+
+        Boolean isActive();
+
+        Boolean isDutyEvent();
     }
 
     public interface DutyTypeListener {

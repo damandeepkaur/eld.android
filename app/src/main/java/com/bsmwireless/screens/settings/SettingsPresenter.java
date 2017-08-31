@@ -1,7 +1,7 @@
 package com.bsmwireless.screens.settings;
 
 import com.bsmwireless.common.dagger.ActivityScope;
-import com.bsmwireless.data.storage.DutyManager;
+import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.domain.interactors.SettingsInteractor;
 import com.bsmwireless.screens.common.menu.BaseMenuPresenter;
 import com.bsmwireless.screens.common.menu.BaseMenuView;
@@ -18,10 +18,10 @@ public class SettingsPresenter extends BaseMenuPresenter {
     private SettingsInteractor mSettingsInteractor;
 
     @Inject
-    public SettingsPresenter(SettingsView view, SettingsInteractor settingsInteractor, DutyManager dutyManager) {
+    public SettingsPresenter(SettingsView view, SettingsInteractor settingsInteractor, DutyTypeManager dutyTypeManager) {
         mView = view;
         mSettingsInteractor = settingsInteractor;
-        mDutyManager = dutyManager;
+        mDutyTypeManager = dutyTypeManager;
         mDisposables = new CompositeDisposable();
 
         Timber.d("CREATED");
@@ -32,7 +32,7 @@ public class SettingsPresenter extends BaseMenuPresenter {
         mView.setFixedAmountSwitchEnabled(mSettingsInteractor.isFixedAmountEnabled());
 
         // set current selected value for odometer units
-        mView.showOdometerUnits(loadLastSelectedOdometerUnit());
+        mView.checkOdometerUnit(loadLastSelectedOdometerUnit());
     }
 
     public void onBoxGPSSwitchChecked(boolean isBoxGPSEnabled) {
@@ -48,11 +48,11 @@ public class SettingsPresenter extends BaseMenuPresenter {
         return mView;
     }
 
-    public void onKMOdometerUnitsSelected(boolean isKMOdometerUnitsSelected) {
+    public void onUnitsSelected(boolean isKMOdometerUnitsSelected) {
         if (isKMOdometerUnitsSelected) {
-            mView.showOdometerUnits(SettingsView.OdometerUnits.ODOMETER_UNITS_KM);
+            mView.checkOdometerUnit(SettingsView.OdometerUnits.ODOMETER_UNITS_KM);
         } else {
-            mView.showOdometerUnits(SettingsView.OdometerUnits.ODOMETER_UNITS_MI);
+            mView.checkOdometerUnit(SettingsView.OdometerUnits.ODOMETER_UNITS_MI);
         }
 
         mSettingsInteractor.saveKMOdometerUnitsSelected(isKMOdometerUnitsSelected);

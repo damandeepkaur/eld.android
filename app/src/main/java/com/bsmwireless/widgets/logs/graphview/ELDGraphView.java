@@ -3,6 +3,7 @@ package com.bsmwireless.widgets.logs.graphview;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
@@ -24,6 +25,7 @@ public class ELDGraphView extends View {
     private final static int SEC_IN_MIN = 60;
     private final static int MS_IN_MIN = 60 * 1000;
     private final static int MS_IN_DAY = 24 * 60 * MS_IN_MIN;
+    private static final int DOTTED_LINE_WIDTH_DP = 20;
 
     private final int GRID_WIDTH_DP = 1;
     private final int LINE_WIDTH_DP = 3;
@@ -44,7 +46,7 @@ public class ELDGraphView extends View {
     private Paint mHeaderPaint;
     private Paint mHorizontalLinesPaint;
     private Paint mVerticalLinesPaint;
-    private List<EventLogModel> mLogs;
+    private List<DrawableLog> mLogs;
     private Bitmap mBitmap;
     private Paint mBitmapPaint;
     private long mStartDayUnixTimeInMs;
@@ -142,7 +144,7 @@ public class ELDGraphView extends View {
     }
 
     public void setLogs(final List<EventLogModel> logs) {
-        mLogs = logs;
+        mLogs = prepareEvents(logs);
         if (!logs.isEmpty()) {
             EventLogModel firstLog = logs.get(0);
             mStartDayUnixTimeInMs = DateUtils.getStartDayTimeInMs(firstLog.getDriverTimezone(), firstLog.getEventTime());
@@ -186,7 +188,7 @@ public class ELDGraphView extends View {
         }
     }
 
-    private void drawLog(List<EventLogModel> logData, Canvas canvas) {
+    private void drawLog(List<DrawableLog> logData, Canvas canvas) {
 
         if (logData == null || logData.size() == 0) {
             return;
@@ -194,19 +196,17 @@ public class ELDGraphView extends View {
 
         float gridUnit = mGraphWidth / (mHoursCount * SEC_IN_MIN);
 
-        int firstEventCode = 1;
-
         float x1, x2, y1, y2;
 
-        EventLogModel firstEvent = logData.get(0);
+        DrawableLog firstEvent = logData.get(0);
         long firstLogDayTime = (firstEvent.getEventTime() - mStartDayUnixTimeInMs) / MS_IN_MIN;
         x1 = mGraphLeft + firstLogDayTime * gridUnit;
-        y1 = mGraphTop + (firstEvent.getEventCode() - firstEventCode) * mSegmentHeight + mSegmentHeight / 2;
+        y1 = mGraphTop + firstEvent.getEventCode() * mSegmentHeight + mSegmentHeight / 2;
         int color;
 
         for (int i = 1; i < logData.size(); i++) {
-            EventLogModel event = logData.get(i);
-            EventLogModel prevEvent = logData.get(i - 1);
+            DrawableLog event = logData.get(i);
+            DrawableLog prevEvent = logData.get(i - 1);
 
             Long logDate = event.getEventTime();
             Long prevLogDate = prevEvent.getEventTime();
@@ -214,10 +214,22 @@ public class ELDGraphView extends View {
             long timeStamp = (logDate - prevLogDate) / MS_IN_MIN;
 
             x2 = x1 + timeStamp * gridUnit;
-            y2 = mGraphTop + (event.getEventCode() - firstEventCode) * mSegmentHeight + mSegmentHeight / 2;
+            y2 = mGraphTop + event.getEventCode() * mSegmentHeight + mSegmentHeight / 2;
 
-            color = ContextCompat.getColor(getContext(), DutyType.getTypeByCode(prevEvent.getEventType(), prevEvent.getEventCode()).getColor());
+            color = ContextCompat.getColor(getContext(), prevEvent.getEventType().getColor());
             mHorizontalLinesPaint.setColor(color);
+
+            if (prevEvent.isSpecialStatus()) {
+                mHorizontalLinesPaint.setPathEffect(
+                        new DashPathEffect(
+                                new float[]{ViewUtils.convertPixelsToDp(DOTTED_LINE_WIDTH_DP,
+                                        getContext()),
+                                        ViewUtils.convertPixelsToDp(DOTTED_LINE_WIDTH_DP, getContext())
+                                }, 0));
+            } else {
+                mHorizontalLinesPaint.setPathEffect(null);
+            }
+
             canvas.drawLine(x1, y1, x2, y1, mHorizontalLinesPaint);
 
             if (y1 != y2) {
@@ -228,17 +240,82 @@ public class ELDGraphView extends View {
             y1 = y2;
         }
 
-        EventLogModel log = logData.get(logData.size() - 1);
-        color = ContextCompat.getColor(getContext(), DutyType.getTypeByCode(log.getEventType(), log.getEventCode()).getColor());
+        DrawableLog log = logData.get(logData.size() - 1);
+        color = ContextCompat.getColor(getContext(), log.getEventType().getColor());
         mHorizontalLinesPaint.setColor(color);
+
+        if (log.isSpecialStatus()) {
+            mHorizontalLinesPaint.setPathEffect(
+                    new DashPathEffect(
+                            new float[]{ViewUtils.convertPixelsToDp(DOTTED_LINE_WIDTH_DP,
+                                    getContext()),
+                                    ViewUtils.convertPixelsToDp(DOTTED_LINE_WIDTH_DP, getContext())
+                            }, 0));
+        } else {
+            mHorizontalLinesPaint.setPathEffect(null);
+        }
 
         if (mStartDayUnixTimeInMs + MS_IN_DAY < Calendar.getInstance().getTimeInMillis()) {
             x2 = mGraphWidth + mGraphLeft;
         } else {
-            long timeStamp = logData.get(logData.size() - 1).getDuration() / MS_IN_MIN;
+            long timeStamp = log.getDuration() / MS_IN_MIN;
             x2 = x1 + timeStamp * gridUnit;
         }
 
         canvas.drawLine(x1, y1, x2, y1, mHorizontalLinesPaint);
+    }
+
+    private List<DrawableLog> prepareEvents(List<EventLogModel> events) {
+        List<DrawableLog> result = new ArrayList<>();
+        for (int i = 0; i < events.size(); i++) {
+            EventLogModel event = events.get(i);
+            DutyType dutyType = DutyType.getTypeByCode(event.getEventType(), event.getEventCode());
+            DrawableLog log;
+            if (event.isActive() && event.isDutyEvent()) {
+                if (dutyType.equals(DutyType.CLEAR)) {
+                    DutyType type = event.getDutyType();
+                    log = new DrawableLog(type, event.getEventTime(), event.getDuration());
+                } else {
+                    log = new DrawableLog(dutyType, event.getEventTime(), event.getDuration());
+                }
+                result.add(log);
+            }
+        }
+        return result;
+    }
+
+    private static class DrawableLog {
+        private DutyType mType;
+        private long mTime;
+        private long mDuration;
+
+        public DrawableLog() {
+        }
+
+        public DrawableLog(DutyType type, long time, long duration) {
+            mType = type;
+            mTime = time;
+            mDuration = duration;
+        }
+
+        public DutyType getEventType() {
+            return mType;
+        }
+
+        public int getEventCode() {
+            return mType.getOriginalCode() - 1;
+        }
+
+        public long getEventTime() {
+            return mTime;
+        }
+
+        public boolean isSpecialStatus() {
+            return mType.equals(DutyType.PERSONAL_USE) || mType.equals(DutyType.YARD_MOVES);
+        }
+
+        public long getDuration() {
+            return mDuration;
+        }
     }
 }

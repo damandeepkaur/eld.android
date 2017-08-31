@@ -7,21 +7,15 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.util.AttributeSet;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bsmwireless.common.utils.DateUtils;
 import com.bsmwireless.widgets.alerts.DutyType;
 
-import java.util.Locale;
-
 import app.bsmuniversal.com.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
-
-import static com.bsmwireless.common.utils.DateUtils.MS_IN_SEC;
 
 public class DutyView extends CardView {
     @BindView(R.id.duty_time_title)
@@ -29,12 +23,6 @@ public class DutyView extends CardView {
 
     @BindView(R.id.duty_time)
     TextView mTimeText;
-
-    @BindView(R.id.duty_status)
-    ImageView mStatusImage;
-
-    @BindView(R.id.duty_progress)
-    ProgressBar mProgressBar;
 
     @Nullable
     @BindView(R.id.duty_selection_layout)
@@ -44,8 +32,17 @@ public class DutyView extends CardView {
     @BindView(R.id.duty_selection_title)
     TextView mSelectionText;
 
+    @Nullable
+    @BindView(R.id.tap_to_change_status_title)
+    TextView mTapToChangeTitle;
+
+    @Nullable
+    @BindView(R.id.duty_divider)
+    View mDutyDivider;
+
     private Unbinder mUnbinder;
     private DutyType mDutyType;
+    private boolean mIsLarge = false;
 
     public DutyView(Context context) {
         super(context);
@@ -72,10 +69,10 @@ public class DutyView extends CardView {
     private void init(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.DutyView, defStyleAttr, 0);
         DutyType dutyType = DutyType.values()[typedArray.getInt(R.styleable.DutyView_dutyType, 0)];
-        boolean isLarge = typedArray.getInt(R.styleable.DutyView_size, 0) == 0;
+        mIsLarge = typedArray.getInt(R.styleable.DutyView_size, 0) == 0;
         typedArray.recycle();
 
-        View rootView = inflate(context, isLarge ? R.layout.view_duty_large : R.layout.view_duty_normal, this);
+        View rootView = inflate(context, mIsLarge ? R.layout.view_duty_large : R.layout.view_duty_normal, this);
         mUnbinder = ButterKnife.bind(rootView, this);
 
         setDutyType(dutyType);
@@ -93,16 +90,31 @@ public class DutyView extends CardView {
         int color = ContextCompat.getColor(getContext(), dutyType.getColor());
         String name = getResources().getString(dutyType.getName());
 
-        mProgressBar.getProgressDrawable().setColorFilter(color, android.graphics.PorterDuff.Mode.SRC_IN);
-
         if (mSelectionLayout != null && mSelectionText != null) {
             mSelectionLayout.getBackground().setColorFilter(color, android.graphics.PorterDuff.Mode.SRC_IN);
             mSelectionText.setTextColor(color);
             mSelectionText.setText(name);
+            mSelectionText.setCompoundDrawablesWithIntrinsicBounds(0, 0, dutyType.getIcon(), 0);
         }
 
-        mStatusImage.setImageResource(dutyType.getIcon());
-        mTimeTitleText.setText(String.format(Locale.US, "%s %s", name, "time"));
+        int id = R.string.duty_cycle_time;
+
+        switch (dutyType) {
+            case ON_DUTY:
+            case YARD_MOVES:
+                id = R.string.duty_on_duty_time;
+                break;
+
+            case DRIVING:
+                id = R.string.duty_driving_time;
+                break;
+
+            case SLEEPER_BERTH:
+                id = R.string.duty_sleeper_berth_time;
+                break;
+        }
+
+        mTimeTitleText.setText(getResources().getString(id));
     }
 
     public DutyType getDutyType() {
@@ -110,7 +122,18 @@ public class DutyView extends CardView {
     }
 
     public void setTime(long time) {
-        mTimeText.setText(DateUtils.convertTotalTimeInMsToFullStringTime(time));
-        mProgressBar.setProgress((int) (time / MS_IN_SEC));
+        mTimeText.setText(mIsLarge ? DateUtils.convertTotalTimeInMsToFullStringTime(time) : DateUtils.convertTotalTimeInMsToStringTime(time));
+    }
+
+    public void setCanChangingSatusView(boolean canChange) {
+        if (mIsLarge) {
+
+            if (mTapToChangeTitle == null || mDutyDivider == null) {
+                return;
+            }
+
+            mTapToChangeTitle.setVisibility(canChange ? VISIBLE : GONE);
+            mDutyDivider.setVisibility(canChange ? VISIBLE : GONE);
+        }
     }
 }

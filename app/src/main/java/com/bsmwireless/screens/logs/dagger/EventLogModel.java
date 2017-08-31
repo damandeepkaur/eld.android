@@ -1,16 +1,16 @@
 package com.bsmwireless.screens.logs.dagger;
 
-import com.bsmwireless.data.storage.DutyManager;
+import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.models.ELDEvent;
+import com.bsmwireless.widgets.alerts.DutyType;
 
-public class EventLogModel implements DutyManager.DutyCheckable {
+public class EventLogModel implements DutyTypeManager.DutyTypeCheckable {
 
     private ELDEvent mEvent;
     private Long mDuration;
     private String mDriverTimezone;
     private String mVehicleName;
-    //only for indication off events (type 3 and code 0)
-    private int mOnIndicationCode;
+    private DutyType mDutyType;
 
     public EventLogModel() {
     }
@@ -73,12 +73,22 @@ public class EventLogModel implements DutyManager.DutyCheckable {
         mVehicleName = vehicleName;
     }
 
-    public int getOnIndicationCode() {
-        return mOnIndicationCode;
+    public DutyType getDutyType() {
+        return mDutyType;
     }
 
-    public void setOnIndicationCode(int onIndicationCode) {
-        mOnIndicationCode = onIndicationCode;
+    public void setDutyType(DutyType dutyType) {
+        mDutyType = dutyType;
+    }
+
+    @Override
+    public Boolean isActive() {
+        return mEvent.isActive();
+    }
+
+    @Override
+    public Boolean isDutyEvent() {
+        return mEvent.isDutyEvent();
     }
 
     @Override
@@ -90,9 +100,5 @@ public class EventLogModel implements DutyManager.DutyCheckable {
         sb.append(", mVehicleName='").append(mVehicleName).append('\'');
         sb.append('}');
         return sb.toString();
-    }
-
-    public boolean isActive() {
-        return mEvent.getStatus().equals(ELDEvent.StatusCode.ACTIVE.getValue());
     }
 }

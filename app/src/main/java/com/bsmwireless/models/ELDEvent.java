@@ -3,14 +3,14 @@ package com.bsmwireless.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.bsmwireless.data.storage.DutyManager;
+import com.bsmwireless.data.storage.DutyTypeManager;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-public class ELDEvent implements Parcelable, DutyManager.DutyCheckable {
+public class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheckable {
     public enum EventType {
         DUTY_STATUS_CHANGING(1),
         INTERMEDIATE_LOG(2),
@@ -72,6 +72,23 @@ public class ELDEvent implements Parcelable, DutyManager.DutyCheckable {
 
         LoginLogoutCode(int code) {
             mCode = code;
+        }
+
+        public int getValue() {
+            return mCode;
+        }
+    }
+
+    public enum EnginePowerCode {
+        POWER_UP(1),
+        POWER_UP_REDUCE_DECISION(2),
+        SHUT_DOWN(3),
+        SHUT_DOWN_REDUCE_DECISION(4);
+
+        private int mCode;
+
+        EnginePowerCode(int type) {
+            mCode = type;
         }
 
         public int getValue() {
@@ -448,6 +465,17 @@ public class ELDEvent implements Parcelable, DutyManager.DutyCheckable {
 
     public void setDiagnostic(Boolean diagnostic) {
         this.mDiagnostic = diagnostic;
+    }
+
+    @Override
+    public Boolean isActive() {
+        return mStatus.equals(ELDEvent.StatusCode.ACTIVE.getValue());
+    }
+
+    @Override
+    public Boolean isDutyEvent() {
+        return mEventType.equals(ELDEvent.EventType.DUTY_STATUS_CHANGING.getValue()) ||
+                mEventType.equals(ELDEvent.EventType.CHANGE_IN_DRIVER_INDICATION.getValue());
     }
 
     @Override

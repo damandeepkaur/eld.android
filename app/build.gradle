@@ -10,8 +10,8 @@ android {
         applicationId "app.bsmuniversal.com"
         minSdkVersion 15
         targetSdkVersion 25
-        versionCode 43
-        versionName "1.0.42"
+        versionCode 52
+        versionName "1.0.51"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         javaCompileOptions {
@@ -36,9 +36,13 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             buildConfigField "boolean", "USE_LOG", "false"
             signingConfig signingConfigs.release
+
+            testCoverageEnabled = true
         }
         debug {
             buildConfigField "boolean", "USE_LOG", "true"
+
+            testCoverageEnabled = true
         }
     }
 
@@ -171,3 +175,6 @@ dependencies {
 
     compile 'com.github.instacart.truetime-android:library-extension-rx:3.3'
 }
+
+
+apply from: "jacoco.gradle"
