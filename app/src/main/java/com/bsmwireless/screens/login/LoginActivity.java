@@ -72,7 +72,7 @@ public class LoginActivity extends BaseActivity implements LoginView {
     }
 
     private void initView() {
-        this.hideProgressBar();
+        hideProgressBar();
         mPresenter.onViewCreated();
     }
 
