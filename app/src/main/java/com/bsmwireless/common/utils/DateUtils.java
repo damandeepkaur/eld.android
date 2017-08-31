@@ -242,7 +242,7 @@ public class DateUtils {
      * @return real time which is sync with the ntp server
      */
     public static Long currentTimeMillis() {
-        long realTimeInMilisecondsDiff = App.getComponent().ntpClientManager().getRealTimeInMilisecondsDiff();
+        long realTimeInMilisecondsDiff = App.getComponent().ntpClientManager().getRealTimeInMillisDiff();
         long realTimeInMiliseconds = System.currentTimeMillis() + realTimeInMilisecondsDiff;
         return realTimeInMiliseconds;
     }
