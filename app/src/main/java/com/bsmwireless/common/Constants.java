@@ -7,11 +7,12 @@ public interface Constants {
 
     int MAX_LAST_VEHICLE = 5;
     int DEFAULT_CALENDAR_DAYS_COUNT = 30;
+    int RETRY_COUNT_NTP_SYNC = 100;
 
     String BASE_URL = "https://develd.bsmtechnologies.com/sdmobile/rest/";
     String DEVICE_TYPE = "Android";
 
     String SUCCESS = "ACK";
 
-    String NTP_POOL_SERVER = "time.apple.com";
+    String NTP_POOL_SERVER = "time.google.com";
 }

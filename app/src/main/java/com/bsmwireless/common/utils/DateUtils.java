@@ -1,6 +1,11 @@
 package com.bsmwireless.common.utils;
 
 import android.content.Context;
+import android.util.Log;
+
+import com.bsmwireless.common.App;
+import com.bsmwireless.data.network.NtpClientManager;
+import com.instacart.library.truetime.TrueTimeRx;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -232,4 +237,12 @@ public class DateUtils {
         return format.format(calendar.getTime());
     }
 
+    /**
+     * @return real time which is sync with the ntp server
+     */
+    public static Long currentTimeMillis() {
+        long realTimeInMilisecondsDiff = App.getComponent().ntpClientManager().getRealTimeInMilisecondsDiff();
+        long realTimeInMiliseconds = System.currentTimeMillis() + realTimeInMilisecondsDiff;
+        return realTimeInMiliseconds;
+    }
 }

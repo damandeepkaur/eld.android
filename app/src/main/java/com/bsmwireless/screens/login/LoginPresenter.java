@@ -93,8 +93,11 @@ public class LoginPresenter {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                        date -> Timber.i("TrueTime initialized: %b", date),
-                        throwable -> Timber.e("TrueTime error: %s", throwable));
+                        date -> {
+                            Timber.i("Ntp sync date = %s", date.toString());
+                            mNtpClientManager.setRealTimeInMillisDiff(date);
+                        },
+                        throwable ->  Timber.e("Something went wrong when trying to initializeRx TrueTime: %s", throwable));
         mDisposables.add(disposable);
     }
 
