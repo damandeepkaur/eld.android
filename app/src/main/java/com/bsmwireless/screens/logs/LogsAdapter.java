@@ -13,11 +13,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.bsmwireless.common.utils.DateUtils;
-import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.LogSheetHeader;
 import com.bsmwireless.screens.logs.dagger.EventLogModel;
 import com.bsmwireless.widgets.alerts.DutyType;
-import com.bsmwireless.widgets.logs.EventDescription;
 import com.bsmwireless.widgets.logs.LogsTitleView;
 import com.bsmwireless.widgets.logs.calendar.CalendarItem;
 import com.bsmwireless.widgets.logs.calendar.CalendarLayout;
@@ -300,16 +298,10 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
         holder.mMenuButton.setTag(log);
         holder.mMenuButton.setOnClickListener(mOnMenuClickListener);
 
-        DutyType currentDuty;
-        if (log.getEventType() == ELDEvent.EventType.CHANGE_IN_DRIVER_INDICATION.getValue()
-                && log.getEventCode() == DutyType.CLEAR.getCode()) {
-            currentDuty = DutyType.getTypeByCode(ELDEvent.EventType.DUTY_STATUS_CHANGING.getValue(), log.getOnIndicationCode());
-        } else {
-            currentDuty = DutyType.getTypeByCode(log.getEventType(), log.getEventCode());
-        }
+        DutyType currentDuty = log.getDutyType();
 
         holder.mEventStatus.setTextColor(mColors.get(currentDuty.getColor()));
-        holder.mEventStatus.setText(EventDescription.getTitle(currentDuty.getType(), currentDuty.getCode()));
+        holder.mEventStatus.setText(currentDuty.getTitle());
 
         if (log.isActive()) {
             holder.itemView.setBackgroundColor(mAdapterColors.mTransparentColor);

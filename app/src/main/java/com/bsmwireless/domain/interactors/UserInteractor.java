@@ -25,7 +25,6 @@ import java.util.Calendar;
 
 import javax.inject.Inject;
 
-import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
 
@@ -103,7 +102,7 @@ public class UserInteractor {
             mPreferencesManager.clearValues();
         } else {
             mTokenManager.clearToken(mTokenManager.getToken(mPreferencesManager.getAccountName()));
-        };
+        }
     }
 
     public Observable<Boolean> syncDriverProfile(User user) {

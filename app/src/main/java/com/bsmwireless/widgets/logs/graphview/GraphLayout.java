@@ -5,8 +5,6 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.LinearLayout;
 
-import com.bsmwireless.common.utils.DutyUtils;
-import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.screens.logs.dagger.EventLogModel;
 import com.bsmwireless.widgets.common.FontTextView;
 

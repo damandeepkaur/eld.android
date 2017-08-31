@@ -10,7 +10,6 @@ import com.bsmwireless.data.storage.users.FullUserEntity;
 import com.bsmwireless.data.storage.users.UserDao;
 import com.bsmwireless.data.storage.users.UserEntity;
 import com.bsmwireless.models.Auth;
-import com.bsmwireless.models.BlackBoxModel;
 import com.bsmwireless.models.Carrier;
 import com.bsmwireless.models.DriverHomeTerminal;
 import com.bsmwireless.models.DriverProfileModel;
@@ -38,7 +37,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import app.bsmuniversal.com.RxSchedulerRule;
-import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.observers.TestObserver;
@@ -46,7 +44,6 @@ import io.reactivex.subscribers.TestSubscriber;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;

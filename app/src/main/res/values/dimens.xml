@@ -160,4 +160,10 @@
     <dimen name="logs_list_item_log_header_field_margin_top">17dp</dimen>
     <dimen name="logs_list_item_log_header_margin_left">12dp</dimen>
 
+    <!-- Lock Screen Activity -->
+    <dimen name="margin_between_views">8dp</dimen>
+    <dimen name="button_corners">5dp</dimen>
+    <dimen name="message_margin_left">46dp</dimen>
+    <dimen name="lock_screen_top_padding">24dp</dimen>
+
 </resources>

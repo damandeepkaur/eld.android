@@ -331,9 +331,9 @@
 
     <!-- END OLD STRINGS -->
 
-    <string name="app_name">BSM Universal App</string>
     <string name="account_label">BSM Wireless</string>
     <string name="select_asset_title">Select Asset</string>
+    <string name="app_name">BSM Connect</string>
 
     <!-- Driver Profile -->
     <string name="driver_profile">Driver profile</string>
@@ -453,7 +453,7 @@
     <!--Logs Events-->
     <string name="event_changed">(CHANGED)</string>
     <string name="event_type_off_duty">Off Duty</string>
-    <string name="event_type_sleeping">Sleeping Berth</string>
+    <string name="event_type_sleeping">Sleeper Berth</string>
     <string name="event_type_driving">Driving</string>
     <string name="event_type_on_duty">On Duty</string>
     <string name="event_type_personal_use">Personal Use</string>
@@ -466,8 +466,10 @@
     <string name="event_type_shut_down">Shut Down</string>
     <string name="event_type_power_up">Power Up</string>
     <string name="event_type_unknown_type">Unknown event type</string>
-    <string name="event_type_personal_use_title">Off Duty (Personal Use)</string>
-    <string name="event_type_yard_moves_title">On Duty (Yard Moves)</string>
+    <string name="event_type_personal_use_title">Off Duty (Start of Personal Use)</string>
+    <string name="event_type_yard_moves_title">On Duty (Start of Yard Moves)</string>
+    <string name="event_type_personal_use_end_title">Off Duty (End of Personal Use)</string>
+    <string name="event_type_yard_moves_end_title">On Duty (End of Yard Moves)</string>
     <string name="update_event_error">Update event error</string>
     <string name="add_event_error">Add event error</string>
     <string name="event_added">Event added</string>
@@ -538,6 +540,10 @@
         <item>14 days</item>
     </string-array>
     <string name="multiday_total_hours">Total hours</string>
+    
+    <!-- Lock screen -->
+    <string name="lock_screen_switch_co_driver_message">You can switch to co-driver view to continue work in application</string>
+    <string name="switch_to_co_driver_view">SWITCH TO CO-DRIVER VIEW</string>
 
     <!-- Geo location enum direction description -->
     <string name="geo_location_at_description">At indicated geo-location</string>
