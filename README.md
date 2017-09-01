@@ -3,7 +3,7 @@ ELD app for Android
 
 # Version history
 
-
+* **1.0.52** - Add Log header to Logs Screen (_EA-339_)
 * **1.0.51** - Add confirmation dialog select assets screen
 * **1.0.50** - Added UI for Lock Screen(_EA-206_)
 * **1.0.49** - Improve wording of PU and YM events (_EA-337_)
@@ -13,7 +13,7 @@ ELD app for Android
 * **1.0.45** - Update multiday screen
 * **1.0.44** - Update graph drawing and add ability create special events
 * **1.0.43** - Add dashboard indicators (_EA-280_)
-* **1.0.41** - Fix crash on incorrent events loading (_EA-313_)
+* **1.0.41** - Fix crash on incorrect events loading (_EA-313_)
 * **1.0.40** - Add YM and PU to logs screen (_EA-286_)
 * **1.0.39** - Change inactive events view
 * **1.0.38** - Update logs graph

@@ -27,6 +27,7 @@ import static com.bsmwireless.common.utils.DateUtils.SEC_IN_HOUR;
 
 public class ELDEventsInteractor {
 
+    private static String mTimezone = "";
     private Disposable mSyncEventsDisposable;
     private ServiceApi mServiceApi;
     private BlackBoxInteractor mBlackBoxInteractor;
@@ -34,8 +35,6 @@ public class ELDEventsInteractor {
     private DutyTypeManager mDutyTypeManager;
     private ELDEventDao mELDEventDao;
     private PreferencesManager mPreferencesManager;
-
-    private static String mTimezone = "";
 
     @Inject
     public ELDEventsInteractor(ServiceApi serviceApi, PreferencesManager preferencesManager,
@@ -53,7 +52,8 @@ public class ELDEventsInteractor {
     }
 
     public void syncELDEventsWithServer(Long startTime, Long endTime) {
-        mServiceApi.getELDEvents(startTime, endTime)
+        if (mSyncEventsDisposable != null) mSyncEventsDisposable.dispose();
+        mSyncEventsDisposable = mServiceApi.getELDEvents(startTime, endTime)
                 .subscribeOn(Schedulers.io())
                 .subscribe(eldEventsFromServer -> {
                             List<ELDEventEntity> entities = mELDEventDao.getEventsFromStartToEndTimeSync(
@@ -64,13 +64,7 @@ public class ELDEventsInteractor {
                                 mELDEventDao.insertAll(entitiesArray);
                             }
                         },
-                        error -> {
-                            Timber.e(error);
-                        });
-    }
-
-    public Flowable<List<ELDEvent>> getELDEvents(long startTime, long endTime) {
-        return getDutyEventsFromDB(startTime, endTime);
+                        error -> Timber.e(error));
     }
 
     public Flowable<List<ELDEvent>> getDutyEventsFromDB(long startTime, long endTime) {

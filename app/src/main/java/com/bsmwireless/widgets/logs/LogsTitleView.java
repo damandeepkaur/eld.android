@@ -87,7 +87,7 @@ public class LogsTitleView extends FrameLayout {
         if (mType == Type.EVENTS) {
             mTitle.setText(R.string.logs_events);
         } else {
-            mTitle.setText(R.string.logs_trip_info);
+            mTitle.setText(R.string.logs_log_header);
         }
 
         mArrow.setRotation(mIsCollapsed ? 0 : -180);
@@ -103,6 +103,6 @@ public class LogsTitleView extends FrameLayout {
 
     public enum Type {
         EVENTS,
-        TRIP_INFO
+        LOG_HEADER
     }
 }

@@ -46,18 +46,6 @@
     <string name="error_domain">Domain Required</string>
     <string name="error_pair">Pair error</string>
 
-    <!--Logs-->
-    <string name="logs_sign_logsheet">SIGN LOGSHEET</string>
-    <string name="logs_events">EVENTS</string>
-    <string name="logs_trip_info">TRIP INFO</string>
-    <string name="logs_co_driver">Co-driver</string>
-    <string name="logs_on_duty_left">On duty left</string>
-    <string name="logs_drive">Drive</string>
-    <string name="logs_odometer">Odometer</string>
-    <string name="logs_mi_set">mi</string>
-    <string name="logs_km_set">km</string>
-
-
     <!-- START OLD STRINGS -->
     <string name="no_network">No Network Available</string>
     <string name="app_compatability">Note: Compatible with Android 4.0.3 - 6.0.1</string>
@@ -339,14 +327,16 @@
     <string name="show_location_alert_title">Address</string>
     <string name="show_location_alert_msg">Please enter your current location</string>
     <string name="str_inspectorView">INSPECTOR VIEW</string>
-    <string name="account_label">BSM Wireless</string>
+
     <string name="timer_default_time">00:00</string>
     <string name="timer_default_type">OFF DUTY</string>
     <string name="timer_hours_minutes">HOURS MINUTES</string>
     <string name="string_total">TOTAL</string>
-    <string name="select_asset_title">Select Asset</string>
+
     <!-- END OLD STRINGS -->
 
+    <string name="account_label">BSM Wireless</string>
+    <string name="select_asset_title">Select Asset</string>
     <string name="app_name">BSM Connect</string>
 
     <!-- Driver Profile -->
@@ -445,7 +435,9 @@
     <string name="edit_event_comment_error">Comment should not include special characters</string>
     <string name="edit_event_valid_comment">Valid comment</string>
 
-    <!-- Logs -->
+    <!--Logs-->
+    <string name="logs_log_header">log header</string>
+    <string name="logs_events">events</string>
     <string name="odometer">Odometer(%1$s)</string>
     <string name="add_event">Add event</string>
     <string name="edit">Edit</string>
@@ -457,14 +449,13 @@
     <string name="no_address_available">No address available</string>
     <string name="hours">hrs</string>
     <string name="minutes">mins</string>
-
     <string name="sign_dialog_title">Sign confirmation</string>
     <string name="sign_dialog_confirmation_text">Are you sure you want to sign this logsheet?</string>
     <string name="sign_dialog_visibility_note">Signed logsheets will be visible to supervisors</string>
     <string name="decline">decline</string>
     <string name="accept">accept</string>
+    <!--Logs Events-->
     <string name="event_changed">(CHANGED)</string>
-
     <string name="event_type_off_duty">Off Duty</string>
     <string name="event_type_sleeping">Sleeper Berth</string>
     <string name="event_type_driving">Driving</string>
@@ -487,6 +478,21 @@
     <string name="add_event_error">Add event error</string>
     <string name="event_added">Event added</string>
     <string name="event_updated">Event updated</string>
+    <!--Logs Log Header-->
+    <string name="log_header_time_zone">Time Zone</string>
+    <string name="log_header_driver_name">Driver name</string>
+    <string name="log_header_co_driver_s_name">Co-driver(s) name</string>
+    <string name="log_header_vehicle_name">Vehicle name</string>
+    <string name="log_header_vehicle_license">Vehicle license</string>
+    <string name="log_header_start_odometer">Start Odometer</string>
+    <string name="log_header_end_odometer">End Odometer</string>
+    <string name="log_header_distance_driven">Distance Driven</string>
+    <string name="log_header_carrier_name">Carrier Name</string>
+    <string name="log_header_home_terminal_name">Home Terminal Name</string>
+    <string name="log_header_home_terminal_address">Home Terminal Address</string>
+    <string name="log_header_trailers">Trailer(s)</string>
+    <string name="log_header_shipping_id">Shipping ID</string>
+    <string name="log_header_driving_exemptions">Driving Exemptions</string>
 
     <!-- Auto Logout Activity -->
     <string name="logout_dialog_title">Expiration Warning</string>

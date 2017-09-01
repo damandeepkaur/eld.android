@@ -113,7 +113,7 @@ public class NavigationPresenter extends BaseMenuPresenter {
 
                     return mEventsInteractor.getDutyEventsFromDB(time[0], time[1])
                             .map(selectedDayEvents -> {
-                                List<ELDEvent> prevDayLatestEvents = mEventsInteractor.getLatestActiveDutyEventFromDB(time[0]);
+                                List<ELDEvent> prevDayLatestEvents = mEventsInteractor.getLatestActiveDutyEventFromDBSync(time[0]);
                                 if (!prevDayLatestEvents.isEmpty()) {
                                     selectedDayEvents.add(0, prevDayLatestEvents.get(prevDayLatestEvents.size() - 1));
                                 }
