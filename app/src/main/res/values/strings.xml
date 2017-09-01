@@ -9,6 +9,10 @@
     <string name="select_asset_find_nothing">Sorry we couldn\'t find anything</string>
     <string name="select_asset_characters">Enter at least 3 characters</string>
     <string name="select_asset_error">Select asset error</string>
+    <string name="select_asset_dialog_title">Nothing is selected</string>
+    <string name="select_asset_information_no_selected_assets">You didn\'t select any asset and tap on back button. Please tap Continue to keep working or Close to end your session now.</string>
+    <string name="select_asset_continue">Continue</string>
+    <string name="select_asset_close">Close</string>
 
     <!--Alerts-->
     <string name="eld_green">Green notification</string>
