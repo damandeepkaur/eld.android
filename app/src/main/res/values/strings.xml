@@ -587,4 +587,18 @@
     <string name="geo_location_north_west_code">NW</string>
     <string name="geo_location_north_north_west_code">NNW</string>
 
+    <!-- Switch co-driver -->
+    <string name="switch_driver">Switch driver</string>
+    <string name="switch_driver_log_in">Login</string>
+    <string name="switch_driver_cancel">Cancel</string>
+    <string name="switch_driver_log_out">Log out</string>
+    <string name="switch_driver_add_co_driver">Add co-driver</string>
+    <string name="switch_driver_driver_seat">Driver\'s seat</string>
+    <string name="switch_driver_co_drivers">Co-drivers</string>
+    <string name="switch_driver_co_driver_log_out">Driver Log out</string>
+    <string name="switch_driver_confirm_driver_seat">Confirm</string>
+    <string name="switch_driver_invalid_credentials">Invalid credentials</string>
+    <string name="switch_driver_error_login_codriver">Co-driver was not logged in</string>
+    <string name="switch_driver_login_error">Login error</string>
+
 </resources>

@@ -1,7 +1,10 @@
 package com.bsmwireless.screens.navigation;
 
+import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.data.storage.AutoDutyTypeManager;
 import com.bsmwireless.data.storage.DutyTypeManager;
+import com.bsmwireless.data.storage.users.UserConverter;
+import com.bsmwireless.data.storage.users.UserEntity;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
 import com.bsmwireless.domain.interactors.SyncEventsInteractor;
 import com.bsmwireless.domain.interactors.UserInteractor;
@@ -58,6 +61,9 @@ public class NavigationPresenterTest {
     @Mock
     SyncEventsInteractor mSyncEventsInteractor;
 
+    @Mock
+    AccountManager mAccountManager;
+
 
     private NavigationPresenter mNavigationPresenter;
 
@@ -66,7 +72,7 @@ public class NavigationPresenterTest {
     public void before() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        mNavigationPresenter = new NavigationPresenter(mView, mUserInteractor, mVehiclesInteractor, mEventsInteractor, mDutyTypeManager, mAutoDutyTypeManager, mSyncEventsInteractor);
+        mNavigationPresenter = new NavigationPresenter(mView, mUserInteractor, mVehiclesInteractor, mEventsInteractor, mDutyTypeManager, mAutoDutyTypeManager, mSyncEventsInteractor, mAccountManager);
     }
 
     /**
@@ -82,7 +88,7 @@ public class NavigationPresenterTest {
 
         // then
         verify(mEventsInteractor).postLogoutEvent();
-        verify(mUserInteractor).deleteUser();
+        verify(mUserInteractor).deleteDriver();
     }
 
     /**
@@ -124,15 +130,16 @@ public class NavigationPresenterTest {
         // given
         final String name = "userName";
         final Flowable<String> userFlowable = Flowable.just(name);
+        final Flowable<Integer> coDriverCountFlowable = Flowable.just(3);
 
-        final int coDriver = 1; // note: business logic is incorrect as can have multiple co-drivers
+        final int coDriver = 3; // note: business logic is incorrect as can have multiple co-drivers
         // TODO: add refactor task/story to JIRA after server-side API refactors to match correct business logic
 
         final int boxId = 1111;
         final int assetNumber = 2222;
 
-        when(mUserInteractor.getFullName()).thenReturn(userFlowable);
-        when(mUserInteractor.getCoDriversNumber()).thenReturn(coDriver);
+        when(mUserInteractor.getFullDriverName()).thenReturn(userFlowable);
+        when(mUserInteractor.getCoDriversNumber()).thenReturn(coDriverCountFlowable);
         when(mVehiclesInteractor.getBoxId()).thenReturn(boxId);
         when(mVehiclesInteractor.getAssetsNumber()).thenReturn(assetNumber);
 
@@ -155,13 +162,17 @@ public class NavigationPresenterTest {
     public void testOnUserUpdated() {
         // given
         User user = new User();
-        when(mUserInteractor.syncDriverProfile(any(User.class))).thenReturn(Observable.just(true)); // prevent null pointer exception
+        user.setId(0);
+
+        when(mUserInteractor.getUserFromDBSync(user.getId())).thenReturn(UserConverter.toEntity(user));
+        when(mUserInteractor.syncDriverProfile(any(UserEntity.class))).thenReturn(Observable.just(true)); // prevent null pointer exception
 
         // when
         mNavigationPresenter.onUserUpdated(user);
 
         // then
-        verify(mUserInteractor).syncDriverProfile(eq(user));
+        verify(mUserInteractor).getUserFromDBSync(eq(user.getId()));
+        verify(mUserInteractor).syncDriverProfile(any(UserEntity.class));
     }
 
     @Test
@@ -173,20 +184,24 @@ public class NavigationPresenterTest {
         mNavigationPresenter.onUserUpdated(null);
 
         // then
-        verify(mUserInteractor, never()).syncDriverProfile(any(User.class));
+        verify(mUserInteractor, never()).syncDriverProfile(any(UserEntity.class));
     }
 
     @Test
     public void testOnUserUpdatedError() {
         // given
         User user = new User();
+        user.setId(0);
+        UserEntity userEntity = UserConverter.toEntity(user);
         String error = "sorry, it didn't work";
-        when(mUserInteractor.syncDriverProfile(any(User.class))).thenReturn(Observable.error(new RuntimeException(error)));
+        when(mUserInteractor.getUserFromDBSync(user.getId())).thenReturn(userEntity);
+        when(mUserInteractor.syncDriverProfile(any(UserEntity.class))).thenReturn(Observable.error(new RuntimeException(error)));
 
         // when
         mNavigationPresenter.onUserUpdated(user);
 
         // then
+        verify(mUserInteractor).syncDriverProfile(any(UserEntity.class));
         verify(mView).showErrorMessage(eq(error));
     }
 }

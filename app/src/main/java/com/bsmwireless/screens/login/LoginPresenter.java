@@ -33,7 +33,7 @@ public class LoginPresenter {
         if (mUserInteractor.isLoginActive()) {
             mView.goToNavigationScreen();
         } else if (mUserInteractor.isRememberMeEnabled()) {
-            mView.loadUserData(mUserInteractor.getUserName(), mUserInteractor.getDomainName());
+            mView.loadUserData(mUserInteractor.getDriverName(), mUserInteractor.getDriverDomainName());
         }
     }
 

@@ -27,13 +27,11 @@ import timber.log.Timber;
 public class EditEventPresenter extends BaseMenuPresenter {
 
     private EditEventView mView;
-    private CompositeDisposable mDisposables;
     private ELDEvent mELDEvent;
     private String mTimezone;
     private long mEventDay;
     private Calendar mCalendar;
 
-    private UserInteractor mUserInteractor;
 
     @Inject
     public EditEventPresenter(EditEventView view, UserInteractor userInteractor, ELDEventsInteractor eventsInteractor, DutyTypeManager dutyTypeManager) {

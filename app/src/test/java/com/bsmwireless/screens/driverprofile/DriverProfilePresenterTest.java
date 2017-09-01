@@ -2,6 +2,7 @@ package com.bsmwireless.screens.driverprofile;
 
 import android.content.res.Resources;
 
+import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.data.network.RetrofitException;
 import com.bsmwireless.data.storage.carriers.CarrierEntity;
@@ -64,6 +65,9 @@ public class DriverProfilePresenterTest {
     @Mock
     ELDEventsInteractor mEventsInteractor;
 
+    @Mock
+    AccountManager mAccountManager;
+
     private static final int MAX_SIGNATURE_LENGTH = 50000; // defined here explicitly because number is defined in API
 
     private final String mTestSignature = "51,377;89,310;89,310;-544,-1";
@@ -82,13 +86,13 @@ public class DriverProfilePresenterTest {
         MockitoAnnotations.initMocks(this);
 
         mFakeFullUserEntity = new FullUserEntity();
-        mDriverProfilePresenter = new DriverProfilePresenter(mView, mUserInteractor, mDutyTypeManager, mEventsInteractor);
+        mDriverProfilePresenter = new DriverProfilePresenter(mView, mUserInteractor, mDutyTypeManager, mEventsInteractor, mAccountManager);
     }
 
     @Test
     public void testOnNeedUpdateUserInfo() {
         // given
-        when(mUserInteractor.getFullUser()).thenReturn(Flowable.just(mFakeFullUserEntity));
+        when(mUserInteractor.getFullUserSync()).thenReturn(mFakeFullUserEntity);
 
         // when
         mDriverProfilePresenter.onNeedUpdateUserInfo();
@@ -101,7 +105,7 @@ public class DriverProfilePresenterTest {
     public void testOnNeedUpdateUserInfoError() {
         // given
         final Throwable error = new RuntimeException("error!");
-        when(mUserInteractor.getFullUser()).thenReturn(Flowable.error(error));
+        when(mUserInteractor.getFullDriver()).thenReturn(Flowable.error(error));
 
         // when
         mDriverProfilePresenter.onNeedUpdateUserInfo();
@@ -134,7 +138,7 @@ public class DriverProfilePresenterTest {
         mFakeFullUserEntity.getUserEntity().setHomeTermId(selectedHomeTerminalId);
         mFakeFullUserEntity.setHomeTerminalEntities(homeTerminals);
 
-        when(mUserInteractor.getFullUser()).thenReturn(Flowable.just(mFakeFullUserEntity));
+        when(mUserInteractor.getFullUserSync()).thenReturn(mFakeFullUserEntity);
 
         // when
         mDriverProfilePresenter.onNeedUpdateUserInfo();
@@ -160,7 +164,7 @@ public class DriverProfilePresenterTest {
 
         mFakeFullUserEntity.setCarriers(carriers);
 
-        when(mUserInteractor.getFullUser()).thenReturn(Flowable.just(mFakeFullUserEntity));
+        when(mUserInteractor.getFullUserSync()).thenReturn(mFakeFullUserEntity);
 
         // when
         mDriverProfilePresenter.onNeedUpdateUserInfo();
