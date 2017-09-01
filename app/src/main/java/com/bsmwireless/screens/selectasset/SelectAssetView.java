@@ -36,4 +36,6 @@ public interface SelectAssetView {
     void initConfirmationDialog();
 
     void showConfirmationDialog();
+
+    void onActionDone();
 }

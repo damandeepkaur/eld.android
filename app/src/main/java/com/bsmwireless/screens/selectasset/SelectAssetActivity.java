@@ -1,5 +1,6 @@
 package com.bsmwireless.screens.selectasset;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -262,8 +263,10 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
     public void initConfirmationDialog() {
         mAlertDialog = new AlertDialog.Builder(this)
                 .setCancelable(true)
+                .setTitle(R.string.select_asset_dialog_title)
                 .setMessage(R.string.select_asset_information_no_selected_assets)
-                .setPositiveButton(R.string.select_asset_confirm_button, (dialog, which) -> finish())
+                .setPositiveButton(R.string.select_asset_continue, (dialog, which) -> {})
+                .setNegativeButton(R.string.select_asset_close, (dialog, which) -> onActionDone())
                 .create();
     }
 
@@ -272,6 +275,11 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
         if (mAlertDialog != null) {
             mAlertDialog.show();
         }
+    }
+
+    @Override
+    public void onActionDone() {
+        finish();
     }
 
     @Override
