@@ -3,8 +3,10 @@ package com.bsmwireless.data.storage;
 import android.content.SharedPreferences;
 
 public class PreferencesManager {
-    private static final String KEY_ACCOUNT_NAME = "account_name";
+    private static final String KEY_DRIVER_ACCOUNT_NAME = "driver_account_name";
+    private static final String KEY_USER_ACCOUNT_NAME = "user_account_name";
     private static final String KEY_DRIVER_ID = "driver_id";
+    private static final String KEY_USER_ID = "user_id";
     private static final String KEY_SELECTED_VEHICLE_ID = "selected_vehicle_id";
     private static final String KEY_SELECTED_BOX_ID = "selected_box_id";
     private static final String KEY_REMEMBER_USER_ENABLED = "keep_user_enabled";
@@ -36,16 +38,28 @@ public class PreferencesManager {
         mPreferences.unregisterOnSharedPreferenceChangeListener(listener);
     }
 
-    public String setAccountName(String accountName) {
+    public String setDriverAccountName(String accountName) {
         SharedPreferences.Editor editor = mPreferences.edit();
-        editor.putString(KEY_ACCOUNT_NAME, accountName);
+        editor.putString(KEY_DRIVER_ACCOUNT_NAME, accountName);
         editor.apply();
 
         return accountName;
     }
 
-    public String getAccountName() {
-        return mPreferences.getString(KEY_ACCOUNT_NAME, null);
+    public String getDriverAccountName() {
+        return mPreferences.getString(KEY_DRIVER_ACCOUNT_NAME, null);
+    }
+
+    public String setUserAccountName(String accountName) {
+        SharedPreferences.Editor editor = mPreferences.edit();
+        editor.putString(KEY_USER_ACCOUNT_NAME, accountName);
+        editor.apply();
+
+        return accountName;
+    }
+
+    public String getUserAccountName() {
+        return mPreferences.getString(KEY_USER_ACCOUNT_NAME, null);
     }
 
     public void setDriverId(int driverId) {
@@ -56,6 +70,16 @@ public class PreferencesManager {
 
     public int getDriverId() {
         return mPreferences.getInt(KEY_DRIVER_ID, NOT_FOUND_VALUE);
+    }
+
+    public void setUserId(int userId) {
+        SharedPreferences.Editor editor = mPreferences.edit();
+        editor.putInt(KEY_USER_ID, userId);
+        editor.apply();
+    }
+
+    public int getUserId() {
+        return mPreferences.getInt(KEY_USER_ID, NOT_FOUND_VALUE);
     }
 
     public void setVehicleId(int vehicleId) {

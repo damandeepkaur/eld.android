@@ -11,6 +11,8 @@ public interface NavigateView extends BaseMenuView {
     void setBoxId(int boxId);
     void setAssetsNumber(int assetsNum);
     void setResetTime(long time);
+    void onCoDriverViewStart(String coDriverName);
+    void onCoDriverViewEnd();
 
     void setAutoOnDuty();
     void setAutoDriving();

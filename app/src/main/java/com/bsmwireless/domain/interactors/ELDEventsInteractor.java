@@ -1,12 +1,15 @@
 package com.bsmwireless.domain.interactors;
 
 import com.bsmwireless.data.network.ServiceApi;
+import com.bsmwireless.data.network.authenticator.TokenManager;
+import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.data.storage.eldevents.ELDEventConverter;
 import com.bsmwireless.data.storage.eldevents.ELDEventDao;
 import com.bsmwireless.data.storage.eldevents.ELDEventEntity;
+import com.bsmwireless.data.storage.users.UserDao;
 import com.bsmwireless.models.BlackBoxModel;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.widgets.alerts.DutyType;
@@ -18,7 +21,6 @@ import javax.inject.Inject;
 
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
-import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
@@ -27,27 +29,33 @@ import static com.bsmwireless.common.utils.DateUtils.SEC_IN_HOUR;
 
 public class ELDEventsInteractor {
 
-    private Disposable mSyncEventsDisposable;
     private ServiceApi mServiceApi;
     private BlackBoxInteractor mBlackBoxInteractor;
     private UserInteractor mUserInteractor;
     private DutyTypeManager mDutyTypeManager;
     private ELDEventDao mELDEventDao;
+    private UserDao mUserDao;
     private PreferencesManager mPreferencesManager;
+    private AccountManager mAccountManager;
+    private TokenManager mTokenManager;
 
     private static String mTimezone = "";
 
     @Inject
     public ELDEventsInteractor(ServiceApi serviceApi, PreferencesManager preferencesManager,
                                AppDatabase appDatabase, UserInteractor userInteractor,
-                               BlackBoxInteractor blackBoxInteractor, DutyTypeManager dutyTypeManager) {
+                               BlackBoxInteractor blackBoxInteractor, DutyTypeManager dutyTypeManager,
+                               AccountManager accountManager, TokenManager tokenManager) {
         mServiceApi = serviceApi;
         mPreferencesManager = preferencesManager;
         mUserInteractor = userInteractor;
         mBlackBoxInteractor = blackBoxInteractor;
         mDutyTypeManager = dutyTypeManager;
         mELDEventDao = appDatabase.ELDEventDao();
+        mUserDao = appDatabase.userDao();
         mPreferencesManager = preferencesManager;
+        mAccountManager = accountManager;
+        mTokenManager = tokenManager;
 
         mUserInteractor.getTimezone().subscribe(timezone -> mTimezone = timezone);
     }
@@ -74,22 +82,22 @@ public class ELDEventsInteractor {
     }
 
     public Flowable<List<ELDEvent>> getDutyEventsFromDB(long startTime, long endTime) {
-        return mELDEventDao.getDutyEventsFromStartToEndTime(startTime, endTime, mPreferencesManager.getDriverId())
+        int driverId = mAccountManager.getCurrentUserId();
+        return mELDEventDao.getDutyEventsFromStartToEndTime(startTime, endTime, driverId)
                 .map(ELDEventConverter::toModelList);
     }
 
-    public List<ELDEvent> getLatestActiveDutyEventFromDB(long latestTime) {
-        return ELDEventConverter.toModelList(mELDEventDao.getLatestActiveDutyEventSync(latestTime,
-                mPreferencesManager.getDriverId()));
+    public Flowable<List<ELDEvent>> getLatestActiveDutyEventFromDB(long latestTime, int userId) {
+        return mELDEventDao.getLatestActiveDutyEvent(latestTime, userId)
+                .map(ELDEventConverter::toModelList);
     }
 
-    public List<ELDEvent> getLatestActiveDutyEventFromDBSync(long latestTime) {
-        return ELDEventConverter.toModelList(mELDEventDao.getLatestActiveDutyEventSync(latestTime,
-                mPreferencesManager.getDriverId()));
+    public List<ELDEvent> getLatestActiveDutyEventFromDBSync(long latestTime, int userId) {
+        return ELDEventConverter.toModelList(mELDEventDao.getLatestActiveDutyEventSync(latestTime, userId));
     }
 
     public List<ELDEvent> getActiveEventsFromDBSync(long startTime, long endTime) {
-        int driverId = mPreferencesManager.getDriverId();
+        int driverId = mAccountManager.getCurrentUserId();
         return ELDEventConverter.toModelList(mELDEventDao.getActiveEventsFromStartToEndTimeSync(startTime, endTime, driverId));
     }
 
@@ -120,8 +128,22 @@ public class ELDEventsInteractor {
 
     public Observable<Boolean> postLogoutEvent() {
         return mServiceApi.logout(getEvent(ELDEvent.LoginLogoutCode.LOGOUT))
-                .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS))
-                .switchMap(aBoolean -> mBlackBoxInteractor.shutdown(aBoolean));
+                          .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS))
+                          .switchMap(aBoolean -> mBlackBoxInteractor.shutdown(aBoolean));
+    }
+
+    public Observable<Boolean> postLogoutEvent(int userId) {
+        return Observable.fromCallable(() -> mUserDao.getUserSync(userId))
+                         .flatMap(userEntity -> {
+                             String token = mTokenManager.getToken(userEntity.getAccountName());
+                             return mServiceApi.logout(
+                                     getEvent(ELDEvent.LoginLogoutCode.LOGOUT),
+                                     token,
+                                     String.valueOf(userEntity.getId())
+                             );
+                         })
+                         .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS))
+                         .switchMap(aBoolean -> mBlackBoxInteractor.shutdown(aBoolean));
     }
 
     private ArrayList<ELDEvent> getEvents(DutyType dutyType) {
@@ -210,7 +232,7 @@ public class ELDEventsInteractor {
 
     private ELDEvent getEvent(BlackBoxModel blackBoxModel, boolean isAuto) {
         long currentTime = System.currentTimeMillis();
-        int driverId = mUserInteractor.getDriverId();
+        int driverId = mAccountManager.getCurrentUserId();
 
         ELDEvent event = new ELDEvent();
         event.setEventTime(currentTime);

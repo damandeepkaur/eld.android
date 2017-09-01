@@ -1,6 +1,7 @@
 package com.bsmwireless.domain.interactors;
 
 import com.bsmwireless.data.network.ServiceApi;
+import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.data.storage.hometerminals.HomeTerminalConverter;
@@ -23,12 +24,15 @@ public class LogSheetInteractor {
     private ServiceApi mServiceApi;
     private PreferencesManager mPreferencesManager;
     private AppDatabase mAppDatabase;
+    private AccountManager mAccountManager;
 
     @Inject
-    public LogSheetInteractor(ServiceApi serviceApi, PreferencesManager preferencesManager, AppDatabase appDatabase) {
+    public LogSheetInteractor(ServiceApi serviceApi, PreferencesManager preferencesManager,
+                              AppDatabase appDatabase, AccountManager accountManager) {
         mServiceApi = serviceApi;
         mPreferencesManager = preferencesManager;
         mAppDatabase = appDatabase;
+        mAccountManager = accountManager;
     }
 
     public Flowable<List<LogSheetHeader>> getLogSheetHeaders(Long startLogDay, Long endLogDay) {
@@ -43,7 +47,8 @@ public class LogSheetInteractor {
     public Observable<LogSheetHeader> createLogSheetHeader(long logday) {
         LogSheetHeader logSheetHeader = new LogSheetHeader();
         return Observable.fromCallable(() -> {
-            int driverId = mPreferencesManager.getDriverId();
+            int driverId = mAccountManager.getCurrentDriverId();
+
             int boxId = mPreferencesManager.getBoxId();
             int vehicleId = mPreferencesManager.getVehicleId();
 
