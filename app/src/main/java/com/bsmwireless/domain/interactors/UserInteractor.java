@@ -23,7 +23,6 @@ import com.bsmwireless.models.ResponseMessage;
 import com.bsmwireless.models.RuleSelectionModel;
 import com.bsmwireless.models.User;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
@@ -145,7 +144,7 @@ public class UserInteractor {
                               if (user.getHomeTerminals() != null) {
                                   mAppDatabase.homeTerminalDao().insertHomeTerminals(HomeTerminalConverter.toEntityList(user.getHomeTerminals(), user.getId()));
                               }
-                          }).flatMapSingle(user -> {
+                          }).flatMap(user -> {
                                 // get last 7 days events
                                 long current = System.currentTimeMillis();
                                 long start = DateUtils.getStartDayTimeInMs(user.getTimezone(), current - MS_IN_WEEK);

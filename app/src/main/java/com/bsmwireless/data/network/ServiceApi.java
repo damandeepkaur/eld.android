@@ -68,7 +68,7 @@ public interface ServiceApi {
      * @return Logout response {@link ResponseMessage}
      */
     @POST("v1/app/logout")
-    Single<ResponseMessage> logout(@Body ELDEvent logoutEvent, @Header("X-Token") String token, @Header("X-Driver") String driver);
+    Observable<ResponseMessage> logout(@Body ELDEvent logoutEvent, @Header("X-Token") String token, @Header("X-Driver") String driver);
 
     /**
      * User logout
@@ -128,7 +128,7 @@ public interface ServiceApi {
      * @return List of unidentified or changed event records {@link ELDEvent}.
      */
     @GET("v1/sync/records/search/{start}/{end}")
-    Single<List<ELDEvent>> getELDEvents(@Path("start") Long startTime, @Path("end") Long endTime, @Header("X-Token") String token, @Header("X-Driver") String driver);
+    Observable<List<ELDEvent>> getELDEvents(@Path("start") Long startTime, @Path("end") Long endTime, @Header("X-Token") String token, @Header("X-Driver") String driver);
 
     /**
      * Update unidentified records or change record request.

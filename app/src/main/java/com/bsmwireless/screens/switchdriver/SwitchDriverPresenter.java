@@ -16,7 +16,6 @@ import java.util.List;
 import javax.inject.Inject;
 
 import io.reactivex.Completable;
-import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
