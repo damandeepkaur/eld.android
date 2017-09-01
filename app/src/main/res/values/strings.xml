@@ -589,5 +589,6 @@
     <string name="switch_driver_confirm_driver_seat">Confirm</string>
     <string name="switch_driver_invalid_credentials">Invalid credentials</string>
     <string name="switch_driver_error_login_codriver">Co-driver was not logged in</string>
+    <string name="switch_driver_login_error">Login error</string>
 
 </resources>

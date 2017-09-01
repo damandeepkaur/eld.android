@@ -21,6 +21,7 @@ import javax.inject.Inject;
 
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
@@ -133,8 +134,8 @@ public class ELDEventsInteractor {
     }
 
     public Observable<Boolean> postLogoutEvent(int userId) {
-        return Observable.fromCallable(() -> mUserDao.getUserSync(userId))
-                         .flatMap(userEntity -> {
+        return Single.fromCallable(() -> mUserDao.getUserSync(userId))
+                     .flatMap(userEntity -> {
                              String token = mTokenManager.getToken(userEntity.getAccountName());
                              return mServiceApi.logout(
                                      getEvent(ELDEvent.LoginLogoutCode.LOGOUT),
@@ -142,8 +143,8 @@ public class ELDEventsInteractor {
                                      String.valueOf(userEntity.getId())
                              );
                          })
-                         .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS))
-                         .switchMap(aBoolean -> mBlackBoxInteractor.shutdown(aBoolean));
+                     .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS))
+                     .flatMapObservable(isSuccess -> mBlackBoxInteractor.shutdown(isSuccess));
     }
 
     private ArrayList<ELDEvent> getEvents(DutyType dutyType) {

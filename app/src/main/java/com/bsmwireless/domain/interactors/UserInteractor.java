@@ -30,6 +30,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
 
@@ -114,7 +115,7 @@ public class UserInteractor {
                 });
     }
 
-    public Observable<Boolean> loginCoDriver(final String name, final String password, User.DriverType driverType) {
+    public Completable loginCoDriver(final String name, final String password, User.DriverType driverType) {
         String domain = getDriverDomainName();
 
         LoginModel request = new LoginModel();
@@ -144,7 +145,7 @@ public class UserInteractor {
                               if (user.getHomeTerminals() != null) {
                                   mAppDatabase.homeTerminalDao().insertHomeTerminals(HomeTerminalConverter.toEntityList(user.getHomeTerminals(), user.getId()));
                               }
-                          }).flatMap(user -> {
+                          }).flatMapSingle(user -> {
                                 // get last 7 days events
                                 long current = System.currentTimeMillis();
                                 long start = DateUtils.getStartDayTimeInMs(user.getTimezone(), current - MS_IN_WEEK);
@@ -152,11 +153,10 @@ public class UserInteractor {
                                 String token = user.getAuth().getToken();
                                 int userId = user.getId();
                                 return mServiceApi.getELDEvents(start, end, token, String.valueOf(userId));
-                          }).map(events -> {
-                                ELDEventEntity[] entities = ELDEventConverter.toEntityList(events).toArray(new ELDEventEntity[events.size()]);
-                                mAppDatabase.ELDEventDao().insertAll(entities);
-                                return true;
-                          });
+                          }).flatMapCompletable(events -> Completable.fromAction(() -> {
+                              ELDEventEntity[] entities = ELDEventConverter.toEntityList(events).toArray(new ELDEventEntity[events.size()]);
+                              mAppDatabase.ELDEventDao().insertAll(entities);
+                          }));
     }
 
     public void deleteDriver() {

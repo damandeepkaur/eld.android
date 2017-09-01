@@ -31,6 +31,7 @@ import com.bsmwireless.models.Vehicle;
 import java.util.List;
 
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
@@ -67,7 +68,7 @@ public interface ServiceApi {
      * @return Logout response {@link ResponseMessage}
      */
     @POST("v1/app/logout")
-    Observable<ResponseMessage> logout(@Body ELDEvent logoutEvent, @Header("X-Token") String token, @Header("X-Driver") String driver);
+    Single<ResponseMessage> logout(@Body ELDEvent logoutEvent, @Header("X-Token") String token, @Header("X-Driver") String driver);
 
     /**
      * User logout
@@ -127,7 +128,7 @@ public interface ServiceApi {
      * @return List of unidentified or changed event records {@link ELDEvent}.
      */
     @GET("v1/sync/records/search/{start}/{end}")
-    Observable<List<ELDEvent>> getELDEvents(@Path("start") Long startTime, @Path("end") Long endTime, @Header("X-Token") String token, @Header("X-Driver") String driver);
+    Single<List<ELDEvent>> getELDEvents(@Path("start") Long startTime, @Path("end") Long endTime, @Header("X-Token") String token, @Header("X-Driver") String driver);
 
     /**
      * Update unidentified records or change record request.

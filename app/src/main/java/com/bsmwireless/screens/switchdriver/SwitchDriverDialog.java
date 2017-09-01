@@ -1,7 +1,6 @@
 package com.bsmwireless.screens.switchdriver;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AlertDialog;
@@ -165,6 +164,7 @@ public class SwitchDriverDialog implements SwitchDriverView, DriverDialog {
 
     @Override
     public void loginError() {
+        Toast.makeText(mContext, mContext.getString(R.string.switch_driver_login_error), Toast.LENGTH_SHORT).show();
         show(SwitchDriverStatus.SWITCH_DRIVER);
     }
 
