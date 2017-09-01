@@ -129,7 +129,7 @@ public class ELDEventsInteractor {
     public Observable<Boolean> postLogoutEvent() {
         return mServiceApi.logout(getEvent(ELDEvent.LoginLogoutCode.LOGOUT))
                           .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS))
-                          .switchMap(aBoolean -> mBlackBoxInteractor.shutdown(aBoolean));
+                          .switchMap(isSuccess -> mBlackBoxInteractor.shutdown(isSuccess));
     }
 
     public Observable<Boolean> postLogoutEvent(int userId) {

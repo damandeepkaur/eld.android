@@ -286,13 +286,13 @@ public class NavigationActivity extends BaseMenuActivity implements OnNavigation
 
     @Override
     public void onCoDriverViewStart(String coDriverName) {
-        // TODO
+        // TODO add co-driver notification
         Toast.makeText(this, "View as co-driver " + coDriverName, Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onCoDriverViewEnd() {
-        // TODO
+        // TODO remove co-driver notification
     }
 
     @Override

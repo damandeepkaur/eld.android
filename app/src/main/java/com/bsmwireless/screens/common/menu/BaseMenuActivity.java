@@ -133,8 +133,11 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
                     break;
 
                 case DRIVING:
-                case SLEEPER_BERTH:
                     isEnabled &= current != DutyType.YARD_MOVES & current != DutyType.PERSONAL_USE & getPresenter().isUserDriver();
+                    break;
+
+                case SLEEPER_BERTH:
+                    isEnabled &= current != DutyType.YARD_MOVES & current != DutyType.PERSONAL_USE;
                     break;
 
                 case PERSONAL_USE:

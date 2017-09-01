@@ -24,6 +24,7 @@ import com.bsmwireless.models.RuleSelectionModel;
 import com.bsmwireless.models.User;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
@@ -132,7 +133,7 @@ public class UserInteractor {
                               userEntity.setAccountName(accountName);
                               mAppDatabase.userDao().insertUser(userEntity);
 
-                              List<Integer> coDriverIds = saveCoDrivers(getDriverId(), new ArrayList<Integer>() {{ add(user.getId()); }});
+                              List<Integer> coDriverIds = saveCoDrivers(getDriverId(), Arrays.asList(user.getId()));
                               coDriverIds.add(getDriverId());
                               updateCoDrivers(coDriverIds);
 

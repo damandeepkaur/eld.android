@@ -111,7 +111,7 @@ public class SwitchDriverPresenter {
         mGetCoDriversDisposable = mUserInteractor.getCoDriversFromDB()
                                                  .subscribeOn(Schedulers.io())
                                                  .map(userEntities -> {
-                                                     List<SwitchDriverDialog.UserModel> users = new ArrayList<>();
+                                                     List<SwitchDriverDialog.UserModel> users = new ArrayList<>(userEntities.size());
                                                      for (UserEntity userEntity: userEntities) {
                                                          SwitchDriverDialog.UserModel user = new SwitchDriverDialog.UserModel(userEntity);
                                                          List<ELDEvent> events = mELDEventsInteractor.getLatestActiveDutyEventFromDBSync(System.currentTimeMillis(), userEntity.getId());
