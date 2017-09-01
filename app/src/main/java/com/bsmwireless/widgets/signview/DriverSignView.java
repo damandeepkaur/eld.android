@@ -19,12 +19,9 @@ import android.view.ViewParent;
 import com.bsmwireless.common.utils.ViewUtils;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import app.bsmuniversal.com.R;
-
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;

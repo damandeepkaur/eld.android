@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
@@ -9,49 +8,12 @@
 
     <LinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <com.bsmwireless.widgets.dashboard.DutyView
-            android:id="@+id/dashboard_current"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/margin_small"
-            app:size="large"/>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <com.bsmwireless.widgets.dashboard.DutyView
-                android:id="@+id/dashboard_break"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_margin="@dimen/margin_small"
-                app:size="normal"/>
-
-            <com.bsmwireless.widgets.dashboard.DutyView
-                android:id="@+id/dashboard_workday"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_margin="@dimen/margin_small"
-                app:size="normal"/>
-
-            <com.bsmwireless.widgets.dashboard.DutyView
-                android:id="@+id/dashboard_cycle"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_margin="@dimen/margin_small"
-                app:size="normal"/>
-
-        </LinearLayout>
+        <include layout="@layout/layout_dashboard"/>
 
         <android.support.v7.widget.CardView
             android:id="@+id/dashboard_indicator_layout"

@@ -32,6 +32,14 @@ public class DutyView extends CardView {
     @BindView(R.id.duty_selection_title)
     TextView mSelectionText;
 
+    @Nullable
+    @BindView(R.id.tap_to_change_status_title)
+    TextView mTapToChangeTitle;
+
+    @Nullable
+    @BindView(R.id.duty_divider)
+    View mDutyDivider;
+
     private Unbinder mUnbinder;
     private DutyType mDutyType;
     private boolean mIsLarge = false;
@@ -115,5 +123,17 @@ public class DutyView extends CardView {
 
     public void setTime(long time) {
         mTimeText.setText(mIsLarge ? DateUtils.convertTotalTimeInMsToFullStringTime(time) : DateUtils.convertTotalTimeInMsToStringTime(time));
+    }
+
+    public void setCanChangingSatusView(boolean canChange) {
+        if (mIsLarge) {
+
+            if (mTapToChangeTitle == null || mDutyDivider == null) {
+                return;
+            }
+
+            mTapToChangeTitle.setVisibility(canChange ? VISIBLE : GONE);
+            mDutyDivider.setVisibility(canChange ? VISIBLE : GONE);
+        }
     }
 }
