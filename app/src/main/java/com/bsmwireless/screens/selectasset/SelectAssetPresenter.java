@@ -105,7 +105,6 @@ public class SelectAssetPresenter {
     }
 
     public void onBackButtonPressed() {
-        mView.initConfirmationDialog();
         mView.showConfirmationDialog();
     }
 

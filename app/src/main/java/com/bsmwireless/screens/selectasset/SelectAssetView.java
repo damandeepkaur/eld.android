@@ -33,8 +33,6 @@ public interface SelectAssetView {
 
     void showEmptyLastListMessage();
 
-    void initConfirmationDialog();
-
     void showConfirmationDialog();
 
     void onActionDone();
