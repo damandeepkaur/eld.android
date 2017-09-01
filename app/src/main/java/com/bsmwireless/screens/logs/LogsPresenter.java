@@ -217,24 +217,16 @@ public class LogsPresenter {
         })
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(new DisposableSingleObserver<HOSTimesModel>() {
-                    @Override
-                    public void onSuccess(@NonNull HOSTimesModel hosTimesModel) {
-                        mHOSTimesModel = hosTimesModel;
-                        mView.setHOSTimes(hosTimesModel);
-                    }
-
-                    @Override
-                    public void onError(@NonNull Throwable e) {
-                        Timber.e(e.getMessage());
-                    }
-
-                });
+                .subscribe(hosTimesModel -> {
+                            mHOSTimesModel = hosTimesModel;
+                            mView.setHOSTimes(hosTimesModel);
+                        },
+                        Timber::e);
         mDisposables.add(disposable);
     }
 
     public void updateLogHeader() {
-        Observable.fromCallable(() -> {
+        Single.fromCallable(() -> {
             LogHeaderModel model = new LogHeaderModel();
             model.setTimezone(mTimeZone);
 
@@ -314,7 +306,7 @@ public class LogsPresenter {
         ELDEvent event = createCertEvent(logSheetHeader);
         mDisposables.add(mELDEventsInteractor.postNewELDEvent(event)
                 .subscribeOn(Schedulers.io())
-                .flatMap(isCreated -> mLogSheetInteractor.updateLogSheetHeader(logSheetHeader))
+                .flatMapSingle(isCreated -> mLogSheetInteractor.updateLogSheetHeader(logSheetHeader))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         response -> {

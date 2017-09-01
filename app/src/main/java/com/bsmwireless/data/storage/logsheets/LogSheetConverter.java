@@ -54,7 +54,7 @@ public class LogSheetConverter {
     public static List<LogSheetHeader> toModelList(List<LogSheetEntity> entities) {
         List<LogSheetHeader> logSheetHeaders = null;
         if (entities != null) {
-            logSheetHeaders = new ArrayList<>();
+            logSheetHeaders = new ArrayList<>(entities.size());
             for (LogSheetEntity entity : entities) {
                 logSheetHeaders.add(toModel(entity));
             }
@@ -65,7 +65,7 @@ public class LogSheetConverter {
     public static List<LogSheetEntity> toEntityList(List<LogSheetHeader> models) {
         List<LogSheetEntity> entities = null;
         if (models != null) {
-            entities = new ArrayList<>();
+            entities = new ArrayList<>(models.size());
             for (LogSheetHeader model : models) {
                 entities.add(toEntity(model));
             }

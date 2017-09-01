@@ -22,6 +22,7 @@ import com.bsmwireless.widgets.logs.calendar.CalendarLayout;
 import com.bsmwireless.widgets.logs.graphview.GraphLayout;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -49,9 +50,9 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
     private GraphLayout mGraphLayout;
     private TextView mSignLogsheet;
     private View mSigned;
-    private List<EventLogModel> mEventLogs = new ArrayList<>();
+    private List<EventLogModel> mEventLogs = Collections.emptyList();
     private LogHeaderModel mLogHeaderInfo = new LogHeaderModel();
-    private List<LogSheetHeader> mLogHeaders = new ArrayList<>();
+    private List<LogSheetHeader> mLogHeaders = Collections.emptyList();
     private View.OnClickListener mOnMenuClickListener;
     private RecyclerView.SmoothScroller mSmoothScroller;
     private Context mContext;

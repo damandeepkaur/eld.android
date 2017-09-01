@@ -1,14 +1,11 @@
 package com.bsmwireless.domain.interactors;
 
-import android.util.Log;
-
 import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.data.storage.hometerminals.HomeTerminalConverter;
 import com.bsmwireless.data.storage.hometerminals.HomeTerminalEntity;
 import com.bsmwireless.data.storage.logsheets.LogSheetConverter;
-import com.bsmwireless.data.storage.logsheets.LogSheetDao;
 import com.bsmwireless.data.storage.logsheets.LogSheetEntity;
 import com.bsmwireless.data.storage.users.UserEntity;
 import com.bsmwireless.models.HomeTerminal;
@@ -21,6 +18,7 @@ import javax.inject.Inject;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
@@ -45,14 +43,13 @@ public class LogSheetInteractor {
                 .toFlowable(BackpressureStrategy.LATEST);
     }
 
-    public Observable<LogSheetHeader> getLogSheet(Long logDay) {
-
-        return Observable.fromCallable(() -> {
+    public Single<LogSheetHeader> getLogSheet(Long logDay) {
+        return Single.fromCallable(() -> {
             LogSheetEntity entity = mAppDatabase.logSheetDao().getByLogDaySync(logDay);
             if (entity == null) {
                 LogSheetHeader logSheetHeader = createLogSheetHeaderModel(logDay);
                 mAppDatabase.logSheetDao().insert(LogSheetConverter.toEntity(logSheetHeader));
-                createLogSheetHeader(logSheetHeader);
+                syncLogSheetHeader(logSheetHeader);
                 return logSheetHeader;
             } else {
                 return LogSheetConverter.toModel(entity);
@@ -60,18 +57,19 @@ public class LogSheetInteractor {
         });
     }
 
-    public Observable<Boolean> updateLogSheetHeader(LogSheetHeader logSheetHeader) {
+    public Single<Boolean> updateLogSheetHeader(LogSheetHeader logSheetHeader) {
         return mServiceApi.updateLogSheetHeader(logSheetHeader)
                 .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
     }
 
-    public Observable<LogSheetHeader> createLogSheetHeader(long logday) {
-        return Observable.fromCallable(() -> createLogSheetHeaderModel(logday))
-                .flatMap(logSheetHeader -> updateLogSheetHeader(logSheetHeader).map(updated -> (updated) ? logSheetHeader : null
+    public Single<LogSheetHeader> createLogSheetHeader(long logday) {
+        return Single.fromCallable(() -> createLogSheetHeaderModel(logday))
+                .flatMap(logSheetHeader -> updateLogSheetHeader(logSheetHeader)
+                        .map(updated -> (updated) ? logSheetHeader : null
                 ));
     }
 
-    public void createLogSheetHeader(LogSheetHeader logSheetHeader) {
+    public void syncLogSheetHeader(LogSheetHeader logSheetHeader) {
         updateLogSheetHeader(logSheetHeader)
                 .observeOn(Schedulers.io())
                 .subscribe(isCreated -> {
