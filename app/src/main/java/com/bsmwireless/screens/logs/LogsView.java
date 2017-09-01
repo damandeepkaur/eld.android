@@ -11,24 +11,11 @@ import app.bsmuniversal.com.R;
 
 public interface LogsView {
 
-    enum Error {
-        ERROR_ADD_EVENT(R.string.add_event_error),
-        ERROR_UPDATE_EVENT(R.string.update_event_error);
-
-        private int mStringId;
-
-        Error(int stringId) {
-            mStringId = stringId;
-        }
-
-        public int getStringId() {
-            return mStringId;
-        }
-    }
-
     void setEventLogs(List<EventLogModel> logs);
 
-    void setTripInfo(TripInfoModel tripInfo);
+    void setHOSTimes(HOSTimesModel hosTimes);
+
+    void setLogHeader(LogHeaderModel logHeader);
 
     void setLogSheetHeaders(List<LogSheetHeader> logs);
 
@@ -47,5 +34,20 @@ public interface LogsView {
     void showError(RetrofitException exception);
 
     void showError(Error error);
+
+    enum Error {
+        ERROR_ADD_EVENT(R.string.add_event_error),
+        ERROR_UPDATE_EVENT(R.string.update_event_error);
+
+        private int mStringId;
+
+        Error(int stringId) {
+            mStringId = stringId;
+        }
+
+        public int getStringId() {
+            return mStringId;
+        }
+    }
 
 }

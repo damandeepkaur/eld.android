@@ -1,23 +1,18 @@
 package com.bsmwireless.screens.logs;
 
-public class TripInfoModel {
-
+public class HOSTimesModel {
     private static final String DEFAULT_TIME = "00:00";
 
     private String mOffDutyTime;
     private String mSleeperBerthTime;
     private String mDrivingTime;
     private String mOnDutyTime;
-    private String mCoDriverValue;
-    private UnitType mUnitType = UnitType.KM;
-    private int mOdometerValue;
 
-    public TripInfoModel() {
+    public HOSTimesModel() {
         mOffDutyTime = DEFAULT_TIME;
         mSleeperBerthTime = DEFAULT_TIME;
         mDrivingTime = DEFAULT_TIME;
         mOnDutyTime = DEFAULT_TIME;
-        mCoDriverValue = "-";
     }
 
     public String getOffDutyTime() {
@@ -50,34 +45,5 @@ public class TripInfoModel {
 
     public void setOnDutyTime(String onDutyTime) {
         mOnDutyTime = onDutyTime;
-    }
-
-    public String getCoDriverValue() {
-        return mCoDriverValue;
-    }
-
-    public void setCoDriverValue(String coDriverValue) {
-        mCoDriverValue = coDriverValue;
-    }
-
-    public UnitType getUnitType() {
-        return mUnitType;
-    }
-
-    public void setUnitType(UnitType unitType) {
-        mUnitType = unitType;
-    }
-
-    public int getOdometerValue() {
-        return mOdometerValue;
-    }
-
-    public void setOdometerValue(int odometerValue) {
-        mOdometerValue = odometerValue;
-    }
-
-    public enum UnitType {
-        KM,
-        ML
     }
 }

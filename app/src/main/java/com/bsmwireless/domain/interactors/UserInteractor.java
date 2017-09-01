@@ -271,12 +271,13 @@ public class UserInteractor {
         return mAppDatabase.userDao().getUser(getDriverId());
     }
 
-    public Flowable<FullUserEntity> getFullDriver() {
-        return mAppDatabase.userDao().getFullUser(getDriverId());
+    public Flowable<User> getUser() {
+        return mAppDatabase.userDao().getUser(getDriverId())
+                .map(userEntity -> UserConverter.toUser(userEntity));
     }
 
-    public Flowable<UserEntity> getUser() {
-        return mAppDatabase.userDao().getUser(getUserId());
+    public Flowable<FullUserEntity> getFullDriver() {
+        return mAppDatabase.userDao().getFullUser(getDriverId());
     }
 
     public FullUserEntity getFullUserSync() {

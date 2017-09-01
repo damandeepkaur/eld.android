@@ -9,6 +9,7 @@
         android:layout_height="match_parent"
         android:layout_marginLeft="@dimen/logs_list_item_title_margin_left"
         android:gravity="center_vertical"
+        android:textAllCaps="true"
         android:textColor="@color/primary_text"
         android:textStyle="bold"/>
 

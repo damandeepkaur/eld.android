@@ -814,7 +814,7 @@ public class UserInteractorTest {
         when(mAppDatabase.userDao()).thenReturn(mUserDao);
         when(mUserDao.getUser(any(Integer.class))).thenReturn(Flowable.just(new UserEntity()));
 
-        TestSubscriber<UserEntity> testSubscriber = TestSubscriber.create();
+        TestSubscriber<User> testSubscriber = TestSubscriber.create();
 
         // when
         mLoginUserInteractor.getUser().subscribe(testSubscriber);

@@ -235,7 +235,7 @@ public interface ServiceApi {
      * @return Update LogSheet header Response {@link ResponseMessage}
      */
     @PUT("v1/sync/logsheet/header")
-    Observable<ResponseMessage> updateLogSheetHeader(@Body LogSheetHeader logSheetHeader);
+    Single<ResponseMessage> updateLogSheetHeader(@Body LogSheetHeader logSheetHeader);
 
     /**
      * Link the driver to the vehicle, fetch unidentified record for update, and carrier's change requests.
