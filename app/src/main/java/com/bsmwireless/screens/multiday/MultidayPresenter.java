@@ -20,6 +20,7 @@ import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.disposables.Disposables;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
@@ -43,22 +44,20 @@ public class MultidayPresenter implements AccountManager.AccountListener {
         mUserInteractor = userInteractor;
         mAccountManager = accountManager;
         mDisposables = new CompositeDisposable();
+        mGetEventDisposable = Disposables.disposed();
         mTimeZone = TimeZone.getDefault().getID();
 
         Timber.d("CREATED");
-
-        mAccountManager.addListener(this);
     }
 
     public void onDestroy() {
         mAccountManager.removeListener(this);
-        if (mGetEventDisposable != null) {
-            mGetEventDisposable.dispose();
-        }
+        mGetEventDisposable.dispose();
         mDisposables.dispose();
     }
 
     public void onViewCreated() {
+        mAccountManager.addListener(this);
         mDisposables.add(mUserInteractor.getTimezone()
                 .subscribeOn(Schedulers.io())
                 .subscribe(timezone -> {
@@ -79,10 +78,7 @@ public class MultidayPresenter implements AccountManager.AccountListener {
 
         mELDEventsInteractor.syncELDEventsWithServer(startDayTime, endDayTime);
 
-        if (mGetEventDisposable != null) {
-            mGetEventDisposable.dispose();
-        }
-
+        mGetEventDisposable.dispose();
         mGetEventDisposable = Observable.fromCallable(() -> getMultidayItems(dayCount, startDayTime))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

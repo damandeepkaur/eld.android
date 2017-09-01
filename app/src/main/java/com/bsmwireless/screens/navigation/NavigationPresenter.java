@@ -26,6 +26,7 @@ import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.disposables.Disposables;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
@@ -66,17 +67,14 @@ public class NavigationPresenter extends BaseMenuPresenter implements AccountMan
         mSyncEventsInteractor = syncEventsInteractor;
         mAccountManager = accountManager;
         mDisposables = new CompositeDisposable();
-
-        mAccountManager.addListener(this);
+        mResetTimeDisposable = Disposables.disposed();
 
         mAutoDutyTypeManager.setListener(mListener);
     }
 
     @Override
     public void onDestroy() {
-        if (mResetTimeDisposable != null) {
-            mResetTimeDisposable.dispose();
-        }
+        mResetTimeDisposable.dispose();
         mAccountManager.removeListener(this);
         mSyncEventsInteractor.stopSync();
         mAutoDutyTypeManager.removeListener();
@@ -107,6 +105,7 @@ public class NavigationPresenter extends BaseMenuPresenter implements AccountMan
     }
 
     public void onViewCreated() {
+        mAccountManager.addListener(this);
         mDisposables.add(mUserInteractor.getFullDriverName()
                                         .subscribeOn(Schedulers.io())
                                         .observeOn(AndroidSchedulers.mainThread())
@@ -127,9 +126,7 @@ public class NavigationPresenter extends BaseMenuPresenter implements AccountMan
         //start and end time
         long[] time = new long[2];
 
-        if (mResetTimeDisposable != null) {
-            mResetTimeDisposable.dispose();
-        }
+        mResetTimeDisposable.dispose();
         mResetTimeDisposable = mUserInteractor.getTimezone()
               .flatMap(timeZone -> {
                   long current = System.currentTimeMillis();

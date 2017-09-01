@@ -14,6 +14,7 @@ import com.bsmwireless.screens.common.menu.BaseMenuPresenter;
 import com.bsmwireless.screens.common.menu.BaseMenuView;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -50,7 +51,9 @@ public class DriverProfilePresenter extends BaseMenuPresenter implements Account
         mDisposables = new CompositeDisposable();
 
         Timber.d("CREATED");
+    }
 
+    public void onViewCreated() {
         mAccountManager.addListener(this);
     }
 
@@ -68,7 +71,7 @@ public class DriverProfilePresenter extends BaseMenuPresenter implements Account
                                                int position = findHomeTerminalById(mHomeTerminals, selectedHomeTerminalId);
                                                mView.setHomeTerminalsSpinner(getHomeTerminalNames(mHomeTerminals), position);
                                            } else {
-                                               mView.setHomeTerminalsSpinner(new ArrayList<>(), 0);
+                                               mView.setHomeTerminalsSpinner(Collections.emptyList(), 0);
                                            }
 
                                            List<CarrierEntity> carriers = mFullUserEntity.getCarriers();

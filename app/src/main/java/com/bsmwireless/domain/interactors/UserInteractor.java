@@ -286,12 +286,12 @@ public class UserInteractor {
         return mPreferencesManager.isShowHomeScreenEnabled() && mTokenManager.getToken(mAccountManager.getCurrentDriverAccountName()) != null;
     }
 
-    public Integer getDriverId() {
+    public int getDriverId() {
         String id = mTokenManager.getDriver(mAccountManager.getCurrentDriverAccountName());
         return id == null || id.isEmpty() ? -1 : Integer.valueOf(id);
     }
 
-    public Integer getUserId() {
+    public int getUserId() {
         String id = mTokenManager.getDriver(mAccountManager.getCurrentUserAccountName());
         return id == null || id.isEmpty() ? -1 : Integer.valueOf(id);
     }

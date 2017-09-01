@@ -38,24 +38,20 @@ public class PreferencesManager {
         mPreferences.unregisterOnSharedPreferenceChangeListener(listener);
     }
 
-    public String setDriverAccountName(String accountName) {
+    public void setDriverAccountName(String accountName) {
         SharedPreferences.Editor editor = mPreferences.edit();
         editor.putString(KEY_DRIVER_ACCOUNT_NAME, accountName);
         editor.apply();
-
-        return accountName;
     }
 
     public String getDriverAccountName() {
         return mPreferences.getString(KEY_DRIVER_ACCOUNT_NAME, null);
     }
 
-    public String setUserAccountName(String accountName) {
+    public void setUserAccountName(String accountName) {
         SharedPreferences.Editor editor = mPreferences.edit();
         editor.putString(KEY_USER_ACCOUNT_NAME, accountName);
         editor.apply();
-
-        return accountName;
     }
 
     public String getUserAccountName() {

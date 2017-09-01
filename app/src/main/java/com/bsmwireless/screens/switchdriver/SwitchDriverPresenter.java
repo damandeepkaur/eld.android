@@ -19,6 +19,7 @@ import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.disposables.Disposables;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
@@ -45,23 +46,20 @@ public class SwitchDriverPresenter {
         mUserInteractor = userInteractor;
         mAccountManager = accountManager;
         mDisposables = new CompositeDisposable();
+        mGetUsernameDisposable = Disposables.disposed();
+        mGetCoDriversDisposable = Disposables.disposed();
 
         Timber.d("CREATED");
     }
 
     public void onDestroy() {
-        if (mGetUsernameDisposable != null) {
-            mGetUsernameDisposable.dispose();
-        }
-        if (mGetCoDriversDisposable != null) {
-            mGetCoDriversDisposable.dispose();
-        }
+        mGetUsernameDisposable.dispose();
+        mGetCoDriversDisposable.dispose();
+        mDisposables.dispose();
     }
 
     public void onSwitchDriverCreated() {
-        if (mGetCoDriversDisposable != null) {
-            mGetCoDriversDisposable.dispose();
-        }
+        mGetCoDriversDisposable.dispose();
         mGetCoDriversDisposable = mUserInteractor.getCoDriversFromDB()
                                                  .subscribeOn(Schedulers.io())
                                                  .map(userEntities -> {
@@ -85,9 +83,7 @@ public class SwitchDriverPresenter {
     }
 
     public void onLogOutCoDriverCreated() {
-        if (mGetCoDriversDisposable != null) {
-            mGetCoDriversDisposable.dispose();
-        }
+        mGetCoDriversDisposable.dispose();
         mGetCoDriversDisposable = mUserInteractor.getCoDriversFromDB()
                                                  .subscribeOn(Schedulers.io())
                                                  .map(userEntities -> {
@@ -111,9 +107,7 @@ public class SwitchDriverPresenter {
     }
 
     public void onDriverSeatDialogCreated() {
-        if (mGetCoDriversDisposable != null) {
-            mGetCoDriversDisposable.dispose();
-        }
+        mGetCoDriversDisposable.dispose();
         mGetCoDriversDisposable = mUserInteractor.getCoDriversFromDB()
                                                  .subscribeOn(Schedulers.io())
                                                  .map(userEntities -> {

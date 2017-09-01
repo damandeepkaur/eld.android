@@ -3,13 +3,14 @@ package com.bsmwireless.data.storage;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 
-import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 public class AccountManager {
 
     private PreferencesManager mPreferencesManager;
 
-    private final ArrayList<AccountListener> mListeners = new ArrayList<>();
+    private final Set<AccountListener> mListeners = new HashSet<>();
 
     private Handler mHandler = new Handler();
     private Runnable mNotifyUserChangedTask = () -> {
@@ -76,7 +77,6 @@ public class AccountManager {
         mHandler.post(() -> {
             synchronized (mListeners) {
                 mListeners.add(listener);
-                listener.onUserChanged();
             }
         });
     }

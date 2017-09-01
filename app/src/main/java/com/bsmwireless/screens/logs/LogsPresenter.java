@@ -33,6 +33,7 @@ import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.disposables.Disposables;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
@@ -71,18 +72,17 @@ public class LogsPresenter implements AccountManager.AccountListener {
         mUserInteractor = userInteractor;
         mDutyTypeManager = dutyTypeManager;
         mDisposables = new CompositeDisposable();
+        mGetEventsFromDBDisposable = Disposables.disposed();
+        mGetTimezoneDisposable = Disposables.disposed();
         mTripInfo = new TripInfoModel();
         mAccountManager = accountManager;
         Timber.d("CREATED");
 
         mDutyTypeManager.addListener(mListener);
-        mAccountManager.addListener(this);
     }
 
     public void onViewCreated() {
-        if (mGetTimezoneDisposable != null) {
-            mGetTimezoneDisposable.dispose();
-        }
+        mGetTimezoneDisposable.dispose();
         mGetTimezoneDisposable = mUserInteractor.getTimezone()
                         .subscribeOn(Schedulers.io())
                         .flatMap(timeZone -> {
@@ -103,6 +103,7 @@ public class LogsPresenter implements AccountManager.AccountListener {
                                     }
                                     setEventsForDay(mSelectedDayCalendar);
                                 }, error -> Timber.e("LoginUser error: %s", error));
+        mAccountManager.addListener(this);
     }
 
     public void onCalendarDaySelected(CalendarItem calendarItem) {
@@ -123,7 +124,7 @@ public class LogsPresenter implements AccountManager.AccountListener {
 
         mELDEventsInteractor.syncELDEventsWithServer(startDayTime - MS_IN_DAY, endDayTime);
 
-        if (mGetEventsFromDBDisposable != null) mGetEventsFromDBDisposable.dispose();
+        mGetEventsFromDBDisposable.dispose();
         mGetEventsFromDBDisposable = mELDEventsInteractor.getDutyEventsFromDB(startDayTime, endDayTime)
                 .map(selectedDayEvents -> {
                     List<ELDEvent> prevDayLatestEvents = mELDEventsInteractor.getLatestActiveDutyEventFromDBSync(startDayTime, mUserInteractor.getUserId());
@@ -304,12 +305,8 @@ public class LogsPresenter implements AccountManager.AccountListener {
     public void onDestroy() {
         mAccountManager.removeListener(this);
         mDutyTypeManager.removeListener(mListener);
-        if (mGetTimezoneDisposable != null) {
-            mGetTimezoneDisposable.dispose();
-        }
-        if (mGetEventsFromDBDisposable != null) {
-            mGetEventsFromDBDisposable.dispose();
-        }
+        mGetTimezoneDisposable.dispose();
+        mGetEventsFromDBDisposable.dispose();
         mDisposables.dispose();
         Timber.d("DESTROYED");
     }
