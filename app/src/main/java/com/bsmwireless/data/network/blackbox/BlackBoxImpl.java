@@ -11,6 +11,7 @@ import java.net.Socket;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
+import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
@@ -39,12 +40,24 @@ public final class BlackBoxImpl implements BlackBox {
     private Disposable mDisposable;
     private AtomicReference<BlackBoxModel> mBlackBoxModel = new AtomicReference<>(new BlackBoxModel());
 
+    public BlackBoxImpl() {
+        mEmitter = BehaviorSubject.create();
+    }
+
+    @Override
+    public Completable connectRx(int boxId) {
+        return Observable
+                .interval(RETRY_CONNECT_DELAY, TimeUnit.MILLISECONDS)
+                .filter(interval -> initializeCommunication(1))
+                .firstElement()
+                .ignoreElement();
+    }
+
     @Override
     public void connect(int boxId) throws Exception {
         Timber.d("connect");
         if (!isConnected()) {
             mSocket = new Socket(WIFI_GATEWAY_IP, WIFI_REMOTE_PORT);
-            mEmitter = BehaviorSubject.create();
             mBoxId = boxId;
             mDisposable = Observable.interval(RETRY_CONNECT_DELAY, TimeUnit.MILLISECONDS)
                     .take(RETRY_COUNT)

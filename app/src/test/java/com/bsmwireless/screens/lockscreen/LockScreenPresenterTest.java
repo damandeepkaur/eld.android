@@ -25,7 +25,7 @@ public class LockScreenPresenterTest {
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-        presenter = new LockScreenPresenter(lockScreenView, dutyManager);
+        presenter = new LockScreenPresenter(lockScreenView, dutyManager, connectionManager, blackBox, blackBoxTimeoutMillis);
         RxAndroidPlugins.setInitMainThreadSchedulerHandler(schedulerCallable -> Schedulers.trampoline());
     }
 

@@ -53,7 +53,7 @@ public class LoginActivity extends BaseActivity implements LoginView {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        doBindToService(false);
         DaggerLoginComponent.builder().appComponent(App.getComponent()).loginModule(new LoginModule(this)).build().inject(this);
 
         setContentView(R.layout.activity_login);
@@ -154,5 +154,9 @@ public class LoginActivity extends BaseActivity implements LoginView {
     @Override
     public void setLoginButtonEnabled(boolean enabled) {
         mLoginButton.setEnabled(enabled);
+    }
+
+    @Override
+    public void runMonitoringService() {
     }
 }

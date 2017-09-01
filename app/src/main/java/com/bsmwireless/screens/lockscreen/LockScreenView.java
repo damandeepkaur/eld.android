@@ -7,4 +7,8 @@ public interface LockScreenView {
     void setCurrentTime(long interval);
 
     void openCoDriverDialog();
+
+    void showIgnitionOfDetectedDialog();
+
+    void closeLockScreen();
 }

@@ -43,7 +43,7 @@ public class LockScreenActivity extends BaseActivity implements LockScreenView {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        doBindToService(false);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Window w = getWindow(); // in Activity's onCreate() for instance
             w.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
@@ -108,6 +108,16 @@ public class LockScreenActivity extends BaseActivity implements LockScreenView {
 
     @Override
     public void openCoDriverDialog() {
+
+    }
+
+    @Override
+    public void showIgnitionOfDetectedDialog() {
+
+    }
+
+    @Override
+    public void closeLockScreen() {
 
     }
 
