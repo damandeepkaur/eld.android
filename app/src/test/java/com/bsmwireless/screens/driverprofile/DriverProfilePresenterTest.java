@@ -92,7 +92,11 @@ public class DriverProfilePresenterTest {
     @Test
     public void testOnNeedUpdateUserInfo() {
         // given
+<<<<<<< HEAD
         when(mUserInteractor.getFullUserSync()).thenReturn(mFakeFullUserEntity);
+=======
+        when(mUserInteractor.getFullUserEntity()).thenReturn(Flowable.just(mFakeFullUserEntity));
+>>>>>>> EA-340 #comment Add edit Log Header screen
 
         // when
         mDriverProfilePresenter.onNeedUpdateUserInfo();
@@ -105,7 +109,11 @@ public class DriverProfilePresenterTest {
     public void testOnNeedUpdateUserInfoError() {
         // given
         final Throwable error = new RuntimeException("error!");
+<<<<<<< HEAD
         when(mUserInteractor.getFullDriver()).thenReturn(Flowable.error(error));
+=======
+        when(mUserInteractor.getFullUserEntity()).thenReturn(Flowable.error(error));
+>>>>>>> EA-340 #comment Add edit Log Header screen
 
         // when
         mDriverProfilePresenter.onNeedUpdateUserInfo();
@@ -138,7 +146,11 @@ public class DriverProfilePresenterTest {
         mFakeFullUserEntity.getUserEntity().setHomeTermId(selectedHomeTerminalId);
         mFakeFullUserEntity.setHomeTerminalEntities(homeTerminals);
 
+<<<<<<< HEAD
         when(mUserInteractor.getFullUserSync()).thenReturn(mFakeFullUserEntity);
+=======
+        when(mUserInteractor.getFullUserEntity()).thenReturn(Flowable.just(mFakeFullUserEntity));
+>>>>>>> EA-340 #comment Add edit Log Header screen
 
         // when
         mDriverProfilePresenter.onNeedUpdateUserInfo();
@@ -164,7 +176,11 @@ public class DriverProfilePresenterTest {
 
         mFakeFullUserEntity.setCarriers(carriers);
 
+<<<<<<< HEAD
         when(mUserInteractor.getFullUserSync()).thenReturn(mFakeFullUserEntity);
+=======
+        when(mUserInteractor.getFullUserEntity()).thenReturn(Flowable.just(mFakeFullUserEntity));
+>>>>>>> EA-340 #comment Add edit Log Header screen
 
         // when
         mDriverProfilePresenter.onNeedUpdateUserInfo();

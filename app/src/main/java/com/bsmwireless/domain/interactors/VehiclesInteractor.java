@@ -72,7 +72,6 @@ public class VehiclesInteractor {
         }
 
         mAppDatabase.userDao().setUserLastVehicles(driverId, builder.toString());
-        mAppDatabase.userDao().setUserLastVehicles(driverId, builder.toString());
     }
 
     public Flowable<List<Vehicle>> getVehiclesFromDB(List<Integer> vehicleIds) {

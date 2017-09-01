@@ -61,13 +61,13 @@ public class LogSheetInteractor {
         });
     }
 
-    public Single<Boolean> updateLogSheetHeader(LogSheetHeader logSheetHeader) {
+    public Observable<Boolean> updateLogSheetHeader(LogSheetHeader logSheetHeader) {
         return mServiceApi.updateLogSheetHeader(logSheetHeader)
                 .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
     }
 
-    public Single<LogSheetHeader> createLogSheetHeader(long logday) {
-        return Single.fromCallable(() -> createLogSheetHeaderModel(logday))
+    public Observable<LogSheetHeader> createLogSheetHeader(long logday) {
+        return Observable.fromCallable(() -> createLogSheetHeaderModel(logday))
                 .flatMap(logSheetHeader -> updateLogSheetHeader(logSheetHeader)
                         .map(updated -> (updated) ? logSheetHeader : null
                 ));

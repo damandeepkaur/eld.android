@@ -273,7 +273,8 @@ public class ELDGraphView extends View {
             DutyType dutyType = DutyType.getTypeByCode(event.getEventType(), event.getEventCode());
             DrawableLog log;
             if (event.isActive() && event.isDutyEvent()) {
-                if (dutyType.equals(DutyType.CLEAR)) {
+                if (dutyType.equals(DutyType.CLEAR) || dutyType.equals(DutyType.CLEAR_PU)
+                        || dutyType.equals(DutyType.CLEAR_YM)) {
                     DutyType type = event.getDutyType();
                     log = new DrawableLog(type, event.getEventTime(), event.getDuration());
                 } else {

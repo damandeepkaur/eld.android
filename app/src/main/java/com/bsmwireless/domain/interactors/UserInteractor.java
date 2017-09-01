@@ -8,6 +8,7 @@ import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.data.storage.carriers.CarrierConverter;
+import com.bsmwireless.data.storage.configurations.ConfigurationConverter;
 import com.bsmwireless.data.storage.eldevents.ELDEventConverter;
 import com.bsmwireless.data.storage.eldevents.ELDEventEntity;
 import com.bsmwireless.data.storage.hometerminals.HomeTerminalConverter;
@@ -73,34 +74,8 @@ public class UserInteractor {
 
                     mTokenManager.setToken(accountName, name, domain, user.getAuth());
 
-                    String lastVehicles = mAppDatabase.userDao().getUserLastVehiclesSync(user.getId());
-                    String coDrivers = mAppDatabase.userDao().getUserCoDriversSync(user.getId());
+                    saveUserDataInDB(user, accountName);
 
-                    UserEntity userEntity = UserConverter.toEntity(user);
-                    userEntity.setAccountName(accountName);
-                    mAppDatabase.userDao().insertUser(userEntity);
-
-                    List<Integer> coDriverIds = ListConverter.toIntegerList(coDrivers);
-                    coDriverIds.add(user.getId());
-                    updateCoDrivers(coDriverIds);
-
-                    if (user.getCarriers() != null) {
-                        mAppDatabase.carrierDao().insertCarriers(CarrierConverter
-                                .toEntityList(user.getCarriers(), user.getId()));
-                    }
-
-                    if (user.getHomeTerminals() != null) {
-                        mAppDatabase.homeTerminalDao().insertHomeTerminals(HomeTerminalConverter
-                                .toEntityList(user.getHomeTerminals(), user.getId()));
-                    }
-
-                    if (lastVehicles != null) {
-                        mAppDatabase.userDao().setUserLastVehicles(user.getId(), lastVehicles);
-                    }
-
-                    if (coDrivers != null) {
-                        mAppDatabase.userDao().setUserCoDrivers(user.getId(), coDrivers);
-                    }
                 }).flatMap(user -> {
                     // get last 7 days events
                     long current = System.currentTimeMillis();
@@ -218,8 +193,8 @@ public class UserInteractor {
                 .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
     }
 
-    public Observable<Boolean> updateDriverRule(String ruleException) {
-        return mServiceApi.updateDriverRule(getRuleSelectionModel(ruleException))
+    public Observable<Boolean> updateDriverRule(String ruleException, String dutyCycle) {
+        return mServiceApi.updateDriverRule(getRuleSelectionModel(ruleException, dutyCycle))
                 .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
     }
 
@@ -275,12 +250,18 @@ public class UserInteractor {
                 .map(userEntity -> UserConverter.toUser(userEntity));
     }
 
+
     public Flowable<FullUserEntity> getFullDriver() {
         return mAppDatabase.userDao().getFullUser(getDriverId());
     }
 
     public FullUserEntity getFullUserSync() {
         return mAppDatabase.userDao().getFullUserSync(getUserId());
+    }
+
+    public Flowable<User> getFullUser() {
+        return mAppDatabase.userDao().getFullUser(getDriverId())
+                .map(fullUserEntity -> UserConverter.toFullUser(fullUserEntity));
     }
 
     public boolean isLoginActive() {
@@ -333,7 +314,7 @@ public class UserInteractor {
             }
         }
 
-        mAppDatabase.userDao().setUserCoDrivers(driverId, ListConverter.toString(savedCoDrivers));
+        mAppDatabase.userDao().setUserCoDrivers(driverId, ListConverter.integerListToString(savedCoDrivers));
 
         return savedCoDrivers;
     }
@@ -350,7 +331,7 @@ public class UserInteractor {
 
         savedCoDrivers.remove(coDriverId);
 
-        mAppDatabase.userDao().setUserCoDrivers(driverId, ListConverter.toString(savedCoDrivers));
+        mAppDatabase.userDao().setUserCoDrivers(driverId, ListConverter.integerListToString(savedCoDrivers));
     }
 
     private PasswordModel getPasswordModel(String oldPassword, String newPassword) {
@@ -373,11 +354,12 @@ public class UserInteractor {
         return homeTerminal;
     }
 
-    private RuleSelectionModel getRuleSelectionModel(String ruleException) {
+    private RuleSelectionModel getRuleSelectionModel(String ruleException, String dutyCycle) {
         RuleSelectionModel ruleSelectionModel = new RuleSelectionModel();
 
         ruleSelectionModel.setDriverId(getUserId());
         ruleSelectionModel.setRuleException(ruleException);
+        ruleSelectionModel.setDutyCycle(dutyCycle);
         ruleSelectionModel.setApplyTime(Calendar.getInstance().getTimeInMillis());
 
         return ruleSelectionModel;
@@ -390,6 +372,44 @@ public class UserInteractor {
         signatureInfo.setSignature(signature);
 
         return signatureInfo;
+    }
+
+    private void saveUserDataInDB(User user, String accountName) {
+        int userId = user.getId();
+
+        String lastVehicles = mAppDatabase.userDao().getUserLastVehiclesSync(userId);
+        String coDrivers = mAppDatabase.userDao().getUserCoDriversSync(userId);
+
+        UserEntity userEntity = UserConverter.toEntity(user);
+        userEntity.setAccountName(accountName);
+        mAppDatabase.userDao().insertUser(userEntity);
+
+        List<Integer> coDriverIds = ListConverter.toIntegerList(coDrivers);
+        coDriverIds.add(userId);
+        updateCoDrivers(coDriverIds);
+
+
+        if (user.getCarriers() != null) {
+            mAppDatabase.carrierDao().deleteByUserId(userId);
+            mAppDatabase.carrierDao().insertCarriers(CarrierConverter
+                    .toEntityList(user.getCarriers(), userId));
+        }
+
+        if (user.getHomeTerminals() != null) {
+            mAppDatabase.homeTerminalDao().deleteByUserId(userId);
+            mAppDatabase.homeTerminalDao().insertHomeTerminals(HomeTerminalConverter
+                    .toEntityList(user.getHomeTerminals(), userId));
+        }
+
+        if (user.getConfigurations() != null) {
+            mAppDatabase.configurationDao().deleteByUserId(userId);
+            mAppDatabase.configurationDao().insertAll(ConfigurationConverter
+                    .toEntityList(user.getConfigurations(), userId));
+        }
+
+        if (lastVehicles != null) {
+            mAppDatabase.userDao().setUserLastVehicles(userId, lastVehicles);
+        }
     }
 }
 

@@ -835,7 +835,11 @@ public class UserInteractorTest {
         TestSubscriber<FullUserEntity> testSubscriber = TestSubscriber.create();
 
         // when
+<<<<<<< HEAD
         mLoginUserInteractor.getFullDriver().subscribe(testSubscriber);
+=======
+        mLoginUserInteractor.getFullUserEntity().subscribe(testSubscriber);
+>>>>>>> EA-340 #comment Add edit Log Header screen
 
         // then
         verify(mUserDao).getFullUser(any(Integer.class));

@@ -1,8 +1,10 @@
 package com.bsmwireless.screens.logs;
 
-import java.util.List;
 
-public class LogHeaderModel {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class LogHeaderModel implements Parcelable {
     private String mTimezone;
     private String mDriverName;
     private String mCoDriversName;
@@ -16,7 +18,8 @@ public class LogHeaderModel {
     private String mHomeTerminalAddress;
     private String mTrailers;
     private String mShippingId;
-    private String mExemptions;
+    private String mAllExemptions;
+    private String mSelectedExemptions;
 
     public LogHeaderModel() {
     }
@@ -125,11 +128,96 @@ public class LogHeaderModel {
         mShippingId = shippingId;
     }
 
-    public String getExemptions() {
-        return mExemptions;
+    public String getAllExemptions() {
+        return mAllExemptions;
     }
 
-    public void setExemptions(String exemptions) {
-        mExemptions = exemptions;
+    public void setAllExemptions(String allExemptions) {
+        mAllExemptions = allExemptions;
+    }
+
+    public String getSelectedExemptions() {
+        return mSelectedExemptions;
+    }
+
+    public void setSelectedExemptions(String selectedExamptions) {
+        mSelectedExemptions = selectedExamptions;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.mTimezone);
+        dest.writeString(this.mDriverName);
+        dest.writeString(this.mCoDriversName);
+        dest.writeString(this.mVehicleName);
+        dest.writeString(this.mVehicleLicense);
+        dest.writeString(this.mStartOdometer);
+        dest.writeString(this.mEndOdometer);
+        dest.writeString(this.mDistanceDriven);
+        dest.writeString(this.mCarrierName);
+        dest.writeString(this.mHomeTerminalName);
+        dest.writeString(this.mHomeTerminalAddress);
+        dest.writeString(this.mTrailers);
+        dest.writeString(this.mShippingId);
+        dest.writeString(this.mAllExemptions);
+        dest.writeString(this.mSelectedExemptions);
+    }
+
+    protected LogHeaderModel(Parcel in) {
+        this.mTimezone = in.readString();
+        this.mDriverName = in.readString();
+        this.mCoDriversName = in.readString();
+        this.mVehicleName = in.readString();
+        this.mVehicleLicense = in.readString();
+        this.mStartOdometer = in.readString();
+        this.mEndOdometer = in.readString();
+        this.mDistanceDriven = in.readString();
+        this.mCarrierName = in.readString();
+        this.mHomeTerminalName = in.readString();
+        this.mHomeTerminalAddress = in.readString();
+        this.mTrailers = in.readString();
+        this.mShippingId = in.readString();
+        this.mAllExemptions = in.readString();
+        this.mSelectedExemptions = in.readString();
+    }
+
+    public static final Creator<LogHeaderModel> CREATOR = new Creator<LogHeaderModel>() {
+        @Override
+        public LogHeaderModel createFromParcel(Parcel source) {
+            return new LogHeaderModel(source);
+        }
+
+        @Override
+        public LogHeaderModel[] newArray(int size) {
+            return new LogHeaderModel[size];
+        }
+    };
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("LogHeaderModel{");
+        sb.append("mTimezone='").append(mTimezone).append('\'');
+        sb.append(", mDriverName='").append(mDriverName).append('\'');
+        sb.append(", mCoDriversName='").append(mCoDriversName).append('\'');
+        sb.append(", mVehicleName='").append(mVehicleName).append('\'');
+        sb.append(", mVehicleLicense='").append(mVehicleLicense).append('\'');
+        sb.append(", mStartOdometer='").append(mStartOdometer).append('\'');
+        sb.append(", mEndOdometer='").append(mEndOdometer).append('\'');
+        sb.append(", mDistanceDriven='").append(mDistanceDriven).append('\'');
+        sb.append(", mCarrierName='").append(mCarrierName).append('\'');
+        sb.append(", mHomeTerminalName='").append(mHomeTerminalName).append('\'');
+        sb.append(", mHomeTerminalAddress='").append(mHomeTerminalAddress).append('\'');
+        sb.append(", mTrailers='").append(mTrailers).append('\'');
+        sb.append(", mShippingId='").append(mShippingId).append('\'');
+        sb.append(", mAllExemptions='").append(mAllExemptions).append('\'');
+        sb.append(", mSelectedExemptions='").append(mSelectedExemptions).append('\'');
+        sb.append('}');
+        return sb.toString();
     }
 }
+
