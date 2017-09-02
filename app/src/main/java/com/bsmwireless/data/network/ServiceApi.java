@@ -31,6 +31,7 @@ import com.bsmwireless.models.Vehicle;
 import java.util.List;
 
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
@@ -210,7 +211,7 @@ public interface ServiceApi {
      * @return Update LogSheet header Response {@link ResponseMessage}
      */
     @PUT("v1/sync/logsheet/header")
-    Observable<ResponseMessage> updateLogSheetHeader(@Body LogSheetHeader logSheetHeader);
+    Single<ResponseMessage> updateLogSheetHeader(@Body LogSheetHeader logSheetHeader);
 
     /**
      * Link the driver to the vehicle, fetch unidentified record for update, and carrier's change requests.
