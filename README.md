@@ -3,6 +3,7 @@ ELD app for Android
 
 # Version history
 
+* **1.0.55** - YM or PC events: Add Duty status automatic event should not be added by manual edits from the Add Event screen (_EA-338_)
 * **1.0.54** - Add progress bar
 * **1.0.53** - Add switch driver and co-drivers logic
 * **1.0.52** - Add Log header to Logs Screen (_EA-339_)
