@@ -1,17 +1,22 @@
 package com.bsmwireless.screens.logs;
 
 
+import android.util.Log;
+
 import com.bsmwireless.common.Constants;
 import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.common.utils.DateUtils;
 import com.bsmwireless.data.network.RetrofitException;
-import com.bsmwireless.data.storage.DutyManager;
+import com.bsmwireless.data.storage.AccountManager;
+import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
 import com.bsmwireless.domain.interactors.LogSheetInteractor;
 import com.bsmwireless.domain.interactors.UserInteractor;
 import com.bsmwireless.domain.interactors.VehiclesInteractor;
+import com.bsmwireless.models.Carrier;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.LogSheetHeader;
+import com.bsmwireless.models.User;
 import com.bsmwireless.models.Vehicle;
 import com.bsmwireless.screens.logs.dagger.EventLogModel;
 import com.bsmwireless.widgets.alerts.DutyType;
@@ -28,55 +33,70 @@ import java.util.TimeZone;
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
-import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.disposables.Disposables;
+import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
 import static com.bsmwireless.common.utils.DateUtils.MS_IN_DAY;
-import static com.bsmwireless.screens.logs.TripInfoModel.UnitType.KM;
+import static com.bsmwireless.widgets.alerts.DutyType.CLEAR_PU;
+import static com.bsmwireless.widgets.alerts.DutyType.CLEAR_YM;
+
 
 @ActivityScope
-public class LogsPresenter {
+public class LogsPresenter implements AccountManager.AccountListener {
     private LogsView mView;
     private ELDEventsInteractor mELDEventsInteractor;
     private LogSheetInteractor mLogSheetInteractor;
     private VehiclesInteractor mVehiclesInteractor;
     private UserInteractor mUserInteractor;
-    private DutyManager mDutyManager;
+    private DutyTypeManager mDutyTypeManager;
+    private AccountManager mAccountManager;
     private CompositeDisposable mDisposables;
     private String mTimeZone;
-    private TripInfoModel mTripInfo;
-    private Map<Integer, String> mVehicleIdToNameMap = new HashMap<>();
+    private User mUser;
+    private LogHeaderModel mLogHeaderModel;
+    private HOSTimesModel mHOSTimesModel;
+    private Map<Integer, Vehicle> mVehicleIdToNameMap = new HashMap<>();
     private List<LogSheetHeader> mLogSheetHeaders;
     private Disposable mGetEventsFromDBDisposable;
-    private DutyManager.DutyTypeListener mListener = dutyType -> mView.dutyUpdated();
+    private Disposable mGetTimezoneDisposable;
     private Calendar mSelectedDayCalendar;
+    private LogSheetHeader mLogSheetHeader;
+
+    private DutyTypeManager.DutyTypeListener mListener = dutyType -> mView.dutyUpdated();
 
     @Inject
     public LogsPresenter(LogsView view, ELDEventsInteractor eventsInteractor, LogSheetInteractor logSheetInteractor,
-                         VehiclesInteractor vehiclesInteractor, UserInteractor userInteractor, DutyManager dutyManager) {
+                         VehiclesInteractor vehiclesInteractor, UserInteractor userInteractor, DutyTypeManager dutyTypeManager, AccountManager accountManager) {
         mView = view;
         mELDEventsInteractor = eventsInteractor;
         mLogSheetInteractor = logSheetInteractor;
         mVehiclesInteractor = vehiclesInteractor;
         mUserInteractor = userInteractor;
-        mDutyManager = dutyManager;
+        mDutyTypeManager = dutyTypeManager;
         mDisposables = new CompositeDisposable();
-        mTripInfo = new TripInfoModel();
+        mGetEventsFromDBDisposable = Disposables.disposed();
+        mGetTimezoneDisposable = Disposables.disposed();
+        mLogHeaderModel = new LogHeaderModel();
+        mAccountManager = accountManager;
         Timber.d("CREATED");
 
-        mDutyManager.addListener(mListener);
+        mDutyTypeManager.addListener(mListener);
     }
 
     public void onViewCreated() {
         mDisposables.add(
-                mUserInteractor.getTimezone()
+                mUserInteractor.getUser()
                         .subscribeOn(Schedulers.io())
-                        .flatMap(timeZone -> {
-                            mTimeZone = timeZone;
+                        .flatMap(user -> {
+                            mUser = user;
+                            mTimeZone = user.getTimezone();
                             long currentTime = Calendar.getInstance().getTimeInMillis();
                             long todayDateLong = DateUtils.convertTimeToDayNumber(mTimeZone, currentTime);
                             long monthAgoLong = DateUtils.convertTimeToDayNumber(mTimeZone, currentTime
@@ -90,12 +110,15 @@ public class LogsPresenter {
                                     mView.setLogSheetHeaders(logSheetHeaders);
                                     if (mSelectedDayCalendar == null) {
                                         mSelectedDayCalendar = Calendar.getInstance(TimeZone.getTimeZone(mTimeZone));
+                                        mLogSheetHeader = mLogSheetHeaders.get(mLogSheetHeaders.size() - 1);
                                     }
                                     setEventsForDay(mSelectedDayCalendar);
-                                }, error -> Timber.e("LoginUser error: %s", error)));
+                                }, Timber::e));
+        mAccountManager.addListener(this);
     }
 
     public void onCalendarDaySelected(CalendarItem calendarItem) {
+        mLogSheetHeader = calendarItem.getAssociatedLogSheet();
         setEventsForDay(calendarItem.getCalendar());
     }
 
@@ -113,10 +136,10 @@ public class LogsPresenter {
 
         mELDEventsInteractor.syncELDEventsWithServer(startDayTime - MS_IN_DAY, endDayTime);
 
-        if (mGetEventsFromDBDisposable != null) mGetEventsFromDBDisposable.dispose();
+        mGetEventsFromDBDisposable.dispose();
         mGetEventsFromDBDisposable = mELDEventsInteractor.getDutyEventsFromDB(startDayTime, endDayTime)
                 .map(selectedDayEvents -> {
-                    List<ELDEvent> prevDayLatestEvents = mELDEventsInteractor.getLatestActiveDutyEventFromDB(startDayTime);
+                    List<ELDEvent> prevDayLatestEvents = mELDEventsInteractor.getLatestActiveDutyEventFromDBSync(startDayTime, mUserInteractor.getUserId());
                     if (!prevDayLatestEvents.isEmpty()) {
                         prevDayLatestEvents.get(prevDayLatestEvents.size() - 1).setEventTime(startDayTime);
                         selectedDayEvents.add(0, prevDayLatestEvents.get(prevDayLatestEvents.size() - 1));
@@ -134,18 +157,29 @@ public class LogsPresenter {
                     for (EventLogModel log : dutyStateLogs) {
                         int vehicleId = log.getEvent().getVehicleId();
                         if (mVehicleIdToNameMap.containsKey(vehicleId)) {
-                            log.setVehicleName(mVehicleIdToNameMap.get(vehicleId));
+                            log.setVehicleName(mVehicleIdToNameMap.get(vehicleId).getName());
                         } else {
                             vehicleIds.add(vehicleId);
                         }
                     }
 
-                    mView.setTripInfo(mTripInfo);
                     mView.setEventLogs(dutyStateLogs);
-                    updateTripInfo(dutyStateLogs, startDayTime, endDayTime);
+                    if (mHOSTimesModel != null) mView.setHOSTimes(mHOSTimesModel);
+                    if (mLogSheetInteractor != null) mView.setLogHeader(mLogHeaderModel);
+                    updateHOSTimes(dutyStateLogs, startDayTime, endDayTime);
                     updateVehicleInfo(new ArrayList<>(vehicleIds), dutyStateLogs);
+                    updateLogHeader();
                 }, throwable -> Timber.e(throwable.getMessage()));
         mDisposables.add(mGetEventsFromDBDisposable);
+
+        //create logsheet if not exist
+        long logday = DateUtils.convertTimeToDayNumber(mTimeZone, startDayTime);
+        mDisposables.add(mLogSheetInteractor.getLogSheet(logday)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(logSheet -> mLogSheetHeader = logSheet,
+                        Timber::e
+                ));
     }
 
     public void updateVehicleInfo(List<Integer> vehicleIds, List<EventLogModel> logs) {
@@ -154,12 +188,12 @@ public class LogsPresenter {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(vehicles -> {
                             for (Vehicle vehicle : vehicles) {
-                                mVehicleIdToNameMap.put(vehicle.getId(), vehicle.getName());
+                                mVehicleIdToNameMap.put(vehicle.getId(), vehicle);
                             }
 
                             for (EventLogModel log : logs) {
                                 if (mVehicleIdToNameMap.containsKey(log.getEvent().getVehicleId())) {
-                                    log.setVehicleName(mVehicleIdToNameMap.get(log.getEvent().getVehicleId()));
+                                    log.setVehicleName(mVehicleIdToNameMap.get(log.getEvent().getVehicleId()).getName());
                                 }
                             }
                             mView.setEventLogs(logs);
@@ -168,10 +202,9 @@ public class LogsPresenter {
                 ));
     }
 
-    public void updateTripInfo(final List<EventLogModel> events, final long startDayTime, final long endDayTime) {
-        TripInfoModel tripInfo = new TripInfoModel();
-
-        Disposable disposable = Observable.create((ObservableOnSubscribe<TripInfoModel>) e -> {
+    public void updateHOSTimes(final List<EventLogModel> events, final long startDayTime, final long endDayTime) {
+        Disposable disposable = Single.fromCallable(() -> {
+            HOSTimesModel hosTimesModel = new HOSTimesModel();
             int odometer = 0;
             EventLogModel log;
             for (int i = 0; i < events.size(); i++) {
@@ -182,30 +215,77 @@ public class LogsPresenter {
                 }
             }
             long currentTime = Calendar.getInstance().getTimeInMillis();
-            long[] times = DutyManager.getDutyTypeTimes(new ArrayList<>(events), startDayTime, endDayTime < currentTime ? endDayTime : currentTime);
+            long[] times = DutyTypeManager.getDutyTypeTimes(new ArrayList<>(events), startDayTime, endDayTime < currentTime ? endDayTime : currentTime);
 
-            tripInfo.setSleeperBerthTime(DateUtils.convertTotalTimeInMsToStringTime(times[DutyType.SLEEPER_BERTH.ordinal()]));
-            tripInfo.setDrivingTime(DateUtils.convertTotalTimeInMsToStringTime(times[DutyType.DRIVING.ordinal()]));
-            tripInfo.setOffDutyTime(DateUtils.convertTotalTimeInMsToStringTime(times[DutyType.OFF_DUTY.ordinal()]));
-            tripInfo.setOnDutyTime(DateUtils.convertTotalTimeInMsToStringTime(times[DutyType.ON_DUTY.ordinal()]));
-
-            //TODO: convert odometer value from meters to appropriate unit
-            tripInfo.setUnitType(KM);
-            tripInfo.setOdometerValue(odometer / 1000);
-
-            e.onNext(tripInfo);
+            hosTimesModel.setSleeperBerthTime(DateUtils.convertTotalTimeInMsToStringTime(times[DutyType.SLEEPER_BERTH.ordinal()]));
+            hosTimesModel.setDrivingTime(DateUtils.convertTotalTimeInMsToStringTime(times[DutyType.DRIVING.ordinal()]));
+            hosTimesModel.setOffDutyTime(DateUtils.convertTotalTimeInMsToStringTime(times[DutyType.OFF_DUTY.ordinal()]));
+            hosTimesModel.setOnDutyTime(DateUtils.convertTotalTimeInMsToStringTime(times[DutyType.ON_DUTY.ordinal()]));
+            return hosTimesModel;
         })
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(times -> {
-                            mTripInfo = tripInfo;
-                            mView.setTripInfo(mTripInfo);
+                .subscribe(hosTimesModel -> {
+                            mHOSTimesModel = hosTimesModel;
+                            mView.setHOSTimes(hosTimesModel);
                         },
-                        throwable -> Timber.e(throwable.getMessage()));
-
+                        Timber::e);
         mDisposables.add(disposable);
     }
 
+    public void updateLogHeader() {
+        Single.fromCallable(() -> {
+            LogHeaderModel model = new LogHeaderModel();
+            model.setTimezone(mTimeZone);
+
+            if (mUser != null) {
+                model.setDriverName(mUser.getFirstName() + " " + mUser.getLastName());
+                //set carrier name
+                List<Carrier> carriers = mUser.getCarriers();
+                if (carriers != null && !carriers.isEmpty()) {
+                    StringBuilder sb = new StringBuilder();
+                    for (Carrier carrier : carriers) {
+                        sb.append(carrier.getName());
+                        sb.append(",");
+                    }
+                    sb.deleteCharAt(sb.length() - 1);
+                    model.setCarrierName(sb.toString());
+                }
+                model.setExemptions(mUser.getRuleException());
+            }
+
+            if (mLogSheetHeader != null) {
+                int vehicleId = mLogSheetHeader.getVehicleId();
+                Vehicle vehicle;
+                if (mVehicleIdToNameMap.containsKey(vehicleId)) {
+                    vehicle = mVehicleIdToNameMap.get(vehicleId);
+                } else {
+                    vehicle = mVehiclesInteractor.getVehicle(vehicleId);
+                }
+                if (vehicle != null) {
+                    model.setVehicleName(vehicle.getName());
+                    model.setVehicleLicense(vehicle.getLicense());
+                }
+                model.setTrailers(mLogSheetHeader.getTrailerIds());
+                model.setHomeTerminalAddress(mLogSheetHeader.getHomeTerminal().getAddress());
+                model.setHomeTerminalName(mLogSheetHeader.getHomeTerminal().getName());
+
+                model.setShippingId(mLogSheetHeader.getShippingId());
+
+                String codriverIds = mLogSheetHeader.getCoDriverIds();
+                //TODO: get codriver names by ids
+                model.setCoDriversName(codriverIds);
+            }
+            //TODO: init by data from black box
+            model.setStartOdometer("0");
+            model.setEndOdometer("0");
+            model.setDistanceDriven("-");
+            return model;
+        })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(logHeaderModel -> mView.setLogHeader(logHeaderModel));
+    }
 
     public void onSignLogsheetButtonClicked(CalendarItem calendarItem) {
         LogSheetHeader logSheetHeader = calendarItem.getAssociatedLogSheet();
@@ -234,7 +314,7 @@ public class LogsPresenter {
         ELDEvent event = createCertEvent(logSheetHeader);
         mDisposables.add(mELDEventsInteractor.postNewELDEvent(event)
                 .subscribeOn(Schedulers.io())
-                .flatMap(isCreated -> mLogSheetInteractor.updateLogSheetHeader(logSheetHeader))
+                .flatMapSingle(isCreated -> mLogSheetInteractor.updateLogSheetHeader(logSheetHeader))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         response -> {
@@ -292,7 +372,10 @@ public class LogsPresenter {
     }
 
     public void onDestroy() {
-        mDutyManager.removeListener(mListener);
+        mAccountManager.removeListener(this);
+        mDutyTypeManager.removeListener(mListener);
+        mGetTimezoneDisposable.dispose();
+        mGetEventsFromDBDisposable.dispose();
         mDisposables.dispose();
         Timber.d("DESTROYED");
     }
@@ -325,23 +408,23 @@ public class LogsPresenter {
                 EventLogModel log = new EventLogModel(event, mTimeZone);
                 if (event.getEventType() == ELDEvent.EventType.CHANGE_IN_DRIVER_INDICATION.getValue()
                         && event.getEventCode() == DutyType.CLEAR.getCode()) {
+                    log.setDutyType(DutyType.CLEAR);
                     //get code of indication ON event for indication OFF event
                     for (int j = i - 1; j >= 0; j--) {
                         ELDEvent dutyEvent = events.get(j);
 
-                        if (dutyEvent.getEventType() == ELDEvent.EventType.DUTY_STATUS_CHANGING.getValue()) {
-                            log.setOnIndicationCode(dutyEvent.getEventCode());
-                            break;
-                        } else if (dutyEvent.getEventType() == ELDEvent.EventType.CHANGE_IN_DRIVER_INDICATION.getValue()) {
+                        if (dutyEvent.getEventType() == ELDEvent.EventType.CHANGE_IN_DRIVER_INDICATION.getValue()) {
                             if (dutyEvent.getEventCode() == DutyType.PERSONAL_USE.getCode()) {
-                                log.setOnIndicationCode(DutyType.OFF_DUTY.getCode());
+                                log.setDutyType(CLEAR_PU);
                                 break;
                             } else if (dutyEvent.getEventCode() == DutyType.YARD_MOVES.getCode()) {
-                                log.setOnIndicationCode(DutyType.ON_DUTY.getCode());
+                                log.setDutyType(CLEAR_YM);
                                 break;
                             }
                         }
                     }
+                } else {
+                    log.setDutyType(DutyType.getTypeByCode(log.getEventType(), log.getEventCode()));
                 }
                 logs.add(log);
                 if (logs.get(0).getEventTime() < startDayTime) {
@@ -367,4 +450,12 @@ public class LogsPresenter {
         long endWeekTime = startWeekTime + MS_IN_DAY * 7;
         mELDEventsInteractor.syncELDEventsWithServer(startWeekTime, endWeekTime);
     }
+
+    @Override
+    public void onUserChanged() {
+        onViewCreated();
+    }
+
+    @Override
+    public void onDriverChanged() {}
 }

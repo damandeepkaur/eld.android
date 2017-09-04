@@ -126,7 +126,7 @@ public class LogsFragment extends BaseFragment implements LogsView {
                                              .setPositiveLabel(mContext.getString(R.string.add_event), v -> mPresenter.onAddEventClicked(mAdapter.getCurrentItem())))
                              .showSnackbar();
                 break;
-            case TRIP_INFO:
+            case LOG_HEADER:
                 mNavigateView.getSnackBar()
                              .setOnReadyListener(snackBar ->
                                      snackBar.reset()
@@ -174,8 +174,13 @@ public class LogsFragment extends BaseFragment implements LogsView {
     }
 
     @Override
-    public void setTripInfo(TripInfoModel tripInfo) {
-        mAdapter.setTripInfo(tripInfo);
+    public void setHOSTimes(HOSTimesModel hosTimes) {
+        mAdapter.setHOSTimes(hosTimes);
+    }
+
+    @Override
+    public void setLogHeader(LogHeaderModel logHeader) {
+        mAdapter.setLogHeaderInfo(logHeader);
     }
 
     @Override

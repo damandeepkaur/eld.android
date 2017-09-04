@@ -80,6 +80,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.ViewHo
 
     public void updateLogs(List<LogSheetHeader> logs) {
         if (logs != null) {
+            clearItems();
             for (LogSheetHeader log : logs) {
                 CalendarItem item = findItemByDate(DateUtils.convertDayNumberToUnixMs(log.getLogDay()));
                 if (item != null) {
@@ -114,6 +115,12 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.ViewHo
             }
         }
         return null;
+    }
+
+    private void clearItems() {
+        for (CalendarItem item : mItems) {
+            item.setAssociatedLog(null);
+        }
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

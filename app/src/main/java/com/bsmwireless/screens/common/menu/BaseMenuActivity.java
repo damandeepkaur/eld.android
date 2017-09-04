@@ -5,11 +5,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 
-import com.bsmwireless.data.storage.DutyManager;
+import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.screens.common.BaseActivity;
+import com.bsmwireless.screens.switchdriver.DriverDialog;
+import com.bsmwireless.screens.switchdriver.SwitchDriverDialog;
 import com.bsmwireless.widgets.alerts.DutyType;
 import com.bsmwireless.widgets.alerts.ELDType;
 import com.bsmwireless.widgets.alerts.OccupancyType;
+
+import java.util.ArrayList;
 
 import app.bsmuniversal.com.R;
 
@@ -20,6 +24,10 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
 
     protected AlertDialog mDutyDialog;
 
+    protected DriverDialog mSwitchDriverDialog;
+
+    protected abstract BaseMenuPresenter getPresenter();
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_alert, menu);
@@ -28,7 +36,7 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
         mDutyItem = menu.findItem(R.id.action_duty);
         mOccupancyItem = menu.findItem(R.id.action_occupancy);
 
-        initDialog();
+        mSwitchDriverDialog = new SwitchDriverDialog(this);
 
         getPresenter().onMenuCreated();
 
@@ -41,9 +49,10 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
             case R.id.action_eld:
                 break;
             case R.id.action_duty:
-                mDutyDialog.show();
+                getPresenter().onChangeDutyClick();
                 break;
             case R.id.action_occupancy:
+                showSwitchDriverDialog();
                 break;
             case android.R.id.home: {
                 onHomePress();
@@ -62,12 +71,7 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
         }
     }
 
-    protected abstract BaseMenuPresenter getPresenter();
-
-    protected void onHomePress() {
-        onBackPressed();
-    }
-
+    @Override
     public void setELDType(ELDType type) {
         if (mELDItem != null) {
             mELDItem.getIcon().setLevel(type.ordinal());
@@ -75,6 +79,7 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
         }
     }
 
+    @Override
     public void setDutyType(DutyType type) {
         if (mDutyItem != null) {
             mDutyItem.setIcon(type.getIcon());
@@ -82,6 +87,7 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
         }
     }
 
+    @Override
     public void setOccupancyType(OccupancyType type) {
         if (mOccupancyItem != null) {
             mOccupancyItem.getIcon().setLevel(type.ordinal());
@@ -90,24 +96,81 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
     }
 
     @Override
-    public void showDutyDialog() {
-        if (mDutyDialog != null) {
-            mDutyDialog.show();
+    public void showSwitchDriverDialog() {
+        if (mSwitchDriverDialog != null) {
+            mSwitchDriverDialog.show();
         }
     }
 
-    protected void initDialog() {
-        //TODO: set correct types
-        DutyType[] types = DutyManager.DRIVER_DUTY_EXTENDED;
-        ArrayAdapter<DutyType> arrayAdapter = new BaseMenuAdapter(this, types);
-
-        mDutyDialog = new AlertDialog.Builder(this)
-                .setAdapter(arrayAdapter, (dialog, which) -> changeDutyType(types[which]))
-                .setCancelable(true)
-                .create();
-    }
-
+    @Override
     public void changeDutyType(DutyType dutyType) {
         getPresenter().onDutyChanged(dutyType);
+    }
+
+    protected void onHomePress() {
+        onBackPressed();
+    }
+
+    @Override
+    public void showDutyTypeDialog(DutyType current) {
+        if (mDutyDialog != null) {
+            mDutyDialog.dismiss();
+        }
+
+        //TODO: set correct types
+        DutyType[] dutyTypes = DutyTypeManager.DRIVER_DUTY_EXTENDED;
+
+        ArrayList<BaseMenuAdapter.DutyItem> dutyItems = new ArrayList<>();
+        for (DutyType dutyType : dutyTypes) {
+            boolean isEnabled = current != dutyType;
+            switch (dutyType) {
+                case ON_DUTY:
+                    isEnabled &= current != DutyType.PERSONAL_USE;
+                    break;
+
+                case OFF_DUTY:
+                    isEnabled &= current != DutyType.YARD_MOVES;
+                    break;
+
+                case DRIVING:
+                    isEnabled &= current != DutyType.YARD_MOVES & current != DutyType.PERSONAL_USE & getPresenter().isUserDriver();
+                    break;
+
+                case SLEEPER_BERTH:
+                    isEnabled &= current != DutyType.YARD_MOVES & current != DutyType.PERSONAL_USE;
+                    break;
+
+                case PERSONAL_USE:
+                    isEnabled &= current == DutyType.OFF_DUTY;
+                    break;
+
+                case YARD_MOVES:
+                    isEnabled &= current == DutyType.ON_DUTY;
+                    break;
+            }
+
+            dutyItems.add(new BaseMenuAdapter.DutyItem(dutyType, isEnabled));
+        }
+
+        ArrayAdapter<BaseMenuAdapter.DutyItem> arrayAdapter = new BaseMenuAdapter(this, dutyItems);
+
+        mDutyDialog = new AlertDialog.Builder(this)
+                .setAdapter(arrayAdapter, (dialog, which) -> changeDutyType(dutyItems.get(which).getDutyType()))
+                .setCancelable(true)
+                .show();
+    }
+
+    @Override
+    public void showNotInVehicleDialog() {
+        if (mDutyDialog != null) {
+            mDutyDialog.dismiss();
+        }
+
+        mDutyDialog = new AlertDialog.Builder(this)
+                .setTitle(R.string.not_in_vehicle_dialog_title)
+                .setMessage(R.string.not_in_vehicle_dialog_message)
+                .setPositiveButton(R.string.not_in_vehicle_accept, null)
+                .setCancelable(true)
+                .show();
     }
 }

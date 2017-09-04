@@ -10,6 +10,7 @@ import android.widget.ProgressBar;
 
 import com.bsmwireless.common.App;
 import com.bsmwireless.common.utils.NetworkUtils;
+import com.bsmwireless.common.utils.SchedulerUtils;
 import com.bsmwireless.data.network.RetrofitException;
 import com.bsmwireless.screens.common.BaseActivity;
 import com.bsmwireless.screens.login.dagger.DaggerLoginComponent;
@@ -139,6 +140,9 @@ public class LoginActivity extends BaseActivity implements LoginView {
 
     @Override
     public void goToSelectAssetScreen() {
+        SchedulerUtils.cancel();
+        SchedulerUtils.schedule();
+
         startActivity(new Intent(this, SelectAssetActivity.class));
         finish();
     }

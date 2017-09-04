@@ -1,9 +1,10 @@
 package com.bsmwireless.domain.interactors;
 
-import com.bsmwireless.common.utils.SchedulerUtils;
 import com.bsmwireless.common.utils.DateUtils;
+import com.bsmwireless.common.utils.ListConverter;
 import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.network.authenticator.TokenManager;
+import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.data.storage.carriers.CarrierConverter;
@@ -16,23 +17,24 @@ import com.bsmwireless.data.storage.users.UserEntity;
 import com.bsmwireless.models.DriverHomeTerminal;
 import com.bsmwireless.models.DriverProfileModel;
 import com.bsmwireless.models.DriverSignature;
-import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.LoginModel;
 import com.bsmwireless.models.PasswordModel;
 import com.bsmwireless.models.ResponseMessage;
 import com.bsmwireless.models.RuleSelectionModel;
 import com.bsmwireless.models.User;
 
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.List;
 
 import javax.inject.Inject;
 
+import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
 
 import static com.bsmwireless.common.Constants.SUCCESS;
 import static com.bsmwireless.common.utils.DateUtils.MS_IN_WEEK;
-import static com.bsmwireless.models.ELDEvent.EventType.LOGIN_LOGOUT;
 
 public class UserInteractor {
 
@@ -40,16 +42,16 @@ public class UserInteractor {
     private AppDatabase mAppDatabase;
     private TokenManager mTokenManager;
     private PreferencesManager mPreferencesManager;
-    private BlackBoxInteractor mBlackBoxInteractor;
+    private AccountManager mAccountManager;
 
     @Inject
     public UserInteractor(ServiceApi serviceApi, PreferencesManager preferencesManager, AppDatabase appDatabase,
-                          TokenManager tokenManager, BlackBoxInteractor blackBoxInteractor) {
+                          TokenManager tokenManager, AccountManager accountManager) {
         mServiceApi = serviceApi;
         mPreferencesManager = preferencesManager;
         mAppDatabase = appDatabase;
         mTokenManager = tokenManager;
-        mBlackBoxInteractor = blackBoxInteractor;
+        mAccountManager = accountManager;
     }
 
     public Observable<Boolean> loginUser(final String name, final String password, final String domain, boolean keepToken, User.DriverType driverType) {
@@ -63,16 +65,24 @@ public class UserInteractor {
                 .doOnNext(user -> {
                     String accountName = mTokenManager.getAccountName(name, domain);
 
-                    mPreferencesManager.setAccountName(accountName);
                     mPreferencesManager.setRememberUserEnabled(keepToken);
                     mPreferencesManager.setShowHomeScreenEnabled(true);
-                    mPreferencesManager.setDriverId(user.getAuth().getDriverId());
+
+                    mAccountManager.setCurrentDriver(user.getAuth().getDriverId(), accountName);
+                    mAccountManager.setCurrentUser(user.getAuth().getDriverId(), accountName);
 
                     mTokenManager.setToken(accountName, name, domain, user.getAuth());
 
                     String lastVehicles = mAppDatabase.userDao().getUserLastVehiclesSync(user.getId());
+                    String coDrivers = mAppDatabase.userDao().getUserCoDriversSync(user.getId());
 
-                    mAppDatabase.userDao().insertUser(UserConverter.toEntity(user));
+                    UserEntity userEntity = UserConverter.toEntity(user);
+                    userEntity.setAccountName(accountName);
+                    mAppDatabase.userDao().insertUser(userEntity);
+
+                    List<Integer> coDriverIds = ListConverter.toIntegerList(coDrivers);
+                    coDriverIds.add(user.getId());
+                    updateCoDrivers(coDriverIds);
 
                     if (user.getCarriers() != null) {
                         mAppDatabase.carrierDao().insertCarriers(CarrierConverter
@@ -87,6 +97,10 @@ public class UserInteractor {
                     if (lastVehicles != null) {
                         mAppDatabase.userDao().setUserLastVehicles(user.getId(), lastVehicles);
                     }
+
+                    if (coDrivers != null) {
+                        mAppDatabase.userDao().setUserCoDrivers(user.getId(), coDrivers);
+                    }
                 }).flatMap(user -> {
                     // get last 7 days events
                     long current = System.currentTimeMillis();
@@ -100,109 +114,186 @@ public class UserInteractor {
                 });
     }
 
-    public Observable<Boolean> logoutUser() {
-        ELDEvent logoutEvent = new ELDEvent();
-        int driverId = getDriverId();
-        logoutEvent.setStatus(ELDEvent.StatusCode.ACTIVE.getValue());
-        logoutEvent.setOrigin(ELDEvent.EventOrigin.DRIVER.getValue());
-        logoutEvent.setEventType(LOGIN_LOGOUT.getValue());
-        logoutEvent.setEventCode(ELDEvent.LoginLogoutCode.LOGOUT.getValue());
-        logoutEvent.setEventTime(System.currentTimeMillis());
-        logoutEvent.setMobileTime(System.currentTimeMillis());
-        logoutEvent.setDriverId(getDriverId());
-        logoutEvent.setBoxId(mPreferencesManager.getBoxId());
-        logoutEvent.setVehicleId(mPreferencesManager.getVehicleId());
+    public Completable loginCoDriver(final String name, final String password, User.DriverType driverType) {
+        String domain = getDriverDomainName();
 
-        return mBlackBoxInteractor.getData()
-                .flatMap(blackBox -> {
-                    logoutEvent.setTimezone(getTimezoneSync(driverId));
-                    logoutEvent.setEngineHours(blackBox.getEngineHours());
-                    logoutEvent.setOdometer(blackBox.getOdometer());
-                    logoutEvent.setLat(blackBox.getLat());
-                    logoutEvent.setLng(blackBox.getLon());
+        LoginModel request = new LoginModel();
+        request.setUsername(name);
+        request.setPassword(password);
+        request.setDomain(domain);
+        request.setDriverType(driverType.ordinal());
 
-                    return mServiceApi.logout(logoutEvent)
-                            .doOnNext(responseMessage -> {
-                                if (!mPreferencesManager.isRememberUserEnabled()) {
-                                    mAppDatabase.userDao().deleteUser(getDriverId());
-                                    mTokenManager.removeAccount(mPreferencesManager.getAccountName());
-                                    mPreferencesManager.clearValues();
-                                } else {
-                                    mTokenManager.clearToken(mTokenManager.getToken(mPreferencesManager.getAccountName()));
-                                }
-                                // Cancel auto logout in any case if user is logged out
-                                SchedulerUtils.cancel();
-                            })
-                            .doOnError(throwable -> SchedulerUtils.cancel())
-                            .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
-                });
+        return mServiceApi.loginUser(request)
+                          .doOnNext(user -> {
+                              String accountName = mTokenManager.getAccountName(name, domain);
+
+                              mTokenManager.setToken(accountName, name, domain, user.getAuth());
+
+                              UserEntity userEntity = UserConverter.toEntity(user);
+                              userEntity.setAccountName(accountName);
+                              mAppDatabase.userDao().insertUser(userEntity);
+
+                              List<Integer> coDriverIds = saveCoDrivers(getDriverId(), Arrays.asList(user.getId()));
+                              coDriverIds.add(getDriverId());
+                              updateCoDrivers(coDriverIds);
+
+                              if (user.getCarriers() != null) {
+                                  mAppDatabase.carrierDao().insertCarriers(CarrierConverter.toEntityList(user.getCarriers(), user.getId()));
+                              }
+
+                              if (user.getHomeTerminals() != null) {
+                                  mAppDatabase.homeTerminalDao().insertHomeTerminals(HomeTerminalConverter.toEntityList(user.getHomeTerminals(), user.getId()));
+                              }
+                          }).flatMap(user -> {
+                                // get last 7 days events
+                                long current = System.currentTimeMillis();
+                                long start = DateUtils.getStartDayTimeInMs(user.getTimezone(), current - MS_IN_WEEK);
+                                long end = DateUtils.getEndDayTimeInMs(user.getTimezone(), current);
+                                String token = user.getAuth().getToken();
+                                int userId = user.getId();
+                                return mServiceApi.getELDEvents(start, end, token, String.valueOf(userId));
+                          }).flatMapCompletable(events -> Completable.fromAction(() -> {
+                              ELDEventEntity[] entities = ELDEventConverter.toEntityList(events).toArray(new ELDEventEntity[events.size()]);
+                              mAppDatabase.ELDEventDao().insertAll(entities);
+                          }));
     }
 
-    public Observable<Boolean> syncDriverProfile(User user) {
-        UserEntity userEntity = UserConverter.toEntity(user);
+    public void deleteDriver() {
+        int driverId = getDriverId();
+        // Need to remove driver from co-driver's lists
+        String coDrivers = mAppDatabase.userDao().getUserCoDriversSync(driverId);
+        List<Integer> coDriverIds = ListConverter.toIntegerList(coDrivers);
+        for (Integer userId : coDriverIds) {
+            removeCoDriver(userId, driverId);
+        }
+
+        if (!mPreferencesManager.isRememberUserEnabled()) {
+            mAppDatabase.userDao().deleteUser(driverId);
+            mTokenManager.removeAccount(mAccountManager.getCurrentDriverAccountName());
+            mPreferencesManager.clearValues();
+        } else {
+            mTokenManager.clearToken(mTokenManager.getToken(mAccountManager.getCurrentDriverAccountName()));
+            mAppDatabase.userDao().setUserCoDrivers(driverId, null);
+        }
+    }
+
+    public void deleteCoDriver(UserEntity coDriver) {
+        int coDriverId = coDriver.getId();
+        // Need to remove driver from co-driver's lists
+        String coDrivers = mAppDatabase.userDao().getUserCoDriversSync(coDriverId);
+        List<Integer> coDriverIds = ListConverter.toIntegerList(coDrivers);
+        for (Integer userId: coDriverIds) {
+            removeCoDriver(userId, coDriverId);
+        }
+
+        // And remove user from db
+        mAppDatabase.userDao().deleteUser(coDriverId);
+        mTokenManager.removeAccount(coDriver.getAccountName());
+
+        int currentUserId = mAccountManager.getCurrentUserId();
+        if (currentUserId == coDriverId) {
+            mAccountManager.resetUserToDriver();
+        }
+    }
+
+    public Observable<Boolean> syncDriverProfile(UserEntity userEntity) {
         return Observable.fromCallable(() -> mAppDatabase.userDao().insertUser(userEntity))
-                         .map(userId -> userId > 0)
-                         .flatMap(userInserted -> {
-                             if (userInserted) {
-                                 return mServiceApi.updateDriverProfile(new DriverProfileModel(userEntity));
-                             }
-                             return Observable.just(new ResponseMessage(""));
-                         })
-                         .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
+                .map(userId -> userId > 0)
+                .flatMap(userInserted -> {
+                    if (userInserted) {
+                        return mServiceApi.updateDriverProfile(new DriverProfileModel(userEntity));
+                    }
+                    return Observable.just(new ResponseMessage(""));
+                })
+                .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
     }
 
     public Observable<Boolean> updateDriverPassword(String oldPassword, String newPassword) {
         return mServiceApi.updateDriverPassword(getPasswordModel(oldPassword, newPassword))
-                          .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
+                .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
     }
 
     public Observable<Boolean> updateDriverSignature(String signature) {
         return mServiceApi.updateDriverSignature(getDriverSignature(signature))
-                          .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
+                .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
     }
 
     public Observable<Boolean> updateDriverRule(String ruleException) {
         return mServiceApi.updateDriverRule(getRuleSelectionModel(ruleException))
-                          .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
+                .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
     }
 
     public Observable<Boolean> updateDriverHomeTerminal(Integer homeTerminalId) {
         return mServiceApi.updateDriverHomeTerminal(getHomeTerminal(homeTerminalId))
-                          .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
+                .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
+    }
+
+    public String getDriverName() {
+        return mTokenManager.getName(mAccountManager.getCurrentDriverAccountName());
     }
 
     public String getUserName() {
-        return mTokenManager.getName(mPreferencesManager.getAccountName());
+        return mTokenManager.getName(mAccountManager.getCurrentUserAccountName());
     }
 
-    public Flowable<String> getFullName() {
+    public Flowable<String> getFullDriverName() {
         return mAppDatabase.userDao().getUser(getDriverId())
                 .map(userEntity -> userEntity.getFirstName() + " " + userEntity.getLastName());
     }
 
-    public int getCoDriversNumber() {
-        //TODO: implement getting co drivers number
-        return 1;
+    public String getFullDriverNameSync() {
+        UserEntity userEntity = mAppDatabase.userDao().getUserSync(getDriverId());
+        return userEntity.getFirstName() + " " + userEntity.getLastName();
     }
 
-    public String getDomainName() {
-        return mTokenManager.getDomain(mPreferencesManager.getAccountName());
+    public String getFullUserNameSync() {
+        UserEntity userEntity = mAppDatabase.userDao().getUserSync(getUserId());
+        return userEntity.getFirstName() + " " + userEntity.getLastName();
     }
 
-    public Flowable<UserEntity> getUser() {
+    public Flowable<Integer> getCoDriversNumber() {
+        return mAppDatabase.userDao()
+                           .getUserCoDrivers(mAccountManager.getCurrentDriverId())
+                           .map(ListConverter::toIntegerList)
+                           .map(List::size);
+    }
+
+    public Integer getCoDriversNumberSync() {
+        return ListConverter.toIntegerList(mAppDatabase.userDao().getUserCoDriversSync(mAccountManager.getCurrentDriverId())).size();
+    }
+
+    public String getDriverDomainName() {
+        return mTokenManager.getDomain(mAccountManager.getCurrentDriverAccountName());
+    }
+
+    public Flowable<UserEntity> getDriver() {
         return mAppDatabase.userDao().getUser(getDriverId());
     }
 
-    public Flowable<FullUserEntity> getFullUser() {
+    public Flowable<User> getUser() {
+        return mAppDatabase.userDao().getUser(getDriverId())
+                .map(userEntity -> UserConverter.toUser(userEntity));
+    }
+
+    public Flowable<FullUserEntity> getFullDriver() {
         return mAppDatabase.userDao().getFullUser(getDriverId());
     }
 
-    public boolean isLoginActive() {
-        return mPreferencesManager.isShowHomeScreenEnabled() && mTokenManager.getToken(mPreferencesManager.getAccountName()) != null;
+    public FullUserEntity getFullUserSync() {
+        return mAppDatabase.userDao().getFullUserSync(getUserId());
     }
 
-    public Integer getDriverId() {
-        String id = mTokenManager.getDriver(mPreferencesManager.getAccountName());
+    public boolean isLoginActive() {
+        return mPreferencesManager.isShowHomeScreenEnabled() && mTokenManager.getToken(mAccountManager.getCurrentDriverAccountName()) != null;
+    }
+
+    public int getDriverId() {
+        String id = mTokenManager.getDriver(mAccountManager.getCurrentDriverAccountName());
+        return id == null || id.isEmpty() ? -1 : Integer.valueOf(id);
+    }
+
+    public int getUserId() {
+        String id = mTokenManager.getDriver(mAccountManager.getCurrentUserAccountName());
         return id == null || id.isEmpty() ? -1 : Integer.valueOf(id);
     }
 
@@ -218,10 +309,54 @@ public class UserInteractor {
         return mPreferencesManager.isRememberUserEnabled();
     }
 
+    public Flowable<List<UserEntity>> getCoDriversFromDB() {
+        return mAppDatabase.userDao()
+                           .getUserCoDrivers(getDriverId())
+                           .flatMap(coDriversIds -> mAppDatabase.userDao().getDrivers(ListConverter.toIntegerList(coDriversIds)));
+    }
+
+    public boolean isUserDriver() {
+        return mAccountManager.isCurrentUserDriver();
+    }
+
+    public UserEntity getUserFromDBSync(int userId) {
+        return mAppDatabase.userDao().getUserSync(userId);
+    }
+
+    private List<Integer> saveCoDrivers(int driverId, List<Integer> coDriverIds) {
+        String coDrivers = mAppDatabase.userDao().getUserCoDriversSync(driverId);
+        List<Integer> savedCoDrivers = ListConverter.toIntegerList(coDrivers);
+
+        for (Integer coDriverId : coDriverIds) {
+            if (!savedCoDrivers.contains(coDriverId) && !coDriverId.equals(driverId)) {
+                savedCoDrivers.add(coDriverId);
+            }
+        }
+
+        mAppDatabase.userDao().setUserCoDrivers(driverId, ListConverter.toString(savedCoDrivers));
+
+        return savedCoDrivers;
+    }
+
+    private void updateCoDrivers(List<Integer> driverIds) {
+        for (Integer coDriverId: driverIds) {
+            saveCoDrivers(coDriverId, driverIds);
+        }
+    }
+
+    private void removeCoDriver(int driverId, Integer coDriverId) {
+        String coDrivers = mAppDatabase.userDao().getUserCoDriversSync(driverId);
+        List<Integer> savedCoDrivers = ListConverter.toIntegerList(coDrivers);
+
+        savedCoDrivers.remove(coDriverId);
+
+        mAppDatabase.userDao().setUserCoDrivers(driverId, ListConverter.toString(savedCoDrivers));
+    }
+
     private PasswordModel getPasswordModel(String oldPassword, String newPassword) {
         PasswordModel passwordModel = new PasswordModel();
 
-        passwordModel.setId(getDriverId());
+        passwordModel.setId(getUserId());
         passwordModel.setUsername(getUserName());
         passwordModel.setPassword(oldPassword);
         passwordModel.setNewPassword(newPassword);
@@ -232,7 +367,7 @@ public class UserInteractor {
     private DriverHomeTerminal getHomeTerminal(Integer homeTerminalId) {
         DriverHomeTerminal homeTerminal = new DriverHomeTerminal();
 
-        homeTerminal.setDriverId(getDriverId());
+        homeTerminal.setDriverId(getUserId());
         homeTerminal.setHomeTermId(homeTerminalId);
 
         return homeTerminal;
@@ -241,7 +376,7 @@ public class UserInteractor {
     private RuleSelectionModel getRuleSelectionModel(String ruleException) {
         RuleSelectionModel ruleSelectionModel = new RuleSelectionModel();
 
-        ruleSelectionModel.setDriverId(getDriverId());
+        ruleSelectionModel.setDriverId(getUserId());
         ruleSelectionModel.setRuleException(ruleException);
         ruleSelectionModel.setApplyTime(Calendar.getInstance().getTimeInMillis());
 
@@ -251,7 +386,7 @@ public class UserInteractor {
     private DriverSignature getDriverSignature(String signature) {
         DriverSignature signatureInfo = new DriverSignature();
 
-        signatureInfo.setDriverId(getDriverId());
+        signatureInfo.setDriverId(getUserId());
         signatureInfo.setSignature(signature);
 
         return signatureInfo;
