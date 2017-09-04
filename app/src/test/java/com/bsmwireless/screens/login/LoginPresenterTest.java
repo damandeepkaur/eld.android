@@ -38,15 +38,12 @@ public class LoginPresenterTest {
     @Mock
     UserInteractor mUserInteractor;
 
-    @Mock
-    NtpClientManager mNtpClientManager;
-
     private LoginPresenter mLoginPresenter;
 
     @Before
     public void before() throws Exception {
         MockitoAnnotations.initMocks(this);
-        mLoginPresenter = new LoginPresenter(mView, mUserInteractor, mNtpClientManager);
+        mLoginPresenter = new LoginPresenter(mView, mUserInteractor);
     }
 
 

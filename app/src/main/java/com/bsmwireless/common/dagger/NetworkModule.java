@@ -8,6 +8,7 @@ import com.bsmwireless.data.network.HttpClientManager;
 import com.bsmwireless.data.network.NtpClientManager;
 import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.network.authenticator.TokenManager;
+import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.data.storage.PreferencesManager;
 
 import java.util.ArrayList;
@@ -60,8 +61,10 @@ public class NetworkModule {
 
     @Singleton
     @Provides
-    HttpClientManager provideHttpClientManager(HttpLoggingInterceptor logger, TokenManager tokenManager, PreferencesManager preferencesManager, CookieJar cookieJar) {
-        return new HttpClientManager(logger, tokenManager, preferencesManager, cookieJar);
+    HttpClientManager provideHttpClientManager(HttpLoggingInterceptor logger, TokenManager tokenManager,
+                                               PreferencesManager preferencesManager, CookieJar cookieJar,
+                                               AccountManager accountManager) {
+        return new HttpClientManager(logger, tokenManager, preferencesManager, cookieJar, accountManager);
     }
 
     @Provides

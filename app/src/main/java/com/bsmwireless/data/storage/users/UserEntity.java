@@ -41,6 +41,10 @@ public class UserEntity {
     private Integer mUom;
     @ColumnInfo(name = "last_vehicle_ids")
     private String mLastVehicleIds;
+    @ColumnInfo(name = "co_drivers_ids")
+    private String mCoDriversIds;
+    @ColumnInfo(name = "account_name")
+    private String mAccountName;
 
     public Integer getId() {
         return mId;
@@ -176,5 +180,21 @@ public class UserEntity {
 
     public void setUom(Integer uom) {
         mUom = uom;
+    }
+
+    public String getCoDriversIds() {
+        return mCoDriversIds;
+    }
+
+    public void setCoDriversIds(String coDriversIds) {
+        mCoDriversIds = coDriversIds;
+    }
+
+    public String getAccountName() {
+        return mAccountName;
+    }
+
+    public void setAccountName(String accountName) {
+        mAccountName = accountName;
     }
 }

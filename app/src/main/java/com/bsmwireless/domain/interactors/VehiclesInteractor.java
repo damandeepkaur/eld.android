@@ -67,16 +67,21 @@ public class VehiclesInteractor {
             if (!next.equals(vehicleId)) {
                 builder.append(",");
                 builder.append(next);
-                count ++;
+                count++;
             }
         }
 
         mAppDatabase.userDao().setUserLastVehicles(driverId, builder.toString());
+        mAppDatabase.userDao().setUserLastVehicles(driverId, builder.toString());
     }
 
-    public Flowable<List<Vehicle>> getVehiclesFromDB(List<Integer> vehicleIds){
+    public Flowable<List<Vehicle>> getVehiclesFromDB(List<Integer> vehicleIds) {
         return mAppDatabase.vehicleDao().getVehicles(vehicleIds)
                 .map(VehicleConverter::toVehicle);
+    }
+
+    public Vehicle getVehicle(Integer vehicleId) {
+        return VehicleConverter.toVehicle(mAppDatabase.vehicleDao().getVehicleSync(vehicleId));
     }
 
     public Completable cleanSelectedVehicle() {

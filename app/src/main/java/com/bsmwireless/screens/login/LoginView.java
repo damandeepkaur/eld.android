@@ -28,4 +28,8 @@ public interface LoginView {
     void loadUserData(String name, String domain);
 
     void setLoginButtonEnabled(boolean enabled);
+
+    void showProgressBar();
+
+    void hideProgressBar();
 }

@@ -3,7 +3,12 @@ ELD app for Android
 
 # Version history
 
-* **1.0.51** - Add NTP sync
+* **1.0.56** - Add NTP sync
+* **1.0.55** - Not creating duty event with creating YM or PC event (_EA-338_)
+* **1.0.54** - Add progress bar
+* **1.0.53** - Add switch driver and co-drivers logic
+* **1.0.52** - Add Log header to Logs Screen (_EA-339_)
+* **1.0.51** - Add confirmation dialog select assets screen
 * **1.0.50** - Added UI for Lock Screen(_EA-206_)
 * **1.0.49** - Improve wording of PU and YM events (_EA-337_)
 * **1.0.48** - Add black box connection
@@ -12,7 +17,7 @@ ELD app for Android
 * **1.0.45** - Update multiday screen
 * **1.0.44** - Update graph drawing and add ability create special events
 * **1.0.43** - Add dashboard indicators (_EA-280_)
-* **1.0.41** - Fix crash on incorrent events loading (_EA-313_)
+* **1.0.41** - Fix crash on incorrect events loading (_EA-313_)
 * **1.0.40** - Add YM and PU to logs screen (_EA-286_)
 * **1.0.39** - Change inactive events view
 * **1.0.38** - Update logs graph

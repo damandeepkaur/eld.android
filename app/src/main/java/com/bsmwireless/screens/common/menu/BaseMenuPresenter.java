@@ -1,8 +1,11 @@
 package com.bsmwireless.screens.common.menu;
 
+import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
+import com.bsmwireless.domain.interactors.UserInteractor;
 import com.bsmwireless.widgets.alerts.DutyType;
+import com.bsmwireless.widgets.alerts.OccupancyType;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -11,7 +14,9 @@ import timber.log.Timber;
 
 public abstract class BaseMenuPresenter {
     protected DutyTypeManager mDutyTypeManager;
+    protected AccountManager mAccountManager;
     protected ELDEventsInteractor mEventsInteractor;
+    protected UserInteractor mUserInteractor;
     protected CompositeDisposable mDisposables;
 
     private DutyTypeManager.DutyTypeListener mListener = dutyType -> getView().setDutyType(dutyType);
@@ -20,6 +25,10 @@ public abstract class BaseMenuPresenter {
 
     void onMenuCreated() {
         mDutyTypeManager.addListener(mListener);
+        mDisposables.add(mUserInteractor.getCoDriversNumber()
+                                        .subscribeOn(Schedulers.io())
+                                        .observeOn(AndroidSchedulers.mainThread())
+                                        .subscribe(count -> getView().setOccupancyType(OccupancyType.getTypeById(count))));
     }
 
     void onDutyChanged(DutyType dutyType) {
@@ -49,5 +58,9 @@ public abstract class BaseMenuPresenter {
         mDisposables.dispose();
 
         Timber.d("DESTROYED");
+    }
+
+    public boolean isUserDriver() {
+        return mUserInteractor.isUserDriver();
     }
 }

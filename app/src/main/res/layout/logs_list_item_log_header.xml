@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+
+              android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="@dimen/logs_list_item_log_header_margin_left"
+        android:orientation="vertical">
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/logs_list_item_log_header_field_height"
+            android:layout_marginTop="@dimen/logs_list_item_log_header_field_margin_top">
+
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/timezone"
+                style="@style/TextInputEditText.Disabled"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/log_header_time_zone"
+                tools:text="time_zone"/>
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/logs_list_item_log_header_field_height"
+            android:layout_marginTop="@dimen/logs_list_item_log_header_field_margin_top">
+
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/driver_name"
+                style="@style/TextInputEditText.Disabled"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/log_header_driver_name"
+                tools:text="Logan Harvey"/>
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/logs_list_item_log_header_field_height"
+            android:layout_marginTop="@dimen/logs_list_item_log_header_field_margin_top">
+
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/co_drivers_name"
+                style="@style/TextInputEditText.Disabled"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/log_header_co_driver_s_name"
+                tools:text="Lewis Strickland, John Nothan"/>
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/logs_list_item_log_header_field_height"
+            android:layout_marginTop="@dimen/logs_list_item_log_header_field_margin_top">
+
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/vehicle_name"
+                style="@style/TextInputEditText.Disabled"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:hint="@string/log_header_vehicle_name"
+                tools:text="Logan Harvey"/>
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/logs_list_item_log_header_field_height"
+            android:layout_marginTop="@dimen/logs_list_item_log_header_field_margin_top">
+
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/vehicle_license"
+                style="@style/TextInputEditText.Disabled"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/log_header_vehicle_license"
+                tools:text="VEH_LIC"/>
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/logs_list_item_log_header_field_height"
+            android:layout_marginTop="@dimen/logs_list_item_log_header_field_margin_top">
+
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/start_odometer"
+                style="@style/TextInputEditText.Disabled"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/log_header_start_odometer"
+                tools:text="ODO_START"/>
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/logs_list_item_log_header_field_height"
+            android:layout_marginTop="@dimen/logs_list_item_log_header_field_margin_top">
+
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/end_odometer"
+                style="@style/TextInputEditText.Disabled"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/log_header_end_odometer"
+                tools:text="ODO_END"/>
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/logs_list_item_log_header_field_height"
+            android:layout_marginTop="@dimen/logs_list_item_log_header_field_margin_top">
+
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/distance_driven"
+                style="@style/TextInputEditText.Disabled"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/log_header_distance_driven"
+                tools:text="DR_DIST"/>
+
+        </android.support.design.widget.TextInputLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_gravity="bottom"
+            android:background="?android:attr/listDivider"/>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/logs_list_item_log_header_field_height"
+            android:layout_marginTop="@dimen/logs_list_item_log_header_field_margin_top">
+
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/carrier_name"
+                style="@style/TextInputEditText.Disabled.Black"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:hint="@string/log_header_carrier_name"
+                tools:text="CAR_NAME"/>
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/logs_list_item_log_header_field_height"
+            android:layout_marginTop="@dimen/logs_list_item_log_header_field_margin_top">
+
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/home_terminal_name"
+                style="@style/TextInputEditText.Disabled.Black"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:hint="@string/log_header_home_terminal_name"
+                tools:text="HT_NAME"/>
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/logs_list_item_log_header_field_height"
+            android:layout_marginTop="@dimen/logs_list_item_log_header_field_margin_top">
+
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/home_terminal_address"
+                style="@style/TextInputEditText.Disabled.Black"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:hint="@string/log_header_home_terminal_address"
+                tools:text="HT_ADDR"/>
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/logs_list_item_log_header_field_height"
+            android:layout_marginTop="@dimen/logs_list_item_log_header_field_margin_top">
+
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/trailers"
+                style="@style/TextInputEditText.Disabled.Black"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:hint="@string/log_header_trailers"
+                tools:text="TR_NAME"/>
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/logs_list_item_log_header_field_height"
+            android:layout_marginTop="@dimen/logs_list_item_log_header_field_margin_top">
+
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/shipping_id"
+                style="@style/TextInputEditText.Disabled.Black"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:hint="@string/log_header_shipping_id"
+                tools:text="B_L"/>
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/logs_list_item_log_header_field_height"
+            android:layout_marginTop="@dimen/logs_list_item_log_header_field_margin_top">
+
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/driving_exemptions"
+                style="@style/TextInputEditText.Disabled.Black"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:hint="@string/log_header_driving_exemptions"
+                tools:text="EXEMP1, EXEMP2, EXEMP3"/>
+
+        </android.support.design.widget.TextInputLayout>
+
+    </LinearLayout>
+</LinearLayout>

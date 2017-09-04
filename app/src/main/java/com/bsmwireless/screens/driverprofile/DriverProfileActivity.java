@@ -119,6 +119,7 @@ public class DriverProfileActivity extends BaseMenuActivity implements DriverPro
         initToolbar();
 
         mPresenter.onNeedUpdateUserInfo();
+        mPresenter.onViewCreated();
 
         mSignatureLayout.setOnSaveListener(this);
     }
