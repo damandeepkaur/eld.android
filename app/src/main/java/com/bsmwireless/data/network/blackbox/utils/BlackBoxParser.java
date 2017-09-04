@@ -16,7 +16,6 @@ public class BlackBoxParser {
     public static final int START_INDEX = 11;
     //  2 start bytes, 1 checksum, 2 length, 1 command, 1 packetId,  4 boxid, 2 year, 1 month, 1 day, 1 hour, 1 minute, 1 sec, 2 millisecond, 1 GPS, 1 update rate.
     private static final int SUBSCRIPTION_PACKET_LENGTH = 22;
-    private static final int STATUS_REQUEST_LENGTH = 11;
     private static final byte SUBSCRIPTION_REQUEST = (byte) 'C';
     private static final byte STATUS_REQUEST = (byte) 'S';
     private static final byte START_MESSAGE_INDICATOR = (byte) '@';

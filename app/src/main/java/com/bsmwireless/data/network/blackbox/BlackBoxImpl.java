@@ -17,7 +17,6 @@ import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
 import timber.log.Timber;
 
-import static app.bsmuniversal.com.R.string.error;
 import static com.bsmwireless.data.network.blackbox.models.BlackBoxResponseModel.NackReasonCode.UNKNOWN_ERROR;
 import static com.bsmwireless.data.network.blackbox.utils.BlackBoxParser.HEADER_LENGTH;
 import static com.bsmwireless.data.network.blackbox.utils.BlackBoxParser.START_INDEX;
