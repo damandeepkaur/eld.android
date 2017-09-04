@@ -101,109 +101,18 @@ public class EditEventPresenter extends BaseMenuPresenter {
             newEvent = mEventsInteractor.getEvent(type);
         }
 
-        if (type.equals(DutyType.PERSONAL_USE) || type.equals(DutyType.YARD_MOVES)) {
-            ELDEvent indicationDutyEvent = mEventsInteractor.getEvent(type);
-            indicationDutyEvent.setEventType(type.getType());
-            indicationDutyEvent.setEventCode(type.getCode());
-            indicationDutyEvent.setEventTime(eventTime);
+        newEvent.setStatus(ELDEvent.StatusCode.ACTIVE.getValue());
+        newEvent.setEventType(type.getType());
+        newEvent.setEventCode(type.getCode());
+        newEvent.setEventTime(eventTime);
+        newEvent.setComment(comment);
 
-            newEvent.setStatus(ELDEvent.StatusCode.ACTIVE.getValue());
-            newEvent.setEventTime(eventTime);
-            newEvent.setComment(comment);
-            if (type.equals(DutyType.PERSONAL_USE)) {
-                newEvent.setEventCode(DutyType.OFF_DUTY.getCode());
-            } else if (type.equals(DutyType.YARD_MOVES)) {
-                newEvent.setEventCode(DutyType.ON_DUTY.getCode());
-            }
-
-            if (mELDEvent == null) {
-                newEvent.setMobileTime(eventTime);
-                indicationDutyEvent.setMobileTime(eventTime);
-            } else {
-                indicationDutyEvent.setMobileTime(mELDEvent.getMobileTime());
-            }
-
-            // TODO: remove if we need not auto generate clear event
-            // Auto generating clear event
-            /*mDisposables.add(mEventsInteractor.getLatestActiveDutyEventFromDB(eventTime)
-                                              .subscribeOn(Schedulers.io())
-                                              .observeOn(AndroidSchedulers.mainThread())
-                                              .subscribe(latestEvents -> {
-                                                  for (ELDEvent event: latestEvents) {
-                                                      DutyType prevDutyType = DutyType.getTypeByCode(event.getEventType(), event.getEventCode());
-                                                      if (prevDutyType.equals(DutyType.YARD_MOVES) || prevDutyType.equals(DutyType.PERSONAL_USE)) {
-                                                          ELDEvent clearEvent = prepareNewELDEvent();
-                                                          clearEvent.setEventType(DutyType.CLEAR.getType());
-                                                          clearEvent.setEventCode(DutyType.CLEAR.getCode());
-                                                          clearEvent.setEventTime(eventTime);
-                                                          if (mELDEvent == null) {
-                                                              clearEvent.setMobileTime(eventTime);
-                                                          } else {
-                                                              clearEvent.setMobileTime(mELDEvent.getMobileTime());
-                                                          }
-                                                          events.add(clearEvent);
-                                                      }
-                                                  }
-
-                                                  events.add(newEvent);
-                                                  events.add(indicationDutyEvent);
-
-                                                  mView.changeEvent(events);
-                                              }, throwable -> {
-                                                  if (throwable instanceof RetrofitException) {
-                                                      mView.showError((RetrofitException) throwable);
-                                                  } else {
-                                                      mView.showError(EditEventView.Error.SERVER_ERROR);
-                                                  }
-                                              }));*/
-
-            events.add(newEvent);
-            events.add(indicationDutyEvent);
-        } else {
-            newEvent.setStatus(ELDEvent.StatusCode.ACTIVE.getValue());
-            newEvent.setEventType(type.getType());
-            newEvent.setEventCode(type.getCode());
-            newEvent.setEventTime(eventTime);
-            newEvent.setComment(comment);
-
-            if (mELDEvent == null) {
-                newEvent.setMobileTime(eventTime);
-            }
-
-            // TODO: remove if we need not auto generate clear event
-            // Auto generating clear event
-            /*mDisposables.add(mEventsInteractor.getLatestActiveDutyEventFromDB(eventTime)
-                                              .subscribeOn(Schedulers.io())
-                                              .observeOn(AndroidSchedulers.mainThread())
-                                              .subscribe(latestEvents -> {
-                                                  for (ELDEvent event: latestEvents) {
-                                                      DutyType prevDutyType = DutyType.getTypeByCode(event.getEventType(), event.getEventCode());
-                                                      if (prevDutyType.equals(DutyType.YARD_MOVES) || prevDutyType.equals(DutyType.PERSONAL_USE)) {
-                                                          ELDEvent clearEvent = prepareNewELDEvent();
-                                                          clearEvent.setEventType(DutyType.CLEAR.getType());
-                                                          clearEvent.setEventCode(DutyType.CLEAR.getCode());
-                                                          clearEvent.setEventTime(eventTime);
-                                                          if (mELDEvent == null) {
-                                                              clearEvent.setMobileTime(eventTime);
-                                                          } else {
-                                                              clearEvent.setMobileTime(mELDEvent.getMobileTime());
-                                                          }
-                                                          events.add(clearEvent);
-                                                      }
-                                                  }
-
-                                                  events.add(newEvent);
-
-                                                  mView.changeEvent(events);
-                                              }, throwable -> {
-                                                  if (throwable instanceof RetrofitException) {
-                                                      mView.showError((RetrofitException) throwable);
-                                                  } else {
-                                                      mView.showError(EditEventView.Error.SERVER_ERROR);
-                                                  }
-                                              }));*/
-            events.add(newEvent);
+        // Need set mobile time for new event or take it from mELDEvent
+        if (mELDEvent == null) {
+            newEvent.setMobileTime(eventTime);
         }
+
+        events.add(newEvent);
 
         mView.changeEvent(events);
     }
