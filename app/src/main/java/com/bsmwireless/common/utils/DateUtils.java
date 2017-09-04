@@ -1,11 +1,8 @@
 package com.bsmwireless.common.utils;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.bsmwireless.common.App;
-import com.bsmwireless.data.network.NtpClientManager;
-import com.instacart.library.truetime.TrueTimeRx;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

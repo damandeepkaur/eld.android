@@ -96,6 +96,15 @@
         </receiver>
 
         <activity android:name="com.bsmwireless.screens.lockscreen.LockScreenActivity"/>
+
+        <service
+            android:name="com.bsmwireless.schedulers.jobscheduler.SyncNtpJobService"
+            android:exported="false"
+            android:permission="android.permission.BIND_JOB_SERVICE"/>
+
+        <service android:name="com.bsmwireless.schedulers.alarmmanager.SyncNtpService"/>
+
+        <receiver android:name="com.bsmwireless.schedulers.alarmmanager.SyncNtpAlarmReceiver"/>
     </application>
 
 </manifest>

@@ -22,14 +22,12 @@ public class LoginPresenter {
     private LoginView mView;
     private UserInteractor mUserInteractor;
     private CompositeDisposable mDisposables;
-    private NtpClientManager mNtpClientManager;
 
     @Inject
-    public LoginPresenter(LoginView view, UserInteractor interactor, NtpClientManager ntpClientManager) {
+    public LoginPresenter(LoginView view, UserInteractor interactor) {
         mView = view;
         mUserInteractor = interactor;
         mDisposables = new CompositeDisposable();
-        mNtpClientManager = ntpClientManager;
 
         Timber.d("CREATED");
     }
@@ -69,7 +67,6 @@ public class LoginPresenter {
                             Timber.i("LoginUser status = %b", status);
 
                             if (status) {
-                                syncDeviceNtpRequest();
                                 SchedulerUtils.schedule();
                                 mView.goToSelectAssetScreen();
                             } else {
@@ -85,19 +82,6 @@ public class LoginPresenter {
                             mView.setLoginButtonEnabled(true);
                         }
                 );
-        mDisposables.add(disposable);
-    }
-
-    private void syncDeviceNtpRequest() {
-        Disposable disposable = mNtpClientManager.init()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        date -> {
-                            Timber.i("Ntp sync date = %s", date.toString());
-                            mNtpClientManager.setRealTimeInMillisDiff(date);
-                        },
-                        throwable ->  Timber.e("Something went wrong when trying to initializeRx TrueTime: %s", throwable));
         mDisposables.add(disposable);
     }
 
