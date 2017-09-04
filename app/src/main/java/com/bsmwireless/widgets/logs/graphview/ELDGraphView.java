@@ -25,10 +25,11 @@ public class ELDGraphView extends View {
     private final static int SEC_IN_MIN = 60;
     private final static int MS_IN_MIN = 60 * 1000;
     private final static int MS_IN_DAY = 24 * 60 * MS_IN_MIN;
-    private static final int DOTTED_LINE_WIDTH_DP = 20;
+    private static final int DOTTED_LINE_WIDTH_DP = 1;
 
-    private final int GRID_WIDTH_DP = 1;
-    private final int LINE_WIDTH_DP = 3;
+    private final float GRID_WIDTH_DP = 0.3f;
+    private final float VERTICAL_LINE_WIDTH_DP = 1f;
+    private final float LINE_WIDTH_DP = 3f;
     private final int mDutyStatusCount = 4;
     private final int mHoursCount = 24;
     private boolean invalidateLogsData;
@@ -79,7 +80,7 @@ public class ELDGraphView extends View {
         mGridPaint.setAntiAlias(true);
         mGridPaint.setColor(ContextCompat.getColor(getContext(), R.color.graph_grid_paint_color));
         mGridPaint.setStyle(Paint.Style.STROKE);
-        mGridPaint.setStrokeWidth(ViewUtils.convertPixelsToDp(GRID_WIDTH_DP, getContext()));
+        mGridPaint.setStrokeWidth(ViewUtils.convertDpToPixels(GRID_WIDTH_DP, getContext()));
 
         mHeaderPaint = new Paint();
         mHeaderPaint.setAntiAlias(true);
@@ -99,7 +100,7 @@ public class ELDGraphView extends View {
         mVerticalLinesPaint.setAntiAlias(true);
         mVerticalLinesPaint.setColor(ContextCompat.getColor(context, DutyType.OFF_DUTY.getColor()));
         mVerticalLinesPaint.setStyle(Paint.Style.STROKE);
-        mVerticalLinesPaint.setStrokeWidth(ViewUtils.convertDpToPixels(GRID_WIDTH_DP, getContext()));
+        mVerticalLinesPaint.setStrokeWidth(ViewUtils.convertDpToPixels(VERTICAL_LINE_WIDTH_DP, getContext()));
 
         mBitmapPaint = new Paint(Paint.FILTER_BITMAP_FLAG);
 
@@ -222,9 +223,9 @@ public class ELDGraphView extends View {
             if (prevEvent.isSpecialStatus()) {
                 mHorizontalLinesPaint.setPathEffect(
                         new DashPathEffect(
-                                new float[]{ViewUtils.convertPixelsToDp(DOTTED_LINE_WIDTH_DP,
+                                new float[]{ViewUtils.convertDpToPixels(DOTTED_LINE_WIDTH_DP,
                                         getContext()),
-                                        ViewUtils.convertPixelsToDp(DOTTED_LINE_WIDTH_DP, getContext())
+                                        ViewUtils.convertDpToPixels(DOTTED_LINE_WIDTH_DP, getContext())
                                 }, 0));
             } else {
                 mHorizontalLinesPaint.setPathEffect(null);
@@ -247,9 +248,9 @@ public class ELDGraphView extends View {
         if (log.isSpecialStatus()) {
             mHorizontalLinesPaint.setPathEffect(
                     new DashPathEffect(
-                            new float[]{ViewUtils.convertPixelsToDp(DOTTED_LINE_WIDTH_DP,
+                            new float[]{ViewUtils.convertDpToPixels(DOTTED_LINE_WIDTH_DP,
                                     getContext()),
-                                    ViewUtils.convertPixelsToDp(DOTTED_LINE_WIDTH_DP, getContext())
+                                    ViewUtils.convertDpToPixels(DOTTED_LINE_WIDTH_DP, getContext())
                             }, 0));
         } else {
             mHorizontalLinesPaint.setPathEffect(null);
