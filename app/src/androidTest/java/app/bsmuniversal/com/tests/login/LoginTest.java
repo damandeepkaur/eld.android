@@ -9,16 +9,11 @@ import com.bsmwireless.screens.selectasset.SelectAssetActivity;
 import org.junit.Rule;
 import org.junit.Test;
 
-import app.bsmuniversal.com.R;
 import app.bsmuniversal.com.base.BaseTestClass;
-
-import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.action.ViewActions.click;
-import static android.support.test.espresso.intent.Intents.intended;
-import static android.support.test.espresso.intent.Intents.times;
-import static android.support.test.espresso.intent.matcher.IntentMatchers.hasComponent;
-import static android.support.test.espresso.matcher.ViewMatchers.withId;
-
+import app.bsmuniversal.com.locators.LoginLocators;
+import app.bsmuniversal.com.locators.SelectAssetLocators;
+import app.bsmuniversal.com.pages.SelectAssetPage;
+import app.bsmuniversal.com.utils.Users;
 
 /**
  * Automation test class to verify Login implementation
@@ -29,68 +24,70 @@ public class LoginTest extends BaseTestClass {
     public ActivityTestRule<LoginActivity> mLoginActivityTestRule = new IntentsTestRule<>(LoginActivity.class);
 
     @Test
-    public void test_firstLoginSuccessful() throws InterruptedException {
-        fillLoginDataAndDoLogin("mera2", "pass789", "mera", false);
-        intended(hasComponent(SelectAssetActivity.class.getName()));
-        onView(withId(R.id.select_asset_not_in_vehicle_button)).perform(click());
+    public void test_firstLoginSuccessful() {
+        login(Users.getUserOne(), false);
+        wait_for_view(REQUEST_TIMEOUT, SelectAssetLocators.not_in_vehicle_button);
+        assert_activity_shown(SelectAssetActivity.class.getName(), 1);
         doLogout();
     }
 
     @Test
-    public void test_secondLoginSuccessful() throws InterruptedException {
-        fillLoginDataAndDoLogin("mera2", "pass789", "mera", false);
-        onView(withId(R.id.select_asset_not_in_vehicle_button)).perform(click());
+    public void test_secondLoginSuccessful() {
+        login(Users.getUserOne(), false);
+        wait_for_view(REQUEST_TIMEOUT, SelectAssetLocators.not_in_vehicle_button);
         doLogout();
-        fillLoginDataAndDoLogin("mera2", "pass789", "mera", true);
-        intended(hasComponent(SelectAssetActivity.class.getName()), times(2));
-        onView(withId(R.id.select_asset_not_in_vehicle_button)).perform(click());
+        login(Users.getUserOne(), true);
+        wait_for_view(REQUEST_TIMEOUT, SelectAssetLocators.not_in_vehicle_button);
+        assert_activity_shown(SelectAssetActivity.class.getName(), 2);
         doLogout();
     }
 
-    @Test
-    public void test_wrongUsername() throws InterruptedException {
-        fillLoginDataAndDoLogin("asasdd", "pass789", "mera", false);
-        checkIfSnackBarWithMessageIsDisplayed(R.id.login_snackbar, "(Error 401) Not Authenticated");
+    private void doLogout() {
+        SelectAssetPage.go_to_home_screen_from_select_asset_screen();
+        logout();
+        wait_for_view(REQUEST_TIMEOUT, LoginLocators.execute_login);
     }
 
     @Test
-    public void test_wrongPassword() throws InterruptedException {
-        fillLoginDataAndDoLogin("mera2", "pasasdasds789", "mera", false);
-        checkIfSnackBarWithMessageIsDisplayed(R.id.login_snackbar, "(Error 401) Not Authenticated");
+    public void test_wrongUsername() {
+        login(Users.getUserWrongUsername(), false);
+        assert_snack_bar_with_message_displayed(LoginLocators.login_snackbar, LoginLocators.error_401_message);
     }
 
     @Test
-    public void test_wrongCompany() throws InterruptedException {
-        fillLoginDataAndDoLogin("mera2", "pass789", "mera12asd", false);
-        checkIfSnackBarWithMessageIsDisplayed(R.id.login_snackbar, "(Error 401) Not Authenticated");
+    public void test_wrongPassword() {
+        login(Users.getUserWrongPassword(), false);
+        assert_snack_bar_with_message_displayed(LoginLocators.login_snackbar, LoginLocators.error_401_message);
     }
 
     @Test
-    public void test_emptyUsername() throws InterruptedException {
-        fillLoginDataAndDoLogin("", "pass789", "mera", false);
-        checkIfSnackBarWithMessageIsDisplayed(R.id.login_snackbar,
-                mLoginActivityTestRule.getActivity().getString(R.string.error_username));
+    public void test_wrongCompany() {
+        login(Users.getUserWrongCompany(), false);
+        assert_snack_bar_with_message_displayed(LoginLocators.login_snackbar, LoginLocators.error_401_message);
     }
 
     @Test
-    public void test_emptyPassword() throws InterruptedException {
-        fillLoginDataAndDoLogin("mera2", "", "mera", false);
-        checkIfSnackBarWithMessageIsDisplayed(R.id.login_snackbar,
-                mLoginActivityTestRule.getActivity().getString(R.string.error_password));
+    public void test_emptyUsername() {
+        login(Users.getUserEmptyUsername(), false);
+        assert_snack_bar_with_message_displayed(LoginLocators.login_snackbar, LoginLocators.error_empty_username);
     }
 
     @Test
-    public void test_emptyCompany() throws InterruptedException {
-        fillLoginDataAndDoLogin("mera", "pass789", "", false);
-        checkIfSnackBarWithMessageIsDisplayed(R.id.login_snackbar,
-                mLoginActivityTestRule.getActivity().getString(R.string.error_domain));
+    public void test_emptyPassword() {
+        login(Users.getUserEmptyPassword(), false);
+        assert_snack_bar_with_message_displayed(LoginLocators.login_snackbar, LoginLocators.error_empty_password);
     }
 
     @Test
-    public void test_emptyFields() throws InterruptedException {
-        fillLoginDataAndDoLogin("", "", "", false);
-        checkIfSnackBarWithMessageIsDisplayed(R.id.login_snackbar,
-                mLoginActivityTestRule.getActivity().getString(R.string.error_username));
+    public void test_emptyCompany() {
+        login(Users.getUserEmptyCompany(), false);
+        assert_snack_bar_with_message_displayed(LoginLocators.login_snackbar, LoginLocators.error_empty_domain);
+    }
+
+    @Test
+    public void test_emptyFields() {
+        login(Users.getEmptyUser(), false);
+        assert_snack_bar_with_message_displayed(LoginLocators.login_snackbar, LoginLocators.error_empty_username);
     }
 
 }
