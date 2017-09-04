@@ -180,5 +180,5 @@ dependencies {
 }
 
 spoon {
-    noAnimations = true;
+    noAnimations = true
 }
