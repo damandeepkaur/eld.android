@@ -8,6 +8,8 @@ public interface BaseMenuView {
     void setELDType(ELDType type);
     void setDutyType(DutyType type);
     void setOccupancyType(OccupancyType type);
-    void showDutyDialog();
+    void showDutyTypeDialog(DutyType dutyType);
+    void showNotInVehicleDialog();
     void changeDutyType(DutyType dutyType);
+    void showSwitchDriverDialog();
 }

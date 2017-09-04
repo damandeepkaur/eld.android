@@ -183,7 +183,7 @@ public class SyncInspectionCategory implements Parcelable {
         this.mGroupId = (Integer) in.readValue(Integer.class.getClassLoader());
         this.mBarcode = in.readString();
         this.mSType = in.readString();
-        this.mItems = new ArrayList<SyncInspectionItem>();
+        this.mItems = new ArrayList<>();
         in.readList(this.mItems, SyncInspectionItem.class.getClassLoader());
         this.mDesc = in.readParcelable(SyncDescription.class.getClassLoader());
         this.mId = (Integer) in.readValue(Integer.class.getClassLoader());

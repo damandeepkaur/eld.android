@@ -1,7 +1,7 @@
 package com.bsmwireless.screens.dashboard;
 
 import com.bsmwireless.common.dagger.ActivityScope;
-import com.bsmwireless.data.storage.DutyManager;
+import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.widgets.alerts.DutyType;
 
 import javax.inject.Inject;
@@ -12,25 +12,25 @@ import timber.log.Timber;
 public class DashboardPresenter {
     private DashboardView mView;
 
-    private DutyManager mDutyManager;
+    private DutyTypeManager mDutyTypeManager;
 
-    private DutyManager.DutyTypeListener mListener = dutyType -> mView.setDutyType(dutyType);
+    private DutyTypeManager.DutyTypeListener mListener = dutyType -> mView.setDutyType(dutyType);
 
     @Inject
-    public DashboardPresenter(DashboardView view, DutyManager dutyManager) {
+    public DashboardPresenter(DashboardView view, DutyTypeManager dutyTypeManager) {
         mView = view;
 
-        mDutyManager = dutyManager;
+        mDutyTypeManager = dutyTypeManager;
         Timber.d("CREATED");
     }
 
     void onResume() {
-        mView.setDutyType(mDutyManager.getDutyType());
-        mDutyManager.addListener(mListener);
+        mView.setDutyType(mDutyTypeManager.getDutyType());
+        mDutyTypeManager.addListener(mListener);
     }
 
     void onPause() {
-        mDutyManager.removeListener(mListener);
+        mDutyTypeManager.removeListener(mListener);
     }
 
     public void onDestroy() {
@@ -38,6 +38,6 @@ public class DashboardPresenter {
     }
 
     long getDutyTypeTime(DutyType dutyType) {
-        return mDutyManager.getDutyTypeTime(dutyType);
+        return mDutyTypeManager.getDutyTypeTime(dutyType);
     }
 }

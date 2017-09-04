@@ -47,9 +47,6 @@ public class DashboardFragment extends BaseFragment implements DashboardView {
     @BindView(R.id.dashboard_cycle)
     DutyView mCycleDutyView;
 
-    @BindView(R.id.dashboard_layout)
-    View mLayout;
-
     @BindView(R.id.dashboard_indicator_layout)
     CardView mIndicatorView;
 
@@ -119,7 +116,7 @@ public class DashboardFragment extends BaseFragment implements DashboardView {
 
     @OnClick(R.id.dashboard_current)
     public void onDutyClick() {
-        mNavigateView.showDutyDialog();
+        mNavigateView.showDutyTypeDialog(mDutyType);
     }
 
     @OnClick(R.id.dashboard_indicator)
@@ -144,6 +141,7 @@ public class DashboardFragment extends BaseFragment implements DashboardView {
     }
 
     private void initTimer() {
+        //TODO: set timer for cycle when cycle time is read
         if (mDutyType != DutyType.OFF_DUTY && mDutyType != DutyType.PERSONAL_USE) {
             mHandler.post(mTimerTask);
         }

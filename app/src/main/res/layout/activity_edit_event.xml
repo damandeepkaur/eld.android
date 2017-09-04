@@ -53,7 +53,7 @@
                 android:layout_marginLeft="@dimen/default_margin"
                 android:layout_marginRight="@dimen/default_margin"
                 android:layout_marginBottom="@dimen/default_margin"
-                android:theme="@style/DriverProfileTheme.EditView"
+                android:theme="@style/TextInputEditText"
                 style="@style/Widget.AppCompat.Spinner.Underlined"/>
 
             <android.support.design.widget.TextInputLayout
@@ -66,7 +66,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/edit_event_address"
-                    style="@style/DriverProfileTheme.EditView.Disabled"
+                    style="@style/TextInputEditText.Disabled"
                     android:imeOptions="actionDone"/>
 
             </android.support.design.widget.TextInputLayout>
@@ -102,7 +102,7 @@
                     android:layout_height="wrap_content"
                     android:hint="@string/edit_event_comment"
                     android:maxLength="@integer/max_comment_length"
-                    style="@style/DriverProfileTheme.EditView"
+                    style="@style/TextInputEditText"
                     android:imeOptions="actionDone"/>
 
             </android.support.design.widget.TextInputLayout>

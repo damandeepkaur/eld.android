@@ -1,8 +1,9 @@
 package com.bsmwireless.screens.settings;
 
 import com.bsmwireless.common.dagger.ActivityScope;
-import com.bsmwireless.data.storage.DutyManager;
+import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.domain.interactors.SettingsInteractor;
+import com.bsmwireless.domain.interactors.UserInteractor;
 import com.bsmwireless.screens.common.menu.BaseMenuPresenter;
 import com.bsmwireless.screens.common.menu.BaseMenuView;
 
@@ -18,10 +19,11 @@ public class SettingsPresenter extends BaseMenuPresenter {
     private SettingsInteractor mSettingsInteractor;
 
     @Inject
-    public SettingsPresenter(SettingsView view, SettingsInteractor settingsInteractor, DutyManager dutyManager) {
+    public SettingsPresenter(SettingsView view, SettingsInteractor settingsInteractor, DutyTypeManager dutyTypeManager, UserInteractor userInteractor) {
         mView = view;
         mSettingsInteractor = settingsInteractor;
-        mDutyManager = dutyManager;
+        mDutyTypeManager = dutyTypeManager;
+        mUserInteractor = userInteractor;
         mDisposables = new CompositeDisposable();
 
         Timber.d("CREATED");

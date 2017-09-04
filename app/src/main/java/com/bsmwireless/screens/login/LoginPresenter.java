@@ -33,7 +33,7 @@ public class LoginPresenter {
         if (mUserInteractor.isLoginActive()) {
             mView.goToNavigationScreen();
         } else if (mUserInteractor.isRememberMeEnabled()) {
-            mView.loadUserData(mUserInteractor.getUserName(), mUserInteractor.getDomainName());
+            mView.loadUserData(mUserInteractor.getDriverName(), mUserInteractor.getDriverDomainName());
         }
     }
 
@@ -55,6 +55,7 @@ public class LoginPresenter {
             return;
         }
         mView.setLoginButtonEnabled(false);
+        mView.showProgressBar();
 
         Disposable disposable = mUserInteractor.loginUser(username, password, domain, keepToken, User.DriverType.DRIVER)
                 .subscribeOn(Schedulers.io())
@@ -70,6 +71,7 @@ public class LoginPresenter {
                                 mView.showErrorMessage(LoginView.Error.ERROR_UNEXPECTED);
                                 mView.setLoginButtonEnabled(true);
                             }
+                            mView.hideProgressBar();
                         },
                         error -> {
                             Timber.e("LoginUser error: %s", error);
@@ -77,6 +79,7 @@ public class LoginPresenter {
                                 mView.showErrorMessage((RetrofitException) error);
                             }
                             mView.setLoginButtonEnabled(true);
+                            mView.hideProgressBar();
                         }
                 );
         mDisposables.add(disposable);

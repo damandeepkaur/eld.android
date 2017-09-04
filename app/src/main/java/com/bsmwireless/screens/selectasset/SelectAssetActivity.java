@@ -1,9 +1,11 @@
 package com.bsmwireless.screens.selectasset;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -74,6 +76,10 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
     private SelectAssetAdapter mSearchAdapter;
     private SelectAssetAdapter mLastAdapter;
 
+    private AlertDialog mAlertDialog;
+
+    private boolean mIsBoxIdScanned = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -105,6 +111,7 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
         mSearchAdapter = new SelectAssetAdapter(view -> {
             int position = mSearchRecyclerView.getChildAdapterPosition(view);
             mPresenter.onVehicleListItemClicked(mSearchAdapter.getItem(position));
+            mIsBoxIdScanned = false;
         });
 
         LinearLayoutManager searchManager = new LinearLayoutManager(this);
@@ -185,6 +192,9 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
 
     @Override
     protected void onDestroy() {
+        if (mAlertDialog != null) {
+            mAlertDialog.dismiss();
+        }
         mPresenter.onDestroy();
         super.onDestroy();
     }
@@ -197,6 +207,7 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
             String type = data.getStringExtra(BARCODE_TYPE);
             Timber.v(barcodeId + " type:" + type);
             mSearchView.setQuery(barcodeId, false);
+            mIsBoxIdScanned = true;
 
         } else if (data != null && data.getBooleanExtra(BarcodeScannerActivity.IS_PERMISSION_ERROR, false)) {
             showErrorMessage(Error.ERROR_PERMISSION);
@@ -205,8 +216,12 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
 
     @Override
     public void setVehicleList(List<Vehicle> vehicles, String searchText) {
-        mSearchCardView.setVisibility(View.VISIBLE);
-        mSearchAdapter.setSearchList(vehicles, searchText);
+        if (!mIsBoxIdScanned) {
+            mSearchCardView.setVisibility(View.VISIBLE);
+            mSearchAdapter.setSearchList(vehicles, searchText);
+        } else {
+            mPresenter.onVehicleListItemClicked(vehicles.get(0));
+        }
     }
 
     @Override
@@ -245,6 +260,26 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
     }
 
     @Override
+    public void showConfirmationDialog() {
+        if (mAlertDialog != null) {
+            mAlertDialog.dismiss();
+        }
+
+        mAlertDialog = new AlertDialog.Builder(this)
+                .setCancelable(true)
+                .setTitle(R.string.select_asset_dialog_title)
+                .setMessage(R.string.select_asset_information_no_selected_assets)
+                .setPositiveButton(R.string.select_asset_continue, (dialog, which) -> {})
+                .setNegativeButton(R.string.select_asset_close, (dialog, which) -> onActionDone())
+                .show();
+    }
+
+    @Override
+    public void onActionDone() {
+        finish();
+    }
+
+    @Override
     public void showErrorMessage(Error error) {
         ViewUtils.hideSoftKeyboard(this);
 
@@ -252,6 +287,10 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
         switch (error) {
             case ERROR_PERMISSION:
                 id = R.string.barcode_scanner_error;
+                break;
+
+            case ERROR_BLACKBOX:
+                id = R.string.error_pair;
                 break;
 
             default:
@@ -262,6 +301,14 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
         mSnackBarLayout
                 .setMessage(getString(id))
                 .showSnackbar();
+    }
+
+    @Override
+    public void onBackPressed() {
+        mPresenter.onBackButtonPressed();
+        if (this.isFinishing()) {
+            super.onBackPressed();
+        }
     }
 
     @Override

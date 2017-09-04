@@ -9,6 +9,10 @@
     <string name="select_asset_find_nothing">Sorry we couldn\'t find anything</string>
     <string name="select_asset_characters">Enter at least 3 characters</string>
     <string name="select_asset_error">Select asset error</string>
+    <string name="select_asset_dialog_title">Nothing is selected</string>
+    <string name="select_asset_information_no_selected_assets">You didn\'t select any asset and tap on back button. Please tap Continue to keep working or Close to end your session now.</string>
+    <string name="select_asset_continue">Continue</string>
+    <string name="select_asset_close">Close</string>
 
     <!--Alerts-->
     <string name="eld_green">Green notification</string>
@@ -40,18 +44,7 @@
     <string name="error_username">Username Required</string>
     <string name="error_password">Password Required</string>
     <string name="error_domain">Domain Required</string>
-
-    <!--Logs-->
-    <string name="logs_sign_logsheet">SIGN LOGSHEET</string>
-    <string name="logs_events">EVENTS</string>
-    <string name="logs_trip_info">TRIP INFO</string>
-    <string name="logs_co_driver">Co-driver</string>
-    <string name="logs_on_duty_left">On duty left</string>
-    <string name="logs_drive">Drive</string>
-    <string name="logs_odometer">Odometer</string>
-    <string name="logs_mi_set">mi</string>
-    <string name="logs_km_set">km</string>
-
+    <string name="error_pair">Pair error</string>
 
     <!-- START OLD STRINGS -->
     <string name="no_network">No Network Available</string>
@@ -334,15 +327,17 @@
     <string name="show_location_alert_title">Address</string>
     <string name="show_location_alert_msg">Please enter your current location</string>
     <string name="str_inspectorView">INSPECTOR VIEW</string>
-    <string name="account_label">BSM Wireless</string>
+
     <string name="timer_default_time">00:00</string>
     <string name="timer_default_type">OFF DUTY</string>
     <string name="timer_hours_minutes">HOURS MINUTES</string>
     <string name="string_total">TOTAL</string>
-    <string name="select_asset_title">Select Asset</string>
+
     <!-- END OLD STRINGS -->
 
-    <string name="app_name">BSM Universal App</string>
+    <string name="account_label">BSM Wireless</string>
+    <string name="select_asset_title">Select Asset</string>
+    <string name="app_name">BSM Connect</string>
 
     <!-- Driver Profile -->
     <string name="driver_profile">Driver profile</string>
@@ -440,7 +435,9 @@
     <string name="edit_event_comment_error">Comment should not include special characters</string>
     <string name="edit_event_valid_comment">Valid comment</string>
 
-    <!-- Logs -->
+    <!--Logs-->
+    <string name="logs_log_header">log header</string>
+    <string name="logs_events">events</string>
     <string name="odometer">Odometer(%1$s)</string>
     <string name="add_event">Add event</string>
     <string name="edit">Edit</string>
@@ -452,16 +449,15 @@
     <string name="no_address_available">No address available</string>
     <string name="hours">hrs</string>
     <string name="minutes">mins</string>
-
     <string name="sign_dialog_title">Sign confirmation</string>
     <string name="sign_dialog_confirmation_text">Are you sure you want to sign this logsheet?</string>
     <string name="sign_dialog_visibility_note">Signed logsheets will be visible to supervisors</string>
     <string name="decline">decline</string>
     <string name="accept">accept</string>
+    <!--Logs Events-->
     <string name="event_changed">(CHANGED)</string>
-
     <string name="event_type_off_duty">Off Duty</string>
-    <string name="event_type_sleeping">Sleeping Berth</string>
+    <string name="event_type_sleeping">Sleeper Berth</string>
     <string name="event_type_driving">Driving</string>
     <string name="event_type_on_duty">On Duty</string>
     <string name="event_type_personal_use">Personal Use</string>
@@ -474,17 +470,49 @@
     <string name="event_type_shut_down">Shut Down</string>
     <string name="event_type_power_up">Power Up</string>
     <string name="event_type_unknown_type">Unknown event type</string>
-    <string name="event_type_personal_use_title">Off Duty (Personal Use)</string>
-    <string name="event_type_yard_moves_title">On Duty (Yard Moves)</string>
+    <string name="event_type_personal_use_title">Off Duty (Start of Personal Use)</string>
+    <string name="event_type_yard_moves_title">On Duty (Start of Yard Moves)</string>
+    <string name="event_type_personal_use_end_title">Off Duty (End of Personal Use)</string>
+    <string name="event_type_yard_moves_end_title">On Duty (End of Yard Moves)</string>
     <string name="update_event_error">Update event error</string>
     <string name="add_event_error">Add event error</string>
     <string name="event_added">Event added</string>
     <string name="event_updated">Event updated</string>
+    <!--Logs Log Header-->
+    <string name="log_header_time_zone">Time Zone</string>
+    <string name="log_header_driver_name">Driver name</string>
+    <string name="log_header_co_driver_s_name">Co-driver(s) name</string>
+    <string name="log_header_vehicle_name">Vehicle name</string>
+    <string name="log_header_vehicle_license">Vehicle license</string>
+    <string name="log_header_start_odometer">Start Odometer</string>
+    <string name="log_header_end_odometer">End Odometer</string>
+    <string name="log_header_distance_driven">Distance Driven</string>
+    <string name="log_header_carrier_name">Carrier Name</string>
+    <string name="log_header_home_terminal_name">Home Terminal Name</string>
+    <string name="log_header_home_terminal_address">Home Terminal Address</string>
+    <string name="log_header_trailers">Trailer(s)</string>
+    <string name="log_header_shipping_id">Shipping ID</string>
+    <string name="log_header_driving_exemptions">Driving Exemptions</string>
 
     <!-- Auto Logout Activity -->
-    <string name="auto_logout_message_alert_dialog">Do you want to proceed with logout?</string>
-    <string name="auto_logout_positive_button_lbl_alert_dialog">Logout</string>
-    <string name="auto_logout_cancel_button_lbl_alert_dialog">Cancel</string>
+    <string name="logout_dialog_title">Expiration Warning</string>
+    <string name="logout_dialog_message">Your session will expire in 1 minutes. Please tap "Continue" to keep working or "Log out" to end your session now</string>
+    <string name="logout_accept">Continue</string>
+    <string name="logout_cancel">Log out</string>
+
+    <string name="driving_dialog_title">Confirmation required</string>
+    <string name="driving_dialog_message">You are still in Personal Use (Off Duty) mode. Please confirm your status or switch to the proper duty status.</string>
+    <string name="driving_cancel">Switch to Driving</string>
+    <string name="driving_accept">Confirm</string>
+
+    <string name="on_duty_dialog_title">Confirmation required</string>
+    <string name="on_duty_dialog_message">Your vehicle hasn\'t been in-motion for 5 minutes. Please confirm your driving status or switch to the proper duty status.</string>
+    <string name="on_duty_cancel">Switch to On Duty</string>
+    <string name="on_duty_accept">Confirm</string>
+
+    <string name="not_in_vehicle_dialog_title">Warning</string>
+    <string name="not_in_vehicle_dialog_message">You can\'t change duty status while not in vehicle.</string>
+    <string name="not_in_vehicle_accept">OK</string>
 
     <!-- Settings Activity -->
     <string name="settings">Settings</string>
@@ -516,5 +544,61 @@
         <item>14 days</item>
     </string-array>
     <string name="multiday_total_hours">Total hours</string>
+    
+    <!-- Lock screen -->
+    <string name="lock_screen_switch_co_driver_message">You can switch to co-driver view to continue work in application</string>
+    <string name="switch_to_co_driver_view">SWITCH TO CO-DRIVER VIEW</string>
+
+    <!-- Geo location enum direction description -->
+    <string name="geo_location_at_description">At indicated geo-location</string>
+    <string name="geo_location_north_description">North of indicated geo-location</string>
+    <string name="geo_location_north_north_east_description">North – North East of indicated geo-location</string>
+    <string name="geo_location_north_east_description">North East of indicated geo-location</string>
+    <string name="geo_location_east_north_east_description">East – North East of indicated geo-location</string>
+    <string name="geo_location_east_description">East of indicated geo-location</string>
+    <string name="geo_location_east_south_east_description">East – South East of indicated geo-location</string>
+    <string name="geo_location_south_east_description">South East of indicated geo-location</string>
+    <string name="geo_location_south_south_east_description">South – South East of indicated geo-location</string>
+    <string name="geo_location_south_description">South of indicated geo-location</string>
+    <string name="geo_location_south_south_west_description">South – South West of indicated geo-location</string>
+    <string name="geo_location_south_west_description">South West of indicated geo-location</string>
+    <string name="geo_location_west_south_west_description">West – South West of indicated geo-location</string>
+    <string name="geo_location_west_description">West of indicated geo-location</string>
+    <string name="geo_location_west_north_west_description">West – North West of indicated geo-location</string>
+    <string name="geo_location_north_west_description">North West of indicated geo-location</string>
+    <string name="geo_location_north_north_west_description">North – North West of indicated geo-location</string>
+
+    <!-- Geo location enum direction codes -->
+    <string name="geo_location_at_code">&#160;</string>
+    <string name="geo_location_north_code">N</string>
+    <string name="geo_location_north_north_east_code">NNE</string>
+    <string name="geo_location_north_east_code">NE</string>
+    <string name="geo_location_east_north_east_code">ENE</string>
+    <string name="geo_location_east_code">E</string>
+    <string name="geo_location_east_south_east_code">ESE</string>
+    <string name="geo_location_south_east_code">SE</string>
+    <string name="geo_location_south_south_east_code">SSE</string>
+    <string name="geo_location_south_code">S</string>
+    <string name="geo_location_south_south_west_code">SSW</string>
+    <string name="geo_location_south_west_code">SW</string>
+    <string name="geo_location_west_south_west_code">WSW</string>
+    <string name="geo_location_west_code">W</string>
+    <string name="geo_location_west_north_west_code">WNW</string>
+    <string name="geo_location_north_west_code">NW</string>
+    <string name="geo_location_north_north_west_code">NNW</string>
+
+    <!-- Switch co-driver -->
+    <string name="switch_driver">Switch driver</string>
+    <string name="switch_driver_log_in">Login</string>
+    <string name="switch_driver_cancel">Cancel</string>
+    <string name="switch_driver_log_out">Log out</string>
+    <string name="switch_driver_add_co_driver">Add co-driver</string>
+    <string name="switch_driver_driver_seat">Driver\'s seat</string>
+    <string name="switch_driver_co_drivers">Co-drivers</string>
+    <string name="switch_driver_co_driver_log_out">Driver Log out</string>
+    <string name="switch_driver_confirm_driver_seat">Confirm</string>
+    <string name="switch_driver_invalid_credentials">Invalid credentials</string>
+    <string name="switch_driver_error_login_codriver">Co-driver was not logged in</string>
+    <string name="switch_driver_login_error">Login error</string>
 
 </resources>

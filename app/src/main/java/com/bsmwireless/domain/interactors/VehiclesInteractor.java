@@ -1,10 +1,10 @@
 package com.bsmwireless.domain.interactors;
 
 import com.bsmwireless.common.Constants;
+import com.bsmwireless.common.utils.ListConverter;
 import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.PreferencesManager;
-import com.bsmwireless.common.utils.ListConverter;
 import com.bsmwireless.data.storage.vehicles.VehicleConverter;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.Vehicle;
@@ -67,16 +67,21 @@ public class VehiclesInteractor {
             if (!next.equals(vehicleId)) {
                 builder.append(",");
                 builder.append(next);
-                count ++;
+                count++;
             }
         }
 
         mAppDatabase.userDao().setUserLastVehicles(driverId, builder.toString());
+        mAppDatabase.userDao().setUserLastVehicles(driverId, builder.toString());
     }
 
-    public Flowable<List<Vehicle>> getVehiclesFromDB(List<Integer> vehicleIds){
+    public Flowable<List<Vehicle>> getVehiclesFromDB(List<Integer> vehicleIds) {
         return mAppDatabase.vehicleDao().getVehicles(vehicleIds)
                 .map(VehicleConverter::toVehicle);
+    }
+
+    public Vehicle getVehicle(Integer vehicleId) {
+        return VehicleConverter.toVehicle(mAppDatabase.vehicleDao().getVehicleSync(vehicleId));
     }
 
     public Completable cleanSelectedVehicle() {
@@ -91,27 +96,26 @@ public class VehiclesInteractor {
         ELDEvent event = new ELDEvent();
         int id = mUserInteractor.getDriverId();
 
-        //TODO: get real data for hos
-        event.setEngineHours(50);
-
         event.setMobileTime(System.currentTimeMillis());
         event.setDriverId(id);
         event.setVehicleId(vehicle.getId());
         event.setBoxId(vehicle.getBoxId());
 
-        return mBlackBoxInteractor.getData()
+        return mBlackBoxInteractor.getData(vehicle.getBoxId())
                 .doOnNext(blackBox -> saveVehicle(vehicle))
                 .flatMap(blackBox -> {
                     event.setTimezone(mUserInteractor.getTimezoneSync(id));
                     event.setOdometer(blackBox.getOdometer());
                     event.setLat(blackBox.getLat());
                     event.setLng(blackBox.getLon());
+                    event.setEngineHours(blackBox.getEngineHours());
+                    event.setComment(mBlackBoxInteractor.getVinNumber());
 
                     return mServiceApi.pairVehicle(event);
                 })
                 .doOnNext(events -> {
                     saveLastVehicle(id, vehicle.getId());
-                    mELDEventsInteractor.storeEvents(events, true);
+                    mELDEventsInteractor.storeUnidentifiedEvents(events);
                 })
                 .doOnError(error -> cleanSelectedVehicle().blockingAwait());
     }

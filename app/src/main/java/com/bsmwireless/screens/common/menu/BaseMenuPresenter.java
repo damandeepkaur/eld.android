@@ -1,8 +1,11 @@
 package com.bsmwireless.screens.common.menu;
 
-import com.bsmwireless.data.storage.DutyManager;
+import com.bsmwireless.data.storage.AccountManager;
+import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
+import com.bsmwireless.domain.interactors.UserInteractor;
 import com.bsmwireless.widgets.alerts.DutyType;
+import com.bsmwireless.widgets.alerts.OccupancyType;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -10,21 +13,27 @@ import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
 public abstract class BaseMenuPresenter {
-    protected DutyManager mDutyManager;
+    protected DutyTypeManager mDutyTypeManager;
+    protected AccountManager mAccountManager;
     protected ELDEventsInteractor mEventsInteractor;
+    protected UserInteractor mUserInteractor;
     protected CompositeDisposable mDisposables;
 
-    private DutyManager.DutyTypeListener mListener = dutyType -> getView().setDutyType(dutyType);
+    private DutyTypeManager.DutyTypeListener mListener = dutyType -> getView().setDutyType(dutyType);
 
     protected abstract BaseMenuView getView();
 
     void onMenuCreated() {
-        mDutyManager.addListener(mListener);
+        mDutyTypeManager.addListener(mListener);
+        mDisposables.add(mUserInteractor.getCoDriversNumber()
+                                        .subscribeOn(Schedulers.io())
+                                        .observeOn(AndroidSchedulers.mainThread())
+                                        .subscribe(count -> getView().setOccupancyType(OccupancyType.getTypeById(count))));
     }
 
     void onDutyChanged(DutyType dutyType) {
         // don't set the same type
-        if (dutyType != mDutyManager.getDutyType()) {
+        if (dutyType != mDutyTypeManager.getDutyType()) {
             mDisposables.add(mEventsInteractor.postNewDutyTypeEvent(dutyType)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeOn(Schedulers.io())
@@ -36,10 +45,22 @@ public abstract class BaseMenuPresenter {
         }
     }
 
+    public void onChangeDutyClick() {
+        if (mEventsInteractor.isConnected()) {
+            getView().showDutyTypeDialog(mDutyTypeManager.getDutyType());
+        } else {
+            getView().showNotInVehicleDialog();
+        }
+    }
+
     public void onDestroy() {
-        mDutyManager.removeListener(mListener);
+        mDutyTypeManager.removeListener(mListener);
         mDisposables.dispose();
 
         Timber.d("DESTROYED");
+    }
+
+    public boolean isUserDriver() {
+        return mUserInteractor.isUserDriver();
     }
 }

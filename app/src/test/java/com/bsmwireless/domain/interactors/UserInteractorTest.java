@@ -2,6 +2,7 @@ package com.bsmwireless.domain.interactors;
 
 import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.network.authenticator.TokenManager;
+import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.data.storage.carriers.CarrierDao;
@@ -10,7 +11,6 @@ import com.bsmwireless.data.storage.users.FullUserEntity;
 import com.bsmwireless.data.storage.users.UserDao;
 import com.bsmwireless.data.storage.users.UserEntity;
 import com.bsmwireless.models.Auth;
-import com.bsmwireless.models.BlackBoxModel;
 import com.bsmwireless.models.Carrier;
 import com.bsmwireless.models.DriverHomeTerminal;
 import com.bsmwireless.models.DriverProfileModel;
@@ -44,8 +44,8 @@ import io.reactivex.observers.TestObserver;
 import io.reactivex.subscribers.TestSubscriber;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -144,6 +144,9 @@ public class UserInteractorTest {
     @Mock
     ResponseMessage mResponseMessage;
 
+    @Mock
+    AccountManager mAccountManager;
+
 
     private UserInteractor mLoginUserInteractor;
 
@@ -155,7 +158,7 @@ public class UserInteractorTest {
         MockitoAnnotations.initMocks(this);
 
 
-        mLoginUserInteractor = new UserInteractor(mServiceApi, mPreferencesManager, mAppDatabase, mTokenManager, mBlackBoxInteractor);
+        mLoginUserInteractor = new UserInteractor(mServiceApi, mPreferencesManager, mAppDatabase, mTokenManager, mAccountManager);
     }
 
     /**
@@ -191,9 +194,14 @@ public class UserInteractorTest {
                 .subscribe(testObserver);
 
         // then
-        verify(mPreferencesManager).setAccountName(anyString());
         verify(mPreferencesManager).setRememberUserEnabled(eq(mKeepToken));
-        verify(mPreferencesManager).setShowHomeScreenEnabled(any(Boolean.class));
+        verify(mPreferencesManager).setShowHomeScreenEnabled(eq(true));
+
+        verify(mAccountManager).setCurrentDriver(anyInt(), anyString());
+        verify(mAccountManager).setCurrentUser(anyInt(), anyString());
+
+        verify(mTokenManager).setToken(anyString(), eq(mName), eq(mDomain), any(Auth.class));
+
         verify(mUserDao).insertUser(any(UserEntity.class));
     }
 
@@ -319,65 +327,55 @@ public class UserInteractorTest {
         when(mServiceApi.loginUser(any(LoginModel.class))).thenReturn(Observable.just(user));
 
         // when
-
         mLoginUserInteractor.loginUser(mName, mPassword, mDomain, mKeepToken, mDriverType)
                 .subscribe(testObserver);
 
         // then
-        verify(mPreferencesManager).setAccountName(anyString());
-
         verify(mPreferencesManager).setRememberUserEnabled(eq(mKeepToken));
+        verify(mPreferencesManager).setShowHomeScreenEnabled(eq(true));
+
+        verify(mAccountManager).setCurrentDriver(anyInt(), anyString());
+        verify(mAccountManager).setCurrentUser(anyInt(), anyString());
+
         verify(mTokenManager).setToken(anyString(), eq(mName), eq(mDomain), any(Auth.class));
     }
 
 
     @Test
-    public void testLogoutUserSuccessNoRemember() {
+    public void testDeleteUserSuccessNoRemember() {
         // given
         final String accountName = "mock account name";
         final String driver = "90210"; // parsable to int
         final int driverInt = 90210; // int version of driver
 
-        TestObserver<Boolean> isLogoutTestObserver = new TestObserver<>();
-        BlackBoxModel blackBoxModel = new BlackBoxModel();
-
-        when(mPreferencesManager.getAccountName()).thenReturn(accountName);
+        when(mPreferencesManager.getDriverAccountName()).thenReturn(accountName);
         when(mTokenManager.getDriver(anyString())).thenReturn(driver);
-        when(mBlackBoxInteractor.getData()).thenReturn(Observable.just(blackBoxModel));
         when(mAppDatabase.userDao()).thenReturn(mUserDao);
 
         when(mPreferencesManager.isRememberUserEnabled()).thenReturn(false);
         when(mServiceApi.logout(any(ELDEvent.class))).thenReturn(Observable.just(mResponseMessage));
         when(mResponseMessage.getMessage()).thenReturn(mSuccessResponse);
 
+        when(mAccountManager.getCurrentDriverAccountName()).thenReturn(accountName);
+
         // when
-        Observable<Boolean> isLogout = mLoginUserInteractor.logoutUser();
-        isLogout.subscribeWith(isLogoutTestObserver);
+        mLoginUserInteractor.deleteDriver();
 
         // then
-        verify(mServiceApi).logout(any(ELDEvent.class));
         verify(mUserDao).deleteUser(eq(driverInt));
         verify(mTokenManager).removeAccount(eq(accountName));
         verify(mPreferencesManager).clearValues();
-        verify(mServiceApi).logout(argThat(mEldEventLogoutCodeMatcher)); // validates ELD logout event against ELD 7.20 Table 6
-        verify(mServiceApi).logout(argThat(mEldEventActiveStatusCodeMatcher)); // validates ELD 7.23
-        verify(mServiceApi).logout(argThat(mEldEventDriverEditOriginCodeMatcher)); // validates ELD 7.22
-        isLogoutTestObserver.assertResult(true);
     }
 
     @Test
-    public void testLogoutUserSuccessRemember() {
+    public void testDeleteUserSuccessRemember() {
         // given
         final String accountName = "mock account name";
         final String driver = "90210"; // parsable to int
         final String fakeToken = "314159265";
 
-        TestObserver<Boolean> isLogoutTestObserver = new TestObserver<>();
-        BlackBoxModel blackBoxModel = new BlackBoxModel();
-
-        when(mPreferencesManager.getAccountName()).thenReturn(accountName);
+        when(mPreferencesManager.getDriverAccountName()).thenReturn(accountName);
         when(mTokenManager.getDriver(anyString())).thenReturn(driver);
-        when(mBlackBoxInteractor.getData()).thenReturn(Observable.just(blackBoxModel));
         when(mAppDatabase.userDao()).thenReturn(mUserDao);
         when(mTokenManager.getToken(anyString())).thenReturn(fakeToken);
 
@@ -386,51 +384,19 @@ public class UserInteractorTest {
         when(mResponseMessage.getMessage()).thenReturn(mSuccessResponse);
 
         // when
-        Observable<Boolean> isLogout = mLoginUserInteractor.logoutUser();
-        isLogout.subscribeWith(isLogoutTestObserver);
+        mLoginUserInteractor.deleteDriver();
 
         // then
-        verify(mServiceApi).logout(any(ELDEvent.class));
         verify(mTokenManager).clearToken(eq(fakeToken));
-        verify(mServiceApi).logout(argThat(mEldEventLogoutCodeMatcher)); // validates ELD logout event against ELD 7.20 Table 6
-        verify(mServiceApi).logout(argThat(mEldEventActiveStatusCodeMatcher)); // validates ELD 7.23
-        verify(mServiceApi).logout(argThat(mEldEventDriverEditOriginCodeMatcher)); // validates ELD 7.22
-        isLogoutTestObserver.assertResult(true);
-    }
-
-    @Test
-    public void testLogoutUserFailure() {
-        // given
-        ResponseMessage failMessage = new ResponseMessage();
-        failMessage.setMessage("not success");  // at this time, anything but "ACK"
-
-        BlackBoxModel fakeBlackBoxModel = new BlackBoxModel();
-
-        when(mServiceApi.logout(any(ELDEvent.class))).thenReturn(Observable.just(failMessage));
-        when(mPreferencesManager.isRememberUserEnabled()).thenReturn(false); // either is ok
-        when(mBlackBoxInteractor.getData()).thenReturn(Observable.just(fakeBlackBoxModel));
-        when(mAppDatabase.userDao()).thenReturn(mUserDao);
-        when(mUserDao.getUserTimezoneSync(any(Integer.class))).thenReturn("Etc/UTC");
-
-        TestObserver<Boolean> testObserver = TestObserver.create();
-
-        // when
-        mLoginUserInteractor.logoutUser().subscribe(testObserver);
-
-        // then
-        testObserver.assertResult(false);
-        verify(mServiceApi).logout(argThat(mEldEventLogoutCodeMatcher)); // validates ELD logout event against ELD 7.20 Table 6
-        verify(mServiceApi).logout(argThat(mEldEventActiveStatusCodeMatcher)); // validates ELD 7.23
-        verify(mServiceApi).logout(argThat(mEldEventDriverEditOriginCodeMatcher)); // validates ELD 7.22
     }
 
     @Test
     public void testSyncDriverProfileInvalidUserId() {
         // given
-        User user1 = new User();
+        UserEntity user1 = new UserEntity();
         user1.setId(-1); // negative
 
-        User user2 = new User();
+        UserEntity user2 = new UserEntity();
         user2.setId(0); // boundary
 
         TestObserver<Boolean> testObserver1 = TestObserver.create();
@@ -458,7 +424,7 @@ public class UserInteractorTest {
     @Test
     public void testSyncDriverProfileApiFailed() {
         // given
-        User user = new User();
+        UserEntity user = new UserEntity();
         user.setId(12345);
 
         ResponseMessage responseMessage = new ResponseMessage();
@@ -487,7 +453,7 @@ public class UserInteractorTest {
     @Test
     public void testSyncDriverProfileApiError() {
         // given
-        User user = new User();
+        UserEntity user = new UserEntity();
         user.setId(12345);
 
         String fakeErrorMessage = "sorry.";
@@ -518,7 +484,7 @@ public class UserInteractorTest {
     @Test
     public void testSyncDriverProfileSuccess() {
         // given
-        User user = new User();
+        UserEntity user = new UserEntity();
         user.setId(12345);
 
         ResponseMessage responseMessage = new ResponseMessage();
@@ -815,7 +781,7 @@ public class UserInteractorTest {
         TestSubscriber<String> testSubscriber = TestSubscriber.create();
 
         // when
-        mLoginUserInteractor.getFullName().subscribe(testSubscriber);
+        mLoginUserInteractor.getFullDriverName().subscribe(testSubscriber);
 
         // then
         testSubscriber.assertResult(expected1);
@@ -834,7 +800,7 @@ public class UserInteractorTest {
         // n/a
 
         // when
-        mLoginUserInteractor.getDomainName();
+        mLoginUserInteractor.getDriverDomainName();
 
         // then
         verify(mTokenManager).getDomain(anyString());
@@ -848,7 +814,7 @@ public class UserInteractorTest {
         when(mAppDatabase.userDao()).thenReturn(mUserDao);
         when(mUserDao.getUser(any(Integer.class))).thenReturn(Flowable.just(new UserEntity()));
 
-        TestSubscriber<UserEntity> testSubscriber = TestSubscriber.create();
+        TestSubscriber<User> testSubscriber = TestSubscriber.create();
 
         // when
         mLoginUserInteractor.getUser().subscribe(testSubscriber);
@@ -869,7 +835,7 @@ public class UserInteractorTest {
         TestSubscriber<FullUserEntity> testSubscriber = TestSubscriber.create();
 
         // when
-        mLoginUserInteractor.getFullUser().subscribe(testSubscriber);
+        mLoginUserInteractor.getFullDriver().subscribe(testSubscriber);
 
         // then
         verify(mUserDao).getFullUser(any(Integer.class));
@@ -951,7 +917,7 @@ public class UserInteractorTest {
      * Used in tests to prevent exceptions, and only when return value does not matter.
      */
     private void mockGetDriverId() {
-        when(mPreferencesManager.getAccountName()).thenReturn("fake account");
+        when(mPreferencesManager.getDriverAccountName()).thenReturn("fake account");
         when(mTokenManager.getDriver(anyString())).thenReturn("12222"); // fake driver id
     }
 
