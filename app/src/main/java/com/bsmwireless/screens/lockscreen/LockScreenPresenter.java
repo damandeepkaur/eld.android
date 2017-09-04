@@ -5,15 +5,19 @@ import com.bsmwireless.data.network.blackbox.BlackBox;
 import com.bsmwireless.data.network.blackbox.BlackBoxConnectionManager;
 import com.bsmwireless.data.network.blackbox.models.BlackBoxResponseModel;
 import com.bsmwireless.data.storage.DutyTypeManager;
+import com.bsmwireless.models.BlackBoxModel;
 import com.bsmwireless.widgets.alerts.DutyType;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import dagger.Lazy;
+import io.reactivex.Completable;
+import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -26,25 +30,36 @@ public class LockScreenPresenter {
 
     final LockScreenView mView;
     final DutyTypeManager mDutyManager;
-    final AtomicLong drivingTime;
     final Lazy<BlackBoxConnectionManager> connectionManager;
     private final CompositeDisposable mCompositeDisposable;
     private final BlackBox blackBox;
     private final long blackBoxTimeoutMillis;
+    private final long mIdlingTimeoutMillis;
+    private volatile CurrentWork currentWork;
+    private final AtomicReference<Maybe<BlackBoxModel>> generalMonitoringReference;
+    private final AtomicReference<Completable> reconnectionReference;
+    private final AtomicReference<Completable> idleMonitoringCompletableReference;
+    private final AtomicReference<Maybe<BlackBoxModel>> monitoringDrivingReference;
 
     @Inject
     public LockScreenPresenter(LockScreenView view,
                                DutyTypeManager dutyManager,
                                Lazy<BlackBoxConnectionManager> connectionManager,
                                BlackBox blackBox,
-                               long blackBoxTimeoutMillis) {
+                               @Named("disconnectTimeout") long blackBoxTimeoutMillis,
+                               @Named("idleTimeout") long idlingTimeout) {
         mView = view;
         mDutyManager = dutyManager;
         this.connectionManager = connectionManager;
         this.blackBox = blackBox;
         this.blackBoxTimeoutMillis = blackBoxTimeoutMillis;
+        this.mIdlingTimeoutMillis = idlingTimeout;
         mCompositeDisposable = new CompositeDisposable();
-        drivingTime = new AtomicLong(0);
+        currentWork = CurrentWork.NOTHING;
+        generalMonitoringReference = new AtomicReference<>();
+        reconnectionReference = new AtomicReference<>();
+        idleMonitoringCompletableReference = new AtomicReference<>();
+        monitoringDrivingReference = new AtomicReference<>();
     }
 
     public void onStart() {
@@ -72,35 +87,75 @@ public class LockScreenPresenter {
     }
 
     private void startTimer() {
-        final Disposable disposable = Observable.interval(1000, TimeUnit.MILLISECONDS)
-                .map(interval -> {
-                    final long dutyTypeTime = mDutyManager.getDutyTypeTime(DutyType.DRIVING);
-                    drivingTime.set(interval);
-                    return dutyTypeTime;
-                })
+        final Disposable disposable = Observable.interval(1, TimeUnit.SECONDS)
+                .map(interval -> mDutyManager.getDutyTypeTime(DutyType.DRIVING))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(mView::setCurrentTime, throwable -> Timber.d(throwable, "Timer error"));
         mCompositeDisposable.add(disposable);
     }
 
+    /**
+     * Start the monitoring statuses task.
+     */
     void startMonitoring() {
-        final Disposable disposable = blackBox.getDataObservable()
-                .filter(blackBoxModel -> blackBoxModel.getResponseType() == BlackBoxResponseModel.ResponseType.IGNITION_OFF
-                        || blackBoxModel.getResponseType() == BlackBoxResponseModel.ResponseType.STOPPED) // TODO: Check this filter
-                .subscribeOn(Schedulers.io())
-                .firstElement()
-                .observeOn(AndroidSchedulers.mainThread())
+
+        switch (currentWork) {
+            case NOTHING:
+            case GENERAL_MONITORING:
+                startGeneralMonitoring();
+                break;
+
+            case DRIVING_MONITORING:
+                startMonitoringDriving();
+                break;
+
+            case IDLE_MONITORING:
+                startIdlingMonitoring();
+                break;
+
+            case RECONNECTING:
+                startReconnection();
+                break;
+
+            default:
+                throw new IllegalStateException("Unknown current work's type - " + currentWork);
+        }
+    }
+
+    void startGeneralMonitoring() {
+        Maybe<BlackBoxModel> maybe = generalMonitoringReference.get();
+        if (maybe == null) {
+            maybe = blackBox.getDataObservable()
+                    .filter(blackBoxModel ->
+                            blackBoxModel.getResponseType() == BlackBoxResponseModel.ResponseType.IGNITION_OFF
+                                    || blackBoxModel.getResponseType() == BlackBoxResponseModel.ResponseType.STOPPED) // TODO: Check this filter
+                    .firstElement()
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .cache();
+            if (!generalMonitoringReference.compareAndSet(null, maybe)) {
+                maybe = generalMonitoringReference.get();
+            }
+        }
+
+        final Disposable disposable = maybe
+                .doOnSubscribe(disposable1 -> {  // must be lower subscribeOn() in the current chain
+                    mView.removeAnyPopup();
+                    currentWork = CurrentWork.GENERAL_MONITORING;
+                })
+                .doFinally(() -> generalMonitoringReference.set(null))
                 .subscribe(blackBoxModel -> {
 
                     switch (blackBoxModel.getResponseType()) {
                         case IGNITION_OFF:
-                            // change duty status to on duty- popup is there on screen that ignition off is detected do you want to go off duty- on-duty
-                            mView.showIgnitionOfDetectedDialog();
-                            startMonitoringAnyStatus();
+                            // change duty status to on duty- popup is there on screen that ignition
+                            // off is detected do you want to go off duty- on-duty
+                            mView.showIgnitionOffDetectedDialog();
+                            startMonitoringDriving();
                             break;
 
                         case STOPPED:
-                            // idling for 5 minutes triggers unlock of screen with on duty status.(no popup) .
+                            // idling for X minutes triggers unlock off screen with on duty status.(no popup)
                             startIdlingMonitoring();
                             break;
 
@@ -109,40 +164,116 @@ public class LockScreenPresenter {
                     }
 
                 }, throwable -> {
-                    Timber.e(throwable, "Error getting a black box data");
+                    Timber.e(throwable, "Error getting a black box's data");
                     startReconnection();
-                });
+                }, mView::closeLockScreen); // BB is disconnected
         mCompositeDisposable.add(disposable);
     }
 
+    /**
+     * Try to reconnect. If done success start new monitoring task again.
+     * If connection is not established show popup and start
+     */
     void startReconnection() {
 
+        Completable reconnectCompletable = reconnectionReference.get();
+        if (reconnectCompletable == null) {
+            reconnectCompletable = connectionManager.get().connectBlackBox(1)
+                    .toCompletable()
+                    .timeout(blackBoxTimeoutMillis, TimeUnit.MILLISECONDS)
+                    .onErrorResumeNext(throwable -> {
+                        if (throwable instanceof TimeoutException) {
+                            // If timeout is occurs show disconnection popup and continue monitoring
+                            return Completable.fromAction(mView::showDisconnectionPopup)
+                                    .observeOn(Schedulers.io())
+                                    .subscribeOn(AndroidSchedulers.mainThread())
+                                    .andThen(connectionManager.get().connectBlackBox(1))
+                                    .toCompletable();
+                        }
+                        return Completable.error(throwable);
+                    });
+            if (!reconnectionReference.compareAndSet(null, reconnectCompletable)) {
+                reconnectCompletable = reconnectionReference.get();
+            }
+        }
+
+
+        final Disposable disposable = reconnectCompletable
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe(unused -> currentWork = CurrentWork.RECONNECTING)
+                .doFinally(() -> reconnectionReference.set(null))
+                .subscribe(this::startMonitoring,
+                        throwable -> mView.closeLockScreen());
+        mCompositeDisposable.add(disposable);
     }
 
     /**
-     * Detect any status from black box except {@link com.bsmwireless.data.network.blackbox.models.BlackBoxResponseModel.ResponseType#STOPPED}
+     * Detect any status from black box except
+     * {@link com.bsmwireless.data.network.blackbox.models.BlackBoxResponseModel.ResponseType#STOPPED}
      * If that status will be emitted start main monitoring again.
      * Closes the Lock Screen if timeout occurs
      */
     void startIdlingMonitoring() {
-        blackBox.getDataObservable()
-                .filter(blackBoxModel -> blackBoxModel.getResponseType() != BlackBoxResponseModel.ResponseType.STOPPED)
-                .timeout(blackBoxTimeoutMillis, TimeUnit.MILLISECONDS)
-                .firstElement()
-                .ignoreElement()
+
+        Completable idleCompletable = idleMonitoringCompletableReference.get();
+        if (idleCompletable == null) {
+
+            idleCompletable = blackBox.getDataObservable()
+                    .filter(blackBoxModel -> blackBoxModel.getResponseType()
+                            != BlackBoxResponseModel.ResponseType.STOPPED)
+                    .timeout(mIdlingTimeoutMillis, TimeUnit.MILLISECONDS)
+                    .firstElement()
+                    .ignoreElement();
+
+            if (!idleMonitoringCompletableReference.compareAndSet(null, idleCompletable)) {
+                idleCompletable = idleMonitoringCompletableReference.get();
+            }
+        }
+
+        final Disposable disposable = idleCompletable
                 .subscribeOn(Schedulers.io())
-                .subscribe(this::startMonitoring,
+                .doOnSubscribe(unused -> currentWork = CurrentWork.IDLE_MONITORING)
+                .doFinally(() -> idleMonitoringCompletableReference.set(null))
+                .subscribe(this::startGeneralMonitoring, // getting a new status, start monitoring again
                         throwable -> {
                             if (throwable instanceof TimeoutException) {
+                                // Didn't receive any new statuses from BB. Close the screen.
                                 mView.closeLockScreen();
                             } else {
+                                // Unknown error
                                 // what should we do in this case?
                                 Timber.d(throwable, "Idling status error");
                             }
                         });
+        mCompositeDisposable.add(disposable);
     }
 
-    void startMonitoringAnyStatus() {
+    void startMonitoringDriving() {
 
+        Maybe<BlackBoxModel> drivingCompletable = monitoringDrivingReference.get();
+        if (drivingCompletable == null) {
+
+            drivingCompletable = blackBox.getDataObservable()
+                    .filter(blackBoxModel -> blackBoxModel.getResponseType() == BlackBoxResponseModel.ResponseType.MOVING)
+                    .firstElement();
+
+            if (!monitoringDrivingReference.compareAndSet(null, drivingCompletable)) {
+                drivingCompletable = monitoringDrivingReference.get();
+            }
+        }
+
+        final Disposable disposable = drivingCompletable
+                .doOnSubscribe(unused -> currentWork = CurrentWork.DRIVING_MONITORING)
+                .doFinally(() -> monitoringDrivingReference.set(null))
+                .subscribe(
+                        blackBoxModel -> startGeneralMonitoring(),
+                        throwable -> Timber.d(throwable, "Error monitoring MOVING status"),
+                        mView::closeLockScreen);// Data observable was completed for any reason. Close lock screen
+        mCompositeDisposable.add(disposable);
+    }
+
+    private enum CurrentWork {
+        GENERAL_MONITORING, RECONNECTING, DRIVING_MONITORING, IDLE_MONITORING, NOTHING
     }
 }

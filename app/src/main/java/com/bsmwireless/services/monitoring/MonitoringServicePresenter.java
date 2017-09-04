@@ -25,7 +25,6 @@ public class MonitoringServicePresenter {
         monitoringDisposable = Disposables.disposed();
     }
 
-
     public void stopMonitoring() {
         Timber.d("Stop monitoring");
         monitoringDisposable.dispose();
@@ -36,6 +35,7 @@ public class MonitoringServicePresenter {
 
         if (!monitoringDisposable.isDisposed()) {
             Timber.d("Monitoring already running. Return from function");
+            return;
         }
 
         // TODO: 31.08.2017 Need to check current driver
@@ -44,7 +44,7 @@ public class MonitoringServicePresenter {
                 .subscribeOn(Schedulers.io())
                 .filter(blackBoxModel -> BlackBoxResponseModel.ResponseType.MOVING
                         .equals(blackBoxModel.getResponseType()))
-                .firstElement()
+                .firstOrError()
                 .subscribe(blackBoxModel -> mView.startLockScreen(),
                         throwable -> Timber.d(throwable, "Monitoring status error"));
     }

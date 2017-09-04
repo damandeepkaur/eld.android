@@ -8,7 +8,11 @@ public interface LockScreenView {
 
     void openCoDriverDialog();
 
-    void showIgnitionOfDetectedDialog();
+    void showIgnitionOffDetectedDialog();
 
     void closeLockScreen();
+
+    void removeAnyPopup();
+
+    void showDisconnectionPopup();
 }

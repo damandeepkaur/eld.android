@@ -6,11 +6,14 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import com.bsmwireless.common.App;
 import com.bsmwireless.screens.common.BaseActivity;
 import com.bsmwireless.widgets.alerts.DutyType;
 import com.bsmwireless.widgets.dashboard.DutyView;
+
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
@@ -51,7 +54,12 @@ public class LockScreenActivity extends BaseActivity implements LockScreenView {
 
         setContentView(R.layout.activity_lock_screen);
         ButterKnife.bind(this);
-        App.getComponent().lockScreenBuilder().view(this).build().inject(this);
+        App.getComponent().lockScreenBuilder()
+                .view(this)
+                .disconnectionTimeout(TimeUnit.MINUTES.toMillis(5))
+                .idleTimeout(TimeUnit.MINUTES.toMillis(3))
+                .build()
+                .inject(this);
         mCurrentDutyView.setCanChangingSatusView(false);
     }
 
@@ -112,13 +120,24 @@ public class LockScreenActivity extends BaseActivity implements LockScreenView {
     }
 
     @Override
-    public void showIgnitionOfDetectedDialog() {
-
+    public void showIgnitionOffDetectedDialog() {
+        Toast.makeText(this, "Ignition off", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void closeLockScreen() {
+        finish();
+    }
 
+    @Override
+    public void removeAnyPopup() {
+        Toast.makeText(this, "remove popup", Toast.LENGTH_SHORT).show();
+
+    }
+
+    @Override
+    public void showDisconnectionPopup() {
+        Toast.makeText(this, "Disconnection", Toast.LENGTH_SHORT).show();
     }
 
     @OnClick(R.id.switch_co_driver_button)
