@@ -1,6 +1,8 @@
 package com.bsmwireless.domain.interactors;
 
 import com.bsmwireless.data.network.ServiceApi;
+import com.bsmwireless.data.network.authenticator.TokenManager;
+import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.data.storage.PreferencesManager;
@@ -72,6 +74,12 @@ public class ELDEventsInteractorTest {
     @Mock
     private ELDEventDao mEldEventDao;
 
+    @Mock
+    private AccountManager mAccountManager;
+
+    @Mock
+    private TokenManager mTokenManager;
+
 
     private ELDEventsInteractor mEldEventsInteractor;
 
@@ -84,7 +92,8 @@ public class ELDEventsInteractorTest {
         when(mUserInteractor.getTimezone()).thenReturn(Flowable.just(mfakeTimezone));
 
         mEldEventsInteractor = new ELDEventsInteractor(mServiceApi, mPreferencesManager,
-                mAppDatabase, mUserInteractor, mBlackBoxInteractor, mDutyTypeManager);
+                mAppDatabase, mUserInteractor, mBlackBoxInteractor, mDutyTypeManager,
+                mAccountManager, mTokenManager);
 
     }
 
@@ -165,27 +174,6 @@ public class ELDEventsInteractorTest {
     // TODO: test syncELDEventsWithServer error case when testable
 
     @Test
-    public void testGetEldEvents() {
-        // given
-        long startTime = 1234567890;
-        long endTime = 1235555555;
-
-        List<ELDEventEntity> eldEventEntities = new ArrayList<>();
-
-        ELDEventsInteractor eldEventsInteractorSpy = Mockito.spy(mEldEventsInteractor); // (to verify call to non-mocked method)
-
-        when(mPreferencesManager.getDriverId()).thenReturn(12345);
-        when(mEldEventDao.getDutyEventsFromStartToEndTime(anyLong(), anyLong(), anyInt()))
-                .thenReturn(Flowable.just(eldEventEntities));
-
-        // when
-        eldEventsInteractorSpy.getELDEvents(startTime, endTime);
-
-        // then
-        verify(eldEventsInteractorSpy).getDutyEventsFromDB(eq(startTime), eq(endTime));
-    }
-
-    @Test
     public void testGetDutyEventsFromDbSuccess() {
         // given
         long startTime = 1234567890;
@@ -232,6 +220,7 @@ public class ELDEventsInteractorTest {
     public void testGetLatestActiveDutyEventFromDb() {
         // given
         long latestTime = 1503963474;
+        int userId = 1234;
 
         List<ELDEventEntity> eldEventEntities = new ArrayList<>();
 
@@ -239,7 +228,7 @@ public class ELDEventsInteractorTest {
                 .thenReturn(eldEventEntities);
 
         // when
-        mEldEventsInteractor.getLatestActiveDutyEventFromDB(latestTime);
+        mEldEventsInteractor.getLatestActiveDutyEventFromDB(latestTime, userId);
 
         // then
         verify(mPreferencesManager).getDriverId();
@@ -250,6 +239,7 @@ public class ELDEventsInteractorTest {
     public void testGetLatestActiveDutyEventFromDbSync() {
         // given
         long latestTime = 1515151515;
+        int userId = 1234;
 
         List<ELDEventEntity> eldEventEntities = new ArrayList<>();
 
@@ -257,7 +247,7 @@ public class ELDEventsInteractorTest {
                 .thenReturn(eldEventEntities);
 
         // when
-        mEldEventsInteractor.getLatestActiveDutyEventFromDBSync(latestTime);
+        mEldEventsInteractor.getLatestActiveDutyEventFromDBSync(latestTime, userId);
 
         // then
         verify(mPreferencesManager).getDriverId();

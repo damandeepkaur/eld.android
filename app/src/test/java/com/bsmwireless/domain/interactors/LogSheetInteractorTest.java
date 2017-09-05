@@ -1,6 +1,7 @@
 package com.bsmwireless.domain.interactors;
 
 import com.bsmwireless.data.network.ServiceApi;
+import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.data.storage.hometerminals.HomeTerminalDao;
@@ -23,6 +24,7 @@ import java.util.List;
 
 import app.bsmuniversal.com.RxSchedulerRule;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.observers.TestObserver;
 import io.reactivex.subscribers.TestSubscriber;
 
@@ -58,6 +60,9 @@ public class LogSheetInteractorTest {
     @Mock
     HomeTerminalDao mHomeTerminalDao;
 
+    @Mock
+    AccountManager mAccountManager;
+
 
     private LogSheetInteractor mLogSheetInteractor;
 
@@ -65,7 +70,7 @@ public class LogSheetInteractorTest {
     public void before() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        mLogSheetInteractor = new LogSheetInteractor(mServiceApi, mPreferencesManager, mAppDatabase);
+        mLogSheetInteractor = new LogSheetInteractor(mServiceApi, mPreferencesManager, mAppDatabase, mAccountManager);
     }
 
     @Test
@@ -95,7 +100,7 @@ public class LogSheetInteractorTest {
 
         TestObserver<Boolean> testObserver = TestObserver.create();
 
-        when(mServiceApi.updateLogSheetHeader(any(LogSheetHeader.class))).thenReturn(Observable.just(getSuccessResponse()));
+        when(mServiceApi.updateLogSheetHeader(any(LogSheetHeader.class))).thenReturn(Single.just(getSuccessResponse()));
 
 
         // when
@@ -119,7 +124,7 @@ public class LogSheetInteractorTest {
 
         TestObserver<Boolean> testObserver = TestObserver.create();
 
-        when(mServiceApi.updateLogSheetHeader(any(LogSheetHeader.class))).thenReturn(Observable.just(wrongResponse));
+        when(mServiceApi.updateLogSheetHeader(any(LogSheetHeader.class))).thenReturn(Single.just(wrongResponse));
 
         // when
         mLogSheetInteractor.updateLogSheetHeader(logSheetHeader).subscribe(testObserver);
@@ -136,7 +141,7 @@ public class LogSheetInteractorTest {
 
         TestObserver<Boolean> testObserver = TestObserver.create();
 
-        when(mServiceApi.updateLogSheetHeader(any(LogSheetHeader.class))).thenReturn(Observable.error(new RuntimeException(fakeErrorMessage)));
+        when(mServiceApi.updateLogSheetHeader(any(LogSheetHeader.class))).thenReturn(Single.error(new RuntimeException(fakeErrorMessage)));
 
         // when
         mLogSheetInteractor.updateLogSheetHeader(logSheetHeader).subscribe(testObserver);
