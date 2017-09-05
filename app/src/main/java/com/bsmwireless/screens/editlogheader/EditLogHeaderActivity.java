@@ -127,7 +127,7 @@ public class EditLogHeaderActivity extends BaseMenuActivity implements EditLogHe
         LinearLayout list = (LinearLayout) findViewById(R.id.exemptions);
         for (int i = 0; i < exemptions.size(); i++) {
             ExemptionModel exemption = exemptions.get(i);
-            if (!exemption.getName().equals(ExemptionModel.NONE)) {
+            if (!ExemptionModel.NONE.equals(exemption.getName())) {
                 CheckBox checkBox = (CheckBox) getLayoutInflater().inflate(R.layout.exemption_check_box_item, null);
                 checkBox.setText(exemption.getName());
                 checkBox.setChecked(exemption.isSelected());
@@ -139,11 +139,6 @@ public class EditLogHeaderActivity extends BaseMenuActivity implements EditLogHe
                 list.addView(checkBox);
             }
         }
-    }
-
-    @Override
-    public List<ExemptionModel> getExemptions() {
-        return mExemptions;
     }
 
     @Override

@@ -11,6 +11,4 @@ public interface EditLogHeaderView extends BaseMenuView {
     void saveLogHeader(LogHeaderModel logHeaderModel);
 
     void setLogHeaderModel(LogHeaderModel logHeaderModel);
-
-    List<EditLogHeaderActivity.ExemptionModel> getExemptions();
 }

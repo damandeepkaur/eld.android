@@ -36,7 +36,6 @@ public class EditLogHeaderPresenter extends BaseMenuPresenter {
 
     public void onSaveLogHeaderButtonClicked() {
         LogHeaderModel logHeaderModel = mView.getLogHeader(mLogHeaderModel);
-        logHeaderModel.setAllExemptions(mLogHeaderModel.getAllExemptions());
         mView.saveLogHeader(logHeaderModel);
     }
 

@@ -5,6 +5,7 @@ import com.bsmwireless.models.HomeTerminal;
 import com.bsmwireless.models.SyncConfiguration;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class ConfigurationConverter {
@@ -34,7 +35,7 @@ public class ConfigurationConverter {
     }
 
     public static List<SyncConfiguration> toModelList(List<ConfigurationEntity> entities) {
-        List<SyncConfiguration> configurations = null;
+        List<SyncConfiguration> configurations = Collections.emptyList();
         if (entities != null) {
             configurations = new ArrayList<>();
             for (ConfigurationEntity entity : entities) {
@@ -45,7 +46,7 @@ public class ConfigurationConverter {
     }
 
     public static List<ConfigurationEntity> toEntityList(List<SyncConfiguration> configurations, Integer userId) {
-        List<ConfigurationEntity> entities = null;
+        List<ConfigurationEntity> entities = Collections.emptyList();
         if(configurations != null) {
             entities = new ArrayList<>(configurations.size());
             for (SyncConfiguration configuration:configurations) {

@@ -2,6 +2,7 @@ package com.bsmwireless.common.utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import timber.log.Timber;
@@ -41,7 +42,7 @@ public class ListConverter {
     }
 
     public static List<String> toStringList(String str) {
-        List<String> result = new ArrayList<>();
+        List<String> result = Collections.emptyList();
         if (str != null) {
             result = new ArrayList<>(Arrays.asList(str.split(",")));
         }

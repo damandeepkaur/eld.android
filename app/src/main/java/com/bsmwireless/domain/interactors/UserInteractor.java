@@ -33,6 +33,7 @@ import javax.inject.Inject;
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 
 import static com.bsmwireless.common.Constants.SUCCESS;
 import static com.bsmwireless.common.utils.DateUtils.MS_IN_WEEK;
@@ -193,7 +194,7 @@ public class UserInteractor {
                 .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
     }
 
-    public Observable<Boolean> updateDriverRule(String ruleException, String dutyCycle) {
+    public Single<Boolean> updateDriverRule(String ruleException, String dutyCycle) {
         return mServiceApi.updateDriverRule(getRuleSelectionModel(ruleException, dutyCycle))
                 .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
     }
