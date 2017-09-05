@@ -639,13 +639,14 @@ public class UserInteractorTest {
         responseMessage.setMessage(mSuccessResponse);
 
         String fakeRule = "fake rule";
+        String fakeDutyCycle = "Cycle";
 
         TestObserver<Boolean> testObserver = new TestObserver<>();
 
         when(mServiceApi.updateDriverRule(any(RuleSelectionModel.class))).thenReturn(Observable.just(responseMessage));
 
         // when
-        mLoginUserInteractor.updateDriverRule(fakeRule).subscribe(testObserver);
+        mLoginUserInteractor.updateDriverRule(fakeRule,fakeDutyCycle).subscribe(testObserver);
 
         // then
         testObserver.assertResult(true);
@@ -658,13 +659,14 @@ public class UserInteractorTest {
         responseMessage.setMessage("");
 
         String fakeRule = "fake rule";
+        String fakeDutyCycle = "Cycle";
 
         TestObserver<Boolean> testObserver = new TestObserver<>();
 
         when(mServiceApi.updateDriverRule(any(RuleSelectionModel.class))).thenReturn(Observable.just(responseMessage));
 
         // when
-        mLoginUserInteractor.updateDriverRule(fakeRule).subscribe(testObserver);
+        mLoginUserInteractor.updateDriverRule(fakeRule, fakeDutyCycle).subscribe(testObserver);
 
         // then
         testObserver.assertResult(false);
@@ -678,6 +680,7 @@ public class UserInteractorTest {
         responseMessage.setMessage("");
 
         String fakeRule = "fake rule";
+        String fakeDutyCycle = "Cycle";
         String fakeError = "not this time.";
 
         TestObserver<Boolean> testObserver = new TestObserver<>();
@@ -685,7 +688,7 @@ public class UserInteractorTest {
         when(mServiceApi.updateDriverRule(any(RuleSelectionModel.class))).thenReturn(Observable.error(new Exception(fakeError)));
 
         // when
-        mLoginUserInteractor.updateDriverRule(fakeRule).subscribe(testObserver);
+        mLoginUserInteractor.updateDriverRule(fakeRule, fakeDutyCycle).subscribe(testObserver);
 
         // then
         testObserver.assertErrorMessage(fakeError);
@@ -835,11 +838,7 @@ public class UserInteractorTest {
         TestSubscriber<FullUserEntity> testSubscriber = TestSubscriber.create();
 
         // when
-<<<<<<< HEAD
         mLoginUserInteractor.getFullDriver().subscribe(testSubscriber);
-=======
-        mLoginUserInteractor.getFullUserEntity().subscribe(testSubscriber);
->>>>>>> EA-340 #comment Add edit Log Header screen
 
         // then
         verify(mUserDao).getFullUser(any(Integer.class));
