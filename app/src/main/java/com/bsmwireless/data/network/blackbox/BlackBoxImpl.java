@@ -10,6 +10,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
@@ -33,30 +34,42 @@ public final class BlackBoxImpl implements BlackBox {
 
     private Socket mSocket;
     private byte mSequenceID = 1;
-    private BehaviorSubject<BlackBoxModel> mEmitter;
     private int mBoxId;
     private String mVinNumber;
     private Disposable mDisposable;
-    private AtomicReference<BlackBoxModel> mBlackBoxModel = new AtomicReference<>(new BlackBoxModel());
+    private final AtomicReference<BlackBoxModel> mBlackBoxModel;
+    private final AtomicReference<BehaviorSubject<BlackBoxModel>> mEmitter;
+    private final ReentrantReadWriteLock.ReadLock readSocketLock;
+    private final ReentrantReadWriteLock.WriteLock writeLock;
+
+    public BlackBoxImpl() {
+        mBlackBoxModel = new AtomicReference<>(new BlackBoxModel());
+        mEmitter = new AtomicReference<>(BehaviorSubject.create());
+
+        ReentrantReadWriteLock reentrantReadWriteLock = new ReentrantReadWriteLock();
+        readSocketLock = reentrantReadWriteLock.readLock();
+        writeLock = reentrantReadWriteLock.writeLock();
+    }
 
     @Override
     public void connect(int boxId) throws Exception {
         Timber.d("connect");
         if (!isConnected()) {
             mSocket = new Socket(WIFI_GATEWAY_IP, WIFI_REMOTE_PORT);
-            mEmitter = BehaviorSubject.create();
             mBoxId = boxId;
             mDisposable = Observable.interval(RETRY_CONNECT_DELAY, TimeUnit.MILLISECONDS)
                     .take(RETRY_COUNT)
                     .filter(this::initializeCommunication)
-                    .take(1)
-                    .switchMap(unused -> startContinuousRead())
+                    .firstElement()
+                    .ignoreElement()
+                    .andThen(startContinuousRead())
                     .timeout(UPDATE_RATE_MILLIS * TIMEOUT_RATIO,
                             TimeUnit.MILLISECONDS,
                             Observable.error(new BlackBoxConnectionException(UNKNOWN_ERROR)))
-                    .subscribe(model -> mEmitter.onNext(model),
-                            throwable -> mEmitter.onError(throwable),
-                            () -> mEmitter.onComplete());
+                    .subscribeOn(Schedulers.io())
+                    .subscribe(model -> mEmitter.get().onNext(model),
+                            throwable -> mEmitter.get().onError(throwable),
+                            () -> mEmitter.get().onComplete());
         }
     }
 
@@ -66,20 +79,27 @@ public final class BlackBoxImpl implements BlackBox {
         mBlackBoxModel.set(new BlackBoxModel());
         if (isConnected()) {
             mDisposable.dispose();
-            mEmitter = null;
-            mSocket.close();
-            mSocket = null;
+            recreateEmitter();
+            closeSocket();
         }
     }
 
     @Override
     public boolean isConnected() {
-        return mSocket != null && mSocket.isConnected();
+        readSocketLock.lock();
+        boolean connected = mSocket != null && mSocket.isConnected();
+        readSocketLock.unlock();
+        return connected;
     }
 
     @Override
     public Observable<BlackBoxModel> getDataObservable() {
-        return mEmitter;
+
+        if (mEmitter.get().hasComplete() || mEmitter.get().hasThrowable()) {
+            recreateEmitter();
+        }
+
+        return mEmitter.get();
     }
 
     @Override
@@ -90,6 +110,12 @@ public final class BlackBoxImpl implements BlackBox {
     @Override
     public BlackBoxModel getBlackBoxState() {
         return mBlackBoxModel.get();
+    }
+
+    private void recreateEmitter() {
+        BehaviorSubject<BlackBoxModel> old = mEmitter.get();
+        old.onComplete();
+        mEmitter.compareAndSet(old, BehaviorSubject.create());
     }
 
     private boolean initializeCommunication(long retryIndex) throws Exception {
@@ -103,7 +129,7 @@ public final class BlackBoxImpl implements BlackBox {
             mVinNumber = response.getVinNumber();
             Timber.d("readSubscriptionResponse ok");
             return true;
-        } else if (response.getResponseType() == BlackBoxResponseModel.ResponseType.NACK){
+        } else if (response.getResponseType() == BlackBoxResponseModel.ResponseType.NACK) {
             Timber.e("readSubscriptionResponse error");
             throw new BlackBoxConnectionException(response.getErrReasonCode());
         }
@@ -113,9 +139,8 @@ public final class BlackBoxImpl implements BlackBox {
     private Observable<BlackBoxModel> startContinuousRead() {
         Timber.d("startContinuousRead");
         return Observable.interval(UPDATE_RATE_MILLIS / UPDATE_RATE_RATIO, TimeUnit.MILLISECONDS)
-                .observeOn(Schedulers.io())
                 .filter(unused -> isConnected())
-                .map(unused -> mSocket.getInputStream())
+                .map(unused -> getInputStream())
                 .filter(stream -> stream.available() > START_INDEX)
                 .map(this::readRawData)
                 .map(bytes -> BlackBoxParser.parseVehicleStatus(bytes).getBoxData())
@@ -132,7 +157,7 @@ public final class BlackBoxImpl implements BlackBox {
 
     private BlackBoxResponseModel readSubscriptionResponse() throws Exception {
         byte[] response;
-        response = readRawData(mSocket.getInputStream());
+        response = readRawData(getInputStream());
         BlackBoxResponseModel responseModel = null;
         if (response != null) {
             responseModel = BlackBoxParser.parseSubscription(response);
@@ -155,8 +180,30 @@ public final class BlackBoxImpl implements BlackBox {
         return response;
     }
 
+    private void closeSocket() throws IOException {
+        writeLock.lock();
+        mSocket.close();
+        mSocket = null;
+        writeLock.unlock();
+    }
+
+    private InputStream getInputStream() throws Exception {
+        readSocketLock.lock();
+        if (mSocket == null) {
+            throw new Exception("Socket is already closed or still not opened");
+        }
+        final InputStream inputStream = mSocket.getInputStream();
+        readSocketLock.unlock();
+        return inputStream;
+    }
+
     private void writeRawData(byte[] request) throws IOException {
+        readSocketLock.lock();
+        if (mSocket == null) {
+            return;
+        }
         OutputStream output = mSocket.getOutputStream();
+        readSocketLock.unlock();
         output.write(request);
         output.flush();
     }
