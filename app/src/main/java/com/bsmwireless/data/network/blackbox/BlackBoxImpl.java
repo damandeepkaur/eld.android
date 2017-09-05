@@ -128,7 +128,7 @@ public final class BlackBoxImpl implements BlackBox {
     }
 
     private Observable<BlackBoxModel> readStatus() {
-        return Observable.just(1)
+        return Observable.just(0)
                 .observeOn(Schedulers.io())
                 .filter(unused -> isConnected())
                 .map(unused -> mSocket.getInputStream())
@@ -170,7 +170,7 @@ public final class BlackBoxImpl implements BlackBox {
     }
 
     private Observable<BlackBoxModel> requestDataImmediately() throws IOException {
-        return Observable.just(1)
+        return Observable.just(0)
                 .observeOn(Schedulers.io())
                 .doOnNext(unused -> writeRawData(BlackBoxParser.generateImmediateStatusRequest()))
                 // 200ms delay to read current status asap
