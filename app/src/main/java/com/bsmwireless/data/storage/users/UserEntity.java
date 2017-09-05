@@ -1,8 +1,16 @@
 package com.bsmwireless.data.storage.users;
 
 import android.arch.persistence.room.ColumnInfo;
+import android.arch.persistence.room.Embedded;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
+
+import com.bsmwireless.data.storage.configurations.ConfigurationEntity;
+import com.bsmwireless.models.SyncConfiguration;
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
+import java.util.List;
 
 @Entity(tableName = "users")
 public class UserEntity {
