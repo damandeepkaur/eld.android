@@ -42,7 +42,7 @@
 
     <color name="help_transparent_background">#99000000</color>
     <color name="selectasset_recent">#f2f2f4</color>
-    <color name="timer_header_color">#61000000</color>
+    <color name="timer_header_color">@color/light_gray_color</color>
 
     <color name="offduty_light">#9b9b9b</color>
     <color name="sleepingberth_light">@color/coral</color>

@@ -29,5 +29,7 @@ public interface LoginView {
 
     void setLoginButtonEnabled(boolean enabled);
 
-    void runMonitoringService();
+    void showProgressBar();
+
+    void hideProgressBar();
 }

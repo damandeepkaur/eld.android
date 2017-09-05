@@ -4,7 +4,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.SwitchCompat;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 
 import com.bsmwireless.common.App;
 import com.bsmwireless.common.utils.NetworkUtils;
@@ -47,6 +49,9 @@ public class LoginActivity extends BaseActivity implements LoginView {
     @BindView(R.id.login_snackbar)
     SnackBarLayout mSnackBarLayout;
 
+    @BindView(R.id.login_progress_bar)
+    ProgressBar mLoginProgressBar;
+
     @Inject
     LoginPresenter mPresenter;
 
@@ -64,6 +69,11 @@ public class LoginActivity extends BaseActivity implements LoginView {
                 .setHideableOnTimeout(SnackBarLayout.DURATION_LONG)
                 .setPositiveLabel(getString(R.string.try_again), v -> executeLogin());
 
+        initView();
+    }
+
+    private void initView() {
+        hideProgressBar();
         mPresenter.onViewCreated();
     }
 
@@ -157,6 +167,12 @@ public class LoginActivity extends BaseActivity implements LoginView {
     }
 
     @Override
-    public void runMonitoringService() {
+    public void showProgressBar() {
+        mLoginProgressBar.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void hideProgressBar() {
+        mLoginProgressBar.setVisibility(View.INVISIBLE);
     }
 }

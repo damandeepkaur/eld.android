@@ -274,6 +274,7 @@ public class NavigationActivity extends BaseMenuActivity implements OnNavigation
 
     }
 
+    @Override
     public void setResetTime(long time) {
         mHandler.removeCallbacks(mResetTimeTask);
         if (time == 0) {
@@ -281,6 +282,17 @@ public class NavigationActivity extends BaseMenuActivity implements OnNavigation
         } else {
             mHandler.postAtTime(mResetTimeTask, time);
         }
+    }
+
+    @Override
+    public void onCoDriverViewStart(String coDriverName) {
+        // TODO add co-driver notification
+        Toast.makeText(this, "View as co-driver " + coDriverName, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onCoDriverViewEnd() {
+        // TODO remove co-driver notification
     }
 
     @Override
