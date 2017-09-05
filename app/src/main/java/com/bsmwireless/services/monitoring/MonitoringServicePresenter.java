@@ -46,6 +46,10 @@ public class MonitoringServicePresenter {
                         .equals(blackBoxModel.getResponseType()))
                 .firstOrError()
                 .subscribe(blackBoxModel -> mView.startLockScreen(),
-                        throwable -> Timber.d(throwable, "Monitoring status error"));
+                        throwable -> {
+                            Timber.d(throwable, "Monitoring status error");
+                            // Some exception occurs, start monitoring again
+                            startMonitoring();
+                        });
     }
 }

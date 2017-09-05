@@ -67,7 +67,6 @@ public class LoginPresenter {
                             if (status) {
                                 SchedulerUtils.schedule();
                                 mView.goToSelectAssetScreen();
-                                mView.runMonitoringService();
                             } else {
                                 mView.showErrorMessage(LoginView.Error.ERROR_UNEXPECTED);
                                 mView.setLoginButtonEnabled(true);
