@@ -35,6 +35,7 @@ import io.reactivex.Single;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
+import retrofit2.http.Header;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
@@ -57,6 +58,17 @@ public interface ServiceApi {
      */
     @POST("v1/app/newtoken")
     Observable<Auth> refreshToken();
+
+    /**
+     * User logout
+     *
+     * @param logoutEvent
+     * @param token token of user which we want to logout
+     * @param driver id of user which we want to logout
+     * @return Logout response {@link ResponseMessage}
+     */
+    @POST("v1/app/logout")
+    Observable<ResponseMessage> logout(@Body ELDEvent logoutEvent, @Header("X-Token") String token, @Header("X-Driver") String driver);
 
     /**
      * User logout
@@ -105,6 +117,18 @@ public interface ServiceApi {
      */
     @GET("v1/sync/records/search/{start}/{end}")
     Observable<List<ELDEvent>> getELDEvents(@Path("start") Long startTime, @Path("end") Long endTime);
+
+    /**
+     * Fetch processed driver records.
+     *
+     * @param startTime start time.
+     * @param endTime   end time.
+     * @param token token of user
+     * @param driver id of user
+     * @return List of unidentified or changed event records {@link ELDEvent}.
+     */
+    @GET("v1/sync/records/search/{start}/{end}")
+    Observable<List<ELDEvent>> getELDEvents(@Path("start") Long startTime, @Path("end") Long endTime, @Header("X-Token") String token, @Header("X-Driver") String driver);
 
     /**
      * Update unidentified records or change record request.

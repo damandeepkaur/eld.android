@@ -3,6 +3,7 @@ package com.bsmwireless.data.network;
 import android.os.Build;
 
 import com.bsmwireless.data.network.authenticator.TokenManager;
+import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.data.storage.PreferencesManager;
 
 import java.security.GeneralSecurityException;
@@ -32,15 +33,24 @@ import static com.bsmwireless.common.Constants.READ_TIMEOUT;
 public class HttpClientManager {
     private OkHttpClient mClient;
 
-    public HttpClientManager(HttpLoggingInterceptor logger, TokenManager tokenManager, PreferencesManager preferencesManager, CookieJar cookieJar) {
+    public HttpClientManager(HttpLoggingInterceptor logger, TokenManager tokenManager,
+                             PreferencesManager preferencesManager, CookieJar cookieJar,
+                             AccountManager accountManager) {
         Interceptor auth = chain -> {
             Request request = chain.request();
 
-            String accountName = preferencesManager.getAccountName();
-            String driver = tokenManager.getDriver(accountName);
-            String org = tokenManager.getOrg(accountName);
-            String cluster = tokenManager.getCluster(accountName);
-            String token = tokenManager.getToken(accountName);
+            String driver = request.header("X-Driver");
+            String token = request.header("X-Token");
+            String cluster = request.header("X-Cluster");
+            String org = request.header("X-Org");
+
+            String accountName = accountManager.getCurrentUserAccountName();
+
+            org = org == null ? tokenManager.getOrg(accountName) : org;
+            cluster = cluster == null ? tokenManager.getCluster(accountName) : cluster;
+            driver = driver == null ? tokenManager.getDriver(accountName) : driver;
+            token = token == null ? tokenManager.getToken(accountName) : token;
+
             int boxId = preferencesManager.getBoxId();
 
             if (token != null && org != null && cluster != null && driver != null) {

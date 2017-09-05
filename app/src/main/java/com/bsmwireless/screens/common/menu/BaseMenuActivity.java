@@ -7,6 +7,8 @@ import android.widget.ArrayAdapter;
 
 import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.screens.common.BaseActivity;
+import com.bsmwireless.screens.switchdriver.DriverDialog;
+import com.bsmwireless.screens.switchdriver.SwitchDriverDialog;
 import com.bsmwireless.widgets.alerts.DutyType;
 import com.bsmwireless.widgets.alerts.ELDType;
 import com.bsmwireless.widgets.alerts.OccupancyType;
@@ -22,6 +24,10 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
 
     protected AlertDialog mDutyDialog;
 
+    protected DriverDialog mSwitchDriverDialog;
+
+    protected abstract BaseMenuPresenter getPresenter();
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_alert, menu);
@@ -29,6 +35,8 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
         mELDItem = menu.findItem(R.id.action_eld);
         mDutyItem = menu.findItem(R.id.action_duty);
         mOccupancyItem = menu.findItem(R.id.action_occupancy);
+
+        mSwitchDriverDialog = new SwitchDriverDialog(this);
 
         getPresenter().onMenuCreated();
 
@@ -44,6 +52,7 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
                 getPresenter().onChangeDutyClick();
                 break;
             case R.id.action_occupancy:
+                showSwitchDriverDialog();
                 break;
             case android.R.id.home: {
                 onHomePress();
@@ -62,12 +71,7 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
         }
     }
 
-    protected abstract BaseMenuPresenter getPresenter();
-
-    protected void onHomePress() {
-        onBackPressed();
-    }
-
+    @Override
     public void setELDType(ELDType type) {
         if (mELDItem != null) {
             mELDItem.getIcon().setLevel(type.ordinal());
@@ -75,6 +79,7 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
         }
     }
 
+    @Override
     public void setDutyType(DutyType type) {
         if (mDutyItem != null) {
             mDutyItem.setIcon(type.getIcon());
@@ -82,11 +87,28 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
         }
     }
 
+    @Override
     public void setOccupancyType(OccupancyType type) {
         if (mOccupancyItem != null) {
             mOccupancyItem.getIcon().setLevel(type.ordinal());
             mOccupancyItem.setTitle(getString(type.getName()));
         }
+    }
+
+    @Override
+    public void showSwitchDriverDialog() {
+        if (mSwitchDriverDialog != null) {
+            mSwitchDriverDialog.show();
+        }
+    }
+
+    @Override
+    public void changeDutyType(DutyType dutyType) {
+        getPresenter().onDutyChanged(dutyType);
+    }
+
+    protected void onHomePress() {
+        onBackPressed();
     }
 
     @Override
@@ -111,6 +133,9 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
                     break;
 
                 case DRIVING:
+                    isEnabled &= current != DutyType.YARD_MOVES & current != DutyType.PERSONAL_USE & getPresenter().isUserDriver();
+                    break;
+
                 case SLEEPER_BERTH:
                     isEnabled &= current != DutyType.YARD_MOVES & current != DutyType.PERSONAL_USE;
                     break;
@@ -147,9 +172,5 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
                 .setPositiveButton(R.string.not_in_vehicle_accept, null)
                 .setCancelable(true)
                 .show();
-    }
-
-    public void changeDutyType(DutyType dutyType) {
-        getPresenter().onDutyChanged(dutyType);
     }
 }

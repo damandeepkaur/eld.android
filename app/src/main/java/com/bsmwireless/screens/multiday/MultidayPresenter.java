@@ -2,6 +2,7 @@ package com.bsmwireless.screens.multiday;
 
 import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.common.utils.DateUtils;
+import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
 import com.bsmwireless.domain.interactors.UserInteractor;
@@ -19,40 +20,44 @@ import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.disposables.Disposables;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
 import static com.bsmwireless.common.utils.DateUtils.MS_IN_DAY;
 
 @ActivityScope
-public class MultidayPresenter {
+public class MultidayPresenter implements AccountManager.AccountListener {
     private MultidayView mView;
     private ELDEventsInteractor mELDEventsInteractor;
     private UserInteractor mUserInteractor;
+    private AccountManager mAccountManager;
     private CompositeDisposable mDisposables;
     private Disposable mGetEventDisposable;
 
     private String mTimeZone;
 
     @Inject
-    public MultidayPresenter(MultidayView view, ELDEventsInteractor eventsInteractor, UserInteractor userInteractor) {
+    public MultidayPresenter(MultidayView view, ELDEventsInteractor eventsInteractor, UserInteractor userInteractor, AccountManager accountManager) {
         mView = view;
         mELDEventsInteractor = eventsInteractor;
         mUserInteractor = userInteractor;
+        mAccountManager = accountManager;
         mDisposables = new CompositeDisposable();
+        mGetEventDisposable = Disposables.disposed();
         mTimeZone = TimeZone.getDefault().getID();
 
         Timber.d("CREATED");
     }
 
     public void onDestroy() {
-        if (mGetEventDisposable != null) {
-            mGetEventDisposable.dispose();
-        }
+        mAccountManager.removeListener(this);
+        mGetEventDisposable.dispose();
         mDisposables.dispose();
     }
 
     public void onViewCreated() {
+        mAccountManager.addListener(this);
         mDisposables.add(mUserInteractor.getTimezone()
                 .subscribeOn(Schedulers.io())
                 .subscribe(timezone -> {
@@ -73,10 +78,7 @@ public class MultidayPresenter {
 
         mELDEventsInteractor.syncELDEventsWithServer(startDayTime, endDayTime);
 
-        if (mGetEventDisposable != null) {
-            mGetEventDisposable.dispose();
-        }
-
+        mGetEventDisposable.dispose();
         mGetEventDisposable = Observable.fromCallable(() -> getMultidayItems(dayCount, startDayTime))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -98,7 +100,7 @@ public class MultidayPresenter {
 
             List<ELDEvent> dayEvents = mELDEventsInteractor.getActiveEventsFromDBSync(startDay, endDay);
 
-            List<ELDEvent> prevEvents = mELDEventsInteractor.getLatestActiveDutyEventFromDBSync(startDay);
+            List<ELDEvent> prevEvents = mELDEventsInteractor.getLatestActiveDutyEventFromDBSync(startDay, mUserInteractor.getUserId());
             if (!prevEvents.isEmpty()) {
                 ELDEvent prevEvent = prevEvents.get(prevEvents.size() - 1);
                 prevEvent.setEventTime(startDay);
@@ -130,4 +132,12 @@ public class MultidayPresenter {
         }
         return result;
     }
+
+    @Override
+    public void onUserChanged() {
+        getItems(mView.getDayCount());
+    }
+
+    @Override
+    public void onDriverChanged() {}
 }

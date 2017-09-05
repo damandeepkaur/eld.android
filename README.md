@@ -3,6 +3,11 @@ ELD app for Android
 
 # Version history
 
+* **1.0.57** - Fix dotted lines (_EA-310_)
+* **1.0.56** - Edit/Add event input validation should allow 'space' and '.' chars (_EA-326_)
+* **1.0.55** - Not creating duty event with creating YM or PC event (_EA-338_)
+* **1.0.54** - Add progress bar
+* **1.0.53** - Add switch driver and co-drivers logic
 * **1.0.52** - Add Log header to Logs Screen (_EA-339_)
 * **1.0.51** - Add confirmation dialog select assets screen
 * **1.0.50** - Added UI for Lock Screen(_EA-206_)

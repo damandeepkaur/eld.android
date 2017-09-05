@@ -26,7 +26,7 @@ public class ListConverter {
         List<Integer> integers = new ArrayList<>();
 
         try {
-            if (s != null) {
+            if (s != null && !s.isEmpty()) {
                 List<String> list = Arrays.asList(s.split("\\s*,\\s*"));
 
                 for (String item : list) {
