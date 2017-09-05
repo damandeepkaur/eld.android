@@ -128,9 +128,9 @@ public final class BlackBoxImpl implements BlackBox {
     }
 
     private Observable<BlackBoxModel> readStatus() {
-        return Observable.just(0)
+        return Observable.fromCallable(() -> isConnected())
                 .observeOn(Schedulers.io())
-                .filter(unused -> isConnected())
+                .filter(isConnected -> isConnected)
                 .map(unused -> mSocket.getInputStream())
                 .filter(stream -> stream.available() > START_INDEX)
                 .map(this::readRawData)
