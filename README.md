@@ -3,6 +3,7 @@ ELD app for Android
 
 # Version history
 
+* **1.0.59** - Add switching asset by selecting asset in menu
 * **1.0.58** - Add Edit Log header Screen (_EA-340_)
 * **1.0.57** - Fix dotted lines (_EA-310_)
 * **1.0.56** - Edit/Add event input validation should allow 'space' and '.' chars (_EA-326_)
