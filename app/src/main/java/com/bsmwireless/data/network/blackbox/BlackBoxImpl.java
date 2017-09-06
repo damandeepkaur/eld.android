@@ -85,9 +85,9 @@ public final class BlackBoxImpl implements BlackBox {
     public void disconnect() throws IOException {
         Timber.d("disconnect");
         mBlackBoxModel.set(new BlackBoxModel());
+        mDisposable.dispose();
+        recreateEmitter();
         if (isConnected()) {
-            mDisposable.dispose();
-            recreateEmitter();
             closeSocket();
         }
     }
@@ -123,8 +123,10 @@ public final class BlackBoxImpl implements BlackBox {
 
     private boolean initializeCommunication(long retryIndex) throws Exception {
         Timber.d("initializeCommunication");
+        closeSocket();
         mSocket = new Socket(WIFI_GATEWAY_IP, WIFI_REMOTE_PORT);
         if (retryIndex == RETRY_COUNT - 1) {
+            Timber.e("initializeCommunication error");
             throw new BlackBoxConnectionException(UNKNOWN_ERROR);
         }
         writeRawData(BlackBoxParser.generateSubscriptionRequest(getSequenceID(), mBoxId, UPDATE_RATE_MILLIS));
@@ -189,8 +191,10 @@ public final class BlackBoxImpl implements BlackBox {
 
     private void closeSocket() throws IOException {
         writeLock.lock();
-        mSocket.close();
-        mSocket = null;
+        if (mSocket != null && !mSocket.isClosed()) {
+            mSocket.close();
+            mSocket = null;
+        }
         writeLock.unlock();
     }
 
@@ -220,7 +224,7 @@ public final class BlackBoxImpl implements BlackBox {
         return Observable.fromCallable(() -> isConnected())
                 .observeOn(Schedulers.io())
                 .filter(isConnected -> isConnected)
-                .map(unused -> mSocket.getInputStream())
+                .map(unused -> getInputStream())
                 .filter(stream -> stream.available() > START_INDEX)
                 .map(this::readRawData)
                 .map(bytes -> BlackBoxParser.parseVehicleStatus(bytes).getBoxData());
