@@ -40,6 +40,7 @@ import java.util.List;
 import app.bsmuniversal.com.RxSchedulerRule;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.observers.TestObserver;
 import io.reactivex.subscribers.TestSubscriber;
 
@@ -643,7 +644,7 @@ public class UserInteractorTest {
 
         TestObserver<Boolean> testObserver = new TestObserver<>();
 
-        when(mServiceApi.updateDriverRule(any(RuleSelectionModel.class))).thenReturn(Observable.just(responseMessage));
+        when(mServiceApi.updateDriverRule(any(RuleSelectionModel.class))).thenReturn(Single.just(responseMessage));
 
         // when
         mLoginUserInteractor.updateDriverRule(fakeRule,fakeDutyCycle).subscribe(testObserver);
@@ -663,7 +664,7 @@ public class UserInteractorTest {
 
         TestObserver<Boolean> testObserver = new TestObserver<>();
 
-        when(mServiceApi.updateDriverRule(any(RuleSelectionModel.class))).thenReturn(Observable.just(responseMessage));
+        when(mServiceApi.updateDriverRule(any(RuleSelectionModel.class))).thenReturn(Single.just(responseMessage));
 
         // when
         mLoginUserInteractor.updateDriverRule(fakeRule, fakeDutyCycle).subscribe(testObserver);
@@ -685,7 +686,7 @@ public class UserInteractorTest {
 
         TestObserver<Boolean> testObserver = new TestObserver<>();
 
-        when(mServiceApi.updateDriverRule(any(RuleSelectionModel.class))).thenReturn(Observable.error(new Exception(fakeError)));
+        when(mServiceApi.updateDriverRule(any(RuleSelectionModel.class))).thenReturn(Single.error(new Exception(fakeError)));
 
         // when
         mLoginUserInteractor.updateDriverRule(fakeRule, fakeDutyCycle).subscribe(testObserver);
