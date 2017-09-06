@@ -122,6 +122,7 @@ public class LogsPresenter implements AccountManager.AccountListener {
     public void onCalendarDaySelected(CalendarItem calendarItem) {
         mSelectedLogHeader = calendarItem.getAssociatedLogSheet();
         setEventsForDay(calendarItem.getCalendar());
+        setLogHeaderForDay(mSelectedDayCalendar);
     }
 
     public void setEventsForDay(Calendar calendar) {
@@ -314,7 +315,8 @@ public class LogsPresenter implements AccountManager.AccountListener {
             model.setDistanceDriven("-");
 
             mLogHeaderModel = model;
-            return model;
+            mLogHeaderModel.setLogSheetHeader(mSelectedLogHeader);
+            return mLogHeaderModel;
         })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -406,6 +408,8 @@ public class LogsPresenter implements AccountManager.AccountListener {
 
     public void onLogHeaderChanged(LogHeaderModel logHeaderModel) {
         mView.setLogHeader(logHeaderModel);
+
+        mSelectedLogHeader = logHeaderModel.getLogSheetHeader();
 
         HomeTerminal homeTerminal = mSelectedLogHeader.getHomeTerminal();
         if (homeTerminal == null) {
