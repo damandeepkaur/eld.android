@@ -23,7 +23,7 @@ public interface LogsView {
 
     void goToEditEventScreen(EventLogModel event);
 
-    void goToEditTripInfoScreen();
+    void goToEditLogHeaderScreen(LogHeaderModel logHeaderModel);
 
     void eventAdded();
 
