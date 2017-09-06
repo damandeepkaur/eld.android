@@ -8,12 +8,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.disposables.Disposable;
@@ -59,7 +57,6 @@ public final class BlackBoxImpl implements BlackBox {
     public void connect(int boxId) throws Exception {
         Timber.d("connect");
         if (!isConnected()) {
-            mSocket = new Socket(WIFI_GATEWAY_IP, WIFI_REMOTE_PORT);
             mBoxId = boxId;
             mDisposable = Observable.interval(RETRY_CONNECT_DELAY, TimeUnit.MILLISECONDS)
                     .take(RETRY_COUNT)
@@ -73,7 +70,13 @@ public final class BlackBoxImpl implements BlackBox {
                             Observable.error(new BlackBoxConnectionException(UNKNOWN_ERROR)))
                     .subscribeOn(Schedulers.io())
                     .subscribe(model -> getEmitter().onNext(model),
-                            throwable -> getEmitter().onError(throwable),
+                            throwable -> {
+                                if (getEmitter().hasObservers()) {
+                                    getEmitter().onError(throwable);
+                                } else {
+                                    Timber.e("BlackBox error: %s", throwable);
+                                }
+                            },
                             () -> getEmitter().onComplete());
         }
     }
@@ -120,6 +123,7 @@ public final class BlackBoxImpl implements BlackBox {
 
     private boolean initializeCommunication(long retryIndex) throws Exception {
         Timber.d("initializeCommunication");
+        mSocket = new Socket(WIFI_GATEWAY_IP, WIFI_REMOTE_PORT);
         if (retryIndex == RETRY_COUNT - 1) {
             throw new BlackBoxConnectionException(UNKNOWN_ERROR);
         }
