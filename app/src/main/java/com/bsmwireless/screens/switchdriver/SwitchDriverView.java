@@ -36,4 +36,10 @@ public interface SwitchDriverView {
     void showError(RetrofitException error);
     void showProgress();
     void hideProgress();
+    void createSwitchOnlyDialog();
+    void createSwitchDriverDialog();
+    void createAddCoDriverDialog();
+    void createLogOutCoDriverDialog();
+    void createDriverSeatDialog();
+    void createLoadingDialog();
 }

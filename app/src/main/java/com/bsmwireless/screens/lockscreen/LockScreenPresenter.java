@@ -1,9 +1,11 @@
 package com.bsmwireless.screens.lockscreen;
 
+
 import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.data.network.blackbox.BlackBox;
 import com.bsmwireless.data.network.blackbox.BlackBoxConnectionManager;
 import com.bsmwireless.data.network.blackbox.models.BlackBoxResponseModel;
+import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.models.BlackBoxModel;
 import com.bsmwireless.widgets.alerts.DutyType;
@@ -35,6 +37,7 @@ public class LockScreenPresenter {
     private final BlackBox blackBox;
     private final long blackBoxTimeoutMillis;
     private final long mIdlingTimeoutMillis;
+    private final AccountManager accountManager;
     private volatile CurrentWork currentWork;
     private final AtomicReference<Maybe<BlackBoxModel>> generalMonitoringReference;
     private final AtomicReference<Completable> reconnectionReference;
@@ -47,13 +50,14 @@ public class LockScreenPresenter {
                                Lazy<BlackBoxConnectionManager> connectionManager,
                                BlackBox blackBox,
                                @Named("disconnectTimeout") long blackBoxTimeoutMillis,
-                               @Named("idleTimeout") long idlingTimeout) {
+                               @Named("idleTimeout") long idlingTimeout, AccountManager accountManager) {
         mView = view;
         mDutyManager = dutyManager;
         this.connectionManager = connectionManager;
         this.blackBox = blackBox;
         this.blackBoxTimeoutMillis = blackBoxTimeoutMillis;
         this.mIdlingTimeoutMillis = idlingTimeout;
+        this.accountManager = accountManager;
         mCompositeDisposable = new CompositeDisposable();
         currentWork = CurrentWork.NOTHING;
         generalMonitoringReference = new AtomicReference<>();
@@ -71,11 +75,13 @@ public class LockScreenPresenter {
 
         startTimer();
         startMonitoring();
+        accountManager.addListener(accountListener);
     }
 
     public void onStop() {
         mCompositeDisposable.clear();
         resetTime();
+        accountManager.removeListener(accountListener);
     }
 
     public void switchCoDriver() {
@@ -191,7 +197,8 @@ public class LockScreenPresenter {
                                     .toCompletable();
                         }
                         return Completable.error(throwable);
-                    });
+                    })
+                    .cache();
             if (!reconnectionReference.compareAndSet(null, reconnectCompletable)) {
                 reconnectCompletable = reconnectionReference.get();
             }
@@ -224,7 +231,8 @@ public class LockScreenPresenter {
                             != BlackBoxResponseModel.ResponseType.STOPPED)
                     .timeout(mIdlingTimeoutMillis, TimeUnit.MILLISECONDS)
                     .firstElement()
-                    .ignoreElement();
+                    .ignoreElement()
+                    .cache();
 
             if (!idleMonitoringCompletableReference.compareAndSet(null, idleCompletable)) {
                 idleCompletable = idleMonitoringCompletableReference.get();
@@ -256,7 +264,8 @@ public class LockScreenPresenter {
 
             drivingCompletable = blackBox.getDataObservable()
                     .filter(blackBoxModel -> blackBoxModel.getResponseType() == BlackBoxResponseModel.ResponseType.MOVING)
-                    .firstElement();
+                    .firstElement()
+                    .cache();
 
             if (!monitoringDrivingReference.compareAndSet(null, drivingCompletable)) {
                 drivingCompletable = monitoringDrivingReference.get();
@@ -276,4 +285,18 @@ public class LockScreenPresenter {
     private enum CurrentWork {
         GENERAL_MONITORING, RECONNECTING, DRIVING_MONITORING, IDLE_MONITORING, NOTHING
     }
+
+    private final AccountManager.AccountListener accountListener = new AccountManager.AccountListener() {
+        @Override
+        public void onUserChanged() {
+            if (!accountManager.isCurrentUserDriver()) {
+                mView.closeLockScreen();
+            }
+        }
+
+        @Override
+        public void onDriverChanged() {
+
+        }
+    };
 }

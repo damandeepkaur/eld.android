@@ -1,14 +1,16 @@
 package com.bsmwireless.services.monitoring;
 
 
+import com.bsmwireless.BaseTest;
 import com.bsmwireless.data.network.blackbox.BlackBox;
 import com.bsmwireless.data.network.blackbox.models.BlackBoxResponseModel;
+import com.bsmwireless.data.storage.DutyTypeManager;
+import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.models.BlackBoxModel;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
 import io.reactivex.Observable;
 import io.reactivex.plugins.RxJavaPlugins;
@@ -19,25 +21,30 @@ import io.reactivex.subjects.Subject;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class MonitoringServicePresenterTest {
+public class MonitoringServicePresenterTest extends BaseTest {
 
     @Mock
     MonitoringServiceView view;
-
+    @Mock
+    PreferencesManager preferencesManager;
     @Mock
     BlackBox blackBox;
 
+    private DutyTypeManager dutyTypeManager;
     private MonitoringServicePresenter presenter;
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
-        presenter = new MonitoringServicePresenter(view, blackBox);
+        dutyTypeManager = spy(new DutyTypeManager(preferencesManager));
+        presenter = new MonitoringServicePresenter(view, blackBox, dutyTypeManager, null);
         RxJavaPlugins.setIoSchedulerHandler(scheduler -> Schedulers.trampoline());
+        RxJavaPlugins.setComputationSchedulerHandler(scheduler -> Schedulers.trampoline());
+
     }
 
     @Test
@@ -56,6 +63,8 @@ public class MonitoringServicePresenterTest {
         final Subject<BlackBoxModel> subject = BehaviorSubject.create();
         when(blackBox.getDataObservable()).thenReturn(subject);
 
+        when(preferencesManager.getDutyType()).thenReturn(0);
+
         subject.onNext(blackBoxModel);
         presenter.startMonitoring();
 
@@ -66,7 +75,9 @@ public class MonitoringServicePresenterTest {
     @Test
     public void testStartMonitoringTwice() throws Exception {
 
-        RxJavaPlugins.setIoSchedulerHandler(scheduler -> Schedulers.newThread());
+//        RxJavaPlugins.setIoSchedulerHandler(scheduler -> Schedulers.newThread());
+
+//        dutyTypeManager.setDutyType(DutyType.ON_DUTY, false);
 
         final Subject<BlackBoxModel> subject = PublishSubject.create();
         when(blackBox.getDataObservable()).thenReturn(subject);

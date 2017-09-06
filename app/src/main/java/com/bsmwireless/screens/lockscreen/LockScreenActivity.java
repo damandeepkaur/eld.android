@@ -4,12 +4,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.bsmwireless.common.App;
 import com.bsmwireless.screens.common.BaseActivity;
+import com.bsmwireless.screens.switchdriver.SwitchDriverDialog;
 import com.bsmwireless.widgets.alerts.DutyType;
 import com.bsmwireless.widgets.dashboard.DutyView;
 
@@ -39,8 +41,12 @@ public class LockScreenActivity extends BaseActivity implements LockScreenView {
     @Inject
     LockScreenPresenter presenter;
 
+    private AlertDialog dialog;
+
     public static Intent createIntent(Context context) {
-        return new Intent(context, LockScreenActivity.class);
+        Intent intent = new Intent(context, LockScreenActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        return intent;
     }
 
     @Override
@@ -116,7 +122,8 @@ public class LockScreenActivity extends BaseActivity implements LockScreenView {
 
     @Override
     public void openCoDriverDialog() {
-
+        SwitchDriverDialog dialog = new SwitchDriverDialog(this);
+        dialog.show(SwitchDriverDialog.SwitchDriverStatus.SWITCH_DRIVER);
     }
 
     @Override
@@ -132,7 +139,9 @@ public class LockScreenActivity extends BaseActivity implements LockScreenView {
     @Override
     public void removeAnyPopup() {
         Toast.makeText(this, "remove popup", Toast.LENGTH_SHORT).show();
-
+        if (dialog != null) {
+            dialog.dismiss();
+        }
     }
 
     @Override
