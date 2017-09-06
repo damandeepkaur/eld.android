@@ -40,6 +40,7 @@
     <string name="error_username">Username Required</string>
     <string name="error_password">Password Required</string>
     <string name="error_domain">Domain Required</string>
+    <string name="error_pair">Pair error</string>
 
     <!--Logs-->
     <string name="logs_sign_logsheet">SIGN LOGSHEET</string>
@@ -461,7 +462,7 @@
     <string name="event_changed">(CHANGED)</string>
 
     <string name="event_type_off_duty">Off Duty</string>
-    <string name="event_type_sleeping">Sleeping Berth</string>
+    <string name="event_type_sleeping">Sleeper Berth</string>
     <string name="event_type_driving">Driving</string>
     <string name="event_type_on_duty">On Duty</string>
     <string name="event_type_personal_use">Personal Use</string>
@@ -474,17 +475,34 @@
     <string name="event_type_shut_down">Shut Down</string>
     <string name="event_type_power_up">Power Up</string>
     <string name="event_type_unknown_type">Unknown event type</string>
-    <string name="event_type_personal_use_title">Off Duty (Personal Use)</string>
-    <string name="event_type_yard_moves_title">On Duty (Yard Moves)</string>
+    <string name="event_type_personal_use_title">Off Duty (Start of Personal Use)</string>
+    <string name="event_type_yard_moves_title">On Duty (Start of Yard Moves)</string>
+    <string name="event_type_personal_use_end_title">Off Duty (End of Personal Use)</string>
+    <string name="event_type_yard_moves_end_title">On Duty (End of Yard Moves)</string>
     <string name="update_event_error">Update event error</string>
     <string name="add_event_error">Add event error</string>
     <string name="event_added">Event added</string>
     <string name="event_updated">Event updated</string>
 
     <!-- Auto Logout Activity -->
-    <string name="auto_logout_message_alert_dialog">Do you want to proceed with logout?</string>
-    <string name="auto_logout_positive_button_lbl_alert_dialog">Logout</string>
-    <string name="auto_logout_cancel_button_lbl_alert_dialog">Cancel</string>
+    <string name="logout_dialog_title">Expiration Warning</string>
+    <string name="logout_dialog_message">Your session will expire in 1 minutes. Please tap "Continue" to keep working or "Log out" to end your session now</string>
+    <string name="logout_accept">Continue</string>
+    <string name="logout_cancel">Log out</string>
+
+    <string name="driving_dialog_title">Confirmation required</string>
+    <string name="driving_dialog_message">You are still in Personal Use (Off Duty) mode. Please confirm your status or switch to the proper duty status.</string>
+    <string name="driving_cancel">Switch to Driving</string>
+    <string name="driving_accept">Confirm</string>
+
+    <string name="on_duty_dialog_title">Confirmation required</string>
+    <string name="on_duty_dialog_message">Your vehicle hasn\'t been in-motion for 5 minutes. Please confirm your driving status or switch to the proper duty status.</string>
+    <string name="on_duty_cancel">Switch to On Duty</string>
+    <string name="on_duty_accept">Confirm</string>
+
+    <string name="not_in_vehicle_dialog_title">Warning</string>
+    <string name="not_in_vehicle_dialog_message">You can\'t change duty status while not in vehicle.</string>
+    <string name="not_in_vehicle_accept">OK</string>
 
     <!-- Settings Activity -->
     <string name="settings">Settings</string>
@@ -516,5 +534,43 @@
         <item>14 days</item>
     </string-array>
     <string name="multiday_total_hours">Total hours</string>
+
+    <!-- Geo location enum direction description -->
+    <string name="geo_location_at_description">At indicated geo-location</string>
+    <string name="geo_location_north_description">North of indicated geo-location</string>
+    <string name="geo_location_north_north_east_description">North – North East of indicated geo-location</string>
+    <string name="geo_location_north_east_description">North East of indicated geo-location</string>
+    <string name="geo_location_east_north_east_description">East – North East of indicated geo-location</string>
+    <string name="geo_location_east_description">East of indicated geo-location</string>
+    <string name="geo_location_east_south_east_description">East – South East of indicated geo-location</string>
+    <string name="geo_location_south_east_description">South East of indicated geo-location</string>
+    <string name="geo_location_south_south_east_description">South – South East of indicated geo-location</string>
+    <string name="geo_location_south_description">South of indicated geo-location</string>
+    <string name="geo_location_south_south_west_description">South – South West of indicated geo-location</string>
+    <string name="geo_location_south_west_description">South West of indicated geo-location</string>
+    <string name="geo_location_west_south_west_description">West – South West of indicated geo-location</string>
+    <string name="geo_location_west_description">West of indicated geo-location</string>
+    <string name="geo_location_west_north_west_description">West – North West of indicated geo-location</string>
+    <string name="geo_location_north_west_description">North West of indicated geo-location</string>
+    <string name="geo_location_north_north_west_description">North – North West of indicated geo-location</string>
+
+    <!-- Geo location enum direction codes -->
+    <string name="geo_location_at_code">&#160;</string>
+    <string name="geo_location_north_code">N</string>
+    <string name="geo_location_north_north_east_code">NNE</string>
+    <string name="geo_location_north_east_code">NE</string>
+    <string name="geo_location_east_north_east_code">ENE</string>
+    <string name="geo_location_east_code">E</string>
+    <string name="geo_location_east_south_east_code">ESE</string>
+    <string name="geo_location_south_east_code">SE</string>
+    <string name="geo_location_south_south_east_code">SSE</string>
+    <string name="geo_location_south_code">S</string>
+    <string name="geo_location_south_south_west_code">SSW</string>
+    <string name="geo_location_south_west_code">SW</string>
+    <string name="geo_location_west_south_west_code">WSW</string>
+    <string name="geo_location_west_code">W</string>
+    <string name="geo_location_west_north_west_code">WNW</string>
+    <string name="geo_location_north_west_code">NW</string>
+    <string name="geo_location_north_north_west_code">NNW</string>
 
 </resources>

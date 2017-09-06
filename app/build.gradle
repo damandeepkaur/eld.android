@@ -10,8 +10,8 @@ android {
         applicationId "app.bsmuniversal.com"
         minSdkVersion 15
         targetSdkVersion 25
-        versionCode 46
-        versionName "1.0.45"
+        versionCode 50
+        versionName "1.0.49"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         javaCompileOptions {
@@ -177,4 +177,8 @@ dependencies {
     compile 'com.jakewharton.timber:timber:4.5.1'
 
     compile 'org.apache.commons:commons-lang3:3.5'
+}
+
+spoon {
+    noAnimations = true
 }

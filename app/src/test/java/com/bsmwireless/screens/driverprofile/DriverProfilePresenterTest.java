@@ -2,7 +2,7 @@ package com.bsmwireless.screens.driverprofile;
 
 import android.content.res.Resources;
 
-import com.bsmwireless.data.storage.DutyManager;
+import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.data.network.RetrofitException;
 import com.bsmwireless.data.storage.carriers.CarrierEntity;
 import com.bsmwireless.data.storage.hometerminals.HomeTerminalEntity;
@@ -59,7 +59,7 @@ public class DriverProfilePresenterTest {
     UserInteractor mUserInteractor;
 
     @Mock
-    DutyManager mDutyManager;
+    DutyTypeManager mDutyTypeManager;
 
     @Mock
     ELDEventsInteractor mEventsInteractor;
@@ -82,7 +82,7 @@ public class DriverProfilePresenterTest {
         MockitoAnnotations.initMocks(this);
 
         mFakeFullUserEntity = new FullUserEntity();
-        mDriverProfilePresenter = new DriverProfilePresenter(mView, mUserInteractor, mDutyManager, mEventsInteractor);
+        mDriverProfilePresenter = new DriverProfilePresenter(mView, mUserInteractor, mDutyTypeManager, mEventsInteractor);
     }
 
     @Test

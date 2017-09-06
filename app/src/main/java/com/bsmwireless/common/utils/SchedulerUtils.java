@@ -23,8 +23,7 @@ import android.os.SystemClock;
 
 public class SchedulerUtils {
 
-    private static int mJobId = 0;
-
+    private static final int JOB_ID = 111;
     private static final int AUTO_LOGOUT_TRIGGER_DURATION = 60;
     private static final int AUTO_LOGOUT_TRIGGER_DURATION_MIN = 55;
     private static final int AUTO_LOGOUT_TRIGGER_DURATION_MAX = 65;
@@ -96,9 +95,7 @@ public class SchedulerUtils {
             return;
         }
 
-
-        JobInfo.Builder builder = new JobInfo.Builder(mJobId++,
-                new ComponentName(App.getComponent().context(), AutoLogoutJobService.class))
+        JobInfo.Builder builder = new JobInfo.Builder(JOB_ID, new ComponentName(App.getComponent().context(), AutoLogoutJobService.class))
                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
                 .setMinimumLatency(TimeUnit.MINUTES.toMillis(AUTO_LOGOUT_TRIGGER_DURATION_MIN))
                 .setOverrideDeadline(TimeUnit.MINUTES.toMillis(AUTO_LOGOUT_TRIGGER_DURATION_MAX))
