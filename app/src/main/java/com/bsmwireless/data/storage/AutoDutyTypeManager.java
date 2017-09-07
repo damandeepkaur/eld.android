@@ -83,7 +83,7 @@ public class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListener {
     private void processBlackBoxState(BlackBoxModel blackBoxState) {
         ArrayList<ELDEvent> events = new ArrayList<>();
 
-        switch (blackBoxState.getResponseType()) {
+       switch (blackBoxState.getResponseType()) {
             //4.3.2.2.2 Driver's indication of situations impacting drive time recording
             case IGNITION_OFF:
                 events.add(mEventsInteractor.getEvent(mDutyTypeManager.getDutyType() == DutyType.PERSONAL_USE ?

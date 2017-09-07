@@ -21,6 +21,7 @@ import javax.inject.Inject;
 
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
@@ -102,8 +103,8 @@ public class ELDEventsInteractor {
                 mELDEventDao.insertAll(ELDEventConverter.toEntityArray(events, ELDEventEntity.SyncType.UPDATE_UNSYNC)));
     }
 
-    public Observable<Long> postNewELDEvent(ELDEvent event) {
-        return Observable.fromCallable(() ->
+    public Single<Long> postNewELDEvent(ELDEvent event) {
+        return Single.fromCallable(() ->
                 mELDEventDao.insertEvent(ELDEventConverter.toEntity(event, ELDEventEntity.SyncType.NEW_UNSYNC)));
     }
 

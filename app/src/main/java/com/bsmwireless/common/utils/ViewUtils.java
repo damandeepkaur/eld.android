@@ -14,7 +14,7 @@ public class ViewUtils {
         return px / ((float) metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
     }
 
-    public static float convertDpToPixels(int dp, Context context) {
+    public static float convertDpToPixels(float dp, Context context) {
         DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
         return dp * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT);
     }

@@ -332,7 +332,6 @@
     <string name="timer_default_type">OFF DUTY</string>
     <string name="timer_hours_minutes">HOURS MINUTES</string>
     <string name="string_total">TOTAL</string>
-
     <!-- END OLD STRINGS -->
 
     <string name="account_label">BSM Wireless</string>
@@ -418,8 +417,8 @@
     <string name="clear">Clear</string>
     <string name="try_again">Try again</string>
 
-    <!-- Edit Event Fragment -->
-    <string name="edit_event">Edit event</string>
+    <!-- Edit Event -->
+    <string name="edit_event">Edit Event</string>
     <string name="edit_event_status">Status</string>
     <string name="edit_event_address">Address</string>
     <string name="edit_event_start_time">Start time</string>
@@ -435,9 +434,15 @@
     <string name="edit_event_comment_error">Comment should not include special characters</string>
     <string name="edit_event_valid_comment">Valid comment</string>
 
+
     <!--Logs-->
     <string name="logs_log_header">log header</string>
     <string name="logs_events">events</string>
+
+    <!-- Edit Log Header -->
+    <string name="edit_log_header">Edit Log Header</string>
+
+    <!-- Logs -->
     <string name="odometer">Odometer(%1$s)</string>
     <string name="add_event">Add event</string>
     <string name="edit">Edit</string>

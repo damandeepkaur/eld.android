@@ -18,7 +18,6 @@ import javax.inject.Inject;
 
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
-import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
@@ -68,9 +67,7 @@ public class LogSheetInteractor {
 
     public Single<LogSheetHeader> createLogSheetHeader(long logday) {
         return Single.fromCallable(() -> createLogSheetHeaderModel(logday))
-                .flatMap(logSheetHeader -> updateLogSheetHeader(logSheetHeader)
-                        .map(updated -> (updated) ? logSheetHeader : null
-                ));
+                .flatMap(logSheetHeader -> updateLogSheetHeader(logSheetHeader).map(aBoolean -> logSheetHeader));
     }
 
     public void syncLogSheetHeader(LogSheetHeader logSheetHeader) {
