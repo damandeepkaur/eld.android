@@ -43,7 +43,7 @@ public class LockScreenPresenterTest {
                 dutyManager,
                 () -> new BlackBoxConnectionManagerImpl(blackBox),
                 blackBox,
-                TimeUnit.MILLISECONDS.toMillis(1),
+                preferencesManager, TimeUnit.MILLISECONDS.toMillis(1),
                 TimeUnit.MILLISECONDS.toMillis(1), accountManager);
         RxAndroidPlugins.setInitMainThreadSchedulerHandler(schedulerCallable -> Schedulers.trampoline());
         RxJavaPlugins.setIoSchedulerHandler(scheduler -> Schedulers.trampoline());

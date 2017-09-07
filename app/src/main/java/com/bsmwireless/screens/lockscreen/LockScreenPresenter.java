@@ -7,6 +7,7 @@ import com.bsmwireless.data.network.blackbox.BlackBoxConnectionManager;
 import com.bsmwireless.data.network.blackbox.models.BlackBoxResponseModel;
 import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.data.storage.DutyTypeManager;
+import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.models.BlackBoxModel;
 import com.bsmwireless.widgets.alerts.DutyType;
 
@@ -35,6 +36,7 @@ public class LockScreenPresenter {
     final Lazy<BlackBoxConnectionManager> connectionManager;
     private final CompositeDisposable mCompositeDisposable;
     private final BlackBox blackBox;
+    private final PreferencesManager preferencesManager;
     private final long blackBoxTimeoutMillis;
     private final long mIdlingTimeoutMillis;
     private final AccountManager accountManager;
@@ -49,12 +51,14 @@ public class LockScreenPresenter {
                                DutyTypeManager dutyManager,
                                Lazy<BlackBoxConnectionManager> connectionManager,
                                BlackBox blackBox,
+                               PreferencesManager preferencesManager,
                                @Named("disconnectTimeout") long blackBoxTimeoutMillis,
                                @Named("idleTimeout") long idlingTimeout, AccountManager accountManager) {
         mView = view;
         mDutyManager = dutyManager;
         this.connectionManager = connectionManager;
         this.blackBox = blackBox;
+        this.preferencesManager = preferencesManager;
         this.blackBoxTimeoutMillis = blackBoxTimeoutMillis;
         this.mIdlingTimeoutMillis = idlingTimeout;
         this.accountManager = accountManager;
@@ -184,7 +188,8 @@ public class LockScreenPresenter {
 
         Completable reconnectCompletable = reconnectionReference.get();
         if (reconnectCompletable == null) {
-            reconnectCompletable = connectionManager.get().connectBlackBox(1)
+            int boxId = preferencesManager.getBoxId();
+            reconnectCompletable = connectionManager.get().connectBlackBox(boxId)
                     .toCompletable()
                     .timeout(blackBoxTimeoutMillis, TimeUnit.MILLISECONDS)
                     .onErrorResumeNext(throwable -> {
@@ -193,7 +198,7 @@ public class LockScreenPresenter {
                             return Completable.fromAction(mView::showDisconnectionPopup)
                                     .observeOn(Schedulers.io())
                                     .subscribeOn(AndroidSchedulers.mainThread())
-                                    .andThen(connectionManager.get().connectBlackBox(1))
+                                    .andThen(connectionManager.get().connectBlackBox(boxId))
                                     .toCompletable();
                         }
                         return Completable.error(throwable);
