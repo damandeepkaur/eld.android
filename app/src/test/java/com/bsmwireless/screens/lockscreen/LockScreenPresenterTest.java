@@ -3,7 +3,9 @@ package com.bsmwireless.screens.lockscreen;
 import com.bsmwireless.data.network.blackbox.BlackBox;
 import com.bsmwireless.data.network.blackbox.BlackBoxConnectionManagerImpl;
 import com.bsmwireless.data.network.blackbox.models.BlackBoxResponseModel;
+import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.data.storage.DutyTypeManager;
+import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.models.BlackBoxModel;
 import com.bsmwireless.widgets.alerts.DutyType;
 
@@ -33,6 +35,10 @@ public class LockScreenPresenterTest {
     DutyTypeManager dutyManager;
     @Mock
     BlackBox blackBox;
+    @Mock
+    PreferencesManager preferencesManager;
+    @Mock
+    AccountManager accountManager;
 
     LockScreenPresenter presenter;
 
@@ -43,8 +49,10 @@ public class LockScreenPresenterTest {
                 dutyManager,
                 () -> new BlackBoxConnectionManagerImpl(blackBox),
                 blackBox,
-                preferencesManager, TimeUnit.MILLISECONDS.toMillis(1),
-                TimeUnit.MILLISECONDS.toMillis(1), accountManager);
+                preferencesManager,
+                TimeUnit.MILLISECONDS.toMillis(1),
+                TimeUnit.MILLISECONDS.toMillis(1),
+                accountManager);
         RxAndroidPlugins.setInitMainThreadSchedulerHandler(schedulerCallable -> Schedulers.trampoline());
         RxJavaPlugins.setIoSchedulerHandler(scheduler -> Schedulers.trampoline());
     }
