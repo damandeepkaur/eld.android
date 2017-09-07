@@ -2,6 +2,7 @@ package com.bsmwireless.data.network.blackbox;
 
 import com.bsmwireless.data.network.blackbox.models.BlackBoxResponseModel;
 import com.bsmwireless.data.network.blackbox.utils.BlackBoxParser;
+import com.bsmwireless.data.network.blackbox.utils.ConnectionUtils;
 import com.bsmwireless.models.BlackBoxModel;
 
 import java.io.IOException;
@@ -56,6 +57,9 @@ public final class BlackBoxImpl implements BlackBox {
     @Override
     public void connect(int boxId) throws Exception {
         Timber.d("connect");
+        if (ConnectionUtils.isEmulator()) {
+            return;
+        }
         if (!isConnected() && (mDisposable == null || mDisposable.isDisposed())) {
             mBoxId = boxId;
             mDisposable = Observable.interval(RETRY_CONNECT_DELAY, TimeUnit.MILLISECONDS)
