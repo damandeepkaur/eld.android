@@ -2,6 +2,8 @@ package com.bsmwireless.common.utils;
 
 import android.content.Context;
 
+import com.bsmwireless.common.App;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -233,4 +235,12 @@ public class DateUtils {
         return format.format(calendar.getTime());
     }
 
+    /**
+     * @return real time which is sync with the ntp server
+     */
+    public static Long currentTimeMillis() {
+        long realTimeInMilisecondsDiff = App.getComponent().ntpClientManager().getRealTimeInMillisDiff();
+        long realTimeInMiliseconds = System.currentTimeMillis() + realTimeInMilisecondsDiff;
+        return realTimeInMiliseconds;
+    }
 }
