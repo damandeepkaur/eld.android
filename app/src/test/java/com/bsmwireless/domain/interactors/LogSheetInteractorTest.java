@@ -165,7 +165,7 @@ public class LogSheetInteractorTest {
         HomeTerminalEntity fakeHomeTerminalentity = new HomeTerminalEntity();
         fakeHomeTerminalentity.setId(homeTermId);
 
-        when(mPreferencesManager.getDriverId()).thenReturn(driverId);
+        when(mAccountManager.getCurrentDriverId()).thenReturn(driverId);
         when(mPreferencesManager.getBoxId()).thenReturn(boxId);
         when(mPreferencesManager.getVehicleId()).thenReturn(vehicleId);
         when(mAppDatabase.userDao()).thenReturn(mUserDao);
@@ -179,7 +179,7 @@ public class LogSheetInteractorTest {
         mLogSheetInteractor.createLogSheetHeader(startLogDay).subscribe(testObserver);
 
         // then
-        verify(mPreferencesManager).getDriverId();
+        verify(mAccountManager).getCurrentDriverId();
         verify(mPreferencesManager).getBoxId();
         verify(mPreferencesManager).getVehicleId();
         verify(mUserDao).getUserSync(anyInt());

@@ -191,7 +191,6 @@ public class ELDEventsInteractorTest {
         mEldEventsInteractor.getDutyEventsFromDB(startTime, endTime).subscribe(testSubscriber);
 
         // then
-        verify(mPreferencesManager).getDriverId();
         verify(mEldEventDao).getDutyEventsFromStartToEndTime(eq(startTime), eq(endTime), anyInt());
     }
 
@@ -224,15 +223,14 @@ public class ELDEventsInteractorTest {
 
         List<ELDEventEntity> eldEventEntities = new ArrayList<>();
 
-        when(mEldEventDao.getLatestActiveDutyEventSync(anyLong(), anyInt()))
-                .thenReturn(eldEventEntities);
+        when(mEldEventDao.getLatestActiveDutyEvent(anyLong(), anyInt()))
+                .thenReturn(Flowable.just(eldEventEntities));
 
         // when
         mEldEventsInteractor.getLatestActiveDutyEventFromDB(latestTime, userId);
 
         // then
-        verify(mPreferencesManager).getDriverId();
-        verify(mEldEventDao).getLatestActiveDutyEventSync(eq(latestTime), anyInt());
+        verify(mEldEventDao).getLatestActiveDutyEvent(eq(latestTime), anyInt());
     }
 
     @Test
@@ -250,7 +248,6 @@ public class ELDEventsInteractorTest {
         mEldEventsInteractor.getLatestActiveDutyEventFromDBSync(latestTime, userId);
 
         // then
-        verify(mPreferencesManager).getDriverId();
         verify(mEldEventDao).getLatestActiveDutyEventSync(eq(latestTime), anyInt());
     }
 
@@ -270,7 +267,6 @@ public class ELDEventsInteractorTest {
         mEldEventsInteractor.getActiveEventsFromDBSync(startTime, endTime);
 
         // then
-        verify(mPreferencesManager).getDriverId();
         verify(mEldEventDao).getActiveEventsFromStartToEndTimeSync(eq(startTime), eq(endTime), anyInt());
     }
 
