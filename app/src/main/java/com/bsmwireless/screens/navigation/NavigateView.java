@@ -5,6 +5,7 @@ import com.bsmwireless.widgets.snackbar.SnackBarLayout;
 
 public interface NavigateView extends BaseMenuView {
     void goToLoginScreen();
+    void goToSelectAssetScreen();
     void showErrorMessage(String message);
     void setDriverName(String name);
     void setCoDriversNumber(int coDriverNum);

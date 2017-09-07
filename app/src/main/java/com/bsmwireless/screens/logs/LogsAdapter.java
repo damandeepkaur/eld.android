@@ -21,7 +21,6 @@ import com.bsmwireless.widgets.logs.calendar.CalendarItem;
 import com.bsmwireless.widgets.logs.calendar.CalendarLayout;
 import com.bsmwireless.widgets.logs.graphview.GraphLayout;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -51,7 +50,7 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
     private TextView mSignLogsheet;
     private View mSigned;
     private List<EventLogModel> mEventLogs = Collections.emptyList();
-    private LogHeaderModel mLogHeaderInfo = new LogHeaderModel();
+    private LogHeaderModel mLogHeader = new LogHeaderModel();
     private List<LogSheetHeader> mLogHeaders = Collections.emptyList();
     private View.OnClickListener mOnMenuClickListener;
     private RecyclerView.SmoothScroller mSmoothScroller;
@@ -111,8 +110,8 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
         notifyDataSetChanged();
     }
 
-    public void setLogHeaderInfo(LogHeaderModel logHeaderInfo) {
-        mLogHeaderInfo = logHeaderInfo;
+    public void setLogHeader(LogHeaderModel logHeaderModel) {
+        mLogHeader = logHeaderModel;
         notifyDataSetChanged();
     }
 
@@ -191,7 +190,7 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
             EventLogModel event = mEventLogs.get(position - 2);
             bindEventView(holder, event);
         } else if (viewType == VIEW_TYPE_LOG_HEADER_ITEM) {
-            holder.bindLogHeaderView(mLogHeaderInfo);
+            holder.bindLogHeaderView(mLogHeader);
         }
     }
 
@@ -424,7 +423,7 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
             mHomeTerminalAddress.setText(logHeader.getHomeTerminalAddress());
             mTrailers.setText(logHeader.getTrailers());
             mShippingId.setText(logHeader.getShippingId());
-            mDrivingExemptions.setText(logHeader.getExemptions());
+            mDrivingExemptions.setText(logHeader.getSelectedExemptions());
         }
     }
 
