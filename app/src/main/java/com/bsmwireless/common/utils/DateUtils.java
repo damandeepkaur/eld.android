@@ -195,7 +195,7 @@ public class DateUtils {
 
     /**
      * @param time string with format time like "12:35 AM"
-     * @param day current day time
+     * @param day  current day time
      * @return long unix time in ms
      */
     public static Long convertStringAMPMToTime(String time, long day, String timezone) {

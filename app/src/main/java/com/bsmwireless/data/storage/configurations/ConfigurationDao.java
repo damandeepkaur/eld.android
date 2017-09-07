@@ -4,6 +4,8 @@ import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
 
+import com.bsmwireless.data.storage.hometerminals.HomeTerminalEntity;
+
 import java.util.List;
 
 import io.reactivex.Flowable;
@@ -26,4 +28,7 @@ public interface ConfigurationDao {
 
     @Insert(onConflict = REPLACE)
     void insertAll(ConfigurationEntity... configurations);
+
+    @Insert(onConflict = REPLACE)
+    void insertAll(List<ConfigurationEntity> configurations);
 }

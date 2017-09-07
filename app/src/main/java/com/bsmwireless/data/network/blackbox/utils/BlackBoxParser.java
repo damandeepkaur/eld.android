@@ -17,6 +17,7 @@ public class BlackBoxParser {
     //  2 start bytes, 1 checksum, 2 length, 1 command, 1 packetId,  4 boxid, 2 year, 1 month, 1 day, 1 hour, 1 minute, 1 sec, 2 millisecond, 1 GPS, 1 update rate.
     private static final int SUBSCRIPTION_PACKET_LENGTH = 22;
     private static final byte SUBSCRIPTION_REQUEST = (byte) 'C';
+    private static final byte STATUS_REQUEST = (byte) 'S';
     private static final byte START_MESSAGE_INDICATOR = (byte) '@';
     private static final byte START_PACKET_INDICATOR = (byte) 0xFF;
     private static final byte DEVICE_TYPE = (byte) Constants.DEVICE_TYPE.charAt(0);  // Representing 'A' for the device type Android
@@ -181,6 +182,24 @@ public class BlackBoxParser {
         //Vehicle Status Update Rate
         request[index] = (byte) (updateRateMillis / 1000);
         request[CHECK_SUM_INDX] = ConnectionUtils.checkSum(request, 9);
+        return request;
+    }
+
+    public static byte[] generateImmediateStatusRequest() {
+        byte[] request = new byte[SUBSCRIPTION_PACKET_LENGTH + HEADER_LENGTH];
+        int index = 0;
+
+        System.arraycopy(generateHeader(), 0, request, index, HEADER_LENGTH + 2);
+        index = HEADER_LENGTH + 2;
+        // checksum
+        request[CHECK_SUM_INDX] = 0;
+        index++;
+        //Packet length
+        byte[] lengthBytes = ConnectionUtils.intToByte(START_INDEX, 2);
+        System.arraycopy(lengthBytes, 0, request, index, 2); // 2 bytes
+        index += 2;
+        //Command
+        request[index++] = STATUS_REQUEST;
         return request;
     }
 

@@ -14,6 +14,9 @@ public interface CarrierDao {
     @Query("DELETE FROM carriers WHERE id = :id")
     int deleteCarrier(int id);
 
+    @Query("DELETE FROM carriers WHERE user_id = :userId")
+    int deleteByUserId(int userId);
+
     @Insert(onConflict = REPLACE)
     void insertCarriers(List<CarrierEntity> carrier);
 }

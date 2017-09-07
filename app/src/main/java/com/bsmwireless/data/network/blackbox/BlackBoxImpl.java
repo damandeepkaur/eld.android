@@ -56,13 +56,15 @@ public final class BlackBoxImpl implements BlackBox {
         Timber.d("connect");
         if (!isConnected()) {
             mSocket = new Socket(WIFI_GATEWAY_IP, WIFI_REMOTE_PORT);
+            //TODO: remove fake box id
             mBoxId = boxId;
             mDisposable = Observable.interval(RETRY_CONNECT_DELAY, TimeUnit.MILLISECONDS)
                     .take(RETRY_COUNT)
                     .filter(this::initializeCommunication)
                     .firstElement()
                     .ignoreElement()
-                    .andThen(startContinuousRead())
+                    .andThen(requestDataImmediately())
+                    .flatMap(unused -> startContinuousRead())
                     .timeout(UPDATE_RATE_MILLIS * TIMEOUT_RATIO,
                             TimeUnit.MILLISECONDS,
                             Observable.error(new BlackBoxConnectionException(UNKNOWN_ERROR)))
@@ -139,11 +141,7 @@ public final class BlackBoxImpl implements BlackBox {
     private Observable<BlackBoxModel> startContinuousRead() {
         Timber.d("startContinuousRead");
         return Observable.interval(UPDATE_RATE_MILLIS / UPDATE_RATE_RATIO, TimeUnit.MILLISECONDS)
-                .filter(unused -> isConnected())
-                .map(unused -> getInputStream())
-                .filter(stream -> stream.available() > START_INDEX)
-                .map(this::readRawData)
-                .map(bytes -> BlackBoxParser.parseVehicleStatus(bytes).getBoxData())
+                .switchMap(unused -> readStatus())
                 .distinctUntilChanged()
                 .doOnNext(model -> {
                     mBlackBoxModel.set(model);
@@ -153,6 +151,17 @@ public final class BlackBoxImpl implements BlackBox {
 
     public byte getSequenceID() {
         return (mSequenceID & 0xFF) > 250 ? 1 : ++mSequenceID;
+    }
+
+    private Observable<BlackBoxModel> readStatus() {
+        return Observable.fromCallable(this::isConnected)
+                .observeOn(Schedulers.io())
+                .filter(isConnected -> isConnected)
+                .map(unused -> getInputStream())
+                .filter(stream -> stream.available() > START_INDEX)
+                .map(this::readRawData)
+                .map(bytes -> BlackBoxParser.parseVehicleStatus(bytes).getBoxData());
+
     }
 
     private BlackBoxResponseModel readSubscriptionResponse() throws Exception {
@@ -206,5 +215,22 @@ public final class BlackBoxImpl implements BlackBox {
         readSocketLock.unlock();
         output.write(request);
         output.flush();
+    }
+
+    private Observable<BlackBoxModel> requestDataImmediately() throws IOException {
+        return Observable.just(0)
+                .observeOn(Schedulers.io())
+                .doOnNext(unused -> writeRawData(BlackBoxParser.generateImmediateStatusRequest()))
+                // 200ms delay to read current status asap
+                .switchMap(unused -> Observable.interval(200, TimeUnit.MILLISECONDS))
+                .switchMap(unused -> readStatus())
+                // read status only one time
+                .take(1)
+                .doOnNext(model -> {
+                    mBlackBoxModel.set(model);
+                    Timber.v("Box Model processed:" + model.toString());
+                })
+                .doOnNext(model -> mEmitter.get().onNext(model))
+                .doOnError(error -> mEmitter.get().onError(error));
     }
 }
