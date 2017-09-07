@@ -43,26 +43,26 @@ public class Users {
 
     public static class User {
 
-        private String username;
-        private String password;
-        private String domain;
+        private String mUsername;
+        private String mPassword;
+        private String mDomain;
 
         private User(String username, String password, String domain) {
-            this.username = username;
-            this.password = password;
-            this.domain = domain;
+            this.mUsername = username;
+            this.mPassword = password;
+            this.mDomain = domain;
         }
 
         public String getUsername() {
-            return username;
+            return mUsername;
         }
 
         public String getPassword() {
-            return password;
+            return mPassword;
         }
 
         public String getDomain() {
-            return domain;
+            return mDomain;
         }
     }
 }

@@ -21,7 +21,7 @@ import app.bsmuniversal.com.utils.Users;
 public class SimpleLogoutTest extends BaseTestClass {
 
     @Rule
-    public ActivityTestRule<LoginActivity> mLoginActivityTestRule = new IntentsTestRule<>(LoginActivity.class);
+    public ActivityTestRule<LoginActivity> loginActivityTestRule = new IntentsTestRule<>(LoginActivity.class);
 
     @Test
     public void test_logout() {
@@ -54,7 +54,7 @@ public class SimpleLogoutTest extends BaseTestClass {
     }
 
     private void doLogout() {
-        SelectAssetPage.go_to_home_screen_from_select_asset_screen();
+        SelectAssetPage.go_to_home_screen();
         logout();
         wait_for_view(REQUEST_TIMEOUT, LoginLocators.execute_login);
     }
