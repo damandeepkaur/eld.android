@@ -56,7 +56,7 @@ public final class BlackBoxImpl implements BlackBox {
     @Override
     public void connect(int boxId) throws Exception {
         Timber.d("connect");
-        if (!isConnected()) {
+        if (!isConnected() && (mDisposable == null || mDisposable.isDisposed())) {
             mBoxId = boxId;
             mDisposable = Observable.interval(RETRY_CONNECT_DELAY, TimeUnit.MILLISECONDS)
                     .take(RETRY_COUNT)
@@ -85,7 +85,9 @@ public final class BlackBoxImpl implements BlackBox {
     public void disconnect() throws IOException {
         Timber.d("disconnect");
         mBlackBoxModel.set(new BlackBoxModel());
-        mDisposable.dispose();
+        if (mDisposable != null && !mDisposable.isDisposed()) {
+            mDisposable.dispose();
+        }
         recreateEmitter();
         if (isConnected()) {
             closeSocket();
