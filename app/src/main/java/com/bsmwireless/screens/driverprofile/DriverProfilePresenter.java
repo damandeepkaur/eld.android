@@ -31,7 +31,7 @@ import static com.bsmwireless.screens.driverprofile.DriverProfileView.Error.PASS
 import static com.bsmwireless.screens.driverprofile.DriverProfileView.Error.VALID_PASSWORD;
 
 @ActivityScope
-public class DriverProfilePresenter extends BaseMenuPresenter implements AccountManager.AccountListener {
+public class DriverProfilePresenter extends BaseMenuPresenter {
 
     private static final int MAX_SIGNATURE_LENGTH = 50000;
 
@@ -42,7 +42,9 @@ public class DriverProfilePresenter extends BaseMenuPresenter implements Account
     private CarrierEntity mCarrier;
 
     @Inject
-    public DriverProfilePresenter(DriverProfileView view, UserInteractor userInteractor, DutyTypeManager dutyTypeManager, ELDEventsInteractor eventsInteractor, AccountManager accountManager) {
+    public DriverProfilePresenter(DriverProfileView view, UserInteractor userInteractor,
+                                  DutyTypeManager dutyTypeManager, ELDEventsInteractor eventsInteractor,
+                                  AccountManager accountManager) {
         mView = view;
         mUserInteractor = userInteractor;
         mDutyTypeManager = dutyTypeManager;
@@ -51,19 +53,6 @@ public class DriverProfilePresenter extends BaseMenuPresenter implements Account
         mDisposables = new CompositeDisposable();
 
         Timber.d("CREATED");
-    }
-
-    public void onViewCreated() {
-        mAccountManager.addListener(this);
-        if (!mAccountManager.isCurrentUserDriver()) {
-            Disposable disposable = Single.fromCallable(() -> mUserInteractor.getFullUserNameSync())
-                                          .subscribeOn(Schedulers.io())
-                                          .observeOn(AndroidSchedulers.mainThread())
-                                          .subscribe(name -> mView.showCoDriverView(name));
-            mDisposables.add(disposable);
-        } else {
-            mView.hideCoDriverView();
-        }
     }
 
     public void onNeedUpdateUserInfo() {
@@ -93,12 +82,6 @@ public class DriverProfilePresenter extends BaseMenuPresenter implements Account
                                        },
                                        throwable -> Timber.e(throwable.getMessage()));
         mDisposables.add(disposable);
-    }
-
-    @Override
-    public void onDestroy() {
-        mAccountManager.removeListener(this);
-        super.onDestroy();
     }
 
     @Override
@@ -244,18 +227,7 @@ public class DriverProfilePresenter extends BaseMenuPresenter implements Account
 
     @Override
     public void onUserChanged() {
+        super.onUserChanged();
         onNeedUpdateUserInfo();
-        if (!mAccountManager.isCurrentUserDriver()) {
-            Disposable disposable = Single.fromCallable(() -> mUserInteractor.getFullUserNameSync())
-                                          .subscribeOn(Schedulers.io())
-                                          .observeOn(AndroidSchedulers.mainThread())
-                                          .subscribe(name -> mView.showCoDriverView(name));
-            mDisposables.add(disposable);
-        } else {
-            mView.hideCoDriverView();
-        }
     }
-
-    @Override
-    public void onDriverChanged() {}
 }

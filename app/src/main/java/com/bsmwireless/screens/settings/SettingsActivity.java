@@ -6,8 +6,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.AppCompatRadioButton;
-import android.view.View;
-import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
@@ -47,12 +45,6 @@ public class SettingsActivity extends BaseMenuActivity implements SettingsView {
 
     @BindView(R.id.miles_unit_button)
     AppCompatRadioButton mMilesUnitsRadioButton;
-
-    @BindView(R.id.co_driver_notification)
-    TextView mCoDriverNotification;
-
-    @BindView(R.id.co_driver_notification_layout)
-    LinearLayout mCoDriverNotificationLayout;
 
     @Inject
     SettingsPresenter mPresenter;
@@ -136,17 +128,5 @@ public class SettingsActivity extends BaseMenuActivity implements SettingsView {
     @Override
     protected BaseMenuPresenter getPresenter() {
         return mPresenter;
-    }
-
-    @Override
-    public void showCoDriverView(String name) {
-        mCoDriverNotificationLayout.setVisibility(View.VISIBLE);
-        mCoDriverNotification.setText(String.format("You are in co-driver view (%s)", name));
-    }
-
-    @Override
-    public void hideCoDriverView() {
-        mCoDriverNotificationLayout.setVisibility(View.GONE);
-        mCoDriverNotification.setText("");
     }
 }

@@ -17,7 +17,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -67,12 +66,6 @@ public class NavigationActivity extends BaseMenuActivity implements OnNavigation
 
     @BindView(R.id.navigation_snackbar)
     SnackBarLayout mSnackBarLayout;
-
-    @BindView(R.id.co_driver_notification)
-    TextView mCoDriverNotification;
-
-    @BindView(R.id.co_driver_notification_layout)
-    LinearLayout mCoDriverNotificationLayout;
 
     @Inject
     NavigationPresenter mPresenter;
@@ -325,18 +318,6 @@ public class NavigationActivity extends BaseMenuActivity implements OnNavigation
         dialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         dialogIntent.putExtra(EXTRA_AUTO_DRIVING_WITHOUT_CONFIRM, true);
         startActivity(dialogIntent);
-    }
-
-    @Override
-    public void showCoDriverView(String name) {
-        mCoDriverNotificationLayout.setVisibility(View.VISIBLE);
-        mCoDriverNotification.setText(String.format("You are in co-driver view (%s)", name));
-    }
-
-    @Override
-    public void hideCoDriverView() {
-        mCoDriverNotificationLayout.setVisibility(View.GONE);
-        mCoDriverNotification.setText("");
     }
 
     protected static class HeaderViewHolder {

@@ -1,9 +1,13 @@
 package com.bsmwireless.screens.common.menu;
 
+import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.screens.common.BaseActivity;
@@ -16,6 +20,7 @@ import com.bsmwireless.widgets.alerts.OccupancyType;
 import java.util.ArrayList;
 
 import app.bsmuniversal.com.R;
+import butterknife.BindView;
 
 public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuView {
     private MenuItem mELDItem;
@@ -27,6 +32,14 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
     protected DriverDialog mSwitchDriverDialog;
 
     protected abstract BaseMenuPresenter getPresenter();
+
+    @Nullable
+    @BindView(R.id.co_driver_notification)
+    TextView mCoDriverNotification;
+
+    @Nullable
+    @BindView(R.id.co_driver_notification_layout)
+    LinearLayout mCoDriverNotificationLayout;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -172,5 +185,21 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
                 .setPositiveButton(R.string.not_in_vehicle_accept, null)
                 .setCancelable(true)
                 .show();
+    }
+
+    @Override
+    public void showCoDriverView(String name) {
+        if (mCoDriverNotificationLayout != null && mCoDriverNotification != null) {
+            mCoDriverNotificationLayout.setVisibility(View.VISIBLE);
+            mCoDriverNotification.setText(String.format("You are in co-driver view (%s)", name));
+        }
+    }
+
+    @Override
+    public void hideCoDriverView() {
+        if (mCoDriverNotificationLayout != null && mCoDriverNotification != null) {
+            mCoDriverNotificationLayout.setVisibility(View.GONE);
+            mCoDriverNotification.setText("");
+        }
     }
 }

@@ -10,15 +10,11 @@ import com.bsmwireless.screens.common.menu.BaseMenuView;
 
 import javax.inject.Inject;
 
-import io.reactivex.Single;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
 @ActivityScope
-public class SettingsPresenter extends BaseMenuPresenter implements AccountManager.AccountListener {
+public class SettingsPresenter extends BaseMenuPresenter {
 
     private SettingsView mView;
     private SettingsInteractor mSettingsInteractor;
@@ -43,17 +39,6 @@ public class SettingsPresenter extends BaseMenuPresenter implements AccountManag
 
         // set current selected value for odometer units
         mView.checkOdometerUnit(loadLastSelectedOdometerUnit());
-
-        mAccountManager.addListener(this);
-        if (!mAccountManager.isCurrentUserDriver()) {
-            Disposable disposable = Single.fromCallable(() -> mUserInteractor.getFullUserNameSync())
-                                          .subscribeOn(Schedulers.io())
-                                          .observeOn(AndroidSchedulers.mainThread())
-                                          .subscribe(name -> mView.showCoDriverView(name));
-            mDisposables.add(disposable);
-        } else {
-            mView.hideCoDriverView();
-        }
     }
 
     @Override
@@ -90,23 +75,5 @@ public class SettingsPresenter extends BaseMenuPresenter implements AccountManag
             return SettingsView.OdometerUnits.ODOMETER_UNITS_KM;
         }
         return SettingsView.OdometerUnits.ODOMETER_UNITS_MI;
-    }
-
-    @Override
-    public void onUserChanged() {
-        if (!mAccountManager.isCurrentUserDriver()) {
-            Disposable disposable = Single.fromCallable(() -> mUserInteractor.getFullUserNameSync())
-                                          .subscribeOn(Schedulers.io())
-                                          .observeOn(AndroidSchedulers.mainThread())
-                                          .subscribe(name -> mView.showCoDriverView(name));
-            mDisposables.add(disposable);
-        } else {
-            mView.hideCoDriverView();
-        }
-    }
-
-    @Override
-    public void onDriverChanged() {
-
     }
 }

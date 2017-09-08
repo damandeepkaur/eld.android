@@ -11,9 +11,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.LinearLayout;
 import android.widget.ScrollView;
-import android.widget.TextView;
 
 import com.bsmwireless.common.App;
 import com.bsmwireless.common.utils.NetworkUtils;
@@ -106,12 +104,6 @@ public class DriverProfileActivity extends BaseMenuActivity implements DriverPro
     @BindView(R.id.snackbar)
     SnackBarLayout mSnackBarLayout;
 
-    @BindView(R.id.co_driver_notification)
-    TextView mCoDriverNotification;
-
-    @BindView(R.id.co_driver_notification_layout)
-    LinearLayout mCoDriverNotificationLayout;
-
     @Inject
     DriverProfilePresenter mPresenter;
 
@@ -127,7 +119,6 @@ public class DriverProfileActivity extends BaseMenuActivity implements DriverPro
         initToolbar();
 
         mPresenter.onNeedUpdateUserInfo();
-        mPresenter.onViewCreated();
 
         mSignatureLayout.setOnSaveListener(this);
     }
@@ -265,17 +256,5 @@ public class DriverProfileActivity extends BaseMenuActivity implements DriverPro
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
 
-    }
-
-    @Override
-    public void showCoDriverView(String name) {
-        mCoDriverNotificationLayout.setVisibility(View.VISIBLE);
-        mCoDriverNotification.setText(String.format("You are in co-driver view (%s)", name));
-    }
-
-    @Override
-    public void hideCoDriverView() {
-        mCoDriverNotificationLayout.setVisibility(View.GONE);
-        mCoDriverNotification.setText("");
     }
 }

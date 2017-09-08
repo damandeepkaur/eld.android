@@ -19,15 +19,13 @@ import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
-import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
 @ActivityScope
-public class EditEventPresenter extends BaseMenuPresenter implements AccountManager.AccountListener {
+public class EditEventPresenter extends BaseMenuPresenter {
 
     private EditEventView mView;
     private ELDEvent mELDEvent;
@@ -53,7 +51,6 @@ public class EditEventPresenter extends BaseMenuPresenter implements AccountMana
     }
 
     public void onViewCreated() {
-        mAccountManager.addListener(this);
         mDisposables.add(mUserInteractor.getTimezone()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -62,15 +59,6 @@ public class EditEventPresenter extends BaseMenuPresenter implements AccountMana
                     mCalendar = Calendar.getInstance(TimeZone.getTimeZone(mTimezone));
                     mView.getExtrasFromIntent();
                 }));
-        if (!mAccountManager.isCurrentUserDriver()) {
-            Disposable disposable = Single.fromCallable(() -> mUserInteractor.getFullUserNameSync())
-                                          .subscribeOn(Schedulers.io())
-                                          .observeOn(AndroidSchedulers.mainThread())
-                                          .subscribe(name -> mView.showCoDriverView(name));
-            mDisposables.add(disposable);
-        } else {
-            mView.hideCoDriverView();
-        }
     }
 
     @Override
@@ -78,11 +66,10 @@ public class EditEventPresenter extends BaseMenuPresenter implements AccountMana
         return mView;
     }
 
+    @Override
     public void onDestroy() {
-        mAccountManager.removeListener(this);
         mDisposables.dispose();
-
-        Timber.d("DESTROYED");
+        super.onDestroy();
     }
 
     public void onStartTimeClick(String time) {
@@ -168,20 +155,4 @@ public class EditEventPresenter extends BaseMenuPresenter implements AccountMana
         }
         return EditEventView.Error.VALID_COMMENT;
     }
-
-    @Override
-    public void onUserChanged() {
-        if (!mAccountManager.isCurrentUserDriver()) {
-            Disposable disposable = Single.fromCallable(() -> mUserInteractor.getFullUserNameSync())
-                                          .subscribeOn(Schedulers.io())
-                                          .observeOn(AndroidSchedulers.mainThread())
-                                          .subscribe(name -> mView.showCoDriverView(name));
-            mDisposables.add(disposable);
-        } else {
-            mView.hideCoDriverView();
-        }
-    }
-
-    @Override
-    public void onDriverChanged() {}
 }
