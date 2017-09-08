@@ -41,12 +41,6 @@ public class SettingsPresenter extends BaseMenuPresenter {
         mView.checkOdometerUnit(loadLastSelectedOdometerUnit());
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        mAccountManager.removeListener(this);
-    }
-
     public void onBoxGPSSwitchChecked(boolean isBoxGPSEnabled) {
         mSettingsInteractor.saveBoxGPSEnabled(isBoxGPSEnabled);
     }

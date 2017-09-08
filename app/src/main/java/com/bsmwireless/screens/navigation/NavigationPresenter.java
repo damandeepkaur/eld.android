@@ -118,16 +118,6 @@ public class NavigationPresenter extends BaseMenuPresenter {
                                         .subscribe(count -> mView.setCoDriversNumber(count)));
         mAutoDutyTypeManager.validateBlackBoxState();
         mSyncEventsInteractor.startSync();
-
-        if (!mAccountManager.isCurrentUserDriver()) {
-            Disposable disposable = Single.fromCallable(() -> mUserInteractor.getFullUserNameSync())
-                                          .subscribeOn(Schedulers.io())
-                                          .observeOn(AndroidSchedulers.mainThread())
-                                          .subscribe(name -> mView.showCoDriverView(name));
-            mDisposables.add(disposable);
-        } else {
-            mView.hideCoDriverView();
-        }
     }
 
     public void onResetTime() {
