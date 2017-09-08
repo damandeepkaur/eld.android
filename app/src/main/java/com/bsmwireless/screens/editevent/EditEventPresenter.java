@@ -144,7 +144,7 @@ public class EditEventPresenter extends BaseMenuPresenter {
         if (comment.length() < 4) {
             return EditEventView.Error.INVALID_COMMENT_LENGTH;
         }
-        Pattern pattern = Pattern.compile("[^A-Za-z0-9]", Pattern.CASE_INSENSITIVE);
+        Pattern pattern = Pattern.compile("[^A-Za-z0-9 .,:;`?!-_%&()\"'@#$*+]", Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(comment);
         if (matcher.find()) {
             return EditEventView.Error.INVALID_COMMENT;
