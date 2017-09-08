@@ -12,6 +12,8 @@ import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.bsmwireless.common.App;
 import com.bsmwireless.data.storage.DutyTypeManager;
@@ -55,6 +57,10 @@ public class EditEventActivity extends BaseMenuActivity implements EditEventView
     TextInputEditText mComment;
     @BindView(R.id.address)
     TextInputEditText mAddress;
+    @BindView(R.id.co_driver_notification)
+    TextView mCoDriverNotification;
+    @BindView(R.id.co_driver_notification_layout)
+    LinearLayout mCoDriverNotificationLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -215,5 +221,17 @@ public class EditEventActivity extends BaseMenuActivity implements EditEventView
         DutyType[] types = DutyTypeManager.DRIVER_DUTY_EXTENDED_WITH_CLEAR;
         mEventStatus.setAdapter(new DutyTypeSpinnerAdapter(this, types));
         mEventStatus.setOnItemSelectedListener(this);
+    }
+
+    @Override
+    public void showCoDriverView(String name) {
+        mCoDriverNotificationLayout.setVisibility(View.VISIBLE);
+        mCoDriverNotification.setText(String.format("You are in co-driver view (%s)", name));
+    }
+
+    @Override
+    public void hideCoDriverView() {
+        mCoDriverNotificationLayout.setVisibility(View.GONE);
+        mCoDriverNotification.setText("");
     }
 }

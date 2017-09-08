@@ -17,6 +17,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -55,7 +56,7 @@ public class NavigationActivity extends BaseMenuActivity implements OnNavigation
     @BindView(R.id.navigation_view)
     NavigationView mNavigationView;
 
-    @BindView(R.id.navigation_toolbar)
+    @BindView(R.id.toolbar)
     Toolbar mToolbar;
 
     @BindView(R.id.navigation_tab_layout)
@@ -66,6 +67,12 @@ public class NavigationActivity extends BaseMenuActivity implements OnNavigation
 
     @BindView(R.id.navigation_snackbar)
     SnackBarLayout mSnackBarLayout;
+
+    @BindView(R.id.co_driver_notification)
+    TextView mCoDriverNotification;
+
+    @BindView(R.id.co_driver_notification_layout)
+    LinearLayout mCoDriverNotificationLayout;
 
     @Inject
     NavigationPresenter mPresenter;
@@ -297,17 +304,6 @@ public class NavigationActivity extends BaseMenuActivity implements OnNavigation
     }
 
     @Override
-    public void onCoDriverViewStart(String coDriverName) {
-        // TODO add co-driver notification
-        Toast.makeText(this, "View as co-driver " + coDriverName, Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onCoDriverViewEnd() {
-        // TODO remove co-driver notification
-    }
-
-    @Override
     public void setAutoOnDuty() {
         Intent dialogIntent = new Intent(this, AutoDutyDialogActivity.class);
         dialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -329,6 +325,18 @@ public class NavigationActivity extends BaseMenuActivity implements OnNavigation
         dialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         dialogIntent.putExtra(EXTRA_AUTO_DRIVING_WITHOUT_CONFIRM, true);
         startActivity(dialogIntent);
+    }
+
+    @Override
+    public void showCoDriverView(String name) {
+        mCoDriverNotificationLayout.setVisibility(View.VISIBLE);
+        mCoDriverNotification.setText(String.format("You are in co-driver view (%s)", name));
+    }
+
+    @Override
+    public void hideCoDriverView() {
+        mCoDriverNotificationLayout.setVisibility(View.GONE);
+        mCoDriverNotification.setText("");
     }
 
     protected static class HeaderViewHolder {

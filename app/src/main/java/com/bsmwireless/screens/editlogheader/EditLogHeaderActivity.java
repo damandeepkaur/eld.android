@@ -5,8 +5,10 @@ import android.os.Bundle;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.bsmwireless.common.App;
 import com.bsmwireless.common.utils.ListConverter;
@@ -54,6 +56,12 @@ public class EditLogHeaderActivity extends BaseMenuActivity implements EditLogHe
 
     @BindView(R.id.exemptions)
     LinearLayout mExemptionList;
+
+    @BindView(R.id.co_driver_notification)
+    TextView mCoDriverNotification;
+
+    @BindView(R.id.co_driver_notification_layout)
+    LinearLayout mCoDriverNotificationLayout;
 
     private List<ExemptionModel> mExemptions;
 
@@ -180,6 +188,18 @@ public class EditLogHeaderActivity extends BaseMenuActivity implements EditLogHe
             actionBar.setDisplayShowTitleEnabled(true);
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+    }
+
+    @Override
+    public void showCoDriverView(String name) {
+        mCoDriverNotificationLayout.setVisibility(View.VISIBLE);
+        mCoDriverNotification.setText(String.format("You are in co-driver view (%s)", name));
+    }
+
+    @Override
+    public void hideCoDriverView() {
+        mCoDriverNotificationLayout.setVisibility(View.GONE);
+        mCoDriverNotification.setText("");
     }
 
     public class ExemptionModel {

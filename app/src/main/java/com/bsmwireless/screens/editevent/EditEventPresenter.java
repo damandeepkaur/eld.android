@@ -2,6 +2,7 @@ package com.bsmwireless.screens.editevent;
 
 import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.common.utils.DateUtils;
+import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
 import com.bsmwireless.domain.interactors.UserInteractor;
@@ -18,13 +19,15 @@ import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
+import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
 @ActivityScope
-public class EditEventPresenter extends BaseMenuPresenter {
+public class EditEventPresenter extends BaseMenuPresenter implements AccountManager.AccountListener {
 
     private EditEventView mView;
     private ELDEvent mELDEvent;
@@ -34,12 +37,15 @@ public class EditEventPresenter extends BaseMenuPresenter {
 
 
     @Inject
-    public EditEventPresenter(EditEventView view, UserInteractor userInteractor, ELDEventsInteractor eventsInteractor, DutyTypeManager dutyTypeManager) {
+    public EditEventPresenter(EditEventView view, UserInteractor userInteractor,
+                              ELDEventsInteractor eventsInteractor, DutyTypeManager dutyTypeManager,
+                              AccountManager accountManager) {
         mView = view;
         mDisposables = new CompositeDisposable();
         mUserInteractor = userInteractor;
         mEventsInteractor = eventsInteractor;
         mDutyTypeManager = dutyTypeManager;
+        mAccountManager = accountManager;
         mTimezone = TimeZone.getDefault().getID();
         mCalendar = Calendar.getInstance();
 
@@ -47,6 +53,7 @@ public class EditEventPresenter extends BaseMenuPresenter {
     }
 
     public void onViewCreated() {
+        mAccountManager.addListener(this);
         mDisposables.add(mUserInteractor.getTimezone()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -55,6 +62,15 @@ public class EditEventPresenter extends BaseMenuPresenter {
                     mCalendar = Calendar.getInstance(TimeZone.getTimeZone(mTimezone));
                     mView.getExtrasFromIntent();
                 }));
+        if (!mAccountManager.isCurrentUserDriver()) {
+            Disposable disposable = Single.fromCallable(() -> mUserInteractor.getFullUserNameSync())
+                                          .subscribeOn(Schedulers.io())
+                                          .observeOn(AndroidSchedulers.mainThread())
+                                          .subscribe(name -> mView.showCoDriverView(name));
+            mDisposables.add(disposable);
+        } else {
+            mView.hideCoDriverView();
+        }
     }
 
     @Override
@@ -63,6 +79,7 @@ public class EditEventPresenter extends BaseMenuPresenter {
     }
 
     public void onDestroy() {
+        mAccountManager.removeListener(this);
         mDisposables.dispose();
 
         Timber.d("DESTROYED");
@@ -151,4 +168,20 @@ public class EditEventPresenter extends BaseMenuPresenter {
         }
         return EditEventView.Error.VALID_COMMENT;
     }
+
+    @Override
+    public void onUserChanged() {
+        if (!mAccountManager.isCurrentUserDriver()) {
+            Disposable disposable = Single.fromCallable(() -> mUserInteractor.getFullUserNameSync())
+                                          .subscribeOn(Schedulers.io())
+                                          .observeOn(AndroidSchedulers.mainThread())
+                                          .subscribe(name -> mView.showCoDriverView(name));
+            mDisposables.add(disposable);
+        } else {
+            mView.hideCoDriverView();
+        }
+    }
+
+    @Override
+    public void onDriverChanged() {}
 }

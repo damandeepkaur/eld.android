@@ -15,13 +15,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/settings_toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingTop="@dimen/default_toolbar_padding"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Dark"
-            app:titleTextAppearance="@style/ActionBarTitleTextStyle"/>
+        <include layout="@layout/menu_toolbar"/>
+
     </android.support.design.widget.AppBarLayout>
 
     <TextView

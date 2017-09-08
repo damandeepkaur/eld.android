@@ -116,7 +116,11 @@ public class DashboardFragment extends BaseFragment implements DashboardView {
 
     @OnClick(R.id.dashboard_current)
     public void onDutyClick() {
-        mNavigateView.showDutyTypeDialog(mDutyType);
+        if (mPresenter.isConnected()) {
+            mNavigateView.showDutyTypeDialog(mDutyType);
+        } else {
+            mNavigateView.showNotInVehicleDialog();
+        }
     }
 
     @OnClick(R.id.dashboard_indicator)

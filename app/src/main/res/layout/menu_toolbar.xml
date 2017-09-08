@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:paddingTop="@dimen/default_toolbar_padding">
+
+        <LinearLayout
+            android:id="@+id/co_driver_notification_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:background="@color/coral"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/co_driver_notification"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/navigation_header_co_driver_margin"
+                android:textSize="@dimen/text_size_extra_small"
+                android:textStyle="normal"
+                android:textColor="@android:color/white"/>
+
+        </LinearLayout>
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:titleTextAppearance="@style/ActionBarTitleTextStyle"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
+
+</LinearLayout>

@@ -55,6 +55,15 @@ public class DriverProfilePresenter extends BaseMenuPresenter implements Account
 
     public void onViewCreated() {
         mAccountManager.addListener(this);
+        if (!mAccountManager.isCurrentUserDriver()) {
+            Disposable disposable = Single.fromCallable(() -> mUserInteractor.getFullUserNameSync())
+                                          .subscribeOn(Schedulers.io())
+                                          .observeOn(AndroidSchedulers.mainThread())
+                                          .subscribe(name -> mView.showCoDriverView(name));
+            mDisposables.add(disposable);
+        } else {
+            mView.hideCoDriverView();
+        }
     }
 
     public void onNeedUpdateUserInfo() {
@@ -236,6 +245,15 @@ public class DriverProfilePresenter extends BaseMenuPresenter implements Account
     @Override
     public void onUserChanged() {
         onNeedUpdateUserInfo();
+        if (!mAccountManager.isCurrentUserDriver()) {
+            Disposable disposable = Single.fromCallable(() -> mUserInteractor.getFullUserNameSync())
+                                          .subscribeOn(Schedulers.io())
+                                          .observeOn(AndroidSchedulers.mainThread())
+                                          .subscribe(name -> mView.showCoDriverView(name));
+            mDisposables.add(disposable);
+        } else {
+            mView.hideCoDriverView();
+        }
     }
 
     @Override
