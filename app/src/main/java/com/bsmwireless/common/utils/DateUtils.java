@@ -233,4 +233,10 @@ public class DateUtils {
         return format.format(calendar.getTime());
     }
 
+    public static String convertToFullTime(String timezone, Date date) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm MMM dd, yyyy", Locale.getDefault());
+        dateFormat.setTimeZone(TimeZone.getTimeZone(timezone));
+        return dateFormat.format(date);
+    }
+
 }

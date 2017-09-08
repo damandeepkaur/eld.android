@@ -12,9 +12,12 @@ import com.bsmwireless.data.storage.eldevents.ELDEventEntity;
 import com.bsmwireless.data.storage.users.UserDao;
 import com.bsmwireless.models.BlackBoxModel;
 import com.bsmwireless.models.ELDEvent;
+import com.bsmwireless.models.Malfunction;
 import com.bsmwireless.widgets.alerts.DutyType;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -140,6 +143,59 @@ public class ELDEventsInteractor {
                              );
                          })
                          .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
+    }
+
+    /**
+     * Load all active diagnostic events
+     * @return
+     */
+    public Flowable<List<ELDEvent>> getDiagnosticEvents(){
+
+        Calendar instance = Calendar.getInstance();
+        instance.add(Calendar.DATE, -1);
+
+        // TODO: 08.09.2017 Stub events
+        ELDEvent first = new ELDEvent();
+        first.setMalCode(Malfunction.POWER_DATA_DIAGNOSTIC);
+        first.setEventTime(instance.getTimeInMillis());
+
+        instance.add(Calendar.DATE, -1);
+        ELDEvent second = new ELDEvent();
+        second.setMalCode(Malfunction.ENGINE_SYNCHRONIZATION);
+        second.setEventTime(instance.getTimeInMillis());
+
+        instance.add(Calendar.DATE, -1);
+        ELDEvent third = new ELDEvent();
+        third.setMalCode(Malfunction.MISSING_REQUIRED_DATA_ELEMENTS);
+        third.setEventTime(instance.getTimeInMillis());
+
+        return Flowable.just(Arrays.asList(first, second, third));
+    }
+
+    /**
+     * Load all active malfunction events
+     * @return
+     */
+    public Flowable<List<ELDEvent>> getMalfunctionEvents(){
+        Calendar instance = Calendar.getInstance();
+        instance.add(Calendar.DATE, -1);
+
+        // TODO: 08.09.2017 Stub events
+        ELDEvent first = new ELDEvent();
+        first.setMalCode(Malfunction.POSITIONING_COMPLIANCE);
+        first.setEventTime(instance.getTimeInMillis());
+
+        instance.add(Calendar.DATE, -1);
+        ELDEvent second = new ELDEvent();
+        second.setMalCode(Malfunction.ENGINE_SYNCHRONIZATION_COMPLIANCE);
+        second.setEventTime(instance.getTimeInMillis());
+
+        instance.add(Calendar.DATE, -1);
+        ELDEvent third = new ELDEvent();
+        third.setMalCode(Malfunction.POSITIONING_COMPLIANCE);
+        third.setEventTime(instance.getTimeInMillis());
+
+        return Flowable.just(Arrays.asList(first, second, third));
     }
 
     private ArrayList<ELDEvent> getEvents(DutyType dutyType) {

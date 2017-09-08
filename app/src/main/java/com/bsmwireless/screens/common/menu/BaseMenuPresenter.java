@@ -23,6 +23,14 @@ public abstract class BaseMenuPresenter {
 
     protected abstract BaseMenuView getView();
 
+    public void showMalfunctionEvent() {
+        getView().showMalfunctionDialog();
+    }
+
+    public void showDiagnosticEvents() {
+        getView().showDiagnosticEvents();
+    }
+
     void onMenuCreated() {
         mDutyTypeManager.addListener(mListener);
         mDisposables.add(mUserInteractor.getCoDriversNumber()

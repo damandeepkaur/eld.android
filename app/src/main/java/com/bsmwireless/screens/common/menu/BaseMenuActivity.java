@@ -7,6 +7,8 @@ import android.widget.ArrayAdapter;
 
 import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.screens.common.BaseActivity;
+import com.bsmwireless.screens.diagnostic.DiagnosticDialog;
+import com.bsmwireless.screens.diagnostic.MalfunctionDialog;
 import com.bsmwireless.screens.switchdriver.DriverDialog;
 import com.bsmwireless.screens.switchdriver.SwitchDriverDialog;
 import com.bsmwireless.widgets.alerts.DutyType;
@@ -21,6 +23,7 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
     private MenuItem mELDItem;
     private MenuItem mDutyItem;
     private MenuItem mOccupancyItem;
+    private MenuItem mMalfunctionItem;
 
     protected AlertDialog mDutyDialog;
 
@@ -32,9 +35,10 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_alert, menu);
 
-        mELDItem = menu.findItem(R.id.action_eld);
+        mELDItem = menu.findItem(R.id.action_diagnostic);
         mDutyItem = menu.findItem(R.id.action_duty);
         mOccupancyItem = menu.findItem(R.id.action_occupancy);
+        mMalfunctionItem = menu.findItem(R.id.action_malfunction);
 
         mSwitchDriverDialog = new SwitchDriverDialog(this);
 
@@ -46,7 +50,8 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_eld:
+            case R.id.action_diagnostic:
+                getPresenter().showDiagnosticEvents();
                 break;
             case R.id.action_duty:
                 getPresenter().onChangeDutyClick();
@@ -58,6 +63,9 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
                 onHomePress();
                 break;
             }
+            case R.id.action_malfunction:
+                getPresenter().showMalfunctionEvent();
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -100,6 +108,16 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
         if (mSwitchDriverDialog != null) {
             mSwitchDriverDialog.show();
         }
+    }
+
+    @Override
+    public void showMalfunctionDialog() {
+        MalfunctionDialog.newInstance().show(getSupportFragmentManager(), "");
+    }
+
+    @Override
+    public void showDiagnosticEvents() {
+        DiagnosticDialog.newInstance().show(getSupportFragmentManager(), "");
     }
 
     @Override

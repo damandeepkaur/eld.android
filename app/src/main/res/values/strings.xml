@@ -549,7 +549,7 @@
         <item>14 days</item>
     </string-array>
     <string name="multiday_total_hours">Total hours</string>
-    
+
     <!-- Lock screen -->
     <string name="lock_screen_switch_co_driver_message">You can switch to co-driver view to continue work in application</string>
     <string name="switch_to_co_driver_view">SWITCH TO CO-DRIVER VIEW</string>
@@ -605,5 +605,25 @@
     <string name="switch_driver_invalid_credentials">Invalid credentials</string>
     <string name="switch_driver_error_login_codriver">Co-driver was not logged in</string>
     <string name="switch_driver_login_error">Login error</string>
+
+    <!-- Diagnostic events -->
+    <string name="diagnostic_events_title">Data diagnostics events</string>
+    <string name="malfunction_events_title">ELD malfunctions events</string>
+    <string name="diagnostic_power_data">Power Diagnostic</string>
+    <string name="diagnostic_engine_synchronization">Engine Synchronization</string>
+    <string name="diagnostic_missing_req_data">Missing Required Data Elements</string>
+    <string name="diagnostic_data_transfer">Data Transfer</string>
+    <string name="diagnostic_unidentified_driving">Unidentified Driving Records</string>
+    <string name="diagnostic_other">Other</string>
+    <string name="malfunction_power">Power Compliance</string>
+    <string name="malfunction_engine_synchronization">Engine Synchronization</string>
+    <string name="malfunction_timing">Timing</string>
+    <string name="malfunction_positioning">Positioning</string>
+    <string name="malfunction_data_recording">Data Recording</string>
+    <string name="malfunction_data_transfer">Data Transfer</string>
+    <string name="malfunction_other">Other</string>
+
+
+
 
 </resources>

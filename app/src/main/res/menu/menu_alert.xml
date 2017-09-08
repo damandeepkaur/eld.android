@@ -3,7 +3,13 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:local="http://schemas.android.com/apk/res-auto">
 
-    <item android:id="@+id/action_eld"
+
+    <item android:id="@+id/action_malfunction"
+          android:icon="@drawable/ic_eld_selector"
+          android:title="MLF"
+          local:showAsAction="always" />
+
+    <item android:id="@+id/action_diagnostic"
           android:icon="@drawable/ic_eld_selector"
           android:title="@string/driver_profile_menu_eld"
           local:showAsAction="always" />
