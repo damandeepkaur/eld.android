@@ -5,6 +5,7 @@ import com.bsmwireless.common.utils.DateUtils;
 import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
+import com.bsmwireless.domain.interactors.SyncInteractor;
 import com.bsmwireless.domain.interactors.UserInteractor;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.widgets.alerts.DutyType;
@@ -30,6 +31,7 @@ import static com.bsmwireless.common.utils.DateUtils.MS_IN_DAY;
 public class MultidayPresenter implements AccountManager.AccountListener {
     private MultidayView mView;
     private ELDEventsInteractor mELDEventsInteractor;
+    private SyncInteractor mSyncInteractor;
     private UserInteractor mUserInteractor;
     private AccountManager mAccountManager;
     private CompositeDisposable mDisposables;
@@ -38,9 +40,11 @@ public class MultidayPresenter implements AccountManager.AccountListener {
     private String mTimeZone;
 
     @Inject
-    public MultidayPresenter(MultidayView view, ELDEventsInteractor eventsInteractor, UserInteractor userInteractor, AccountManager accountManager) {
+    public MultidayPresenter(MultidayView view, ELDEventsInteractor eventsInteractor, UserInteractor userInteractor,
+                             AccountManager accountManager, SyncInteractor syncInteractor) {
         mView = view;
         mELDEventsInteractor = eventsInteractor;
+        mSyncInteractor = syncInteractor;
         mUserInteractor = userInteractor;
         mAccountManager = accountManager;
         mDisposables = new CompositeDisposable();
@@ -73,10 +77,9 @@ public class MultidayPresenter implements AccountManager.AccountListener {
 
         long endDayTime = calendar.getTimeInMillis();
         calendar.setTimeInMillis(endDayTime - (dayCount - 1) * MS_IN_DAY);
-        long startDayTime = DateUtils.getStartDate(mTimeZone, calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.MONTH), calendar.get(Calendar.YEAR));
+        long startDayTime = DateUtils.getStartDate(mTimeZone, calendar);
 
-
-        mELDEventsInteractor.syncELDEventsWithServer(startDayTime, endDayTime);
+        mSyncInteractor.syncEventsForDay(calendar, mTimeZone);
 
         mGetEventDisposable.dispose();
         mGetEventDisposable = Observable.fromCallable(() -> getMultidayItems(dayCount, startDayTime))
