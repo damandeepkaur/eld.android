@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 
 import com.bsmwireless.common.Constants;
 import com.bsmwireless.data.network.HttpClientManager;
+import com.bsmwireless.data.network.NtpClientManager;
 import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.network.authenticator.TokenManager;
 import com.bsmwireless.data.network.converters.MalfunctionConverter;
@@ -94,5 +95,11 @@ public class NetworkModule {
     @Singleton
     ServiceApi provideServiceApi(Retrofit retrofit) {
         return retrofit.create(ServiceApi.class);
+    }
+
+    @Provides
+    @Singleton
+    public NtpClientManager provideNtpClientManager() {
+        return new NtpClientManager();
     }
 }

@@ -6,10 +6,12 @@ import com.bsmwireless.domain.interactors.UserInteractor;
 import com.bsmwireless.widgets.alerts.DutyType;
 import com.bsmwireless.widgets.alerts.OccupancyType;
 
+import io.reactivex.Single;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.disposables.Disposables;
 import io.reactivex.schedulers.Schedulers;
@@ -17,7 +19,7 @@ import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.Subject;
 import timber.log.Timber;
 
-public abstract class BaseMenuPresenter {
+public abstract class BaseMenuPresenter implements AccountManager.AccountListener{
     private final DutyTypeManager mDutyTypeManager;
     private final ELDEventsInteractor mEventsInteractor;
     private final UserInteractor mUserInteractor;
@@ -65,6 +67,16 @@ public abstract class BaseMenuPresenter {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(count -> getView().setOccupancyType(OccupancyType.getTypeById(count))));
+        mAccountManager.addListener(this);
+        if (!mAccountManager.isCurrentUserDriver()) {
+            Disposable disposable = Single.fromCallable(() -> mUserInteractor.getFullUserNameSync())
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(name -> getView().showCoDriverView(name));
+            mDisposables.add(disposable);
+        } else {
+            getView().hideCoDriverView();
+        }
     }
 
     void onDutyChanged(DutyType dutyType) {
@@ -91,6 +103,7 @@ public abstract class BaseMenuPresenter {
     }
 
     public void onDestroy() {
+        mAccountManager.removeListener(this);
         mDutyTypeManager.removeListener(mListener);
         mDisposables.dispose();
         menuCreatedSubject.onComplete();
@@ -155,4 +168,20 @@ public abstract class BaseMenuPresenter {
     protected DutyTypeManager getDutyTypeManager() {
         return mDutyTypeManager;
     }
+
+    @Override
+    public void onUserChanged() {
+        if (!mAccountManager.isCurrentUserDriver()) {
+            Disposable disposable = Single.fromCallable(() -> mUserInteractor.getFullUserNameSync())
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(name -> getView().showCoDriverView(name));
+            mDisposables.add(disposable);
+        } else {
+            getView().hideCoDriverView();
+        }
+    }
+
+    @Override
+    public void onDriverChanged() {}
 }

@@ -12,6 +12,8 @@ public interface BaseMenuView {
     void showNotInVehicleDialog();
     void changeDutyType(DutyType dutyType);
     void showSwitchDriverDialog();
+    void showCoDriverView(String name);
+    void hideCoDriverView();
     void showMalfunctionDialog();
     void showDiagnosticEvents();
     void changeMalfunctionStatus(boolean hasMalfunctionEvents);

@@ -2,6 +2,7 @@ package com.bsmwireless.screens.editevent;
 
 import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.common.utils.DateUtils;
+import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
 import com.bsmwireless.domain.interactors.UserInteractor;
@@ -58,6 +59,7 @@ public class EditEventPresenter extends BaseMenuPresenter {
         return mView;
     }
 
+    @Override
     public void onDestroy() {
         super.onDestroy();
         Timber.d("DESTROYED");

@@ -606,6 +606,7 @@
     <string name="switch_driver_invalid_credentials">Invalid credentials</string>
     <string name="switch_driver_error_login_codriver">Co-driver was not logged in</string>
     <string name="switch_driver_login_error">Login error</string>
+    <string name="switch_driver_co_driver_view">You are in co-driver view</string>
 
     <!-- Diagnostic events -->
     <string name="diagnostic_events_title">Data diagnostics events</string>
