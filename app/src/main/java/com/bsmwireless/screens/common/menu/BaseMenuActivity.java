@@ -191,7 +191,9 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
     public void showCoDriverView(String name) {
         if (mCoDriverNotificationLayout != null && mCoDriverNotification != null) {
             mCoDriverNotificationLayout.setVisibility(View.VISIBLE);
-            mCoDriverNotification.setText(String.format("You are in co-driver view (%s)", name));
+            mCoDriverNotification.setText(
+                    String.format(getString(R.string.switch_driver_co_driver_view) + " (%s)", name)
+            );
         }
     }
 
