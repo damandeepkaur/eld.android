@@ -64,13 +64,12 @@ public class NavigationPresenter extends BaseMenuPresenter {
                                AutoDutyTypeManager autoDutyTypeManager,
                                SyncEventsInteractor syncEventsInteractor,
                                AccountManager accountManager) {
-        super(dutyTypeManager, eventsInteractor, userInteractor);
+        super(dutyTypeManager, eventsInteractor, userInteractor, accountManager);
         mView = view;
         mVehiclesInteractor = vehiclesInteractor;
         mAutoDutyTypeManager = autoDutyTypeManager;
         mSyncEventsInteractor = syncEventsInteractor;
         mResetTimeDisposable = Disposables.disposed();
-        mAccountManager = accountManager;
 
         mAutoDutyTypeManager.setListener(mListener);
     }

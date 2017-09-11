@@ -39,7 +39,6 @@ public class DriverProfilePresenter extends BaseMenuPresenter {
     private FullUserEntity mFullUserEntity;
     private List<HomeTerminalEntity> mHomeTerminals;
     private CarrierEntity mCarrier;
-    private final AccountManager mAccountManager;
 
     @Inject
     public DriverProfilePresenter(DriverProfileView view,
@@ -47,9 +46,8 @@ public class DriverProfilePresenter extends BaseMenuPresenter {
                                   DutyTypeManager dutyTypeManager,
                                   ELDEventsInteractor eventsInteractor,
                                   AccountManager accountManager) {
-        super(dutyTypeManager, eventsInteractor, userInteractor);
+        super(dutyTypeManager, eventsInteractor, userInteractor, accountManager);
         mView = view;
-        mAccountManager = accountManager;
 
         Timber.d("CREATED");
     }

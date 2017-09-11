@@ -24,8 +24,9 @@ public class SettingsPresenter extends BaseMenuPresenter {
                              SettingsInteractor settingsInteractor,
                              DutyTypeManager dutyTypeManager,
                              UserInteractor userInteractor,
-                             ELDEventsInteractor eldEventsInteractor) {
-        super(dutyTypeManager, eldEventsInteractor, userInteractor);
+                             ELDEventsInteractor eldEventsInteractor,
+                             AccountManager accountManager) {
+        super(dutyTypeManager, eldEventsInteractor, userInteractor, accountManager);
         mView = view;
         mSettingsInteractor = settingsInteractor;
 

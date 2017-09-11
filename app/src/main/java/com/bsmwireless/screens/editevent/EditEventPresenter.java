@@ -34,8 +34,12 @@ public class EditEventPresenter extends BaseMenuPresenter {
 
 
     @Inject
-    public EditEventPresenter(EditEventView view, UserInteractor userInteractor, ELDEventsInteractor eventsInteractor, DutyTypeManager dutyTypeManager) {
-        super(dutyTypeManager, eventsInteractor, userInteractor);
+    public EditEventPresenter(EditEventView view,
+                              UserInteractor userInteractor,
+                              ELDEventsInteractor eventsInteractor,
+                              DutyTypeManager dutyTypeManager,
+                              AccountManager accountManager) {
+        super(dutyTypeManager, eventsInteractor, userInteractor, accountManager);
         mView = view;
         mTimezone = TimeZone.getDefault().getID();
         mCalendar = Calendar.getInstance();

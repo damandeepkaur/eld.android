@@ -43,7 +43,7 @@ public class BaseMenuPresenterTest {
         RxJavaPlugins.setIoSchedulerHandler(scheduler -> Schedulers.trampoline());
         RxAndroidPlugins.setInitMainThreadSchedulerHandler(scheduler -> Schedulers.trampoline());
 
-        baseMenuPresenter = new BaseMenuPresenter(dutyTypeManager, eldEventsInteractor, userInteractor) {
+        baseMenuPresenter = new BaseMenuPresenter(dutyTypeManager, eldEventsInteractor, userInteractor, mAccountManager) {
             @Override
             protected BaseMenuView getView() {
                 return view;

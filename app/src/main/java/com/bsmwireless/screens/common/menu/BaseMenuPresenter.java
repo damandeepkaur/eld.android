@@ -1,17 +1,17 @@
 package com.bsmwireless.screens.common.menu;
 
+import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
 import com.bsmwireless.domain.interactors.UserInteractor;
 import com.bsmwireless.widgets.alerts.DutyType;
 import com.bsmwireless.widgets.alerts.OccupancyType;
 
-import io.reactivex.Single;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
+import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.disposables.Disposables;
 import io.reactivex.schedulers.Schedulers;
@@ -23,6 +23,7 @@ public abstract class BaseMenuPresenter implements AccountManager.AccountListene
     private final DutyTypeManager mDutyTypeManager;
     private final ELDEventsInteractor mEventsInteractor;
     private final UserInteractor mUserInteractor;
+    private final AccountManager mAccountManager;
     private CompositeDisposable mDisposables;
     private Disposable mDiagnosticEventsDisposable;
     private Disposable mMalfunctionEventsDisposable;
@@ -30,10 +31,11 @@ public abstract class BaseMenuPresenter implements AccountManager.AccountListene
 
     public BaseMenuPresenter(DutyTypeManager dutyTypeManager,
                              ELDEventsInteractor eventsInteractor,
-                             UserInteractor userInteractor) {
+                             UserInteractor userInteractor, AccountManager mAccountManager) {
         this.mDutyTypeManager = dutyTypeManager;
         this.mEventsInteractor = eventsInteractor;
         this.mUserInteractor = userInteractor;
+        this.mAccountManager = mAccountManager;
         this.mDisposables = new CompositeDisposable();
         mDiagnosticEventsDisposable = Disposables.disposed();
         mMalfunctionEventsDisposable = Disposables.disposed();
@@ -69,7 +71,7 @@ public abstract class BaseMenuPresenter implements AccountManager.AccountListene
                 .subscribe(count -> getView().setOccupancyType(OccupancyType.getTypeById(count))));
         mAccountManager.addListener(this);
         if (!mAccountManager.isCurrentUserDriver()) {
-            Disposable disposable = Single.fromCallable(() -> mUserInteractor.getFullUserNameSync())
+            Disposable disposable = Single.fromCallable(mUserInteractor::getFullUserNameSync)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(name -> getView().showCoDriverView(name));
