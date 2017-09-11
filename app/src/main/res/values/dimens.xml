@@ -95,6 +95,7 @@
     <dimen name="navigation_header_top_padding">51dp</dimen>
     <dimen name="navigation_header_title_text_size">14sp</dimen>
     <dimen name="navigation_header_num_value_text_size">12sp</dimen>
+    <dimen name="navigation_header_co_driver_margin">4dp</dimen>
 
     <!-- Driver profile dimens -->
     <dimen name="driver_profile_item_margin">16dp</dimen>
@@ -173,5 +174,8 @@
     <!-- Floating action button -->
     <dimen name="action_button_frame_size">88dp</dimen>
     <dimen name="action_button_size">56dp</dimen>
+
+    <!-- Switch driver -->
+    <dimen name="progress_height">2dp</dimen>
 
 </resources>

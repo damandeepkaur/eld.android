@@ -13,8 +13,10 @@ import android.os.Build;
 
 import com.bsmwireless.common.App;
 import com.bsmwireless.schedulers.alarmmanager.AlarmBootReceiver;
+import com.bsmwireless.schedulers.alarmmanager.SyncNtpAlarmReceiver;
 import com.bsmwireless.schedulers.jobscheduler.AutoLogoutJobService;
 import com.bsmwireless.schedulers.alarmmanager.AlarmReceiver;
+import com.bsmwireless.schedulers.jobscheduler.SyncNtpJobService;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -24,17 +26,21 @@ import android.os.SystemClock;
 public class SchedulerUtils {
 
     private static final int JOB_ID = 111;
+    private static final int SYNC_NTP_JOB_ID = 222;
     private static final int AUTO_LOGOUT_TRIGGER_DURATION = 60;
     private static final int AUTO_LOGOUT_TRIGGER_DURATION_MIN = 55;
     private static final int AUTO_LOGOUT_TRIGGER_DURATION_MAX = 65;
+    private static final int SYNC_NTP_TRIGGER_PERIOD_MIN = 5;
 
     private static PendingIntent mPendingIntent;
 
     public static void schedule() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             scheduleExactJobScheduler();
+            scheduleInExactJobScheduler();
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
             scheduleExactAlarmManager();
+            scheduleInExactAlarmManager();
         }
     }
 
@@ -59,6 +65,16 @@ public class SchedulerUtils {
             alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,
                     SystemClock.elapsedRealtime() + TimeUnit.MINUTES.toMillis(AUTO_LOGOUT_TRIGGER_DURATION), mPendingIntent);
         }
+    }
+
+    public static void scheduleInExactAlarmManager() {
+        Intent intent = new Intent(App.getComponent().context(), SyncNtpAlarmReceiver.class);
+        mPendingIntent = PendingIntent.getBroadcast(App.getComponent().context(), 0, intent, 0);
+        AlarmManager alarmManager = (AlarmManager) App.getComponent().context().getSystemService(Context.ALARM_SERVICE);
+        alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                SystemClock.elapsedRealtime() + TimeUnit.MINUTES.toMillis(SYNC_NTP_TRIGGER_PERIOD_MIN),
+                TimeUnit.MINUTES.toMillis(SYNC_NTP_TRIGGER_PERIOD_MIN),
+                mPendingIntent);
     }
 
     public static void cancel() {
@@ -101,6 +117,17 @@ public class SchedulerUtils {
                 .setOverrideDeadline(TimeUnit.MINUTES.toMillis(AUTO_LOGOUT_TRIGGER_DURATION_MAX))
                 .setPersisted(true)
                 .setRequiresDeviceIdle(true);
+
+        JobScheduler jobScheduler = (JobScheduler) App.getComponent().context().getSystemService(Context.JOB_SCHEDULER_SERVICE);
+        jobScheduler.schedule(builder.build());
+    }
+
+    @TargetApi(21)
+    private static void scheduleInExactJobScheduler() {
+        JobInfo.Builder builder = new JobInfo.Builder(SYNC_NTP_JOB_ID, new ComponentName(App.getComponent().context(), SyncNtpJobService.class))
+                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+                .setPeriodic(TimeUnit.MINUTES.toMillis(SYNC_NTP_TRIGGER_PERIOD_MIN))
+                .setPersisted(false);
 
         JobScheduler jobScheduler = (JobScheduler) App.getComponent().context().getSystemService(Context.JOB_SCHEDULER_SERVICE);
         jobScheduler.schedule(builder.build());

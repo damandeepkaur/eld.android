@@ -13,7 +13,7 @@ import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.User;
 import com.bsmwireless.widgets.alerts.DutyType;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -73,30 +73,42 @@ public class SwitchDriverPresenter {
     public void onSwitchDriverCreated() {
         mGetCoDriversDisposable.dispose();
         mGetCoDriversDisposable = mUserInteractor.getCoDriversFromDB()
-                .subscribeOn(Schedulers.io())
-                .map(this::getModelList)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(coDrivers -> mView.setCoDriversForSwitchDialog(coDrivers));
+                                                 .subscribeOn(Schedulers.io())
+                                                 .map(SwitchDriverDialog.UserModel::fromEntity)
+                                                 .observeOn(AndroidSchedulers.mainThread())
+                                                 .doOnNext(userModels -> mView.setCoDriversForSwitchDialog(userModels))
+                                                 .observeOn(Schedulers.io())
+                                                 .map(this::updateStatus)
+                                                 .observeOn(AndroidSchedulers.mainThread())
+                                                 .subscribe(coDrivers -> mView.setCoDriversForSwitchDialog(coDrivers));
         getDriverInfo();
     }
 
     public void onLogOutCoDriverCreated() {
         mGetCoDriversDisposable.dispose();
         mGetCoDriversDisposable = mUserInteractor.getCoDriversFromDB()
-                .subscribeOn(Schedulers.io())
-                .map(this::getModelList)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(coDrivers -> mView.setCoDriversForLogOutDialog(coDrivers));
+                                                 .subscribeOn(Schedulers.io())
+                                                 .map(SwitchDriverDialog.UserModel::fromEntity)
+                                                 .observeOn(AndroidSchedulers.mainThread())
+                                                 .doOnNext(userModels -> mView.setCoDriversForSwitchDialog(userModels))
+                                                 .observeOn(Schedulers.io())
+                                                 .map(this::updateStatus)
+                                                 .observeOn(AndroidSchedulers.mainThread())
+                                                 .subscribe(coDrivers -> mView.setCoDriversForLogOutDialog(coDrivers));
         getDriverInfo();
     }
 
     public void onDriverSeatDialogCreated() {
         mGetCoDriversDisposable.dispose();
         mGetCoDriversDisposable = mUserInteractor.getCoDriversFromDB()
-                .subscribeOn(Schedulers.io())
-                .map(this::getModelList)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(coDrivers -> mView.setCoDriversForDriverSeatDialog(coDrivers));
+                                                 .subscribeOn(Schedulers.io())
+                                                 .map(SwitchDriverDialog.UserModel::fromEntity)
+                                                 .observeOn(AndroidSchedulers.mainThread())
+                                                 .doOnNext(userModels -> mView.setCoDriversForDriverSeatDialog(userModels))
+                                                 .observeOn(Schedulers.io())
+                                                 .map(this::updateStatus)
+                                                 .observeOn(AndroidSchedulers.mainThread())
+                                                 .subscribe(coDrivers -> mView.setCoDriversForDriverSeatDialog(coDrivers));
         getDriverInfo();
     }
 
@@ -160,6 +172,10 @@ public class SwitchDriverPresenter {
         }
     }
 
+    public int getCurrentUserId() {
+        return mAccountManager.getCurrentUserId();
+    }
+
     public void setCurrentDriver(UserEntity user) {
         mAccountManager.setCurrentDriver(user.getId(), user.getAccountName());
         mAccountManager.resetUserToDriver();
@@ -201,39 +217,26 @@ public class SwitchDriverPresenter {
     }
 
     private void getDriverInfo() {
-        if (mGetUsernameDisposable != null) {
-            mGetUsernameDisposable.dispose();
-        }
+        mGetUsernameDisposable.dispose();
         mGetUsernameDisposable = mUserInteractor.getDriver()
-                .subscribeOn(Schedulers.io())
-                .map(userEntity -> {
-                    List<ELDEvent> events = mELDEventsInteractor.getLatestActiveDutyEventFromDBSync(System.currentTimeMillis(), userEntity.getId());
-                    SwitchDriverDialog.UserModel user = new SwitchDriverDialog.UserModel(userEntity);
-                    if (events != null && !events.isEmpty()) {
-                        ELDEvent event = events.get(events.size() - 1);
-                        user.setDutyType(DutyType.getTypeByCode(event.getEventType(), event.getEventCode()));
-                    } else {
-                        user.setDutyType(DutyType.OFF_DUTY);
-                    }
-                    return user;
-                })
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(driver -> mView.setDriverInfo(driver));
+                                                .subscribeOn(Schedulers.io())
+                                                .map(SwitchDriverDialog.UserModel::new)
+                                                .observeOn(AndroidSchedulers.mainThread())
+                                                .doOnNext(model -> mView.setDriverInfo(model))
+                                                .observeOn(Schedulers.io())
+                                                .map(model -> updateStatus(Collections.singletonList(model)))
+                                                .observeOn(AndroidSchedulers.mainThread())
+                                                .subscribe(driverModel -> mView.setDriverInfo(driverModel.get(0)));
     }
 
-    private List<SwitchDriverDialog.UserModel> getModelList(List<UserEntity> userEntities) {
-        List<SwitchDriverDialog.UserModel> users = new ArrayList<>(userEntities.size());
-        for (UserEntity userEntity : userEntities) {
-            SwitchDriverDialog.UserModel user = new SwitchDriverDialog.UserModel(userEntity);
-            List<ELDEvent> events = mELDEventsInteractor.getLatestActiveDutyEventFromDBSync(System.currentTimeMillis(), userEntity.getId());
+    private List<SwitchDriverDialog.UserModel> updateStatus(List<SwitchDriverDialog.UserModel> userEntities) {
+        for (SwitchDriverDialog.UserModel user: userEntities) {
+            List<ELDEvent> events = mELDEventsInteractor.getLatestActiveDutyEventFromDBSync(System.currentTimeMillis(), user.getUser().getId());
             if (events != null && !events.isEmpty()) {
                 ELDEvent event = events.get(events.size() - 1);
                 user.setDutyType(DutyType.getTypeByCode(event.getEventType(), event.getEventCode()));
-            } else {
-                user.setDutyType(DutyType.OFF_DUTY);
             }
-            users.add(user);
         }
-        return users;
+        return userEntities;
     }
 }

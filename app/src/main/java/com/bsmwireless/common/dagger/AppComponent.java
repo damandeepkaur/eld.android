@@ -2,6 +2,7 @@ package com.bsmwireless.common.dagger;
 
 import android.content.Context;
 
+import com.bsmwireless.data.network.NtpClientManager;
 import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.network.authenticator.TokenManager;
 import com.bsmwireless.data.storage.AccountManager;
@@ -38,6 +39,8 @@ public interface AppComponent {
     AutoDutyTypeManager autoDutyTypeManager();
 
     BlackBoxConnectionManager blackBoxConnectionManager();
+
+    NtpClientManager ntpClientManager();
 
     void inject(FontTextView fontTextView);
 

@@ -105,6 +105,15 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
         </receiver>
+
+        <service
+            android:name="com.bsmwireless.schedulers.jobscheduler.SyncNtpJobService"
+            android:exported="false"
+            android:permission="android.permission.BIND_JOB_SERVICE"/>
+
+        <service android:name="com.bsmwireless.schedulers.alarmmanager.SyncNtpService"/>
+
+        <receiver android:name="com.bsmwireless.schedulers.alarmmanager.SyncNtpAlarmReceiver"/>
     </application>
 
 </manifest>

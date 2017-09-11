@@ -7,12 +7,14 @@ import com.bsmwireless.domain.interactors.UserInteractor;
 import com.bsmwireless.widgets.alerts.DutyType;
 import com.bsmwireless.widgets.alerts.OccupancyType;
 
+import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
-public abstract class BaseMenuPresenter {
+public abstract class BaseMenuPresenter implements AccountManager.AccountListener {
     protected DutyTypeManager mDutyTypeManager;
     protected AccountManager mAccountManager;
     protected ELDEventsInteractor mEventsInteractor;
@@ -29,6 +31,17 @@ public abstract class BaseMenuPresenter {
                                         .subscribeOn(Schedulers.io())
                                         .observeOn(AndroidSchedulers.mainThread())
                                         .subscribe(count -> getView().setOccupancyType(OccupancyType.getTypeById(count))));
+
+        mAccountManager.addListener(this);
+        if (!mAccountManager.isCurrentUserDriver()) {
+            Disposable disposable = Single.fromCallable(() -> mUserInteractor.getFullUserNameSync())
+                                          .subscribeOn(Schedulers.io())
+                                          .observeOn(AndroidSchedulers.mainThread())
+                                          .subscribe(name -> getView().showCoDriverView(name));
+            mDisposables.add(disposable);
+        } else {
+            getView().hideCoDriverView();
+        }
     }
 
     void onDutyChanged(DutyType dutyType) {
@@ -54,6 +67,7 @@ public abstract class BaseMenuPresenter {
     }
 
     public void onDestroy() {
+        mAccountManager.removeListener(this);
         mDutyTypeManager.removeListener(mListener);
         mDisposables.dispose();
 
@@ -63,4 +77,20 @@ public abstract class BaseMenuPresenter {
     public boolean isUserDriver() {
         return mUserInteractor.isUserDriver();
     }
+
+    @Override
+    public void onUserChanged() {
+        if (!mAccountManager.isCurrentUserDriver()) {
+            Disposable disposable = Single.fromCallable(() -> mUserInteractor.getFullUserNameSync())
+                                          .subscribeOn(Schedulers.io())
+                                          .observeOn(AndroidSchedulers.mainThread())
+                                          .subscribe(name -> getView().showCoDriverView(name));
+            mDisposables.add(disposable);
+        } else {
+            getView().hideCoDriverView();
+        }
+    }
+
+    @Override
+    public void onDriverChanged() {}
 }

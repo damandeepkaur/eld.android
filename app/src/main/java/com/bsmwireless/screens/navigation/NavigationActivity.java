@@ -55,7 +55,7 @@ public class NavigationActivity extends BaseMenuActivity implements OnNavigation
     @BindView(R.id.navigation_view)
     NavigationView mNavigationView;
 
-    @BindView(R.id.navigation_toolbar)
+    @BindView(R.id.toolbar)
     Toolbar mToolbar;
 
     @BindView(R.id.navigation_tab_layout)
@@ -294,17 +294,6 @@ public class NavigationActivity extends BaseMenuActivity implements OnNavigation
         } else {
             mHandler.postAtTime(mResetTimeTask, time);
         }
-    }
-
-    @Override
-    public void onCoDriverViewStart(String coDriverName) {
-        // TODO add co-driver notification
-        Toast.makeText(this, "View as co-driver " + coDriverName, Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onCoDriverViewEnd() {
-        // TODO remove co-driver notification
     }
 
     @Override

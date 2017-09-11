@@ -188,18 +188,16 @@ public class BlackBoxParser {
     public static byte[] generateImmediateStatusRequest() {
         byte[] request = new byte[SUBSCRIPTION_PACKET_LENGTH + HEADER_LENGTH];
         int index = 0;
-
         System.arraycopy(generateHeader(), 0, request, index, HEADER_LENGTH + 2);
-        index = HEADER_LENGTH + 2;
-        // checksum
-        request[CHECK_SUM_INDX] = 0;
-        index++;
+        index = HEADER_LENGTH + 3;
         //Packet length
         byte[] lengthBytes = ConnectionUtils.intToByte(START_INDEX, 2);
         System.arraycopy(lengthBytes, 0, request, index, 2); // 2 bytes
         index += 2;
         //Command
         request[index++] = STATUS_REQUEST;
+        // checksum
+        request[CHECK_SUM_INDX] = ConnectionUtils.checkSum(request, 9);
         return request;
     }
 

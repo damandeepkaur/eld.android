@@ -154,8 +154,8 @@ public class LoginActivity extends BaseActivity implements LoginView {
     }
 
     @Override
-    public void loadUserData(String name, String domain) {
-        mSwitchButton.setChecked(true);
+    public void loadUserData(String name, String domain, boolean enabled) {
+        mSwitchButton.setChecked(enabled);
 
         mUserName.setText(name);
         mDomain.setText(domain);

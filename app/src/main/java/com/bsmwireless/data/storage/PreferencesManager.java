@@ -105,7 +105,7 @@ public class PreferencesManager {
     }
 
     public boolean isRememberUserEnabled() {
-        return mPreferences.getBoolean(KEY_REMEMBER_USER_ENABLED, true);
+        return mPreferences.getBoolean(KEY_REMEMBER_USER_ENABLED, false);
     }
 
     public void setShowHomeScreenEnabled(boolean showHomeScreen) {

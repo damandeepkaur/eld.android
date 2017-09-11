@@ -2,6 +2,7 @@ package com.bsmwireless.data.network.blackbox;
 
 import com.bsmwireless.data.network.blackbox.models.BlackBoxResponseModel;
 import com.bsmwireless.data.network.blackbox.utils.BlackBoxParser;
+import com.bsmwireless.data.network.blackbox.utils.ConnectionUtils;
 import com.bsmwireless.models.BlackBoxModel;
 
 import java.io.IOException;
@@ -13,9 +14,11 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
+import io.reactivex.subjects.Subject;
 import timber.log.Timber;
 
 import static com.bsmwireless.data.network.blackbox.models.BlackBoxResponseModel.NackReasonCode.UNKNOWN_ERROR;
@@ -39,24 +42,25 @@ public final class BlackBoxImpl implements BlackBox {
     private Disposable mDisposable;
     private final AtomicReference<BlackBoxModel> mBlackBoxModel;
     private final AtomicReference<BehaviorSubject<BlackBoxModel>> mEmitter;
-    private final ReentrantReadWriteLock.ReadLock readSocketLock;
-    private final ReentrantReadWriteLock.WriteLock writeLock;
+    private final ReentrantReadWriteLock.ReadLock mReadSocketLock;
+    private final ReentrantReadWriteLock.WriteLock mWriteLock;
 
     public BlackBoxImpl() {
         mBlackBoxModel = new AtomicReference<>(new BlackBoxModel());
         mEmitter = new AtomicReference<>(BehaviorSubject.create());
 
         ReentrantReadWriteLock reentrantReadWriteLock = new ReentrantReadWriteLock();
-        readSocketLock = reentrantReadWriteLock.readLock();
-        writeLock = reentrantReadWriteLock.writeLock();
+        mReadSocketLock = reentrantReadWriteLock.readLock();
+        mWriteLock = reentrantReadWriteLock.writeLock();
     }
 
     @Override
     public void connect(int boxId) throws Exception {
         Timber.d("connect");
-        if (!isConnected()) {
-            mSocket = new Socket(WIFI_GATEWAY_IP, WIFI_REMOTE_PORT);
-            //TODO: remove fake box id
+        if (ConnectionUtils.isEmulator()) {
+            return;
+        }
+        if (!isConnected() && (mDisposable == null || mDisposable.isDisposed())) {
             mBoxId = boxId;
             mDisposable = Observable.interval(RETRY_CONNECT_DELAY, TimeUnit.MILLISECONDS)
                     .take(RETRY_COUNT)
@@ -64,14 +68,20 @@ public final class BlackBoxImpl implements BlackBox {
                     .firstElement()
                     .ignoreElement()
                     .andThen(requestDataImmediately())
-                    .flatMap(unused -> startContinuousRead())
+                    .flatMapObservable(blackBoxModel -> startContinuousRead())
                     .timeout(UPDATE_RATE_MILLIS * TIMEOUT_RATIO,
                             TimeUnit.MILLISECONDS,
                             Observable.error(new BlackBoxConnectionException(UNKNOWN_ERROR)))
                     .subscribeOn(Schedulers.io())
-                    .subscribe(model -> mEmitter.get().onNext(model),
-                            throwable -> mEmitter.get().onError(throwable),
-                            () -> mEmitter.get().onComplete());
+                    .subscribe(model -> getEmitter().onNext(model),
+                            throwable -> {
+                                if (getEmitter().hasObservers()) {
+                                    getEmitter().onError(throwable);
+                                } else {
+                                    Timber.e("BlackBox error: %s", throwable);
+                                }
+                            },
+                            () -> getEmitter().onComplete());
         }
     }
 
@@ -79,29 +89,26 @@ public final class BlackBoxImpl implements BlackBox {
     public void disconnect() throws IOException {
         Timber.d("disconnect");
         mBlackBoxModel.set(new BlackBoxModel());
-        if (isConnected()) {
+        if (mDisposable != null && !mDisposable.isDisposed()) {
             mDisposable.dispose();
-            recreateEmitter();
+        }
+        recreateEmitter();
+        if (isConnected()) {
             closeSocket();
         }
     }
 
     @Override
     public boolean isConnected() {
-        readSocketLock.lock();
+        mReadSocketLock.lock();
         boolean connected = mSocket != null && mSocket.isConnected();
-        readSocketLock.unlock();
+        mReadSocketLock.unlock();
         return connected;
     }
 
     @Override
     public Observable<BlackBoxModel> getDataObservable() {
-
-        if (mEmitter.get().hasComplete() || mEmitter.get().hasThrowable()) {
-            recreateEmitter();
-        }
-
-        return mEmitter.get();
+        return getEmitter();
     }
 
     @Override
@@ -122,7 +129,10 @@ public final class BlackBoxImpl implements BlackBox {
 
     private boolean initializeCommunication(long retryIndex) throws Exception {
         Timber.d("initializeCommunication");
+        closeSocket();
+        mSocket = new Socket(WIFI_GATEWAY_IP, WIFI_REMOTE_PORT);
         if (retryIndex == RETRY_COUNT - 1) {
+            Timber.e("initializeCommunication error");
             throw new BlackBoxConnectionException(UNKNOWN_ERROR);
         }
         writeRawData(BlackBoxParser.generateSubscriptionRequest(getSequenceID(), mBoxId, UPDATE_RATE_MILLIS));
@@ -153,16 +163,13 @@ public final class BlackBoxImpl implements BlackBox {
         return (mSequenceID & 0xFF) > 250 ? 1 : ++mSequenceID;
     }
 
-    private Observable<BlackBoxModel> readStatus() {
-        return Observable.fromCallable(this::isConnected)
-                .observeOn(Schedulers.io())
-                .filter(isConnected -> isConnected)
-                .map(unused -> getInputStream())
-                .filter(stream -> stream.available() > START_INDEX)
-                .map(this::readRawData)
-                .map(bytes -> BlackBoxParser.parseVehicleStatus(bytes).getBoxData());
-
+    private Subject<BlackBoxModel> getEmitter() {
+        if (mEmitter.get().hasComplete() || mEmitter.get().hasThrowable()) {
+            recreateEmitter();
+        }
+        return mEmitter.get();
     }
+
 
     private BlackBoxResponseModel readSubscriptionResponse() throws Exception {
         byte[] response;
@@ -190,47 +197,59 @@ public final class BlackBoxImpl implements BlackBox {
     }
 
     private void closeSocket() throws IOException {
-        writeLock.lock();
-        mSocket.close();
-        mSocket = null;
-        writeLock.unlock();
+        mWriteLock.lock();
+        if (mSocket != null && !mSocket.isClosed()) {
+            mSocket.close();
+            mSocket = null;
+        }
+        mWriteLock.unlock();
     }
 
     private InputStream getInputStream() throws Exception {
-        readSocketLock.lock();
+        mReadSocketLock.lock();
         if (mSocket == null) {
             throw new Exception("Socket is already closed or still not opened");
         }
         final InputStream inputStream = mSocket.getInputStream();
-        readSocketLock.unlock();
+        mReadSocketLock.unlock();
         return inputStream;
     }
 
-    private void writeRawData(byte[] request) throws IOException {
-        readSocketLock.lock();
+    private boolean writeRawData(byte[] request) throws IOException {
+        mReadSocketLock.lock();
         if (mSocket == null) {
-            return;
+            return false;
         }
         OutputStream output = mSocket.getOutputStream();
-        readSocketLock.unlock();
+        mReadSocketLock.unlock();
         output.write(request);
         output.flush();
+        return true;
     }
 
-    private Observable<BlackBoxModel> requestDataImmediately() throws IOException {
-        return Observable.just(0)
+    private Observable<BlackBoxModel> readStatus() {
+        return Observable.fromCallable(() -> isConnected())
                 .observeOn(Schedulers.io())
-                .doOnNext(unused -> writeRawData(BlackBoxParser.generateImmediateStatusRequest()))
+                .filter(isConnected -> isConnected)
+                .map(unused -> getInputStream())
+                .filter(stream -> stream.available() > START_INDEX)
+                .map(this::readRawData)
+                .map(bytes -> BlackBoxParser.parseVehicleStatus(bytes).getBoxData());
+    }
+
+    private Single<BlackBoxModel> requestDataImmediately() throws IOException {
+        return Observable.fromCallable(() -> writeRawData(BlackBoxParser.generateImmediateStatusRequest()))
+                .subscribeOn(Schedulers.io())
                 // 200ms delay to read current status asap
                 .switchMap(unused -> Observable.interval(200, TimeUnit.MILLISECONDS))
                 .switchMap(unused -> readStatus())
                 // read status only one time
-                .take(1)
-                .doOnNext(model -> {
+                .firstElement()
+                .doOnSuccess(model -> {
                     mBlackBoxModel.set(model);
-                    Timber.v("Box Model processed:" + model.toString());
+                    getEmitter().onNext(model);
+                    Timber.v("Box Model requested immediately: " + model.toString());
                 })
-                .doOnNext(model -> mEmitter.get().onNext(model))
-                .doOnError(error -> mEmitter.get().onError(error));
+                .toSingle();
     }
 }
