@@ -19,7 +19,6 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.Subject;
-import retrofit2.http.HEAD;
 import timber.log.Timber;
 
 import static com.bsmwireless.data.network.blackbox.models.BlackBoxResponseModel.NackReasonCode.UNKNOWN_ERROR;
@@ -43,16 +42,16 @@ public final class BlackBoxImpl implements BlackBox {
     private Disposable mDisposable;
     private final AtomicReference<BlackBoxModel> mBlackBoxModel;
     private final AtomicReference<BehaviorSubject<BlackBoxModel>> mEmitter;
-    private final ReentrantReadWriteLock.ReadLock readSocketLock;
-    private final ReentrantReadWriteLock.WriteLock writeLock;
+    private final ReentrantReadWriteLock.ReadLock mReadSocketLock;
+    private final ReentrantReadWriteLock.WriteLock mWriteLock;
 
     public BlackBoxImpl() {
         mBlackBoxModel = new AtomicReference<>(new BlackBoxModel());
         mEmitter = new AtomicReference<>(BehaviorSubject.create());
 
         ReentrantReadWriteLock reentrantReadWriteLock = new ReentrantReadWriteLock();
-        readSocketLock = reentrantReadWriteLock.readLock();
-        writeLock = reentrantReadWriteLock.writeLock();
+        mReadSocketLock = reentrantReadWriteLock.readLock();
+        mWriteLock = reentrantReadWriteLock.writeLock();
     }
 
     @Override
@@ -101,9 +100,9 @@ public final class BlackBoxImpl implements BlackBox {
 
     @Override
     public boolean isConnected() {
-        readSocketLock.lock();
+        mReadSocketLock.lock();
         boolean connected = mSocket != null && mSocket.isConnected();
-        readSocketLock.unlock();
+        mReadSocketLock.unlock();
         return connected;
     }
 
@@ -198,31 +197,31 @@ public final class BlackBoxImpl implements BlackBox {
     }
 
     private void closeSocket() throws IOException {
-        writeLock.lock();
+        mWriteLock.lock();
         if (mSocket != null && !mSocket.isClosed()) {
             mSocket.close();
             mSocket = null;
         }
-        writeLock.unlock();
+        mWriteLock.unlock();
     }
 
     private InputStream getInputStream() throws Exception {
-        readSocketLock.lock();
+        mReadSocketLock.lock();
         if (mSocket == null) {
             throw new Exception("Socket is already closed or still not opened");
         }
         final InputStream inputStream = mSocket.getInputStream();
-        readSocketLock.unlock();
+        mReadSocketLock.unlock();
         return inputStream;
     }
 
     private boolean writeRawData(byte[] request) throws IOException {
-        readSocketLock.lock();
+        mReadSocketLock.lock();
         if (mSocket == null) {
             return false;
         }
         OutputStream output = mSocket.getOutputStream();
-        readSocketLock.unlock();
+        mReadSocketLock.unlock();
         output.write(request);
         output.flush();
         return true;
