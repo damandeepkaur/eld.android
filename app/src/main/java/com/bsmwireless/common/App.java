@@ -71,9 +71,6 @@ public class App extends Application {
         //We shouldn't show home screen if app process was killed
         mComponent.prefsManager().setShowHomeScreenEnabled(false);
 
-        //We should enable remember me by default
-        mComponent.prefsManager().setRememberUserEnabled(true);
-
         Timber.plant(BuildConfig.USE_LOG ? new Timber.DebugTree() : new ReleaseTree());
     }
 

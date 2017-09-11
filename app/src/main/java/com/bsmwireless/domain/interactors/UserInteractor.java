@@ -147,6 +147,7 @@ public class UserInteractor {
             mAppDatabase.userDao().deleteUser(driverId);
             mTokenManager.removeAccount(mAccountManager.getCurrentDriverAccountName());
             mPreferencesManager.clearValues();
+            mPreferencesManager.setRememberUserEnabled(false);
         } else {
             mTokenManager.clearToken(mTokenManager.getToken(mAccountManager.getCurrentDriverAccountName()));
             mAppDatabase.userDao().setUserCoDrivers(driverId, null);
