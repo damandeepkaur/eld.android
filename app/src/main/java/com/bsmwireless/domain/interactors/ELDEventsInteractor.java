@@ -198,6 +198,14 @@ public class ELDEventsInteractor {
         return Flowable.just(Arrays.asList(first, second, third));
     }
 
+    public Flowable<Boolean> hasMalfunctionEvents(){
+        return Flowable.just(true);
+    }
+
+    public Flowable<Boolean> hasDiagnosticEvents(){
+        return Flowable.just(true);
+    }
+
     private ArrayList<ELDEvent> getEvents(DutyType dutyType) {
         ArrayList<ELDEvent> events = new ArrayList<>();
         DutyType current = mDutyTypeManager.getDutyType();

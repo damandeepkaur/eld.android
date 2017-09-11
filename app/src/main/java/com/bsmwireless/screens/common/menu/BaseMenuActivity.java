@@ -32,6 +32,18 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
     protected abstract BaseMenuPresenter getPresenter();
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        getPresenter().onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        getPresenter().onStop();
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_alert, menu);
 
@@ -51,7 +63,7 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_diagnostic:
-                getPresenter().showDiagnosticEvents();
+                getPresenter().onDiagnosticEventsClick();
                 break;
             case R.id.action_duty:
                 getPresenter().onChangeDutyClick();
@@ -64,7 +76,7 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
                 break;
             }
             case R.id.action_malfunction:
-                getPresenter().showMalfunctionEvent();
+                getPresenter().onMalfunctionEventsClick();
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -118,6 +130,20 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
     @Override
     public void showDiagnosticEvents() {
         DiagnosticDialog.newInstance().show(getSupportFragmentManager(), "");
+    }
+
+    @Override
+    public void changeMalfunctionStatus(boolean hasMalfunctionEvents) {
+        if (mMalfunctionItem != null) {
+            mMalfunctionItem.getIcon().setLevel(hasMalfunctionEvents ? 1 : 0);
+        }
+    }
+
+    @Override
+    public void changeDiagnosticStatus(boolean hasMalfunctionEvents) {
+        if (mELDItem != null) {
+            mELDItem.getIcon().setLevel(hasMalfunctionEvents ? 2 : 0);
+        }
     }
 
     @Override

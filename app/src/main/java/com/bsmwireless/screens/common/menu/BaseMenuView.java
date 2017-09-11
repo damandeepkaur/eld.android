@@ -14,4 +14,6 @@ public interface BaseMenuView {
     void showSwitchDriverDialog();
     void showMalfunctionDialog();
     void showDiagnosticEvents();
+    void changeMalfunctionStatus(boolean hasMalfunctionEvents);
+    void changeDiagnosticStatus(boolean hasMalfunctionEvents);
 }

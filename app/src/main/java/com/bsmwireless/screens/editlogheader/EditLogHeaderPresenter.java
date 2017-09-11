@@ -10,7 +10,6 @@ import com.bsmwireless.screens.logs.LogHeaderModel;
 
 import javax.inject.Inject;
 
-import io.reactivex.disposables.CompositeDisposable;
 import timber.log.Timber;
 
 @ActivityScope
@@ -20,11 +19,12 @@ public class EditLogHeaderPresenter extends BaseMenuPresenter {
     private LogHeaderModel mLogHeaderModel;
 
     @Inject
-    public EditLogHeaderPresenter(EditLogHeaderView view, UserInteractor userInteractor, DutyTypeManager dutyTypeManager) {
+    public EditLogHeaderPresenter(EditLogHeaderView view,
+                                  UserInteractor userInteractor,
+                                  DutyTypeManager dutyTypeManager,
+                                  ELDEventsInteractor eldEventsInteractor) {
+        super(dutyTypeManager, eldEventsInteractor, userInteractor);
         mView = view;
-        mDisposables = new CompositeDisposable();
-        mUserInteractor = userInteractor;
-        mDutyTypeManager = dutyTypeManager;
 
         Timber.d("CREATED");
     }
