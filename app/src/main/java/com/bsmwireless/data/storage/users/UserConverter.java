@@ -1,5 +1,8 @@
 package com.bsmwireless.data.storage.users;
 
+import com.bsmwireless.data.storage.carriers.CarrierConverter;
+import com.bsmwireless.data.storage.configurations.ConfigurationConverter;
+import com.bsmwireless.data.storage.hometerminals.HomeTerminalConverter;
 import com.bsmwireless.models.User;
 
 public class UserConverter {
@@ -17,7 +20,6 @@ public class UserConverter {
             user.setUpdated(entity.getUpdated());
             user.setDot(entity.getDot());
             user.setSyncTime(entity.getSyncTime());
-            //TODO: set configurations
             user.setFirstName(entity.getFirstName());
             user.setMidName(entity.getMidName());
             user.setLastName(entity.getLastName());
@@ -45,7 +47,6 @@ public class UserConverter {
             entity.setUpdated(user.getUpdated());
             entity.setDot(user.getDot());
             entity.setSyncTime(user.getSyncTime());
-            //TODO: set configurations
             entity.setFirstName(user.getFirstName());
             entity.setMidName(user.getMidName());
             entity.setLastName(user.getLastName());
@@ -56,5 +57,19 @@ public class UserConverter {
         }
 
         return entity;
+    }
+
+    public static User toFullUser(FullUserEntity entity) {
+        User user = null;
+
+        if (entity != null && entity.getUserEntity() != null) {
+            UserEntity userEntity = entity.getUserEntity();
+            user = toUser(userEntity);
+            user.setCarriers(CarrierConverter.toCarrierList(entity.getCarriers()));
+            user.setHomeTerminals(HomeTerminalConverter.toHomeTerminalList(entity.getHomeTerminalEntities()));
+            user.setConfigurations(ConfigurationConverter.toModelList(entity.getConfigurationEntities()));
+        }
+
+        return user;
     }
 }

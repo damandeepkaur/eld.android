@@ -19,6 +19,7 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.Subject;
+import retrofit2.http.HEAD;
 import timber.log.Timber;
 
 import static com.bsmwireless.data.network.blackbox.models.BlackBoxResponseModel.NackReasonCode.UNKNOWN_ERROR;
@@ -170,6 +171,7 @@ public final class BlackBoxImpl implements BlackBox {
         return mEmitter.get();
     }
 
+
     private BlackBoxResponseModel readSubscriptionResponse() throws Exception {
         byte[] response;
         response = readRawData(getInputStream());
@@ -234,7 +236,6 @@ public final class BlackBoxImpl implements BlackBox {
                 .filter(stream -> stream.available() > START_INDEX)
                 .map(this::readRawData)
                 .map(bytes -> BlackBoxParser.parseVehicleStatus(bytes).getBoxData());
-
     }
 
     private Single<BlackBoxModel> requestDataImmediately() throws IOException {

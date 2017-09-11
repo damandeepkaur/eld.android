@@ -44,9 +44,9 @@ public class ListConverterTest {
         String expectedMulti = "10,20,314,15,9265,358,9,7";
 
         // when
-        String resultNone = ListConverter.toString(noIntegers);
-        String resultSingle = ListConverter.toString(singleInt);
-        String resultMulti = ListConverter.toString(multiInt);
+        String resultNone = ListConverter.integerListToString(noIntegers);
+        String resultSingle = ListConverter.integerListToString(singleInt);
+        String resultMulti = ListConverter.integerListToString(multiInt);
 
         // then
         assertEquals(expectedNone, resultNone);

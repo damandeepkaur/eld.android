@@ -20,6 +20,7 @@ import com.bsmwireless.screens.switchdriver.dagger.DaggerSwitchDriverComponent;
 import com.bsmwireless.screens.switchdriver.dagger.SwitchDriverModule;
 import com.bsmwireless.widgets.alerts.DutyType;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -127,7 +128,7 @@ public class SwitchDriverDialog implements SwitchDriverView, DriverDialog {
     @Override
     public void setCoDriversForSwitchDialog(List<UserModel> coDrivers) {
         if (mCoDrivers != null) {
-            CoDriverAdapter adapter = new CoDriverAdapter(mContext, coDrivers);
+            CoDriverAdapter adapter = new CoDriverAdapter(mContext, coDrivers, mPresenter);
             mCoDrivers.setAdapter(adapter);
             mCoDrivers.setOnItemClickListener((parent, view, position, id) -> {
                 UserModel user = adapter.getItem(position);
@@ -194,7 +195,6 @@ public class SwitchDriverDialog implements SwitchDriverView, DriverDialog {
     public void showProgress() {
         if (mProgressBar != null) {
             mProgressBar.setIndeterminate(true);
-            mProgressBar.setVisibility(View.VISIBLE);
         }
     }
 
@@ -202,7 +202,6 @@ public class SwitchDriverDialog implements SwitchDriverView, DriverDialog {
     public void hideProgress() {
         if (mProgressBar != null) {
             mProgressBar.setIndeterminate(false);
-            mProgressBar.setVisibility(View.GONE);
         }
     }
 
@@ -328,6 +327,7 @@ public class SwitchDriverDialog implements SwitchDriverView, DriverDialog {
 
         public UserModel(UserEntity user) {
             mUser = user;
+            mDutyType = DutyType.OFF_DUTY;
         }
 
         public UserEntity getUser() {
@@ -344,6 +344,14 @@ public class SwitchDriverDialog implements SwitchDriverView, DriverDialog {
 
         public void setDutyType(DutyType dutyType) {
             mDutyType = dutyType;
+        }
+
+        public static List<UserModel> fromEntity(List<UserEntity> users) {
+            List<UserModel> models = new ArrayList<>(users.size());
+            for (UserEntity user: users) {
+                models.add(new UserModel(user));
+            }
+            return models;
         }
     }
 }

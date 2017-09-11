@@ -105,6 +105,7 @@ public class DriverProfilePresenterTest {
     public void testOnNeedUpdateUserInfoError() {
         // given
         final Throwable error = new RuntimeException("error!");
+
         when(mUserInteractor.getFullDriver()).thenReturn(Flowable.error(error));
 
         // when

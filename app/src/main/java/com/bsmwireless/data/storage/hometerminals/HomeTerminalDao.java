@@ -14,6 +14,9 @@ public interface HomeTerminalDao {
     @Query("DELETE FROM home_terminals WHERE id = :id")
     int deleteHomeTerminal(int id);
 
+    @Query("DELETE FROM home_terminals WHERE user_id = :userId")
+    int deleteByUserId(int userId);
+
     @Insert(onConflict = REPLACE)
     void insertHomeTerminals(List<HomeTerminalEntity> homeTerminals);
 
