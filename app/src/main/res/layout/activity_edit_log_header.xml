@@ -13,14 +13,7 @@
         android:background="@drawable/toolbar_gradient"
         android:theme="@style/ActionBarTheme">
 
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingTop="@dimen/default_toolbar_padding"
-            app:layout_scrollFlags="enterAlways|snap"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-            app:titleTextAppearance="@style/ActionBarTitleTextStyle"/>
+        <include layout="@layout/menu_toolbar"/>
 
     </android.support.design.widget.AppBarLayout>
 
