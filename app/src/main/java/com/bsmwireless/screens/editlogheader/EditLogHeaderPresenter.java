@@ -1,8 +1,8 @@
 package com.bsmwireless.screens.editlogheader;
 
 import com.bsmwireless.common.dagger.ActivityScope;
+import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.data.storage.DutyTypeManager;
-import com.bsmwireless.domain.interactors.ELDEventsInteractor;
 import com.bsmwireless.domain.interactors.UserInteractor;
 import com.bsmwireless.screens.common.menu.BaseMenuPresenter;
 import com.bsmwireless.screens.common.menu.BaseMenuView;
@@ -20,11 +20,13 @@ public class EditLogHeaderPresenter extends BaseMenuPresenter {
     private LogHeaderModel mLogHeaderModel;
 
     @Inject
-    public EditLogHeaderPresenter(EditLogHeaderView view, UserInteractor userInteractor, DutyTypeManager dutyTypeManager) {
+    public EditLogHeaderPresenter(EditLogHeaderView view, UserInteractor userInteractor,
+                                  DutyTypeManager dutyTypeManager, AccountManager accountManager) {
         mView = view;
         mDisposables = new CompositeDisposable();
         mUserInteractor = userInteractor;
         mDutyTypeManager = dutyTypeManager;
+        mAccountManager = accountManager;
 
         Timber.d("CREATED");
     }
@@ -42,9 +44,5 @@ public class EditLogHeaderPresenter extends BaseMenuPresenter {
     @Override
     protected BaseMenuView getView() {
         return mView;
-    }
-
-    public void onDestroy() {
-        Timber.d("DESTROYED");
     }
 }

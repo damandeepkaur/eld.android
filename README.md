@@ -3,6 +3,8 @@ ELD app for Android
 
 # Version history
 
+* **1.0.63** - Fix for crash on login/logout 
+* **1.0.62** - Added co-driver view notification
 * **1.0.61** - Add NTP sync
 * **1.0.60** - Fix remember me
 * **1.0.59** - Add switching asset by selecting asset in menu
