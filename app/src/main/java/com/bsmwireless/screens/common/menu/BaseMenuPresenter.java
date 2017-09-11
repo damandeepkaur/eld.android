@@ -104,8 +104,11 @@ public abstract class BaseMenuPresenter {
 
     private void startMonitoringEvents() {
 
-        mDiagnosticEventsDisposable = Flowable.combineLatest(mEventsInteractor.hasDiagnosticEvents(),
-                menuCreatedSubject.toFlowable(BackpressureStrategy.LATEST), (result, integer) -> result)
+        mDiagnosticEventsDisposable = Flowable
+                .combineLatest(mEventsInteractor.hasDiagnosticEvents(),
+                        menuCreatedSubject.toFlowable(BackpressureStrategy.LATEST),
+                        (result, integer) -> result)
+                .distinctUntilChanged()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .onErrorReturn(throwable -> {
@@ -114,8 +117,11 @@ public abstract class BaseMenuPresenter {
                 })
                 .subscribe(hasEvents -> getView().changeDiagnosticStatus(hasEvents));
 
-        mMalfunctionEventsDisposable = Flowable.combineLatest(mEventsInteractor.hasMalfunctionEvents(),
-                menuCreatedSubject.toFlowable(BackpressureStrategy.LATEST), (result, integer) -> result)
+        mMalfunctionEventsDisposable = Flowable
+                .combineLatest(mEventsInteractor.hasMalfunctionEvents(),
+                        menuCreatedSubject.toFlowable(BackpressureStrategy.LATEST),
+                        (result, integer) -> result)
+                .distinctUntilChanged()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .onErrorReturn(throwable -> {

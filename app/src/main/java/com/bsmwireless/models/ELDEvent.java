@@ -96,6 +96,24 @@ public class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheckable {
         }
     }
 
+    public enum MalfunctionCode {
+
+        MALFUNCTION_LOGGED(1),
+        MALFUNCTION_CLEARED(2),
+        DIAGNOSTIC_LOGGED(3),
+        DIAGNOSTIC_CLEARED(4)
+        ;
+        private int mCode;
+
+        MalfunctionCode(int code) {
+            mCode = code;
+        }
+
+        public int getCode() {
+            return mCode;
+        }
+    }
+
     @SerializedName("id")
     @Expose
     private Integer mId;

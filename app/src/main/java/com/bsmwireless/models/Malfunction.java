@@ -3,7 +3,9 @@ package com.bsmwireless.models;
 import app.bsmuniversal.com.R;
 
 public enum Malfunction {
+
     UNKNOWN("", false, R.string.diagnostic_other),
+    //Diagnostic
     POWER_DATA_DIAGNOSTIC("1", false, R.string.diagnostic_power_data),
     ENGINE_SYNCHRONIZATION("2", false, R.string.diagnostic_engine_synchronization),
     MISSING_REQUIRED_DATA_ELEMENTS("3", false, R.string.diagnostic_missing_req_data),
@@ -11,13 +13,14 @@ public enum Malfunction {
     UNIDENTIFIED_DRIVING("5", false, R.string.diagnostic_unidentified_driving),
     OTHER_DIAGNOSTIC("6", false, R.string.diagnostic_other),
 
+    //Malfunction
     POWER_COMPLIANCE("P", true, R.string.malfunction_power),
     ENGINE_SYNCHRONIZATION_COMPLIANCE("E", true, R.string.malfunction_engine_synchronization),
     TIMING_COMPLIANCE("T", true, R.string.malfunction_timing),
     POSITIONING_COMPLIANCE("L", true, R.string.malfunction_positioning),
     DATA_RECORDING_COMPLIANCE("R", true, R.string.malfunction_data_recording),
     DATA_TRANSFER_COMPLIANCE("S", true, R.string.malfunction_data_transfer),
-    OTHER_COMPLIANCE("0", true, R.string.malfunction_other);
+    OTHER_COMPLIANCE("O", true, R.string.malfunction_other);
 
     private final String mCode;
     private final boolean mMalfunction;

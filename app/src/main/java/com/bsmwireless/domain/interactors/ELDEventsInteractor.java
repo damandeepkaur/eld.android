@@ -1,5 +1,6 @@
 package com.bsmwireless.domain.interactors;
 
+import com.bsmwireless.common.Constants;
 import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.network.authenticator.TokenManager;
 import com.bsmwireless.data.storage.AccountManager;
@@ -128,28 +129,29 @@ public class ELDEventsInteractor {
 
     public Observable<Boolean> postLogoutEvent() {
         return mServiceApi.logout(getEvent(ELDEvent.LoginLogoutCode.LOGOUT))
-                          .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS))
-                          .switchMap(isSuccess -> mBlackBoxInteractor.shutdown(isSuccess));
+                .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS))
+                .switchMap(isSuccess -> mBlackBoxInteractor.shutdown(isSuccess));
     }
 
     public Observable<Boolean> postLogoutEvent(int userId) {
         return Observable.fromCallable(() -> mUserDao.getUserSync(userId))
-                         .flatMap(userEntity -> {
-                             String token = mTokenManager.getToken(userEntity.getAccountName());
-                             return mServiceApi.logout(
-                                     getEvent(ELDEvent.LoginLogoutCode.LOGOUT),
-                                     token,
-                                     String.valueOf(userEntity.getId())
-                             );
-                         })
-                         .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
+                .flatMap(userEntity -> {
+                    String token = mTokenManager.getToken(userEntity.getAccountName());
+                    return mServiceApi.logout(
+                            getEvent(ELDEvent.LoginLogoutCode.LOGOUT),
+                            token,
+                            String.valueOf(userEntity.getId())
+                    );
+                })
+                .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
     }
 
     /**
      * Load all active diagnostic events
+     *
      * @return
      */
-    public Flowable<List<ELDEvent>> getDiagnosticEvents(){
+    public Flowable<List<ELDEvent>> getDiagnosticEvents() {
 
         Calendar instance = Calendar.getInstance();
         instance.add(Calendar.DATE, -1);
@@ -174,9 +176,10 @@ public class ELDEventsInteractor {
 
     /**
      * Load all active malfunction events
+     *
      * @return
      */
-    public Flowable<List<ELDEvent>> getMalfunctionEvents(){
+    public Flowable<List<ELDEvent>> getMalfunctionEvents() {
         Calendar instance = Calendar.getInstance();
         instance.add(Calendar.DATE, -1);
 
@@ -198,12 +201,29 @@ public class ELDEventsInteractor {
         return Flowable.just(Arrays.asList(first, second, third));
     }
 
-    public Flowable<Boolean> hasMalfunctionEvents(){
-        return Flowable.just(true);
+    public Flowable<Boolean> hasMalfunctionEvents() {
+        return Flowable
+                .combineLatest(
+                        getMalfunctionCount(ELDEvent.MalfunctionCode.MALFUNCTION_LOGGED,
+                                Constants.MALFUNCTION_CODES),
+                        getMalfunctionCount(ELDEvent.MalfunctionCode.MALFUNCTION_CLEARED,
+                                Constants.MALFUNCTION_CODES),
+                        (loggedCount, clearedCount) -> loggedCount.compareTo(clearedCount) != 0);
     }
 
-    public Flowable<Boolean> hasDiagnosticEvents(){
-        return Flowable.just(true);
+    public Flowable<Boolean> hasDiagnosticEvents() {
+        return Flowable
+                .combineLatest(
+                        getMalfunctionCount(ELDEvent.MalfunctionCode.DIAGNOSTIC_LOGGED,
+                                Constants.DIAGNOSTIC_CODES),
+                        getMalfunctionCount(ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED,
+                                Constants.DIAGNOSTIC_CODES),
+                        (loggedCount, clearedCount) -> loggedCount.compareTo(clearedCount) != 0);
+    }
+
+    private Flowable<Integer> getMalfunctionCount(ELDEvent.MalfunctionCode code, String[] codes) {
+        return mELDEventDao.getMalfunctionEventCount(ELDEvent.EventType.DATA_DIAGNOSTIC.getValue(),
+                code.getCode(), codes);
     }
 
     private ArrayList<ELDEvent> getEvents(DutyType dutyType) {

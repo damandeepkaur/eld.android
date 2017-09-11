@@ -74,7 +74,7 @@ public class LoginPresenter {
                             mView.hideProgressBar();
                         },
                         error -> {
-                            Timber.e("LoginUser error: %s", error);
+                            Timber.e(error, "LoginUser error:");
                             if (error instanceof RetrofitException) {
                                 mView.showErrorMessage((RetrofitException) error);
                             }
