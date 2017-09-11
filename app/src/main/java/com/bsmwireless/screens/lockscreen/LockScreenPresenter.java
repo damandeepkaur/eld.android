@@ -4,11 +4,11 @@ package com.bsmwireless.screens.lockscreen;
 import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.data.network.blackbox.BlackBox;
 import com.bsmwireless.data.network.blackbox.BlackBoxConnectionManager;
-import com.bsmwireless.data.network.blackbox.models.BlackBoxResponseModel;
 import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.models.BlackBoxModel;
+import com.bsmwireless.models.BlackBoxSensorState;
 import com.bsmwireless.widgets.alerts.DutyType;
 
 import java.util.concurrent.TimeUnit;
@@ -136,9 +136,12 @@ public class LockScreenPresenter {
         Maybe<BlackBoxModel> maybe = generalMonitoringReference.get();
         if (maybe == null) {
             maybe = blackBox.getDataObservable()
-                    .filter(blackBoxModel ->
-                            blackBoxModel.getResponseType() == BlackBoxResponseModel.ResponseType.IGNITION_OFF
-                                    || blackBoxModel.getResponseType() == BlackBoxResponseModel.ResponseType.STOPPED) // TODO: Check this filter
+                    // Now blackbox doesn't return correct response type. Workaround: check sensor state
+//                    .filter(blackBoxModel ->
+//                            blackBoxModel.getResponseType() == BlackBoxResponseModel.ResponseType.IGNITION_OFF
+//                                    || blackBoxModel.getResponseType() == BlackBoxResponseModel.ResponseType.STOPPED) // TODO: Check this filter
+                    .filter(blackBoxModel -> !blackBoxModel.getSensorState(BlackBoxSensorState.IGNITION)
+                            || !blackBoxModel.getSensorState(BlackBoxSensorState.MOVING))
                     .firstElement()
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
@@ -232,8 +235,10 @@ public class LockScreenPresenter {
         if (idleCompletable == null) {
 
             idleCompletable = blackBox.getDataObservable()
-                    .filter(blackBoxModel -> blackBoxModel.getResponseType()
-                            != BlackBoxResponseModel.ResponseType.STOPPED)
+                    // Now blackbox doesn't return correct response type. Workaround: check sensor state
+//                    .filter(blackBoxModel -> blackBoxModel.getResponseType()
+//                            != BlackBoxResponseModel.ResponseType.STOPPED)
+                    .filter(blackBoxModel -> !blackBoxModel.getSensorState(BlackBoxSensorState.MOVING))
                     .timeout(mIdlingTimeoutMillis, TimeUnit.MILLISECONDS)
                     .firstElement()
                     .ignoreElement()
@@ -268,7 +273,9 @@ public class LockScreenPresenter {
         if (drivingCompletable == null) {
 
             drivingCompletable = blackBox.getDataObservable()
-                    .filter(blackBoxModel -> blackBoxModel.getResponseType() == BlackBoxResponseModel.ResponseType.MOVING)
+                    // Now blackbox doesn't return correct response type. Workaround: check sensor state
+//                    .filter(blackBoxModel -> blackBoxModel.getResponseType() == BlackBoxResponseModel.ResponseType.MOVING)
+                    .filter(blackBoxModel -> blackBoxModel.getSensorState(BlackBoxSensorState.MOVING))
                     .firstElement()
                     .cache();
 

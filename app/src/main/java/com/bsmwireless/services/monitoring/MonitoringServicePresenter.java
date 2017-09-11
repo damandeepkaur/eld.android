@@ -3,10 +3,10 @@ package com.bsmwireless.services.monitoring;
 
 import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.data.network.blackbox.BlackBox;
-import com.bsmwireless.data.network.blackbox.models.BlackBoxResponseModel;
 import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.models.BlackBoxModel;
+import com.bsmwireless.models.BlackBoxSensorState;
 import com.bsmwireless.widgets.alerts.DutyType;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -74,7 +74,9 @@ public class MonitoringServicePresenter {
 
     boolean checkConditions(Result result) {
         return accountManager.isCurrentUserDriver() &&
-                BlackBoxResponseModel.ResponseType.MOVING == result.blackBoxModel.getResponseType() &&
+                // Now blackbox doesn't return MOVING response type. Workaround: check sensor state
+//                BlackBoxResponseModel.ResponseType.MOVING == result.blackBoxModel.getResponseType() &&
+                result.blackBoxModel.getSensorState(BlackBoxSensorState.MOVING) &&
                 (result.dutyType != DutyType.PERSONAL_USE && result.dutyType != DutyType.YARD_MOVES);
     }
 
