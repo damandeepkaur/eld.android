@@ -7,6 +7,7 @@ import com.bsmwireless.widgets.alerts.DutyType;
 import com.bsmwireless.widgets.alerts.OccupancyType;
 
 import io.reactivex.BackpressureStrategy;
+import io.reactivex.Flowable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
@@ -102,8 +103,9 @@ public abstract class BaseMenuPresenter {
     }
 
     private void startMonitoringEvents() {
-        mDiagnosticEventsDisposable = mEventsInteractor.hasDiagnosticEvents()
-                .zipWith(menuCreatedSubject.toFlowable(BackpressureStrategy.LATEST), (result, integer) -> result)
+
+        mDiagnosticEventsDisposable = Flowable.combineLatest(mEventsInteractor.hasDiagnosticEvents(),
+                menuCreatedSubject.toFlowable(BackpressureStrategy.LATEST), (result, integer) -> result)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .onErrorReturn(throwable -> {
@@ -112,8 +114,8 @@ public abstract class BaseMenuPresenter {
                 })
                 .subscribe(hasEvents -> getView().changeDiagnosticStatus(hasEvents));
 
-        mMalfunctionEventsDisposable = mEventsInteractor.hasMalfunctionEvents()
-                .zipWith(menuCreatedSubject.toFlowable(BackpressureStrategy.LATEST), (result, integer) -> result)
+        mMalfunctionEventsDisposable = Flowable.combineLatest(mEventsInteractor.hasMalfunctionEvents(),
+                menuCreatedSubject.toFlowable(BackpressureStrategy.LATEST), (result, integer) -> result)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .onErrorReturn(throwable -> {
@@ -132,19 +134,19 @@ public abstract class BaseMenuPresenter {
         mDisposables.add(disposable);
     }
 
-    protected CompositeDisposable getDisposables(){
+    protected CompositeDisposable getDisposables() {
         return mDisposables;
     }
 
-    protected UserInteractor getUserInteractor(){
+    protected UserInteractor getUserInteractor() {
         return mUserInteractor;
     }
 
-    protected ELDEventsInteractor getEventsInteractor(){
+    protected ELDEventsInteractor getEventsInteractor() {
         return mEventsInteractor;
     }
 
-    protected DutyTypeManager getDutyTypeManager(){
+    protected DutyTypeManager getDutyTypeManager() {
         return mDutyTypeManager;
     }
 }
