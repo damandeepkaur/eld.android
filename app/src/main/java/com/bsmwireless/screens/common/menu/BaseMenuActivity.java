@@ -37,10 +37,6 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
     @BindView(R.id.co_driver_notification)
     TextView mCoDriverNotification;
 
-    @Nullable
-    @BindView(R.id.co_driver_notification_layout)
-    LinearLayout mCoDriverNotificationLayout;
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_alert, menu);
@@ -189,8 +185,8 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
 
     @Override
     public void showCoDriverView(String name) {
-        if (mCoDriverNotificationLayout != null && mCoDriverNotification != null) {
-            mCoDriverNotificationLayout.setVisibility(View.VISIBLE);
+        if (mCoDriverNotification != null) {
+            mCoDriverNotification.setVisibility(View.VISIBLE);
             mCoDriverNotification.setText(
                     String.format(getString(R.string.switch_driver_co_driver_view) + " (%s)", name)
             );
@@ -199,8 +195,8 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
 
     @Override
     public void hideCoDriverView() {
-        if (mCoDriverNotificationLayout != null && mCoDriverNotification != null) {
-            mCoDriverNotificationLayout.setVisibility(View.GONE);
+        if (mCoDriverNotification != null) {
+            mCoDriverNotification.setVisibility(View.GONE);
             mCoDriverNotification.setText("");
         }
     }

@@ -41,11 +41,15 @@ public class DashboardPresenter {
         Timber.d("DESTROYED");
     }
 
-    public boolean isConnected() {
-        return mEventsInteractor.isConnected();
-    }
-
     long getDutyTypeTime(DutyType dutyType) {
         return mDutyTypeManager.getDutyTypeTime(dutyType);
+    }
+
+    void onDutyClick() {
+        if (mEventsInteractor.isConnected()) {
+            mView.showDutyTypeDialog();
+        } else {
+            mView.showNotInVehicleDialog();
+        }
     }
 }
