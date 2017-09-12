@@ -25,7 +25,7 @@ public class SettingsActivity extends BaseMenuActivity implements SettingsView {
 
     private static final String TAG = SettingsActivity.class.getCanonicalName();
 
-    @BindView(R.id.settings_toolbar)
+    @BindView(R.id.toolbar)
     Toolbar mToolbar;
 
     @BindView(R.id.box_gps_switch)

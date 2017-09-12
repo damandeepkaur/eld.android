@@ -71,6 +71,12 @@
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="stateAlwaysHidden"/>
 
+        <activity
+            android:name="com.bsmwireless.screens.editlogheader.EditLogHeaderActivity"
+            android:label="@string/edit_log_header"
+            android:theme="@style/AppTheme"
+            android:windowSoftInputMode="stateAlwaysHidden"/>
+
         <service android:name="com.bsmwireless.data.network.authenticator.BsmAuthenticatorService">
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator"/>
@@ -96,6 +102,15 @@
         </receiver>
 
         <activity android:name="com.bsmwireless.screens.lockscreen.LockScreenActivity"/>
+
+        <service
+            android:name="com.bsmwireless.schedulers.jobscheduler.SyncNtpJobService"
+            android:exported="false"
+            android:permission="android.permission.BIND_JOB_SERVICE"/>
+
+        <service android:name="com.bsmwireless.schedulers.alarmmanager.SyncNtpService"/>
+
+        <receiver android:name="com.bsmwireless.schedulers.alarmmanager.SyncNtpAlarmReceiver"/>
     </application>
 
 </manifest>
