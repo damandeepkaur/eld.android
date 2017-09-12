@@ -13,6 +13,7 @@ import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.screens.diagnostic.dagger.DiagnosticComponent;
 import com.bsmwireless.screens.lockscreen.dagger.LockScreenComponent;
+import com.bsmwireless.services.malfunction.MalfunctionServiceComponent;
 import com.bsmwireless.widgets.common.FontTextView;
 
 import javax.inject.Singleton;
@@ -47,4 +48,6 @@ public interface AppComponent {
     LockScreenComponent.Builder lockScreenBuilder();
 
     DiagnosticComponent.Builder diagnosticBuilder();
+
+    MalfunctionServiceComponent.Builder malfunctionServiceComponentBuilder();
 }

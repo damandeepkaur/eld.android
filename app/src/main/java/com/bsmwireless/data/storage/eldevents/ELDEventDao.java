@@ -55,6 +55,16 @@ public interface ELDEventDao {
     @Query("SELECT count(id) FROM events WHERE event_type = :type and event_code = :code and mal_code IN (:malCodes)")
     Flowable<Integer> getMalfunctionEventCount(int type, int code, String[] malCodes);
 
+    /**
+     * Returns the latest event from a database
+     * @param type event type
+     * @param code event code
+     * @param malCode malfunction code. For non-malfunction event should be empty
+     * @return latest ELD event
+     */
+    @Query("SELECT * FROM events WHERE event_type = :type and mal_code = :malCode ORDER BY event_time LIMIT 1")
+    Flowable<ELDEventEntity> getLatestEvent(int type, String malCode);
+
     @Delete
     void delete(ELDEventEntity event);
 

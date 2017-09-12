@@ -20,7 +20,7 @@ public class BlackBoxInteractor {
     public Observable<BlackBoxModel> getData(int boxId) {
         if (!mConnectionManager.isConnected()) {
             return mConnectionManager.connectBlackBox(boxId)
-                    .flatMap(connectionManager ->  connectionManager.getDataObservable())
+                    .flatMap(BlackBoxConnectionManager::getDataObservable)
                     .doOnError(error -> mConnectionManager.disconnectBlackBox());
         }
 

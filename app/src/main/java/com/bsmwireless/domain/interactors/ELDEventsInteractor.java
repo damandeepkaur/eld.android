@@ -13,6 +13,7 @@ import com.bsmwireless.data.storage.eldevents.ELDEventEntity;
 import com.bsmwireless.data.storage.users.UserDao;
 import com.bsmwireless.models.BlackBoxModel;
 import com.bsmwireless.models.ELDEvent;
+import com.bsmwireless.models.Malfunction;
 import com.bsmwireless.widgets.alerts.DutyType;
 
 import java.util.ArrayList;
@@ -180,6 +181,16 @@ public class ELDEventsInteractor {
                         getMalfunctionCount(ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED,
                                 Constants.DIAGNOSTIC_CODES),
                         (loggedCount, clearedCount) -> loggedCount.compareTo(clearedCount) != 0);
+    }
+
+    /**
+     * Returns the latest malfunction event with malfunction code
+     * @param malfunction malfunction code
+     * @return latest malfunction ELD event
+     */
+    public Flowable<ELDEvent> getLatestMalfunctinoEvent(Malfunction malfunction){
+        return mELDEventDao.getLatestEvent(ELDEvent.EventType.DATA_DIAGNOSTIC.getValue(), malfunction.getCode())
+                .map(ELDEventConverter::toModel);
     }
 
     private Flowable<Integer> getMalfunctionCount(ELDEvent.MalfunctionCode code, String[] codes) {
