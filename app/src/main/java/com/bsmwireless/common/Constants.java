@@ -14,7 +14,7 @@ public interface Constants {
     int SYNC_NTP_RETRY_COUNT = 100;
 
     long LOCK_SCREEN_IDLE_MONITORING_TIMEOUT_MS = TimeUnit.MINUTES.toMillis(5);
-    long LOCK_SCREEN_DISCONNECTION_TIMEOUT_MS = TimeUnit.SECONDS.toMillis(5);
+    long LOCK_SCREEN_DISCONNECTION_TIMEOUT_MS = TimeUnit.MINUTES.toMillis(5);
 
     String BASE_URL = "https://develd.bsmtechnologies.com/sdmobile/rest/";
     String DEVICE_TYPE = "Android";

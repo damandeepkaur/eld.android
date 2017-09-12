@@ -2,7 +2,7 @@ package com.bsmwireless.services.monitoring;
 
 
 import com.bsmwireless.BaseTest;
-import com.bsmwireless.data.network.blackbox.BlackBox;
+import com.bsmwireless.data.network.blackbox.BlackBoxConnectionManager;
 import com.bsmwireless.data.network.blackbox.models.BlackBoxResponseModel;
 import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.data.storage.PreferencesManager;
@@ -34,7 +34,7 @@ public class MonitoringServicePresenterTest extends BaseTest {
     @Mock
     PreferencesManager preferencesManager;
     @Mock
-    BlackBox blackBox;
+    BlackBoxConnectionManager blackBox;
 
     private DutyTypeManager dutyTypeManager;
     private MonitoringServicePresenter presenter;
@@ -42,7 +42,7 @@ public class MonitoringServicePresenterTest extends BaseTest {
     @Before
     public void setUp() throws Exception {
         dutyTypeManager = spy(new DutyTypeManager(preferencesManager));
-        presenter = new MonitoringServicePresenter(view, blackBox, dutyTypeManager, null, checker);
+        presenter = new MonitoringServicePresenter(view, blackBox, dutyTypeManager, null, null);
         RxJavaPlugins.setIoSchedulerHandler(scheduler -> Schedulers.trampoline());
         RxJavaPlugins.setComputationSchedulerHandler(scheduler -> Schedulers.trampoline());
 
