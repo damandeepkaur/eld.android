@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/item_layout"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="@drawable/co_driver_item_bg">
 
     <TextView
         android:id="@+id/co_driver_name"
@@ -10,6 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/default_margin_small"
         android:layout_marginTop="@dimen/default_margin_small"
+        android:layout_marginLeft="@dimen/margin_large"
         android:layout_alignParentLeft="true"
         android:clickable="false"
         android:focusable="false"
@@ -21,6 +24,7 @@
         android:id="@+id/duty_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginRight="@dimen/margin_large"
         android:layout_marginBottom="@dimen/default_margin_small"
         android:layout_marginTop="@dimen/default_margin_small"
         android:layout_alignParentRight="true"/>
