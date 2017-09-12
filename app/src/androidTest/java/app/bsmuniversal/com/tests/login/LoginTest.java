@@ -6,12 +6,15 @@ import android.support.test.rule.ActivityTestRule;
 import com.bsmwireless.screens.login.LoginActivity;
 import com.bsmwireless.screens.selectasset.SelectAssetActivity;
 
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 
 import app.bsmuniversal.com.base.BaseTestClass;
+import app.bsmuniversal.com.locators.CommonLocators;
 import app.bsmuniversal.com.locators.LoginLocators;
 import app.bsmuniversal.com.locators.SelectAssetLocators;
+import app.bsmuniversal.com.pages.LoginPage;
 import app.bsmuniversal.com.pages.SelectAssetPage;
 import app.bsmuniversal.com.utils.Users;
 
@@ -88,6 +91,27 @@ public class LoginTest extends BaseTestClass {
     public void test_emptyFields() {
         login(Users.getEmptyUser(), false);
         assert_snack_bar_with_message_displayed(LoginLocators.login_snackbar, LoginLocators.error_empty_username);
+    }
+
+
+    @Test
+    public void test_switch() {
+        assert_checked(LoginLocators.switch_button, true);
+    }
+
+    @Test
+    public void test_elements() {
+        int primaryColor = LoginPage.get_primary_color(loginActivityTestRule.getActivity());
+        int accentColor = LoginPage.get_accent_color(loginActivityTestRule.getActivity());
+        Assert.assertEquals(CommonLocators.primary_color, primaryColor);
+        Assert.assertEquals(CommonLocators.accent_color, accentColor);
+
+        assert_something_displayed(LoginLocators.username, true);
+        assert_something_displayed(LoginLocators.password, true);
+        assert_something_displayed(LoginLocators.password_toggle, true);
+        assert_something_displayed(LoginLocators.domain, true);
+        assert_something_displayed(LoginLocators.switch_button, true);
+        assert_something_displayed(LoginLocators.execute_login, true);
     }
 
 }
