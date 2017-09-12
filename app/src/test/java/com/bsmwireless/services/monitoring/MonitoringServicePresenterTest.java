@@ -42,7 +42,7 @@ public class MonitoringServicePresenterTest extends BaseTest {
     @Before
     public void setUp() throws Exception {
         dutyTypeManager = spy(new DutyTypeManager(preferencesManager));
-        presenter = new MonitoringServicePresenter(view, blackBox, dutyTypeManager, null);
+        presenter = new MonitoringServicePresenter(view, blackBox, dutyTypeManager, null, checker);
         RxJavaPlugins.setIoSchedulerHandler(scheduler -> Schedulers.trampoline());
         RxJavaPlugins.setComputationSchedulerHandler(scheduler -> Schedulers.trampoline());
 

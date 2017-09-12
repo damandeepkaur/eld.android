@@ -2,6 +2,7 @@ package com.bsmwireless.common.dagger;
 
 import android.content.Context;
 
+import com.bsmwireless.common.utils.BlackBoxStateChecker;
 import com.bsmwireless.data.network.NtpClientManager;
 import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.network.authenticator.TokenManager;
@@ -41,6 +42,8 @@ public interface AppComponent {
     BlackBoxConnectionManager blackBoxConnectionManager();
 
     NtpClientManager ntpClientManager();
+
+    BlackBoxStateChecker checker();
 
     void inject(FontTextView fontTextView);
 

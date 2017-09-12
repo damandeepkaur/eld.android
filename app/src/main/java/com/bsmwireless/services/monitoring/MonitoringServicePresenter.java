@@ -2,7 +2,8 @@ package com.bsmwireless.services.monitoring;
 
 
 import com.bsmwireless.common.dagger.ActivityScope;
-import com.bsmwireless.data.network.blackbox.BlackBox;
+import com.bsmwireless.common.utils.BlackBoxStateChecker;
+import com.bsmwireless.data.network.blackbox.BlackBoxConnectionManager;
 import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.models.BlackBoxModel;
@@ -24,20 +25,22 @@ import timber.log.Timber;
 public class MonitoringServicePresenter {
 
     final MonitoringServiceView mView;
-    private final BlackBox mBlackBox;
+    private final BlackBoxConnectionManager mBlackBox;
     private Disposable mMonitoringDisposable;
     private final DutyTypeManager mDutyTypeManager;
     private final AccountManager mAccountManager;
+    final BlackBoxStateChecker checker;
 
     @Inject
     public MonitoringServicePresenter(MonitoringServiceView mView,
-                                      BlackBox blackBox,
+                                      BlackBoxConnectionManager blackBox,
                                       DutyTypeManager dutyTypeManager,
-                                      AccountManager accountManager) {
+                                      AccountManager accountManager, BlackBoxStateChecker checker) {
         this.mView = mView;
         this.mBlackBox = blackBox;
         this.mDutyTypeManager = dutyTypeManager;
         this.mAccountManager = accountManager;
+        this.checker = checker;
         mMonitoringDisposable = Disposables.disposed();
     }
 
@@ -73,10 +76,11 @@ public class MonitoringServicePresenter {
     }
 
     boolean checkConditions(Result result) {
+
+        Timber.d("Moving - " + result.blackBoxModel.getSensorState(BlackBoxSensorState.MOVING));
+
         return mAccountManager.isCurrentUserDriver() &&
-                // Now blackbox doesn't return MOVING response type. Workaround: check sensor state
-//                BlackBoxResponseModel.ResponseType.MOVING == result.blackBoxModel.getResponseType() &&
-                result.blackBoxModel.getSensorState(BlackBoxSensorState.MOVING) &&
+                checker.isMoving(result.blackBoxModel) &&
                 (result.dutyType != DutyType.PERSONAL_USE && result.dutyType != DutyType.YARD_MOVES);
     }
 

@@ -2,13 +2,12 @@ package com.bsmwireless.screens.lockscreen;
 
 
 import com.bsmwireless.common.dagger.ActivityScope;
-import com.bsmwireless.data.network.blackbox.BlackBox;
+import com.bsmwireless.common.utils.BlackBoxStateChecker;
 import com.bsmwireless.data.network.blackbox.BlackBoxConnectionManager;
 import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.models.BlackBoxModel;
-import com.bsmwireless.models.BlackBoxSensorState;
 import com.bsmwireless.widgets.alerts.DutyType;
 
 import java.util.concurrent.TimeUnit;
@@ -18,7 +17,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import dagger.Lazy;
 import io.reactivex.Completable;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
@@ -33,10 +31,10 @@ public class LockScreenPresenter {
 
     final LockScreenView mView;
     final DutyTypeManager mDutyManager;
-    final Lazy<BlackBoxConnectionManager> connectionManager;
+    final BlackBoxConnectionManager connectionManager;
     private final CompositeDisposable mCompositeDisposable;
-    private final BlackBox blackBox;
     private final PreferencesManager preferencesManager;
+    final BlackBoxStateChecker checker;
     private final long blackBoxTimeoutMillis;
     private final long mIdlingTimeoutMillis;
     private final AccountManager accountManager;
@@ -49,16 +47,16 @@ public class LockScreenPresenter {
     @Inject
     public LockScreenPresenter(LockScreenView view,
                                DutyTypeManager dutyManager,
-                               Lazy<BlackBoxConnectionManager> connectionManager,
-                               BlackBox blackBox,
+                               BlackBoxConnectionManager connectionManager,
                                PreferencesManager preferencesManager,
+                               BlackBoxStateChecker checker,
                                @Named("disconnectTimeout") long blackBoxTimeoutMillis,
                                @Named("idleTimeout") long idlingTimeout, AccountManager accountManager) {
         mView = view;
         mDutyManager = dutyManager;
         this.connectionManager = connectionManager;
-        this.blackBox = blackBox;
         this.preferencesManager = preferencesManager;
+        this.checker = checker;
         this.blackBoxTimeoutMillis = blackBoxTimeoutMillis;
         this.mIdlingTimeoutMillis = idlingTimeout;
         this.accountManager = accountManager;
@@ -135,13 +133,9 @@ public class LockScreenPresenter {
     void startGeneralMonitoring() {
         Maybe<BlackBoxModel> maybe = generalMonitoringReference.get();
         if (maybe == null) {
-            maybe = blackBox.getDataObservable()
-                    // Now blackbox doesn't return correct response type. Workaround: check sensor state
-//                    .filter(blackBoxModel ->
-//                            blackBoxModel.getResponseType() == BlackBoxResponseModel.ResponseType.IGNITION_OFF
-//                                    || blackBoxModel.getResponseType() == BlackBoxResponseModel.ResponseType.STOPPED) // TODO: Check this filter
-                    .filter(blackBoxModel -> !blackBoxModel.getSensorState(BlackBoxSensorState.IGNITION)
-                            || !blackBoxModel.getSensorState(BlackBoxSensorState.MOVING))
+            maybe = connectionManager.getDataObservable()
+                    .filter(blackBoxModel ->
+                            checker.isIgnitionOff(blackBoxModel) || checker.isStopped(blackBoxModel)) // TODO: Check this filter
                     .firstElement()
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
@@ -192,7 +186,7 @@ public class LockScreenPresenter {
         Completable reconnectCompletable = reconnectionReference.get();
         if (reconnectCompletable == null) {
             int boxId = preferencesManager.getBoxId();
-            reconnectCompletable = connectionManager.get().connectBlackBox(boxId)
+            reconnectCompletable = connectionManager.connectBlackBox(boxId)
                     .toCompletable()
                     .timeout(blackBoxTimeoutMillis, TimeUnit.MILLISECONDS)
                     .onErrorResumeNext(throwable -> {
@@ -201,7 +195,7 @@ public class LockScreenPresenter {
                             return Completable.fromAction(mView::showDisconnectionPopup)
                                     .observeOn(Schedulers.io())
                                     .subscribeOn(AndroidSchedulers.mainThread())
-                                    .andThen(connectionManager.get().connectBlackBox(boxId))
+                                    .andThen(connectionManager.connectBlackBox(boxId))
                                     .toCompletable();
                         }
                         return Completable.error(throwable);
@@ -234,11 +228,8 @@ public class LockScreenPresenter {
         Completable idleCompletable = idleMonitoringCompletableReference.get();
         if (idleCompletable == null) {
 
-            idleCompletable = blackBox.getDataObservable()
-                    // Now blackbox doesn't return correct response type. Workaround: check sensor state
-//                    .filter(blackBoxModel -> blackBoxModel.getResponseType()
-//                            != BlackBoxResponseModel.ResponseType.STOPPED)
-                    .filter(blackBoxModel -> !blackBoxModel.getSensorState(BlackBoxSensorState.MOVING))
+            idleCompletable = connectionManager.getDataObservable()
+                    .filter(blackBoxModel -> !checker.isStopped(blackBoxModel))
                     .timeout(mIdlingTimeoutMillis, TimeUnit.MILLISECONDS)
                     .firstElement()
                     .ignoreElement()
@@ -272,10 +263,8 @@ public class LockScreenPresenter {
         Maybe<BlackBoxModel> drivingCompletable = monitoringDrivingReference.get();
         if (drivingCompletable == null) {
 
-            drivingCompletable = blackBox.getDataObservable()
-                    // Now blackbox doesn't return correct response type. Workaround: check sensor state
-//                    .filter(blackBoxModel -> blackBoxModel.getResponseType() == BlackBoxResponseModel.ResponseType.MOVING)
-                    .filter(blackBoxModel -> blackBoxModel.getSensorState(BlackBoxSensorState.MOVING))
+            drivingCompletable = connectionManager.getDataObservable()
+                    .filter(checker::isMoving)
                     .firstElement()
                     .cache();
 
