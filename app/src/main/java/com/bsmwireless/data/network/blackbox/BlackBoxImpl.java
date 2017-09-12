@@ -132,7 +132,7 @@ public final class BlackBoxImpl implements BlackBox {
         try {
             mSocket.connect(new InetSocketAddress(WIFI_GATEWAY_IP, WIFI_REMOTE_PORT),
                     UPDATE_RATE_MILLIS * TIMEOUT_RATIO);
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new BlackBoxConnectionException(UNKNOWN_ERROR);
         }
         if (retryIndex == RETRY_COUNT - 1) {
