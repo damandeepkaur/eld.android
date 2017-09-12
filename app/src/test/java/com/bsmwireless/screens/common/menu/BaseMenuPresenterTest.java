@@ -1,5 +1,6 @@
 package com.bsmwireless.screens.common.menu;
 
+import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
 import com.bsmwireless.domain.interactors.UserInteractor;
@@ -33,6 +34,9 @@ public class BaseMenuPresenterTest {
     @Mock
     BaseMenuView view;
 
+    @Mock
+    AccountManager accountManager;
+
     private BaseMenuPresenter baseMenuPresenter;
 
     @Before
@@ -43,7 +47,7 @@ public class BaseMenuPresenterTest {
         RxJavaPlugins.setIoSchedulerHandler(scheduler -> Schedulers.trampoline());
         RxAndroidPlugins.setInitMainThreadSchedulerHandler(scheduler -> Schedulers.trampoline());
 
-        baseMenuPresenter = new BaseMenuPresenter(dutyTypeManager, eldEventsInteractor, userInteractor, mAccountManager) {
+        baseMenuPresenter = new BaseMenuPresenter(dutyTypeManager, eldEventsInteractor, userInteractor, accountManager) {
             @Override
             protected BaseMenuView getView() {
                 return view;
