@@ -211,7 +211,7 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
             }
         } else {
             titleView.collapse();
-            mOnLogsStateChangeListener.hideTitle();
+            mOnLogsStateChangeListener.hideTitle(titleView.getType());
         }
 
         notifyDataSetChanged();
@@ -324,7 +324,7 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
     public interface OnLogsStateChangeListener {
         void showTitle(LogsTitleView.Type type);
 
-        void hideTitle();
+        void hideTitle(LogsTitleView.Type type);
 
         void onSignButtonClicked(CalendarItem calendarItem);
     }

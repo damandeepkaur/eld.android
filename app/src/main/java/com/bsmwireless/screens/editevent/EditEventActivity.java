@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TextInputEditText;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
@@ -64,8 +65,16 @@ public class EditEventActivity extends BaseMenuActivity implements EditEventView
         mUnbinder = ButterKnife.bind(this);
 
         initToolbar();
-        showSnackbar();
         initStatusSpinner();
+    }
+
+    @OnClick(R.id.save_event)
+    void onSaveEventButtonClicked() {
+        DutyType type = (DutyType) mEventStatus.getSelectedItem();
+        String startTime = mStartTime.getText().toString();
+        String comment = mComment.getText().toString();
+
+        mPresenter.onSaveClick(type, startTime, comment);
     }
 
     @Override
@@ -122,42 +131,34 @@ public class EditEventActivity extends BaseMenuActivity implements EditEventView
 
     @Override
     public void showError(Error error) {
-        mSnackBarLayout.setOnReadyListener(snackBar -> {
-            snackBar.reset()
-                    .setMessage(getString(error.getStringId()))
-                    .setHideableOnTimeout(SnackBarLayout.DURATION_LONG)
-                    .setOnCloseListener(new SnackBarLayout.OnCloseListener() {
-                        @Override
-                        public void onClose(SnackBarLayout snackBar) {
-                            showSnackbar();
-                        }
+        mSnackBarLayout.setOnReadyListener(snackBar -> snackBar.reset()
+                .setMessage(getString(error.getStringId()))
+                .setHideableOnTimeout(SnackBarLayout.DURATION_LONG)
+                .setOnCloseListener(new SnackBarLayout.OnCloseListener() {
+                    @Override
+                    public void onClose(SnackBarLayout snackBar) {
+                    }
 
-                        @Override
-                        public void onOpen(SnackBarLayout snackBar) {
-
-                        }
-                    });
-        }).showSnackbar();
+                    @Override
+                    public void onOpen(SnackBarLayout snackBar) {
+                    }
+                })).showSnackbar();
     }
 
     @Override
     public void showError(RetrofitException error) {
-        mSnackBarLayout.setOnReadyListener(snackBar -> {
-            snackBar.reset()
-                    .setMessage(NetworkUtils.getErrorMessage(error, this))
-                    .setHideableOnTimeout(SnackBarLayout.DURATION_LONG)
-                    .setOnCloseListener(new SnackBarLayout.OnCloseListener() {
-                        @Override
-                        public void onClose(SnackBarLayout snackBar) {
-                            showSnackbar();
-                        }
+        mSnackBarLayout.setOnReadyListener(snackBar -> snackBar.reset()
+                .setMessage(NetworkUtils.getErrorMessage(error, this))
+                .setHideableOnTimeout(SnackBarLayout.DURATION_LONG)
+                .setOnCloseListener(new SnackBarLayout.OnCloseListener() {
+                    @Override
+                    public void onClose(SnackBarLayout snackBar) {
+                    }
 
-                        @Override
-                        public void onOpen(SnackBarLayout snackBar) {
-
-                        }
-                    });
-        }).showSnackbar();
+                    @Override
+                    public void onOpen(SnackBarLayout snackBar) {
+                    }
+                })).showSnackbar();
     }
 
     @Override
@@ -195,19 +196,6 @@ public class EditEventActivity extends BaseMenuActivity implements EditEventView
             actionBar.setDisplayShowTitleEnabled(true);
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
-    }
-
-    private void showSnackbar() {
-        mSnackBarLayout.setOnReadyListener(snackBar -> {
-            snackBar.reset()
-                    .setPositiveLabel(getString(R.string.edit_event_save), v -> {
-                        DutyType type = (DutyType) mEventStatus.getSelectedItem();
-                        String startTime = mStartTime.getText().toString();
-                        String comment = mComment.getText().toString();
-
-                        mPresenter.onSaveClick(type, startTime, comment);
-                    }).setHideableOnTouch(false);
-        }).showSnackbar();
     }
 
     private void initStatusSpinner() {
