@@ -202,6 +202,8 @@ public class LockScreenPresenter {
                                     .observeOn(Schedulers.io())
                                     .subscribeOn(AndroidSchedulers.mainThread())
                                     .andThen(connectionManager.connectBlackBox(boxId))
+                                    .flatMapObservable(BlackBoxConnectionManager::getDataObservable)
+                                    .firstOrError()
                                     .toCompletable();
                         }
                         return Completable.error(throwable);
@@ -211,7 +213,6 @@ public class LockScreenPresenter {
                 reconnectCompletable = reconnectionReference.get();
             }
         }
-
 
         final Disposable disposable = reconnectCompletable
                 .subscribeOn(Schedulers.io())
