@@ -105,7 +105,7 @@ public class PreferencesManager {
     }
 
     public boolean isRememberUserEnabled() {
-        return mPreferences.getBoolean(KEY_REMEMBER_USER_ENABLED, false);
+        return mPreferences.getBoolean(KEY_REMEMBER_USER_ENABLED, true);
     }
 
     public void setShowHomeScreenEnabled(boolean showHomeScreen) {
@@ -119,7 +119,9 @@ public class PreferencesManager {
     }
 
     public void clearValues() {
+        boolean rememberUserEnabled = isRememberUserEnabled();
         mPreferences.edit().clear().apply();
+        setRememberUserEnabled(rememberUserEnabled);
     }
 
     public void setBoxGPSEnabled(boolean boxGPSEnabled) {
