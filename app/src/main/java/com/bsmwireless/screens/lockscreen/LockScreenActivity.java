@@ -10,12 +10,11 @@ import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.bsmwireless.common.App;
+import com.bsmwireless.common.Constants;
 import com.bsmwireless.screens.common.BaseActivity;
 import com.bsmwireless.screens.switchdriver.SwitchDriverDialog;
 import com.bsmwireless.widgets.alerts.DutyType;
 import com.bsmwireless.widgets.dashboard.DutyView;
-
-import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
@@ -62,8 +61,8 @@ public class LockScreenActivity extends BaseActivity implements LockScreenView {
         ButterKnife.bind(this);
         App.getComponent().lockScreenBuilder()
                 .view(this)
-                .disconnectionTimeout(TimeUnit.MINUTES.toMillis(5))
-                .idleTimeout(TimeUnit.MINUTES.toMillis(3))
+                .disconnectionTimeout(Constants.LOCK_SCREEN_DISCONNECTION_TIMEOUT_MS)
+                .idleTimeout(Constants.LOCK_SCREEN_IDLE_MONITORING_TIMEOUT_MS)
                 .build()
                 .inject(this);
         mCurrentDutyView.setCanChangingSatusView(false);

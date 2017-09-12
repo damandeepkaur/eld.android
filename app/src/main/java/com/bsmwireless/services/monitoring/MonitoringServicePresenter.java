@@ -7,7 +7,6 @@ import com.bsmwireless.data.network.blackbox.BlackBoxConnectionManager;
 import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.models.BlackBoxModel;
-import com.bsmwireless.models.BlackBoxSensorState;
 import com.bsmwireless.widgets.alerts.DutyType;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -77,7 +76,7 @@ public class MonitoringServicePresenter {
 
     boolean checkConditions(Result result) {
 
-        Timber.d("Moving - " + result.blackBoxModel.getSensorState(BlackBoxSensorState.MOVING));
+        Timber.d("Moving - " + checker.isMoving(result.blackBoxModel));
 
         return mAccountManager.isCurrentUserDriver() &&
                 checker.isMoving(result.blackBoxModel) &&

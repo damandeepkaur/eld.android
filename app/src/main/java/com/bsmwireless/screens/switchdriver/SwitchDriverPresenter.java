@@ -1,7 +1,6 @@
 package com.bsmwireless.screens.switchdriver;
 
 import com.bsmwireless.common.dagger.ActivityScope;
-import com.bsmwireless.common.utils.BlackBoxStateChecker;
 import com.bsmwireless.data.network.RetrofitException;
 import com.bsmwireless.data.network.blackbox.BlackBoxConnectionManager;
 import com.bsmwireless.data.network.blackbox.models.BlackBoxResponseModel;
@@ -10,6 +9,7 @@ import com.bsmwireless.data.storage.users.UserEntity;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
 import com.bsmwireless.domain.interactors.UserInteractor;
 import com.bsmwireless.models.BlackBoxModel;
+import com.bsmwireless.models.BlackBoxSensorState;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.User;
 import com.bsmwireless.widgets.alerts.DutyType;
@@ -39,7 +39,6 @@ public class SwitchDriverPresenter {
     private UserInteractor mUserInteractor;
     private AccountManager mAccountManager;
     private BlackBoxConnectionManager blackBox;
-    private final BlackBoxStateChecker checker;
 
     private Disposable mGetUsernameDisposable;
     private Disposable mGetCoDriversDisposable;
@@ -50,13 +49,12 @@ public class SwitchDriverPresenter {
     @Inject
     public SwitchDriverPresenter(SwitchDriverView view, ELDEventsInteractor eventsInteractor,
                                  UserInteractor userInteractor, AccountManager accountManager,
-                                 BlackBoxConnectionManager blackBox, BlackBoxStateChecker checker) {
+                                 BlackBoxConnectionManager blackBox) {
         mView = view;
         mELDEventsInteractor = eventsInteractor;
         mUserInteractor = userInteractor;
         mAccountManager = accountManager;
         this.blackBox = blackBox;
-        this.checker = checker;
         mGetUsernameDisposable = Disposables.disposed();
         mGetCoDriversDisposable = Disposables.disposed();
         mLoginDisposable = Disposables.disposed();
@@ -212,7 +210,7 @@ public class SwitchDriverPresenter {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(responseType -> {
-                    if (checker.isMoving(responseType)) {
+                    if (responseType.getSensorState(BlackBoxSensorState.MOVING)) {
                         mView.createSwitchOnlyDialog();
                     } else {
                         mView.createSwitchDriverDialog();

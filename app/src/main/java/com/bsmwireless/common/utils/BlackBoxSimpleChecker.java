@@ -25,4 +25,9 @@ public class BlackBoxSimpleChecker implements BlackBoxStateChecker {
     public boolean isIgnitionOff(@NonNull BlackBoxModel blackBoxModel) {
         return BlackBoxResponseModel.ResponseType.IGNITION_OFF == blackBoxModel.getResponseType();
     }
+
+    @Override
+    public boolean isUpdate(@NonNull BlackBoxModel blackBoxModel) {
+        return BlackBoxResponseModel.ResponseType.STATUS_UPDATE == blackBoxModel.getResponseType();
+    }
 }

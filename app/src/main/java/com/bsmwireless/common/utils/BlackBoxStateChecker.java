@@ -10,5 +10,6 @@ public interface BlackBoxStateChecker {
     boolean isStopped(@NonNull BlackBoxModel blackBoxModel);
     boolean isIgnitionOn(@NonNull BlackBoxModel blackBoxModel);
     boolean isIgnitionOff(@NonNull BlackBoxModel blackBoxModel);
+    boolean isUpdate(@NonNull BlackBoxModel blackBoxModel);
 
 }

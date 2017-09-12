@@ -107,6 +107,8 @@ public class LockScreenPresenter {
      */
     void startMonitoring() {
 
+        Timber.d("startMonitoring, currentWork " + currentWork);
+
         switch (currentWork) {
             case NOTHING:
             case GENERAL_MONITORING:
@@ -183,10 +185,14 @@ public class LockScreenPresenter {
      */
     void startReconnection() {
 
+        Timber.d("Start reconnection");
+
         Completable reconnectCompletable = reconnectionReference.get();
         if (reconnectCompletable == null) {
             int boxId = preferencesManager.getBoxId();
             reconnectCompletable = connectionManager.connectBlackBox(boxId)
+                    .flatMapObservable(BlackBoxConnectionManager::getDataObservable)
+                    .firstOrError()
                     .toCompletable()
                     .timeout(blackBoxTimeoutMillis, TimeUnit.MILLISECONDS)
                     .onErrorResumeNext(throwable -> {
@@ -212,7 +218,7 @@ public class LockScreenPresenter {
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe(unused -> currentWork = CurrentWork.RECONNECTING)
                 .doFinally(() -> reconnectionReference.set(null))
-                .subscribe(this::startMonitoring,
+                .subscribe(this::startGeneralMonitoring,
                         throwable -> mView.closeLockScreen());
         mCompositeDisposable.add(disposable);
     }
@@ -229,7 +235,8 @@ public class LockScreenPresenter {
         if (idleCompletable == null) {
 
             idleCompletable = connectionManager.getDataObservable()
-                    .filter(blackBoxModel -> !checker.isStopped(blackBoxModel))
+                    .filter(blackBoxModel -> !checker.isStopped(blackBoxModel)
+                            && !checker.isUpdate(blackBoxModel))
                     .timeout(mIdlingTimeoutMillis, TimeUnit.MILLISECONDS)
                     .firstElement()
                     .ignoreElement()
@@ -244,6 +251,7 @@ public class LockScreenPresenter {
                 .subscribeOn(Schedulers.io())
                 .doOnSubscribe(unused -> currentWork = CurrentWork.IDLE_MONITORING)
                 .doFinally(() -> idleMonitoringCompletableReference.set(null))
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::startGeneralMonitoring, // getting a new status, start monitoring again
                         throwable -> {
                             if (throwable instanceof TimeoutException) {
