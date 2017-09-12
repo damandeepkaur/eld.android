@@ -10,8 +10,8 @@ android {
         applicationId "app.bsmuniversal.com"
         minSdkVersion 15
         targetSdkVersion 25
-        versionCode 50
-        versionName "1.0.49"
+        versionCode 56
+        versionName "1.0.55"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         javaCompileOptions {
@@ -36,9 +36,13 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             buildConfigField "boolean", "USE_LOG", "false"
             signingConfig signingConfigs.release
+
+            testCoverageEnabled = true
         }
         debug {
             buildConfigField "boolean", "USE_LOG", "true"
+
+            testCoverageEnabled = true
         }
     }
 
@@ -182,3 +186,5 @@ dependencies {
 spoon {
     noAnimations = true
 }
+
+apply from: "jacoco.gradle"

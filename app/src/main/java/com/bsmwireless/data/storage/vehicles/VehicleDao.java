@@ -19,7 +19,7 @@ public interface VehicleDao {
     Flowable<List<VehicleEntity>> getVehicles(List<Integer> ids);
 
     @Query("SELECT * FROM vehicles WHERE id = :id LIMIT 1")
-    Flowable<VehicleEntity> getVehicle(int id);
+    VehicleEntity getVehicleSync(int id);
 
     @Query("DELETE FROM vehicles WHERE id = :id")
     int deleteVehicle(int id);

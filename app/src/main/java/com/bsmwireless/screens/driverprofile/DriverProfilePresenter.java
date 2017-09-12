@@ -1,6 +1,7 @@
 package com.bsmwireless.screens.driverprofile;
 
 import com.bsmwireless.common.dagger.ActivityScope;
+import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.data.network.RetrofitException;
 import com.bsmwireless.data.storage.carriers.CarrierEntity;
@@ -13,10 +14,12 @@ import com.bsmwireless.screens.common.menu.BaseMenuPresenter;
 import com.bsmwireless.screens.common.menu.BaseMenuView;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
 
+import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
@@ -28,11 +31,10 @@ import static com.bsmwireless.screens.driverprofile.DriverProfileView.Error.PASS
 import static com.bsmwireless.screens.driverprofile.DriverProfileView.Error.VALID_PASSWORD;
 
 @ActivityScope
-public class DriverProfilePresenter extends BaseMenuPresenter {
+public class DriverProfilePresenter extends BaseMenuPresenter implements AccountManager.AccountListener {
 
     private static final int MAX_SIGNATURE_LENGTH = 50000;
 
-    private UserInteractor mUserInteractor;
     private DriverProfileView mView;
 
     private FullUserEntity mFullUserEntity;
@@ -40,39 +42,54 @@ public class DriverProfilePresenter extends BaseMenuPresenter {
     private CarrierEntity mCarrier;
 
     @Inject
-    public DriverProfilePresenter(DriverProfileView view, UserInteractor userInteractor, DutyTypeManager dutyTypeManager, ELDEventsInteractor eventsInteractor) {
+    public DriverProfilePresenter(DriverProfileView view, UserInteractor userInteractor, DutyTypeManager dutyTypeManager, ELDEventsInteractor eventsInteractor, AccountManager accountManager) {
         mView = view;
         mUserInteractor = userInteractor;
         mDutyTypeManager = dutyTypeManager;
         mEventsInteractor = eventsInteractor;
+        mAccountManager = accountManager;
         mDisposables = new CompositeDisposable();
 
         Timber.d("CREATED");
     }
 
+    public void onViewCreated() {
+        mAccountManager.addListener(this);
+    }
+
     public void onNeedUpdateUserInfo() {
-        Disposable disposable = mUserInteractor.getFullUser()
-                                                    .subscribeOn(Schedulers.io())
-                                                    .observeOn(AndroidSchedulers.mainThread())
-                                                    .subscribe(userEntity -> {
-                                                                mFullUserEntity = userEntity;
-                                                                mView.setUserInfo(mFullUserEntity.getUserEntity());
+        Disposable disposable = Single.fromCallable(() -> mUserInteractor.getFullUserSync())
+                                      .subscribeOn(Schedulers.io())
+                                      .observeOn(AndroidSchedulers.mainThread())
+                                      .subscribe(userEntity -> {
+                                           mFullUserEntity = userEntity;
+                                           mView.setUserInfo(mFullUserEntity.getUserEntity());
 
-                                                                mHomeTerminals = mFullUserEntity.getHomeTerminalEntities();
-                                                                if (mHomeTerminals != null && mHomeTerminals.size() > 0) {
-                                                                    Integer selectedHomeTerminalId = mFullUserEntity.getUserEntity().getHomeTermId();
-                                                                    int position = findHomeTerminalById(mHomeTerminals, selectedHomeTerminalId);
-                                                                    mView.setHomeTerminalsSpinner(getHomeTerminalNames(mHomeTerminals), position);
-                                                                }
+                                           mHomeTerminals = mFullUserEntity.getHomeTerminalEntities();
+                                           if (mHomeTerminals != null && mHomeTerminals.size() > 0) {
+                                               Integer selectedHomeTerminalId = mFullUserEntity.getUserEntity().getHomeTermId();
+                                               int position = findHomeTerminalById(mHomeTerminals, selectedHomeTerminalId);
+                                               mView.setHomeTerminalsSpinner(getHomeTerminalNames(mHomeTerminals), position);
+                                           } else {
+                                               mView.setHomeTerminalsSpinner(Collections.emptyList(), 0);
+                                           }
 
-                                                                List<CarrierEntity> carriers = mFullUserEntity.getCarriers();
-                                                                if (carriers != null && carriers.size() > 0) {
-                                                                    mCarrier = carriers.get(0);
-                                                                    mView.setCarrierInfo(mCarrier);
-                                                                }
-                                                            },
-                                                            throwable -> Timber.e(throwable.getMessage()));
+                                           List<CarrierEntity> carriers = mFullUserEntity.getCarriers();
+                                           if (carriers != null && carriers.size() > 0) {
+                                               mCarrier = carriers.get(0);
+                                               mView.setCarrierInfo(mCarrier);
+                                           } else {
+                                               mView.setCarrierInfo(new CarrierEntity());
+                                           }
+                                       },
+                                       throwable -> Timber.e(throwable.getMessage()));
         mDisposables.add(disposable);
+    }
+
+    @Override
+    public void onDestroy() {
+        mAccountManager.removeListener(this);
+        super.onDestroy();
     }
 
     @Override
@@ -90,22 +107,22 @@ public class DriverProfilePresenter extends BaseMenuPresenter {
             mFullUserEntity.getUserEntity().setSignature(signature);
 
             Disposable disposable = mUserInteractor.updateDriverSignature(signature)
-                                                        .subscribeOn(Schedulers.io())
-                                                        .observeOn(AndroidSchedulers.mainThread())
-                                                        .subscribe(wasUpdated -> {
-                                                                    Timber.d("Update signature: " + wasUpdated);
-                                                                    if (!wasUpdated) {
-                                                                        mView.showError(DriverProfileView.Error.ERROR_SAVE_SIGNATURE);
-                                                                    } else {
-                                                                        mView.showSignatureChanged();
-                                                                    }
-                                                                },
-                                                                throwable -> {
-                                                                    Timber.e(throwable.getMessage());
-                                                                    if (throwable instanceof RetrofitException) {
-                                                                        mView.showError((RetrofitException) throwable);
-                                                                    }
-                                                                });
+                                                   .subscribeOn(Schedulers.io())
+                                                   .observeOn(AndroidSchedulers.mainThread())
+                                                   .subscribe(wasUpdated -> {
+                                                               Timber.d("Update signature: " + wasUpdated);
+                                                               if (!wasUpdated) {
+                                                                   mView.showError(DriverProfileView.Error.ERROR_SAVE_SIGNATURE);
+                                                               } else {
+                                                                   mView.showSignatureChanged();
+                                                               }
+                                                           },
+                                                           throwable -> {
+                                                               Timber.e(throwable.getMessage());
+                                                               if (throwable instanceof RetrofitException) {
+                                                                   mView.showError((RetrofitException) throwable);
+                                                               }
+                                                           });
             mDisposables.add(disposable);
         } else {
             mView.showError(DriverProfileView.Error.ERROR_INVALID_USER);
@@ -124,21 +141,21 @@ public class DriverProfilePresenter extends BaseMenuPresenter {
         DriverProfileView.Error validationError = validatePassword(oldPwd, newPwd, confirmPwd);
         if (validationError.equals(VALID_PASSWORD)) {
             Disposable disposable = mUserInteractor.updateDriverPassword(oldPwd, newPwd)
-                                                        .subscribeOn(Schedulers.io())
-                                                        .observeOn(AndroidSchedulers.mainThread())
-                                                        .subscribe(passwordUpdated -> {
-                                                                    if (passwordUpdated) {
-                                                                        mView.showPasswordChanged();
-                                                                    } else {
-                                                                        mView.showError(DriverProfileView.Error.ERROR_CHANGE_PASSWORD);
-                                                                    }
-                                                                },
-                                                                throwable -> {
-                                                                    Timber.e(throwable.getMessage());
-                                                                    if (throwable instanceof RetrofitException) {
-                                                                        mView.showError((RetrofitException) throwable);
-                                                                    }
-                                                                });
+                                                   .subscribeOn(Schedulers.io())
+                                                   .observeOn(AndroidSchedulers.mainThread())
+                                                   .subscribe(passwordUpdated -> {
+                                                               if (passwordUpdated) {
+                                                                   mView.showPasswordChanged();
+                                                               } else {
+                                                                   mView.showError(DriverProfileView.Error.ERROR_CHANGE_PASSWORD);
+                                                               }
+                                                           },
+                                                           throwable -> {
+                                                               Timber.e(throwable.getMessage());
+                                                               if (throwable instanceof RetrofitException) {
+                                                                   mView.showError((RetrofitException) throwable);
+                                                               }
+                                                           });
             mDisposables.add(disposable);
         } else {
             mView.showError(validationError);
@@ -152,18 +169,18 @@ public class DriverProfilePresenter extends BaseMenuPresenter {
             mFullUserEntity.getUserEntity().setHomeTermId(homeTerminal.getId());
 
             Disposable disposable = mUserInteractor.updateDriverHomeTerminal(homeTerminal.getId())
-                                                        .subscribeOn(Schedulers.io())
-                                                        .observeOn(AndroidSchedulers.mainThread())
-                                                        .subscribe(wasUpdated -> {
-                                                            if (!wasUpdated) {
-                                                                mView.showError(DriverProfileView.Error.ERROR_TERMINAL_UPDATE);
-                                                            }
-                                                        }, throwable -> {
-                                                            Timber.e(throwable.getMessage());
-                                                            if (throwable instanceof RetrofitException) {
-                                                                mView.showError((RetrofitException) throwable);
-                                                            }
-                                                        });
+                                                   .subscribeOn(Schedulers.io())
+                                                   .observeOn(AndroidSchedulers.mainThread())
+                                                   .subscribe(wasUpdated -> {
+                                                       if (!wasUpdated) {
+                                                           mView.showError(DriverProfileView.Error.ERROR_TERMINAL_UPDATE);
+                                                       }
+                                                   }, throwable -> {
+                                                       Timber.e(throwable.getMessage());
+                                                       if (throwable instanceof RetrofitException) {
+                                                           mView.showError((RetrofitException) throwable);
+                                                       }
+                                                   });
             mDisposables.add(disposable);
 
             mView.setHomeTerminalInfo(homeTerminal);
@@ -215,4 +232,12 @@ public class DriverProfilePresenter extends BaseMenuPresenter {
         }
         return terminalNames;
     }
+
+    @Override
+    public void onUserChanged() {
+        onNeedUpdateUserInfo();
+    }
+
+    @Override
+    public void onDriverChanged() {}
 }

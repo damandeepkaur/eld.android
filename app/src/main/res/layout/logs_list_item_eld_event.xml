@@ -66,7 +66,7 @@
             android:src="@drawable/ic_more_vert"/>
 
         <TextView
-            android:id="@+id/vehicle_name"
+            android:id="@+id/event_vehicle_name"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_toLeftOf="@id/menu_button"

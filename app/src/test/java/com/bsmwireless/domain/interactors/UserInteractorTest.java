@@ -2,6 +2,7 @@ package com.bsmwireless.domain.interactors;
 
 import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.network.authenticator.TokenManager;
+import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.data.storage.carriers.CarrierDao;
@@ -43,6 +44,7 @@ import io.reactivex.observers.TestObserver;
 import io.reactivex.subscribers.TestSubscriber;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
@@ -142,6 +144,9 @@ public class UserInteractorTest {
     @Mock
     ResponseMessage mResponseMessage;
 
+    @Mock
+    AccountManager mAccountManager;
+
 
     private UserInteractor mLoginUserInteractor;
 
@@ -153,7 +158,7 @@ public class UserInteractorTest {
         MockitoAnnotations.initMocks(this);
 
 
-        mLoginUserInteractor = new UserInteractor(mServiceApi, mPreferencesManager, mAppDatabase, mTokenManager);
+        mLoginUserInteractor = new UserInteractor(mServiceApi, mPreferencesManager, mAppDatabase, mTokenManager, mAccountManager);
     }
 
     /**
@@ -189,9 +194,14 @@ public class UserInteractorTest {
                 .subscribe(testObserver);
 
         // then
-        verify(mPreferencesManager).setAccountName(anyString());
         verify(mPreferencesManager).setRememberUserEnabled(eq(mKeepToken));
-        verify(mPreferencesManager).setShowHomeScreenEnabled(any(Boolean.class));
+        verify(mPreferencesManager).setShowHomeScreenEnabled(eq(true));
+
+        verify(mAccountManager).setCurrentDriver(anyInt(), anyString());
+        verify(mAccountManager).setCurrentUser(anyInt(), anyString());
+
+        verify(mTokenManager).setToken(anyString(), eq(mName), eq(mDomain), any(Auth.class));
+
         verify(mUserDao).insertUser(any(UserEntity.class));
     }
 
@@ -321,9 +331,12 @@ public class UserInteractorTest {
                 .subscribe(testObserver);
 
         // then
-        verify(mPreferencesManager).setAccountName(anyString());
-
         verify(mPreferencesManager).setRememberUserEnabled(eq(mKeepToken));
+        verify(mPreferencesManager).setShowHomeScreenEnabled(eq(true));
+
+        verify(mAccountManager).setCurrentDriver(anyInt(), anyString());
+        verify(mAccountManager).setCurrentUser(anyInt(), anyString());
+
         verify(mTokenManager).setToken(anyString(), eq(mName), eq(mDomain), any(Auth.class));
     }
 
@@ -335,7 +348,7 @@ public class UserInteractorTest {
         final String driver = "90210"; // parsable to int
         final int driverInt = 90210; // int version of driver
 
-        when(mPreferencesManager.getAccountName()).thenReturn(accountName);
+        when(mPreferencesManager.getDriverAccountName()).thenReturn(accountName);
         when(mTokenManager.getDriver(anyString())).thenReturn(driver);
         when(mAppDatabase.userDao()).thenReturn(mUserDao);
 
@@ -343,8 +356,10 @@ public class UserInteractorTest {
         when(mServiceApi.logout(any(ELDEvent.class))).thenReturn(Observable.just(mResponseMessage));
         when(mResponseMessage.getMessage()).thenReturn(mSuccessResponse);
 
+        when(mAccountManager.getCurrentDriverAccountName()).thenReturn(accountName);
+
         // when
-        mLoginUserInteractor.deleteUser();
+        mLoginUserInteractor.deleteDriver();
 
         // then
         verify(mUserDao).deleteUser(eq(driverInt));
@@ -359,7 +374,7 @@ public class UserInteractorTest {
         final String driver = "90210"; // parsable to int
         final String fakeToken = "314159265";
 
-        when(mPreferencesManager.getAccountName()).thenReturn(accountName);
+        when(mPreferencesManager.getDriverAccountName()).thenReturn(accountName);
         when(mTokenManager.getDriver(anyString())).thenReturn(driver);
         when(mAppDatabase.userDao()).thenReturn(mUserDao);
         when(mTokenManager.getToken(anyString())).thenReturn(fakeToken);
@@ -369,7 +384,7 @@ public class UserInteractorTest {
         when(mResponseMessage.getMessage()).thenReturn(mSuccessResponse);
 
         // when
-        mLoginUserInteractor.deleteUser();
+        mLoginUserInteractor.deleteDriver();
 
         // then
         verify(mTokenManager).clearToken(eq(fakeToken));
@@ -378,10 +393,10 @@ public class UserInteractorTest {
     @Test
     public void testSyncDriverProfileInvalidUserId() {
         // given
-        User user1 = new User();
+        UserEntity user1 = new UserEntity();
         user1.setId(-1); // negative
 
-        User user2 = new User();
+        UserEntity user2 = new UserEntity();
         user2.setId(0); // boundary
 
         TestObserver<Boolean> testObserver1 = TestObserver.create();
@@ -409,7 +424,7 @@ public class UserInteractorTest {
     @Test
     public void testSyncDriverProfileApiFailed() {
         // given
-        User user = new User();
+        UserEntity user = new UserEntity();
         user.setId(12345);
 
         ResponseMessage responseMessage = new ResponseMessage();
@@ -438,7 +453,7 @@ public class UserInteractorTest {
     @Test
     public void testSyncDriverProfileApiError() {
         // given
-        User user = new User();
+        UserEntity user = new UserEntity();
         user.setId(12345);
 
         String fakeErrorMessage = "sorry.";
@@ -469,7 +484,7 @@ public class UserInteractorTest {
     @Test
     public void testSyncDriverProfileSuccess() {
         // given
-        User user = new User();
+        UserEntity user = new UserEntity();
         user.setId(12345);
 
         ResponseMessage responseMessage = new ResponseMessage();
@@ -766,7 +781,7 @@ public class UserInteractorTest {
         TestSubscriber<String> testSubscriber = TestSubscriber.create();
 
         // when
-        mLoginUserInteractor.getFullName().subscribe(testSubscriber);
+        mLoginUserInteractor.getFullDriverName().subscribe(testSubscriber);
 
         // then
         testSubscriber.assertResult(expected1);
@@ -785,7 +800,7 @@ public class UserInteractorTest {
         // n/a
 
         // when
-        mLoginUserInteractor.getDomainName();
+        mLoginUserInteractor.getDriverDomainName();
 
         // then
         verify(mTokenManager).getDomain(anyString());
@@ -799,7 +814,7 @@ public class UserInteractorTest {
         when(mAppDatabase.userDao()).thenReturn(mUserDao);
         when(mUserDao.getUser(any(Integer.class))).thenReturn(Flowable.just(new UserEntity()));
 
-        TestSubscriber<UserEntity> testSubscriber = TestSubscriber.create();
+        TestSubscriber<User> testSubscriber = TestSubscriber.create();
 
         // when
         mLoginUserInteractor.getUser().subscribe(testSubscriber);
@@ -820,7 +835,7 @@ public class UserInteractorTest {
         TestSubscriber<FullUserEntity> testSubscriber = TestSubscriber.create();
 
         // when
-        mLoginUserInteractor.getFullUser().subscribe(testSubscriber);
+        mLoginUserInteractor.getFullDriver().subscribe(testSubscriber);
 
         // then
         verify(mUserDao).getFullUser(any(Integer.class));
@@ -902,7 +917,7 @@ public class UserInteractorTest {
      * Used in tests to prevent exceptions, and only when return value does not matter.
      */
     private void mockGetDriverId() {
-        when(mPreferencesManager.getAccountName()).thenReturn("fake account");
+        when(mPreferencesManager.getDriverAccountName()).thenReturn("fake account");
         when(mTokenManager.getDriver(anyString())).thenReturn("12222"); // fake driver id
     }
 

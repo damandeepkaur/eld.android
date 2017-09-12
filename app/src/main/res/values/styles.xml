@@ -40,7 +40,7 @@
 
     <style name="DriverProfileTheme" parent="AppTheme"/>
 
-    <style name="DriverProfileTheme.EditView">
+    <style name="TextInputEditText" parent="AppTheme">
         <item name="android:textSize">@dimen/driver_profile_item_title_text_size</item>
         <item name="android:textStyle">normal</item>
         <item name="android:textColor">@color/primary_text</item>
@@ -49,12 +49,17 @@
         <item name="android:maxLines">1</item>
     </style>
 
-    <style name="DriverProfileTheme.EditView.Disabled" parent="DriverProfileTheme.EditView">
+    <style name="TextInputEditText.Disabled" parent="TextInputEditText">
         <item name="android:enabled">false</item>
         <item name="android:focusable">false</item>
         <item name="android:textColor">@drawable/disabled_edit_text_color</item>
         <item name="backgroundTint">@android:color/transparent</item>
     </style>
+
+    <style name="TextInputEditText.Disabled.Black" parent="TextInputEditText.Disabled">
+        <item name="android:textColor">@color/primary_text</item>
+    </style>
+
 
     <style name="DriverProfileTheme.GroupLabel">
         <item name="android:textSize">14sp</item>
@@ -107,6 +112,11 @@
 
     <style name="PositiveButtonStyle" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
         <item name="android:textColor">@color/nasty_green</item>
+    </style>
+
+    <style name="AppTheme.Widget.ButtonBordered" parent="Widget.AppCompat.Button.Borderless.Colored">
+        <item name="android:background">@drawable/button_border</item>
+        <item name="android:textAppearance">@style/AppTheme.TextAppearance.Button.Borderless.Colored</item>
     </style>
 
     <!-- START OLD STYLES -->
@@ -235,4 +245,16 @@
         <item name="app.bsmuniversal.com:font">fonty</item>
     </style>
     <!-- END OLD STYLES -->
+
+
+    <!-- Text Appearance-->
+    <style name="AppTheme.TextAppearance.Caption" parent="TextAppearance.AppCompat.Caption">
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">@color/black_38</item>
+    </style>
+
+    <style name="AppTheme.TextAppearance.Button.Borderless.Colored" parent="@style/TextAppearance.AppCompat.Widget.Button.Borderless.Colored">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">normal</item>
+    </style>
 </resources>

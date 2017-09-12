@@ -11,4 +11,5 @@ public interface BaseMenuView {
     void showDutyTypeDialog(DutyType dutyType);
     void showNotInVehicleDialog();
     void changeDutyType(DutyType dutyType);
+    void showSwitchDriverDialog();
 }
