@@ -5,7 +5,7 @@ import android.view.View;
 import org.hamcrest.Matcher;
 
 import app.bsmuniversal.com.utils.ViewActionsUtil;
-
+import android.support.test.espresso.ViewInteraction;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.clearText;
 import static android.support.test.espresso.action.ViewActions.click;
@@ -52,7 +52,20 @@ public class CommonPage {
     }
 
     public static void perform_click(Matcher<View> view) {
-        onView(view).perform(click());
+        perform_click(view,false,false);
+         }
+
+    //updated perform_click after scroll when the element or locator is not in the current View
+
+    public static void perform_click(Matcher<View> view,boolean withScroll, boolean closeKeyboard) {
+        if (withScroll) {
+            onView(view).perform(scrollTo());
+        }
+        if (closeKeyboard) {
+            onView(view).perform(clearText(),closeSoftKeyboard());
+        } else {
+            onView(view).perform(click());
+        }
     }
 
     public static void set_checked(Matcher<View> view, boolean checked) {
