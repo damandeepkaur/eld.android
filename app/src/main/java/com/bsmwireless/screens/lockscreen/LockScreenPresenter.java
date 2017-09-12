@@ -152,7 +152,7 @@ public class LockScreenPresenter {
         }
 
         final Disposable disposable = maybe
-                .doOnSubscribe(disposable1 -> {  // must be lower subscribeOn() in the current chain
+                .doOnSubscribe(unused -> {  // must be lower subscribeOn() in the current chain
                     mView.removeAnyPopup();
                     currentWork = CurrentWork.GENERAL_MONITORING;
                 })

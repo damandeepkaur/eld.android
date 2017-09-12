@@ -14,7 +14,7 @@ import butterknife.Unbinder;
 public abstract class BaseActivity extends AppCompatActivity{
     protected Unbinder mUnbinder;
     private boolean doBind = true;
-    /*private*/ boolean isBound = false;
+    boolean isBound = false;
 
     @Override
     protected void onStart() {

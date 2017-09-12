@@ -43,7 +43,7 @@ public class SwitchDriverPresenter {
     private Disposable mGetCoDriversDisposable;
     private Disposable mLoginDisposable;
     private Disposable mLogoutDisposable;
-    private final CompositeDisposable commonDisposables;
+    private final CompositeDisposable mCommonDisposables;
 
     @Inject
     public SwitchDriverPresenter(SwitchDriverView view, ELDEventsInteractor eventsInteractor,
@@ -58,7 +58,7 @@ public class SwitchDriverPresenter {
         mGetCoDriversDisposable = Disposables.disposed();
         mLoginDisposable = Disposables.disposed();
         mLogoutDisposable = Disposables.disposed();
-        commonDisposables = new CompositeDisposable();
+        mCommonDisposables = new CompositeDisposable();
         Timber.d("CREATED");
     }
 
@@ -67,7 +67,7 @@ public class SwitchDriverPresenter {
         mGetCoDriversDisposable.dispose();
         mLoginDisposable.dispose();
         mLogoutDisposable.dispose();
-        commonDisposables.clear();
+        mCommonDisposables.clear();
     }
 
     public void onSwitchDriverCreated() {
@@ -213,7 +213,7 @@ public class SwitchDriverPresenter {
                         mView.createSwitchDriverDialog();
                     }
                 });
-        commonDisposables.add(disposable);
+        mCommonDisposables.add(disposable);
     }
 
     private void getDriverInfo() {

@@ -24,10 +24,10 @@ import timber.log.Timber;
 public class MonitoringServicePresenter {
 
     final MonitoringServiceView mView;
-    private final BlackBox blackBox;
-    private Disposable monitoringDisposable;
-    private final DutyTypeManager dutyTypeManager;
-    private final AccountManager accountManager;
+    private final BlackBox mBlackBox;
+    private Disposable mMonitoringDisposable;
+    private final DutyTypeManager mDutyTypeManager;
+    private final AccountManager mAccountManager;
 
     @Inject
     public MonitoringServicePresenter(MonitoringServiceView mView,
@@ -35,29 +35,29 @@ public class MonitoringServicePresenter {
                                       DutyTypeManager dutyTypeManager,
                                       AccountManager accountManager) {
         this.mView = mView;
-        this.blackBox = blackBox;
-        this.dutyTypeManager = dutyTypeManager;
-        this.accountManager = accountManager;
-        monitoringDisposable = Disposables.disposed();
+        this.mBlackBox = blackBox;
+        this.mDutyTypeManager = dutyTypeManager;
+        this.mAccountManager = accountManager;
+        mMonitoringDisposable = Disposables.disposed();
     }
 
     public void stopMonitoring() {
         Timber.d("Stop monitoring");
-        monitoringDisposable.dispose();
+        mMonitoringDisposable.dispose();
     }
 
     public void startMonitoring() {
         Timber.d("Start monitoring");
 
-        if (!monitoringDisposable.isDisposed()) {
+        if (!mMonitoringDisposable.isDisposed()) {
             Timber.d("Monitoring already running. Return from function");
             return;
         }
 
-        monitoringDisposable = Observable
+        mMonitoringDisposable = Observable
                 .combineLatest(
-                        blackBox.getDataObservable(),
-                        new DutyManagerObservable(dutyTypeManager),
+                        mBlackBox.getDataObservable(),
+                        new DutyManagerObservable(mDutyTypeManager),
                         Result::new)
                 .subscribeOn(Schedulers.io())
                 // Some callback can be called from different thread(UI for example) that's why observeOn is called
@@ -73,7 +73,7 @@ public class MonitoringServicePresenter {
     }
 
     boolean checkConditions(Result result) {
-        return accountManager.isCurrentUserDriver() &&
+        return mAccountManager.isCurrentUserDriver() &&
                 // Now blackbox doesn't return MOVING response type. Workaround: check sensor state
 //                BlackBoxResponseModel.ResponseType.MOVING == result.blackBoxModel.getResponseType() &&
                 result.blackBoxModel.getSensorState(BlackBoxSensorState.MOVING) &&
