@@ -46,6 +46,13 @@ public class Auth implements Parcelable {
 
     };
 
+    public Auth(int driverId) {
+        mDriverId = driverId;
+    }
+
+    public Auth() {
+    }
+
     public String getToken() {
         return mToken;
     }

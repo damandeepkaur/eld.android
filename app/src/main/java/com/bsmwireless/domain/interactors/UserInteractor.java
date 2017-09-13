@@ -1,5 +1,7 @@
 package com.bsmwireless.domain.interactors;
 
+import android.util.Log;
+
 import com.bsmwireless.common.utils.DateUtils;
 import com.bsmwireless.common.utils.ListConverter;
 import com.bsmwireless.data.network.RetrofitException;
@@ -16,6 +18,7 @@ import com.bsmwireless.data.storage.hometerminals.HomeTerminalConverter;
 import com.bsmwireless.data.storage.users.FullUserEntity;
 import com.bsmwireless.data.storage.users.UserConverter;
 import com.bsmwireless.data.storage.users.UserEntity;
+import com.bsmwireless.models.Auth;
 import com.bsmwireless.models.DriverHomeTerminal;
 import com.bsmwireless.models.DriverProfileModel;
 import com.bsmwireless.models.DriverSignature;
@@ -25,7 +28,10 @@ import com.bsmwireless.models.ResponseMessage;
 import com.bsmwireless.models.RuleSelectionModel;
 import com.bsmwireless.models.User;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -66,35 +72,24 @@ public class UserInteractor {
         request.setDomain(domain);
         request.setDriverType(driverType.ordinal());
 
+        String accountName = mTokenManager.getAccountName(name, domain);
+
         return mServiceApi.loginUser(request)
-                .doOnNext(user -> {
-                    String accountName = mTokenManager.getAccountName(name, domain);
-                    mTokenManager.setToken(accountName, name, password, domain, user.getAuth());
-
-                    saveUserDataInDB(user, accountName);
-
-                })
+                .doOnNext(user -> saveUserDataInDB(user, accountName))
                 .onErrorResumeNext(throwable -> {
-                    boolean isNetworkError = throwable instanceof RetrofitException ||
-                            throwable instanceof IOException;
-                    if (!isNetworkError) {
-                        return Observable.error(throwable);
+                    if (throwable instanceof RetrofitException || throwable instanceof UnknownHostException) {
+                        String driverId = mTokenManager.getDriver(accountName);
+                        return Observable.fromCallable(() -> mTokenManager.getPassword(accountName))
+                                .filter(accountPassword -> !StringUtils.isAnyEmpty(password, accountPassword) && password.equals(accountPassword))
+                                .map(filterIn -> mAppDatabase.userDao().getUserSync(Integer.valueOf(driverId)))
+                                .map(UserConverter::toUser)
+                                .map(user -> user.setAuth(new Auth(Integer.valueOf(driverId))));
                     }
-
-                    return Observable.fromCallable(() -> mTokenManager.getAccountName(name, domain))
-                            .map(accountName -> mTokenManager.getPassword(accountName))
-                            .map(accountPassword -> accountPassword.equals(password))
-                            .map(aBoolean -> {
-                                if (!aBoolean) throw new IllegalStateException();
-                                return mTokenManager.getAccountName(name, domain);
-                            })
-                            .map(accountName -> mTokenManager.getDriver(accountName))
-                            .map(driverId -> mAppDatabase.userDao().getUserSync(Integer.valueOf(driverId)))
-                            .flatMap(userEntity -> Observable.just(UserConverter.toUser(userEntity)));
+                    return Observable.error(throwable);
                 })
+                .doOnNext(user -> mTokenManager.setToken(accountName, name, password, domain, user.getAuth()))
                 .flatMap(user -> {
                     //save user data
-                    String accountName = mTokenManager.getAccountName(name, domain);
                     mPreferencesManager.setRememberUserEnabled(keepToken);
                     mPreferencesManager.setShowHomeScreenEnabled(true);
 
@@ -107,11 +102,24 @@ public class UserInteractor {
                     long end = DateUtils.getEndDayTimeInMs(user.getTimezone(), current);
                     return mServiceApi.getELDEvents(start, end);
                 })
-                .onErrorReturn(throwable -> new ArrayList<>())
-                .map(events -> {
-                    ELDEventEntity[] entities = ELDEventConverter.toEntityArray(events);
+                .onErrorResumeNext(throwable -> {
+                    throwable.printStackTrace();
+                    if (throwable instanceof RetrofitException || throwable instanceof UnknownHostException) {
+                        Log.e("Login", "onErrorResumeNext2");
+                        return Observable.just(new ArrayList<>());
+                    }
+                    return Observable.error(throwable);
+                })
+                .switchMap(eldEvents -> {
+                    if (eldEvents == null) {
+                        return Observable.just(false);
+                    }
+                    ELDEventEntity[] entities = ELDEventConverter.toEntityArray(eldEvents);
                     mAppDatabase.ELDEventDao().insertAll(entities);
-                    return true;
+                    return Observable.just(true);
+                })
+                .onErrorResumeNext(throwable -> {
+                    return Observable.just(false);
                 });
     }
 
