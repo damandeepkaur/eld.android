@@ -98,82 +98,6 @@ public class ELDEventsInteractorTest {
     }
 
     @Test
-    public void testSyncEldEventsWithServerEmptyListEqual() {
-        // given
-        final long startTime = 1234567890;
-        final long endTime = 1235555555;
-        final int driverId = 999;
-
-        List<ELDEvent> eldEventsFromApi = new ArrayList<>();
-        List<ELDEventEntity> eldEventsFromDb = new ArrayList<>();
-
-        ELDEvent eldEvent1 = new ELDEvent();
-        ELDEvent eldEvent2 = new ELDEvent();
-        eldEvent1.setId(1);
-        eldEvent2.setId(2);
-
-        eldEventsFromApi.add(eldEvent1);
-        eldEventsFromApi.add(eldEvent2);
-
-        ELDEventEntity eldEventEntity1 = new ELDEventEntity();
-        ELDEventEntity eldEventEntity2 = new ELDEventEntity();
-        eldEventEntity1.setId(1);
-        eldEventEntity2.setId(2);
-
-        eldEventsFromDb.add(eldEventEntity1);
-        eldEventsFromDb.add(eldEventEntity2);
-
-        when(mServiceApi.getELDEvents(anyLong(), anyLong())).thenReturn(Observable.just(eldEventsFromApi));
-        when(mEldEventDao.getEventsFromStartToEndTimeSync(anyLong(), anyLong(), anyInt())).thenReturn(eldEventsFromDb);
-        when(mPreferencesManager.getDriverId()).thenReturn(driverId);
-
-        // when
-        mEldEventsInteractor.syncELDEventsWithServer(startTime, endTime);
-
-        // then
-        verify(mServiceApi).getELDEvents(eq(startTime), eq(endTime));
-        verify(mEldEventDao).getEventsFromStartToEndTimeSync(eq(startTime), eq(endTime), anyInt());
-        verify(mEldEventDao, never()).insertAll(any()); // no insert if not needed
-    }
-
-    @Test
-    public void testSyncEldEventsWithServerEmptyListNotEqual() {
-        // given
-        final long startTime = 1234567890;
-        final long endTime = 1235555555;
-        final int driverId = 999;
-
-        List<ELDEvent> eldEventsFromApi = new ArrayList<>();
-        List<ELDEventEntity> eldEventsFromDb = new ArrayList<>();
-
-        ELDEvent eldEvent1 = new ELDEvent();
-        eldEvent1.setId(1);
-        eldEventsFromApi.add(eldEvent1);
-
-        ELDEventEntity eldEventEntity1 = new ELDEventEntity();
-        ELDEventEntity eldEventEntity2 = new ELDEventEntity();
-        eldEventEntity1.setId(1);
-        eldEventEntity2.setId(2);
-
-        eldEventsFromDb.add(eldEventEntity1);
-        eldEventsFromDb.add(eldEventEntity2);
-
-        when(mServiceApi.getELDEvents(anyLong(), anyLong())).thenReturn(Observable.just(eldEventsFromApi));
-        when(mEldEventDao.getEventsFromStartToEndTimeSync(anyLong(), anyLong(), anyInt())).thenReturn(eldEventsFromDb);
-        when(mPreferencesManager.getDriverId()).thenReturn(driverId);
-
-        // when
-        mEldEventsInteractor.syncELDEventsWithServer(startTime, endTime);
-
-        // then
-        verify(mServiceApi).getELDEvents(eq(startTime), eq(endTime));
-        verify(mEldEventDao).getEventsFromStartToEndTimeSync(eq(startTime), eq(endTime), anyInt());
-        verify(mEldEventDao).insertAll(any()); // note: insert-all is only valid if we assume API sends full vs. incremental, and if ELD events are never deleted server-side
-    }
-
-    // TODO: test syncELDEventsWithServer error case when testable
-
-    @Test
     public void testGetDutyEventsFromDbSuccess() {
         // given
         long startTime = 1234567890;
@@ -223,14 +147,14 @@ public class ELDEventsInteractorTest {
 
         List<ELDEventEntity> eldEventEntities = new ArrayList<>();
 
-        when(mEldEventDao.getLatestActiveDutyEvent(anyLong(), anyInt()))
-                .thenReturn(Flowable.just(eldEventEntities));
+        when(mEldEventDao.getLatestActiveDutyEventSync(anyLong(), anyInt()))
+                .thenReturn(eldEventEntities);
 
         // when
-        mEldEventsInteractor.getLatestActiveDutyEventFromDB(latestTime, userId);
+        mEldEventsInteractor.getLatestActiveDutyEventFromDBSync(latestTime, userId);
 
         // then
-        verify(mEldEventDao).getLatestActiveDutyEvent(eq(latestTime), anyInt());
+        verify(mEldEventDao).getLatestActiveDutyEventSync(eq(latestTime), anyInt());
     }
 
     @Test
