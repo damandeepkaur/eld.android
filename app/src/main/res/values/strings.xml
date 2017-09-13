@@ -424,7 +424,7 @@
     <string name="edit_event_start_time">Start time</string>
     <string name="edit_event_end_time">End time</string>
     <string name="edit_event_comment">Comment</string>
-    <string name="edit_event_default_time">0:00 AM</string>
+    <string name="edit_event_default_time">0:00:00 AM</string>
     <string name="edit_event_pm">PM</string>
     <string name="edit_event_am">AM</string>
     <string name="edit_event_save">Save</string>

@@ -174,7 +174,7 @@ public class DateUtils {
      * @return long with format time like 20170708
      */
     public static long convertTimeToDayNumber(String zone, long time) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
         Calendar calendar = Calendar.getInstance();
         TimeZone timeZone = TimeZone.getTimeZone(zone);
         calendar.setTimeZone(timeZone);
@@ -188,7 +188,7 @@ public class DateUtils {
      * @return long unix time in ms
      */
     public static long convertDayNumberToUnixMs(long logday) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd", Locale.US);
         Date date = null;
         try {
             date = sdf.parse(String.valueOf(logday));
@@ -203,7 +203,7 @@ public class DateUtils {
      * @return string with format time like "12:35 AM"
      */
     public static String convertTimeToAMPMString(long time, String timezone) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm aaa");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm:ss aaa", Locale.US);
         TimeZone timeZone = TimeZone.getTimeZone(timezone);
         dateFormat.setTimeZone(timeZone);
         return dateFormat.format(time);
@@ -215,7 +215,7 @@ public class DateUtils {
      * @return long unix time in ms
      */
     public static Long convertStringAMPMToTime(String time, long day, String timezone) {
-        SimpleDateFormat format = new SimpleDateFormat("hh:mm aaa", Locale.US);
+        SimpleDateFormat format = new SimpleDateFormat("hh:mm:ss aaa", Locale.US);
         TimeZone timeZone = TimeZone.getTimeZone(timezone);
         format.setTimeZone(timeZone);
         try {
@@ -226,11 +226,13 @@ public class DateUtils {
 
             int hourOfDay = calendar.get(Calendar.HOUR_OF_DAY);
             int minute = calendar.get(Calendar.MINUTE);
+            int seconds = calendar.get(Calendar.SECOND);
 
             // Time of day
             calendar.setTimeInMillis(day);
             calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
             calendar.set(Calendar.MINUTE, minute);
+            calendar.set(Calendar.SECOND, seconds);
             return calendar.getTimeInMillis();
         } catch (ParseException e) {
             e.printStackTrace();
