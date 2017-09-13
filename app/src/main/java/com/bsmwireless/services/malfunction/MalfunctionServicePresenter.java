@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 
 import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.data.network.blackbox.BlackBoxConnectionManager;
+import com.bsmwireless.data.network.blackbox.models.BlackBoxResponseModel;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
 import com.bsmwireless.models.BlackBoxModel;
 import com.bsmwireless.models.BlackBoxSensorState;
@@ -54,6 +55,7 @@ public class MalfunctionServicePresenter {
         defaultEvent.setEventCode(ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED.getCode());
 
         Disposable disposable = getBaseObservable()
+                .filter(blackBoxModel -> BlackBoxResponseModel.ResponseType.STATUS_UPDATE == blackBoxModel.getResponseType())
                 .flatMap(blackBoxModel -> mELDEventsInteractor
                                 .getLatestMalfunctionEvent(Malfunction.ENGINE_SYNCHRONIZATION)
                                 .defaultIfEmpty(defaultEvent)
