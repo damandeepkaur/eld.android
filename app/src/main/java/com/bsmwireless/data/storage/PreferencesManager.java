@@ -119,9 +119,7 @@ public class PreferencesManager {
     }
 
     public void clearValues() {
-        boolean rememberUserEnabled = isRememberUserEnabled();
         mPreferences.edit().clear().apply();
-        setRememberUserEnabled(rememberUserEnabled);
     }
 
     public void setBoxGPSEnabled(boolean boxGPSEnabled) {
