@@ -3,6 +3,7 @@ ELD app for Android
 
 # Version history
 
+* **1.0.65** - Fix app returns home screen instead of login screen after selecting close
 * **1.0.64** - Fixed remember me enable by default
 * **1.0.63** - Fix for crash on login/logout 
 * **1.0.62** - Added co-driver view notification

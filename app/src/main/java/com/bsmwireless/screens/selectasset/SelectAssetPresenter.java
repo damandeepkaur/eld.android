@@ -3,6 +3,7 @@ package com.bsmwireless.screens.selectasset;
 import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.data.network.RetrofitException;
 import com.bsmwireless.data.network.blackbox.BlackBoxConnectionException;
+import com.bsmwireless.domain.interactors.ELDEventsInteractor;
 import com.bsmwireless.domain.interactors.UserInteractor;
 import com.bsmwireless.domain.interactors.VehiclesInteractor;
 import com.bsmwireless.models.Vehicle;
@@ -18,14 +19,19 @@ import timber.log.Timber;
 
 @ActivityScope
 public class SelectAssetPresenter {
+
     private SelectAssetView mView;
     private VehiclesInteractor mVehiclesInteractor;
+    private UserInteractor mUserInteractor;
+    private ELDEventsInteractor mEventsInteractor;
     private CompositeDisposable mDisposables;
 
     @Inject
-    public SelectAssetPresenter(SelectAssetView view, VehiclesInteractor vehiclesInteractor, UserInteractor userInteractor) {
+    public SelectAssetPresenter(SelectAssetView view, VehiclesInteractor vehiclesInteractor, UserInteractor userInteractor, ELDEventsInteractor eventsInteractor) {
         mView = view;
         mVehiclesInteractor = vehiclesInteractor;
+        mUserInteractor = userInteractor;
+        mEventsInteractor = eventsInteractor;
         mDisposables = new CompositeDisposable();
 
         Timber.d("CREATED");
@@ -49,7 +55,7 @@ public class SelectAssetPresenter {
     }
 
     public void onSearchTextChanged(String searchText) {
-        if (searchText.isEmpty()){
+        if (searchText.isEmpty()) {
             mView.setEmptyList();
         } else if (searchText.length() < 3) {
             mView.showSearchErrorMessage();
@@ -102,6 +108,27 @@ public class SelectAssetPresenter {
                                 }
                             }));
         }
+    }
+
+    public void onCancelDialogButtonClicked() {
+        mDisposables.add(mEventsInteractor.postLogoutEvent()
+                .doOnNext(isSuccess -> mUserInteractor.deleteDriver())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        status -> {
+                            Timber.i("Logout status = %b", status);
+                            if (status) {
+                                mView.onActionDone();
+                            }
+                        },
+                        error -> {
+                            Timber.e("Logout error: %s", error);
+                            if (error instanceof RetrofitException) {
+                                mView.showErrorMessage((RetrofitException) error);
+                            }
+                        }
+                ));
     }
 
     public void onBackButtonPressed() {
