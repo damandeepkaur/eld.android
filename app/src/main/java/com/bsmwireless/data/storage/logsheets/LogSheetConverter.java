@@ -12,6 +12,7 @@ public class LogSheetConverter {
 
         if (entity != null) {
             model = new LogSheetHeader();
+            model.setDriverId(entity.getDriverId());
             model.setLogDay(entity.getLogDay());
             model.setVehicleId(entity.getVehicleId());
             model.setBoxId(entity.getBoxId());
@@ -34,6 +35,7 @@ public class LogSheetConverter {
 
         if (model != null) {
             entity = new LogSheetEntity();
+            entity.setDriverId(model.getDriverId());
             entity.setLogDay(model.getLogDay());
             entity.setVehicleId(model.getVehicleId());
             entity.setBoxId(model.getBoxId());

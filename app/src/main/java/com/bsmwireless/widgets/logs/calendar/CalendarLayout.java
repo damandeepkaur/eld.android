@@ -31,7 +31,6 @@ public class CalendarLayout extends LinearLayout implements View.OnClickListener
     private int mDaysCount;
     private LinearLayoutManager mLayoutManager;
     private OnItemSelectListener mOnItemSelectListener;
-    private OnWeekChangedListener mOnWeekChangedListener;
     private List<LogSheetHeader> mLogSheetHeaders;
 
     public CalendarLayout(Context context) {
@@ -106,9 +105,6 @@ public class CalendarLayout extends LinearLayout implements View.OnClickListener
         int lastPosition = mLayoutManager.findLastVisibleItemPosition();
         int newPosition = lastPosition + (lastPosition - firstPosition) - 1;
         mRecyclerView.smoothScrollToPosition(newPosition < mAdapter.getItemCount() ? newPosition : mAdapter.getItemCount() - 1);
-        if (mOnWeekChangedListener != null) {
-            mOnWeekChangedListener.onWeekChanged(mAdapter.getItemByPosition(firstPosition));
-        }
     }
 
     private void onRightClicked() {
@@ -116,9 +112,6 @@ public class CalendarLayout extends LinearLayout implements View.OnClickListener
         int lastPosition = mLayoutManager.findLastVisibleItemPosition();
         int newPosition = firstPosition - (lastPosition - firstPosition) + 1;
         mRecyclerView.smoothScrollToPosition(newPosition > 0 ? newPosition : 0);
-        if (mOnWeekChangedListener != null) {
-            mOnWeekChangedListener.onWeekChanged(mAdapter.getItemByPosition(firstPosition));
-        }
     }
 
     public void setLogs(List<LogSheetHeader> logsSheetHeaders) {
@@ -131,10 +124,6 @@ public class CalendarLayout extends LinearLayout implements View.OnClickListener
 
     public void setOnItemSelectedListener(OnItemSelectListener listener) {
         mOnItemSelectListener = listener;
-    }
-
-    public void setOnWeekChangedListener(OnWeekChangedListener listener) {
-        mOnWeekChangedListener = listener;
     }
 
     private List<CalendarItem> getItems() {
@@ -158,9 +147,5 @@ public class CalendarLayout extends LinearLayout implements View.OnClickListener
 
     public interface OnItemSelectListener {
         void onItemSelected(CalendarItem log);
-    }
-
-    public interface OnWeekChangedListener {
-        void onWeekChanged(CalendarItem startWeekDay);
     }
 }

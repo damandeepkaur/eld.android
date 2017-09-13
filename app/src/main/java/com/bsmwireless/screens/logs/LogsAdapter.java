@@ -149,7 +149,6 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
                     updateSignButton();
                     mPresenter.onCalendarDaySelected(calendarItem);
                 });
-                mCalendarLayout.setOnWeekChangedListener((startWeekDay) -> mPresenter.onWeekChanged(startWeekDay));
 
                 mSignLogsheet = (TextView) view.findViewById(R.id.sign_logsheet);
                 mSigned = view.findViewById(R.id.signed);

@@ -9,7 +9,7 @@ public interface Constants {
     int DEFAULT_CALENDAR_DAYS_COUNT = 30;
     int MAX_CODRIVERS = 2;
     int SYNC_TIMEOUT_IN_MIN = 1;
-    int SYNC_NTP_RETRY_COUNT = 100;
+    int SYNC_NTP_RETRY_COUNT = 3;
 
     String BASE_URL = "https://develd.bsmtechnologies.com/sdmobile/rest/";
     String DEVICE_TYPE = "Android";
