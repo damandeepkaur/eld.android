@@ -26,10 +26,10 @@ public class DiagnosticPresenter {
 
     private final ELDEventsInteractor mEldEventsInteractor;
     private final DiagnosticView mView;
-    private final EventType eventType;
+    private final EventType mEventType;
     private final AccountManager mAccountManager;
     private final UserInteractor mUserInteractor;
-    private Disposable loadingEventsDisposable;
+    private Disposable mLoadingEventsDisposable;
 
     @Inject
     public DiagnosticPresenter(ELDEventsInteractor eldEventsInteractor,
@@ -39,27 +39,27 @@ public class DiagnosticPresenter {
                                UserInteractor userInteractor) {
         this.mEldEventsInteractor = eldEventsInteractor;
         this.mView = view;
-        this.eventType = eventType;
+        this.mEventType = eventType;
         this.mAccountManager = accountManager;
         this.mUserInteractor = userInteractor;
-        loadingEventsDisposable = Disposables.disposed();
+        mLoadingEventsDisposable = Disposables.disposed();
     }
 
     public void onDestroyed() {
-        loadingEventsDisposable.dispose();
+        mLoadingEventsDisposable.dispose();
     }
 
     public void onCreated() {
-        loadingEventsDisposable.dispose();
-        loadingEventsDisposable = Flowable
+        mLoadingEventsDisposable.dispose();
+        mLoadingEventsDisposable = Flowable
                 .defer(() -> {
-                    switch (eventType) {
+                    switch (mEventType) {
                         case DIAGNOSTIC:
                             return mEldEventsInteractor.getDiagnosticEvents();
                         case MALFUNCTION:
                             return mEldEventsInteractor.getMalfunctionEvents();
                         default:
-                            return Flowable.error(new Exception("Unknown event type: " + eventType));
+                            return Flowable.error(new Exception("Unknown event type: " + mEventType));
                     }
                 })
                 .zipWith(getUser().toFlowable(), Result::new)
