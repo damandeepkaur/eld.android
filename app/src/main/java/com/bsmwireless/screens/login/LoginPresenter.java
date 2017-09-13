@@ -1,8 +1,8 @@
 package com.bsmwireless.screens.login;
 
+
 import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.common.utils.SchedulerUtils;
-import com.bsmwireless.data.network.RetrofitException;
 import com.bsmwireless.domain.interactors.UserInteractor;
 import com.bsmwireless.models.User;
 
@@ -13,6 +13,7 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
+
 
 @ActivityScope
 public class LoginPresenter {
@@ -33,7 +34,7 @@ public class LoginPresenter {
         if (mUserInteractor.isLoginActive()) {
             mView.goToNavigationScreen();
         } else if (mUserInteractor.isRememberMeEnabled()) {
-            mView.loadUserData(mUserInteractor.getDriverName(), mUserInteractor.getDriverDomainName());
+            mView.loadUserData(mUserInteractor.getDriverName(), mUserInteractor.getDriverDomainName(), mUserInteractor.isRememberMeEnabled());
         }
     }
 
@@ -75,9 +76,6 @@ public class LoginPresenter {
                         },
                         error -> {
                             Timber.e("LoginUser error: %s", error);
-                            if (error instanceof RetrofitException) {
-                                mView.showErrorMessage((RetrofitException) error);
-                            }
                             mView.setLoginButtonEnabled(true);
                             mView.hideProgressBar();
                         }

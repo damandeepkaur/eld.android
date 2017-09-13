@@ -35,7 +35,6 @@
         <item name="android:textStyle">normal</item>
         <item name="android:textSize">@dimen/text_size_large</item>
         <item name="android:lineSpacingExtra">@dimen/text_size_spacing</item>
-        <item name="android:textAllCaps">true</item>
     </style>
 
     <style name="DriverProfileTheme" parent="AppTheme"/>

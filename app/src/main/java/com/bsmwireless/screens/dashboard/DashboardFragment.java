@@ -116,7 +116,7 @@ public class DashboardFragment extends BaseFragment implements DashboardView {
 
     @OnClick(R.id.dashboard_current)
     public void onDutyClick() {
-        mNavigateView.showDutyTypeDialog(mDutyType);
+        mPresenter.onDutyClick();
     }
 
     @OnClick(R.id.dashboard_indicator)
@@ -140,6 +140,16 @@ public class DashboardFragment extends BaseFragment implements DashboardView {
         initTimer();
     }
 
+    @Override
+    public void showDutyTypeDialog() {
+        mNavigateView.showDutyTypeDialog(mDutyType);
+    }
+
+    @Override
+    public void showNotInVehicleDialog() {
+        mNavigateView.showNotInVehicleDialog();
+    }
+
     private void initTimer() {
         //TODO: set timer for cycle when cycle time is read
         if (mDutyType != DutyType.OFF_DUTY && mDutyType != DutyType.PERSONAL_USE) {
@@ -152,8 +162,10 @@ public class DashboardFragment extends BaseFragment implements DashboardView {
     }
 
     private void updateDutyView(DutyView dutyView, DutyType dutyType) {
-        dutyView.setDutyType(dutyType);
-        dutyView.setTime(mPresenter.getDutyTypeTime(dutyView.getDutyType()));
+        if (dutyView != null) {
+            dutyView.setDutyType(dutyType);
+            dutyView.setTime(mPresenter.getDutyTypeTime(dutyView.getDutyType()));
+        }
     }
 
     private void updateIndicator(DutyType dutyType) {

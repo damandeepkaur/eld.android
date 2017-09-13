@@ -25,7 +25,7 @@ public interface LoginView {
 
     void goToNavigationScreen();
 
-    void loadUserData(String name, String domain);
+    void loadUserData(String name, String domain, boolean isRememberMeEnabled);
 
     void setLoginButtonEnabled(boolean enabled);
 

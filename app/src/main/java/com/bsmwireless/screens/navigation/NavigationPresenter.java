@@ -7,7 +7,7 @@ import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.data.storage.users.UserConverter;
 import com.bsmwireless.data.storage.users.UserEntity;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
-import com.bsmwireless.domain.interactors.SyncEventsInteractor;
+import com.bsmwireless.domain.interactors.SyncInteractor;
 import com.bsmwireless.domain.interactors.UserInteractor;
 import com.bsmwireless.domain.interactors.VehiclesInteractor;
 import com.bsmwireless.models.ELDEvent;
@@ -30,12 +30,12 @@ import io.reactivex.disposables.Disposables;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
-public class NavigationPresenter extends BaseMenuPresenter implements AccountManager.AccountListener {
+public class NavigationPresenter extends BaseMenuPresenter {
 
     private NavigateView mView;
     private VehiclesInteractor mVehiclesInteractor;
     private Disposable mResetTimeDisposable;
-    private SyncEventsInteractor mSyncEventsInteractor;
+    private SyncInteractor mSyncInteractor;
     private AutoDutyTypeManager mAutoDutyTypeManager;
 
     private AutoDutyTypeManager.AutoDutyTypeListener mListener = new AutoDutyTypeManager.AutoDutyTypeListener() {
@@ -57,14 +57,14 @@ public class NavigationPresenter extends BaseMenuPresenter implements AccountMan
 
     @Inject
     public NavigationPresenter(NavigateView view, UserInteractor userInteractor, VehiclesInteractor vehiclesInteractor, ELDEventsInteractor eventsInteractor,
-                               DutyTypeManager dutyTypeManager, AutoDutyTypeManager autoDutyTypeManager, SyncEventsInteractor syncEventsInteractor, AccountManager accountManager) {
+                               DutyTypeManager dutyTypeManager, AutoDutyTypeManager autoDutyTypeManager, SyncInteractor syncInteractor, AccountManager accountManager) {
         mView = view;
         mUserInteractor = userInteractor;
         mVehiclesInteractor = vehiclesInteractor;
         mEventsInteractor = eventsInteractor;
         mDutyTypeManager = dutyTypeManager;
         mAutoDutyTypeManager = autoDutyTypeManager;
-        mSyncEventsInteractor = syncEventsInteractor;
+        mSyncInteractor = syncInteractor;
         mAccountManager = accountManager;
         mDisposables = new CompositeDisposable();
         mResetTimeDisposable = Disposables.disposed();
@@ -75,8 +75,7 @@ public class NavigationPresenter extends BaseMenuPresenter implements AccountMan
     @Override
     public void onDestroy() {
         mResetTimeDisposable.dispose();
-        mAccountManager.removeListener(this);
-        mSyncEventsInteractor.stopSync();
+        mSyncInteractor.stopSync();
         mAutoDutyTypeManager.removeListener();
         super.onDestroy();
     }
@@ -105,7 +104,6 @@ public class NavigationPresenter extends BaseMenuPresenter implements AccountMan
     }
 
     public void onViewCreated() {
-        mAccountManager.addListener(this);
         mDisposables.add(mUserInteractor.getFullDriverName()
                                         .subscribeOn(Schedulers.io())
                                         .observeOn(AndroidSchedulers.mainThread())
@@ -119,7 +117,7 @@ public class NavigationPresenter extends BaseMenuPresenter implements AccountMan
                                         .observeOn(AndroidSchedulers.mainThread())
                                         .subscribe(count -> mView.setCoDriversNumber(count)));
         mAutoDutyTypeManager.validateBlackBoxState();
-        mSyncEventsInteractor.startSync();
+        mSyncInteractor.startSync();
     }
 
     public void onResetTime() {
@@ -224,27 +222,20 @@ public class NavigationPresenter extends BaseMenuPresenter implements AccountMan
                                               .flatMap(userEntity -> mUserInteractor.syncDriverProfile(userEntity))
                                               .observeOn(AndroidSchedulers.mainThread())
                                               .subscribe(userUpdated -> {},
-                                                         throwable -> mView.showErrorMessage(throwable.getMessage()));
+                                                         Timber::e);
             mDisposables.add(disposable);
         }
     }
 
     @Override
     public void onUserChanged() {
+        super.onUserChanged();
         onResetTime();
-        if (!mAccountManager.isCurrentUserDriver()) {
-            Disposable disposable = Single.fromCallable(() -> mUserInteractor.getFullUserNameSync())
-                                          .subscribeOn(Schedulers.io())
-                                          .observeOn(AndroidSchedulers.mainThread())
-                                          .subscribe(name -> mView.onCoDriverViewStart(name));
-            mDisposables.add(disposable);
-        } else {
-            mView.onCoDriverViewEnd();
-        }
     }
 
     @Override
     public void onDriverChanged() {
+        super.onDriverChanged();
         Disposable disposable = Single.fromCallable(() -> mUserInteractor.getFullDriverNameSync())
                                       .subscribeOn(Schedulers.io())
                                       .observeOn(AndroidSchedulers.mainThread())

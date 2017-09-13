@@ -332,7 +332,6 @@
     <string name="timer_default_type">OFF DUTY</string>
     <string name="timer_hours_minutes">HOURS MINUTES</string>
     <string name="string_total">TOTAL</string>
-
     <!-- END OLD STRINGS -->
 
     <string name="account_label">BSM Wireless</string>
@@ -418,14 +417,14 @@
     <string name="clear">Clear</string>
     <string name="try_again">Try again</string>
 
-    <!-- Edit Event Fragment -->
-    <string name="edit_event">Edit event</string>
+    <!-- Edit Event -->
+    <string name="edit_event">Edit Event</string>
     <string name="edit_event_status">Status</string>
     <string name="edit_event_address">Address</string>
     <string name="edit_event_start_time">Start time</string>
     <string name="edit_event_end_time">End time</string>
     <string name="edit_event_comment">Comment</string>
-    <string name="edit_event_default_time">0:00 AM</string>
+    <string name="edit_event_default_time">0:00:00 AM</string>
     <string name="edit_event_pm">PM</string>
     <string name="edit_event_am">AM</string>
     <string name="edit_event_save">Save</string>
@@ -435,9 +434,15 @@
     <string name="edit_event_comment_error">Comment should not include special characters</string>
     <string name="edit_event_valid_comment">Valid comment</string>
 
+
     <!--Logs-->
     <string name="logs_log_header">log header</string>
     <string name="logs_events">events</string>
+
+    <!-- Edit Log Header -->
+    <string name="edit_log_header">Edit Log Header</string>
+
+    <!-- Logs -->
     <string name="odometer">Odometer(%1$s)</string>
     <string name="add_event">Add event</string>
     <string name="edit">Edit</string>
@@ -478,6 +483,7 @@
     <string name="add_event_error">Add event error</string>
     <string name="event_added">Event added</string>
     <string name="event_updated">Event updated</string>
+    <string name="not_in_vehicle_error">Forbidden for not in vehicle state</string>
     <!--Logs Log Header-->
     <string name="log_header_time_zone">Time Zone</string>
     <string name="log_header_driver_name">Driver name</string>
@@ -600,5 +606,6 @@
     <string name="switch_driver_invalid_credentials">Invalid credentials</string>
     <string name="switch_driver_error_login_codriver">Co-driver was not logged in</string>
     <string name="switch_driver_login_error">Login error</string>
+    <string name="switch_driver_co_driver_view">You are in co-driver view</string>
 
 </resources>

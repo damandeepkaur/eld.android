@@ -40,6 +40,7 @@ import java.util.List;
 import app.bsmuniversal.com.RxSchedulerRule;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.observers.TestObserver;
 import io.reactivex.subscribers.TestSubscriber;
 
@@ -200,7 +201,7 @@ public class UserInteractorTest {
         verify(mAccountManager).setCurrentDriver(anyInt(), anyString());
         verify(mAccountManager).setCurrentUser(anyInt(), anyString());
 
-        verify(mTokenManager).setToken(anyString(), eq(mName), eq(mDomain), any(Auth.class));
+        verify(mTokenManager).setToken(anyString(), eq(mName), eq(mPassword), eq(mDomain), any(Auth.class));
 
         verify(mUserDao).insertUser(any(UserEntity.class));
     }
@@ -337,7 +338,7 @@ public class UserInteractorTest {
         verify(mAccountManager).setCurrentDriver(anyInt(), anyString());
         verify(mAccountManager).setCurrentUser(anyInt(), anyString());
 
-        verify(mTokenManager).setToken(anyString(), eq(mName), eq(mDomain), any(Auth.class));
+        verify(mTokenManager).setToken(anyString(), eq(mName), eq(mPassword), eq(mDomain), any(Auth.class));
     }
 
 
@@ -639,13 +640,14 @@ public class UserInteractorTest {
         responseMessage.setMessage(mSuccessResponse);
 
         String fakeRule = "fake rule";
+        String fakeDutyCycle = "Cycle";
 
         TestObserver<Boolean> testObserver = new TestObserver<>();
 
-        when(mServiceApi.updateDriverRule(any(RuleSelectionModel.class))).thenReturn(Observable.just(responseMessage));
+        when(mServiceApi.updateDriverRule(any(RuleSelectionModel.class))).thenReturn(Single.just(responseMessage));
 
         // when
-        mLoginUserInteractor.updateDriverRule(fakeRule).subscribe(testObserver);
+        mLoginUserInteractor.updateDriverRule(fakeRule,fakeDutyCycle).subscribe(testObserver);
 
         // then
         testObserver.assertResult(true);
@@ -658,13 +660,14 @@ public class UserInteractorTest {
         responseMessage.setMessage("");
 
         String fakeRule = "fake rule";
+        String fakeDutyCycle = "Cycle";
 
         TestObserver<Boolean> testObserver = new TestObserver<>();
 
-        when(mServiceApi.updateDriverRule(any(RuleSelectionModel.class))).thenReturn(Observable.just(responseMessage));
+        when(mServiceApi.updateDriverRule(any(RuleSelectionModel.class))).thenReturn(Single.just(responseMessage));
 
         // when
-        mLoginUserInteractor.updateDriverRule(fakeRule).subscribe(testObserver);
+        mLoginUserInteractor.updateDriverRule(fakeRule, fakeDutyCycle).subscribe(testObserver);
 
         // then
         testObserver.assertResult(false);
@@ -678,14 +681,15 @@ public class UserInteractorTest {
         responseMessage.setMessage("");
 
         String fakeRule = "fake rule";
+        String fakeDutyCycle = "Cycle";
         String fakeError = "not this time.";
 
         TestObserver<Boolean> testObserver = new TestObserver<>();
 
-        when(mServiceApi.updateDriverRule(any(RuleSelectionModel.class))).thenReturn(Observable.error(new Exception(fakeError)));
+        when(mServiceApi.updateDriverRule(any(RuleSelectionModel.class))).thenReturn(Single.error(new Exception(fakeError)));
 
         // when
-        mLoginUserInteractor.updateDriverRule(fakeRule).subscribe(testObserver);
+        mLoginUserInteractor.updateDriverRule(fakeRule, fakeDutyCycle).subscribe(testObserver);
 
         // then
         testObserver.assertErrorMessage(fakeError);

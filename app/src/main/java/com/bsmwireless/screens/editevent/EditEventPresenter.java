@@ -2,6 +2,7 @@ package com.bsmwireless.screens.editevent;
 
 import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.common.utils.DateUtils;
+import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
 import com.bsmwireless.domain.interactors.UserInteractor;
@@ -34,12 +35,15 @@ public class EditEventPresenter extends BaseMenuPresenter {
 
 
     @Inject
-    public EditEventPresenter(EditEventView view, UserInteractor userInteractor, ELDEventsInteractor eventsInteractor, DutyTypeManager dutyTypeManager) {
+    public EditEventPresenter(EditEventView view, UserInteractor userInteractor,
+                              ELDEventsInteractor eventsInteractor, DutyTypeManager dutyTypeManager,
+                              AccountManager accountManager) {
         mView = view;
         mDisposables = new CompositeDisposable();
         mUserInteractor = userInteractor;
         mEventsInteractor = eventsInteractor;
         mDutyTypeManager = dutyTypeManager;
+        mAccountManager = accountManager;
         mTimezone = TimeZone.getDefault().getID();
         mCalendar = Calendar.getInstance();
 
@@ -62,10 +66,10 @@ public class EditEventPresenter extends BaseMenuPresenter {
         return mView;
     }
 
+    @Override
     public void onDestroy() {
         mDisposables.dispose();
-
-        Timber.d("DESTROYED");
+        super.onDestroy();
     }
 
     public void onStartTimeClick(String time) {
@@ -75,6 +79,7 @@ public class EditEventPresenter extends BaseMenuPresenter {
         mView.openTimePickerDialog((view, hourOfDay, minute) -> {
             mCalendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
             mCalendar.set(Calendar.MINUTE, minute);
+            mCalendar.set(Calendar.SECOND, 0);
             mView.setStartTime(DateUtils.convertTimeToAMPMString(mCalendar.getTimeInMillis(), mTimezone));
         }, hours, minutes);
     }
@@ -97,6 +102,9 @@ public class EditEventPresenter extends BaseMenuPresenter {
 
         if (mELDEvent != null) {
             newEvent = mELDEvent.clone();
+            mELDEvent.setStatus(ELDEvent.StatusCode.INACTIVE_CHANGED.getValue());
+            mELDEvent.setId(null);
+            events.add(mELDEvent);
         } else {
             newEvent = mEventsInteractor.getEvent(type);
         }
@@ -144,7 +152,7 @@ public class EditEventPresenter extends BaseMenuPresenter {
         if (comment.length() < 4) {
             return EditEventView.Error.INVALID_COMMENT_LENGTH;
         }
-        Pattern pattern = Pattern.compile("[^A-Za-z0-9]", Pattern.CASE_INSENSITIVE);
+        Pattern pattern = Pattern.compile("[^A-Za-z0-9 .,:;`?!-_%&()\"'@#$*+]", Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(comment);
         if (matcher.find()) {
             return EditEventView.Error.INVALID_COMMENT;

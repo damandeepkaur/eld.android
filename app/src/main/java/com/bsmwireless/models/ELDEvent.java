@@ -479,37 +479,6 @@ public class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheckable {
     }
 
     @Override
-    public String toString() {
-        final StringBuilder sb = new StringBuilder("ELDEvent{");
-        sb.append("mId=").append(mId);
-        sb.append(", mStatus=").append(mStatus).append('\'');
-        sb.append(", mOrigin=").append(mOrigin);
-        sb.append(", mEventType=").append(mEventType);
-        sb.append(", mEventCode=").append(mEventCode);
-        sb.append(", mEventTime=").append(mEventTime);
-        sb.append(", mOdometer='").append(mOdometer);
-        sb.append(", mEngineHours=").append(mEngineHours);
-        sb.append(", mLat=").append(mLat);
-        sb.append(", mLng='").append(mLng);
-        sb.append(", mDistance=").append(mDistance);
-        sb.append(", mComment=").append(mComment).append('\'');
-        sb.append(", mLocation=").append(mLocation).append('\'');
-        sb.append(", mCheckSum=").append(mCheckSum).append('\'');
-        sb.append(", mShippingId=").append(mShippingId).append('\'');
-        sb.append(", mCoDriverId=").append(mCoDriverId);
-        sb.append(", mBoxId=").append(mBoxId);
-        sb.append(", mVehicleId=").append(mVehicleId);
-        sb.append(", mTzOffset=").append(mTzOffset);
-        sb.append(", mTimezone=").append(mTimezone).append('\'');
-        sb.append(", mMobileTime=").append(mMobileTime);
-        sb.append(", mDriverId=").append(mDriverId);
-        sb.append(", mMalfunction=").append(mMalfunction);
-        sb.append(", mDiagnostic=").append(mDiagnostic);
-        sb.append('}');
-        return sb.toString();
-    }
-
-    @Override
     public boolean equals(Object other) {
         // self check
         if (this == other) {
@@ -726,5 +695,36 @@ public class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheckable {
         ELDEvent copy = (ELDEvent) parcel.readValue(ELDEvent.class.getClassLoader());
         parcel.recycle();
         return copy;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("ELDEvent{");
+        sb.append("mId=").append(mId);
+        sb.append(", mEventType=").append(mEventType);
+        sb.append(", mEventCode=").append(mEventCode);
+        sb.append(", mStatus=").append(mStatus);
+        sb.append(", mOrigin=").append(mOrigin);
+        sb.append(", mEventTime=").append(mEventTime);
+        sb.append(", mOdometer=").append(mOdometer);
+        sb.append(", mEngineHours=").append(mEngineHours);
+        sb.append(", mLat=").append(mLat);
+        sb.append(", mLng=").append(mLng);
+        sb.append(", mDistance=").append(mDistance);
+        sb.append(", mComment='").append(mComment).append('\'');
+        sb.append(", mLocation='").append(mLocation).append('\'');
+        sb.append(", mCheckSum='").append(mCheckSum).append('\'');
+        sb.append(", mShippingId='").append(mShippingId).append('\'');
+        sb.append(", mCoDriverId=").append(mCoDriverId);
+        sb.append(", mBoxId=").append(mBoxId);
+        sb.append(", mVehicleId=").append(mVehicleId);
+        sb.append(", mTzOffset=").append(mTzOffset);
+        sb.append(", mTimezone='").append(mTimezone).append('\'');
+        sb.append(", mMobileTime=").append(mMobileTime);
+        sb.append(", mDriverId=").append(mDriverId);
+        sb.append(", mMalfunction=").append(mMalfunction);
+        sb.append(", mDiagnostic=").append(mDiagnostic);
+        sb.append('}');
+        return sb.toString();
     }
 }

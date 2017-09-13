@@ -10,8 +10,8 @@ android {
         applicationId "app.bsmuniversal.com"
         minSdkVersion 15
         targetSdkVersion 25
-        versionCode 56
-        versionName "1.0.55"
+        versionCode 67
+        versionName "1.0.66"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         javaCompileOptions {
@@ -127,6 +127,7 @@ allprojects {
     repositories {
         jcenter()
         maven { url 'https://maven.google.com' }
+        maven { url 'https://jitpack.io' }
     }
 }
 
@@ -181,6 +182,8 @@ dependencies {
     compile 'com.jakewharton.timber:timber:4.5.1'
 
     compile 'org.apache.commons:commons-lang3:3.5'
+
+    compile 'com.github.instacart.truetime-android:library-extension-rx:3.3'
 }
 
 spoon {

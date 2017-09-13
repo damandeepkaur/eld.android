@@ -2,8 +2,10 @@ package com.bsmwireless.data.storage.users;
 
 import android.arch.persistence.room.Embedded;
 import android.arch.persistence.room.Relation;
+import android.content.res.Configuration;
 
 import com.bsmwireless.data.storage.carriers.CarrierEntity;
+import com.bsmwireless.data.storage.configurations.ConfigurationEntity;
 import com.bsmwireless.data.storage.hometerminals.HomeTerminalEntity;
 
 import java.util.List;
@@ -15,6 +17,8 @@ public class FullUserEntity {
     private List<CarrierEntity> mCarriers;
     @Relation(parentColumn = "id", entityColumn = "user_id", entity = HomeTerminalEntity.class)
     private List<HomeTerminalEntity> mHomeTerminalEntities;
+    @Relation(parentColumn = "id", entityColumn = "user_id", entity = ConfigurationEntity.class)
+    private List<ConfigurationEntity> mConfigurationEntities;
 
     public FullUserEntity() {
         mUserEntity = new UserEntity();
@@ -43,5 +47,13 @@ public class FullUserEntity {
     public void setHomeTerminalEntities(
             List<HomeTerminalEntity> homeTerminalEntities) {
         mHomeTerminalEntities = homeTerminalEntities;
+    }
+
+    public List<ConfigurationEntity> getConfigurationEntities() {
+        return mConfigurationEntities;
+    }
+
+    public void setConfigurationEntities(List<ConfigurationEntity> configurationEntities) {
+        mConfigurationEntities = configurationEntities;
     }
 }

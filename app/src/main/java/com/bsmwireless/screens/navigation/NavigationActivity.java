@@ -29,6 +29,7 @@ import com.bsmwireless.screens.driverprofile.DriverProfileActivity;
 import com.bsmwireless.screens.login.LoginActivity;
 import com.bsmwireless.screens.navigation.dagger.DaggerNavigationComponent;
 import com.bsmwireless.screens.navigation.dagger.NavigationModule;
+import com.bsmwireless.screens.selectasset.SelectAssetActivity;
 import com.bsmwireless.screens.settings.SettingsActivity;
 import com.bsmwireless.widgets.snackbar.SnackBarLayout;
 
@@ -54,7 +55,7 @@ public class NavigationActivity extends BaseMenuActivity implements OnNavigation
     @BindView(R.id.navigation_view)
     NavigationView mNavigationView;
 
-    @BindView(R.id.navigation_toolbar)
+    @BindView(R.id.toolbar)
     Toolbar mToolbar;
 
     @BindView(R.id.navigation_tab_layout)
@@ -75,6 +76,8 @@ public class NavigationActivity extends BaseMenuActivity implements OnNavigation
 
     private Handler mHandler = new Handler();
     private Runnable mResetTimeTask = () -> mPresenter.onResetTime();
+
+    private View.OnClickListener mOnAssetMenuClickListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -162,7 +165,8 @@ public class NavigationActivity extends BaseMenuActivity implements OnNavigation
         mDrawerToggle.syncState();
 
         View header = mNavigationView.getHeaderView(0);
-        mHeaderViewHolder = new HeaderViewHolder(header);
+        mOnAssetMenuClickListener = v -> goToSelectAssetScreen();
+        mHeaderViewHolder = new HeaderViewHolder(header, mOnAssetMenuClickListener);
 
         mPagerAdapter = new NavigationAdapter(getApplicationContext(), getSupportFragmentManager());
         mViewPager.setAdapter(mPagerAdapter);
@@ -189,6 +193,14 @@ public class NavigationActivity extends BaseMenuActivity implements OnNavigation
     @Override
     public void goToLoginScreen() {
         Intent intent = new Intent(this, LoginActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+        finish();
+    }
+
+    @Override
+    public void goToSelectAssetScreen() {
+        Intent intent = new Intent(this, SelectAssetActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
         finish();
@@ -285,17 +297,6 @@ public class NavigationActivity extends BaseMenuActivity implements OnNavigation
     }
 
     @Override
-    public void onCoDriverViewStart(String coDriverName) {
-        // TODO add co-driver notification
-        Toast.makeText(this, "View as co-driver " + coDriverName, Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onCoDriverViewEnd() {
-        // TODO remove co-driver notification
-    }
-
-    @Override
     public void setAutoOnDuty() {
         Intent dialogIntent = new Intent(this, AutoDutyDialogActivity.class);
         dialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -334,8 +335,10 @@ public class NavigationActivity extends BaseMenuActivity implements OnNavigation
 
         private Unbinder mUnbinder;
 
-        HeaderViewHolder(View view) {
+        HeaderViewHolder(View view, View.OnClickListener listener) {
             mUnbinder = ButterKnife.bind(this, view);
+
+            boxId.setOnClickListener(listener);
         }
 
         void unbind() {
