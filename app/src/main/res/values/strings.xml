@@ -424,7 +424,7 @@
     <string name="edit_event_start_time">Start time</string>
     <string name="edit_event_end_time">End time</string>
     <string name="edit_event_comment">Comment</string>
-    <string name="edit_event_default_time">0:00 AM</string>
+    <string name="edit_event_default_time">0:00:00 AM</string>
     <string name="edit_event_pm">PM</string>
     <string name="edit_event_am">AM</string>
     <string name="edit_event_save">Save</string>
@@ -483,6 +483,7 @@
     <string name="add_event_error">Add event error</string>
     <string name="event_added">Event added</string>
     <string name="event_updated">Event updated</string>
+    <string name="not_in_vehicle_error">Forbidden for not in vehicle state</string>
     <!--Logs Log Header-->
     <string name="log_header_time_zone">Time Zone</string>
     <string name="log_header_driver_name">Driver name</string>

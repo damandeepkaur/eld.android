@@ -201,7 +201,7 @@ public class UserInteractorTest {
         verify(mAccountManager).setCurrentDriver(anyInt(), anyString());
         verify(mAccountManager).setCurrentUser(anyInt(), anyString());
 
-        verify(mTokenManager).setToken(anyString(), eq(mName), eq(mDomain), any(Auth.class));
+        verify(mTokenManager).setToken(anyString(), eq(mName), eq(mPassword), eq(mDomain), any(Auth.class));
 
         verify(mUserDao).insertUser(any(UserEntity.class));
     }
@@ -338,7 +338,7 @@ public class UserInteractorTest {
         verify(mAccountManager).setCurrentDriver(anyInt(), anyString());
         verify(mAccountManager).setCurrentUser(anyInt(), anyString());
 
-        verify(mTokenManager).setToken(anyString(), eq(mName), eq(mDomain), any(Auth.class));
+        verify(mTokenManager).setToken(anyString(), eq(mName), eq(mPassword), eq(mDomain), any(Auth.class));
     }
 
 
