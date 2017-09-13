@@ -6,7 +6,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bsmwireless.data.storage.DutyTypeManager;
@@ -144,14 +143,22 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
     @Override
     public void changeMalfunctionStatus(boolean hasMalfunctionEvents) {
         if (mMalfunctionItem != null) {
-            mMalfunctionItem.getIcon().setLevel(hasMalfunctionEvents ? 1 : 0);
+            if (hasMalfunctionEvents) {
+                mMalfunctionItem.setIcon(R.drawable.ic_ico_dd_red);
+            } else {
+                mMalfunctionItem.setIcon(R.drawable.ic_ico_dd_green);
+            }
         }
     }
 
     @Override
     public void changeDiagnosticStatus(boolean hasMalfunctionEvents) {
         if (mELDItem != null) {
-            mELDItem.getIcon().setLevel(hasMalfunctionEvents ? 2 : 0);
+            if (hasMalfunctionEvents) {
+                mELDItem.setIcon(R.drawable.ic_eld_red);
+            } else {
+                mELDItem.setIcon(R.drawable.ic_eld_green);
+            }
         }
     }
 

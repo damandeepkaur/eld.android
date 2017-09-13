@@ -36,7 +36,6 @@ public class NavigationPresenter extends BaseMenuPresenter {
     private Disposable mResetTimeDisposable;
     private SyncInteractor mSyncInteractor;
     private AutoDutyTypeManager mAutoDutyTypeManager;
-    private AccountManager mAccountManager;
 
     private AutoDutyTypeManager.AutoDutyTypeListener mListener = new AutoDutyTypeManager.AutoDutyTypeListener() {
         @Override
@@ -56,15 +55,19 @@ public class NavigationPresenter extends BaseMenuPresenter {
     };
 
     @Inject
-    public NavigationPresenter(NavigateView view, UserInteractor userInteractor, VehiclesInteractor vehiclesInteractor, ELDEventsInteractor eventsInteractor,
-                               DutyTypeManager dutyTypeManager, AutoDutyTypeManager autoDutyTypeManager, SyncInteractor syncInteractor, AccountManager accountManager) {
+    public NavigationPresenter(NavigateView view,
+                               UserInteractor userInteractor,
+                               VehiclesInteractor vehiclesInteractor,
+                               ELDEventsInteractor eventsInteractor,
+                               DutyTypeManager dutyTypeManager,
+                               AutoDutyTypeManager autoDutyTypeManager,
+                               SyncInteractor syncInteractor,
+                               AccountManager accountManager) {
+        super(dutyTypeManager, eventsInteractor, userInteractor, accountManager);
         mView = view;
         mVehiclesInteractor = vehiclesInteractor;
         mAutoDutyTypeManager = autoDutyTypeManager;
         mSyncInteractor = syncInteractor;
-        mAccountManager = accountManager;
-        mDisposables = new CompositeDisposable();
-        mSyncEventsInteractor = syncEventsInteractor;
         mResetTimeDisposable = Disposables.disposed();
 
         mAutoDutyTypeManager.setListener(mListener);
