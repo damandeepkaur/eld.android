@@ -336,10 +336,6 @@ public class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheckable {
         mEventTime = eventTime;
     }
 
-    public void setEventCode(Long eventTime) {
-        this.mEventTime = eventTime;
-    }
-
     public Integer getOdometer() {
         return mOdometer;
     }

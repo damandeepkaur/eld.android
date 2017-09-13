@@ -72,12 +72,11 @@ public class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListener {
             mBlackBoxDisposable.dispose();
         }
 
-        mBlackBoxDisposable = (mBlackBoxInteractor.getData(boxId)
+        mBlackBoxDisposable = mBlackBoxInteractor.getData(boxId)
                 .subscribeOn(Schedulers.io())
                 .subscribe(
                         blackBoxState -> processBlackBoxState(blackBoxState),
-                        error -> Timber.e("BlackBox error: %s", error)
-        ));
+                        error -> Timber.e("BlackBox error: %s", error));
     }
 
     private void processBlackBoxState(BlackBoxModel blackBoxState) {

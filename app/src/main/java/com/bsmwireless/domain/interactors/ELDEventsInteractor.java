@@ -23,6 +23,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import io.reactivex.Flowable;
+import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.disposables.Disposable;
@@ -188,7 +189,7 @@ public class ELDEventsInteractor {
      * @param malfunction malfunction code
      * @return latest malfunction ELD event
      */
-    public Flowable<ELDEvent> getLatestMalfunctinoEvent(Malfunction malfunction){
+    public Maybe<ELDEvent> getLatestMalfunctionEvent(Malfunction malfunction){
         return mELDEventDao.getLatestEvent(ELDEvent.EventType.DATA_DIAGNOSTIC.getValue(), malfunction.getCode())
                 .map(ELDEventConverter::toModel);
     }

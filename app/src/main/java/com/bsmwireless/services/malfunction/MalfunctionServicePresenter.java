@@ -12,8 +12,6 @@ import com.bsmwireless.models.Malfunction;
 
 import javax.inject.Inject;
 
-import io.reactivex.BackpressureStrategy;
-import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
@@ -50,17 +48,26 @@ public class MalfunctionServicePresenter {
     }
 
     private void startSynchronizationMonitoring() {
-        Disposable disposable = Flowable
-                .combineLatest(getBaseObservable().toFlowable(BackpressureStrategy.LATEST),
-                        mELDEventsInteractor.getLatestMalfunctinoEvent(Malfunction.ENGINE_SYNCHRONIZATION),
-                        SynchResult::new)
+
+        // If database hasn't got an event for diagnostic, return this object with CLEARED flag
+        ELDEvent defaultEvent = new ELDEvent();
+        defaultEvent.setEventCode(ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED.getCode());
+
+        Disposable disposable = getBaseObservable()
+                .flatMap(blackBoxModel -> mELDEventsInteractor
+                                .getLatestMalfunctionEvent(Malfunction.ENGINE_SYNCHRONIZATION)
+                                .defaultIfEmpty(defaultEvent)
+                                .toObservable(),
+                        SynchResult::new
+                )
                 .filter(this::isStateAndEventAreDifferent)
                 .map(synchResult -> createSynchDiagnosticEvent(synchResult.mBlackBoxModel))
-                .flatMap(eldEvent -> mELDEventsInteractor.postNewELDEvent(eldEvent).toFlowable())
+                .flatMap(eldEvent -> mELDEventsInteractor.postNewELDEvent(eldEvent).toObservable())
                 .onErrorReturn(throwable -> {
                     Timber.e(throwable, "Error handle synchronization event");
                     return -1L;
                 })
+                .subscribeOn(Schedulers.io())
                 .subscribe();
         mCompositeDisposable.add(disposable);
     }
@@ -70,13 +77,20 @@ public class MalfunctionServicePresenter {
      * return true if they are different.
      * For example, if current sensor state is in ECM CABLE CONNECTED state and current event
      * in a database for this state is in DISCONNECTED state {@code true} will be returned
+     *
      * @param synchResult
      * @return
      */
-    private boolean isStateAndEventAreDifferent(SynchResult synchResult){
-        return (synchResult.mBlackBoxModel.getSensorState(BlackBoxSensorState.ECM_CABLE)
-                || synchResult.mBlackBoxModel.getSensorState(BlackBoxSensorState.ECM_SYNC))
-                && synchResult.mELDEvent.getEventCode() == ELDEvent.MalfunctionCode.DIAGNOSTIC_LOGGED.getCode();
+    private boolean isStateAndEventAreDifferent(SynchResult synchResult) {
+
+        if (ELDEvent.MalfunctionCode.DIAGNOSTIC_LOGGED.getCode() == synchResult.mELDEvent.getEventCode()) {
+            return synchResult.mBlackBoxModel.getSensorState(BlackBoxSensorState.ECM_CABLE)
+                    && synchResult.mBlackBoxModel.getSensorState(BlackBoxSensorState.ECM_SYNC);
+        } else if (ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED.getCode() == synchResult.mELDEvent.getEventCode()) {
+            return !synchResult.mBlackBoxModel.getSensorState(BlackBoxSensorState.ECM_CABLE)
+                    || !synchResult.mBlackBoxModel.getSensorState(BlackBoxSensorState.ECM_SYNC);
+        }
+        return true;
     }
 
     @NonNull
