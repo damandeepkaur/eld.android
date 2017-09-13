@@ -7,7 +7,7 @@ import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.data.storage.users.UserConverter;
 import com.bsmwireless.data.storage.users.UserEntity;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
-import com.bsmwireless.domain.interactors.SyncEventsInteractor;
+import com.bsmwireless.domain.interactors.SyncInteractor;
 import com.bsmwireless.domain.interactors.UserInteractor;
 import com.bsmwireless.domain.interactors.VehiclesInteractor;
 import com.bsmwireless.models.ELDEvent;
@@ -35,7 +35,7 @@ public class NavigationPresenter extends BaseMenuPresenter {
     private NavigateView mView;
     private VehiclesInteractor mVehiclesInteractor;
     private Disposable mResetTimeDisposable;
-    private SyncEventsInteractor mSyncEventsInteractor;
+    private SyncInteractor mSyncInteractor;
     private AutoDutyTypeManager mAutoDutyTypeManager;
 
     private AutoDutyTypeManager.AutoDutyTypeListener mListener = new AutoDutyTypeManager.AutoDutyTypeListener() {
@@ -57,14 +57,14 @@ public class NavigationPresenter extends BaseMenuPresenter {
 
     @Inject
     public NavigationPresenter(NavigateView view, UserInteractor userInteractor, VehiclesInteractor vehiclesInteractor, ELDEventsInteractor eventsInteractor,
-                               DutyTypeManager dutyTypeManager, AutoDutyTypeManager autoDutyTypeManager, SyncEventsInteractor syncEventsInteractor, AccountManager accountManager) {
+                               DutyTypeManager dutyTypeManager, AutoDutyTypeManager autoDutyTypeManager, SyncInteractor syncInteractor, AccountManager accountManager) {
         mView = view;
         mUserInteractor = userInteractor;
         mVehiclesInteractor = vehiclesInteractor;
         mEventsInteractor = eventsInteractor;
         mDutyTypeManager = dutyTypeManager;
         mAutoDutyTypeManager = autoDutyTypeManager;
-        mSyncEventsInteractor = syncEventsInteractor;
+        mSyncInteractor = syncInteractor;
         mAccountManager = accountManager;
         mDisposables = new CompositeDisposable();
         mResetTimeDisposable = Disposables.disposed();
@@ -75,7 +75,7 @@ public class NavigationPresenter extends BaseMenuPresenter {
     @Override
     public void onDestroy() {
         mResetTimeDisposable.dispose();
-        mSyncEventsInteractor.stopSync();
+        mSyncInteractor.stopSync();
         mAutoDutyTypeManager.removeListener();
         super.onDestroy();
     }
@@ -117,7 +117,7 @@ public class NavigationPresenter extends BaseMenuPresenter {
                                         .observeOn(AndroidSchedulers.mainThread())
                                         .subscribe(count -> mView.setCoDriversNumber(count)));
         mAutoDutyTypeManager.validateBlackBoxState();
-        mSyncEventsInteractor.startSync();
+        mSyncInteractor.startSync();
     }
 
     public void onResetTime() {

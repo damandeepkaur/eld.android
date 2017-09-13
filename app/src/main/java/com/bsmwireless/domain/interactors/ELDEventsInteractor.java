@@ -35,7 +35,6 @@ import static com.bsmwireless.common.utils.DateUtils.SEC_IN_HOUR;
 public class ELDEventsInteractor {
 
     private static String mTimezone = "";
-    private Disposable mSyncEventsDisposable;
     private ServiceApi mServiceApi;
     private BlackBoxInteractor mBlackBoxInteractor;
     private UserInteractor mUserInteractor;
@@ -65,30 +64,9 @@ public class ELDEventsInteractor {
         mUserInteractor.getTimezone().subscribe(timezone -> mTimezone = timezone);
     }
 
-    public void syncELDEventsWithServer(Long startTime, Long endTime) {
-        if (mSyncEventsDisposable != null) mSyncEventsDisposable.dispose();
-        mSyncEventsDisposable = mServiceApi.getELDEvents(startTime, endTime)
-                .subscribeOn(Schedulers.io())
-                .subscribe(eldEventsFromServer -> {
-                            List<ELDEventEntity> entities = mELDEventDao.getEventsFromStartToEndTimeSync(
-                                    startTime, endTime, mPreferencesManager.getDriverId());
-                            List<ELDEvent> eventsFromDB = ELDEventConverter.toModelList(entities);
-                            if (!eldEventsFromServer.equals(eventsFromDB)) {
-                                ELDEventEntity[] entitiesArray = ELDEventConverter.toEntityArray(eldEventsFromServer);
-                                mELDEventDao.insertAll(entitiesArray);
-                            }
-                        },
-                        error -> Timber.e(error));
-    }
-
     public Flowable<List<ELDEvent>> getDutyEventsFromDB(long startTime, long endTime) {
         int driverId = mAccountManager.getCurrentUserId();
         return mELDEventDao.getDutyEventsFromStartToEndTime(startTime, endTime, driverId)
-                .map(ELDEventConverter::toModelList);
-    }
-
-    public Flowable<List<ELDEvent>> getLatestActiveDutyEventFromDB(long latestTime, int userId) {
-        return mELDEventDao.getLatestActiveDutyEvent(latestTime, userId)
                 .map(ELDEventConverter::toModelList);
     }
 
