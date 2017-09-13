@@ -1,5 +1,6 @@
 package com.bsmwireless.domain.interactors;
 
+import com.bsmwireless.data.network.RetrofitException;
 import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.network.authenticator.TokenManager;
 import com.bsmwireless.data.storage.AccountManager;
@@ -12,8 +13,10 @@ import com.bsmwireless.data.storage.eldevents.ELDEventEntity;
 import com.bsmwireless.data.storage.users.UserDao;
 import com.bsmwireless.models.BlackBoxModel;
 import com.bsmwireless.models.ELDEvent;
+import com.bsmwireless.models.ResponseMessage;
 import com.bsmwireless.widgets.alerts.DutyType;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -125,21 +128,36 @@ public class ELDEventsInteractor {
 
     public Observable<Boolean> postLogoutEvent() {
         return mServiceApi.logout(getEvent(ELDEvent.LoginLogoutCode.LOGOUT))
-                          .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS))
-                          .switchMap(isSuccess -> mBlackBoxInteractor.shutdown(isSuccess));
+                .onErrorReturn(throwable -> {
+                    if (throwable instanceof RetrofitException ||
+                            throwable instanceof IOException) {
+                        return new ResponseMessage(SUCCESS);
+                    }
+                    return new ResponseMessage(throwable.getMessage());
+                })
+                .map(responseMessage -> SUCCESS.equals(responseMessage.getMessage()))
+                .switchMap(isSuccess -> mBlackBoxInteractor.shutdown(isSuccess));
     }
 
     public Observable<Boolean> postLogoutEvent(int userId) {
         return Observable.fromCallable(() -> mUserDao.getUserSync(userId))
-                         .flatMap(userEntity -> {
-                             String token = mTokenManager.getToken(userEntity.getAccountName());
-                             return mServiceApi.logout(
-                                     getEvent(ELDEvent.LoginLogoutCode.LOGOUT),
-                                     token,
-                                     String.valueOf(userEntity.getId())
-                             );
-                         })
-                         .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
+                .flatMap(userEntity -> {
+                    String token = mTokenManager.getToken(userEntity.getAccountName());
+                    return mServiceApi.logout(
+                            getEvent(ELDEvent.LoginLogoutCode.LOGOUT),
+                            token,
+                            String.valueOf(userEntity.getId())
+
+                    )
+                            .onErrorReturn(throwable -> {
+                                if (throwable instanceof RetrofitException ||
+                                        throwable instanceof IOException) {
+                                    return new ResponseMessage(SUCCESS);
+                                }
+                                return new ResponseMessage(throwable.getMessage());
+                            });
+                })
+                .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
     }
 
     private ArrayList<ELDEvent> getEvents(DutyType dutyType) {

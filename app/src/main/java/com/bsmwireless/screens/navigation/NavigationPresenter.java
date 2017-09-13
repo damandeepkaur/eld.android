@@ -222,7 +222,7 @@ public class NavigationPresenter extends BaseMenuPresenter {
                                               .flatMap(userEntity -> mUserInteractor.syncDriverProfile(userEntity))
                                               .observeOn(AndroidSchedulers.mainThread())
                                               .subscribe(userUpdated -> {},
-                                                         throwable -> mView.showErrorMessage(throwable.getMessage()));
+                                                         Timber::e);
             mDisposables.add(disposable);
         }
     }
