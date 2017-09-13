@@ -1,5 +1,6 @@
 package com.bsmwireless.domain.interactors;
 
+import com.bsmwireless.data.network.RetrofitException;
 import com.bsmwireless.common.Constants;
 import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.network.authenticator.TokenManager;
@@ -13,8 +14,10 @@ import com.bsmwireless.data.storage.eldevents.ELDEventEntity;
 import com.bsmwireless.data.storage.users.UserDao;
 import com.bsmwireless.models.BlackBoxModel;
 import com.bsmwireless.models.ELDEvent;
+import com.bsmwireless.models.ResponseMessage;
 import com.bsmwireless.widgets.alerts.DutyType;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -34,7 +37,6 @@ import static com.bsmwireless.common.utils.DateUtils.SEC_IN_HOUR;
 public class ELDEventsInteractor {
 
     private static String mTimezone = "";
-    private Disposable mSyncEventsDisposable;
     private ServiceApi mServiceApi;
     private BlackBoxInteractor mBlackBoxInteractor;
     private UserInteractor mUserInteractor;
@@ -64,30 +66,9 @@ public class ELDEventsInteractor {
         mUserInteractor.getTimezone().subscribe(timezone -> mTimezone = timezone);
     }
 
-    public void syncELDEventsWithServer(Long startTime, Long endTime) {
-        if (mSyncEventsDisposable != null) mSyncEventsDisposable.dispose();
-        mSyncEventsDisposable = mServiceApi.getELDEvents(startTime, endTime)
-                .subscribeOn(Schedulers.io())
-                .subscribe(eldEventsFromServer -> {
-                            List<ELDEventEntity> entities = mELDEventDao.getEventsFromStartToEndTimeSync(
-                                    startTime, endTime, mPreferencesManager.getDriverId());
-                            List<ELDEvent> eventsFromDB = ELDEventConverter.toModelList(entities);
-                            if (!eldEventsFromServer.equals(eventsFromDB)) {
-                                ELDEventEntity[] entitiesArray = ELDEventConverter.toEntityArray(eldEventsFromServer);
-                                mELDEventDao.insertAll(entitiesArray);
-                            }
-                        },
-                        error -> Timber.e(error));
-    }
-
     public Flowable<List<ELDEvent>> getDutyEventsFromDB(long startTime, long endTime) {
         int driverId = mAccountManager.getCurrentUserId();
         return mELDEventDao.getDutyEventsFromStartToEndTime(startTime, endTime, driverId)
-                .map(ELDEventConverter::toModelList);
-    }
-
-    public Flowable<List<ELDEvent>> getLatestActiveDutyEventFromDB(long latestTime, int userId) {
-        return mELDEventDao.getLatestActiveDutyEvent(latestTime, userId)
                 .map(ELDEventConverter::toModelList);
     }
 
@@ -127,7 +108,14 @@ public class ELDEventsInteractor {
 
     public Observable<Boolean> postLogoutEvent() {
         return mServiceApi.logout(getEvent(ELDEvent.LoginLogoutCode.LOGOUT))
-                .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS))
+                .onErrorReturn(throwable -> {
+                    if (throwable instanceof RetrofitException ||
+                            throwable instanceof IOException) {
+                        return new ResponseMessage(SUCCESS);
+                    }
+                    return new ResponseMessage(throwable.getMessage());
+                })
+                .map(responseMessage -> SUCCESS.equals(responseMessage.getMessage()))
                 .switchMap(isSuccess -> mBlackBoxInteractor.shutdown(isSuccess));
     }
 
@@ -139,7 +127,15 @@ public class ELDEventsInteractor {
                             getEvent(ELDEvent.LoginLogoutCode.LOGOUT),
                             token,
                             String.valueOf(userEntity.getId())
-                    );
+
+                    )
+                            .onErrorReturn(throwable -> {
+                                if (throwable instanceof RetrofitException ||
+                                        throwable instanceof IOException) {
+                                    return new ResponseMessage(SUCCESS);
+                                }
+                                return new ResponseMessage(throwable.getMessage());
+                            });
                 })
                 .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
     }

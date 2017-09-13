@@ -214,8 +214,9 @@ public class User implements Parcelable {
         return mAuth;
     }
 
-    public void setAuth(Auth auth) {
+    public User setAuth(Auth auth) {
         this.mAuth = auth;
+        return this;
     }
 
     public String getFirstName() {

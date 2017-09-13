@@ -162,8 +162,10 @@ public class DashboardFragment extends BaseFragment implements DashboardView {
     }
 
     private void updateDutyView(DutyView dutyView, DutyType dutyType) {
-        dutyView.setDutyType(dutyType);
-        dutyView.setTime(mPresenter.getDutyTypeTime(dutyView.getDutyType()));
+        if (dutyView != null) {
+            dutyView.setDutyType(dutyType);
+            dutyView.setTime(mPresenter.getDutyTypeTime(dutyView.getDutyType()));
+        }
     }
 
     private void updateIndicator(DutyType dutyType) {
