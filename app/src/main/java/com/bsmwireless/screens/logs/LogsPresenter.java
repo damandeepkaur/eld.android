@@ -143,10 +143,12 @@ public class LogsPresenter implements AccountManager.AccountListener {
         mGetEventsFromDBDisposable = mELDEventsInteractor.getDutyEventsFromDB(startDayTime, endDayTime)
                 .map(selectedDayEvents -> {
                     List<ELDEvent> prevDayLatestEvents = mELDEventsInteractor.getLatestActiveDutyEventFromDBSync(startDayTime, mUserInteractor.getUserId());
+                    ELDEvent prevDayLatestEvent = null;
                     if (!prevDayLatestEvents.isEmpty()) {
-                        prevDayLatestEvents.get(prevDayLatestEvents.size() - 1).setEventTime(startDayTime);
-                        selectedDayEvents.add(0, prevDayLatestEvents.get(prevDayLatestEvents.size() - 1));
+                        prevDayLatestEvent = prevDayLatestEvents.get(prevDayLatestEvents.size() - 1);
+                        prevDayLatestEvent.setEventTime(startDayTime);
                     }
+                    mView.setPrevDayEvent(prevDayLatestEvent);
                     return selectedDayEvents;
                 })
                 .subscribeOn(Schedulers.io())
@@ -167,9 +169,7 @@ public class LogsPresenter implements AccountManager.AccountListener {
                     }
 
                     mView.setEventLogs(dutyStateLogs);
-                    if (mHOSTimesModel != null) mView.setHOSTimes(mHOSTimesModel);
                     if (mLogSheetInteractor != null) mView.setLogHeader(mLogHeaderModel);
-                    updateHOSTimes(dutyStateLogs, startDayTime, endDayTime);
                     updateVehicleInfo(new ArrayList<>(vehicleIds), dutyStateLogs);
                     updateLogHeader();
                 }, throwable -> Timber.e(throwable.getMessage()));
@@ -219,37 +219,6 @@ public class LogsPresenter implements AccountManager.AccountListener {
                         }
                         , throwable -> Timber.e(throwable.getMessage())
                 ));
-    }
-
-    private void updateHOSTimes(final List<EventLogModel> events, final long startDayTime, final long endDayTime) {
-        Disposable disposable = Single.fromCallable(() -> {
-            HOSTimesModel hosTimesModel = new HOSTimesModel();
-            int odometer = 0;
-            EventLogModel log;
-            for (int i = 0; i < events.size(); i++) {
-                log = events.get(i);
-
-                if (log.getEvent().getOdometer() != null && odometer < log.getEvent().getOdometer()) {
-                    odometer = log.getEvent().getOdometer();
-                }
-            }
-            long currentTime = Calendar.getInstance().getTimeInMillis();
-            long[] times = DutyTypeManager.getDutyTypeTimes(new ArrayList<>(events), startDayTime, endDayTime < currentTime ? endDayTime : currentTime);
-
-            hosTimesModel.setSleeperBerthTime(DateUtils.convertTotalTimeInMsToStringTime(times[DutyType.SLEEPER_BERTH.ordinal()]));
-            hosTimesModel.setDrivingTime(DateUtils.convertTotalTimeInMsToStringTime(times[DutyType.DRIVING.ordinal()]));
-            hosTimesModel.setOffDutyTime(DateUtils.convertTotalTimeInMsToStringTime(times[DutyType.OFF_DUTY.ordinal()]));
-            hosTimesModel.setOnDutyTime(DateUtils.convertTotalTimeInMsToStringTime(times[DutyType.ON_DUTY.ordinal()]));
-            return hosTimesModel;
-        })
-                .subscribeOn(Schedulers.computation())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(hosTimesModel -> {
-                            mHOSTimesModel = hosTimesModel;
-                            mView.setHOSTimes(hosTimesModel);
-                        },
-                        Timber::e);
-        mDisposables.add(disposable);
     }
 
     private void updateLogHeader() {
@@ -478,7 +447,7 @@ public class LogsPresenter implements AccountManager.AccountListener {
         List<EventLogModel> logs = new ArrayList<>();
 
         if (!events.isEmpty()) {
-            //convert to logs model
+            //convertToDrawableLog to logs model
             long duration;
             for (int i = 0; i < events.size(); i++) {
                 ELDEvent event = events.get(i);
