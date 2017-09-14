@@ -2,7 +2,6 @@ package com.bsmwireless.data.network.utils;
 
 import com.bsmwireless.data.network.blackbox.models.BlackBoxResponseModel;
 import com.bsmwireless.data.network.blackbox.utils.BlackBoxParser;
-import com.bsmwireless.domain.interactors.BlackBoxInteractor;
 
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -46,6 +45,19 @@ public class BlackBoxParserTest {
     @Before
     public void before() throws Exception {
         MockitoAnnotations.initMocks(this);
+    }
+
+    @Test
+    public void testGenerateSubscription() {
+        byte sequenceId = (byte)0;
+        int boxId = 312648;
+        int updateRateMillis = 60000;
+
+        byte[] response = BlackBoxParser.generateSubscriptionRequest(sequenceId, boxId, updateRateMillis);
+
+        System.out.println(boxToString(response));
+        System.out.println(boxToCompactHexString(response));
+        System.out.println(boxToEscapedHexString(response));
     }
 
     @Test
@@ -139,6 +151,47 @@ public class BlackBoxParserTest {
      */
     private String charToByteHexStr(char c) {
         return String.format("%02x", (int)c);
+    }
+
+
+    private String boxToString(byte[] boxCommand) {
+        StringBuilder dataStr = new StringBuilder();
+
+        for(int i=0; i<boxCommand.length; i++) {
+            dataStr.append((char)boxCommand[i]);
+        }
+
+        return dataStr.toString();
+    }
+
+    private String boxToDebugHexString(byte[] boxCommand) {
+        StringBuilder hexStr = new StringBuilder();
+
+        for(int i=0; i<boxCommand.length; i++) {
+            hexStr.append(i + "=" + String.format("%02x", boxCommand[i]) + ": ");
+        }
+
+        return hexStr.toString();
+    }
+
+    private String boxToCompactHexString(byte[] boxCommand) {
+        StringBuilder hexStr = new StringBuilder();
+
+        for(int i=0; i<boxCommand.length; i++) {
+            hexStr.append(String.format("%02x", boxCommand[i]));
+        }
+
+        return hexStr.toString();
+    }
+
+    private String boxToEscapedHexString(byte[] boxCommand) {
+        StringBuilder hexStr = new StringBuilder();
+
+        for(int i=0; i<boxCommand.length; i++) {
+            hexStr.append("\\x" + String.format("%02x", boxCommand[i]));
+        }
+
+        return hexStr.toString();
     }
 
 
