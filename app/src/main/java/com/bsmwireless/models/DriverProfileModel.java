@@ -63,7 +63,7 @@ public class DriverProfileModel implements Parcelable {
     public DriverProfileModel(UserEntity userEntity) {
         mEmail = userEntity.getEmail();
         mLicense = userEntity.getLicense();
-        mLastModified = userEntity.getSyncTime();
+        mLastModified = System.currentTimeMillis();
         mDriverId = userEntity.getId();
         mFirstName = userEntity.getFirstName();
         mMidName = userEntity.getMidName();

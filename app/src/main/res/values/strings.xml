@@ -377,6 +377,7 @@
     <string name="driver_profile_password_field_empty">Password field empty</string>
     <string name="driver_profile_valid_password">Valid password</string>
     <string name="driver_profile_home_terminal_updating_error">Home terminal was not updated</string>
+    <string name="driver_profile_hos_cycle_updating_error">HOS cycle was not updated</string>
     <string name="driver_profile_signature_changing_error">Signature changing error</string>
     <string name="driver_profile_signature_changed">Signature changed</string>
 
