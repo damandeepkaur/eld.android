@@ -6,7 +6,7 @@ import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.data.storage.users.UserConverter;
 import com.bsmwireless.data.storage.users.UserEntity;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
-import com.bsmwireless.domain.interactors.SyncEventsInteractor;
+import com.bsmwireless.domain.interactors.SyncInteractor;
 import com.bsmwireless.domain.interactors.UserInteractor;
 import com.bsmwireless.domain.interactors.VehiclesInteractor;
 import com.bsmwireless.models.User;
@@ -59,7 +59,7 @@ public class NavigationPresenterTest {
     AutoDutyTypeManager mAutoDutyTypeManager;
 
     @Mock
-    SyncEventsInteractor mSyncEventsInteractor;
+    SyncInteractor mSyncInteractor;
 
     @Mock
     AccountManager mAccountManager;
@@ -72,7 +72,7 @@ public class NavigationPresenterTest {
     public void before() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        mNavigationPresenter = new NavigationPresenter(mView, mUserInteractor, mVehiclesInteractor, mEventsInteractor, mDutyTypeManager, mAutoDutyTypeManager, mSyncEventsInteractor, mAccountManager);
+        mNavigationPresenter = new NavigationPresenter(mView, mUserInteractor, mVehiclesInteractor, mEventsInteractor, mDutyTypeManager, mAutoDutyTypeManager, mSyncInteractor, mAccountManager);
     }
 
     /**
@@ -187,21 +187,4 @@ public class NavigationPresenterTest {
         verify(mUserInteractor, never()).syncDriverProfile(any(UserEntity.class));
     }
 
-    @Test
-    public void testOnUserUpdatedError() {
-        // given
-        User user = new User();
-        user.setId(0);
-        UserEntity userEntity = UserConverter.toEntity(user);
-        String error = "sorry, it didn't work";
-        when(mUserInteractor.getUserFromDBSync(user.getId())).thenReturn(userEntity);
-        when(mUserInteractor.syncDriverProfile(any(UserEntity.class))).thenReturn(Observable.error(new RuntimeException(error)));
-
-        // when
-        mNavigationPresenter.onUserUpdated(user);
-
-        // then
-        verify(mUserInteractor).syncDriverProfile(any(UserEntity.class));
-        verify(mView).showErrorMessage(eq(error));
-    }
 }

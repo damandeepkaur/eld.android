@@ -1,6 +1,7 @@
 package com.bsmwireless.screens.logs;
 
 import com.bsmwireless.data.network.RetrofitException;
+import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.LogSheetHeader;
 import com.bsmwireless.screens.logs.dagger.EventLogModel;
 import com.bsmwireless.widgets.logs.calendar.CalendarItem;
@@ -13,7 +14,7 @@ public interface LogsView {
 
     void setEventLogs(List<EventLogModel> logs);
 
-    void setHOSTimes(HOSTimesModel hosTimes);
+    void setPrevDayEvent(ELDEvent prevDayEvent);
 
     void setLogHeader(LogHeaderModel logHeader);
 
@@ -37,7 +38,8 @@ public interface LogsView {
 
     enum Error {
         ERROR_ADD_EVENT(R.string.add_event_error),
-        ERROR_UPDATE_EVENT(R.string.update_event_error);
+        ERROR_UPDATE_EVENT(R.string.update_event_error),
+        ERROR_NOT_IN_VEHICLE(R.string.not_in_vehicle_error);
 
         private int mStringId;
 
