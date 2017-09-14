@@ -187,21 +187,4 @@ public class NavigationPresenterTest {
         verify(mUserInteractor, never()).syncDriverProfile(any(UserEntity.class));
     }
 
-    @Test
-    public void testOnUserUpdatedError() {
-        // given
-        User user = new User();
-        user.setId(0);
-        UserEntity userEntity = UserConverter.toEntity(user);
-        String error = "sorry, it didn't work";
-        when(mUserInteractor.getUserFromDBSync(user.getId())).thenReturn(userEntity);
-        when(mUserInteractor.syncDriverProfile(any(UserEntity.class))).thenReturn(Observable.error(new RuntimeException(error)));
-
-        // when
-        mNavigationPresenter.onUserUpdated(user);
-
-        // then
-        verify(mUserInteractor).syncDriverProfile(any(UserEntity.class));
-        verify(mView).showErrorMessage(eq(error));
-    }
 }
