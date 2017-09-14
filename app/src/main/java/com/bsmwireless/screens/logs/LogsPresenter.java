@@ -269,8 +269,11 @@ public class LogsPresenter implements AccountManager.AccountListener {
                     model.setVehicleLicense(vehicle.getLicense());
                 }
                 model.setTrailers(mSelectedLogHeader.getTrailerIds());
-                model.setHomeTerminalAddress(mSelectedLogHeader.getHomeTerminal().getAddress());
-                model.setHomeTerminalName(mSelectedLogHeader.getHomeTerminal().getName());
+
+                if(mSelectedLogHeader.getHomeTerminal() != null) {
+                    model.setHomeTerminalAddress(mSelectedLogHeader.getHomeTerminal().getAddress());
+                    model.setHomeTerminalName(mSelectedLogHeader.getHomeTerminal().getName());
+                }
 
                 model.setShippingId(mSelectedLogHeader.getShippingId());
 
