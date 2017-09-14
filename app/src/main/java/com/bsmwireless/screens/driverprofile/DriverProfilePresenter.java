@@ -8,8 +8,10 @@ import com.bsmwireless.data.storage.carriers.CarrierEntity;
 import com.bsmwireless.data.storage.hometerminals.HomeTerminalEntity;
 import com.bsmwireless.data.storage.users.FullUserEntity;
 import com.bsmwireless.data.storage.users.UserConverter;
+import com.bsmwireless.data.storage.users.UserEntity;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
 import com.bsmwireless.domain.interactors.UserInteractor;
+import com.bsmwireless.models.User;
 import com.bsmwireless.screens.common.menu.BaseMenuPresenter;
 import com.bsmwireless.screens.common.menu.BaseMenuView;
 
@@ -19,6 +21,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -87,6 +90,12 @@ public class DriverProfilePresenter extends BaseMenuPresenter {
 
             Disposable disposable = mUserInteractor.updateDriverSignature(signature)
                                                    .subscribeOn(Schedulers.io())
+                                                   .flatMap(wasUpdated -> {
+                                                       if (wasUpdated) {
+                                                           return mUserInteractor.syncDriverProfile(mFullUserEntity.getUserEntity());
+                                                       }
+                                                       return Observable.just(wasUpdated);
+                                                   })
                                                    .observeOn(AndroidSchedulers.mainThread())
                                                    .subscribe(wasUpdated -> {
                                                                Timber.d("Update signature: " + wasUpdated);
@@ -103,14 +112,6 @@ public class DriverProfilePresenter extends BaseMenuPresenter {
                                                                }
                                                            });
             mDisposables.add(disposable);
-        } else {
-            mView.showError(DriverProfileView.Error.ERROR_INVALID_USER);
-        }
-    }
-
-    public void onSaveUserInfo() {
-        if (mFullUserEntity != null) {
-            mView.setResults(UserConverter.toUser(mFullUserEntity.getUserEntity()));
         } else {
             mView.showError(DriverProfileView.Error.ERROR_INVALID_USER);
         }
@@ -149,6 +150,12 @@ public class DriverProfilePresenter extends BaseMenuPresenter {
 
             Disposable disposable = mUserInteractor.updateDriverHomeTerminal(homeTerminal.getId())
                                                    .subscribeOn(Schedulers.io())
+                                                   .flatMap(wasUpdated -> {
+                                                       if (wasUpdated) {
+                                                           return mUserInteractor.syncDriverProfile(mFullUserEntity.getUserEntity());
+                                                       }
+                                                       return Observable.just(wasUpdated);
+                                                   })
                                                    .observeOn(AndroidSchedulers.mainThread())
                                                    .subscribe(wasUpdated -> {
                                                        if (!wasUpdated) {
@@ -177,6 +184,12 @@ public class DriverProfilePresenter extends BaseMenuPresenter {
 
             Disposable disposable = mUserInteractor.updateDriverRule(ruleException, cycle)
                                                    .subscribeOn(Schedulers.io())
+                                                   .flatMapObservable(wasUpdated -> {
+                                                       if (wasUpdated) {
+                                                           return mUserInteractor.syncDriverProfile(mFullUserEntity.getUserEntity());
+                                                       }
+                                                       return Observable.just(wasUpdated);
+                                                   })
                                                    .observeOn(AndroidSchedulers.mainThread())
                                                    .subscribe(wasUpdated -> {
                                                        if (!wasUpdated) {

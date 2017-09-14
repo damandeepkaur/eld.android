@@ -40,7 +40,6 @@ public interface DriverProfileView extends BaseMenuView {
     void setCarrierInfo(CarrierEntity carrier);
     void setCycleInfo(List<String> cycles, int selectedCycle);
     void showPasswordChanged();
-    void setResults(User user);
     void showSignatureChanged();
 
     void showError(RetrofitException error);

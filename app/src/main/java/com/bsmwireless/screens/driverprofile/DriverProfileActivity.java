@@ -1,6 +1,5 @@
 package com.bsmwireless.screens.driverprofile;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
@@ -41,8 +40,6 @@ import timber.log.Timber;
 import static com.bsmwireless.common.utils.DateUtils.getFullTimeZone;
 
 public class DriverProfileActivity extends BaseMenuActivity implements DriverProfileView, SignatureLayout.OnSaveSignatureListener {
-
-    public static final String EXTRA_USER = "user";
 
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
@@ -146,12 +143,6 @@ public class DriverProfileActivity extends BaseMenuActivity implements DriverPro
     }
 
     @Override
-    public void onBackPressed() {
-        mPresenter.onSaveUserInfo();
-        super.onBackPressed();
-    }
-
-    @Override
     protected void onDestroy() {
         mPresenter.onDestroy();
         mSnackBarLayout.reset().hideSnackbar();
@@ -217,13 +208,6 @@ public class DriverProfileActivity extends BaseMenuActivity implements DriverPro
     @Override
     public void onChangeClicked() {
         showChangeSignSnackBar();
-    }
-
-    @Override
-    public void setResults(User user) {
-        Intent resultIntent = new Intent();
-        resultIntent.putExtra(EXTRA_USER, user);
-        setResult(RESULT_OK, resultIntent);
     }
 
     @Override
