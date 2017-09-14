@@ -32,20 +32,20 @@ public class LockScreenPresenter {
 
     final LockScreenView mView;
     final DutyTypeManager mDutyManager;
-    final BlackBoxConnectionManager connectionManager;
+    final BlackBoxConnectionManager mBlackBoxConnectionManager;
     private final CompositeDisposable mCompositeDisposable;
-    private final PreferencesManager preferencesManager;
-    final BlackBoxStateChecker checker;
-    private final long blackBoxTimeoutMillis;
+    private final PreferencesManager mPreferencesManager;
+    final BlackBoxStateChecker mChecker;
+    private final long mBlackBoxTimeoutMillis;
     private final long mIdlingTimeoutMillis;
-    private final AccountManager accountManager;
-    private volatile CurrentWork currentWork;
-    private final AtomicReference<Maybe<BlackBoxModel>> generalMonitoringReference;
-    private final AtomicReference<Completable> reconnectionReference;
-    private final AtomicReference<Completable> idleMonitoringCompletableReference;
-    private final AtomicReference<Maybe<BlackBoxModel>> monitoringDrivingReference;
+    private final AccountManager mAccountManager;
+    private volatile CurrentWork mCurrentWork;
+    private final AtomicReference<Maybe<BlackBoxModel>> mGeneralMonitoringReference;
+    private final AtomicReference<Completable> mReconnectionReference;
+    private final AtomicReference<Completable> mIdleMonitoringCompletableReference;
+    private final AtomicReference<Maybe<BlackBoxModel>> mMonitoringDrivingReference;
     // Disposable for current monitoring task
-    private Disposable currentMonitoringDisposable;
+    private Disposable mCurrentMonitoringDisposable;
 
     @Inject
     public LockScreenPresenter(LockScreenView view,
@@ -57,19 +57,19 @@ public class LockScreenPresenter {
                                @Named("idleTimeout") long idlingTimeout, AccountManager accountManager) {
         mView = view;
         mDutyManager = dutyManager;
-        this.connectionManager = connectionManager;
-        this.preferencesManager = preferencesManager;
-        this.checker = checker;
-        this.blackBoxTimeoutMillis = blackBoxTimeoutMillis;
+        this.mBlackBoxConnectionManager = connectionManager;
+        this.mPreferencesManager = preferencesManager;
+        this.mChecker = checker;
+        this.mBlackBoxTimeoutMillis = blackBoxTimeoutMillis;
         this.mIdlingTimeoutMillis = idlingTimeout;
-        this.accountManager = accountManager;
+        this.mAccountManager = accountManager;
         mCompositeDisposable = new CompositeDisposable();
-        currentWork = CurrentWork.NOTHING;
-        generalMonitoringReference = new AtomicReference<>();
-        reconnectionReference = new AtomicReference<>();
-        idleMonitoringCompletableReference = new AtomicReference<>();
-        monitoringDrivingReference = new AtomicReference<>();
-        currentMonitoringDisposable = Disposables.disposed();
+        mCurrentWork = CurrentWork.NOTHING;
+        mGeneralMonitoringReference = new AtomicReference<>();
+        mReconnectionReference = new AtomicReference<>();
+        mIdleMonitoringCompletableReference = new AtomicReference<>();
+        mMonitoringDrivingReference = new AtomicReference<>();
+        mCurrentMonitoringDisposable = Disposables.disposed();
     }
 
     public void onStart() {
@@ -81,13 +81,13 @@ public class LockScreenPresenter {
 
         startTimer();
         startMonitoring();
-        accountManager.addListener(accountListener);
+        mAccountManager.addListener(accountListener);
     }
 
     public void onStop() {
         mCompositeDisposable.clear();
         resetTime();
-        accountManager.removeListener(accountListener);
+        mAccountManager.removeListener(accountListener);
     }
 
     public void switchCoDriver() {
@@ -120,9 +120,9 @@ public class LockScreenPresenter {
      */
     void startMonitoring() {
 
-        Timber.d("startMonitoring, currentWork " + currentWork);
+        Timber.d("startMonitoring, mCurrentWork " + mCurrentWork);
 
-        switch (currentWork) {
+        switch (mCurrentWork) {
             case NOTHING:
             case GENERAL_MONITORING:
                 startGeneralMonitoring();
@@ -141,32 +141,32 @@ public class LockScreenPresenter {
                 break;
 
             default:
-                throw new IllegalStateException("Unknown current work's type - " + currentWork);
+                throw new IllegalStateException("Unknown current work's type - " + mCurrentWork);
         }
     }
 
     void startGeneralMonitoring() {
-        Maybe<BlackBoxModel> maybe = generalMonitoringReference.get();
+        Maybe<BlackBoxModel> maybe = mGeneralMonitoringReference.get();
         if (maybe == null) {
-            maybe = connectionManager.getDataObservable()
+            maybe = mBlackBoxConnectionManager.getDataObservable()
                     .filter(blackBoxModel ->
-                            checker.isIgnitionOff(blackBoxModel) || checker.isStopped(blackBoxModel)) // TODO: Check this filter
+                            mChecker.isIgnitionOff(blackBoxModel) || mChecker.isStopped(blackBoxModel)) // TODO: Check this filter
                     .firstElement()
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .cache();
-            if (!generalMonitoringReference.compareAndSet(null, maybe)) {
-                maybe = generalMonitoringReference.get();
+            if (!mGeneralMonitoringReference.compareAndSet(null, maybe)) {
+                maybe = mGeneralMonitoringReference.get();
             }
         }
 
-        currentMonitoringDisposable.dispose();
-        currentMonitoringDisposable = maybe
+        mCurrentMonitoringDisposable.dispose();
+        mCurrentMonitoringDisposable = maybe
                 .doOnSubscribe(unused -> {  // must be lower subscribeOn() in the current chain
                     mView.removeAnyPopup();
-                    currentWork = CurrentWork.GENERAL_MONITORING;
+                    mCurrentWork = CurrentWork.GENERAL_MONITORING;
                 })
-                .doFinally(() -> generalMonitoringReference.set(null))
+                .doFinally(() -> mGeneralMonitoringReference.set(null))
                 .subscribe(blackBoxModel -> {
 
                     switch (blackBoxModel.getResponseType()) {
@@ -200,14 +200,14 @@ public class LockScreenPresenter {
 
         Timber.d("Start reconnection");
 
-        Completable reconnectCompletable = reconnectionReference.get();
+        Completable reconnectCompletable = mReconnectionReference.get();
         if (reconnectCompletable == null) {
-            int boxId = preferencesManager.getBoxId();
-            reconnectCompletable = connectionManager.connectBlackBox(boxId)
+            int boxId = mPreferencesManager.getBoxId();
+            reconnectCompletable = mBlackBoxConnectionManager.connectBlackBox(boxId)
                     .flatMapObservable(BlackBoxConnectionManager::getDataObservable)
                     .firstOrError()
                     .toCompletable()
-                    .timeout(blackBoxTimeoutMillis, TimeUnit.MILLISECONDS)
+                    .timeout(mBlackBoxTimeoutMillis, TimeUnit.MILLISECONDS)
                     .onErrorResumeNext(throwable -> {
                         Timber.d("start reconnection again");
                         if (throwable instanceof TimeoutException) {
@@ -215,7 +215,7 @@ public class LockScreenPresenter {
                             return Completable.fromAction(mView::showDisconnectionPopup)
                                     .observeOn(Schedulers.io())
                                     .subscribeOn(AndroidSchedulers.mainThread())
-                                    .andThen(connectionManager.connectBlackBox(boxId))
+                                    .andThen(mBlackBoxConnectionManager.connectBlackBox(boxId))
                                     .flatMapObservable(BlackBoxConnectionManager::getDataObservable)
                                     .firstOrError()
                                     .toCompletable();
@@ -223,17 +223,17 @@ public class LockScreenPresenter {
                         return Completable.error(throwable);
                     })
                     .cache();
-            if (!reconnectionReference.compareAndSet(null, reconnectCompletable)) {
-                reconnectCompletable = reconnectionReference.get();
+            if (!mReconnectionReference.compareAndSet(null, reconnectCompletable)) {
+                reconnectCompletable = mReconnectionReference.get();
             }
         }
 
-        currentMonitoringDisposable.dispose();
-        currentMonitoringDisposable  = reconnectCompletable
+        mCurrentMonitoringDisposable.dispose();
+        mCurrentMonitoringDisposable = reconnectCompletable
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe(unused -> currentWork = CurrentWork.RECONNECTING)
-                .doFinally(() -> reconnectionReference.set(null))
+                .doOnSubscribe(unused -> mCurrentWork = CurrentWork.RECONNECTING)
+                .doFinally(() -> mReconnectionReference.set(null))
                 .subscribe(this::startGeneralMonitoring,
                         throwable -> mView.closeLockScreen());
     }
@@ -246,27 +246,27 @@ public class LockScreenPresenter {
      */
     void startIdlingMonitoring() {
 
-        Completable idleCompletable = idleMonitoringCompletableReference.get();
+        Completable idleCompletable = mIdleMonitoringCompletableReference.get();
         if (idleCompletable == null) {
 
-            idleCompletable = connectionManager.getDataObservable()
-                    .filter(blackBoxModel -> !checker.isStopped(blackBoxModel)
-                            && !checker.isUpdate(blackBoxModel))
+            idleCompletable = mBlackBoxConnectionManager.getDataObservable()
+                    .filter(blackBoxModel -> !mChecker.isStopped(blackBoxModel)
+                            && !mChecker.isUpdate(blackBoxModel))
                     .timeout(mIdlingTimeoutMillis, TimeUnit.MILLISECONDS)
                     .firstElement()
                     .ignoreElement()
                     .cache();
 
-            if (!idleMonitoringCompletableReference.compareAndSet(null, idleCompletable)) {
-                idleCompletable = idleMonitoringCompletableReference.get();
+            if (!mIdleMonitoringCompletableReference.compareAndSet(null, idleCompletable)) {
+                idleCompletable = mIdleMonitoringCompletableReference.get();
             }
         }
 
-        currentMonitoringDisposable.dispose();
-        currentMonitoringDisposable  = idleCompletable
+        mCurrentMonitoringDisposable.dispose();
+        mCurrentMonitoringDisposable = idleCompletable
                 .subscribeOn(Schedulers.io())
-                .doOnSubscribe(unused -> currentWork = CurrentWork.IDLE_MONITORING)
-                .doFinally(() -> idleMonitoringCompletableReference.set(null))
+                .doOnSubscribe(unused -> mCurrentWork = CurrentWork.IDLE_MONITORING)
+                .doFinally(() -> mIdleMonitoringCompletableReference.set(null))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::startGeneralMonitoring, // getting a new status, start monitoring again
                         throwable -> {
@@ -283,23 +283,23 @@ public class LockScreenPresenter {
 
     void startMonitoringDriving() {
 
-        Maybe<BlackBoxModel> drivingCompletable = monitoringDrivingReference.get();
+        Maybe<BlackBoxModel> drivingCompletable = mMonitoringDrivingReference.get();
         if (drivingCompletable == null) {
 
-            drivingCompletable = connectionManager.getDataObservable()
-                    .filter(checker::isMoving)
+            drivingCompletable = mBlackBoxConnectionManager.getDataObservable()
+                    .filter(mChecker::isMoving)
                     .firstElement()
                     .cache();
 
-            if (!monitoringDrivingReference.compareAndSet(null, drivingCompletable)) {
-                drivingCompletable = monitoringDrivingReference.get();
+            if (!mMonitoringDrivingReference.compareAndSet(null, drivingCompletable)) {
+                drivingCompletable = mMonitoringDrivingReference.get();
             }
         }
 
-        currentMonitoringDisposable.dispose();
-        currentMonitoringDisposable  = drivingCompletable
-                .doOnSubscribe(unused -> currentWork = CurrentWork.DRIVING_MONITORING)
-                .doFinally(() -> monitoringDrivingReference.set(null))
+        mCurrentMonitoringDisposable.dispose();
+        mCurrentMonitoringDisposable = drivingCompletable
+                .doOnSubscribe(unused -> mCurrentWork = CurrentWork.DRIVING_MONITORING)
+                .doFinally(() -> mMonitoringDrivingReference.set(null))
                 .subscribe(
                         blackBoxModel -> startGeneralMonitoring(),
                         throwable -> Timber.d(throwable, "Error monitoring MOVING status"),
@@ -313,7 +313,7 @@ public class LockScreenPresenter {
     private final AccountManager.AccountListener accountListener = new AccountManager.AccountListener() {
         @Override
         public void onUserChanged() {
-            if (!accountManager.isCurrentUserDriver()) {
+            if (!mAccountManager.isCurrentUserDriver()) {
                 mView.closeLockScreen();
             }
         }

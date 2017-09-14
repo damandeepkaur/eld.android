@@ -13,13 +13,13 @@ import butterknife.Unbinder;
 
 public abstract class BaseActivity extends AppCompatActivity{
     protected Unbinder mUnbinder;
-    private boolean doBind = true;
-    boolean isBound = false;
+    private boolean mDoBind = true;
+    boolean mIsBound = false;
 
     @Override
     protected void onStart() {
         super.onStart();
-        if (doBind) {
+        if (mDoBind) {
             final Intent intent = StatusMonitoringService.createIntent(this);
             bindService(intent, serviceConnection, BIND_AUTO_CREATE);
         }
@@ -28,9 +28,9 @@ public abstract class BaseActivity extends AppCompatActivity{
     @Override
     protected void onStop() {
         super.onStop();
-        if (isBound) {
+        if (mIsBound) {
             unbindService(serviceConnection);
-            isBound = false;
+            mIsBound = false;
         }
     }
 
@@ -49,18 +49,18 @@ public abstract class BaseActivity extends AppCompatActivity{
      * @param doBind true if need to bind service, otherwise false
      */
     protected void doBindToService(boolean doBind) {
-        this.doBind = doBind;
+        this.mDoBind = doBind;
     }
 
     ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            isBound = true;
+            mIsBound = true;
         }
 
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
-            isBound = false;
+            mIsBound = false;
         }
     };
 }

@@ -34,6 +34,7 @@ import static com.bsmwireless.common.Constants.MAX_CODRIVERS;
 @ActivityScope
 public class SwitchDriverPresenter {
 
+    public static final int GETTING_BLACKBOX_MODEL_TIMEOUT = 10;
     private SwitchDriverView mView;
     private ELDEventsInteractor mELDEventsInteractor;
     private UserInteractor mUserInteractor;
@@ -74,42 +75,42 @@ public class SwitchDriverPresenter {
     public void onSwitchDriverCreated() {
         mGetCoDriversDisposable.dispose();
         mGetCoDriversDisposable = mUserInteractor.getCoDriversFromDB()
-                                                 .subscribeOn(Schedulers.io())
-                                                 .map(SwitchDriverDialog.UserModel::fromEntity)
-                                                 .observeOn(AndroidSchedulers.mainThread())
-                                                 .doOnNext(userModels -> mView.setCoDriversForSwitchDialog(userModels))
-                                                 .observeOn(Schedulers.io())
-                                                 .map(this::updateStatus)
-                                                 .observeOn(AndroidSchedulers.mainThread())
-                                                 .subscribe(coDrivers -> mView.setCoDriversForSwitchDialog(coDrivers));
+                .subscribeOn(Schedulers.io())
+                .map(SwitchDriverDialog.UserModel::fromEntity)
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnNext(userModels -> mView.setCoDriversForSwitchDialog(userModels))
+                .observeOn(Schedulers.io())
+                .map(this::updateStatus)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(coDrivers -> mView.setCoDriversForSwitchDialog(coDrivers));
         getDriverInfo();
     }
 
     public void onLogOutCoDriverCreated() {
         mGetCoDriversDisposable.dispose();
         mGetCoDriversDisposable = mUserInteractor.getCoDriversFromDB()
-                                                 .subscribeOn(Schedulers.io())
-                                                 .map(SwitchDriverDialog.UserModel::fromEntity)
-                                                 .observeOn(AndroidSchedulers.mainThread())
-                                                 .doOnNext(userModels -> mView.setCoDriversForSwitchDialog(userModels))
-                                                 .observeOn(Schedulers.io())
-                                                 .map(this::updateStatus)
-                                                 .observeOn(AndroidSchedulers.mainThread())
-                                                 .subscribe(coDrivers -> mView.setCoDriversForLogOutDialog(coDrivers));
+                .subscribeOn(Schedulers.io())
+                .map(SwitchDriverDialog.UserModel::fromEntity)
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnNext(userModels -> mView.setCoDriversForSwitchDialog(userModels))
+                .observeOn(Schedulers.io())
+                .map(this::updateStatus)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(coDrivers -> mView.setCoDriversForLogOutDialog(coDrivers));
         getDriverInfo();
     }
 
     public void onDriverSeatDialogCreated() {
         mGetCoDriversDisposable.dispose();
         mGetCoDriversDisposable = mUserInteractor.getCoDriversFromDB()
-                                                 .subscribeOn(Schedulers.io())
-                                                 .map(SwitchDriverDialog.UserModel::fromEntity)
-                                                 .observeOn(AndroidSchedulers.mainThread())
-                                                 .doOnNext(userModels -> mView.setCoDriversForDriverSeatDialog(userModels))
-                                                 .observeOn(Schedulers.io())
-                                                 .map(this::updateStatus)
-                                                 .observeOn(AndroidSchedulers.mainThread())
-                                                 .subscribe(coDrivers -> mView.setCoDriversForDriverSeatDialog(coDrivers));
+                .subscribeOn(Schedulers.io())
+                .map(SwitchDriverDialog.UserModel::fromEntity)
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnNext(userModels -> mView.setCoDriversForDriverSeatDialog(userModels))
+                .observeOn(Schedulers.io())
+                .map(this::updateStatus)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(coDrivers -> mView.setCoDriversForDriverSeatDialog(coDrivers));
         getDriverInfo();
     }
 
@@ -201,39 +202,39 @@ public class SwitchDriverPresenter {
 
         mView.createLoadingDialog();
         Disposable disposable = blackBox.getDataObservable()
-                .first(defaultModel)
-                .timeout(10, TimeUnit.SECONDS)
-                .onErrorReturn(throwable -> {
-                    Timber.e(throwable, "Error getting black box state");
-                    return defaultModel;
-                })
+                .firstOrError()
+                .timeout(GETTING_BLACKBOX_MODEL_TIMEOUT, TimeUnit.SECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(responseType -> {
-                    if (responseType.getSensorState(BlackBoxSensorState.MOVING)) {
-                        mView.createSwitchOnlyDialog();
-                    } else {
-                        mView.createSwitchDriverDialog();
-                    }
-                });
+                .subscribe(
+                        responseType -> {
+                            if (responseType.getSensorState(BlackBoxSensorState.MOVING)) {
+                                mView.createSwitchOnlyDialog();
+                            } else {
+                                mView.createSwitchDriverDialog();
+                            }
+                        }, throwable -> {
+                            Timber.e(throwable, "Error getting current blackbox status");
+                            mView.createSwitchDriverDialog();
+                        });
         mCommonDisposables.add(disposable);
     }
 
     private void getDriverInfo() {
         mGetUsernameDisposable.dispose();
         mGetUsernameDisposable = mUserInteractor.getDriver()
-                                                .subscribeOn(Schedulers.io())
-                                                .map(SwitchDriverDialog.UserModel::new)
-                                                .observeOn(AndroidSchedulers.mainThread())
-                                                .doOnNext(model -> mView.setDriverInfo(model))
-                                                .observeOn(Schedulers.io())
-                                                .map(model -> updateStatus(Collections.singletonList(model)))
-                                                .observeOn(AndroidSchedulers.mainThread())
-                                                .subscribe(driverModel -> mView.setDriverInfo(driverModel.get(0)));
+                .subscribeOn(Schedulers.io())
+                .map(SwitchDriverDialog.UserModel::new)
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnNext(model -> mView.setDriverInfo(model))
+                .observeOn(Schedulers.io())
+                .map(model -> updateStatus(Collections.singletonList(model)))
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(driverModel -> mView.setDriverInfo(driverModel.get(0)));
     }
 
     private List<SwitchDriverDialog.UserModel> updateStatus(List<SwitchDriverDialog.UserModel> userEntities) {
-        for (SwitchDriverDialog.UserModel user: userEntities) {
+        for (SwitchDriverDialog.UserModel user : userEntities) {
             List<ELDEvent> events = mELDEventsInteractor.getLatestActiveDutyEventFromDBSync(System.currentTimeMillis(), user.getUser().getId());
             if (events != null && !events.isEmpty()) {
                 ELDEvent event = events.get(events.size() - 1);
