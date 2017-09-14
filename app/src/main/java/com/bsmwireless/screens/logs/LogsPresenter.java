@@ -9,6 +9,7 @@ import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
 import com.bsmwireless.domain.interactors.LogSheetInteractor;
+import com.bsmwireless.domain.interactors.SyncInteractor;
 import com.bsmwireless.domain.interactors.UserInteractor;
 import com.bsmwireless.domain.interactors.VehiclesInteractor;
 import com.bsmwireless.models.Carrier;
@@ -65,14 +66,17 @@ public class LogsPresenter implements AccountManager.AccountListener {
     private Disposable mGetTimezoneDisposable;
     private Calendar mSelectedDayCalendar;
     private LogSheetHeader mSelectedLogHeader;
+    private SyncInteractor mSyncInteractor;
 
     private DutyTypeManager.DutyTypeListener mListener = dutyType -> mView.dutyUpdated();
 
     @Inject
     public LogsPresenter(LogsView view, ELDEventsInteractor eventsInteractor, LogSheetInteractor logSheetInteractor,
-                         VehiclesInteractor vehiclesInteractor, UserInteractor userInteractor, DutyTypeManager dutyTypeManager, AccountManager accountManager) {
+                         VehiclesInteractor vehiclesInteractor, UserInteractor userInteractor, DutyTypeManager dutyTypeManager,
+                         AccountManager accountManager, SyncInteractor syncInteractor) {
         mView = view;
         mELDEventsInteractor = eventsInteractor;
+        mSyncInteractor = syncInteractor;
         mLogSheetInteractor = logSheetInteractor;
         mVehiclesInteractor = vehiclesInteractor;
         mUserInteractor = userInteractor;
@@ -133,13 +137,11 @@ public class LogsPresenter implements AccountManager.AccountListener {
 
         mSelectedDayCalendar = calendar;
 
-        long startDayTime = DateUtils.getStartDate(mTimeZone, calendar.get(Calendar.DAY_OF_MONTH),
-                calendar.get(Calendar.MONTH), calendar.get(Calendar.YEAR));
+        long startDayTime = DateUtils.getStartDate(mTimeZone, calendar);
         long endDayTime = startDayTime + MS_IN_DAY;
 
-        mELDEventsInteractor.syncELDEventsWithServer(startDayTime - MS_IN_DAY, endDayTime);
+        mSyncInteractor.syncEventsForDay(calendar, mTimeZone);
 
-        mGetEventsFromDBDisposable.dispose();
         mGetEventsFromDBDisposable = mELDEventsInteractor.getDutyEventsFromDB(startDayTime, endDayTime)
                 .map(selectedDayEvents -> {
                     List<ELDEvent> prevDayLatestEvents = mELDEventsInteractor.getLatestActiveDutyEventFromDBSync(startDayTime, mUserInteractor.getUserId());
@@ -172,13 +174,12 @@ public class LogsPresenter implements AccountManager.AccountListener {
                     if (mLogSheetInteractor != null) mView.setLogHeader(mLogHeaderModel);
                     updateVehicleInfo(new ArrayList<>(vehicleIds), dutyStateLogs);
                     updateLogHeader();
-                }, throwable -> Timber.e(throwable.getMessage()));
+                }, Timber::e);
         mDisposables.add(mGetEventsFromDBDisposable);
     }
 
     public void setLogHeaderForDay(Calendar calendar) {
-        long startDayTime = DateUtils.getStartDate(mTimeZone, calendar.get(Calendar.DAY_OF_MONTH),
-                calendar.get(Calendar.MONTH), calendar.get(Calendar.YEAR));
+        long startDayTime = DateUtils.getStartDate(mTimeZone, calendar);
         long logDay = DateUtils.convertTimeToDayNumber(mTimeZone, startDayTime);
         LogSheetHeader logSheetHeader = mLogSheetHeadersMap.get(logDay);
 
@@ -336,18 +337,30 @@ public class LogsPresenter implements AccountManager.AccountListener {
     }
 
     public void onEditEventClicked(EventLogModel event) {
-        mView.goToEditEventScreen(event);
+        if (mVehiclesInteractor.getVehicleId() > 0) {
+            mView.goToEditEventScreen(event);
+        } else {
+            mView.showError(LogsView.Error.ERROR_NOT_IN_VEHICLE);
+        }
     }
 
     public void onRemovedEventClicked(EventLogModel event) {
     }
 
     public void onAddEventClicked(CalendarItem day) {
-        mView.goToAddEventScreen(day);
+        if (mVehiclesInteractor.getVehicleId() > 0) {
+            mView.goToAddEventScreen(day);
+        } else {
+            mView.showError(LogsView.Error.ERROR_NOT_IN_VEHICLE);
+        }
     }
 
     public void onEditLogHeaderClicked() {
-        mView.goToEditLogHeaderScreen(mLogHeaderModel);
+        if (mVehiclesInteractor.getVehicleId() > 0) {
+            mView.goToEditLogHeaderScreen(mLogHeaderModel);
+        } else {
+            mView.showError(LogsView.Error.ERROR_NOT_IN_VEHICLE);
+        }
     }
 
     public void onEventAdded(List<ELDEvent> newEvents) {
@@ -487,14 +500,6 @@ public class LogsPresenter implements AccountManager.AccountListener {
             lastEvent.setDuration(endDayTime - lastEvent.getEventTime());
         }
         return logs;
-    }
-
-    public void onWeekChanged(CalendarItem startWeekDay) {
-        Calendar calendar = startWeekDay.getCalendar();
-        long startWeekTime = DateUtils.getStartDate(mTimeZone, calendar.get(Calendar.DAY_OF_MONTH),
-                calendar.get(Calendar.MONTH), calendar.get(Calendar.YEAR));
-        long endWeekTime = startWeekTime + MS_IN_DAY * 7;
-        mELDEventsInteractor.syncELDEventsWithServer(startWeekTime, endWeekTime);
     }
 
     @Override
