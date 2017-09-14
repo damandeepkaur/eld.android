@@ -23,6 +23,7 @@ import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.disposables.Disposables;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
@@ -43,6 +44,8 @@ public class LockScreenPresenter {
     private final AtomicReference<Completable> reconnectionReference;
     private final AtomicReference<Completable> idleMonitoringCompletableReference;
     private final AtomicReference<Maybe<BlackBoxModel>> monitoringDrivingReference;
+    // Disposable for current monitoring task
+    private Disposable currentMonitoringDisposable;
 
     @Inject
     public LockScreenPresenter(LockScreenView view,
@@ -66,6 +69,7 @@ public class LockScreenPresenter {
         reconnectionReference = new AtomicReference<>();
         idleMonitoringCompletableReference = new AtomicReference<>();
         monitoringDrivingReference = new AtomicReference<>();
+        currentMonitoringDisposable = Disposables.disposed();
     }
 
     public void onStart() {
@@ -88,6 +92,15 @@ public class LockScreenPresenter {
 
     public void switchCoDriver() {
         mView.openCoDriverDialog();
+    }
+
+    public void onDutyTypeSelected(DutyType dutyType) {
+        changeDutyStatus(dutyType);
+        mView.closeLockScreen();
+    }
+
+    private void changeDutyStatus(DutyType dutyType) {
+
     }
 
     private void resetTime() {
@@ -147,7 +160,8 @@ public class LockScreenPresenter {
             }
         }
 
-        final Disposable disposable = maybe
+        currentMonitoringDisposable.dispose();
+        currentMonitoringDisposable = maybe
                 .doOnSubscribe(unused -> {  // must be lower subscribeOn() in the current chain
                     mView.removeAnyPopup();
                     currentWork = CurrentWork.GENERAL_MONITORING;
@@ -176,12 +190,11 @@ public class LockScreenPresenter {
                     Timber.e(throwable, "Error getting a black box's data");
                     startReconnection();
                 }, mView::closeLockScreen); // BB is disconnected
-        mCompositeDisposable.add(disposable);
     }
 
     /**
      * Try to reconnect. If done success start new monitoring task again.
-     * If connection is not established show popup and start
+     * If connection is not established show popup and continue monitoring
      */
     void startReconnection() {
 
@@ -196,6 +209,7 @@ public class LockScreenPresenter {
                     .toCompletable()
                     .timeout(blackBoxTimeoutMillis, TimeUnit.MILLISECONDS)
                     .onErrorResumeNext(throwable -> {
+                        Timber.d("start reconnection again");
                         if (throwable instanceof TimeoutException) {
                             // If timeout is occurs show disconnection popup and continue monitoring
                             return Completable.fromAction(mView::showDisconnectionPopup)
@@ -214,14 +228,14 @@ public class LockScreenPresenter {
             }
         }
 
-        final Disposable disposable = reconnectCompletable
+        currentMonitoringDisposable.dispose();
+        currentMonitoringDisposable  = reconnectCompletable
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe(unused -> currentWork = CurrentWork.RECONNECTING)
                 .doFinally(() -> reconnectionReference.set(null))
                 .subscribe(this::startGeneralMonitoring,
                         throwable -> mView.closeLockScreen());
-        mCompositeDisposable.add(disposable);
     }
 
     /**
@@ -248,7 +262,8 @@ public class LockScreenPresenter {
             }
         }
 
-        final Disposable disposable = idleCompletable
+        currentMonitoringDisposable.dispose();
+        currentMonitoringDisposable  = idleCompletable
                 .subscribeOn(Schedulers.io())
                 .doOnSubscribe(unused -> currentWork = CurrentWork.IDLE_MONITORING)
                 .doFinally(() -> idleMonitoringCompletableReference.set(null))
@@ -264,7 +279,6 @@ public class LockScreenPresenter {
                                 Timber.d(throwable, "Idling status error");
                             }
                         });
-        mCompositeDisposable.add(disposable);
     }
 
     void startMonitoringDriving() {
@@ -282,14 +296,14 @@ public class LockScreenPresenter {
             }
         }
 
-        final Disposable disposable = drivingCompletable
+        currentMonitoringDisposable.dispose();
+        currentMonitoringDisposable  = drivingCompletable
                 .doOnSubscribe(unused -> currentWork = CurrentWork.DRIVING_MONITORING)
                 .doFinally(() -> monitoringDrivingReference.set(null))
                 .subscribe(
                         blackBoxModel -> startGeneralMonitoring(),
                         throwable -> Timber.d(throwable, "Error monitoring MOVING status"),
                         mView::closeLockScreen);// Data observable was completed for any reason. Close lock screen
-        mCompositeDisposable.add(disposable);
     }
 
     private enum CurrentWork {

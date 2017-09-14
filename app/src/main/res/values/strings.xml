@@ -554,6 +554,16 @@
     <!-- Lock screen -->
     <string name="lock_screen_switch_co_driver_message">You can switch to co-driver view to continue work in application</string>
     <string name="switch_to_co_driver_view">SWITCH TO CO-DRIVER VIEW</string>
+    <string name="lock_screen_ignition_off_dialog_title">Ignition off is detected</string>
+    <string name="lock_screen_ignition_off_dialog_message">You automatically switched to On Duty status by application. Do you want to stay On Duty or switch to Off Duty?</string>
+    <string name="lock_screen_disconnected_dialog_title">Disconnection is detected</string>
+    <string name="lock_screen_disconnected_dialog_message">Disconnection is detected. Do you want to go On Duty, Off Duty, Driving?</string>
+    <string name="lock_screen_promt_dialog_on_duty">STAY ON DUTY</string>
+    <string name="lock_screen_promt_dialog_off_duty">SWITCH TO OFF DUTY</string>
+    <string name="lock_screen_promt_dialog_driving">SWITCH TO DRIVING</string>
+
+
+
 
     <!-- Geo location enum direction description -->
     <string name="geo_location_at_description">At indicated geo-location</string>

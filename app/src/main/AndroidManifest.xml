@@ -78,8 +78,7 @@
             android:windowSoftInputMode="stateAlwaysHidden"/>
 
         <activity
-            android:name="com.bsmwireless.screens.lockscreen.LockScreenActivity"
-            android:screenOrientation="portrait"/>
+            android:name="com.bsmwireless.screens.lockscreen.LockScreenActivity"/>
 
         <service android:name="com.bsmwireless.data.network.authenticator.BsmAuthenticatorService">
             <intent-filter>

@@ -4,10 +4,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.AlertDialog;
+import android.support.v4.app.Fragment;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Toast;
 
 import com.bsmwireless.common.App;
 import com.bsmwireless.common.Constants;
@@ -25,6 +24,7 @@ import butterknife.OnClick;
 
 public class LockScreenActivity extends BaseActivity implements LockScreenView {
 
+    public static final String PROMT_DIALOG = "PROMT_DIALOG";
     @BindView(R.id.dashboard_current)
     DutyView mCurrentDutyView;
 
@@ -40,7 +40,6 @@ public class LockScreenActivity extends BaseActivity implements LockScreenView {
     @Inject
     LockScreenPresenter presenter;
 
-    private AlertDialog dialog;
 
     public static Intent createIntent(Context context) {
         Intent intent = new Intent(context, LockScreenActivity.class);
@@ -72,12 +71,14 @@ public class LockScreenActivity extends BaseActivity implements LockScreenView {
     protected void onStart() {
         super.onStart();
         presenter.onStart();
+        setListenersForPromtDialog(false);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         presenter.onStop();
+        setListenersForPromtDialog(true);
     }
 
     @Override
@@ -127,7 +128,7 @@ public class LockScreenActivity extends BaseActivity implements LockScreenView {
 
     @Override
     public void showIgnitionOffDetectedDialog() {
-        Toast.makeText(this, "Ignition off", Toast.LENGTH_SHORT).show();
+        showPromtDialog(PromtDialog.newInstance(PromtDialog.DialogType.IGNITION_OFF));
     }
 
     @Override
@@ -137,15 +138,15 @@ public class LockScreenActivity extends BaseActivity implements LockScreenView {
 
     @Override
     public void removeAnyPopup() {
-        Toast.makeText(this, "remove popup", Toast.LENGTH_SHORT).show();
-        if (dialog != null) {
-            dialog.dismiss();
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag(PROMT_DIALOG);
+        if (fragment instanceof PromtDialog) {
+            ((PromtDialog) fragment).dismiss();
         }
     }
 
     @Override
     public void showDisconnectionPopup() {
-        Toast.makeText(this, "Disconnection", Toast.LENGTH_SHORT).show();
+        showPromtDialog(PromtDialog.newInstance(PromtDialog.DialogType.IGNITION_OFF));
     }
 
     @OnClick(R.id.switch_co_driver_button)
@@ -153,8 +154,26 @@ public class LockScreenActivity extends BaseActivity implements LockScreenView {
         presenter.switchCoDriver();
     }
 
+    private void showPromtDialog(PromtDialog dialog) {
+        dialog.setCancelable(false);
+        dialog.show(getSupportFragmentManager(), PROMT_DIALOG);
+    }
+
     private void updateDutyView(DutyView dutyView, DutyType dutyType, long time) {
         dutyView.setTime(time);
         dutyView.setDutyType(dutyType);
     }
+
+    private void setListenersForPromtDialog(boolean clearListener) {
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag(PROMT_DIALOG);
+        if (fragment instanceof PromtDialog) {
+            if (clearListener) {
+                ((PromtDialog) fragment).setPromtDialogListener(null);
+            } else {
+                ((PromtDialog) fragment).setPromtDialogListener(mPromtDialogListener);
+            }
+        }
+    }
+
+    private PromtDialog.PromtDialogListener mPromtDialogListener = dutyType -> presenter.onDutyTypeSelected(dutyType);
 }
