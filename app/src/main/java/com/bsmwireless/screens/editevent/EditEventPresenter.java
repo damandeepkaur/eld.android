@@ -11,8 +11,6 @@ import com.bsmwireless.screens.common.menu.BaseMenuPresenter;
 import com.bsmwireless.screens.common.menu.BaseMenuView;
 import com.bsmwireless.widgets.alerts.DutyType;
 
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.TimeZone;
