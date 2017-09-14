@@ -5,6 +5,9 @@ import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
 import com.bsmwireless.widgets.alerts.DutyType;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import javax.inject.Inject;
 
 import timber.log.Timber;
@@ -51,5 +54,17 @@ public class DashboardPresenter {
         } else {
             mView.showNotInVehicleDialog();
         }
+    }
+
+    DashboardView.Error validateComment(String comment) {
+        if (comment.length() < 4) {
+            return DashboardView.Error.INVALID_COMMENT_LENGTH;
+        }
+        Pattern pattern = Pattern.compile("[^A-Za-z0-9`!@#$%^&* ()_\\-+=\\[\\]\\\\/?><.,;:'|\"{}~]", Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(comment);
+        if (matcher.find()) {
+            return DashboardView.Error.INVALID_COMMENT;
+        }
+        return DashboardView.Error.VALID_COMMENT;
     }
 }

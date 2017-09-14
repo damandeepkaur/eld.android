@@ -11,6 +11,8 @@ import com.bsmwireless.screens.common.menu.BaseMenuPresenter;
 import com.bsmwireless.screens.common.menu.BaseMenuView;
 import com.bsmwireless.widgets.alerts.DutyType;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.TimeZone;
@@ -148,7 +150,7 @@ public class EditEventPresenter extends BaseMenuPresenter {
         if (comment.length() < 4) {
             return EditEventView.Error.INVALID_COMMENT_LENGTH;
         }
-        Pattern pattern = Pattern.compile("[^A-Za-z0-9 .,:;`?!-_%&()\"'@#$*+]", Pattern.CASE_INSENSITIVE);
+        Pattern pattern = Pattern.compile("[^A-Za-z0-9`!@#$%^&* ()_\\-+=\\[\\]\\\\/?><.,;:'|\"{}~]", Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(comment);
         if (matcher.find()) {
             return EditEventView.Error.INVALID_COMMENT;
