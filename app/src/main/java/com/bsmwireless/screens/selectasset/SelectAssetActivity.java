@@ -1,6 +1,5 @@
 package com.bsmwireless.screens.selectasset;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -14,6 +13,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.FrameLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bsmwireless.common.App;
@@ -54,6 +55,12 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
 
     @BindView(R.id.select_asset_search_view)
     SearchView mSearchView;
+
+    @BindView(R.id.select_asset_progress_bar_container)
+    FrameLayout mSelectAssetProgressBarContainer;
+
+    @BindView(R.id.select_asset_progress_bar)
+    ProgressBar mSelectAssetProgressBar;
 
     @BindView(R.id.select_asset_search_list)
     RecyclerView mSearchRecyclerView;
@@ -138,6 +145,8 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
         mSnackBarLayout
                 .setHideableOnTimeout(SnackBarLayout.DURATION_LONG)
                 .setHideableOnFocusLost(true);
+
+        hideProgress();
 
         mPresenter.onViewCreated();
     }
@@ -277,6 +286,22 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
     @Override
     public void onActionDone() {
         finish();
+    }
+
+    @Override
+    public void showProgress() {
+        if (mSelectAssetProgressBar != null) {
+            mSelectAssetProgressBarContainer.setVisibility(View.VISIBLE);
+            mSelectAssetProgressBar.setIndeterminate(true);
+        }
+    }
+
+    @Override
+    public void hideProgress() {
+        if (mSelectAssetProgressBar != null) {
+            mSelectAssetProgressBarContainer.setVisibility(View.GONE);
+            mSelectAssetProgressBar.setIndeterminate(false);
+        }
     }
 
     @Override
