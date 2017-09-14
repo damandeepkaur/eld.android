@@ -147,6 +147,7 @@ public final class BlackBoxImpl implements BlackBox {
             return true;
         } else if (response.getResponseType() == BlackBoxResponseModel.ResponseType.NACK) {
             Timber.e("readSubscriptionResponse error");
+            closeSocket();
             throw new BlackBoxConnectionException(response.getErrReasonCode());
         }
         return false;
