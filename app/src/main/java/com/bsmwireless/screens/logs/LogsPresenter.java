@@ -321,8 +321,7 @@ public class LogsPresenter implements AccountManager.AccountListener {
         })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(logHeaderModel -> mView.setLogHeader(logHeaderModel),
-                        throwable -> {});
+                .subscribe(logHeaderModel -> mView.setLogHeader(logHeaderModel));
     }
 
     public void onSignLogsheetButtonClicked(CalendarItem calendarItem) {
