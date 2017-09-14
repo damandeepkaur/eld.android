@@ -2,7 +2,6 @@ package com.bsmwireless.data.storage.users;
 
 import android.arch.persistence.room.Embedded;
 import android.arch.persistence.room.Relation;
-import android.content.res.Configuration;
 
 import com.bsmwireless.common.utils.ListConverter;
 import com.bsmwireless.data.storage.carriers.CarrierEntity;
