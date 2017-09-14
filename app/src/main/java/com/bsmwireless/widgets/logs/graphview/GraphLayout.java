@@ -86,7 +86,8 @@ public class GraphLayout extends LinearLayout {
         }
 
         long[] times = DutyTypeManager.getDutyTypeTimes(checkableEvents, startDayTime,
-                endDayTime < currentTime ? endDayTime : currentTime);
+                Math.min(endDayTime, currentTime));
+
 
         hosTimesModel.setSleeperBerthTime(DateUtils.convertTotalTimeInMsToStringTime(times[DutyType.SLEEPER_BERTH.ordinal()]));
         hosTimesModel.setDrivingTime(DateUtils.convertTotalTimeInMsToStringTime(times[DutyType.DRIVING.ordinal()]));

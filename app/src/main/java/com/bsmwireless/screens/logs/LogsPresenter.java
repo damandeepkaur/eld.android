@@ -459,7 +459,7 @@ public class LogsPresenter implements AccountManager.AccountListener {
         List<EventLogModel> logs = new ArrayList<>();
 
         if (!events.isEmpty()) {
-            //convertToDrawableLog to logs model
+            //convert to logs model
             long duration;
             for (int i = 0; i < events.size(); i++) {
                 ELDEvent event = events.get(i);
