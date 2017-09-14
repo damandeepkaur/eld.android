@@ -550,7 +550,7 @@
         <item>14 days</item>
     </string-array>
     <string name="multiday_total_hours">Total hours</string>
-    
+
     <!-- Lock screen -->
     <string name="lock_screen_switch_co_driver_message">You can switch to co-driver view to continue work in application</string>
     <string name="switch_to_co_driver_view">SWITCH TO CO-DRIVER VIEW</string>
@@ -607,5 +607,29 @@
     <string name="switch_driver_error_login_codriver">Co-driver was not logged in</string>
     <string name="switch_driver_login_error">Login error</string>
     <string name="switch_driver_co_driver_view">You are in co-driver view</string>
+
+    <!-- Event type enum parameter coding -->
+    <string name="event_type_off_duty_description">Driver\'s duty status changed to \"Off-duty\"</string>
+    <string name="event_type_sleeper_berth_description">Driver\'s duty status changed to \"Sleeper Berth\"</string>
+    <string name="event_type_driving_description">Driver\'s duty status changed to \"Driving\"</string>
+    <string name="event_type_on_duty_not_driving_description">Driver\'s duty changed to \"On-duty not driving\"</string>
+    <string name="event_type_intermediate_log_conventional_description">Intermediate log with conventional location precision</string>
+    <string name="event_type_intermediate_log_reduced_description">Intermediate log with reduced location precision</string>
+    <string name="event_type_driver_authorized_personal_use_description">Driver indicates \"Authorized Personal Use of CMV\"</string>
+    <string name="event_type_driver_yard_moves_description">Driver indicates \"Yard moves\"</string>
+    <string name="event_type_driver_cleared_description">Driver indication for PC, YM and WT cleared</string>
+    <string name="event_type_driver_certification_daily_record_description">Driver\'s first certification of a daily record</string>
+    <string name="event_type_driver_n_certification_description">Driver\'s n\'th certification of a daily record (when recertification necessary).
+        \"n\" is an integer between 1 and 9. If more than 9 certifications needed, use 9 for each new re-certification record.</string>
+    <string name="event_type_authenticated_driver_login_description">Authenticated driver\'s ELD login activity</string>
+    <string name="event_type_authenticated_driver_logout_description">Authenticated driver\'s ELD logout activity</string>
+    <string name="event_type_engine_power_up_conventional_description">Engine power-up with conventional location precision</string>
+    <string name="event_type_engine_power_up_reduced_description">Engine power-up with reduced location precision</string>
+    <string name="event_type_engine_shut_down_conventional_description">Engine shut down with conventional location precision</string>
+    <string name="event_type_engine_shut_down_reduced_description">Engine shut down reduced location precision</string>
+    <string name="event_type_engine_eld_malfunction_logged_description">An ELD malfunction logged</string>
+    <string name="event_type_engine_eld_malfunction_cleared_description">An ELD malfunction cleared</string>
+    <string name="event_type_diagnostic_logged_description">A data diagnostic event logged</string>
+    <string name="event_type_diagnostic_cleared_description">A data diagnostic event cleared</string>
 
 </resources>
