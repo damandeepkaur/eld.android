@@ -59,9 +59,8 @@ public class LogsPresenter implements AccountManager.AccountListener {
     private String mTimeZone;
     private User mUser;
     private LogHeaderModel mLogHeaderModel;
-    private HOSTimesModel mHOSTimesModel;
     private Map<Integer, Vehicle> mVehicleIdToNameMap = new HashMap<>();
-    private Map<Long, LogSheetHeader> mLogSheetHeadersMap;
+    private Map<Long, LogSheetHeader> mLogSheetHeadersMap = new HashMap<>();
     private Disposable mGetEventsFromDBDisposable;
     private Disposable mGetTimezoneDisposable;
     private Calendar mSelectedDayCalendar;

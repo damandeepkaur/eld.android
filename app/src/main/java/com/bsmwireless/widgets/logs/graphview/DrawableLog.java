@@ -1,13 +1,12 @@
 package com.bsmwireless.widgets.logs.graphview;
 
-import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.screens.logs.dagger.EventLogModel;
 import com.bsmwireless.widgets.alerts.DutyType;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class DrawableLog implements DutyTypeManager.DutyTypeCheckable {
+public class DrawableLog {
     private DutyType mType;
     private long mTime;
     private long mDuration;
@@ -51,14 +50,6 @@ public class DrawableLog implements DutyTypeManager.DutyTypeCheckable {
 
     public Integer getEventCode() {
         return mType.getOriginalCode() - 1;
-    }
-
-    public Boolean isActive() {
-        return true;
-    }
-
-    public Boolean isDutyEvent() {
-        return true;
     }
 
     public Long getEventTime() {

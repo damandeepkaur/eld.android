@@ -3,6 +3,7 @@ ELD app for Android
 
 # Version history
 
+* **1.0.67** - Not show 'helper' midnight event in logs screen (_EA-349_)
 * **1.0.66** - Fix seconds value for manually added event (_EA-308_)
 * **1.0.65** - Unable to show the original duty status
 * **1.0.64** - Fixed remember me enable by default
