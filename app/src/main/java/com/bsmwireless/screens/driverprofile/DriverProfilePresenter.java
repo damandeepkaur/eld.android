@@ -40,6 +40,7 @@ public class DriverProfilePresenter extends BaseMenuPresenter {
     private FullUserEntity mFullUserEntity;
     private List<HomeTerminalEntity> mHomeTerminals;
     private CarrierEntity mCarrier;
+    private List<String> mHOSCycles;
 
     @Inject
     public DriverProfilePresenter(DriverProfileView view, UserInteractor userInteractor,
@@ -59,28 +60,14 @@ public class DriverProfilePresenter extends BaseMenuPresenter {
         Disposable disposable = Single.fromCallable(() -> mUserInteractor.getFullUserSync())
                                       .subscribeOn(Schedulers.io())
                                       .observeOn(AndroidSchedulers.mainThread())
+                                      .doOnSuccess(this::updateHomeTerminalsList)
+                                      .doOnSuccess(this::updateCarrierInfo)
+                                      .doOnSuccess(this::updateHOSCycles)
                                       .subscribe(userEntity -> {
-                                           mFullUserEntity = userEntity;
-                                           mView.setUserInfo(mFullUserEntity.getUserEntity());
-
-                                           mHomeTerminals = mFullUserEntity.getHomeTerminalEntities();
-                                           if (mHomeTerminals != null && mHomeTerminals.size() > 0) {
-                                               Integer selectedHomeTerminalId = mFullUserEntity.getUserEntity().getHomeTermId();
-                                               int position = findHomeTerminalById(mHomeTerminals, selectedHomeTerminalId);
-                                               mView.setHomeTerminalsSpinner(getHomeTerminalNames(mHomeTerminals), position);
-                                           } else {
-                                               mView.setHomeTerminalsSpinner(Collections.emptyList(), 0);
-                                           }
-
-                                           List<CarrierEntity> carriers = mFullUserEntity.getCarriers();
-                                           if (carriers != null && carriers.size() > 0) {
-                                               mCarrier = carriers.get(0);
-                                               mView.setCarrierInfo(mCarrier);
-                                           } else {
-                                               mView.setCarrierInfo(new CarrierEntity());
-                                           }
-                                       },
-                                       throwable -> Timber.e(throwable.getMessage()));
+                                                  mFullUserEntity = userEntity;
+                                                  mView.setUserInfo(mFullUserEntity.getUserEntity());
+                                              },
+                                              throwable -> Timber.e(throwable.getMessage()));
         mDisposables.add(disposable);
     }
 
@@ -181,6 +168,64 @@ public class DriverProfilePresenter extends BaseMenuPresenter {
         }
     }
 
+    public void onChooseHOSCycle(int position) {
+        if (mHOSCycles != null && mHOSCycles.size() > position) {
+            String cycle = mHOSCycles.get(position);
+
+            mFullUserEntity.getUserEntity().setDutyCycle(cycle);
+            String ruleException = mFullUserEntity.getUserEntity().getRuleException();
+
+            Disposable disposable = mUserInteractor.updateDriverRule(ruleException, cycle)
+                                                   .subscribeOn(Schedulers.io())
+                                                   .observeOn(AndroidSchedulers.mainThread())
+                                                   .subscribe(wasUpdated -> {
+                                                       if (!wasUpdated) {
+                                                           mView.showError(DriverProfileView.Error.ERROR_HOS_CYCLE_UPDATE);
+                                                       }
+                                                   }, throwable -> {
+                                                       Timber.e(throwable.getMessage());
+                                                       if (throwable instanceof RetrofitException) {
+                                                           mView.showError((RetrofitException) throwable);
+                                                       }
+                                                   });
+            mDisposables.add(disposable);
+        } else {
+            mView.showError(DriverProfileView.Error.ERROR_TERMINAL_UPDATE);
+        }
+    }
+
+    private void updateHomeTerminalsList(FullUserEntity userEntity) {
+        mHomeTerminals = userEntity.getHomeTerminalEntities();
+        if (mHomeTerminals != null && !mHomeTerminals.isEmpty()) {
+            Integer selectedHomeTerminalId = userEntity.getUserEntity().getHomeTermId();
+            int position = findHomeTerminalById(mHomeTerminals, selectedHomeTerminalId);
+            mView.setHomeTerminalsSpinner(getHomeTerminalNames(mHomeTerminals), position);
+        } else {
+            mView.setHomeTerminalsSpinner(Collections.emptyList(), 0);
+        }
+    }
+
+    private void updateCarrierInfo(FullUserEntity userEntity) {
+        List<CarrierEntity> carriers = userEntity.getCarriers();
+        if (carriers != null && !carriers.isEmpty()) {
+            mCarrier = carriers.get(0);
+            mView.setCarrierInfo(mCarrier);
+        } else {
+            mView.setCarrierInfo(new CarrierEntity());
+        }
+    }
+
+    private void updateHOSCycles(FullUserEntity userEntity) {
+        mHOSCycles = userEntity.getCyclesList();
+        if (mHOSCycles != null && !mHOSCycles.isEmpty()) {
+            String selectedCycle = userEntity.getUserEntity().getDutyCycle();
+            int selectedCycleIndex = findHOSCycleByName(mHOSCycles, selectedCycle);
+            mView.setCycleInfo(mHOSCycles, selectedCycleIndex);
+        } else {
+            mView.setCycleInfo(Collections.emptyList(), 0);
+        }
+    }
+
     private String cropSignature(String signature) {
         if (signature.length() > MAX_SIGNATURE_LENGTH) {
             String croppedSignature = signature.substring(0, MAX_SIGNATURE_LENGTH);
@@ -208,6 +253,20 @@ public class DriverProfilePresenter extends BaseMenuPresenter {
 
         for (int i = 0; i < homeTerminals.size(); i++) {
             if (homeTerminals.get(i).getId().equals(homeTerminalId)) {
+                return i;
+            }
+        }
+
+        return 0;
+    }
+
+    private int findHOSCycleByName(List<String> cycles, String selectedCycle) {
+        if (cycles == null || selectedCycle == null) {
+            return 0;
+        }
+
+        for (int i = 0; i < cycles.size(); i++) {
+            if (cycles.get(i).equals(selectedCycle)) {
                 return i;
             }
         }

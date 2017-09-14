@@ -4,10 +4,13 @@ import android.arch.persistence.room.Embedded;
 import android.arch.persistence.room.Relation;
 import android.content.res.Configuration;
 
+import com.bsmwireless.common.utils.ListConverter;
 import com.bsmwireless.data.storage.carriers.CarrierEntity;
 import com.bsmwireless.data.storage.configurations.ConfigurationEntity;
 import com.bsmwireless.data.storage.hometerminals.HomeTerminalEntity;
+import com.bsmwireless.models.SyncConfiguration;
 
+import java.util.Collections;
 import java.util.List;
 
 public class FullUserEntity {
@@ -55,5 +58,14 @@ public class FullUserEntity {
 
     public void setConfigurationEntities(List<ConfigurationEntity> configurationEntities) {
         mConfigurationEntities = configurationEntities;
+    }
+
+    public List<String> getCyclesList() {
+        for (ConfigurationEntity configuration: mConfigurationEntities) {
+            if (SyncConfiguration.Type.CYCLE.getName().equals(configuration.getName())) {
+                return ListConverter.toStringList(configuration.getValue());
+            }
+        }
+        return Collections.emptyList();
     }
 }
