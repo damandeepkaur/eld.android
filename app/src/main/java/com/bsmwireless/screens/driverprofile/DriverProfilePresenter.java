@@ -229,7 +229,7 @@ public class DriverProfilePresenter extends BaseMenuPresenter {
         mHOSCycles = userEntity.getCyclesList();
         if (mHOSCycles != null && !mHOSCycles.isEmpty()) {
             String selectedCycle = userEntity.getUserEntity().getDutyCycle();
-            int selectedCycleIndex = findHOSCycleByName(mHOSCycles, selectedCycle);
+            int selectedCycleIndex = mHOSCycles.indexOf(selectedCycle);
             mView.setCycleInfo(mHOSCycles, selectedCycleIndex);
         } else {
             mView.setCycleInfo(Collections.emptyList(), 0);
@@ -263,20 +263,6 @@ public class DriverProfilePresenter extends BaseMenuPresenter {
 
         for (int i = 0; i < homeTerminals.size(); i++) {
             if (homeTerminals.get(i).getId().equals(homeTerminalId)) {
-                return i;
-            }
-        }
-
-        return 0;
-    }
-
-    private int findHOSCycleByName(List<String> cycles, String selectedCycle) {
-        if (cycles == null || selectedCycle == null) {
-            return 0;
-        }
-
-        for (int i = 0; i < cycles.size(); i++) {
-            if (cycles.get(i).equals(selectedCycle)) {
                 return i;
             }
         }
