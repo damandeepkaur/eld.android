@@ -5,13 +5,16 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 
+import com.bsmwireless.screens.lockscreen.RetainFragment;
 import com.bsmwireless.services.monitoring.StatusMonitoringService;
 
 import butterknife.Unbinder;
 
 public abstract class BaseActivity extends AppCompatActivity{
+    public static final String RETAIN_FRAGMENT = "RETAIN_FRAGMENT";
     protected Unbinder mUnbinder;
     private boolean mDoBind = true;
     boolean mIsBound = false;
@@ -50,6 +53,18 @@ public abstract class BaseActivity extends AppCompatActivity{
      */
     protected void doBindToService(boolean doBind) {
         this.mDoBind = doBind;
+    }
+
+    protected RetainFragment getRetainFragment(){
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag(RETAIN_FRAGMENT);
+        if (fragment == null) {
+            fragment = RetainFragment.createFragment();
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .add(fragment, RETAIN_FRAGMENT)
+                    .commit();
+        }
+        return (RetainFragment) fragment;
     }
 
     ServiceConnection serviceConnection = new ServiceConnection() {

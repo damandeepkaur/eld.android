@@ -11,6 +11,7 @@ import android.view.WindowManager;
 import com.bsmwireless.common.App;
 import com.bsmwireless.common.Constants;
 import com.bsmwireless.screens.common.BaseActivity;
+import com.bsmwireless.screens.lockscreen.dagger.LockScreenComponent;
 import com.bsmwireless.screens.switchdriver.SwitchDriverDialog;
 import com.bsmwireless.widgets.alerts.DutyType;
 import com.bsmwireless.widgets.dashboard.DutyView;
@@ -25,6 +26,7 @@ import butterknife.OnClick;
 public class LockScreenActivity extends BaseActivity implements LockScreenView {
 
     public static final String PROMT_DIALOG = "PROMT_DIALOG";
+
     @BindView(R.id.dashboard_current)
     DutyView mCurrentDutyView;
 
@@ -38,8 +40,7 @@ public class LockScreenActivity extends BaseActivity implements LockScreenView {
     DutyView mCycleDutyView;
 
     @Inject
-    LockScreenPresenter presenter;
-
+    LockScreenPresenter mPresenter;
 
     public static Intent createIntent(Context context) {
         Intent intent = new Intent(context, LockScreenActivity.class);
@@ -58,26 +59,21 @@ public class LockScreenActivity extends BaseActivity implements LockScreenView {
 
         setContentView(R.layout.activity_lock_screen);
         ButterKnife.bind(this);
-        App.getComponent().lockScreenBuilder()
-                .view(this)
-                .disconnectionTimeout(Constants.LOCK_SCREEN_DISCONNECTION_TIMEOUT_MS)
-                .idleTimeout(Constants.LOCK_SCREEN_IDLE_MONITORING_TIMEOUT_MS)
-                .build()
-                .inject(this);
+        doInject();
         mCurrentDutyView.setCanChangingSatusView(false);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        presenter.onStart();
+        mPresenter.onStart(this);
         setListenersForPromtDialog(false);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        presenter.onStop();
+        mPresenter.onStop();
         setListenersForPromtDialog(true);
     }
 
@@ -146,16 +142,28 @@ public class LockScreenActivity extends BaseActivity implements LockScreenView {
 
     @Override
     public void showDisconnectionPopup() {
-        showPromtDialog(PromtDialog.newInstance(PromtDialog.DialogType.IGNITION_OFF));
+        showPromtDialog(PromtDialog.newInstance(PromtDialog.DialogType.DISCONNECTED));
     }
 
     @OnClick(R.id.switch_co_driver_button)
     void switchCoDriverClick() {
-        presenter.switchCoDriver();
+        mPresenter.switchCoDriver();
+    }
+
+    private void doInject() {
+        RetainFragment retainFragment = getRetainFragment();
+        LockScreenComponent component = retainFragment.getComponent();
+        if (component == null) {
+            component = App.getComponent().lockScreenBuilder()
+                    .disconnectionTimeout(Constants.LOCK_SCREEN_DISCONNECTION_TIMEOUT_MS)
+                    .idleTimeout(Constants.LOCK_SCREEN_IDLE_MONITORING_TIMEOUT_MS)
+                    .build();
+            retainFragment.saveComponent(component);
+        }
+        component.inject(this);
     }
 
     private void showPromtDialog(PromtDialog dialog) {
-        dialog.setCancelable(false);
         dialog.show(getSupportFragmentManager(), PROMT_DIALOG);
     }
 
@@ -175,5 +183,5 @@ public class LockScreenActivity extends BaseActivity implements LockScreenView {
         }
     }
 
-    private PromtDialog.PromtDialogListener mPromtDialogListener = dutyType -> presenter.onDutyTypeSelected(dutyType);
+    private PromtDialog.PromtDialogListener mPromtDialogListener = dutyType -> mPresenter.onDutyTypeSelected(dutyType);
 }

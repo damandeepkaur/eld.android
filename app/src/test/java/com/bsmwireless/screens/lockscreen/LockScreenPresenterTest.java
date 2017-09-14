@@ -1,11 +1,13 @@
 package com.bsmwireless.screens.lockscreen;
 
+import com.bsmwireless.common.utils.BlackBoxSimpleChecker;
 import com.bsmwireless.data.network.blackbox.BlackBox;
 import com.bsmwireless.data.network.blackbox.BlackBoxConnectionManagerImpl;
 import com.bsmwireless.data.network.blackbox.models.BlackBoxResponseModel;
 import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.data.storage.PreferencesManager;
+import com.bsmwireless.domain.interactors.ELDEventsInteractor;
 import com.bsmwireless.models.BlackBoxModel;
 import com.bsmwireless.widgets.alerts.DutyType;
 
@@ -39,17 +41,20 @@ public class LockScreenPresenterTest {
     PreferencesManager preferencesManager;
     @Mock
     AccountManager accountManager;
+    @Mock
+    ELDEventsInteractor eventsInteractor;
 
     LockScreenPresenter presenter;
 
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-        presenter = new LockScreenPresenter(lockScreenView,
+        presenter = new LockScreenPresenter(
                 dutyManager,
-                () -> new BlackBoxConnectionManagerImpl(blackBox),
-                blackBox,
+                new BlackBoxConnectionManagerImpl(blackBox),
                 preferencesManager,
+                new BlackBoxSimpleChecker(),
+                eventsInteractor,
                 TimeUnit.MILLISECONDS.toMillis(1),
                 TimeUnit.MILLISECONDS.toMillis(1),
                 accountManager);
@@ -66,7 +71,7 @@ public class LockScreenPresenterTest {
 
         when(blackBox.getDataObservable()).thenReturn(Observable.empty());
 
-        presenter.onStart();
+        presenter.onStart(lockScreenView);
         verify(lockScreenView).setTimeForDutyType(DutyType.DRIVING, 1L);
         verify(lockScreenView).setTimeForDutyType(DutyType.SLEEPER_BERTH, 2L);
         verify(lockScreenView).setTimeForDutyType(DutyType.ON_DUTY, 3L);
@@ -82,7 +87,7 @@ public class LockScreenPresenterTest {
     @Test
     public void startMonitoring() throws Exception {
         when(blackBox.getDataObservable()).thenReturn(Observable.empty());
-        presenter.onStart();
+        presenter.onStart(lockScreenView);
         verify(lockScreenView).removeAnyPopup();
     }
 
@@ -97,7 +102,7 @@ public class LockScreenPresenterTest {
 
         final BehaviorSubject<BlackBoxModel> subject = BehaviorSubject.create();
         when(blackBox.getDataObservable()).thenReturn(subject);
-        presenter.onStart();
+        presenter.onStart(lockScreenView);
         subject.onNext(stoppedMock);
         subject.onNext(anyMock);
         subject.onComplete();
@@ -113,7 +118,7 @@ public class LockScreenPresenterTest {
 
         final BehaviorSubject<BlackBoxModel> subject = BehaviorSubject.create();
         when(blackBox.getDataObservable()).thenReturn(subject);
-        presenter.onStart();
+        presenter.onStart(lockScreenView);
         verify(lockScreenView).removeAnyPopup();
         subject.onNext(ignitionOffMock);
         verify(lockScreenView).showIgnitionOffDetectedDialog();

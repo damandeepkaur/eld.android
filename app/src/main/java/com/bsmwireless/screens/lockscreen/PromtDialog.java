@@ -123,6 +123,7 @@ public class PromtDialog extends DialogFragment {
     }
 
     void handleClick(DutyType dutyType) {
+        dismiss();
         if (mPromtDialogListener != null) {
             mPromtDialogListener.onDutyStatusSelected(dutyType);
         }
