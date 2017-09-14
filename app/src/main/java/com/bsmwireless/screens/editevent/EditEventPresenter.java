@@ -79,6 +79,7 @@ public class EditEventPresenter extends BaseMenuPresenter {
         mView.openTimePickerDialog((view, hourOfDay, minute) -> {
             mCalendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
             mCalendar.set(Calendar.MINUTE, minute);
+            mCalendar.set(Calendar.SECOND, 0);
             mView.setStartTime(DateUtils.convertTimeToAMPMString(mCalendar.getTimeInMillis(), mTimezone));
         }, hours, minutes);
     }
@@ -101,6 +102,9 @@ public class EditEventPresenter extends BaseMenuPresenter {
 
         if (mELDEvent != null) {
             newEvent = mELDEvent.clone();
+            mELDEvent.setStatus(ELDEvent.StatusCode.INACTIVE_CHANGED.getValue());
+            mELDEvent.setId(null);
+            events.add(mELDEvent);
         } else {
             newEvent = mEventsInteractor.getEvent(type);
         }
