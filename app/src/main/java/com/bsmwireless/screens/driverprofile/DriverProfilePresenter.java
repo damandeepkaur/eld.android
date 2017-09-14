@@ -200,7 +200,7 @@ public class DriverProfilePresenter extends BaseMenuPresenter {
                                                    });
             mDisposables.add(disposable);
         } else {
-            mView.showError(DriverProfileView.Error.ERROR_TERMINAL_UPDATE);
+            mView.showError(DriverProfileView.Error.ERROR_HOS_CYCLE_UPDATE);
         }
     }
 
