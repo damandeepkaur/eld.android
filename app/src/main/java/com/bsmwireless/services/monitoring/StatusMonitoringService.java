@@ -13,12 +13,12 @@ import com.bsmwireless.screens.lockscreen.LockScreenActivity;
 import javax.inject.Inject;
 
 
-public class StatusMonitoringService extends Service implements MonitoringServiceView {
+public final class StatusMonitoringService extends Service implements MonitoringServiceView {
 
-    private final IBinder binder = new LocalBinder();
+    private final IBinder mBinder = new LocalBinder();
 
     @Inject
-    MonitoringServicePresenter presenter;
+    MonitoringServicePresenter mPresenter;
 
     public static Intent createIntent(Context context) {
         return new Intent(context, StatusMonitoringService.class);
@@ -36,19 +36,19 @@ public class StatusMonitoringService extends Service implements MonitoringServic
     @Override
     public void onRebind(Intent intent) {
         super.onRebind(intent);
-        presenter.startMonitoring();
+        mPresenter.startMonitoring();
     }
 
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        presenter.startMonitoring();
-        return binder;
+        mPresenter.startMonitoring();
+        return mBinder;
     }
 
     @Override
     public boolean onUnbind(Intent intent) {
-        presenter.stopMonitoring();
+        mPresenter.stopMonitoring();
         //we want to get onRebuild call when service will be bound again
         return true;
     }

@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.data.network.blackbox.BlackBoxConnectionManager;
 import com.bsmwireless.data.network.blackbox.models.BlackBoxResponseModel;
+import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
 import com.bsmwireless.models.BlackBoxModel;
 import com.bsmwireless.models.BlackBoxSensorState;
@@ -19,18 +20,22 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
+
 @ActivityScope
-public class MalfunctionServicePresenter {
+public final class MalfunctionServicePresenter {
 
     final BlackBoxConnectionManager mBlackBoxConnectionManager;
     final ELDEventsInteractor mELDEventsInteractor;
+    private final DutyTypeManager mDutyTypeManager;
     private final CompositeDisposable mCompositeDisposable;
 
     @Inject
     public MalfunctionServicePresenter(BlackBoxConnectionManager blackBoxConnectionManager,
-                                       ELDEventsInteractor eldEventsInteractor) {
+                                       ELDEventsInteractor eldEventsInteractor,
+                                       DutyTypeManager dutyTypeManager) {
         mBlackBoxConnectionManager = blackBoxConnectionManager;
         mELDEventsInteractor = eldEventsInteractor;
+        mDutyTypeManager = dutyTypeManager;
         mCompositeDisposable = new CompositeDisposable();
     }
 
@@ -50,20 +55,16 @@ public class MalfunctionServicePresenter {
 
     private void startSynchronizationMonitoring() {
 
-        // If database hasn't got an event for diagnostic, return this object with CLEARED flag
-        ELDEvent defaultEvent = new ELDEvent();
-        defaultEvent.setEventCode(ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED.getCode());
-
         Disposable disposable = getBaseObservable()
-                .filter(blackBoxModel -> BlackBoxResponseModel.ResponseType.STATUS_UPDATE == blackBoxModel.getResponseType())
+                .filter(blackBoxModel -> BlackBoxResponseModel.ResponseType.STATUS_UPDATE
+                        == blackBoxModel.getResponseType())
                 .flatMap(blackBoxModel -> mELDEventsInteractor
                                 .getLatestMalfunctionEvent(Malfunction.ENGINE_SYNCHRONIZATION)
-                                .defaultIfEmpty(defaultEvent)
                                 .toObservable(),
                         SynchResult::new
                 )
                 .filter(this::isStateAndEventAreDifferent)
-                .map(synchResult -> createSynchDiagnosticEvent(synchResult.mBlackBoxModel))
+                .map(unused -> createSynchDiagnosticEvent())
                 .flatMap(eldEvent -> mELDEventsInteractor.postNewELDEvent(eldEvent).toObservable())
                 .onErrorReturn(throwable -> {
                     Timber.e(throwable, "Error handle synchronization event");
@@ -96,8 +97,11 @@ public class MalfunctionServicePresenter {
     }
 
     @NonNull
-    private ELDEvent createSynchDiagnosticEvent(BlackBoxModel blackBoxModel) {
-        ELDEvent eldEvent = new ELDEvent();
+    private ELDEvent createSynchDiagnosticEvent() {
+        ELDEvent eldEvent = mELDEventsInteractor.getEvent(mDutyTypeManager.getDutyType());
+        eldEvent.setMalCode(Malfunction.ENGINE_SYNCHRONIZATION);
+        eldEvent.setEventCode(ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED.getCode());
+        eldEvent.setEventType(ELDEvent.EventType.DATA_DIAGNOSTIC.getValue());
         return eldEvent;
     }
 

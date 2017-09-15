@@ -101,8 +101,7 @@ public class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheckable {
         MALFUNCTION_LOGGED(1),
         MALFUNCTION_CLEARED(2),
         DIAGNOSTIC_LOGGED(3),
-        DIAGNOSTIC_CLEARED(4)
-        ;
+        DIAGNOSTIC_CLEARED(4);
         private int mCode;
 
         MalfunctionCode(int code) {

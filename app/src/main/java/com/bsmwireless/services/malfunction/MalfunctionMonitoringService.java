@@ -16,7 +16,7 @@ import javax.inject.Inject;
 public class MalfunctionMonitoringService extends Service {
 
     @Inject
-    MalfunctionServicePresenter presenter;
+    MalfunctionServicePresenter mPresenter;
 
     public static Intent createIntent(Context context) {
         return new Intent(context, MalfunctionMonitoringService.class);
@@ -30,13 +30,13 @@ public class MalfunctionMonitoringService extends Service {
                 .build()
                 .inject(this);
 
-        presenter.onCreate();
+        mPresenter.onCreate();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        presenter.onDestroy();
+        mPresenter.onDestroy();
     }
 
     @Nullable

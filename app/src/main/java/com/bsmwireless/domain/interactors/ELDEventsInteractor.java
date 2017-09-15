@@ -14,8 +14,8 @@ import com.bsmwireless.data.storage.eldevents.ELDEventEntity;
 import com.bsmwireless.data.storage.users.UserDao;
 import com.bsmwireless.models.BlackBoxModel;
 import com.bsmwireless.models.ELDEvent;
-import com.bsmwireless.models.ResponseMessage;
 import com.bsmwireless.models.Malfunction;
+import com.bsmwireless.models.ResponseMessage;
 import com.bsmwireless.widgets.alerts.DutyType;
 
 import java.io.IOException;
@@ -29,9 +29,6 @@ import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Single;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
-import timber.log.Timber;
 
 import static com.bsmwireless.common.Constants.SUCCESS;
 import static com.bsmwireless.common.utils.DateUtils.SEC_IN_HOUR;
