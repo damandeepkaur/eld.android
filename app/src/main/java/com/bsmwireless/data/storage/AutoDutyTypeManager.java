@@ -116,11 +116,10 @@ public class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListener {
 
                 if (mDutyTypeManager.getDutyType() != DutyType.PERSONAL_USE && mDutyTypeManager.getDutyType() != DutyType.YARD_MOVES) {
                     events.add(mEventsInteractor.getEvent(DutyType.DRIVING, null, true));
+                }
 
-                } else if (mDutyTypeManager.getDutyType() == DutyType.PERSONAL_USE) {
-                    if (mListener != null) {
-                        mListener.onAutoDrivingWithoutConfirm();
-                    }
+                if (mListener != null) {
+                    mListener.onAutoDrivingWithoutConfirm();
                 }
                 break;
 
