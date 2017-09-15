@@ -548,6 +548,10 @@
     <string name="duty_indicator">End %s</string>
     <string name="duty_indicator_title">You are currently working in %s mode</string>
 
+    <string name="dashboard_start_ym">Start Yard Moves</string>
+    <string name="dashboard_start_pu">Start Personal Use</string>
+    <string name="dashboard_exemption">Exemption List</string>
+
     <!-- Multiday fragment -->
     <string-array name="multiday_selector">
         <item>7 days</item>

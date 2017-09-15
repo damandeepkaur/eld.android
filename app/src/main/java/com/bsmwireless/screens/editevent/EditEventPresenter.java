@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
@@ -23,6 +22,8 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
+
+import static com.bsmwireless.common.Constants.COMMENT_VALIDATE_PATTERN;
 
 @ActivityScope
 public class EditEventPresenter extends BaseMenuPresenter {
@@ -152,8 +153,7 @@ public class EditEventPresenter extends BaseMenuPresenter {
         if (comment.length() < 4) {
             return EditEventView.Error.INVALID_COMMENT_LENGTH;
         }
-        Pattern pattern = Pattern.compile("[^A-Za-z0-9`!@#$%^&* ()_\\-+=\\[\\]\\\\/?><.,;:'|\"{}~]", Pattern.CASE_INSENSITIVE);
-        Matcher matcher = pattern.matcher(comment);
+        Matcher matcher = COMMENT_VALIDATE_PATTERN.matcher(comment);
         if (matcher.find()) {
             return EditEventView.Error.INVALID_COMMENT;
         }

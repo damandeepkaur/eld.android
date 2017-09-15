@@ -6,7 +6,6 @@ import android.graphics.Color;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.CardView;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -60,12 +59,5 @@ public class StatusView extends CardView {
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         mUnbinder.unbind();
-    }
-
-    @Override
-    public void setEnabled(boolean enabled) {
-        Log.i("test", "set enabled " + enabled);
-        super.setEnabled(enabled);
-        setAlpha(enabled ? 1.0f : 0.2f);
     }
 }

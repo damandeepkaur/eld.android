@@ -6,11 +6,12 @@ import com.bsmwireless.domain.interactors.ELDEventsInteractor;
 import com.bsmwireless.widgets.alerts.DutyType;
 
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
 import timber.log.Timber;
+
+import static com.bsmwireless.common.Constants.COMMENT_VALIDATE_PATTERN;
 
 @ActivityScope
 public class DashboardPresenter {
@@ -60,8 +61,7 @@ public class DashboardPresenter {
         if (comment.length() < 4) {
             return DashboardView.Error.INVALID_COMMENT_LENGTH;
         }
-        Pattern pattern = Pattern.compile("[^A-Za-z0-9`!@#$%^&* ()_\\-+=\\[\\]\\\\/?><.,;:'|\"{}~]", Pattern.CASE_INSENSITIVE);
-        Matcher matcher = pattern.matcher(comment);
+        Matcher matcher = COMMENT_VALIDATE_PATTERN.matcher(comment);
         if (matcher.find()) {
             return DashboardView.Error.INVALID_COMMENT;
         }

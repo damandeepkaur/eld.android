@@ -34,7 +34,7 @@
                 android:layout_height="match_parent"
                 app:sv_color="@color/onduty_light"
                 app:sv_line_enabled="true"
-                app:sv_text="Start Yard Moves"/>
+                app:sv_text="@string/dashboard_start_ym"/>
 
             <com.bsmwireless.widgets.dashboard.StatusView
                 android:id="@+id/dashboard_pu_status"
@@ -44,7 +44,7 @@
                 android:layout_height="match_parent"
                 app:sv_color="@color/offduty_light"
                 app:sv_line_enabled="true"
-                app:sv_text="Start Personal Use"/>
+                app:sv_text="@string/dashboard_start_pu"/>
 
             <com.bsmwireless.widgets.dashboard.StatusView
                 android:id="@+id/dashboard_exception"
@@ -53,7 +53,7 @@
                 android:layout_margin="@dimen/margin_extra_small"
                 android:layout_height="match_parent"
                 app:sv_color="@color/offduty_light"
-                app:sv_text="Exemption List"
+                app:sv_text="@string/dashboard_exemption"
                 app:sv_background_color="@color/divider_color"/>
 
         </LinearLayout>
