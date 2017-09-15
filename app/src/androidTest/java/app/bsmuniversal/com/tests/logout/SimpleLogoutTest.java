@@ -39,7 +39,7 @@ public class SimpleLogoutTest extends BaseTestClass {
         assert_activity_shown(LoginActivity.class.getName(), 1);
         assert_text_not_exist(Users.getUserOne().getUsername());
         assert_text_not_exist(Users.getUserOne().getPassword());
-        assert_checked(LoginLocators.switch_button, true);
+        assert_checked(LoginLocators.switch_button, false);
     }
 
     @Test

@@ -1,7 +1,6 @@
 package app.bsmuniversal.com.tests.selectasset;
 
 import android.support.test.espresso.intent.rule.IntentsTestRule;
-import android.support.test.filters.Suppress;
 import android.support.test.rule.ActivityTestRule;
 
 import com.bsmwireless.screens.login.LoginActivity;
@@ -24,7 +23,6 @@ import app.bsmuniversal.com.utils.Users;
 /**
  * TA class to verify select asset screen implementation
  */
-@Suppress
 public class SelectAssetTest extends BaseTestClass {
 
     @Rule
