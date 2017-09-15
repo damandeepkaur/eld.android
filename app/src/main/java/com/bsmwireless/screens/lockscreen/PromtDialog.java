@@ -101,12 +101,12 @@ public class PromtDialog extends DialogFragment {
                 DutyType.ON_DUTY, getString(R.string.lock_screen_promt_dialog_on_duty));
         linearLayout.addView(onDuty);
         View offDuty = createButton(linearLayout,
-                DutyType.OFF_DUTY, getString(R.string.lock_screen_promt_dialog_on_duty));
+                DutyType.OFF_DUTY, getString(R.string.lock_screen_promt_dialog_off_duty));
         linearLayout.addView(offDuty);
 
         if (dialogType == DialogType.DISCONNECTED) {
             View driving = createButton(linearLayout,
-                    DutyType.DRIVING, getString(R.string.lock_screen_promt_dialog_on_duty));
+                    DutyType.DRIVING, getString(R.string.lock_screen_promt_dialog_driving));
             linearLayout.addView(driving);
         }
 

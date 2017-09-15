@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import com.bsmwireless.common.App;
 import com.bsmwireless.common.Constants;
@@ -164,6 +165,7 @@ public class LockScreenActivity extends BaseActivity implements LockScreenView {
     }
 
     private void showPromtDialog(PromtDialog dialog) {
+        dialog.setPromtDialogListener(mPromtDialogListener);
         dialog.show(getSupportFragmentManager(), PROMT_DIALOG);
     }
 
