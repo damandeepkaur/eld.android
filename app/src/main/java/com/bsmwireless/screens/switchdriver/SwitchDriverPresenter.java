@@ -39,7 +39,7 @@ public class SwitchDriverPresenter {
     private ELDEventsInteractor mELDEventsInteractor;
     private UserInteractor mUserInteractor;
     private AccountManager mAccountManager;
-    private BlackBoxConnectionManager blackBox;
+    private BlackBoxConnectionManager mBlackBox;
 
     private Disposable mGetUsernameDisposable;
     private Disposable mGetCoDriversDisposable;
@@ -55,7 +55,7 @@ public class SwitchDriverPresenter {
         mELDEventsInteractor = eventsInteractor;
         mUserInteractor = userInteractor;
         mAccountManager = accountManager;
-        this.blackBox = blackBox;
+        mBlackBox = blackBox;
         mGetUsernameDisposable = Disposables.disposed();
         mGetCoDriversDisposable = Disposables.disposed();
         mLoginDisposable = Disposables.disposed();
@@ -201,7 +201,7 @@ public class SwitchDriverPresenter {
         defaultModel.setResponseType(BlackBoxResponseModel.ResponseType.NONE);
 
         mView.createLoadingDialog();
-        Disposable disposable = blackBox.getDataObservable()
+        Disposable disposable = mBlackBox.getDataObservable()
                 .firstOrError()
                 .timeout(GETTING_BLACKBOX_MODEL_TIMEOUT, TimeUnit.SECONDS)
                 .subscribeOn(Schedulers.io())

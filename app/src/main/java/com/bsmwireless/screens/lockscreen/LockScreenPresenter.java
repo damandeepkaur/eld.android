@@ -46,7 +46,7 @@ public class LockScreenPresenter {
     private final long mIdlingTimeoutMillis;
     private final AccountManager mAccountManager;
     private final AtomicReference<Completable> mReconnectionReference;
-    private Disposable idlingTDisposable;
+    private Disposable mIdlingTDisposable;
     private volatile BlackBoxResponseModel.ResponseType mCurrentResponseType;
 
     @Inject
@@ -68,7 +68,7 @@ public class LockScreenPresenter {
         this.mAccountManager = accountManager;
         mCompositeDisposable = new CompositeDisposable();
         mReconnectionReference = new AtomicReference<>();
-        idlingTDisposable = Disposables.disposed();
+        mIdlingTDisposable = Disposables.disposed();
         mCurrentResponseType = BlackBoxResponseModel.ResponseType.NONE;
     }
 
@@ -167,7 +167,7 @@ public class LockScreenPresenter {
     }
 
     void handleIgnitionOff() {
-        idlingTDisposable.dispose();
+        mIdlingTDisposable.dispose();
         Disposable disposable = createPostNewEventCompletable(mEventsInteractor.getEvent(DutyType.ON_DUTY))
                 .subscribe(() -> {
                     if (mView != null) {
@@ -179,12 +179,12 @@ public class LockScreenPresenter {
 
     void handleStopped() {
 
-        if (!idlingTDisposable.isDisposed()) {
+        if (!mIdlingTDisposable.isDisposed()) {
             //already running
             return;
         }
 
-        idlingTDisposable = Completable.timer(mIdlingTimeoutMillis, TimeUnit.MILLISECONDS)
+        mIdlingTDisposable = Completable.timer(mIdlingTimeoutMillis, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(mView::closeLockScreen);
@@ -199,11 +199,11 @@ public class LockScreenPresenter {
                     }
                 });
         mCompositeDisposable.add(disposable);
-        idlingTDisposable.dispose();
+        mIdlingTDisposable.dispose();
     }
 
     void handleDisconnection() {
-        idlingTDisposable.dispose();
+        mIdlingTDisposable.dispose();
         ELDEvent event = mEventsInteractor.getEvent(DutyType.ON_DUTY);
         startReconnection(event);
     }

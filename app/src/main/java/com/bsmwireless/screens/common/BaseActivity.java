@@ -14,7 +14,7 @@ import com.bsmwireless.services.monitoring.StatusMonitoringService;
 import butterknife.Unbinder;
 
 public abstract class BaseActivity extends AppCompatActivity{
-    public static final String RETAIN_FRAGMENT = "RETAIN_FRAGMENT";
+    private static final String RETAIN_FRAGMENT = "RETAIN_FRAGMENT";
     protected Unbinder mUnbinder;
     private boolean mDoBind = true;
     boolean mIsBound = false;
