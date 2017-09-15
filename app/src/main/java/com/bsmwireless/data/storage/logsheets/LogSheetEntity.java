@@ -14,9 +14,16 @@ import com.google.gson.annotations.SerializedName;
 
 @Entity(tableName = "log_sheet_header")
 public class LogSheetEntity {
+    public enum SyncType {
+        SYNC,
+        UNSYNC
+    }
+
     @PrimaryKey
     @ColumnInfo(name = "log_day")
     private Long mLogDay;
+    @ColumnInfo(name = "sync")
+    private Integer mSync;
     @ColumnInfo(name = "driver_id")
     private Integer mDriverId;
     @ColumnInfo(name = "vehicle_id")
@@ -48,6 +55,14 @@ public class LogSheetEntity {
 
     public void setLogDay(Long logDay) {
         mLogDay = logDay;
+    }
+
+    public Integer getSync() {
+        return mSync;
+    }
+
+    public void setSync(Integer sync) {
+        mSync = sync;
     }
 
     public Integer getDriverId() {

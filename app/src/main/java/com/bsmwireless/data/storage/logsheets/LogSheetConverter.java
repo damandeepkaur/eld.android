@@ -4,6 +4,7 @@ import com.bsmwireless.data.storage.hometerminals.HomeTerminalConverter;
 import com.bsmwireless.models.LogSheetHeader;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class LogSheetConverter {
@@ -30,11 +31,12 @@ public class LogSheetConverter {
         return model;
     }
 
-    public static LogSheetEntity toEntity(LogSheetHeader model) {
+    public static LogSheetEntity toEntity(LogSheetHeader model, LogSheetEntity.SyncType sync) {
         LogSheetEntity entity = null;
 
         if (model != null) {
             entity = new LogSheetEntity();
+            entity.setSync(sync.ordinal());
             entity.setDriverId(model.getDriverId());
             entity.setLogDay(model.getLogDay());
             entity.setVehicleId(model.getVehicleId());
@@ -53,8 +55,12 @@ public class LogSheetConverter {
         return entity;
     }
 
+    public static LogSheetEntity toEntity(LogSheetHeader model) {
+        return toEntity(model, LogSheetEntity.SyncType.SYNC);
+    }
+
     public static List<LogSheetHeader> toModelList(List<LogSheetEntity> entities) {
-        List<LogSheetHeader> logSheetHeaders = null;
+        List<LogSheetHeader> logSheetHeaders = Collections.EMPTY_LIST;
         if (entities != null) {
             logSheetHeaders = new ArrayList<>(entities.size());
             for (LogSheetEntity entity : entities) {
@@ -65,11 +71,22 @@ public class LogSheetConverter {
     }
 
     public static List<LogSheetEntity> toEntityList(List<LogSheetHeader> models) {
-        List<LogSheetEntity> entities = null;
+        List<LogSheetEntity> entities = Collections.EMPTY_LIST;
         if (models != null) {
             entities = new ArrayList<>(models.size());
             for (LogSheetHeader model : models) {
                 entities.add(toEntity(model));
+            }
+        }
+        return entities;
+    }
+
+    public static List<LogSheetEntity> toEntityList(List<LogSheetHeader> models, LogSheetEntity.SyncType syncType) {
+        List<LogSheetEntity> entities = Collections.EMPTY_LIST;
+        if (models != null) {
+            entities = new ArrayList<>(models.size());
+            for (LogSheetHeader model : models) {
+                entities.add(toEntity(model, syncType));
             }
         }
         return entities;

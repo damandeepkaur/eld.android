@@ -270,7 +270,7 @@ public class LogsPresenter implements AccountManager.AccountListener {
                 }
                 model.setTrailers(mSelectedLogHeader.getTrailerIds());
 
-                if(mSelectedLogHeader.getHomeTerminal() != null) {
+                if (mSelectedLogHeader.getHomeTerminal() != null) {
                     model.setHomeTerminalAddress(mSelectedLogHeader.getHomeTerminal().getAddress());
                     model.setHomeTerminalName(mSelectedLogHeader.getHomeTerminal().getName());
                 }
@@ -297,31 +297,9 @@ public class LogsPresenter implements AccountManager.AccountListener {
 
     public void onSignLogsheetButtonClicked(CalendarItem calendarItem) {
         LogSheetHeader logSheetHeader = calendarItem.getAssociatedLogSheet();
-        if (logSheetHeader == null) {
-            //create log sheet header if not exist
-            long logDay = DateUtils.convertTimeToDayNumber(mTimeZone, calendarItem.getCalendar().getTimeInMillis());
-            mDisposables.add(mLogSheetInteractor.createLogSheetHeader(logDay)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(logSheet -> onSignLogsheet(logSheet),
-                            throwable -> {
-                                Timber.e(throwable.getMessage());
-                                if (throwable instanceof RetrofitException) {
-                                    mView.showError((RetrofitException) throwable);
-                                }
-                            }
-                    ));
-        } else {
-            onSignLogsheet(logSheetHeader);
-        }
-    }
-
-    private void onSignLogsheet(LogSheetHeader logSheetHeader) {
         logSheetHeader.setSigned(true);
-        ELDEvent event = createCertEvent(logSheetHeader);
-        mDisposables.add(mELDEventsInteractor.postNewELDEvent(event)
+        mLogSheetInteractor.updateLogSheetHeader(logSheetHeader)
                 .subscribeOn(Schedulers.io())
-                .flatMap(isCreated -> mLogSheetInteractor.updateLogSheetHeader(logSheetHeader))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         response -> {
@@ -335,7 +313,7 @@ public class LogsPresenter implements AccountManager.AccountListener {
                                 mView.showError((RetrofitException) throwable);
                             }
                         }
-                ));
+                );
     }
 
     public void onEditEventClicked(EventLogModel event) {
@@ -419,7 +397,8 @@ public class LogsPresenter implements AccountManager.AccountListener {
         }
 
         mDisposables.add(mLogSheetInteractor.updateLogSheetHeader(mSelectedLogHeader)
-                .flatMap(isLogSheetUpdated -> mUserInteractor.updateDriverRule(logHeaderModel.getSelectedExemptions(), mUser.getDutyCycle()))
+                .flatMapSingle(isLogSheetUpdated -> mUserInteractor.updateDriverRule(
+                        logHeaderModel.getSelectedExemptions(), mUser.getDutyCycle()))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(result -> {
@@ -448,6 +427,7 @@ public class LogsPresenter implements AccountManager.AccountListener {
         event.setOrigin(ELDEvent.EventOrigin.DRIVER.getValue());
         event.setEventType(ELDEvent.EventType.CERTIFICATION_OF_RECORDS.getValue());
         event.setEventCode(1);
+        event.setLogSheet(logSheetHeader.getLogDay());
         event.setDriverId(logSheetHeader.getDriverId());
         event.setVehicleId(logSheetHeader.getVehicleId());
         event.setEventTime(certDay);

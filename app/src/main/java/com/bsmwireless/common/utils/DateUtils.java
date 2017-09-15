@@ -184,6 +184,30 @@ public class DateUtils {
     }
 
     /**
+     * @param timeZone user timezone object"
+     * @param time unix time in ms
+     * @return long with format time like 20170708
+     */
+    public static long convertTimeToDayNumber(TimeZone timeZone, long time) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeZone(timeZone);
+        calendar.setTimeInMillis(time);
+        String todayDate = dateFormat.format(calendar.getTime());
+        return Long.parseLong(todayDate);
+    }
+
+    /**
+     * @param daysAgo days ago
+     * @return long with format time like 20170708
+     */
+    public static long getLogDayForDaysAgo(int daysAgo) {
+        Calendar calendar = Calendar.getInstance();
+        return DateUtils.convertTimeToDayNumber(calendar.getTimeZone(), calendar.getTimeInMillis()
+                - MS_IN_DAY * daysAgo);
+    }
+
+    /**
      * @param logday long with format time like 20170708
      * @return long unix time in ms
      */
