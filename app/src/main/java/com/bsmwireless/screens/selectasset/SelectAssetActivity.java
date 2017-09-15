@@ -301,8 +301,8 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
             mSelectAssetProgressBarContainer.setVisibility(View.VISIBLE);
             mSelectAssetProgressBar.setIndeterminate(true);
 
-            mSearchRecyclerView.setEnabled(false);
-            mLastRecyclerView.setEnabled(false);
+            mSearchRecyclerView.setVisibility(View.GONE);
+            mLastRecyclerView.setVisibility(View.GONE);
 
             mSelectAssetScanQrCodeButton.setEnabled(false);
             mSelectAssetNotInVehicleButton.setEnabled(false);
@@ -315,8 +315,8 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
             mSelectAssetProgressBarContainer.setVisibility(View.GONE);
             mSelectAssetProgressBar.setIndeterminate(false);
 
-            mSearchRecyclerView.setEnabled(true);
-            mLastRecyclerView.setEnabled(true);
+            mSearchRecyclerView.setVisibility(View.VISIBLE);
+            mLastRecyclerView.setVisibility(View.VISIBLE);
 
             mSelectAssetScanQrCodeButton.setEnabled(true);
             mSelectAssetNotInVehicleButton.setEnabled(true);
