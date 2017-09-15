@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
@@ -15,39 +16,84 @@
 
         <include layout="@layout/layout_dashboard"/>
 
+        <LinearLayout
+            android:id="@+id/dashboard_status_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/margin_extra_small"
+            android:layout_marginStart="@dimen/margin_extra_small"
+            android:layout_marginRight="@dimen/margin_extra_small"
+            android:layout_marginEnd="@dimen/margin_extra_small"
+            android:orientation="horizontal">
+
+            <com.bsmwireless.widgets.dashboard.StatusView
+                android:id="@+id/dashboard_ym_status"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_margin="@dimen/margin_extra_small"
+                android:layout_height="match_parent"
+                app:sv_color="@color/onduty_light"
+                app:sv_line_enabled="true"
+                app:sv_text="@string/dashboard_start_ym"/>
+
+            <com.bsmwireless.widgets.dashboard.StatusView
+                android:id="@+id/dashboard_pu_status"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_margin="@dimen/margin_extra_small"
+                android:layout_height="match_parent"
+                app:sv_color="@color/offduty_light"
+                app:sv_line_enabled="true"
+                app:sv_text="@string/dashboard_start_pu"/>
+
+            <com.bsmwireless.widgets.dashboard.StatusView
+                android:id="@+id/dashboard_exception"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_margin="@dimen/margin_extra_small"
+                android:layout_height="match_parent"
+                app:sv_color="@color/offduty_light"
+                app:sv_text="@string/dashboard_exemption"
+                app:sv_background_color="@color/divider_color"/>
+
+        </LinearLayout>
+
         <android.support.v7.widget.CardView
             android:id="@+id/dashboard_indicator_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/margin_small">
+            android:layout_marginLeft="@dimen/margin_small"
+            android:layout_marginStart="@dimen/margin_small"
+            android:layout_marginRight="@dimen/margin_small"
+            android:layout_marginEnd="@dimen/margin_small"
+            android:layout_marginTop="@dimen/margin_extra_small"
+            android:layout_marginBottom="@dimen/margin_extra_small">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/dashboard_indicator"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"
-                    android:padding="@dimen/default_margin"
-                    android:gravity="center"
-                    android:textAllCaps="true"
-                    android:textColor="@android:color/white"
-                    tools:text="Change to on duty"/>
+                android:layout_margin="@dimen/margin_small"
+                android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/dashboard_indicator_title"
-                    android:layout_width="0dp"
-                    android:layout_weight="2"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="@dimen/default_margin"
-                    android:gravity="start"
-                    android:drawablePadding="@dimen/default_margin"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="@dimen/default_margin"
+                    android:drawablePadding="@dimen/margin_small"
                     android:drawableLeft="@drawable/ic_info"
                     android:drawableStart="@drawable/ic_info"
                     tools:text="You are currently working in Yard Movement mode"/>
+
+                <android.support.v7.widget.AppCompatButton
+                    android:id="@+id/dashboard_indicator"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:textColor="@android:color/white"
+                    tools:text="End yard moves"
+                    tools:backgroundTint="@color/onduty_light"/>
 
             </LinearLayout>
 
