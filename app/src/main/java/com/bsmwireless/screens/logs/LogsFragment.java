@@ -4,12 +4,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.bsmwireless.common.App;
 import com.bsmwireless.common.utils.NetworkUtils;
@@ -18,12 +16,14 @@ import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.LogSheetHeader;
 import com.bsmwireless.screens.common.BaseFragment;
 import com.bsmwireless.screens.editevent.EditEventActivity;
+import com.bsmwireless.screens.editlogheader.EditLogHeaderActivity;
 import com.bsmwireless.screens.logs.LogsAdapter.OnLogsStateChangeListener;
 import com.bsmwireless.screens.logs.dagger.DaggerLogsComponent;
 import com.bsmwireless.screens.logs.dagger.EventLogModel;
 import com.bsmwireless.screens.logs.dagger.LogsModule;
 import com.bsmwireless.screens.navigation.NavigateView;
 import com.bsmwireless.widgets.logs.LogsTitleView;
+import com.bsmwireless.widgets.logs.WrapLinearLayoutManager;
 import com.bsmwireless.widgets.logs.calendar.CalendarItem;
 import com.bsmwireless.widgets.snackbar.SnackBarLayout;
 
@@ -40,11 +40,14 @@ import static android.app.Activity.RESULT_OK;
 import static com.bsmwireless.screens.editevent.EditEventActivity.DAY_TIME_EXTRA;
 import static com.bsmwireless.screens.editevent.EditEventActivity.NEW_ELD_EVENT_EXTRA;
 import static com.bsmwireless.screens.editevent.EditEventActivity.OLD_ELD_EVENT_EXTRA;
+import static com.bsmwireless.screens.editlogheader.EditLogHeaderActivity.NEW_LOG_HEADER_EXTRA;
+import static com.bsmwireless.screens.editlogheader.EditLogHeaderActivity.OLD_LOG_HEADER_EXTRA;
 
 public class LogsFragment extends BaseFragment implements LogsView {
 
     private static final int REQUEST_CODE_EDIT_EVENT = 101;
     private static final int REQUEST_CODE_ADD_EVENT = 102;
+    private static final int REQUEST_CODE_EDIT_LOG_HEADER = 103;
 
     @Inject
     LogsPresenter mPresenter;
@@ -98,7 +101,7 @@ public class LogsFragment extends BaseFragment implements LogsView {
         });
 
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
-        recyclerView.setLayoutManager(new LinearLayoutManager(mContext));
+        recyclerView.setLayoutManager(new WrapLinearLayoutManager(mContext));
         recyclerView.setAdapter(mAdapter);
 
         mPresenter.onViewCreated();
@@ -130,7 +133,7 @@ public class LogsFragment extends BaseFragment implements LogsView {
                 mNavigateView.getSnackBar()
                              .setOnReadyListener(snackBar ->
                                      snackBar.reset()
-                                             .setPositiveLabel(mContext.getString(R.string.edit), v -> mPresenter.onEditTripInfoClicked()))
+                                             .setPositiveLabel(mContext.getString(R.string.edit), v -> mPresenter.onEditLogHeaderClicked()))
                              .showSnackbar();
                 break;
         }
@@ -138,20 +141,18 @@ public class LogsFragment extends BaseFragment implements LogsView {
 
     public void showNotificationSnackBar(String message) {
         mNavigateView.getSnackBar()
-                     .setOnReadyListener(snackBar -> {
-                         snackBar.reset()
-                                 .setMessage(message)
-                                 .setHideableOnTimeout(SnackBarLayout.DURATION_LONG)
-                                 .setOnCloseListener(new SnackBarLayout.OnCloseListener() {
-                                     @Override
-                                     public void onClose(SnackBarLayout snackBar) {
-                                         showSnackBar();
-                                     }
+                     .setOnReadyListener(snackBar -> snackBar.reset()
+                             .setMessage(message)
+                             .setHideableOnTimeout(SnackBarLayout.DURATION_LONG)
+                             .setOnCloseListener(new SnackBarLayout.OnCloseListener() {
+                                 @Override
+                                 public void onClose(SnackBarLayout snackBar) {
+                                     showSnackBar();
+                                 }
 
-                                     @Override
-                                     public void onOpen(SnackBarLayout snackBar) {}
-                                 });
-                     })
+                                 @Override
+                                 public void onOpen(SnackBarLayout snackBar) {}
+                             }))
                      .showSnackbar();
     }
 
@@ -180,7 +181,7 @@ public class LogsFragment extends BaseFragment implements LogsView {
 
     @Override
     public void setLogHeader(LogHeaderModel logHeader) {
-        mAdapter.setLogHeaderInfo(logHeader);
+        mAdapter.setLogHeader(logHeader);
     }
 
     @Override
@@ -203,9 +204,10 @@ public class LogsFragment extends BaseFragment implements LogsView {
     }
 
     @Override
-    public void goToEditTripInfoScreen() {
-        //TODO: go to edit trip info screen
-        Toast.makeText(mContext, "Go to edit trip info screen", Toast.LENGTH_SHORT).show();
+    public void goToEditLogHeaderScreen(LogHeaderModel logHeaderModel) {
+        Intent intent = new Intent(mContext, EditLogHeaderActivity.class);
+        intent.putExtra(OLD_LOG_HEADER_EXTRA, logHeaderModel);
+        startActivityForResult(intent, REQUEST_CODE_EDIT_LOG_HEADER);
     }
 
     @Override
@@ -254,6 +256,13 @@ public class LogsFragment extends BaseFragment implements LogsView {
                 if (resultCode == RESULT_OK) {
                     List<ELDEvent> updatedEvents = data.getParcelableArrayListExtra(NEW_ELD_EVENT_EXTRA);
                     mPresenter.onEventChanged(updatedEvents);
+                }
+                break;
+            }
+            case REQUEST_CODE_EDIT_LOG_HEADER: {
+                if (resultCode == RESULT_OK) {
+                    LogHeaderModel logHeaderModel = data.getParcelableExtra(NEW_LOG_HEADER_EXTRA);
+                    mPresenter.onLogHeaderChanged(logHeaderModel);
                 }
                 break;
             }

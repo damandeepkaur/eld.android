@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import com.bsmwireless.common.Constants;
 import com.bsmwireless.data.network.ErrorHandlingFactory;
 import com.bsmwireless.data.network.HttpClientManager;
+import com.bsmwireless.data.network.NtpClientManager;
 import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.network.authenticator.TokenManager;
 import com.bsmwireless.data.storage.AccountManager;
@@ -24,6 +25,7 @@ import okhttp3.CookieJar;
 import okhttp3.HttpUrl;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 import static okhttp3.logging.HttpLoggingInterceptor.Level.BODY;
@@ -73,7 +75,7 @@ public class NetworkModule {
                 .client(clientManager.getClient())
                 .baseUrl(Constants.BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
-                .addCallAdapterFactory(ErrorHandlingFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build();
     }
 
@@ -81,5 +83,11 @@ public class NetworkModule {
     @Singleton
     ServiceApi provideServiceApi(Retrofit retrofit) {
         return retrofit.create(ServiceApi.class);
+    }
+
+    @Provides
+    @Singleton
+    public NtpClientManager provideNtpClientManager() {
+        return new NtpClientManager();
     }
 }

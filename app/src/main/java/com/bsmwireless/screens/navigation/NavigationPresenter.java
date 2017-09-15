@@ -30,7 +30,7 @@ import io.reactivex.disposables.Disposables;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
-public class NavigationPresenter extends BaseMenuPresenter implements AccountManager.AccountListener {
+public class NavigationPresenter extends BaseMenuPresenter {
 
     private NavigateView mView;
     private VehiclesInteractor mVehiclesInteractor;
@@ -75,7 +75,6 @@ public class NavigationPresenter extends BaseMenuPresenter implements AccountMan
     @Override
     public void onDestroy() {
         mResetTimeDisposable.dispose();
-        mAccountManager.removeListener(this);
         mSyncEventsInteractor.stopSync();
         mAutoDutyTypeManager.removeListener();
         super.onDestroy();
@@ -105,7 +104,6 @@ public class NavigationPresenter extends BaseMenuPresenter implements AccountMan
     }
 
     public void onViewCreated() {
-        mAccountManager.addListener(this);
         mDisposables.add(mUserInteractor.getFullDriverName()
                                         .subscribeOn(Schedulers.io())
                                         .observeOn(AndroidSchedulers.mainThread())
@@ -231,20 +229,13 @@ public class NavigationPresenter extends BaseMenuPresenter implements AccountMan
 
     @Override
     public void onUserChanged() {
+        super.onUserChanged();
         onResetTime();
-        if (!mAccountManager.isCurrentUserDriver()) {
-            Disposable disposable = Single.fromCallable(() -> mUserInteractor.getFullUserNameSync())
-                                          .subscribeOn(Schedulers.io())
-                                          .observeOn(AndroidSchedulers.mainThread())
-                                          .subscribe(name -> mView.onCoDriverViewStart(name));
-            mDisposables.add(disposable);
-        } else {
-            mView.onCoDriverViewEnd();
-        }
     }
 
     @Override
     public void onDriverChanged() {
+        super.onDriverChanged();
         Disposable disposable = Single.fromCallable(() -> mUserInteractor.getFullDriverNameSync())
                                       .subscribeOn(Schedulers.io())
                                       .observeOn(AndroidSchedulers.mainThread())

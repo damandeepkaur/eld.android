@@ -32,9 +32,9 @@ import io.reactivex.subjects.PublishSubject;
 
 public class DriverSignView extends View implements View.OnTouchListener {
 
-    private static final int LINE_WIDTH_DP = 12;
-    private static final int BORDER_WIDTH_DP = 4;
-    private static final int DOTTED_LINE_WIDTH_DP = 20;
+    private static final int LINE_WIDTH_DP = 2;
+    private static final int BORDER_WIDTH_DP = 1;
+    private static final int DOTTED_LINE_WIDTH_DP = 4;
 
     private Paint mPaint;
     private Paint mBorderPaint;
@@ -74,7 +74,7 @@ public class DriverSignView extends View implements View.OnTouchListener {
         mPaint.setAntiAlias(true);
         mPaint.setColor(Color.BLACK);
         mPaint.setStyle(Paint.Style.STROKE);
-        mPaint.setStrokeWidth(ViewUtils.convertPixelsToDp(LINE_WIDTH_DP, context));
+        mPaint.setStrokeWidth(ViewUtils.convertDpToPixels(LINE_WIDTH_DP, context));
         mPaint.setStrokeCap(Paint.Cap.ROUND);
         mPaint.setStrokeJoin(Paint.Join.ROUND);
         mPaint.setFilterBitmap(true);
@@ -83,7 +83,7 @@ public class DriverSignView extends View implements View.OnTouchListener {
         mBorderPaint.setAntiAlias(true);
         mBorderPaint.setColor(ContextCompat.getColor(context, R.color.signature_border));
         mBorderPaint.setStyle(Paint.Style.STROKE);
-        mBorderPaint.setStrokeWidth(ViewUtils.convertPixelsToDp(BORDER_WIDTH_DP, context));
+        mBorderPaint.setStrokeWidth(ViewUtils.convertDpToPixels(BORDER_WIDTH_DP, context));
 
         mDisposables = new CompositeDisposable();
     }
@@ -215,7 +215,11 @@ public class DriverSignView extends View implements View.OnTouchListener {
         canvas.drawLine(mWidth, mHeight, mWidth, 0, mBorderPaint);
         canvas.drawLine(mWidth, mHeight, 0, mHeight, mBorderPaint);
 
-        mBorderPaint.setPathEffect(new DashPathEffect(new float[] { ViewUtils.convertPixelsToDp(DOTTED_LINE_WIDTH_DP, getContext()), ViewUtils.convertPixelsToDp(DOTTED_LINE_WIDTH_DP, getContext()) }, 0));
+        mBorderPaint.setPathEffect(new DashPathEffect(new float[] {
+                ViewUtils.convertDpToPixels(DOTTED_LINE_WIDTH_DP,
+                getContext()),
+                ViewUtils.convertDpToPixels(DOTTED_LINE_WIDTH_DP, getContext())
+        }, 0));
         Path path = new Path();
         path.moveTo(0, 2 * mHeight / 3);
         path.quadTo(0, 2 * mHeight / 3, mWidth, 2 * mHeight / 3);

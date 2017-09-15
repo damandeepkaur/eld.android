@@ -3,6 +3,15 @@ ELD app for Android
 
 # Version history
 
+* **1.0.64** - Fixed remember me enable by default
+* **1.0.63** - Fix for crash on login/logout 
+* **1.0.62** - Added co-driver view notification
+* **1.0.61** - Add NTP sync
+* **1.0.60** - Fix remember me
+* **1.0.59** - Add switching asset by selecting asset in menu
+* **1.0.58** - Add Edit Log header Screen (_EA-340_)
+* **1.0.57** - Fix dotted lines (_EA-310_)
+* **1.0.56** - Edit/Add event input validation should allow 'space' and '.' chars (_EA-326_)
 * **1.0.55** - Not creating duty event with creating YM or PC event (_EA-338_)
 * **1.0.54** - Add progress bar
 * **1.0.53** - Add switch driver and co-drivers logic
