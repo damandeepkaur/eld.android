@@ -379,16 +379,10 @@ public class UserInteractor {
         int userId = user.getId();
 
         String lastVehicles = mAppDatabase.userDao().getUserLastVehiclesSync(userId);
-        String coDrivers = mAppDatabase.userDao().getUserCoDriversSync(userId);
 
         UserEntity userEntity = UserConverter.toEntity(user);
         userEntity.setAccountName(accountName);
         mAppDatabase.userDao().insertUser(userEntity);
-
-        List<Integer> coDriverIds = ListConverter.toIntegerList(coDrivers);
-        coDriverIds.add(userId);
-        updateCoDrivers(coDriverIds);
-
 
         if (user.getCarriers() != null) {
             mAppDatabase.carrierDao().deleteByUserId(userId);

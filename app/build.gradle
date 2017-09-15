@@ -10,8 +10,8 @@ android {
         applicationId "app.bsmuniversal.com"
         minSdkVersion 15
         targetSdkVersion 25
-        versionCode 62
-        versionName "1.0.61"
+        versionCode 65
+        versionName "1.0.64"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         javaCompileOptions {
@@ -186,5 +186,8 @@ dependencies {
     compile 'com.github.instacart.truetime-android:library-extension-rx:3.3'
 }
 
+spoon {
+    noAnimations = true
+}
 
 apply from: "jacoco.gradle"

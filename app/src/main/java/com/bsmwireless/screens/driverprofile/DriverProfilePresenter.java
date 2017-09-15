@@ -31,7 +31,7 @@ import static com.bsmwireless.screens.driverprofile.DriverProfileView.Error.PASS
 import static com.bsmwireless.screens.driverprofile.DriverProfileView.Error.VALID_PASSWORD;
 
 @ActivityScope
-public class DriverProfilePresenter extends BaseMenuPresenter implements AccountManager.AccountListener {
+public class DriverProfilePresenter extends BaseMenuPresenter {
 
     private static final int MAX_SIGNATURE_LENGTH = 50000;
 
@@ -42,7 +42,9 @@ public class DriverProfilePresenter extends BaseMenuPresenter implements Account
     private CarrierEntity mCarrier;
 
     @Inject
-    public DriverProfilePresenter(DriverProfileView view, UserInteractor userInteractor, DutyTypeManager dutyTypeManager, ELDEventsInteractor eventsInteractor, AccountManager accountManager) {
+    public DriverProfilePresenter(DriverProfileView view, UserInteractor userInteractor,
+                                  DutyTypeManager dutyTypeManager, ELDEventsInteractor eventsInteractor,
+                                  AccountManager accountManager) {
         mView = view;
         mUserInteractor = userInteractor;
         mDutyTypeManager = dutyTypeManager;
@@ -51,10 +53,6 @@ public class DriverProfilePresenter extends BaseMenuPresenter implements Account
         mDisposables = new CompositeDisposable();
 
         Timber.d("CREATED");
-    }
-
-    public void onViewCreated() {
-        mAccountManager.addListener(this);
     }
 
     public void onNeedUpdateUserInfo() {
@@ -84,12 +82,6 @@ public class DriverProfilePresenter extends BaseMenuPresenter implements Account
                                        },
                                        throwable -> Timber.e(throwable.getMessage()));
         mDisposables.add(disposable);
-    }
-
-    @Override
-    public void onDestroy() {
-        mAccountManager.removeListener(this);
-        super.onDestroy();
     }
 
     @Override
@@ -235,9 +227,7 @@ public class DriverProfilePresenter extends BaseMenuPresenter implements Account
 
     @Override
     public void onUserChanged() {
+        super.onUserChanged();
         onNeedUpdateUserInfo();
     }
-
-    @Override
-    public void onDriverChanged() {}
 }

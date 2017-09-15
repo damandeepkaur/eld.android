@@ -8,9 +8,9 @@ import app.bsmuniversal.com.locators.SelectAssetLocators;
  */
 public class SelectAssetPage {
 
-    public static void go_to_home_screen_from_select_asset_screen() {
+    public static void go_to_home_screen() {
         BaseTestClass.close_keyboard_and_wait_for_view(SelectAssetLocators.not_in_vehicle_button);
-        CommonPage.perform_click(SelectAssetLocators.not_in_vehicle_button);
+        click_on_not_in_vehicle();
     }
 
     public static void click_on_search() {
@@ -23,5 +23,10 @@ public class SelectAssetPage {
 
     public static void click_on_clear_text() {
         CommonPage.perform_click(SelectAssetLocators.search_clear_text);
+    }
+
+    public static void click_on_not_in_vehicle() {
+        CommonPage.perform_click(SelectAssetLocators.not_in_vehicle_button);
+
     }
 }

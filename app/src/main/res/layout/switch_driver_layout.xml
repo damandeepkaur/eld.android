@@ -1,94 +1,86 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
-    <ProgressBar
-        android:id="@+id/progress_bar"
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:visibility="gone"
-        android:indeterminate="false"/>
+        android:layout_marginTop="@dimen/default_margin"
+        android:layout_marginLeft="@dimen/margin_large"
+        android:layout_marginRight="@dimen/margin_large"
+        android:textSize="@dimen/text_size_small"
+        android:textStyle="normal"
+        android:textColor="@color/light_gray_color"
+        android:text="@string/driver" />
+
+    <RelativeLayout
+        android:id="@+id/driver_info_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/default_margin_small"
+        android:layout_marginLeft="@dimen/margin_large"
+        android:layout_marginRight="@dimen/margin_large">
+
+        <TextView
+            android:id="@+id/driver_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:textSize="@dimen/text_size_middle"
+            android:textStyle="normal"
+            android:textColor="@color/primary_text"/>
+
+        <ImageView
+            android:id="@+id/driver_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true" />
+
+    </RelativeLayout>
+
+    <android.support.v7.widget.AppCompatButton
+        android:id="@+id/driver_seat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/default_margin"
+        android:layout_marginRight="@dimen/default_margin"
+        android:layout_gravity="right"
+        style="@style/Widget.AppCompat.Button.Borderless"
+        android:textColor="@color/nasty_green"
+        android:text="@string/switch_driver_driver_seat"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/default_margin_small"
+        android:layout_marginLeft="@dimen/margin_large"
+        android:layout_marginRight="@dimen/margin_large"
+        android:textSize="@dimen/text_size_small"
+        android:textStyle="normal"
+        android:textColor="@color/light_gray_color"
+        android:text="@string/switch_driver_co_drivers" />
+
+    <ListView
+        android:id="@+id/co_drivers_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:divider="@android:color/transparent"/>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="@dimen/progress_height"
+        android:layout_marginTop="@dimen/default_margin">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/default_margin"
-            android:layout_marginLeft="@dimen/margin_large"
-            android:layout_marginRight="@dimen/margin_large"
-            android:textSize="@dimen/text_size_small"
-            android:textStyle="normal"
-            android:textColor="@color/light_gray_color"
-            android:text="@string/driver" />
-
-        <RelativeLayout
-            android:id="@+id/driver_info_layout"
+        <ProgressBar
+            android:id="@+id/progress_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/default_margin_small"
-            android:layout_marginLeft="@dimen/margin_large"
-            android:layout_marginRight="@dimen/margin_large">
-
-            <TextView
-                android:id="@+id/driver_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:textSize="@dimen/text_size_middle"
-                android:textStyle="normal"
-                android:textColor="@color/primary_text"/>
-
-            <ImageView
-                android:id="@+id/driver_status"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true" />
-
-        </RelativeLayout>
-
-        <android.support.v7.widget.AppCompatButton
-            android:id="@+id/driver_seat"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/default_margin"
-            android:layout_marginRight="@dimen/default_margin"
-            android:layout_gravity="right"
-            style="@style/Widget.AppCompat.Button.Borderless"
-            android:textColor="@color/nasty_green"
-            android:text="@string/switch_driver_driver_seat"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/default_margin_small"
-            android:layout_marginLeft="@dimen/margin_large"
-            android:layout_marginRight="@dimen/margin_large"
-            android:textSize="@dimen/text_size_small"
-            android:textStyle="normal"
-            android:textColor="@color/light_gray_color"
-            android:text="@string/switch_driver_co_drivers" />
-
-        <ListView
-            android:id="@+id/co_drivers_list"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:divider="@android:color/transparent"
-            android:layout_marginLeft="@dimen/margin_large"
-            android:layout_marginRight="@dimen/margin_large"/>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/divider_height"
-            android:layout_marginTop="@dimen/default_margin"
-            android:background="@color/divider_color"/>
+            style="?android:attr/progressBarStyleHorizontal"
+            android:indeterminate="false"/>
 
     </LinearLayout>
 
-</RelativeLayout>
+</LinearLayout>

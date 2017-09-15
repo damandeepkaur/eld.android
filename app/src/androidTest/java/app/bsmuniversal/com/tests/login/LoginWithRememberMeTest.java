@@ -1,7 +1,6 @@
 package app.bsmuniversal.com.tests.login;
 
 import android.support.test.espresso.intent.rule.IntentsTestRule;
-import android.support.test.filters.Suppress;
 import android.support.test.rule.ActivityTestRule;
 
 import com.bsmwireless.screens.login.LoginActivity;
@@ -20,11 +19,10 @@ import app.bsmuniversal.com.utils.Users;
 /**
  * AT class to verify remember me switch implementation
  */
-@Suppress
 public class LoginWithRememberMeTest extends BaseTestClass {
 
     @Rule
-    public ActivityTestRule<LoginActivity> mLoginActivityTestRule = new IntentsTestRule<>(LoginActivity.class);
+    public ActivityTestRule<LoginActivity> loginActivityTestRule = new IntentsTestRule<>(LoginActivity.class);
 
     @Test
     public void test_firstLogin() {
@@ -77,7 +75,7 @@ public class LoginWithRememberMeTest extends BaseTestClass {
         assert_activity_shown(LoginActivity.class.getName(), 2);
         assert_text_not_exist(Users.getUserOne().getUsername());
         assert_text_not_exist(Users.getUserOne().getDomain());
-        assert_checked(LoginLocators.switch_button, true);
+        assert_checked(LoginLocators.switch_button, false);
     }
 
     @Test
@@ -114,11 +112,11 @@ public class LoginWithRememberMeTest extends BaseTestClass {
         assert_activity_shown(LoginActivity.class.getName(), 1);
         assert_text_not_exist(Users.getUserOne().getUsername());
         assert_text_not_exist(Users.getUserOne().getDomain());
-        assert_checked(LoginLocators.switch_button, true);
+        assert_checked(LoginLocators.switch_button, false);
     }
 
     private void doLogout() {
-        SelectAssetPage.go_to_home_screen_from_select_asset_screen();
+        SelectAssetPage.go_to_home_screen();
         logout();
         wait_for_view(REQUEST_TIMEOUT, LoginLocators.execute_login);
     }
