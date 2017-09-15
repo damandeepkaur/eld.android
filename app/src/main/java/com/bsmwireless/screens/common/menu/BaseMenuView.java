@@ -10,7 +10,7 @@ public interface BaseMenuView {
     void setOccupancyType(OccupancyType type);
     void showDutyTypeDialog(DutyType dutyType);
     void showNotInVehicleDialog();
-    void changeDutyType(DutyType dutyType);
+    void changeDutyType(DutyType dutyType, String comment);
     void showSwitchDriverDialog();
     void showCoDriverView(String name);
     void hideCoDriverView();

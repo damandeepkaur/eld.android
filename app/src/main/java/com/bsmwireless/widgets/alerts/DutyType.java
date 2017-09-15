@@ -9,9 +9,9 @@ public enum DutyType {
     DRIVING(1, 3, R.string.event_type_driving, R.string.event_type_driving,R.color.driving_light, R.drawable.ic_duty_status_dr, 3),
     YARD_MOVES(3, 2, R.string.event_type_yard_moves, R.string.event_type_yard_moves_title, R.color.onduty_light, R.drawable.ic_duty_status_ym, 4),
     PERSONAL_USE(3, 1, R.string.event_type_personal_use, R.string.event_type_personal_use_title, R.color.offduty_light, R.drawable.ic_duty_status_pu, 1),
-    CLEAR(3, 0, R.string.event_type_clear, R.string.event_type_clear, R.color.offduty_light, R.drawable.ic_duty_status_of, 0),
-    CLEAR_YM(3, 0, R.string.event_type_clear, R.string.event_type_yard_moves_end_title, R.color.onduty_light, R.drawable.ic_duty_status_of, 0),
-    CLEAR_PU(3, 0, R.string.event_type_clear, R.string.event_type_personal_use_end_title, R.color.offduty_light, R.drawable.ic_duty_status_of, 0);
+    CLEAR(3, 0, R.string.event_type_clear, R.string.event_type_clear, R.color.offduty_light, R.drawable.ic_duty_status_of, 1),
+    CLEAR_YM(3, 0, R.string.event_type_clear, R.string.event_type_yard_moves_end_title, R.color.onduty_light, R.drawable.ic_duty_status_of, 4),
+    CLEAR_PU(3, 0, R.string.event_type_clear, R.string.event_type_personal_use_end_title, R.color.offduty_light, R.drawable.ic_duty_status_of, 1);
 
     private int mCode;
     private int mType;

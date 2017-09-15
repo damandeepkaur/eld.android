@@ -2,6 +2,8 @@ package com.bsmwireless.common;
 
 import com.bsmwireless.models.Malfunction;
 
+import java.util.regex.Pattern;
+
 public interface Constants {
     long READ_TIMEOUT = 60;
     long CONNECTION_TIMEOUT = 60;
@@ -19,6 +21,8 @@ public interface Constants {
     String SUCCESS = "ACK";
 
     String NTP_POOL_SERVER = "time.google.com";
+
+    Pattern COMMENT_VALIDATE_PATTERN = Pattern.compile("[^A-Za-z0-9`!@#$%^&* ()_\\-+=\\[\\]\\\\/?><.,;:'|\"{}~]", Pattern.CASE_INSENSITIVE);
 
     String[] MALFUNCTION_CODES = new String[]{
             Malfunction.POWER_COMPLIANCE.getCode(),

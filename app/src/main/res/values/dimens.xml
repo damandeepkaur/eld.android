@@ -59,6 +59,7 @@
     <dimen name="default_divider">2dp</dimen>
     <dimen name="margin_large">24dp</dimen>
     <dimen name="margin_small">8dp</dimen>
+    <dimen name="margin_extra_small">4dp</dimen>
 
     <dimen name="text_size">16sp</dimen>
     <dimen name="text_size_small">14sp</dimen>
@@ -148,7 +149,7 @@
     <!-- Dashboard -->
     <dimen name="duty_timer_text_size">60sp</dimen>
     <dimen name="duty_title_size">24dp</dimen>
-    <integer name="max_duration">86400</integer>
+    <dimen name="status_line_height">4dp</dimen>
 
     <!--Logs sign dialog-->
     <dimen name="sign_dialog_margin_top">12dp</dimen>

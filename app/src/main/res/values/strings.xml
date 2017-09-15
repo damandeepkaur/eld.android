@@ -410,8 +410,8 @@
     <!-- Graph view -->
     <string name="default_time">00:00</string>
     <string name="offduty_label">OFF</string>
-    <string name="sleepingberth_label">S</string>
-    <string name="driving_label">DR</string>
+    <string name="sleepingberth_label">SB</string>
+    <string name="driving_label">D</string>
     <string name="onduty_label">ON</string>
 
     <string name="ok">Ok</string>
@@ -521,6 +521,11 @@
     <string name="not_in_vehicle_dialog_message">You can\'t change duty status while not in vehicle.</string>
     <string name="not_in_vehicle_accept">OK</string>
 
+    <string name="pu_dialog_message">Starting Personal Use will put you in Off Duty status. Provide some information to change status to Personal Use.</string>
+    <string name="ym_dialog_message">Starting Yard Moves will put you in On Duty status. Provide some information to change status to Yard Moves.</string>
+    <string name="special_status_dialog_accept">Continue</string>
+    <string name="special_status_dialog_cancel">Cancel</string>
+
     <!-- Settings Activity -->
     <string name="settings">Settings</string>
     <string name="settings_title">Settings</string>
@@ -541,8 +546,12 @@
     <string name="duty_on_duty_time">Workday time</string>
     <string name="duty_cycle_time">Cycle time</string>
 
-    <string name="duty_indicator">Change to \n %s</string>
+    <string name="duty_indicator">End %s</string>
     <string name="duty_indicator_title">You are currently working in %s mode</string>
+
+    <string name="dashboard_start_ym">Start Yard Moves</string>
+    <string name="dashboard_start_pu">Start Personal Use</string>
+    <string name="dashboard_exemption">Exemption List</string>
 
     <!-- Multiday fragment -->
     <string-array name="multiday_selector">
