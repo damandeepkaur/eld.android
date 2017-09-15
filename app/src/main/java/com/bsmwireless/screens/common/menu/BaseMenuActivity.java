@@ -6,7 +6,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bsmwireless.data.storage.DutyTypeManager;
@@ -112,8 +111,8 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
     }
 
     @Override
-    public void changeDutyType(DutyType dutyType) {
-        getPresenter().onDutyChanged(dutyType);
+    public void changeDutyType(DutyType dutyType, String comment) {
+        getPresenter().onDutyChanged(dutyType, comment);
     }
 
     protected void onHomePress() {
@@ -127,11 +126,14 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
         }
 
         //TODO: set correct types
-        DutyType[] dutyTypes = DutyTypeManager.DRIVER_DUTY_EXTENDED;
+        DutyType[] dutyTypes = DutyTypeManager.DRIVER_DUTY;
 
         ArrayList<BaseMenuAdapter.DutyItem> dutyItems = new ArrayList<>();
         for (DutyType dutyType : dutyTypes) {
-            boolean isEnabled = current != dutyType;
+            dutyItems.add(new BaseMenuAdapter.DutyItem(dutyType, true));
+
+            //TODO: need to clarify
+            /*boolean isEnabled = current != dutyType;
             switch (dutyType) {
                 case ON_DUTY:
                     isEnabled &= current != DutyType.PERSONAL_USE;
@@ -158,13 +160,13 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
                     break;
             }
 
-            dutyItems.add(new BaseMenuAdapter.DutyItem(dutyType, isEnabled));
+            dutyItems.add(new BaseMenuAdapter.DutyItem(dutyType, isEnabled));*/
         }
 
         ArrayAdapter<BaseMenuAdapter.DutyItem> arrayAdapter = new BaseMenuAdapter(this, dutyItems);
 
         mDutyDialog = new AlertDialog.Builder(this)
-                .setAdapter(arrayAdapter, (dialog, which) -> changeDutyType(dutyItems.get(which).getDutyType()))
+                .setAdapter(arrayAdapter, (dialog, which) -> changeDutyType(dutyItems.get(which).getDutyType(), null))
                 .setCancelable(true)
                 .show();
     }

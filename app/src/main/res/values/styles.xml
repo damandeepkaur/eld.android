@@ -48,6 +48,11 @@
         <item name="android:maxLines">1</item>
     </style>
 
+    <style name="ErrorAppearance" parent="@android:style/TextAppearance">
+        <item name="android:textColor">@color/coral</item>
+        <item name="android:textSize">@dimen/text_size_extra_small</item>
+    </style>
+
     <style name="TextInputEditText.Disabled" parent="TextInputEditText">
         <item name="android:enabled">false</item>
         <item name="android:focusable">false</item>
