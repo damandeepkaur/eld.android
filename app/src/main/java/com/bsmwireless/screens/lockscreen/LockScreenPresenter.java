@@ -134,6 +134,9 @@ public class LockScreenPresenter {
      * Start the monitoring statuses task.
      */
     void startMonitoring() {
+        if (mView != null) {
+            mView.removeAnyPopup();
+        }
         mBlackBoxConnectionManager.getDataObservable()
                 .distinctUntilChanged(BlackBoxModel::getResponseType)
                 .doOnNext(blackBoxModel -> mCurrentResponseType = blackBoxModel.getResponseType())

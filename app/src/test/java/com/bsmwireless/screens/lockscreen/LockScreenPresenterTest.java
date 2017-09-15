@@ -19,13 +19,15 @@ import org.mockito.MockitoAnnotations;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.android.plugins.RxAndroidPlugins;
 import io.reactivex.plugins.RxJavaPlugins;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
 
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -79,7 +81,15 @@ public class LockScreenPresenterTest {
     }
 
     @Test
+    public void testSwitchCoDriverInNonStartedState() throws Exception {
+        presenter.switchCoDriver();
+        verify(lockScreenView, never()).openCoDriverDialog();
+    }
+
+    @Test
     public void testSwitchCoDriver() throws Exception {
+        when(blackBox.getDataObservable()).thenReturn(Observable.empty());
+        presenter.onStart(lockScreenView);
         presenter.switchCoDriver();
         verify(lockScreenView).openCoDriverDialog();
     }
@@ -102,11 +112,13 @@ public class LockScreenPresenterTest {
 
         final BehaviorSubject<BlackBoxModel> subject = BehaviorSubject.create();
         when(blackBox.getDataObservable()).thenReturn(subject);
+
+        when(eventsInteractor.postNewELDEvent(any())).thenReturn(Single.just(1L));
+
         presenter.onStart(lockScreenView);
         subject.onNext(stoppedMock);
         subject.onNext(anyMock);
         subject.onComplete();
-        verify(lockScreenView, times(2)).removeAnyPopup();
         verify(lockScreenView).closeLockScreen();
     }
 
@@ -118,9 +130,13 @@ public class LockScreenPresenterTest {
 
         final BehaviorSubject<BlackBoxModel> subject = BehaviorSubject.create();
         when(blackBox.getDataObservable()).thenReturn(subject);
+
+        when(eventsInteractor.postNewELDEvent(any())).thenReturn(Single.just(1L));
+
         presenter.onStart(lockScreenView);
         verify(lockScreenView).removeAnyPopup();
         subject.onNext(ignitionOffMock);
+        verify(eventsInteractor).postNewELDEvent(any());
         verify(lockScreenView).showIgnitionOffDetectedDialog();
 
     }
