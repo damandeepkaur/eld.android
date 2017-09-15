@@ -259,4 +259,11 @@ public class DateUtils {
         long realTimeInMiliseconds = System.currentTimeMillis() + realTimeInMilisecondsDiff;
         return realTimeInMiliseconds;
     }
+
+    public static String convertToFullTime(String timezone, Date date) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm MMM dd, yyyy", Locale.US);
+        dateFormat.setTimeZone(TimeZone.getTimeZone(timezone));
+        return dateFormat.format(date);
+    }
+
 }

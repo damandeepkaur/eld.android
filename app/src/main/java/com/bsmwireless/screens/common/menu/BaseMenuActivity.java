@@ -10,6 +10,8 @@ import android.widget.TextView;
 
 import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.screens.common.BaseActivity;
+import com.bsmwireless.screens.diagnostic.DiagnosticDialog;
+import com.bsmwireless.screens.diagnostic.MalfunctionDialog;
 import com.bsmwireless.screens.switchdriver.DriverDialog;
 import com.bsmwireless.screens.switchdriver.SwitchDriverDialog;
 import com.bsmwireless.widgets.alerts.DutyType;
@@ -25,6 +27,7 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
     private MenuItem mELDItem;
     private MenuItem mDutyItem;
     private MenuItem mOccupancyItem;
+    private MenuItem mMalfunctionItem;
 
     protected AlertDialog mDutyDialog;
 
@@ -37,12 +40,25 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
     TextView mCoDriverNotification;
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        getPresenter().onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        getPresenter().onStop();
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_alert, menu);
 
-        mELDItem = menu.findItem(R.id.action_eld);
+        mELDItem = menu.findItem(R.id.action_diagnostic);
         mDutyItem = menu.findItem(R.id.action_duty);
         mOccupancyItem = menu.findItem(R.id.action_occupancy);
+        mMalfunctionItem = menu.findItem(R.id.action_malfunction);
 
         mSwitchDriverDialog = new SwitchDriverDialog(this);
 
@@ -54,7 +70,8 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_eld:
+            case R.id.action_diagnostic:
+                getPresenter().onDiagnosticEventsClick();
                 break;
             case R.id.action_duty:
                 getPresenter().onChangeDutyClick();
@@ -66,6 +83,9 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
                 onHomePress();
                 break;
             }
+            case R.id.action_malfunction:
+                getPresenter().onMalfunctionEventsClick();
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -108,6 +128,33 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
         if (mSwitchDriverDialog != null) {
             mSwitchDriverDialog.show();
         }
+    }
+
+    @Override
+    public void showMalfunctionDialog() {
+        MalfunctionDialog.newInstance().show(getSupportFragmentManager(), "");
+    }
+
+    @Override
+    public void showDiagnosticEvents() {
+        DiagnosticDialog.newInstance().show(getSupportFragmentManager(), "");
+    }
+
+    @Override
+    public void changeMalfunctionStatus(boolean hasMalfunctionEvents) {
+
+        if (mMalfunctionItem == null) {
+            return;
+        }
+        mMalfunctionItem.setIcon(hasMalfunctionEvents ? R.drawable.ic_ico_dd_red : R.drawable.ic_ico_dd_green);
+    }
+
+    @Override
+    public void changeDiagnosticStatus(boolean hasMalfunctionEvents) {
+        if (mELDItem == null) {
+            return;
+        }
+        mELDItem.setIcon(hasMalfunctionEvents ? R.drawable.ic_eld_red : R.drawable.ic_eld_green);
     }
 
     @Override

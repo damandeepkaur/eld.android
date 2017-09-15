@@ -32,7 +32,7 @@ import timber.log.Timber;
 import static com.bsmwireless.common.Constants.MAX_CODRIVERS;
 
 @ActivityScope
-public class SwitchDriverPresenter {
+public final class SwitchDriverPresenter {
 
     public static final int GETTING_BLACKBOX_MODEL_TIMEOUT = 10;
     private SwitchDriverView mView;

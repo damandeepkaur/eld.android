@@ -261,4 +261,12 @@
         <item name="android:textSize">14sp</item>
         <item name="android:textStyle">normal</item>
     </style>
+
+    <style name="AppTheme.TextAppearance.Subhead" parent="TextAppearance.AppCompat.Subhead"/>
+
+    <style name="AppTheme.TextAppearance.Description" parent="TextAppearance.AppCompat.Body1">
+        <item name="android:textColor">@color/black_54</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
 </resources>
