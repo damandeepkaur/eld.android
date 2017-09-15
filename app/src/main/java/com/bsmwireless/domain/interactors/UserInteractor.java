@@ -192,6 +192,8 @@ public class UserInteractor {
         }
 
         if (!mPreferencesManager.isRememberUserEnabled()) {
+            mAppDatabase.userDao().deleteUser(driverId);
+            mTokenManager.removeAccount(mAccountManager.getCurrentDriverAccountName());
             mPreferencesManager.clearValues();
         } else {
             mTokenManager.clearToken(mTokenManager.getToken(mAccountManager.getCurrentDriverAccountName()));
