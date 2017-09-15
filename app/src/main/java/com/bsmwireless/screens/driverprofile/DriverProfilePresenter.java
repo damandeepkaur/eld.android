@@ -60,14 +60,17 @@ public class DriverProfilePresenter extends BaseMenuPresenter {
         Disposable disposable = Single.fromCallable(() -> mUserInteractor.getFullUserSync())
                                       .subscribeOn(Schedulers.io())
                                       .observeOn(AndroidSchedulers.mainThread())
-                                      .doOnSuccess(this::updateHomeTerminalsList)
+                                      .doOnSuccess(userEntity -> {
+                                          mFullUserEntity = userEntity;
+                                          mView.setUserInfo(mFullUserEntity.getUserEntity());
+                                      })
                                       .doOnSuccess(this::updateCarrierInfo)
                                       .doOnSuccess(this::updateHOSCycles)
-                                      .subscribe(userEntity -> {
-                                                  mFullUserEntity = userEntity;
-                                                  mView.setUserInfo(mFullUserEntity.getUserEntity());
-                                              },
-                                              throwable -> Timber.e(throwable.getMessage()));
+                                      .doOnSuccess(this::updateHomeTerminalsList)
+                                      .subscribe(
+                                              userEntity -> {}, throwable ->
+                                              Timber.e(throwable.getMessage())
+                                      );
         mDisposables.add(disposable);
     }
 
@@ -177,9 +180,8 @@ public class DriverProfilePresenter extends BaseMenuPresenter {
             String cycle = mHOSCycles.get(position);
 
             mFullUserEntity.getUserEntity().setDutyCycle(cycle);
-            String ruleException = mFullUserEntity.getUserEntity().getRuleException();
 
-            Disposable disposable = mUserInteractor.updateDriverRule(ruleException, cycle)
+            Disposable disposable = mUserInteractor.updateDriverRule(null, cycle)
                                                    .subscribeOn(Schedulers.io())
                                                    .flatMapObservable(wasUpdated -> {
                                                        if (wasUpdated) {
@@ -207,8 +209,7 @@ public class DriverProfilePresenter extends BaseMenuPresenter {
     private void updateHomeTerminalsList(FullUserEntity userEntity) {
         mHomeTerminals = userEntity.getHomeTerminalEntities();
         if (mHomeTerminals != null && !mHomeTerminals.isEmpty()) {
-            Integer selectedHomeTerminalId = userEntity.getUserEntity().getHomeTermId();
-            int position = findHomeTerminalById(mHomeTerminals, selectedHomeTerminalId);
+            int position = findHomeTerminalById(mHomeTerminals, userEntity.getUserEntity().getHomeTermId());
             mView.setHomeTerminalsSpinner(getHomeTerminalNames(mHomeTerminals), position);
         } else {
             mView.setHomeTerminalsSpinner(Collections.emptyList(), 0);

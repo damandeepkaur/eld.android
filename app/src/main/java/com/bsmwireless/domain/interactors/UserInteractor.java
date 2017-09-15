@@ -22,6 +22,7 @@ import com.bsmwireless.models.Auth;
 import com.bsmwireless.models.DriverHomeTerminal;
 import com.bsmwireless.models.DriverProfileModel;
 import com.bsmwireless.models.DriverSignature;
+import com.bsmwireless.models.HomeTerminal;
 import com.bsmwireless.models.LoginModel;
 import com.bsmwireless.models.PasswordModel;
 import com.bsmwireless.models.ResponseMessage;
@@ -138,21 +139,11 @@ public class UserInteractor {
 
                     mTokenManager.setToken(accountName, name, password, domain, user.getAuth());
 
-                    UserEntity userEntity = UserConverter.toEntity(user);
-                    userEntity.setAccountName(accountName);
-                    mAppDatabase.userDao().insertUser(userEntity);
+                    saveUserDataInDB(user, accountName);
 
                     List<Integer> coDriverIds = saveCoDrivers(getDriverId(), Arrays.asList(user.getId()));
                     coDriverIds.add(getDriverId());
                     updateCoDrivers(coDriverIds);
-
-                    if (user.getCarriers() != null) {
-                        mAppDatabase.carrierDao().insertCarriers(CarrierConverter.toEntityList(user.getCarriers(), user.getId()));
-                    }
-
-                    if (user.getHomeTerminals() != null) {
-                        mAppDatabase.homeTerminalDao().insertHomeTerminals(HomeTerminalConverter.toEntityList(user.getHomeTerminals(), user.getId()));
-                    }
                 })
                 .onErrorResumeNext(throwable -> {
                     boolean isNetworkError = throwable instanceof RetrofitException ||
@@ -302,21 +293,31 @@ public class UserInteractor {
 
     public Flowable<User> getUser() {
         return mAppDatabase.userDao().getUser(getDriverId())
-                .map(userEntity -> UserConverter.toUser(userEntity));
+                .map(UserConverter::toUser);
     }
 
 
     public Flowable<FullUserEntity> getFullDriver() {
-        return mAppDatabase.userDao().getFullUser(getDriverId());
+        return mAppDatabase.userDao()
+                   .getFullUser(getDriverId())
+                   .doOnNext(userEntity -> {
+                       userEntity.setHomeTerminalEntities(
+                           mAppDatabase.homeTerminalDao()
+                                       .getHomeTerminalsSync(userEntity.getHomeTerminalIds())
+                       );
+                   });
     }
 
     public FullUserEntity getFullUserSync() {
-        return mAppDatabase.userDao().getFullUserSync(getUserId());
+        FullUserEntity fullUserEntity = mAppDatabase.userDao().getFullUserSync(getUserId());
+        fullUserEntity.setHomeTerminalEntities(mAppDatabase
+                .homeTerminalDao()
+                .getHomeTerminalsSync(fullUserEntity.getHomeTerminalIds()));
+        return fullUserEntity;
     }
 
     public Flowable<User> getFullUser() {
-        return mAppDatabase.userDao().getFullUser(getDriverId())
-                .map(fullUserEntity -> UserConverter.toFullUser(fullUserEntity));
+        return getFullDriver().map(UserConverter::toFullUser);
     }
 
     public boolean isLoginActive() {
@@ -444,10 +445,13 @@ public class UserInteractor {
                     .toEntityList(user.getCarriers(), userId));
         }
 
-        if (user.getHomeTerminals() != null) {
-            mAppDatabase.homeTerminalDao().deleteByUserId(userId);
+        List<HomeTerminal> homeTerminals = user.getHomeTerminals();
+        if (homeTerminals != null) {
+            mAppDatabase.userHomeTerminalDao().deleteUserHomeTerminal(userId);
             mAppDatabase.homeTerminalDao().insertHomeTerminals(HomeTerminalConverter
-                    .toEntityList(user.getHomeTerminals(), userId));
+                    .toEntityList(homeTerminals));
+            mAppDatabase.userHomeTerminalDao().insertUserHomeTerminal(HomeTerminalConverter
+                    .toUserRelation(homeTerminals, userId));
         }
 
         if (user.getConfigurations() != null) {
