@@ -1,6 +1,7 @@
 package com.bsmwireless.screens.navigation;
 
 import com.bsmwireless.common.utils.DateUtils;
+import com.bsmwireless.common.utils.SchedulerUtils;
 import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.data.storage.AutoDutyTypeManager;
 import com.bsmwireless.data.storage.DutyTypeManager;
@@ -89,6 +90,7 @@ public class NavigationPresenter extends BaseMenuPresenter {
                                                        status -> {
                                                            Timber.i("LoginUser status = %b", status);
                                                            if (status) {
+                                                               SchedulerUtils.cancel();
                                                                mView.goToLoginScreen();
                                                            } else {
                                                                mView.showErrorMessage("Logout failed");

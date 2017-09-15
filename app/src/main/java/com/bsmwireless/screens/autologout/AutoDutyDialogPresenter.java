@@ -58,27 +58,27 @@ public class AutoDutyDialogPresenter {
     }
 
     public void onOnDutyClick() {
-        mDisposables.add(mEventsInteractor.postNewDutyTypeEvent(DutyType.ON_DUTY)
+        mDisposables.add(mEventsInteractor.postNewDutyTypeEvent(DutyType.ON_DUTY, null)
                 .subscribeOn(Schedulers.io())
                 .doOnTerminate(() -> {
                     SchedulerUtils.cancel();
                     mView.onActionDone();
                 })
                 .subscribe(
-                        status -> Timber.i("Auto OnDuty status = %b", status),
+                        status -> Timber.i("Auto OnDuty status"),
                         error -> Timber.e("Auto OnDuty error %s", error)
                 ));
     }
 
     public void onDrivingClick() {
-        mDisposables.add(mEventsInteractor.postNewDutyTypeEvent(DutyType.DRIVING)
+        mDisposables.add(mEventsInteractor.postNewDutyTypeEvent(DutyType.DRIVING, null)
                 .subscribeOn(Schedulers.io())
                 .doOnTerminate(() -> {
                     SchedulerUtils.cancel();
                     mView.onActionDone();
                 })
                 .subscribe(
-                        status -> Timber.i("Auto Driving status = %b", status),
+                        status -> Timber.i("Auto Driving status"),
                         error -> Timber.e("Auto Driving error %s", error)
                 ));
     }
