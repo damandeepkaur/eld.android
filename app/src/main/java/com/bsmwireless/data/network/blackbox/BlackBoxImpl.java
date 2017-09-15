@@ -173,6 +173,7 @@ public final class BlackBoxImpl implements BlackBox {
 
     private Subject<BlackBoxModel> getEmitter() {
         if (mEmitter.get().hasComplete() || mEmitter.get().hasThrowable()) {
+            Timber.d("Recreate Emitter");
             recreateEmitter();
         }
         return mEmitter.get();
@@ -236,7 +237,7 @@ public final class BlackBoxImpl implements BlackBox {
     }
 
     private Observable<BlackBoxModel> readStatus() {
-        return Observable.fromCallable(() -> isConnected())
+        return Observable.fromCallable(this::isConnected)
                 .observeOn(Schedulers.io())
                 .filter(isConnected -> isConnected)
                 .map(unused -> getInputStream())

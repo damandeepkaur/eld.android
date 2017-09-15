@@ -3,7 +3,8 @@ ELD app for Android
 
 # Version history
 
-* **1.0.69** - Malfunction and Data diagnostic indications (_EA-104_, _EA-105_, _EA-106_)
+* **1.0.70** - Malfunction and Data diagnostic indications (_EA-104_, _EA-105_, _EA-106_)
+* **1.0.69** - Lock screen in the driving mode (_EA-82_)
 * **1.0.68** - Update Dashboard, fix comment validation (_EA-387_, _EA-326_)
 * **1.0.67** - Not show 'helper' midnight event in logs screen (_EA-349_)
 * **1.0.66** - Fix seconds value for manually added event (_EA-308_)
