@@ -20,7 +20,7 @@ import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
 @ActivityScope
-public class DiagnosticPresenter {
+public final class DiagnosticPresenter {
 
     public enum EventType {DIAGNOSTIC, MALFUNCTION}
 
@@ -37,11 +37,11 @@ public class DiagnosticPresenter {
                                EventType eventType,
                                AccountManager accountManager,
                                UserInteractor userInteractor) {
-        this.mEldEventsInteractor = eldEventsInteractor;
-        this.mView = view;
-        this.mEventType = eventType;
-        this.mAccountManager = accountManager;
-        this.mUserInteractor = userInteractor;
+        mEldEventsInteractor = eldEventsInteractor;
+        mView = view;
+        mEventType = eventType;
+        mAccountManager = accountManager;
+        mUserInteractor = userInteractor;
         mLoadingEventsDisposable = Disposables.disposed();
     }
 
@@ -66,13 +66,13 @@ public class DiagnosticPresenter {
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(result -> {
-                    if (result.events.isEmpty()) {
+                    if (result.mEvents.isEmpty()) {
                         mView.showNoEvents();
                     } else {
-                        mView.showEvents(result.events, result.user.getTimezone());
+                        mView.showEvents(result.mEvents, result.mUser.getTimezone());
                     }
                 }, throwable -> {
-                    Timber.e(throwable, "Error loading events");
+                    Timber.e(throwable, "Error loading mEvents");
                     mView.showNoEvents();
                 });
     }
@@ -85,12 +85,12 @@ public class DiagnosticPresenter {
     }
 
     private final static class Result {
-        final List<ELDEvent> events;
-        final UserEntity user;
+        final List<ELDEvent> mEvents;
+        final UserEntity mUser;
 
         private Result(List<ELDEvent> events, UserEntity user) {
-            this.events = events;
-            this.user = user;
+            this.mEvents = events;
+            this.mUser = user;
         }
     }
 }

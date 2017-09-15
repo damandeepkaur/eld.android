@@ -19,7 +19,7 @@ import javax.inject.Inject;
 import app.bsmuniversal.com.R;
 
 
-public class MalfunctionDialog extends DialogFragment implements DiagnosticView{
+public final class MalfunctionDialog extends DialogFragment implements DiagnosticView{
 
     private RecyclerView mRecyclerView;
     private DiagnosticEventsAdapter mAdapter;
@@ -40,7 +40,7 @@ public class MalfunctionDialog extends DialogFragment implements DiagnosticView{
                 .build().inject(this);
         mRecyclerView = new RecyclerView(getContext());
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        mAdapter = new DiagnosticEventsAdapter(getActivity().getLayoutInflater());
+        mAdapter = new DiagnosticEventsAdapter(getActivity().getLayoutInflater(), getContext());
         mRecyclerView.setAdapter(mAdapter);
     }
 

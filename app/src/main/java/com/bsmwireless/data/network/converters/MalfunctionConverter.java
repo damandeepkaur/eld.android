@@ -11,10 +11,10 @@ import com.google.gson.JsonSerializer;
 
 import java.lang.reflect.Type;
 
-public class MalfunctionConverter implements JsonDeserializer<Malfunction>, JsonSerializer<Malfunction> {
+public final class MalfunctionConverter implements JsonDeserializer<Malfunction>, JsonSerializer<Malfunction> {
     @Override
     public Malfunction deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-        return Malfunction.createByCode(json.getAsString());
+        return Malfunction.createByCode(json.isJsonNull() ? "" : json.getAsString());
     }
 
     @Override

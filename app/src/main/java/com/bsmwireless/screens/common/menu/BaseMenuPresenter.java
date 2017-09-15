@@ -27,7 +27,7 @@ public abstract class BaseMenuPresenter implements AccountManager.AccountListene
     private CompositeDisposable mDisposables;
     private Disposable mDiagnosticEventsDisposable;
     private Disposable mMalfunctionEventsDisposable;
-    private final Subject<Integer> menuCreatedSubject;
+    private final Subject<Integer> mMenuCreatedSubject;
 
     public BaseMenuPresenter(DutyTypeManager dutyTypeManager,
                              ELDEventsInteractor eventsInteractor,
@@ -39,7 +39,7 @@ public abstract class BaseMenuPresenter implements AccountManager.AccountListene
         this.mDisposables = new CompositeDisposable();
         mDiagnosticEventsDisposable = Disposables.disposed();
         mMalfunctionEventsDisposable = Disposables.disposed();
-        menuCreatedSubject = BehaviorSubject.create();
+        mMenuCreatedSubject = BehaviorSubject.create();
     }
 
     private DutyTypeManager.DutyTypeListener mListener = dutyType -> getView().setDutyType(dutyType);
@@ -63,7 +63,7 @@ public abstract class BaseMenuPresenter implements AccountManager.AccountListene
     }
 
     void onMenuCreated() {
-        menuCreatedSubject.onNext(0);
+        mMenuCreatedSubject.onNext(0);
         mDutyTypeManager.addListener(mListener);
         mDisposables.add(mUserInteractor.getCoDriversNumber()
                 .subscribeOn(Schedulers.io())
@@ -108,7 +108,7 @@ public abstract class BaseMenuPresenter implements AccountManager.AccountListene
         mAccountManager.removeListener(this);
         mDutyTypeManager.removeListener(mListener);
         mDisposables.dispose();
-        menuCreatedSubject.onComplete();
+        mMenuCreatedSubject.onComplete();
 
         Timber.d("DESTROYED");
     }
@@ -121,7 +121,7 @@ public abstract class BaseMenuPresenter implements AccountManager.AccountListene
 
         mDiagnosticEventsDisposable = Flowable
                 .combineLatest(mEventsInteractor.hasDiagnosticEvents(),
-                        menuCreatedSubject.toFlowable(BackpressureStrategy.LATEST),
+                        mMenuCreatedSubject.toFlowable(BackpressureStrategy.LATEST),
                         (result, integer) -> result)
                 .distinctUntilChanged()
                 .subscribeOn(Schedulers.io())
@@ -134,7 +134,7 @@ public abstract class BaseMenuPresenter implements AccountManager.AccountListene
 
         mMalfunctionEventsDisposable = Flowable
                 .combineLatest(mEventsInteractor.hasMalfunctionEvents(),
-                        menuCreatedSubject.toFlowable(BackpressureStrategy.LATEST),
+                        mMenuCreatedSubject.toFlowable(BackpressureStrategy.LATEST),
                         (result, integer) -> result)
                 .distinctUntilChanged()
                 .subscribeOn(Schedulers.io())
@@ -174,7 +174,7 @@ public abstract class BaseMenuPresenter implements AccountManager.AccountListene
     @Override
     public void onUserChanged() {
         if (!mAccountManager.isCurrentUserDriver()) {
-            Disposable disposable = Single.fromCallable(() -> mUserInteractor.getFullUserNameSync())
+            Disposable disposable = Single.fromCallable(mUserInteractor::getFullUserNameSync)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(name -> getView().showCoDriverView(name));
