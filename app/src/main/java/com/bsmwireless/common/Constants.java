@@ -1,5 +1,7 @@
 package com.bsmwireless.common;
 
+import java.util.concurrent.TimeUnit;
+
 import java.util.regex.Pattern;
 
 public interface Constants {
@@ -12,6 +14,9 @@ public interface Constants {
     int MAX_CODRIVERS = 2;
     int SYNC_TIMEOUT_IN_MIN = 1;
     int SYNC_NTP_RETRY_COUNT = 3;
+
+    long LOCK_SCREEN_IDLE_MONITORING_TIMEOUT_MS = TimeUnit.MINUTES.toMillis(5);
+    long LOCK_SCREEN_DISCONNECTION_TIMEOUT_MS = TimeUnit.MINUTES.toMillis(5);
 
     String BASE_URL = "https://develd.bsmtechnologies.com/sdmobile/rest/";
     String DEVICE_TYPE = "Android";
