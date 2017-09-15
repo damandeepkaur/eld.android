@@ -105,21 +105,16 @@
 
     </ScrollView>
 
-    <FrameLayout
-        android:layout_width="@dimen/action_button_frame_size"
-        android:layout_height="@dimen/action_button_frame_size"
-        android:layout_gravity="bottom|right">
-
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/save_event"
-            android:layout_width="@dimen/action_button_size"
-            android:layout_height="@dimen/action_button_size"
-            android:layout_gravity="center"
-            android:scaleType="fitCenter"
-            android:src="@drawable/ic_check_white_24dp"
-            app:elevation="6dp"/>
-
-    </FrameLayout>
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/save_event"
+        android:layout_width="@dimen/action_button_size"
+        android:layout_height="@dimen/action_button_size"
+        android:layout_gravity="bottom|right"
+        android:layout_marginBottom="@dimen/default_margin"
+        android:layout_marginRight="@dimen/default_margin"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_check_white_24dp"
+        app:elevation="6dp"/>
 
     <com.bsmwireless.widgets.snackbar.SnackBarLayout
         android:id="@+id/snackbar"

@@ -236,16 +236,16 @@ public class LogsFragment extends BaseFragment implements LogsView {
     public void showTitleButton(LogsTitleView.Type expandedType) {
         switch (expandedType) {
             case EVENTS:
-                if (mEditLogHeaderFloatingActionButton.getVisibility() == View.VISIBLE) {
-                    mEditLogHeaderFloatingActionButton.setVisibility(View.GONE);
+                if (mEditLogHeaderFloatingActionButton.isShown()) {
+                    mEditLogHeaderFloatingActionButton.hide();
                 }
-                mAddEventFloatingActionButton.setVisibility(View.VISIBLE);
+                mAddEventFloatingActionButton.show();
                 break;
             case LOG_HEADER:
-                if (mAddEventFloatingActionButton.getVisibility() == View.VISIBLE) {
-                    mAddEventFloatingActionButton.setVisibility(View.GONE);
+                if (mAddEventFloatingActionButton.isShown()) {
+                    mAddEventFloatingActionButton.hide();
                 }
-                mEditLogHeaderFloatingActionButton.setVisibility(View.VISIBLE);
+                mEditLogHeaderFloatingActionButton.show();
                 break;
             default:
                 break;
@@ -257,10 +257,10 @@ public class LogsFragment extends BaseFragment implements LogsView {
     public void hideTitleButton(LogsTitleView.Type expandedType) {
         switch (expandedType) {
             case EVENTS:
-                mAddEventFloatingActionButton.setVisibility(View.GONE);
+                mAddEventFloatingActionButton.hide();
                 break;
             case LOG_HEADER:
-                mEditLogHeaderFloatingActionButton.setVisibility(View.GONE);
+                mEditLogHeaderFloatingActionButton.hide();
                 break;
             default:
                 break;

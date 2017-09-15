@@ -12,31 +12,29 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
-    <FrameLayout
-        android:layout_width="@dimen/action_button_frame_size"
-        android:layout_height="@dimen/action_button_frame_size"
-        android:layout_gravity="bottom|right">
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/add_event"
+        android:layout_width="@dimen/action_button_size"
+        android:layout_height="@dimen/action_button_size"
+        android:layout_gravity="bottom|right"
+        android:layout_marginBottom="@dimen/default_margin"
+        android:layout_marginRight="@dimen/default_margin"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_add"
+        android:visibility="gone"
+        app:elevation="6dp"/>
 
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/add_event"
-            android:layout_width="@dimen/action_button_size"
-            android:layout_height="@dimen/action_button_size"
-            android:layout_gravity="center"
-            android:scaleType="fitCenter"
-            android:src="@drawable/ic_add"
-            android:visibility="gone"
-            app:elevation="6dp"/>
-
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/edit_log_header"
-            android:layout_width="@dimen/action_button_size"
-            android:layout_height="@dimen/action_button_size"
-            android:layout_gravity="center"
-            android:scaleType="fitCenter"
-            android:src="@drawable/ic_edit"
-            android:visibility="gone"
-            app:elevation="6dp"/>
-
-    </FrameLayout>
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/edit_log_header"
+        android:layout_width="@dimen/action_button_size"
+        android:layout_height="@dimen/action_button_size"
+        android:layout_gravity="bottom|right"
+        android:layout_marginBottom="@dimen/default_margin"
+        android:layout_marginRight="@dimen/default_margin"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_edit"
+        android:visibility="gone"
+        app:elevation="6dp"/>
 
 </android.support.design.widget.CoordinatorLayout>
+
