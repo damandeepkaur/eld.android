@@ -8,6 +8,7 @@ import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.data.storage.carriers.CarrierDao;
 import com.bsmwireless.data.storage.hometerminals.HomeTerminalDao;
 import com.bsmwireless.data.storage.users.FullUserEntity;
+import com.bsmwireless.data.storage.users.UserConverter;
 import com.bsmwireless.data.storage.users.UserDao;
 import com.bsmwireless.data.storage.users.UserEntity;
 import com.bsmwireless.models.Auth;
@@ -46,6 +47,7 @@ import io.reactivex.subscribers.TestSubscriber;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
@@ -182,13 +184,21 @@ public class UserInteractorTest {
     @Test
     public void testLoginUserSuccess() {
         // given
+        List<ELDEvent> eldEvents = new ArrayList<>();
+
         User user = makeFakeUser();
+
+        // TODO: add test-case for missing information such as TZ, if valid use-case(s)
+        // this test throws exception when no TZ is defined
+        user.setTimezone("UTC");
+
         TestObserver<Boolean> testObserver = TestObserver.create();
         String fakeAccountName = "fake account name";
 
         when(mServiceApi.loginUser((any(LoginModel.class)))).thenReturn(Observable.just(user));
         when(mTokenManager.getAccountName(anyString(), anyString())).thenReturn(fakeAccountName);
         when(mAppDatabase.userDao()).thenReturn(mUserDao);
+        when(mServiceApi.getELDEvents(anyLong(), anyLong())).thenReturn(Observable.just(eldEvents));
 
         // when
         mLoginUserInteractor.loginUser(mName, mPassword, mDomain, mKeepToken, mDriverType)
@@ -214,8 +224,14 @@ public class UserInteractorTest {
     @Test
     public void testLoginUserCarriers() {
         // given
+        List<ELDEvent> eldEvents = new ArrayList<>();
+
         User user = makeFakeUser();
         user.setId(123456);
+
+        // TODO: add test-case for missing information such as TZ, if valid use-case(s)
+        // this test throws exception when no TZ is defined
+        user.setTimezone("UTC");
 
         TestObserver<Boolean> testObserver = TestObserver.create();
         String fakeAccountName = "fake account name";
@@ -223,6 +239,7 @@ public class UserInteractorTest {
         when(mServiceApi.loginUser((any(LoginModel.class)))).thenReturn(Observable.just(user));
         when(mTokenManager.getAccountName(anyString(), anyString())).thenReturn(fakeAccountName);
         when(mAppDatabase.userDao()).thenReturn(mUserDao);
+        when(mServiceApi.getELDEvents(anyLong(), anyLong())).thenReturn(Observable.just(eldEvents));
 
         when(mAppDatabase.carrierDao()).thenReturn(mCarrierDao);
 
@@ -253,8 +270,14 @@ public class UserInteractorTest {
     @Test
     public void testLoginUserHomeTerminals() {
         // given
+        List<ELDEvent> eldEvents = new ArrayList<>();
+
         User user = makeFakeUser();
         user.setId(123456);
+
+        // TODO: add test-case for missing information such as TZ, if valid use-case(s)
+        // this test throws exception when no TZ is defined
+        user.setTimezone("UTC");
 
         List<HomeTerminal> homeTerminals = new ArrayList<>();
 
@@ -274,6 +297,7 @@ public class UserInteractorTest {
         when(mServiceApi.loginUser((any(LoginModel.class)))).thenReturn(Observable.just(user));
         when(mTokenManager.getAccountName(anyString(), anyString())).thenReturn(fakeAccountName);
         when(mAppDatabase.userDao()).thenReturn(mUserDao);
+        when(mServiceApi.getELDEvents(anyLong(), anyLong())).thenReturn(Observable.just(eldEvents));
 
         when(mAppDatabase.homeTerminalDao()).thenReturn(mHomeTerminalDao);
 
@@ -293,8 +317,14 @@ public class UserInteractorTest {
     @Test
     public void testLoginUserLastVehicles() {
         // given
+        List<ELDEvent> eldEvents = new ArrayList<>();
+
         User user = makeFakeUser();
         user.setId(123456);
+
+        // TODO: add test-case for missing information such as TZ, if valid use-case(s)
+        // this test throws exception when no TZ is defined
+        user.setTimezone("UTC");
 
         TestObserver<Boolean> testObserver = TestObserver.create();
         String fakeAccountName = "fake account name";
@@ -305,6 +335,7 @@ public class UserInteractorTest {
         when(mServiceApi.loginUser((any(LoginModel.class)))).thenReturn(Observable.just(user));
         when(mTokenManager.getAccountName(anyString(), anyString())).thenReturn(fakeAccountName);
         when(mAppDatabase.userDao()).thenReturn(mUserDao);
+        when(mServiceApi.getELDEvents(anyLong(), anyLong())).thenReturn(Observable.just(eldEvents));
 
         when(mUserDao.getUserLastVehiclesSync(any(Integer.class))).thenReturn(lastVehicles);
 
@@ -322,10 +353,30 @@ public class UserInteractorTest {
     @Test
     public void testLoginUser() {
         // given
+
+        int driverId = 12345;
         User user = makeFakeUser();
+        List<ELDEvent> eldEvents = new ArrayList<>();
+
+        // TODO: add test-case for missing information such as TZ, if valid use-case(s)
+        // this test throws exception when no TZ is defined
+        user.setTimezone("UTC");
+
+        user.setAuth(makeFakeAuth(driverId,
+                "fakeToken",
+                "fakeCluster",
+                111111, // orgId
+                20000000L)); // expire
+
+        UserEntity userEntity = UserConverter.toEntity(user);
 
         TestObserver<Boolean> testObserver = new TestObserver<>();
         when(mServiceApi.loginUser(any(LoginModel.class))).thenReturn(Observable.just(user));
+        when(mAppDatabase.userDao()).thenReturn(mUserDao);
+        when(mTokenManager.getDriver(anyString())).thenReturn(Integer.toString(driverId));
+        when(mTokenManager.getPassword(anyString())).thenReturn(mPassword);
+        when(mUserDao.getUserSync(anyInt())).thenReturn(userEntity);
+        when(mServiceApi.getELDEvents(anyLong(), anyLong())).thenReturn(Observable.just(eldEvents));
 
         // when
         mLoginUserInteractor.loginUser(mName, mPassword, mDomain, mKeepToken, mDriverType)
@@ -363,8 +414,6 @@ public class UserInteractorTest {
         mLoginUserInteractor.deleteDriver();
 
         // then
-        verify(mUserDao).deleteUser(eq(driverInt));
-        verify(mTokenManager).removeAccount(eq(accountName));
         verify(mPreferencesManager).clearValues();
     }
 
@@ -913,6 +962,27 @@ public class UserInteractorTest {
 
 
         return user;
+    }
+
+    /**
+     * Make a fake Auth for testing purposes.
+     *
+     * @param driverId driver id
+     * @param token token
+     * @param cluster cluster
+     * @param orgId organization id
+     * @param expire expire in UTC timestamp
+     * @return Auth containing passed information
+     */
+    private Auth makeFakeAuth(int driverId, String token, String cluster, Integer orgId, Long expire) {
+        Auth auth = new Auth(driverId);
+
+        auth.setToken(token);
+        auth.setCluster(cluster);
+        auth.setOrgId(orgId);
+        auth.setExpire(expire);
+
+        return auth;
     }
 
     /**

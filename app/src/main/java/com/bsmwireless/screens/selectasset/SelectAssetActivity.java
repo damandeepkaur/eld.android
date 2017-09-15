@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -76,6 +77,12 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
 
     @BindView(R.id.select_asset_snackbar)
     SnackBarLayout mSnackBarLayout;
+
+    @BindView(R.id.select_asset_scan_qr_code_button)
+    AppCompatButton mSelectAssetScanQrCodeButton;
+
+    @BindView(R.id.select_asset_not_in_vehicle_button)
+    AppCompatButton mSelectAssetNotInVehicleButton;
 
     @Inject
     SelectAssetPresenter mPresenter;
@@ -293,6 +300,12 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
         if (mSelectAssetProgressBar != null) {
             mSelectAssetProgressBarContainer.setVisibility(View.VISIBLE);
             mSelectAssetProgressBar.setIndeterminate(true);
+
+            mSearchRecyclerView.setEnabled(false);
+            mLastRecyclerView.setEnabled(false);
+
+            mSelectAssetScanQrCodeButton.setEnabled(false);
+            mSelectAssetNotInVehicleButton.setEnabled(false);
         }
     }
 
@@ -301,6 +314,12 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
         if (mSelectAssetProgressBar != null) {
             mSelectAssetProgressBarContainer.setVisibility(View.GONE);
             mSelectAssetProgressBar.setIndeterminate(false);
+
+            mSearchRecyclerView.setEnabled(true);
+            mLastRecyclerView.setEnabled(true);
+
+            mSelectAssetScanQrCodeButton.setEnabled(true);
+            mSelectAssetNotInVehicleButton.setEnabled(true);
         }
     }
 
