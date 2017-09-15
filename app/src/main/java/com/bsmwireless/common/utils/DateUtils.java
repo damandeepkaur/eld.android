@@ -39,7 +39,7 @@ public class DateUtils {
     }
 
     /**
-     * @param zone  user timezone for example "America/Los_Angeles"
+     * @param zone     user timezone for example "America/Los_Angeles"
      * @param calendar calendar with set appropriate day.
      * @return start date in ms
      */
@@ -48,8 +48,8 @@ public class DateUtils {
         Calendar calendarWithTimezone = Calendar.getInstance(timeZone);
         calendarWithTimezone.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH),
                 calendar.get(Calendar.DAY_OF_MONTH), 0, 0, 0);
-
-        return calendarWithTimezone.getTimeInMillis();
+        long timeInMs = calendarWithTimezone.getTimeInMillis();
+        return timeInMs - timeInMs % 1000;
     }
 
     /**
@@ -259,4 +259,11 @@ public class DateUtils {
         long realTimeInMiliseconds = System.currentTimeMillis() + realTimeInMilisecondsDiff;
         return realTimeInMiliseconds;
     }
+
+    public static String convertToFullTime(String timezone, Date date) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm MMM dd, yyyy", Locale.US);
+        dateFormat.setTimeZone(TimeZone.getTimeZone(timezone));
+        return dateFormat.format(date);
+    }
+
 }

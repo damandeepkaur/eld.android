@@ -9,9 +9,7 @@ import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.view.View;
 
-import com.bsmwireless.common.utils.DateUtils;
 import com.bsmwireless.common.utils.ViewUtils;
-import com.bsmwireless.screens.logs.dagger.EventLogModel;
 import com.bsmwireless.widgets.alerts.DutyType;
 
 import java.util.ArrayList;
@@ -144,12 +142,9 @@ public class ELDGraphView extends View {
         }
     }
 
-    public void setLogs(final List<EventLogModel> logs) {
-        mLogs = prepareEvents(logs);
-        if (!logs.isEmpty()) {
-            EventLogModel firstLog = logs.get(0);
-            mStartDayUnixTimeInMs = DateUtils.getStartDayTimeInMs(firstLog.getDriverTimezone(), firstLog.getEventTime());
-        }
+    public void setLogs(final List<DrawableLog> logs, long startDayIime) {
+        mLogs = logs;
+        mStartDayUnixTimeInMs = startDayIime;
         invalidateLogsData = true;
         invalidate();
     }
@@ -217,7 +212,7 @@ public class ELDGraphView extends View {
             x2 = x1 + timeStamp * gridUnit;
             y2 = mGraphTop + event.getEventCode() * mSegmentHeight + mSegmentHeight / 2;
 
-            color = ContextCompat.getColor(getContext(), prevEvent.getEventType().getColor());
+            color = ContextCompat.getColor(getContext(), prevEvent.getEventDutyType().getColor());
             mHorizontalLinesPaint.setColor(color);
 
             if (prevEvent.isSpecialStatus()) {
@@ -242,7 +237,7 @@ public class ELDGraphView extends View {
         }
 
         DrawableLog log = logData.get(logData.size() - 1);
-        color = ContextCompat.getColor(getContext(), log.getEventType().getColor());
+        color = ContextCompat.getColor(getContext(), log.getEventDutyType().getColor());
         mHorizontalLinesPaint.setColor(color);
 
         if (log.isSpecialStatus()) {
@@ -264,60 +259,5 @@ public class ELDGraphView extends View {
         }
 
         canvas.drawLine(x1, y1, x2, y1, mHorizontalLinesPaint);
-    }
-
-    private List<DrawableLog> prepareEvents(List<EventLogModel> events) {
-        List<DrawableLog> result = new ArrayList<>();
-        for (int i = 0; i < events.size(); i++) {
-            EventLogModel event = events.get(i);
-            DutyType dutyType = DutyType.getTypeByCode(event.getEventType(), event.getEventCode());
-            DrawableLog log;
-            if (event.isActive() && event.isDutyEvent()) {
-                if (DutyType.CLEAR.equals(dutyType) || DutyType.CLEAR_PU.equals(dutyType)
-                        || DutyType.CLEAR_YM.equals(dutyType)) {
-                    DutyType type = event.getDutyType();
-                    log = new DrawableLog(type, event.getEventTime(), event.getDuration());
-                } else {
-                    log = new DrawableLog(dutyType, event.getEventTime(), event.getDuration());
-                }
-                result.add(log);
-            }
-        }
-        return result;
-    }
-
-    private static class DrawableLog {
-        private DutyType mType;
-        private long mTime;
-        private long mDuration;
-
-        public DrawableLog() {
-        }
-
-        public DrawableLog(DutyType type, long time, long duration) {
-            mType = type;
-            mTime = time;
-            mDuration = duration;
-        }
-
-        public DutyType getEventType() {
-            return mType;
-        }
-
-        public int getEventCode() {
-            return mType.getOriginalCode() - 1;
-        }
-
-        public long getEventTime() {
-            return mTime;
-        }
-
-        public boolean isSpecialStatus() {
-            return mType.equals(DutyType.PERSONAL_USE) || mType.equals(DutyType.YARD_MOVES);
-        }
-
-        public long getDuration() {
-            return mDuration;
-        }
     }
 }
