@@ -34,71 +34,71 @@ import static org.mockito.Mockito.when;
 public class LockScreenPresenterTest {
 
     @Mock
-    LockScreenView lockScreenView;
+    LockScreenView mLockScreenView;
     @Mock
-    DutyTypeManager dutyManager;
+    DutyTypeManager mDutyTypeManager;
     @Mock
-    BlackBox blackBox;
+    BlackBox mBlackBox;
     @Mock
-    PreferencesManager preferencesManager;
+    PreferencesManager mPreferencesManager;
     @Mock
-    AccountManager accountManager;
+    AccountManager mAccountManager;
     @Mock
-    ELDEventsInteractor eventsInteractor;
+    ELDEventsInteractor mELDEventsInteractor;
 
-    LockScreenPresenter presenter;
+    LockScreenPresenter mPresenter;
 
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-        presenter = new LockScreenPresenter(
-                dutyManager,
-                new BlackBoxConnectionManagerImpl(blackBox),
-                preferencesManager,
+        mPresenter = new LockScreenPresenter(
+                mDutyTypeManager,
+                new BlackBoxConnectionManagerImpl(mBlackBox),
+                mPreferencesManager,
                 new BlackBoxSimpleChecker(),
-                eventsInteractor,
+                mELDEventsInteractor,
                 TimeUnit.MILLISECONDS.toMillis(1),
                 TimeUnit.MILLISECONDS.toMillis(1),
-                accountManager);
+                mAccountManager);
         RxAndroidPlugins.setInitMainThreadSchedulerHandler(schedulerCallable -> Schedulers.trampoline());
         RxJavaPlugins.setIoSchedulerHandler(scheduler -> Schedulers.trampoline());
     }
 
     @Test
     public void testStatuses() throws Exception {
-        when(dutyManager.getDutyTypeTime(DutyType.DRIVING)).thenReturn(1L);
-        when(dutyManager.getDutyTypeTime(DutyType.SLEEPER_BERTH)).thenReturn(2L);
-        when(dutyManager.getDutyTypeTime(DutyType.ON_DUTY)).thenReturn(3L);
-        when(dutyManager.getDutyTypeTime(DutyType.OFF_DUTY)).thenReturn(4L);
+        when(mDutyTypeManager.getDutyTypeTime(DutyType.DRIVING)).thenReturn(1L);
+        when(mDutyTypeManager.getDutyTypeTime(DutyType.SLEEPER_BERTH)).thenReturn(2L);
+        when(mDutyTypeManager.getDutyTypeTime(DutyType.ON_DUTY)).thenReturn(3L);
+        when(mDutyTypeManager.getDutyTypeTime(DutyType.OFF_DUTY)).thenReturn(4L);
 
-        when(blackBox.getDataObservable()).thenReturn(Observable.empty());
+        when(mBlackBox.getDataObservable()).thenReturn(Observable.empty());
 
-        presenter.onStart(lockScreenView);
-        verify(lockScreenView).setTimeForDutyType(DutyType.DRIVING, 1L);
-        verify(lockScreenView).setTimeForDutyType(DutyType.SLEEPER_BERTH, 2L);
-        verify(lockScreenView).setTimeForDutyType(DutyType.ON_DUTY, 3L);
-        verify(lockScreenView).setTimeForDutyType(DutyType.OFF_DUTY, 4L);
+        mPresenter.onStart(mLockScreenView);
+        verify(mLockScreenView).setTimeForDutyType(DutyType.DRIVING, 1L);
+        verify(mLockScreenView).setTimeForDutyType(DutyType.SLEEPER_BERTH, 2L);
+        verify(mLockScreenView).setTimeForDutyType(DutyType.ON_DUTY, 3L);
+        verify(mLockScreenView).setTimeForDutyType(DutyType.OFF_DUTY, 4L);
     }
 
     @Test
     public void testSwitchCoDriverInNonStartedState() throws Exception {
-        presenter.switchCoDriver();
-        verify(lockScreenView, never()).openCoDriverDialog();
+        mPresenter.switchCoDriver();
+        verify(mLockScreenView, never()).openCoDriverDialog();
     }
 
     @Test
     public void testSwitchCoDriver() throws Exception {
-        when(blackBox.getDataObservable()).thenReturn(Observable.empty());
-        presenter.onStart(lockScreenView);
-        presenter.switchCoDriver();
-        verify(lockScreenView).openCoDriverDialog();
+        when(mBlackBox.getDataObservable()).thenReturn(Observable.empty());
+        mPresenter.onStart(mLockScreenView);
+        mPresenter.switchCoDriver();
+        verify(mLockScreenView).openCoDriverDialog();
     }
 
     @Test
     public void startMonitoring() throws Exception {
-        when(blackBox.getDataObservable()).thenReturn(Observable.empty());
-        presenter.onStart(lockScreenView);
-        verify(lockScreenView).removeAnyPopup();
+        when(mBlackBox.getDataObservable()).thenReturn(Observable.empty());
+        mPresenter.onStart(mLockScreenView);
+        verify(mLockScreenView).removeAnyPopup();
     }
 
     @Test
@@ -111,15 +111,15 @@ public class LockScreenPresenterTest {
         when(anyMock.getResponseType()).thenReturn(BlackBoxResponseModel.ResponseType.MOVING);
 
         final BehaviorSubject<BlackBoxModel> subject = BehaviorSubject.create();
-        when(blackBox.getDataObservable()).thenReturn(subject);
+        when(mBlackBox.getDataObservable()).thenReturn(subject);
 
-        when(eventsInteractor.postNewELDEvent(any())).thenReturn(Single.just(1L));
+        when(mELDEventsInteractor.postNewELDEvent(any())).thenReturn(Single.just(1L));
 
-        presenter.onStart(lockScreenView);
+        mPresenter.onStart(mLockScreenView);
         subject.onNext(stoppedMock);
         subject.onNext(anyMock);
         subject.onComplete();
-        verify(lockScreenView).closeLockScreen();
+        verify(mLockScreenView).closeLockScreen();
     }
 
     @Test
@@ -129,15 +129,15 @@ public class LockScreenPresenterTest {
         when(ignitionOffMock.getResponseType()).thenReturn(BlackBoxResponseModel.ResponseType.IGNITION_OFF);
 
         final BehaviorSubject<BlackBoxModel> subject = BehaviorSubject.create();
-        when(blackBox.getDataObservable()).thenReturn(subject);
+        when(mBlackBox.getDataObservable()).thenReturn(subject);
 
-        when(eventsInteractor.postNewELDEvent(any())).thenReturn(Single.just(1L));
+        when(mELDEventsInteractor.postNewELDEvent(any())).thenReturn(Single.just(1L));
 
-        presenter.onStart(lockScreenView);
-        verify(lockScreenView).removeAnyPopup();
+        mPresenter.onStart(mLockScreenView);
+        verify(mLockScreenView).removeAnyPopup();
         subject.onNext(ignitionOffMock);
-        verify(eventsInteractor).postNewELDEvent(any());
-        verify(lockScreenView).showIgnitionOffDetectedDialog();
+        verify(mELDEventsInteractor).postNewELDEvent(any());
+        verify(mLockScreenView).showIgnitionOffDetectedDialog();
 
     }
 }

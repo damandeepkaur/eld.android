@@ -28,7 +28,7 @@ public class MonitoringServicePresenter {
     private Disposable mMonitoringDisposable;
     private final DutyTypeManager mDutyTypeManager;
     private final AccountManager mAccountManager;
-    final BlackBoxStateChecker checker;
+    final BlackBoxStateChecker mChecker;
 
     @Inject
     public MonitoringServicePresenter(MonitoringServiceView mView,
@@ -39,7 +39,7 @@ public class MonitoringServicePresenter {
         this.mBlackBox = blackBox;
         this.mDutyTypeManager = dutyTypeManager;
         this.mAccountManager = accountManager;
-        this.checker = checker;
+        this.mChecker = checker;
         mMonitoringDisposable = Disposables.disposed();
     }
 
@@ -67,19 +67,15 @@ public class MonitoringServicePresenter {
                 .filter(this::checkConditions)
                 .firstOrError()
                 .subscribe(blackBoxModel -> mView.startLockScreen(),
-                        throwable -> {
-                            Timber.d(throwable, "Monitoring status error");
-                            // Some exception occurs, start monitoring again
-//                            startMonitoring();
-                        });
+                        throwable -> Timber.d(throwable, "Monitoring status error"));
     }
 
     boolean checkConditions(Result result) {
 
-        Timber.d("Moving - " + checker.isMoving(result.blackBoxModel));
+        Timber.d("Moving - " + mChecker.isMoving(result.blackBoxModel));
 
         return mAccountManager.isCurrentUserDriver() &&
-                checker.isMoving(result.blackBoxModel) &&
+                mChecker.isMoving(result.blackBoxModel) &&
                 (result.dutyType != DutyType.PERSONAL_USE && result.dutyType != DutyType.YARD_MOVES);
     }
 

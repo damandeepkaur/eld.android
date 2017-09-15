@@ -46,7 +46,6 @@ public class LockScreenPresenter {
     private final long mIdlingTimeoutMillis;
     private final AccountManager mAccountManager;
     private final AtomicReference<Completable> mReconnectionReference;
-    // Disposable for current monitoring task
     private Disposable idlingTDisposable;
     private volatile BlackBoxResponseModel.ResponseType mCurrentResponseType;
 

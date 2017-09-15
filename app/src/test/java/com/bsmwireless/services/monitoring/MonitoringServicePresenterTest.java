@@ -2,8 +2,10 @@ package com.bsmwireless.services.monitoring;
 
 
 import com.bsmwireless.BaseTest;
+import com.bsmwireless.common.utils.BlackBoxStateChecker;
 import com.bsmwireless.data.network.blackbox.BlackBoxConnectionManager;
 import com.bsmwireless.data.network.blackbox.models.BlackBoxResponseModel;
+import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.models.BlackBoxModel;
@@ -20,6 +22,7 @@ import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.PublishSubject;
 import io.reactivex.subjects.Subject;
 
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -30,19 +33,27 @@ import static org.mockito.Mockito.when;
 public class MonitoringServicePresenterTest extends BaseTest {
 
     @Mock
-    MonitoringServiceView view;
+    MonitoringServiceView mView;
     @Mock
-    PreferencesManager preferencesManager;
+    PreferencesManager mPreferencesManager;
     @Mock
-    BlackBoxConnectionManager blackBox;
+    BlackBoxConnectionManager mBlackBox;
+    @Mock
+    AccountManager mAccountManager;
+    @Mock
+    BlackBoxStateChecker mChecker;
 
     private DutyTypeManager dutyTypeManager;
     private MonitoringServicePresenter presenter;
 
     @Before
     public void setUp() throws Exception {
-        dutyTypeManager = spy(new DutyTypeManager(preferencesManager));
-        presenter = new MonitoringServicePresenter(view, blackBox, dutyTypeManager, null, null);
+        dutyTypeManager = spy(new DutyTypeManager(mPreferencesManager));
+        presenter = new MonitoringServicePresenter(mView,
+                mBlackBox,
+                dutyTypeManager,
+                mAccountManager,
+                mChecker);
         RxJavaPlugins.setIoSchedulerHandler(scheduler -> Schedulers.trampoline());
         RxJavaPlugins.setComputationSchedulerHandler(scheduler -> Schedulers.trampoline());
 
@@ -50,56 +61,58 @@ public class MonitoringServicePresenterTest extends BaseTest {
 
     @Test
     public void testStartMonitoringCompleted() throws Exception {
-        when(blackBox.getDataObservable()).thenReturn(Observable.empty());
+        when(mBlackBox.getDataObservable()).thenReturn(Observable.empty());
+
+        when(mAccountManager.isCurrentUserDriver()).thenReturn(false);
+        when(mChecker.isMoving(any())).thenReturn(false);
+
         presenter.startMonitoring();
-        verify(blackBox).getDataObservable();
-        verify(view, never()).startLockScreen();
+        verify(mBlackBox).getDataObservable();
+        verify(mView, never()).startLockScreen();
     }
 
     @Test
-    @Ignore // Handler not Mocked
+    @Ignore("Handler not mocked")
     public void testStartMonitoring() throws Exception {
         final BlackBoxModel blackBoxModel = mock(BlackBoxModel.class);
         when(blackBoxModel.getResponseType()).thenReturn(BlackBoxResponseModel.ResponseType.MOVING);
 
         final Subject<BlackBoxModel> subject = BehaviorSubject.create();
-        when(blackBox.getDataObservable()).thenReturn(subject);
+        when(mBlackBox.getDataObservable()).thenReturn(subject);
 
-        when(preferencesManager.getDutyType()).thenReturn(0);
+        when(mPreferencesManager.getDutyType()).thenReturn(0);
 
         subject.onNext(blackBoxModel);
         presenter.startMonitoring();
 
-        verify(blackBox).getDataObservable();
-        verify(view).startLockScreen();
+        verify(mBlackBox).getDataObservable();
+        verify(mView).startLockScreen();
     }
 
     @Test
-    @Ignore // Handler not Mocked
+    @Ignore("Handler not mocked")
     public void testStartMonitoringTwice() throws Exception {
-
-//        RxJavaPlugins.setIoSchedulerHandler(scheduler -> Schedulers.newThread());
 
 //        dutyTypeManager.setDutyType(DutyType.ON_DUTY, false);
 
         final Subject<BlackBoxModel> subject = PublishSubject.create();
-        when(blackBox.getDataObservable()).thenReturn(subject);
+        when(mBlackBox.getDataObservable()).thenReturn(subject);
         presenter.startMonitoring();
         presenter.startMonitoring();
-        verify(blackBox).getDataObservable();
+        verify(mBlackBox).getDataObservable();
         subject.onComplete();
     }
 
     @Test
     public void testStartMonitoringTwiceAfterCompleted() throws Exception {
-        when(blackBox.getDataObservable()).thenReturn(Observable.empty());
+        when(mBlackBox.getDataObservable()).thenReturn(Observable.empty());
         presenter.startMonitoring();
         presenter.startMonitoring();
-        verify(blackBox, times(2)).getDataObservable();
+        verify(mBlackBox, times(2)).getDataObservable();
     }
 
     @Test
-    @Ignore // Handler not Mocked
+    @Ignore("Handler not mocked")
     public void testEventReceiving() throws Exception {
 
         final BlackBoxModel blackBoxModelFirst = mock(BlackBoxModel.class);
@@ -109,17 +122,17 @@ public class MonitoringServicePresenterTest extends BaseTest {
         when(blackBoxModelSecond.getResponseType()).thenReturn(BlackBoxResponseModel.ResponseType.MOVING);
 
         final Subject<BlackBoxModel> subject = PublishSubject.create();
-        when(blackBox.getDataObservable()).thenReturn(subject);
+        when(mBlackBox.getDataObservable()).thenReturn(subject);
 
         presenter.startMonitoring();
         subject.onNext(blackBoxModelFirst);
-        verify(view, never()).startLockScreen();
+        verify(mView, never()).startLockScreen();
         subject.onNext(blackBoxModelSecond);
-        verify(view).startLockScreen();
+        verify(mView).startLockScreen();
     }
 
     @Test
-    @Ignore // Handler not Mocked
+    @Ignore("Handler not mocked")
     public void testStopMonitoring() throws Exception {
         final BlackBoxModel blackBoxModelFirst = mock(BlackBoxModel.class);
         when(blackBoxModelFirst.getResponseType()).thenReturn(BlackBoxResponseModel.ResponseType.IGNITION_ON);
@@ -128,13 +141,13 @@ public class MonitoringServicePresenterTest extends BaseTest {
         when(blackBoxModelSecond.getResponseType()).thenReturn(BlackBoxResponseModel.ResponseType.MOVING);
 
         final Subject<BlackBoxModel> subject = PublishSubject.create();
-        when(blackBox.getDataObservable()).thenReturn(subject);
+        when(mBlackBox.getDataObservable()).thenReturn(subject);
 
         presenter.startMonitoring();
         subject.onNext(blackBoxModelFirst);
-        verify(view, never()).startLockScreen();
+        verify(mView, never()).startLockScreen();
         presenter.stopMonitoring();
         subject.onNext(blackBoxModelSecond);
-        verify(view, never()).startLockScreen();
+        verify(mView, never()).startLockScreen();
     }
 }
