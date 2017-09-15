@@ -82,23 +82,7 @@
 
             </android.support.design.widget.TextInputLayout>
 
-            <android.support.design.widget.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/default_margin"
-                app:counterEnabled="true"
-                app:counterMaxLength="@integer/max_comment_length">
-
-                <android.support.design.widget.TextInputEditText
-                    android:id="@+id/comment"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/edit_event_comment"
-                    android:maxLength="@integer/max_comment_length"
-                    style="@style/TextInputEditText"
-                    android:imeOptions="actionDone"/>
-
-            </android.support.design.widget.TextInputLayout>
+            <include layout="@layout/view_comment"/>
 
         </LinearLayout>
 

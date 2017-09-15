@@ -91,7 +91,7 @@ public class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListener {
                         ELDEvent.EnginePowerCode.SHUT_DOWN));
 
                 if (mDutyTypeManager.getDutyType() == DutyType.YARD_MOVES) {
-                    events.add(mEventsInteractor.getEvent(DutyType.CLEAR, true));
+                    events.add(mEventsInteractor.getEvent(DutyType.CLEAR, null, true));
                 }
                 break;
 
@@ -115,7 +115,7 @@ public class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListener {
                 mHandler.removeCallbacks(mAutoOnDutyTask);
 
                 if (mDutyTypeManager.getDutyType() != DutyType.PERSONAL_USE && mDutyTypeManager.getDutyType() != DutyType.YARD_MOVES) {
-                    events.add(mEventsInteractor.getEvent(DutyType.DRIVING, true));
+                    events.add(mEventsInteractor.getEvent(DutyType.DRIVING, null, true));
 
                 } else if (mDutyTypeManager.getDutyType() == DutyType.PERSONAL_USE) {
                     if (mListener != null) {
