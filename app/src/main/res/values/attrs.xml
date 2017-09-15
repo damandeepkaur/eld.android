@@ -57,5 +57,12 @@
         <attr name="size"/>
     </declare-styleable>
 
+    <declare-styleable name="StatusView">
+        <attr name="sv_text" format="string"/>
+        <attr name="sv_color" format="color"/>
+        <attr name="sv_background_color" format="color"/>
+        <attr name="sv_line_enabled" format="boolean"/>
+    </declare-styleable>
+
 </resources>
 

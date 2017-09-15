@@ -5,9 +5,13 @@ import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
 import com.bsmwireless.widgets.alerts.DutyType;
 
+import java.util.regex.Matcher;
+
 import javax.inject.Inject;
 
 import timber.log.Timber;
+
+import static com.bsmwireless.common.Constants.COMMENT_VALIDATE_PATTERN;
 
 @ActivityScope
 public class DashboardPresenter {
@@ -51,5 +55,16 @@ public class DashboardPresenter {
         } else {
             mView.showNotInVehicleDialog();
         }
+    }
+
+    DashboardView.Error validateComment(String comment) {
+        if (comment.length() < 4) {
+            return DashboardView.Error.INVALID_COMMENT_LENGTH;
+        }
+        Matcher matcher = COMMENT_VALIDATE_PATTERN.matcher(comment);
+        if (matcher.find()) {
+            return DashboardView.Error.INVALID_COMMENT;
+        }
+        return DashboardView.Error.VALID_COMMENT;
     }
 }
