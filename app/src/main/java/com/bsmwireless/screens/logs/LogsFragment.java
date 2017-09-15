@@ -143,16 +143,7 @@ public class LogsFragment extends BaseFragment implements LogsView {
         mNavigateView.getSnackBar()
                 .setOnReadyListener(snackBar -> snackBar.reset()
                         .setMessage(message)
-                        .setHideableOnTimeout(SnackBarLayout.DURATION_LONG)
-                        .setOnCloseListener(new SnackBarLayout.OnCloseListener() {
-                            @Override
-                            public void onClose(SnackBarLayout snackBar) {
-                            }
-
-                            @Override
-                            public void onOpen(SnackBarLayout snackBar) {
-                            }
-                        }))
+                        .setHideableOnTimeout(SnackBarLayout.DURATION_LONG))
                 .showSnackbar();
     }
 
@@ -175,8 +166,8 @@ public class LogsFragment extends BaseFragment implements LogsView {
     }
 
     @Override
-    public void setHOSTimes(HOSTimesModel hosTimes) {
-        mAdapter.setHOSTimes(hosTimes);
+    public void setPrevDayEvent(ELDEvent event) {
+        mAdapter.setPrevDayEvent(event);
     }
 
     @Override

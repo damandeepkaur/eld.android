@@ -115,13 +115,11 @@ public class PreferencesManager {
     }
 
     public boolean isShowHomeScreenEnabled() {
-        return mPreferences.getBoolean(KEY_SHOW_HOME_SCREEN_ENABLED, false);
+        return mPreferences.getBoolean(KEY_SHOW_HOME_SCREEN_ENABLED, true);
     }
 
     public void clearValues() {
-        boolean rememberUserEnabled = isRememberUserEnabled();
         mPreferences.edit().clear().apply();
-        setRememberUserEnabled(rememberUserEnabled);
     }
 
     public void setBoxGPSEnabled(boolean boxGPSEnabled) {

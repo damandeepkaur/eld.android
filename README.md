@@ -3,9 +3,12 @@ ELD app for Android
 
 # Version history
 
-* **1.0.65** - Replace snackbar to floating action button
+* **1.0.68** - Replace snackbar to floating action button
+* **1.0.67** - Not show 'helper' midnight event in logs screen (_EA-349_)
+* **1.0.66** - Fix seconds value for manually added event (_EA-308_)
+* **1.0.65** - Unable to show the original duty status
 * **1.0.64** - Fixed remember me enable by default
-* **1.0.63** - Fix for crash on login/logout 
+* **1.0.63** - Fix for crash on login/logout
 * **1.0.62** - Added co-driver view notification
 * **1.0.61** - Add NTP sync
 * **1.0.60** - Fix remember me

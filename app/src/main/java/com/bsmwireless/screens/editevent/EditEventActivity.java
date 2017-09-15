@@ -133,32 +133,16 @@ public class EditEventActivity extends BaseMenuActivity implements EditEventView
     public void showError(Error error) {
         mSnackBarLayout.setOnReadyListener(snackBar -> snackBar.reset()
                 .setMessage(getString(error.getStringId()))
-                .setHideableOnTimeout(SnackBarLayout.DURATION_LONG)
-                .setOnCloseListener(new SnackBarLayout.OnCloseListener() {
-                    @Override
-                    public void onClose(SnackBarLayout snackBar) {
-                    }
-
-                    @Override
-                    public void onOpen(SnackBarLayout snackBar) {
-                    }
-                })).showSnackbar();
+                .setHideableOnTimeout(SnackBarLayout.DURATION_LONG))
+                .showSnackbar();
     }
 
     @Override
     public void showError(RetrofitException error) {
         mSnackBarLayout.setOnReadyListener(snackBar -> snackBar.reset()
                 .setMessage(NetworkUtils.getErrorMessage(error, this))
-                .setHideableOnTimeout(SnackBarLayout.DURATION_LONG)
-                .setOnCloseListener(new SnackBarLayout.OnCloseListener() {
-                    @Override
-                    public void onClose(SnackBarLayout snackBar) {
-                    }
-
-                    @Override
-                    public void onOpen(SnackBarLayout snackBar) {
-                    }
-                })).showSnackbar();
+                .setHideableOnTimeout(SnackBarLayout.DURATION_LONG))
+                .showSnackbar();
     }
 
     @Override
@@ -182,7 +166,8 @@ public class EditEventActivity extends BaseMenuActivity implements EditEventView
     }
 
     @Override
-    public void onNothingSelected(AdapterView<?> parent) {}
+    public void onNothingSelected(AdapterView<?> parent) {
+    }
 
     @OnClick(R.id.start_time)
     void onStartTimeClick() {
