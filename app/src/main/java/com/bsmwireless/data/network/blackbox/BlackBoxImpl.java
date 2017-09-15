@@ -8,6 +8,7 @@ import com.bsmwireless.models.BlackBoxModel;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -69,9 +70,6 @@ public final class BlackBoxImpl implements BlackBox {
                     .ignoreElement()
                     .andThen(requestDataImmediately())
                     .flatMapObservable(blackBoxModel -> startContinuousRead())
-                    .timeout(UPDATE_RATE_MILLIS * TIMEOUT_RATIO,
-                            TimeUnit.MILLISECONDS,
-                            Observable.error(new BlackBoxConnectionException(UNKNOWN_ERROR)))
                     .subscribeOn(Schedulers.io())
                     .subscribe(model -> getEmitter().onNext(model),
                             throwable -> {
@@ -130,7 +128,13 @@ public final class BlackBoxImpl implements BlackBox {
     private boolean initializeCommunication(long retryIndex) throws Exception {
         Timber.d("initializeCommunication");
         closeSocket();
-        mSocket = new Socket(WIFI_GATEWAY_IP, WIFI_REMOTE_PORT);
+        mSocket = new Socket();
+        try {
+            mSocket.connect(new InetSocketAddress(WIFI_GATEWAY_IP, WIFI_REMOTE_PORT),
+                    UPDATE_RATE_MILLIS * TIMEOUT_RATIO);
+        } catch (IOException e) {
+            throw new BlackBoxConnectionException(UNKNOWN_ERROR);
+        }
         if (retryIndex == RETRY_COUNT - 1) {
             Timber.e("initializeCommunication error");
             throw new BlackBoxConnectionException(UNKNOWN_ERROR);
@@ -143,6 +147,7 @@ public final class BlackBoxImpl implements BlackBox {
             return true;
         } else if (response.getResponseType() == BlackBoxResponseModel.ResponseType.NACK) {
             Timber.e("readSubscriptionResponse error");
+            closeSocket();
             throw new BlackBoxConnectionException(response.getErrReasonCode());
         }
         return false;
@@ -153,6 +158,9 @@ public final class BlackBoxImpl implements BlackBox {
         return Observable.interval(UPDATE_RATE_MILLIS / UPDATE_RATE_RATIO, TimeUnit.MILLISECONDS)
                 .switchMap(unused -> readStatus())
                 .distinctUntilChanged()
+                .timeout(UPDATE_RATE_MILLIS * TIMEOUT_RATIO,
+                        TimeUnit.MILLISECONDS,
+                        Observable.error(new BlackBoxConnectionException(UNKNOWN_ERROR)))
                 .doOnNext(model -> {
                     mBlackBoxModel.set(model);
                     Timber.v("Box Model processed:" + model.toString());

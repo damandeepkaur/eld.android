@@ -1,13 +1,14 @@
 package com.bsmwireless.screens.navigation;
 
 import com.bsmwireless.common.utils.DateUtils;
+import com.bsmwireless.common.utils.SchedulerUtils;
 import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.data.storage.AutoDutyTypeManager;
 import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.data.storage.users.UserConverter;
 import com.bsmwireless.data.storage.users.UserEntity;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
-import com.bsmwireless.domain.interactors.SyncEventsInteractor;
+import com.bsmwireless.domain.interactors.SyncInteractor;
 import com.bsmwireless.domain.interactors.UserInteractor;
 import com.bsmwireless.domain.interactors.VehiclesInteractor;
 import com.bsmwireless.models.ELDEvent;
@@ -34,7 +35,7 @@ public class NavigationPresenter extends BaseMenuPresenter {
     private NavigateView mView;
     private VehiclesInteractor mVehiclesInteractor;
     private Disposable mResetTimeDisposable;
-    private SyncEventsInteractor mSyncEventsInteractor;
+    private SyncInteractor mSyncInteractor;
     private AutoDutyTypeManager mAutoDutyTypeManager;
     private AccountManager mAccountManager;
 
@@ -56,19 +57,18 @@ public class NavigationPresenter extends BaseMenuPresenter {
     };
 
     @Inject
-    public NavigationPresenter(NavigateView view,
-                               UserInteractor userInteractor,
+    public NavigationPresenter(NavigateView view, UserInteractor userInteractor,
                                VehiclesInteractor vehiclesInteractor,
                                ELDEventsInteractor eventsInteractor,
                                DutyTypeManager dutyTypeManager,
                                AutoDutyTypeManager autoDutyTypeManager,
-                               SyncEventsInteractor syncEventsInteractor,
+                               SyncInteractor syncInteractor,
                                AccountManager accountManager) {
         super(dutyTypeManager, eventsInteractor, userInteractor, accountManager);
         mView = view;
         mVehiclesInteractor = vehiclesInteractor;
         mAutoDutyTypeManager = autoDutyTypeManager;
-        mSyncEventsInteractor = syncEventsInteractor;
+        mSyncInteractor = syncInteractor;
         mResetTimeDisposable = Disposables.disposed();
 
         mAutoDutyTypeManager.setListener(mListener);
@@ -77,7 +77,7 @@ public class NavigationPresenter extends BaseMenuPresenter {
     @Override
     public void onDestroy() {
         mResetTimeDisposable.dispose();
-        mSyncEventsInteractor.stopSync();
+        mSyncInteractor.stopSync();
         mAutoDutyTypeManager.removeListener();
         super.onDestroy();
     }
@@ -91,6 +91,7 @@ public class NavigationPresenter extends BaseMenuPresenter {
                                                        status -> {
                                                            Timber.i("LoginUser status = %b", status);
                                                            if (status) {
+                                                               SchedulerUtils.cancel();
                                                                mView.goToLoginScreen();
                                                            } else {
                                                                mView.showErrorMessage("Logout failed");
@@ -118,7 +119,7 @@ public class NavigationPresenter extends BaseMenuPresenter {
                                         .observeOn(AndroidSchedulers.mainThread())
                                         .subscribe(count -> mView.setCoDriversNumber(count)));
         mAutoDutyTypeManager.validateBlackBoxState();
-        mSyncEventsInteractor.startSync();
+        mSyncInteractor.startSync();
     }
 
     public void onResetTime() {

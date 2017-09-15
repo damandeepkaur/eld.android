@@ -15,13 +15,14 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
+
+import static com.bsmwireless.common.Constants.COMMENT_VALIDATE_PATTERN;
 
 @ActivityScope
 public class EditEventPresenter extends BaseMenuPresenter {
@@ -76,6 +77,7 @@ public class EditEventPresenter extends BaseMenuPresenter {
         mView.openTimePickerDialog((view, hourOfDay, minute) -> {
             mCalendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
             mCalendar.set(Calendar.MINUTE, minute);
+            mCalendar.set(Calendar.SECOND, 0);
             mView.setStartTime(DateUtils.convertTimeToAMPMString(mCalendar.getTimeInMillis(), mTimezone));
         }, hours, minutes);
     }
@@ -98,6 +100,9 @@ public class EditEventPresenter extends BaseMenuPresenter {
 
         if (mELDEvent != null) {
             newEvent = mELDEvent.clone();
+            mELDEvent.setStatus(ELDEvent.StatusCode.INACTIVE_CHANGED.getValue());
+            mELDEvent.setId(null);
+            events.add(mELDEvent);
         } else {
             newEvent = getEventsInteractor().getEvent(type);
         }
@@ -145,8 +150,7 @@ public class EditEventPresenter extends BaseMenuPresenter {
         if (comment.length() < 4) {
             return EditEventView.Error.INVALID_COMMENT_LENGTH;
         }
-        Pattern pattern = Pattern.compile("[^A-Za-z0-9 .,:;`?!-_%&()\"'@#$*+]", Pattern.CASE_INSENSITIVE);
-        Matcher matcher = pattern.matcher(comment);
+        Matcher matcher = COMMENT_VALIDATE_PATTERN.matcher(comment);
         if (matcher.find()) {
             return EditEventView.Error.INVALID_COMMENT;
         }

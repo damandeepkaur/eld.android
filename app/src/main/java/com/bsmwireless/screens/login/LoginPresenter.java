@@ -3,8 +3,6 @@ package com.bsmwireless.screens.login;
 
 import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.common.utils.SchedulerUtils;
-import com.bsmwireless.data.network.NtpClientManager;
-import com.bsmwireless.data.network.RetrofitException;
 import com.bsmwireless.domain.interactors.UserInteractor;
 import com.bsmwireless.models.User;
 
@@ -77,10 +75,7 @@ public class LoginPresenter {
                             mView.hideProgressBar();
                         },
                         error -> {
-                            Timber.e(error, "LoginUser error:");
-                            if (error instanceof RetrofitException) {
-                                mView.showErrorMessage((RetrofitException) error);
-                            }
+                            Timber.e("LoginUser error: %s", error);
                             mView.setLoginButtonEnabled(true);
                             mView.hideProgressBar();
                         }

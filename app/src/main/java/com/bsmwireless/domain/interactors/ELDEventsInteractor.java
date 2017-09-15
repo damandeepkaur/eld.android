@@ -1,6 +1,7 @@
 package com.bsmwireless.domain.interactors;
 
 import com.bsmwireless.common.Constants;
+import com.bsmwireless.data.network.RetrofitException;
 import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.network.authenticator.TokenManager;
 import com.bsmwireless.data.storage.AccountManager;
@@ -13,9 +14,11 @@ import com.bsmwireless.data.storage.eldevents.ELDEventEntity;
 import com.bsmwireless.data.storage.users.UserDao;
 import com.bsmwireless.models.BlackBoxModel;
 import com.bsmwireless.models.ELDEvent;
+import com.bsmwireless.models.ResponseMessage;
 import com.bsmwireless.models.Malfunction;
 import com.bsmwireless.widgets.alerts.DutyType;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -36,7 +39,6 @@ import static com.bsmwireless.common.utils.DateUtils.SEC_IN_HOUR;
 public class ELDEventsInteractor {
 
     private static String mTimezone = "";
-    private Disposable mSyncEventsDisposable;
     private ServiceApi mServiceApi;
     private BlackBoxInteractor mBlackBoxInteractor;
     private UserInteractor mUserInteractor;
@@ -66,30 +68,9 @@ public class ELDEventsInteractor {
         mUserInteractor.getTimezone().subscribe(timezone -> mTimezone = timezone);
     }
 
-    public void syncELDEventsWithServer(Long startTime, Long endTime) {
-        if (mSyncEventsDisposable != null) mSyncEventsDisposable.dispose();
-        mSyncEventsDisposable = mServiceApi.getELDEvents(startTime, endTime)
-                .subscribeOn(Schedulers.io())
-                .subscribe(eldEventsFromServer -> {
-                            List<ELDEventEntity> entities = mELDEventDao.getEventsFromStartToEndTimeSync(
-                                    startTime, endTime, mPreferencesManager.getDriverId());
-                            List<ELDEvent> eventsFromDB = ELDEventConverter.toModelList(entities);
-                            if (!eldEventsFromServer.equals(eventsFromDB)) {
-                                ELDEventEntity[] entitiesArray = ELDEventConverter.toEntityArray(eldEventsFromServer);
-                                mELDEventDao.insertAll(entitiesArray);
-                            }
-                        },
-                        error -> Timber.e(error));
-    }
-
     public Flowable<List<ELDEvent>> getDutyEventsFromDB(long startTime, long endTime) {
         int driverId = mAccountManager.getCurrentUserId();
         return mELDEventDao.getDutyEventsFromStartToEndTime(startTime, endTime, driverId)
-                .map(ELDEventConverter::toModelList);
-    }
-
-    public Flowable<List<ELDEvent>> getLatestActiveDutyEventFromDB(long latestTime, int userId) {
-        return mELDEventDao.getLatestActiveDutyEvent(latestTime, userId)
                 .map(ELDEventConverter::toModelList);
     }
 
@@ -122,14 +103,21 @@ public class ELDEventsInteractor {
         mELDEventDao.insertAll(ELDEventConverter.toEntityArray(events));
     }
 
-    public Observable<long[]> postNewDutyTypeEvent(DutyType dutyType) {
-        return postNewELDEvents(getEvents(dutyType))
+    public Observable<long[]> postNewDutyTypeEvent(DutyType dutyType, String comment) {
+        return postNewELDEvents(getEvents(dutyType, comment))
                 .doOnNext(isSuccess -> mDutyTypeManager.setDutyType(dutyType, true));
     }
 
     public Observable<Boolean> postLogoutEvent() {
         return mServiceApi.logout(getEvent(ELDEvent.LoginLogoutCode.LOGOUT))
-                .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS))
+                .onErrorReturn(throwable -> {
+                    if (throwable instanceof RetrofitException ||
+                            throwable instanceof IOException) {
+                        return new ResponseMessage(SUCCESS);
+                    }
+                    return new ResponseMessage(throwable.getMessage());
+                })
+                .map(responseMessage -> SUCCESS.equals(responseMessage.getMessage()))
                 .switchMap(isSuccess -> mBlackBoxInteractor.shutdown(isSuccess));
     }
 
@@ -141,7 +129,15 @@ public class ELDEventsInteractor {
                             getEvent(ELDEvent.LoginLogoutCode.LOGOUT),
                             token,
                             String.valueOf(userEntity.getId())
-                    );
+
+                    )
+                            .onErrorReturn(throwable -> {
+                                if (throwable instanceof RetrofitException ||
+                                        throwable instanceof IOException) {
+                                    return new ResponseMessage(SUCCESS);
+                                }
+                                return new ResponseMessage(throwable.getMessage());
+                            });
                 })
                 .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
     }
@@ -199,7 +195,7 @@ public class ELDEventsInteractor {
                 code.getCode(), codes);
     }
 
-    private ArrayList<ELDEvent> getEvents(DutyType dutyType) {
+    private ArrayList<ELDEvent> getEvents(DutyType dutyType, String comment) {
         ArrayList<ELDEvent> events = new ArrayList<>();
         DutyType current = mDutyTypeManager.getDutyType();
 
@@ -227,7 +223,7 @@ public class ELDEventsInteractor {
                 if (current != DutyType.OFF_DUTY) {
                     events.add(getEvent(DutyType.OFF_DUTY));
                 }
-                events.add(getEvent(DutyType.PERSONAL_USE));
+                events.add(getEvent(DutyType.PERSONAL_USE, comment));
                 break;
 
             case YARD_MOVES:
@@ -235,11 +231,11 @@ public class ELDEventsInteractor {
                 if (current != DutyType.ON_DUTY) {
                     events.add(getEvent(DutyType.ON_DUTY));
                 }
-                events.add(getEvent(DutyType.YARD_MOVES));
+                events.add(getEvent(DutyType.YARD_MOVES, comment));
                 break;
 
             default:
-                events.add(getEvent(dutyType));
+                events.add(getEvent(dutyType, comment));
                 break;
         }
 
@@ -270,15 +266,23 @@ public class ELDEventsInteractor {
         return event;
     }
 
-    public ELDEvent getEvent(DutyType dutyType) {
-        return getEvent(dutyType, false);
+    public ELDEvent getEvent(DutyType dutyType, String comment) {
+        return getEvent(dutyType, comment, false);
     }
 
-    public ELDEvent getEvent(DutyType dutyType, boolean isAuto) {
+    public ELDEvent getEvent(DutyType dutyType) {
+        return getEvent(dutyType, null, false);
+    }
+
+    public ELDEvent getEvent(DutyType dutyType, String comment, boolean isAuto) {
         ELDEvent event = getEvent(getBlackBoxState(dutyType == DutyType.PERSONAL_USE), isAuto);
         event.setStatus(ELDEvent.StatusCode.ACTIVE.getValue());
         event.setEventType(dutyType.getType());
         event.setEventCode(dutyType.getCode());
+
+        if (comment != null) {
+            event.setComment(comment);
+        }
 
         return event;
     }
