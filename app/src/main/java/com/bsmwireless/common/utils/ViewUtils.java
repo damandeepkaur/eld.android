@@ -3,6 +3,7 @@ package com.bsmwireless.common.utils;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
+import android.support.annotation.NonNull;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -19,8 +20,8 @@ public class ViewUtils {
         return dp * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT);
     }
 
-    public static void hideSoftKeyboard(Activity activity) {
-        View view = activity != null ? activity.getCurrentFocus() : null;
+    public static void hideSoftKeyboard(@NonNull Activity activity) {
+        View view = activity.getCurrentFocus();
         if (view != null) {
             InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);

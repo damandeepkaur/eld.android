@@ -170,7 +170,11 @@ public class DashboardFragment extends BaseFragment implements DashboardView {
                 .setView(view)
                 .setPositiveButton(R.string.special_status_dialog_accept, null)
                 .setNegativeButton(R.string.special_status_dialog_cancel, null)
-                .setOnDismissListener(dialog -> ViewUtils.hideSoftKeyboard(getActivity()))
+                .setOnDismissListener(dialog -> {
+                    if (getActivity() != null) {
+                        ViewUtils.hideSoftKeyboard(getActivity());
+                    }
+                })
                 .show();
 
         TextInputLayout inputLayout = ButterKnife.findById(mAlertDialog, R.id.comment_layout);
