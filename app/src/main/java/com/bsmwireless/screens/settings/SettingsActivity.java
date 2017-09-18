@@ -3,9 +3,9 @@ package com.bsmwireless.screens.settings;
 
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
+import android.support.v7.widget.AppCompatRadioButton;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
-import android.support.v7.widget.AppCompatRadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
@@ -21,7 +21,7 @@ import app.bsmuniversal.com.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class SettingsActivity extends BaseMenuActivity implements SettingsView {
+public final class SettingsActivity extends BaseMenuActivity implements SettingsView {
 
     private static final String TAG = SettingsActivity.class.getCanonicalName();
 

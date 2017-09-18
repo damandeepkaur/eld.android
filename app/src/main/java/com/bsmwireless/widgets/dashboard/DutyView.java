@@ -17,7 +17,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
-public class DutyView extends CardView {
+public final class DutyView extends CardView {
     @BindView(R.id.duty_time_title)
     TextView mTimeTitleText;
 

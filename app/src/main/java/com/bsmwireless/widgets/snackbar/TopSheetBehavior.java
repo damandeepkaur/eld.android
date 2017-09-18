@@ -24,7 +24,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.ref.WeakReference;
 
-public class TopSheetBehavior<V extends View> extends CoordinatorLayout.Behavior<V> {
+public final class TopSheetBehavior<V extends View> extends CoordinatorLayout.Behavior<V> {
 
     /**
      * Callback for monitoring events about bottom sheets.
@@ -361,7 +361,7 @@ public class TopSheetBehavior<V extends View> extends CoordinatorLayout.Behavior
         }
         if (mViewDragHelper.smoothSlideViewTo(child, child.getLeft(), top)) {
             setStateInternal(STATE_SETTLING);
-            ViewCompat.postOnAnimation(child, new SettleRunnable(child, targetState));
+            ViewCompat.postOnAnimation(child, new SettleRunnable(child, mViewDragHelper, this, targetState));
         } else {
             setStateInternal(targetState);
         }
@@ -465,7 +465,7 @@ public class TopSheetBehavior<V extends View> extends CoordinatorLayout.Behavior
         }
         setStateInternal(STATE_SETTLING);
         if (mViewDragHelper.smoothSlideViewTo(child, child.getLeft(), top)) {
-            ViewCompat.postOnAnimation(child, new SettleRunnable(child, state));
+            ViewCompat.postOnAnimation(child, new SettleRunnable(child, mViewDragHelper, this, state));
         }
     }
 
@@ -587,7 +587,7 @@ public class TopSheetBehavior<V extends View> extends CoordinatorLayout.Behavior
             if (mViewDragHelper.settleCapturedViewAt(releasedChild.getLeft(), top)) {
                 setStateInternal(STATE_SETTLING);
                 ViewCompat.postOnAnimation(releasedChild,
-                        new SettleRunnable(releasedChild, targetState));
+                        new SettleRunnable(releasedChild, mViewDragHelper, TopSheetBehavior.this, targetState));
             } else {
                 setStateInternal(targetState);
             }
@@ -625,16 +625,21 @@ public class TopSheetBehavior<V extends View> extends CoordinatorLayout.Behavior
         }
     }
 
-    private class SettleRunnable implements Runnable {
+    private static final class SettleRunnable implements Runnable {
 
         private final View mView;
+        private ViewDragHelper mViewDragHelper;
+        private TopSheetBehavior mBehaviour;
 
         @State
         private final int mTargetState;
 
-        SettleRunnable(View view, @State int targetState) {
+        SettleRunnable(View view, ViewDragHelper dragHelper, TopSheetBehavior behaviour,
+                       @State int targetState) {
             mView = view;
             mTargetState = targetState;
+            mViewDragHelper = dragHelper;
+            mBehaviour = behaviour;
         }
 
         @Override
@@ -642,7 +647,7 @@ public class TopSheetBehavior<V extends View> extends CoordinatorLayout.Behavior
             if (mViewDragHelper != null && mViewDragHelper.continueSettling(true)) {
                 ViewCompat.postOnAnimation(mView, this);
             } else {
-                setStateInternal(mTargetState);
+                mBehaviour.setStateInternal(mTargetState);
             }
         }
     }
@@ -664,7 +669,7 @@ public class TopSheetBehavior<V extends View> extends CoordinatorLayout.Behavior
         }
 
         @Override
-        public void writeToParcel(Parcel out, int flags) {
+        public final void writeToParcel(Parcel out, int flags) {
             super.writeToParcel(out, flags);
             out.writeInt(state);
         }

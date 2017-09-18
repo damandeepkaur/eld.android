@@ -8,7 +8,7 @@ import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 
-public class BlackBoxConnectionManagerImpl implements BlackBoxConnectionManager {
+public final class BlackBoxConnectionManagerImpl implements BlackBoxConnectionManager {
 
     private BlackBox mBlackBox;
 

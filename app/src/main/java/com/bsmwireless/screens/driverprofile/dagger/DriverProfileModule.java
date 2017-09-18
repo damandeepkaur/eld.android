@@ -9,7 +9,7 @@ import dagger.Module;
 import dagger.Provides;
 
 @Module
-public class DriverProfileModule {
+public final class DriverProfileModule {
 
     private final DriverProfileView mHomeView;
 

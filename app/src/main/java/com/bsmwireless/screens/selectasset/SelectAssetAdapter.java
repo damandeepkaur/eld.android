@@ -22,7 +22,7 @@ import app.bsmuniversal.com.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-class SelectAssetAdapter extends RecyclerView.Adapter<SelectAssetAdapter.Holder> {
+final class SelectAssetAdapter extends RecyclerView.Adapter<SelectAssetAdapter.Holder> {
     private List<Vehicle> mSearchList;
     private String mMessage;
     private String mSearchText;
@@ -107,7 +107,7 @@ class SelectAssetAdapter extends RecyclerView.Adapter<SelectAssetAdapter.Holder>
         return mSearchList;
     }
 
-    static class Holder extends RecyclerView.ViewHolder {
+    static final class Holder extends RecyclerView.ViewHolder {
 
         @BindView(R.id.select_asset_item)
         TextView mTextView;

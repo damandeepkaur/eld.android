@@ -18,7 +18,7 @@ import java.util.List;
 
 import app.bsmuniversal.com.R;
 
-public class ELDGraphView extends View {
+public final class ELDGraphView extends View {
 
     private final static int SEC_IN_MIN = 60;
     private final static int MS_IN_MIN = 60 * 1000;

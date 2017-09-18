@@ -9,7 +9,7 @@ import com.google.gson.annotations.SerializedName;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-public class Location implements Parcelable {
+public final class Location implements Parcelable {
 
     @SerializedName("lat")
     @Expose

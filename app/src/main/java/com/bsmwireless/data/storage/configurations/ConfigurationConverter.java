@@ -1,7 +1,5 @@
 package com.bsmwireless.data.storage.configurations;
 
-import com.bsmwireless.data.storage.hometerminals.HomeTerminalEntity;
-import com.bsmwireless.models.HomeTerminal;
 import com.bsmwireless.models.SyncConfiguration;
 
 import java.util.ArrayList;
