@@ -3,6 +3,7 @@ ELD app for Android
 
 # Version history
 
+* **1.0.71** - Add driver cycles list to the profile (_EA-315_)
 * **1.0.70** - Malfunction and Data diagnostic indications (_EA-104_, _EA-105_, _EA-106_)
 * **1.0.69** - Lock screen in the driving mode (_EA-82_)
 * **1.0.68** - Update Dashboard, fix comment validation (_EA-387_, _EA-326_)

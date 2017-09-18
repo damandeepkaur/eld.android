@@ -5,14 +5,11 @@ import com.bsmwireless.common.utils.SchedulerUtils;
 import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.data.storage.AutoDutyTypeManager;
 import com.bsmwireless.data.storage.DutyTypeManager;
-import com.bsmwireless.data.storage.users.UserConverter;
-import com.bsmwireless.data.storage.users.UserEntity;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
 import com.bsmwireless.domain.interactors.SyncInteractor;
 import com.bsmwireless.domain.interactors.UserInteractor;
 import com.bsmwireless.domain.interactors.VehiclesInteractor;
 import com.bsmwireless.models.ELDEvent;
-import com.bsmwireless.models.User;
 import com.bsmwireless.screens.common.menu.BaseMenuPresenter;
 import com.bsmwireless.screens.common.menu.BaseMenuView;
 import com.bsmwireless.widgets.alerts.DutyType;
@@ -22,7 +19,6 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -208,25 +204,6 @@ public class NavigationPresenter extends BaseMenuPresenter {
     @Override
     protected BaseMenuView getView() {
         return mView;
-    }
-
-    public void onUserUpdated(User user) {
-        if (user != null) {
-            Disposable disposable = Observable.fromCallable(() -> getUserInteractor().getUserFromDBSync(user.getId()))
-                                              .subscribeOn(Schedulers.io())
-                                              .map(userEntity -> {
-                                                  UserEntity updatedUser = UserConverter.toEntity(user);
-                                                  updatedUser.setAccountName(userEntity.getAccountName());
-                                                  updatedUser.setLastVehicleIds(userEntity.getLastVehicleIds());
-                                                  updatedUser.setCoDriversIds(userEntity.getCoDriversIds());
-                                                  return updatedUser;
-                                              })
-                                              .flatMap(userEntity -> getUserInteractor().syncDriverProfile(userEntity))
-                                              .observeOn(AndroidSchedulers.mainThread())
-                                              .subscribe(userUpdated -> {},
-                                                         Timber::e);
-            add(disposable);
-        }
     }
 
     @Override
