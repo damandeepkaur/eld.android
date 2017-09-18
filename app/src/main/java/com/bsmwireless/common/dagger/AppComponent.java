@@ -12,6 +12,7 @@ import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.AutoDutyTypeManager;
 import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.data.storage.PreferencesManager;
+import com.bsmwireless.schedulers.jobscheduler.VerifyTokenScheduler;
 import com.bsmwireless.screens.lockscreen.dagger.LockScreenComponent;
 import com.bsmwireless.services.monitoring.dagger.MonitoringServiceComponent;
 import com.bsmwireless.widgets.common.FontTextView;
@@ -46,6 +47,8 @@ public interface AppComponent {
     BlackBoxStateChecker checker();
 
     void inject(FontTextView fontTextView);
+
+    void inject(VerifyTokenScheduler scheduler);
 
     LockScreenComponent.Builder lockScreenBuilder();
     MonitoringServiceComponent.Builder monitoringServiceBuilder();
