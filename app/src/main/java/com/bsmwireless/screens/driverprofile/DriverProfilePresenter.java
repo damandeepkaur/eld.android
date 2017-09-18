@@ -67,9 +67,9 @@ public class DriverProfilePresenter extends BaseMenuPresenter {
                                           mFullUserEntity = userEntity;
                                           mView.setUserInfo(mFullUserEntity.getUserEntity());
                                       })
+                                      .doOnSuccess(this::updateHomeTerminalsList)
                                       .doOnSuccess(this::updateCarrierInfo)
                                       .doOnSuccess(this::updateHOSCycles)
-                                      .doOnSuccess(this::updateHomeTerminalsList)
                                       .subscribe(
                                               userEntity -> {}, throwable ->
                                               Timber.e(throwable.getMessage())
