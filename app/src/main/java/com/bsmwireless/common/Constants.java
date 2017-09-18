@@ -1,9 +1,15 @@
 package com.bsmwireless.common;
 
 import com.bsmwireless.models.Malfunction;
+import com.bsmwireless.screens.lockscreen.LockScreenActivity;
+import com.bsmwireless.screens.login.LoginActivity;
+import com.bsmwireless.screens.selectasset.SelectAssetActivity;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
-
 import java.util.regex.Pattern;
 
 public interface Constants {
@@ -47,4 +53,13 @@ public interface Constants {
             Malfunction.UNIDENTIFIED_DRIVING.getCode(),
             Malfunction.OTHER_COMPLIANCE.getCode()
     };
+
+    Set<Class> NOT_RUNNING_DRIVING_MONITORING_ACTIVITY = Collections
+            .unmodifiableSet(new HashSet<>(Arrays.asList(LoginActivity.class,
+                    LockScreenActivity.class,
+                    SelectAssetActivity.class)));
+
+    Set<Class> NOT_RUNNING_MALFUNCTIONS_MONITORING_ACTIVITY = Collections
+            .unmodifiableSet(new HashSet<>(Arrays.asList(LoginActivity.class,
+                    SelectAssetActivity.class)));
 }

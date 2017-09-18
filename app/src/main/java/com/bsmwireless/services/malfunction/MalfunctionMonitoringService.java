@@ -3,6 +3,7 @@ package com.bsmwireless.services.malfunction;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Binder;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 
@@ -15,6 +16,8 @@ import javax.inject.Inject;
  */
 public class MalfunctionMonitoringService extends Service {
 
+    private final IBinder mBinder = new LocalBinder();
+
     @Inject
     MalfunctionServicePresenter mPresenter;
 
@@ -25,25 +28,35 @@ public class MalfunctionMonitoringService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-
         App.getComponent().malfunctionServiceComponentBuilder()
                 .build()
                 .inject(this);
 
-        mPresenter.onCreate();
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-        mPresenter.onDestroy();
+    public void onRebind(Intent intent) {
+        super.onRebind(intent);
+        mPresenter.startMonitoring();
     }
 
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        mPresenter.startMonitoring();
+        return mBinder;
     }
 
+    @Override
+    public boolean onUnbind(Intent intent) {
+        mPresenter.stopMonitoring();
+        //we want to get onRebuild call when service will be bound again
+        return true;
+    }
 
+    public class LocalBinder extends Binder {
+        MalfunctionMonitoringService getService() {
+            return MalfunctionMonitoringService.this;
+        }
+    }
 }

@@ -39,11 +39,16 @@ public final class MalfunctionServicePresenter {
         mCompositeDisposable = new CompositeDisposable();
     }
 
-    public void onCreate() {
+    public void startMonitoring() {
+
+        Timber.d("Start malfunction monitoring");
+
         startSynchronizationMonitoring();
     }
 
-    public void onDestroy() {
+    public void stopMonitoring() {
+        Timber.d("Stop malfunction monitoring");
+
         mCompositeDisposable.dispose();
     }
 

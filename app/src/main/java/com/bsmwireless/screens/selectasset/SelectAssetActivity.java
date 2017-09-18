@@ -1,6 +1,5 @@
 package com.bsmwireless.screens.selectasset;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -83,7 +82,6 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        doBindToService(false);
         DaggerSelectAssetComponent.builder().appComponent(App.getComponent()).selectAssetModule(new SelectAssetModule(this)).build().inject(this);
 
         setContentView(R.layout.activity_select_asset);

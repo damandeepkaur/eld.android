@@ -75,9 +75,9 @@ public class MalfunctionServicePresenterTest {
 
         when(mDutyTypeManager.getDutyType()).thenReturn(DutyType.ON_DUTY);
 
-        mMalfunctionServicePresenter.onCreate();
+        mMalfunctionServicePresenter.startMonitoring();
 
-        mMalfunctionServicePresenter.onDestroy();
+        mMalfunctionServicePresenter.stopMonitoring();
         verify(mELDEventsInteractor).getEvent(DutyType.ON_DUTY);
         verify(mELDEventsInteractor).postNewELDEvent(any(ELDEvent.class));
     }
@@ -97,7 +97,7 @@ public class MalfunctionServicePresenterTest {
                 .thenReturn(Maybe.just(eldEvent));
         when(mELDEventsInteractor.postNewELDEvent(any())).thenReturn(Single.just(1L));
 
-        mMalfunctionServicePresenter.onCreate();
+        mMalfunctionServicePresenter.startMonitoring();
 
         verify(mELDEventsInteractor, never()).postNewELDEvent(any());
     }
@@ -127,7 +127,7 @@ public class MalfunctionServicePresenterTest {
 
         when(mDutyTypeManager.getDutyType()).thenReturn(DutyType.ON_DUTY);
 
-        mMalfunctionServicePresenter.onCreate();
+        mMalfunctionServicePresenter.startMonitoring();
 
         when(mELDEventsInteractor.getLatestMalfunctionEvent(Malfunction.ENGINE_SYNCHRONIZATION))
                 .thenReturn(Maybe.just(diagnosticCleared));
@@ -138,7 +138,7 @@ public class MalfunctionServicePresenterTest {
         blackBoxObservable.onNext(diagnosticDisappear);
 
         blackBoxObservable.onComplete();
-        mMalfunctionServicePresenter.onDestroy();
+        mMalfunctionServicePresenter.stopMonitoring();
 //        eldEventObservable.onComplete();
 
         verify(mELDEventsInteractor, times(2)).postNewELDEvent(any());
@@ -162,7 +162,7 @@ public class MalfunctionServicePresenterTest {
 
         when(mDutyTypeManager.getDutyType()).thenReturn(DutyType.ON_DUTY);
 
-        mMalfunctionServicePresenter.onCreate();
+        mMalfunctionServicePresenter.startMonitoring();
         verify(mELDEventsInteractor).postNewELDEvent(any());
         verify(mELDEventsInteractor).getLatestMalfunctionEvent(Malfunction.ENGINE_SYNCHRONIZATION);
 
@@ -184,7 +184,7 @@ public class MalfunctionServicePresenterTest {
 
         when(mELDEventsInteractor.postNewELDEvent(any())).thenReturn(Single.just(1L));
 
-        mMalfunctionServicePresenter.onCreate();
+        mMalfunctionServicePresenter.startMonitoring();
         verify(mELDEventsInteractor, never()).postNewELDEvent(any());
         verify(mELDEventsInteractor).getLatestMalfunctionEvent(Malfunction.ENGINE_SYNCHRONIZATION);
     }
