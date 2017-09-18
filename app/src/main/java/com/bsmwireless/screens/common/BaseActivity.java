@@ -37,6 +37,7 @@ public abstract class BaseActivity extends AppCompatActivity{
         }
     }
 
+    @SuppressWarnings("DesignForExtension")
     @Override
     protected void onDestroy() {
         if (mUnbinder != null) {

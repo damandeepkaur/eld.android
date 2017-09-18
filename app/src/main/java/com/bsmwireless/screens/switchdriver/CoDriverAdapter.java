@@ -18,7 +18,7 @@ import java.util.List;
 
 import app.bsmuniversal.com.R;
 
-public class CoDriverAdapter extends ArrayAdapter<SwitchDriverDialog.UserModel> {
+public final class CoDriverAdapter extends ArrayAdapter<SwitchDriverDialog.UserModel> {
 
     private int mSelectedPosition;
 

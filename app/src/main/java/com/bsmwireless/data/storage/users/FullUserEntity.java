@@ -10,7 +10,7 @@ import com.bsmwireless.data.storage.hometerminals.HomeTerminalEntity;
 
 import java.util.List;
 
-public class FullUserEntity {
+public final class FullUserEntity {
     @Embedded
     private UserEntity mUserEntity;
     @Relation(parentColumn = "id", entityColumn = "user_id", entity = CarrierEntity.class)

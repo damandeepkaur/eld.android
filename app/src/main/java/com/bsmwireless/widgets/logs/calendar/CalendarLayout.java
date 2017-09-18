@@ -19,7 +19,7 @@ import java.util.List;
 
 import app.bsmuniversal.com.R;
 
-public class CalendarLayout extends LinearLayout implements View.OnClickListener {
+public final class CalendarLayout extends LinearLayout implements View.OnClickListener {
 
     private static final int DEFAULT_DAYS_COUNT = 30;
 

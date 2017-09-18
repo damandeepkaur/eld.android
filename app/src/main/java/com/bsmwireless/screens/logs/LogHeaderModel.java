@@ -6,7 +6,7 @@ import android.os.Parcelable;
 
 import com.bsmwireless.models.LogSheetHeader;
 
-public class LogHeaderModel implements Parcelable {
+public final class LogHeaderModel implements Parcelable {
     private LogSheetHeader mLogSheetHeader;
     private String mTimezone;
     private String mDriverName;

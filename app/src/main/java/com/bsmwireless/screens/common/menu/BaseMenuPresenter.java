@@ -25,7 +25,7 @@ public abstract class BaseMenuPresenter implements AccountManager.AccountListene
 
     protected abstract BaseMenuView getView();
 
-    void onMenuCreated() {
+    final void onMenuCreated() {
         mDutyTypeManager.addListener(mListener);
         mDisposables.add(mUserInteractor.getCoDriversNumber()
                                         .subscribeOn(Schedulers.io())
@@ -44,10 +44,10 @@ public abstract class BaseMenuPresenter implements AccountManager.AccountListene
         }
     }
 
-    void onDutyChanged(DutyType dutyType, String comment) {
+    final void onDutyChanged(DutyType dutyType) {
         // don't set the same type
         if (dutyType != mDutyTypeManager.getDutyType()) {
-            mDisposables.add(mEventsInteractor.postNewDutyTypeEvent(dutyType, comment)
+            mDisposables.add(mEventsInteractor.postNewDutyTypeEvent(dutyType)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeOn(Schedulers.io())
                     .subscribe(
@@ -58,7 +58,7 @@ public abstract class BaseMenuPresenter implements AccountManager.AccountListene
         }
     }
 
-    public void onChangeDutyClick() {
+    public final void onChangeDutyClick() {
         if (mEventsInteractor.isConnected()) {
             getView().showDutyTypeDialog(mDutyTypeManager.getDutyType());
         } else {
@@ -66,6 +66,7 @@ public abstract class BaseMenuPresenter implements AccountManager.AccountListene
         }
     }
 
+    @SuppressWarnings("DesignForExtension")
     public void onDestroy() {
         mAccountManager.removeListener(this);
         mDutyTypeManager.removeListener(mListener);
@@ -74,10 +75,11 @@ public abstract class BaseMenuPresenter implements AccountManager.AccountListene
         Timber.d("DESTROYED");
     }
 
-    public boolean isUserDriver() {
+    public final boolean isUserDriver() {
         return mUserInteractor.isUserDriver();
     }
 
+    @SuppressWarnings("DesignForExtension")
     @Override
     public void onUserChanged() {
         if (!mAccountManager.isCurrentUserDriver()) {

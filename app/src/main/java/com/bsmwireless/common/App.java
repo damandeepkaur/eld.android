@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import app.bsmuniversal.com.BuildConfig;
 import timber.log.Timber;
 
-public class App extends Application {
+public final class App extends Application {
     private static AppComponent mComponent;
 
     public static AppComponent getComponent() {

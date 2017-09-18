@@ -14,7 +14,7 @@ import io.reactivex.disposables.CompositeDisposable;
 import timber.log.Timber;
 
 @ActivityScope
-public class SettingsPresenter extends BaseMenuPresenter {
+public final class SettingsPresenter extends BaseMenuPresenter {
 
     private SettingsView mView;
     private SettingsInteractor mSettingsInteractor;

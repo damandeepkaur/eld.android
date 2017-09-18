@@ -13,7 +13,7 @@ import com.google.gson.annotations.SerializedName;
 import java.util.List;
 
 @Entity(tableName = "users")
-public class UserEntity {
+public final class UserEntity {
     @PrimaryKey
     @ColumnInfo(name = "id")
     private Integer mId;

@@ -21,7 +21,7 @@ import app.bsmuniversal.com.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class SettingsActivity extends BaseMenuActivity implements SettingsView {
+public final class SettingsActivity extends BaseMenuActivity implements SettingsView {
 
     private static final String TAG = SettingsActivity.class.getCanonicalName();
 

@@ -10,7 +10,7 @@ import com.google.gson.annotations.SerializedName;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-public class Report implements Parcelable {
+public final class Report implements Parcelable {
 
     @SerializedName("id")
     @Expose

@@ -24,7 +24,7 @@ import butterknife.Unbinder;
 
 import static com.bsmwireless.common.utils.DateUtils.MS_IN_DAY;
 
-public class GraphLayout extends LinearLayout {
+public final class GraphLayout extends LinearLayout {
 
     ELDGraphView mELDGraphView;
     @BindView(R.id.time_on)

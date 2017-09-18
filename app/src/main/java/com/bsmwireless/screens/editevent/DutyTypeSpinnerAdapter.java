@@ -11,9 +11,11 @@ import android.widget.TextView;
 
 import com.bsmwireless.widgets.alerts.DutyType;
 
-public class DutyTypeSpinnerAdapter extends ArrayAdapter<DutyType> {
+import java.util.List;
 
-    public DutyTypeSpinnerAdapter(@NonNull Context context, @NonNull DutyType[] objects) {
+public final class DutyTypeSpinnerAdapter extends ArrayAdapter<DutyType> {
+
+    public DutyTypeSpinnerAdapter(@NonNull Context context, @NonNull List<DutyType> objects) {
         super(context, android.R.layout.simple_list_item_1, objects);
     }
 

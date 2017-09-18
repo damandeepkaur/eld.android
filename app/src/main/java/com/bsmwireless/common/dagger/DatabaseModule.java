@@ -12,7 +12,7 @@ import dagger.Module;
 import dagger.Provides;
 
 @Module
-public class DatabaseModule {
+public final class DatabaseModule {
     private final static String DATABASE_NAME = "bsm_db";
 
     @Singleton

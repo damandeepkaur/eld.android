@@ -28,7 +28,7 @@ import timber.log.Timber;
 import static com.bsmwireless.common.utils.DateUtils.MS_IN_DAY;
 
 @ActivityScope
-public class MultidayPresenter implements AccountManager.AccountListener {
+public final class MultidayPresenter implements AccountManager.AccountListener {
     private MultidayView mView;
     private ELDEventsInteractor mELDEventsInteractor;
     private SyncInteractor mSyncInteractor;

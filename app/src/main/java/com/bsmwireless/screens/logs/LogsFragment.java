@@ -43,7 +43,7 @@ import static com.bsmwireless.screens.editevent.EditEventActivity.OLD_ELD_EVENT_
 import static com.bsmwireless.screens.editlogheader.EditLogHeaderActivity.NEW_LOG_HEADER_EXTRA;
 import static com.bsmwireless.screens.editlogheader.EditLogHeaderActivity.OLD_LOG_HEADER_EXTRA;
 
-public class LogsFragment extends BaseFragment implements LogsView {
+public final class LogsFragment extends BaseFragment implements LogsView {
 
     private static final int REQUEST_CODE_EDIT_EVENT = 101;
     private static final int REQUEST_CODE_ADD_EVENT = 102;

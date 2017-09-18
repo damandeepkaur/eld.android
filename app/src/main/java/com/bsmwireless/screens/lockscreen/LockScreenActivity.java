@@ -24,7 +24,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class LockScreenActivity extends BaseActivity implements LockScreenView {
+public final class LockScreenActivity extends BaseActivity implements LockScreenView {
 
     public static final String PROMT_DIALOG = "PROMT_DIALOG";
 

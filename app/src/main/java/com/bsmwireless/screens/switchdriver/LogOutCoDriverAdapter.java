@@ -16,7 +16,7 @@ import java.util.List;
 
 import app.bsmuniversal.com.R;
 
-public class LogOutCoDriverAdapter extends ArrayAdapter<SwitchDriverDialog.UserModel> {
+public final class LogOutCoDriverAdapter extends ArrayAdapter<SwitchDriverDialog.UserModel> {
 
     private int mSelectedPosition;
 

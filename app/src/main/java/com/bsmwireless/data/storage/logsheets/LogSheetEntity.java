@@ -13,7 +13,7 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 @Entity(tableName = "log_sheet_header")
-public class LogSheetEntity {
+public final class LogSheetEntity {
     @PrimaryKey
     @ColumnInfo(name = "log_day")
     private Long mLogDay;

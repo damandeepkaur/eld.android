@@ -7,7 +7,7 @@ import android.content.Intent;
 
 import com.bsmwireless.common.utils.SchedulerUtils;
 
-public class AlarmBootReceiver extends BroadcastReceiver {
+public final class AlarmBootReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
