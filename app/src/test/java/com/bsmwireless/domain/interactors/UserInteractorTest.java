@@ -30,6 +30,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -375,6 +376,7 @@ public class UserInteractorTest {
         when(mAppDatabase.userDao()).thenReturn(mUserDao);
         when(mTokenManager.getDriver(anyString())).thenReturn(Integer.toString(driverId));
         when(mTokenManager.getPassword(anyString())).thenReturn(mPassword);
+        when(mTokenManager.getAccountName(anyString(), anyString())).thenReturn("fake account name");
         when(mUserDao.getUserSync(anyInt())).thenReturn(userEntity);
         when(mServiceApi.getELDEvents(anyLong(), anyLong())).thenReturn(Observable.just(eldEvents));
 
@@ -437,7 +439,8 @@ public class UserInteractorTest {
         mLoginUserInteractor.deleteDriver();
 
         // then
-        verify(mTokenManager).clearToken(eq(fakeToken));
+        verify(mTokenManager).clearToken(Mockito.<String>any()); // nullable
+        verify(mUserDao).setUserCoDrivers(anyInt(), Mockito.<String>any()); // nullable
     }
 
     @Test
@@ -815,7 +818,7 @@ public class UserInteractorTest {
         mLoginUserInteractor.getUserName();
 
         // then
-        verify(mTokenManager).getName(anyString());
+        verify(mTokenManager).getName(Mockito.<String>any());
     }
 
     @Test
@@ -856,7 +859,7 @@ public class UserInteractorTest {
         mLoginUserInteractor.getDriverDomainName();
 
         // then
-        verify(mTokenManager).getDomain(anyString());
+        verify(mTokenManager).getDomain(Mockito.<String>any());
     }
 
     @Test

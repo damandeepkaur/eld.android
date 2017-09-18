@@ -135,7 +135,6 @@ public class BlackBoxInteractorTest {
         BlackBoxModel blackBoxModel = new BlackBoxModel();
 
         when(mBlackBoxConnectionManager.getBlackBox()).thenReturn(null);
-        when(mBlackBox.getBlackBoxState()).thenReturn(blackBoxModel);
 
         // when
         BlackBoxModel result = mBlackBoxInteractor.getLastData();

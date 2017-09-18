@@ -1,5 +1,6 @@
 package com.bsmwireless.domain.interactors;
 
+import com.bsmwireless.data.network.RetrofitException;
 import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.network.authenticator.TokenManager;
 import com.bsmwireless.data.storage.AccountManager;
@@ -23,6 +24,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,6 +35,7 @@ import io.reactivex.observers.TestObserver;
 import io.reactivex.subscribers.TestSubscriber;
 
 import static junit.framework.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
@@ -105,7 +108,6 @@ public class ELDEventsInteractorTest {
 
         List<ELDEventEntity> eldEventEntities = new ArrayList<>();
 
-        when(mPreferencesManager.getDriverId()).thenReturn(12345);
         when(mEldEventDao.getDutyEventsFromStartToEndTime(anyLong(), anyLong(), anyInt()))
                 .thenReturn(Flowable.just(eldEventEntities));
 
@@ -126,7 +128,7 @@ public class ELDEventsInteractorTest {
 
         Exception fakeDbException = new RuntimeException("deadlock");
 
-        when(mPreferencesManager.getDriverId()).thenReturn(12345);
+        when(mAccountManager.getCurrentUserId()).thenReturn(12345);
         when(mEldEventDao.getDutyEventsFromStartToEndTime(anyLong(), anyLong(), anyInt()))
                 .thenReturn(Flowable.error(fakeDbException));
 
@@ -183,7 +185,6 @@ public class ELDEventsInteractorTest {
 
         List<ELDEventEntity> eldEventEntities = new ArrayList<>();
 
-        when(mPreferencesManager.getDriverId()).thenReturn(777);
         when(mEldEventDao.getActiveEventsFromStartToEndTimeSync(anyLong(), anyLong(), anyInt()))
                 .thenReturn(eldEventEntities);
 
@@ -327,25 +328,93 @@ public class ELDEventsInteractorTest {
     }
 
     @Test
-    public void testPostLogoutEventApiError() {
+    public void testPostLogoutUnexpectedEventApiError() {
         // given
-        ResponseMessage response = new ResponseMessage();
-        response.setMessage(""); // anything but "ACK"
+        Throwable error = new RuntimeException("anything but ACK");
 
-        ELDEventsInteractor eldEventsInteractorSpy = Mockito.spy(mEldEventsInteractor);
+        ELDEvent event = new ELDEvent();
+        event.setEventType(ELDEvent.LoginLogoutCode.LOGOUT.getValue());
 
-        Exception exception = new RuntimeException("API died");
-
-        when(mServiceApi.logout(any(ELDEvent.class))).thenReturn(Observable.error(exception));
-        when(mBlackBoxInteractor.getLastData()).thenReturn(new BlackBoxModel());
+        BlackBoxModel blackBoxModel = new BlackBoxModel();
+        blackBoxModel.setEngineHours(1000); // prevent null pointer exception in getBlackBoxState()
 
         TestObserver<Boolean> testObserver = TestObserver.create();
+        when(mServiceApi.logout(any(ELDEvent.class))).thenReturn(Observable.error(error));
+
+        when(mBlackBoxInteractor.getLastData()).thenReturn(blackBoxModel);
+        when(mDutyTypeManager.getDutyType()).thenReturn(DutyType.DRIVING);
+
+        when(mPreferencesManager.getBoxId()).thenReturn(12345); // for getEvents()
+        when(mPreferencesManager.getVehicleId()).thenReturn(22222); // for getEvents()
+
+        when(mBlackBoxInteractor.shutdown(anyBoolean())).thenReturn(Observable.just(false)); // return value ignored for now
 
         // when
-        eldEventsInteractorSpy.postLogoutEvent().subscribe(testObserver);
+        mEldEventsInteractor.postLogoutEvent().subscribe(testObserver);
 
         // then
-        testObserver.assertError(exception);
+        testObserver.assertNoErrors();
+        verify(mBlackBoxInteractor).shutdown(eq(false));
+    }
+
+    @Test
+    public void testPostLogoutApiRetrofitError() {
+        // given
+        Throwable error = RetrofitException.unexpectedError(new RuntimeException("unexpected retrofit"));
+
+        ELDEvent event = new ELDEvent();
+        event.setEventType(ELDEvent.LoginLogoutCode.LOGOUT.getValue());
+
+        BlackBoxModel blackBoxModel = new BlackBoxModel();
+        blackBoxModel.setEngineHours(1000); // prevent null pointer exception in getBlackBoxState()
+
+        TestObserver<Boolean> testObserver = TestObserver.create();
+        when(mServiceApi.logout(any(ELDEvent.class))).thenReturn(Observable.error(error));
+
+        when(mBlackBoxInteractor.getLastData()).thenReturn(blackBoxModel);
+        when(mDutyTypeManager.getDutyType()).thenReturn(DutyType.DRIVING);
+
+        when(mPreferencesManager.getBoxId()).thenReturn(12345); // for getEvents()
+        when(mPreferencesManager.getVehicleId()).thenReturn(22222); // for getEvents()
+
+        when(mBlackBoxInteractor.shutdown(anyBoolean())).thenReturn(Observable.just(false)); // return value ignored for now
+
+        // when
+        mEldEventsInteractor.postLogoutEvent().subscribe(testObserver);
+
+        // then
+        testObserver.assertNoErrors();
+        verify(mBlackBoxInteractor).shutdown(eq(true));
+    }
+
+    @Test
+    public void testPostLogoutAoiIoException() {
+        // given
+        Throwable error = new IOException();
+
+        ELDEvent event = new ELDEvent();
+        event.setEventType(ELDEvent.LoginLogoutCode.LOGOUT.getValue());
+
+        BlackBoxModel blackBoxModel = new BlackBoxModel();
+        blackBoxModel.setEngineHours(1000); // prevent null pointer exception in getBlackBoxState()
+
+        TestObserver<Boolean> testObserver = TestObserver.create();
+        when(mServiceApi.logout(any(ELDEvent.class))).thenReturn(Observable.error(error));
+
+        when(mBlackBoxInteractor.getLastData()).thenReturn(blackBoxModel);
+        when(mDutyTypeManager.getDutyType()).thenReturn(DutyType.DRIVING);
+
+        when(mPreferencesManager.getBoxId()).thenReturn(12345); // for getEvents()
+        when(mPreferencesManager.getVehicleId()).thenReturn(22222); // for getEvents()
+
+        when(mBlackBoxInteractor.shutdown(anyBoolean())).thenReturn(Observable.just(false)); // return value ignored for now
+
+        // when
+        mEldEventsInteractor.postLogoutEvent().subscribe(testObserver);
+
+        // then
+        testObserver.assertNoErrors();
+        verify(mBlackBoxInteractor).shutdown(eq(true));
     }
 
     @Test
