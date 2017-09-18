@@ -142,16 +142,19 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
 
     @Override
     public void changeMalfunctionStatus(boolean hasMalfunctionEvents) {
-        if (mMalfunctionItem != null) {
-            mMalfunctionItem.getIcon().setLevel(hasMalfunctionEvents ? 1 : 0);
+
+        if (mMalfunctionItem == null) {
+            return;
         }
+        mMalfunctionItem.setIcon(hasMalfunctionEvents ? R.drawable.ic_ico_dd_red : R.drawable.ic_ico_dd_green);
     }
 
     @Override
     public void changeDiagnosticStatus(boolean hasMalfunctionEvents) {
-        if (mELDItem != null) {
-            mELDItem.getIcon().setLevel(hasMalfunctionEvents ? 2 : 0);
+        if (mELDItem == null) {
+            return;
         }
+        mELDItem.setIcon(hasMalfunctionEvents ? R.drawable.ic_eld_red : R.drawable.ic_eld_green);
     }
 
     @Override

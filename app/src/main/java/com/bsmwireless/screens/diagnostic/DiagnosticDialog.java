@@ -19,13 +19,13 @@ import javax.inject.Inject;
 import app.bsmuniversal.com.R;
 
 
-public class DiagnosticDialog extends DialogFragment implements DiagnosticView{
+public final class DiagnosticDialog extends DialogFragment implements DiagnosticView{
 
-    private RecyclerView recyclerView;
-    private DiagnosticEventsAdapter adapter;
+    private RecyclerView mRecyclerView;
+    private DiagnosticEventsAdapter mAdapter;
 
     @Inject
-    DiagnosticPresenter presenter;
+    DiagnosticPresenter mPresenter;
 
     public static DiagnosticDialog newInstance(){
         return new DiagnosticDialog();
@@ -39,25 +39,25 @@ public class DiagnosticDialog extends DialogFragment implements DiagnosticView{
                 .dialogType(DiagnosticPresenter.EventType.DIAGNOSTIC)
                 .build()
                 .inject(this);
-        recyclerView = new RecyclerView(getContext());
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter = new DiagnosticEventsAdapter(getActivity().getLayoutInflater());
-        recyclerView.setAdapter(adapter);
+        mRecyclerView = new RecyclerView(getContext());
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        mAdapter = new DiagnosticEventsAdapter(getActivity().getLayoutInflater(), getContext());
+        mRecyclerView.setAdapter(mAdapter);
     }
 
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        presenter.onCreated();
+        mPresenter.onCreated();
         return new AlertDialog.Builder(getContext())
                 .setTitle(R.string.diagnostic_events_title)
-                .setView(recyclerView)
+                .setView(mRecyclerView)
                 .create();
     }
 
     @Override
     public void onDestroyView() {
-        presenter.onDestroyed();
+        mPresenter.onDestroyed();
         super.onDestroyView();
     }
 
@@ -68,8 +68,8 @@ public class DiagnosticDialog extends DialogFragment implements DiagnosticView{
 
     @Override
     public void showEvents(List<ELDEvent> events, String timezone) {
-        adapter.setTimeZone(timezone);
-        adapter.setItems(events);
-        adapter.notifyDataSetChanged();
+        mAdapter.setTimeZone(timezone);
+        mAdapter.setItems(events);
+        mAdapter.notifyDataSetChanged();
     }
 }

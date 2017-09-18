@@ -1,6 +1,7 @@
 package com.bsmwireless.screens.diagnostic;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,28 +19,17 @@ import app.bsmuniversal.com.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class DiagnosticEventsAdapter extends RecyclerView.Adapter<DiagnosticEventsAdapter.ViewHolder> {
+public final class DiagnosticEventsAdapter extends RecyclerView.Adapter<DiagnosticEventsAdapter.ViewHolder> {
 
     private final LayoutInflater mLayoutInflater;
+    private final Context mContext;
     private String mTimezone;
     private List<ELDEvent> mEldEvents;
-    private Context mContext;
 
-    public DiagnosticEventsAdapter(LayoutInflater layoutInflater) {
+    public DiagnosticEventsAdapter(@NonNull LayoutInflater layoutInflater, @NonNull Context context) {
         mLayoutInflater = layoutInflater;
+        mContext = context;
         mEldEvents = Collections.emptyList();
-    }
-
-    @Override
-    public void onAttachedToRecyclerView(RecyclerView recyclerView) {
-        super.onAttachedToRecyclerView(recyclerView);
-        mContext = recyclerView.getContext();
-    }
-
-    @Override
-    public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
-        super.onDetachedFromRecyclerView(recyclerView);
-        mContext = null;
     }
 
     @Override
@@ -49,10 +39,6 @@ public class DiagnosticEventsAdapter extends RecyclerView.Adapter<DiagnosticEven
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-
-        if (mContext == null) {
-            return;
-        }
 
         ELDEvent event = mEldEvents.get(position);
         holder.mEventCode.setText(event.getMalCode().getCode());
