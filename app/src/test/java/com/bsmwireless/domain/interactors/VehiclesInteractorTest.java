@@ -19,7 +19,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -283,8 +283,9 @@ public class VehiclesInteractorTest {
         verify(mUserDao).getUserLastVehicles(anyInt());
 
         verify(mVehicleDao).getVehicles(argThat(new ArgumentMatcher<List<Integer>>() {
+
             @Override
-            public boolean matches(Object argument) {
+            public boolean matches(List<Integer> argument) {
                 boolean result = true;
 
                 List<Integer> lastVehiclesList = (List<Integer>) argument;
@@ -366,7 +367,7 @@ public class VehiclesInteractorTest {
     /**
      * Matches last-vehicle-list strings with a specific vehicle id on top.
      */
-    private class LastVehicleIsAtTopMatcher extends ArgumentMatcher<String> {
+    private class LastVehicleIsAtTopMatcher implements ArgumentMatcher<String> {
 
         private int mExpectedVehicleId;
 
@@ -375,7 +376,7 @@ public class VehiclesInteractorTest {
         }
 
         @Override
-        public boolean matches(Object argument) {
+        public boolean matches(String argument) {
             try {
                 String argVehicles = (String) argument;
 
@@ -392,7 +393,7 @@ public class VehiclesInteractorTest {
     /**
      * Matches last-vehicle-list strings with a specific number of vehicle ids.
      */
-    private class LastVehicleListSizeMatcher extends ArgumentMatcher<String> {
+    private class LastVehicleListSizeMatcher implements ArgumentMatcher<String> {
         private int mExpectedSize;
 
         public LastVehicleListSizeMatcher(int expectedNewListSize) {
@@ -400,7 +401,7 @@ public class VehiclesInteractorTest {
         }
 
         @Override
-        public boolean matches(Object argument) {
+        public boolean matches(String argument) {
             try {
                 String argVehicles = (String) argument;
                 int resultNewListSize = getVehiclesFromLastVehString(argVehicles).size();

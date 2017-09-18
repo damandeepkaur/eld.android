@@ -21,7 +21,7 @@ import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -268,6 +268,7 @@ public class ELDEventsInteractorTest {
         // given
         DutyType dutyType = DutyType.DRIVING;
         long[] rowIds = {};
+        String comment = "any comment";
 
         when(mBlackBoxInteractor.getLastData()).thenReturn(new BlackBoxModel());
         when(mEldEventDao.insertAll(any(ELDEventEntity.class))).thenReturn(rowIds);
@@ -276,7 +277,7 @@ public class ELDEventsInteractorTest {
         ELDEventsInteractor eldEventsInteractorSpy = Mockito.spy(mEldEventsInteractor);
 
         // when
-        eldEventsInteractorSpy.postNewDutyTypeEvent(dutyType).subscribe(testObserver);
+        eldEventsInteractorSpy.postNewDutyTypeEvent(dutyType, comment).subscribe(testObserver);
 
         // then
         verify(eldEventsInteractorSpy).postNewELDEvents(any(List.class));

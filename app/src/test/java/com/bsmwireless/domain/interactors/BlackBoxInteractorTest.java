@@ -11,10 +11,11 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import app.bsmuniversal.com.RxSchedulerRule;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.observers.TestObserver;
 
 import static junit.framework.Assert.assertEquals;
@@ -80,7 +81,7 @@ public class BlackBoxInteractorTest {
         when(mBlackBoxConnectionManager.getDataObservable()).thenReturn(Observable.just(new BlackBoxModel()));
 
         when(mBlackBoxConnectionManager.connectBlackBox(anyInt()))
-                .thenReturn(Observable.just(mBlackBoxConnectionManager));
+                .thenReturn(Single.just(mBlackBoxConnectionManager));
 
         TestObserver<BlackBoxModel> testObserver = TestObserver.create();
 
@@ -101,7 +102,7 @@ public class BlackBoxInteractorTest {
         Exception boxException = new RuntimeException("box exception");
 
         when(mBlackBoxConnectionManager.isConnected()).thenReturn(false);
-        when(mBlackBoxConnectionManager.connectBlackBox(anyInt())).thenReturn(Observable.error(boxException));
+        when(mBlackBoxConnectionManager.connectBlackBox(anyInt())).thenReturn(Single.error(boxException));
 
         TestObserver<BlackBoxModel> testObserver = TestObserver.create();
 
@@ -157,7 +158,7 @@ public class BlackBoxInteractorTest {
         TestObserver<Integer> testObserverInteger = TestObserver.create();
 
         when(mBlackBoxConnectionManager.disconnectBlackBox())
-                .thenReturn(Observable.just(mBlackBoxConnectionManager));
+                .thenReturn(Single.just(mBlackBoxConnectionManager));
 
         // when
         Observable<String> observableString = mBlackBoxInteractor.shutdown(emittedString);
@@ -178,7 +179,7 @@ public class BlackBoxInteractorTest {
     public void testShutdownBoxError() {
         // given
         Exception error = new Exception("sorry Dave, I'm afraid I can't do that");
-        when(mBlackBoxConnectionManager.disconnectBlackBox()).thenReturn(Observable.error(error));
+        when(mBlackBoxConnectionManager.disconnectBlackBox()).thenReturn(Single.error(error));
         TestObserver<String> testObserverString = TestObserver.create();
 
         // when
