@@ -21,6 +21,7 @@ import javax.inject.Inject;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
@@ -35,11 +36,14 @@ public class DriverProfilePresenter extends BaseMenuPresenter {
     private static final int MAX_SIGNATURE_LENGTH = 50000;
 
     private DriverProfileView mView;
+    private UserInteractor mUserInteractor;
 
     private FullUserEntity mFullUserEntity;
     private List<HomeTerminalEntity> mHomeTerminals;
     private CarrierEntity mCarrier;
     private List<String> mHOSCycles;
+
+    private CompositeDisposable mDisposables;
 
     @Inject
     public DriverProfilePresenter(DriverProfileView view,
@@ -49,6 +53,8 @@ public class DriverProfilePresenter extends BaseMenuPresenter {
                                   AccountManager accountManager) {
         super(dutyTypeManager, eventsInteractor, userInteractor, accountManager);
         mView = view;
+        mUserInteractor = userInteractor;
+        mDisposables = new CompositeDisposable();
 
         Timber.d("CREATED");
     }
