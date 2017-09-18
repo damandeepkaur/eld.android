@@ -46,7 +46,7 @@ public class DriverProfilePage {
         DriverProfileLocator.back.perform(click());
     }
 
-    public static void Change_terminal_home() {
+    public static void change_terminal_home() {
         Espresso.closeSoftKeyboard();
         CommonPage.perform_click(DriverProfileLocator.terminal_list, true, false);
         ViewInteraction Terminal_Home_list = onView(

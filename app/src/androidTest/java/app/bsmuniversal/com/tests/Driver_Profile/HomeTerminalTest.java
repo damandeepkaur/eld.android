@@ -39,8 +39,8 @@ public class HomeTerminalTest extends BaseTestClass {
         SelectAssetPage.go_to_home_screen();
         DrawerPage.open_navigation_drawer();
         assert_navigation_drawer_opened(DrawerLocators.navigation_drawer, true);
-        DrawerPage.click_on_navigation_item(DrawerLocators.nav_Driver_profile);
-        DriverProfilePage.Change_terminal_home();
+        DrawerPage.click_on_navigation_item(DrawerLocators.nav_driver_profile);
+        DriverProfilePage.change_terminal_home();
 
     }
 
