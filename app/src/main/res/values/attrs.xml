@@ -35,7 +35,7 @@
     </declare-styleable>
 
     <declare-styleable name="FontTextView">
-        <attr name="font">
+        <attr name="textFont">
             <enum name="none" value="0"/>
             <enum name="sans_serif" value="1"/>
             <enum name="bebasNeue" value="2"/>

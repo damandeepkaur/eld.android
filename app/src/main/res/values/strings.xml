@@ -355,6 +355,7 @@
     <string name="driver_profile_item_confirm_password">Confirm password</string>
     <string name="driver_profile_item_cycle">HOS Cycle</string>
     <string name="driver_profile_menu_eld">ELD</string>
+    <string name="driver_profile_menu_malfunction">MLF</string>
     <string name="driver_profile_menu_sign">Sign</string>
     <string name="driver_profile_menu_occupants">Occupants</string>
     <string name="driver_profile_signature_error">Signature size too large. It will be cropped.</string>
@@ -559,10 +560,20 @@
         <item>14 days</item>
     </string-array>
     <string name="multiday_total_hours">Total hours</string>
-    
+
     <!-- Lock screen -->
     <string name="lock_screen_switch_co_driver_message">You can switch to co-driver view to continue work in application</string>
     <string name="switch_to_co_driver_view">SWITCH TO CO-DRIVER VIEW</string>
+    <string name="lock_screen_ignition_off_dialog_title">Ignition off is detected</string>
+    <string name="lock_screen_ignition_off_dialog_message">You automatically switched to On Duty status by application. Do you want to stay On Duty or switch to Off Duty?</string>
+    <string name="lock_screen_disconnected_dialog_title">Disconnection is detected</string>
+    <string name="lock_screen_disconnected_dialog_message">Disconnection is detected. Do you want to go On Duty, Off Duty, Driving?</string>
+    <string name="lock_screen_promt_dialog_on_duty">STAY ON DUTY</string>
+    <string name="lock_screen_promt_dialog_off_duty">SWITCH TO OFF DUTY</string>
+    <string name="lock_screen_promt_dialog_driving">SWITCH TO DRIVING</string>
+
+
+
 
     <!-- Geo location enum direction description -->
     <string name="geo_location_at_description">At indicated geo-location</string>
@@ -616,5 +627,25 @@
     <string name="switch_driver_error_login_codriver">Co-driver was not logged in</string>
     <string name="switch_driver_login_error">Login error</string>
     <string name="switch_driver_co_driver_view">You are in co-driver view</string>
+
+    <!-- Diagnostic events -->
+    <string name="diagnostic_events_title">Data diagnostics events</string>
+    <string name="malfunction_events_title">ELD malfunctions events</string>
+    <string name="diagnostic_power_data">Power Diagnostic</string>
+    <string name="diagnostic_engine_synchronization">Engine Synchronization</string>
+    <string name="diagnostic_missing_req_data">Missing Required Data Elements</string>
+    <string name="diagnostic_data_transfer">Data Transfer</string>
+    <string name="diagnostic_unidentified_driving">Unidentified Driving Records</string>
+    <string name="diagnostic_other">Other</string>
+    <string name="malfunction_power">Power Compliance</string>
+    <string name="malfunction_engine_synchronization">Engine Synchronization</string>
+    <string name="malfunction_timing">Timing</string>
+    <string name="malfunction_positioning">Positioning</string>
+    <string name="malfunction_data_recording">Data Recording</string>
+    <string name="malfunction_data_transfer">Data Transfer</string>
+    <string name="malfunction_other">Other</string>
+
+
+
 
 </resources>

@@ -19,7 +19,6 @@ import java.util.regex.Matcher;
 import javax.inject.Inject;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
@@ -36,15 +35,13 @@ public class EditEventPresenter extends BaseMenuPresenter {
 
 
     @Inject
-    public EditEventPresenter(EditEventView view, UserInteractor userInteractor,
-                              ELDEventsInteractor eventsInteractor, DutyTypeManager dutyTypeManager,
+    public EditEventPresenter(EditEventView view,
+                              UserInteractor userInteractor,
+                              ELDEventsInteractor eventsInteractor,
+                              DutyTypeManager dutyTypeManager,
                               AccountManager accountManager) {
+        super(dutyTypeManager, eventsInteractor, userInteractor, accountManager);
         mView = view;
-        mDisposables = new CompositeDisposable();
-        mUserInteractor = userInteractor;
-        mEventsInteractor = eventsInteractor;
-        mDutyTypeManager = dutyTypeManager;
-        mAccountManager = accountManager;
         mTimezone = TimeZone.getDefault().getID();
         mCalendar = Calendar.getInstance();
 
@@ -52,7 +49,7 @@ public class EditEventPresenter extends BaseMenuPresenter {
     }
 
     public void onViewCreated() {
-        mDisposables.add(mUserInteractor.getTimezone()
+        add(getUserInteractor().getTimezone()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(timezone -> {
@@ -69,8 +66,8 @@ public class EditEventPresenter extends BaseMenuPresenter {
 
     @Override
     public void onDestroy() {
-        mDisposables.dispose();
         super.onDestroy();
+        Timber.d("DESTROYED");
     }
 
     public void onStartTimeClick(String time) {
@@ -107,7 +104,7 @@ public class EditEventPresenter extends BaseMenuPresenter {
             mELDEvent.setId(null);
             events.add(mELDEvent);
         } else {
-            newEvent = mEventsInteractor.getEvent(type);
+            newEvent = getEventsInteractor().getEvent(type);
         }
 
         newEvent.setStatus(ELDEvent.StatusCode.ACTIVE.getValue());

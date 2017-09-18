@@ -23,7 +23,7 @@
             android:textColor="@color/offduty_light"
             android:lineSpacingExtra="@dimen/text_size_spacing"
             android:text="@string/offduty_label"
-            app:font="sans_serif"/>
+            app:textFont="sans_serif"/>
 
         <com.bsmwireless.widgets.common.FontTextView
             android:layout_width="match_parent"
@@ -35,7 +35,7 @@
             android:textColor="@color/sleepingberth_light"
             android:lineSpacingExtra="@dimen/text_size_spacing"
             android:text="@string/sleepingberth_label"
-            app:font="sans_serif"/>
+            app:textFont="sans_serif"/>
 
         <com.bsmwireless.widgets.common.FontTextView
             android:layout_width="match_parent"
@@ -47,7 +47,7 @@
             android:textColor="@color/driving_light"
             android:lineSpacingExtra="@dimen/text_size_spacing"
             android:text="@string/driving_label"
-            app:font="sans_serif"/>
+            app:textFont="sans_serif"/>
 
         <com.bsmwireless.widgets.common.FontTextView
             android:layout_width="match_parent"
@@ -59,7 +59,7 @@
             android:textColor="@color/onduty_light"
             android:lineSpacingExtra="@dimen/text_size_spacing"
             android:text="@string/onduty_label"
-            app:font="sans_serif"/>
+            app:textFont="sans_serif"/>
 
     </LinearLayout>
 
@@ -88,7 +88,7 @@
             android:textColor="@color/offduty_light"
             android:lineSpacingExtra="@dimen/text_size_spacing"
             android:text="@string/default_time"
-            app:font="sans_serif"/>
+            app:textFont="sans_serif"/>
 
         <com.bsmwireless.widgets.common.FontTextView
             android:id="@+id/time_s"
@@ -101,7 +101,7 @@
             android:textColor="@color/sleepingberth_light"
             android:lineSpacingExtra="@dimen/text_size_spacing"
             android:text="@string/default_time"
-            app:font="sans_serif"/>
+            app:textFont="sans_serif"/>
 
         <com.bsmwireless.widgets.common.FontTextView
             android:id="@+id/time_dr"
@@ -114,7 +114,7 @@
             android:textColor="@color/driving_light"
             android:lineSpacingExtra="@dimen/text_size_spacing"
             android:text="@string/default_time"
-            app:font="sans_serif"/>
+            app:textFont="sans_serif"/>
 
         <com.bsmwireless.widgets.common.FontTextView
             android:id="@+id/time_on"
@@ -127,7 +127,7 @@
             android:textColor="@color/onduty_light"
             android:lineSpacingExtra="@dimen/text_size_spacing"
             android:text="@string/default_time"
-            app:font="sans_serif"/>
+            app:textFont="sans_serif"/>
 
     </LinearLayout>
 

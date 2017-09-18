@@ -2,6 +2,7 @@ package com.bsmwireless.common.dagger;
 
 import android.content.Context;
 
+import com.bsmwireless.common.utils.BlackBoxStateChecker;
 import com.bsmwireless.data.network.NtpClientManager;
 import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.network.authenticator.TokenManager;
@@ -11,7 +12,9 @@ import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.AutoDutyTypeManager;
 import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.data.storage.PreferencesManager;
+import com.bsmwireless.screens.diagnostic.dagger.DiagnosticComponent;
 import com.bsmwireless.screens.lockscreen.dagger.LockScreenComponent;
+import com.bsmwireless.services.monitoring.dagger.MonitoringServiceComponent;
 import com.bsmwireless.widgets.common.FontTextView;
 
 import javax.inject.Singleton;
@@ -41,7 +44,13 @@ public interface AppComponent {
 
     NtpClientManager ntpClientManager();
 
+    BlackBoxStateChecker checker();
+
     void inject(FontTextView fontTextView);
 
     LockScreenComponent.Builder lockScreenBuilder();
+
+    DiagnosticComponent.Builder diagnosticBuilder();
+
+    MonitoringServiceComponent.Builder monitoringServiceBuilder();
 }

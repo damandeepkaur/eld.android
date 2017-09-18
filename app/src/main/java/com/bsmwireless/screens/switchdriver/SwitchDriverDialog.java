@@ -91,28 +91,24 @@ public class SwitchDriverDialog implements SwitchDriverView, DriverDialog {
             mDialog.dismiss();
         }
         switch (status) {
-            case SWITCH_DRIVER: {
-                mDialog = createSwitchDriverDialog();
-                break;
-            }
             case ADD_CO_DRIVER: {
-                mDialog = createAddCoDriverDialog();
+                mPresenter.onAddCoDriverDialog();
                 break;
             }
             case LOG_OUT: {
-                mDialog = createLogOutCoDriverDialog();
+                mPresenter.onLogoutDialog();
                 break;
             }
             case DRIVER_SEAT: {
-                mDialog = createDriverSeatDialog();
+                mPresenter.onDriverSeatDialog();
                 break;
             }
+            case SWITCH_DRIVER:
             default: {
-                mDialog = createSwitchDriverDialog();
+                mPresenter.onSwitchDriverDialog();
                 break;
             }
         }
-        mDialog.show();
     }
 
     @Override
@@ -205,7 +201,8 @@ public class SwitchDriverDialog implements SwitchDriverView, DriverDialog {
         }
     }
 
-    private AlertDialog createSwitchDriverDialog() {
+    @Override
+    public void createSwitchDriverDialog() {
         View view = View.inflate(mContext, R.layout.switch_driver_layout, null);
         ButterKnife.bind(this, view);
 
@@ -232,11 +229,11 @@ public class SwitchDriverDialog implements SwitchDriverView, DriverDialog {
                 .create();
 
         switchDriverDialog.setOnShowListener(dialog -> mPresenter.onSwitchDriverCreated());
-
-        return switchDriverDialog;
+        showDialog(switchDriverDialog);
     }
 
-    private AlertDialog createAddCoDriverDialog() {
+    @Override
+    public void createAddCoDriverDialog() {
         View view = View.inflate(mContext, R.layout.add_co_driver_layout, null);
         ButterKnife.bind(this,view);
 
@@ -259,11 +256,12 @@ public class SwitchDriverDialog implements SwitchDriverView, DriverDialog {
                              });
             mPresenter.onAddCoDriverCreated();
         });
+        showDialog(addCoDriverDialog);
 
-        return addCoDriverDialog;
     }
 
-    private AlertDialog createLogOutCoDriverDialog() {
+    @Override
+    public void createLogOutCoDriverDialog() {
         View view = View.inflate(mContext, R.layout.switch_driver_layout, null);
         ButterKnife.bind(this,view);
 
@@ -289,11 +287,12 @@ public class SwitchDriverDialog implements SwitchDriverView, DriverDialog {
                              });
             mPresenter.onLogOutCoDriverCreated();
         });
+        showDialog(logOutCoDriverDialog);
 
-        return logOutCoDriverDialog;
     }
 
-    private AlertDialog createDriverSeatDialog() {
+    @Override
+    public void createDriverSeatDialog() {
         View view = View.inflate(mContext, R.layout.switch_driver_layout, null);
         ButterKnife.bind(this,view);
 
@@ -314,11 +313,59 @@ public class SwitchDriverDialog implements SwitchDriverView, DriverDialog {
                 .setCancelable(true)
                 .create();
 
-        driverSeatDialog.setOnShowListener(dialog -> {
-            mPresenter.onDriverSeatDialogCreated();
-        });
+        driverSeatDialog.setOnShowListener(dialog -> mPresenter.onDriverSeatDialogCreated());
+        showDialog(driverSeatDialog);
+    }
 
-        return driverSeatDialog;
+    @Override
+    public void createLoadingDialog() {
+
+        View view = View.inflate(mContext, R.layout.view_loading_indicator, null);
+
+        AlertDialog loadingDialog = new AlertDialog.Builder(mContext)
+                .setOnDismissListener(dialog -> mPresenter.onDestroy())
+                .setView(view)
+                .setCancelable(true)
+                .create();
+        showDialog(loadingDialog);
+    }
+
+    @Override
+    public void createSwitchOnlyDialog() {
+        View view = View.inflate(mContext, R.layout.switch_driver_layout, null);
+        ButterKnife.bind(this, view);
+
+        if (mDriverSeat != null) {
+            mDriverSeat.setVisibility(View.GONE);
+        }
+
+        if (mDriverInfoLayout != null) {
+            mDriverInfoLayout.setOnClickListener(v -> {
+                mPresenter.setCurrentUser(null);
+                if (mDialog != null && mDialog.isShowing()) {
+                    mDialog.dismiss();
+                }
+            });
+        }
+
+        AlertDialog switchDriverDialog = new AlertDialog.Builder(mContext)
+                .setTitle(R.string.switch_driver)
+                .setView(view)
+                .setNegativeButton(R.string.switch_driver_cancel, null)
+                .setOnDismissListener(dialog -> mPresenter.onDestroy())
+                .setCancelable(true)
+                .create();
+
+        switchDriverDialog.setOnShowListener(dialog -> mPresenter.onSwitchDriverCreated());
+        showDialog(switchDriverDialog);
+    }
+
+    private void showDialog(AlertDialog dialog) {
+        if (mDialog != null) {
+            mDialog.dismiss();
+        }
+        mDialog = dialog;
+        mDialog.show();
     }
 
     public static class UserModel {
