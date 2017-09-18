@@ -1,6 +1,5 @@
 package com.bsmwireless.screens.selectasset;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -45,7 +44,7 @@ import timber.log.Timber;
 import static com.bsmwireless.screens.barcode.BarcodeScannerActivity.BARCODE_TYPE;
 import static com.bsmwireless.screens.barcode.BarcodeScannerActivity.BARCODE_UUID;
 
-public class SelectAssetActivity extends BaseActivity implements SelectAssetView {
+public final class SelectAssetActivity extends BaseActivity implements SelectAssetView {
 
     private static final int BARCODE_REQUEST_CODE = 101;
 

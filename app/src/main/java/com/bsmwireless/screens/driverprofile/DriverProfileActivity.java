@@ -40,7 +40,7 @@ import timber.log.Timber;
 
 import static com.bsmwireless.common.utils.DateUtils.getFullTimeZone;
 
-public class DriverProfileActivity extends BaseMenuActivity implements DriverProfileView, SignatureLayout.OnSaveSignatureListener, AdapterView.OnItemSelectedListener {
+public final class DriverProfileActivity extends BaseMenuActivity implements DriverProfileView, SignatureLayout.OnSaveSignatureListener, AdapterView.OnItemSelectedListener {
 
     public static final String EXTRA_USER = "user";
 

@@ -8,7 +8,7 @@ import com.google.gson.annotations.SerializedName;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-public class Vehicle implements Parcelable {
+public final class Vehicle implements Parcelable {
     @SerializedName("id")
     private Integer mId;
 

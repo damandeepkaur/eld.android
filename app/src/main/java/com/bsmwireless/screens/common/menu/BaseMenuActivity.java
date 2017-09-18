@@ -19,6 +19,7 @@ import com.bsmwireless.widgets.alerts.ELDType;
 import com.bsmwireless.widgets.alerts.OccupancyType;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import app.bsmuniversal.com.R;
 import butterknife.BindView;
@@ -39,18 +40,21 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
     @BindView(R.id.co_driver_notification)
     TextView mCoDriverNotification;
 
+    @SuppressWarnings("DesignForExtension")
     @Override
     protected void onStart() {
         super.onStart();
         getPresenter().onStart();
     }
 
+    @SuppressWarnings("DesignForExtension")
     @Override
     protected void onStop() {
         super.onStop();
         getPresenter().onStop();
     }
 
+    @SuppressWarnings("DesignForExtension")
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_alert, menu);
@@ -68,7 +72,7 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public final boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_diagnostic:
                 getPresenter().onDiagnosticEventsClick();
@@ -90,6 +94,7 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
         return super.onOptionsItemSelected(item);
     }
 
+    @SuppressWarnings("DesignForExtension")
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -99,6 +104,7 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
         }
     }
 
+    @SuppressWarnings("DesignForExtension")
     @Override
     public void setELDType(ELDType type) {
         if (mELDItem != null) {
@@ -107,6 +113,7 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
         }
     }
 
+    @SuppressWarnings("DesignForExtension")
     @Override
     public void setDutyType(DutyType type) {
         if (mDutyItem != null) {
@@ -115,6 +122,7 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
         }
     }
 
+    @SuppressWarnings("DesignForExtension")
     @Override
     public void setOccupancyType(OccupancyType type) {
         if (mOccupancyItem != null) {
@@ -123,6 +131,7 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
         }
     }
 
+    @SuppressWarnings("DesignForExtension")
     @Override
     public void showSwitchDriverDialog() {
         if (mSwitchDriverDialog != null) {
@@ -130,18 +139,19 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
         }
     }
 
+    @SuppressWarnings("DesignForExtension")
     @Override
     public void showMalfunctionDialog() {
         MalfunctionDialog.newInstance().show(getSupportFragmentManager(), "");
     }
 
     @Override
-    public void showDiagnosticEvents() {
+    public final void showDiagnosticEvents() {
         DiagnosticDialog.newInstance().show(getSupportFragmentManager(), "");
     }
 
     @Override
-    public void changeMalfunctionStatus(boolean hasMalfunctionEvents) {
+    public final void changeMalfunctionStatus(boolean hasMalfunctionEvents) {
 
         if (mMalfunctionItem == null) {
             return;
@@ -150,7 +160,7 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
     }
 
     @Override
-    public void changeDiagnosticStatus(boolean hasMalfunctionEvents) {
+    public final void changeDiagnosticStatus(boolean hasMalfunctionEvents) {
         if (mELDItem == null) {
             return;
         }
@@ -158,14 +168,16 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
     }
 
     @Override
-    public void changeDutyType(DutyType dutyType, String comment) {
+    public final void changeDutyType(DutyType dutyType, String comment) {
         getPresenter().onDutyChanged(dutyType, comment);
     }
 
+    @SuppressWarnings("DesignForExtension")
     protected void onHomePress() {
         onBackPressed();
     }
 
+    @SuppressWarnings("DesignForExtension")
     @Override
     public void showDutyTypeDialog(DutyType current) {
         if (mDutyDialog != null) {
@@ -173,14 +185,11 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
         }
 
         //TODO: set correct types
-        DutyType[] dutyTypes = DutyTypeManager.DRIVER_DUTY;
+        List<DutyType> dutyTypes = DutyTypeManager.DRIVER_DUTY_EXTENDED;
 
         ArrayList<BaseMenuAdapter.DutyItem> dutyItems = new ArrayList<>();
         for (DutyType dutyType : dutyTypes) {
-            dutyItems.add(new BaseMenuAdapter.DutyItem(dutyType, true));
-
-            //TODO: need to clarify
-            /*boolean isEnabled = current != dutyType;
+            boolean isEnabled = current != dutyType;
             switch (dutyType) {
                 case ON_DUTY:
                     isEnabled &= current != DutyType.PERSONAL_USE;
@@ -207,7 +216,7 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
                     break;
             }
 
-            dutyItems.add(new BaseMenuAdapter.DutyItem(dutyType, isEnabled));*/
+            dutyItems.add(new BaseMenuAdapter.DutyItem(dutyType, isEnabled));
         }
 
         ArrayAdapter<BaseMenuAdapter.DutyItem> arrayAdapter = new BaseMenuAdapter(this, dutyItems);
@@ -218,6 +227,7 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
                 .show();
     }
 
+    @SuppressWarnings("DesignForExtension")
     @Override
     public void showNotInVehicleDialog() {
         if (mDutyDialog != null) {
@@ -232,6 +242,7 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
                 .show();
     }
 
+    @SuppressWarnings("DesignForExtension")
     @Override
     public void showCoDriverView(String name) {
         if (mCoDriverNotification != null) {
@@ -242,6 +253,7 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
         }
     }
 
+    @SuppressWarnings("DesignForExtension")
     @Override
     public void hideCoDriverView() {
         if (mCoDriverNotification != null) {

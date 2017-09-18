@@ -9,7 +9,7 @@ import dagger.Module;
 import dagger.Provides;
 
 @Module
-public class SelectAssetModule {
+public final class SelectAssetModule {
 
     private final SelectAssetView mHomeView;
 

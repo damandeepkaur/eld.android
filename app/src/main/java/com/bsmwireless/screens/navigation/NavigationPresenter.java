@@ -30,7 +30,7 @@ import io.reactivex.disposables.Disposables;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
-public class NavigationPresenter extends BaseMenuPresenter {
+public final class NavigationPresenter extends BaseMenuPresenter {
 
     private NavigateView mView;
     private VehiclesInteractor mVehiclesInteractor;

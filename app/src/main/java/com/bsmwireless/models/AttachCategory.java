@@ -9,7 +9,7 @@ import com.google.gson.annotations.SerializedName;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-public class AttachCategory implements Parcelable {
+public final class AttachCategory implements Parcelable {
 
     @SerializedName("id")
     @Expose

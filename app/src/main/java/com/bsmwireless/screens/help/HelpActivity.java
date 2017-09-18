@@ -14,7 +14,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
-public class HelpActivity extends Activity {
+public final class HelpActivity extends Activity {
 
     public static final String HELP_IMAGE_ID_TEG = "HELP_IMAGE_RESOURCE_ID";
     public static final String HELP_MODEL_EXTRA = "help_model";

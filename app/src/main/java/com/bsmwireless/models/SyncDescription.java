@@ -9,7 +9,7 @@ import com.google.gson.annotations.SerializedName;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-public class SyncDescription implements Parcelable {
+public final class SyncDescription implements Parcelable {
     @SerializedName("en")
     @Expose
     private String mEnglish;

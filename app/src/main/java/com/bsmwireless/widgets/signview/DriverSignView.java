@@ -30,7 +30,7 @@ import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 
 
-public class DriverSignView extends View implements View.OnTouchListener {
+public final class DriverSignView extends View implements View.OnTouchListener {
 
     private static final int LINE_WIDTH_DP = 2;
     private static final int BORDER_WIDTH_DP = 1;

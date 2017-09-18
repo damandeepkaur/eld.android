@@ -10,7 +10,7 @@ import dagger.Module;
 import dagger.Provides;
 
 @Module
-public class CacheModule {
+public final class CacheModule {
     @Singleton
     @Provides
     FontCache provideFontCache(Context context) {

@@ -55,6 +55,7 @@ public class StatusView extends CardView {
         typedArray.recycle();
     }
 
+    @SuppressWarnings("DesignForExtension")
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();

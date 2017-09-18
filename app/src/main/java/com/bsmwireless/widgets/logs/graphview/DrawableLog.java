@@ -6,7 +6,7 @@ import com.bsmwireless.widgets.alerts.DutyType;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DrawableLog {
+public final class DrawableLog {
     private DutyType mType;
     private long mTime;
     private long mDuration;

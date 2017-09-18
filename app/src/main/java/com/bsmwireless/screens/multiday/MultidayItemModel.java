@@ -2,7 +2,7 @@ package com.bsmwireless.screens.multiday;
 
 import com.bsmwireless.common.utils.DateUtils;
 
-public class MultidayItemModel {
+public final class MultidayItemModel {
 
     private static final String DEFAULT_TIME = "00:00";
 

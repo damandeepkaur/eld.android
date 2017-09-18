@@ -10,7 +10,7 @@ import dagger.Module;
 import dagger.Provides;
 
 @Module
-public class SettingsModule {
+public final class SettingsModule {
 
     private final SettingsView mSettingsView;
 

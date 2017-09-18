@@ -9,7 +9,7 @@ import dagger.Module;
 import dagger.Provides;
 
 @Module
-public class LogsModule {
+public final class LogsModule {
 
     private final LogsView mLogsView;
 

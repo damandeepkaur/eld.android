@@ -9,7 +9,7 @@ import dagger.Module;
 import dagger.Provides;
 
 @Module
-public class MultidayModule {
+public final class MultidayModule {
     private final MultidayView mHomeView;
 
     public MultidayModule(@NonNull MultidayView view) {

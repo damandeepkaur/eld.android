@@ -9,7 +9,7 @@ import dagger.Module;
 import dagger.Provides;
 
 @Module
-public class SwitchDriverModule {
+public final class SwitchDriverModule {
     private final SwitchDriverView mHomeView;
 
     public SwitchDriverModule(@NonNull SwitchDriverView view) {

@@ -27,7 +27,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 
-public class LoginActivity extends BaseActivity implements LoginView {
+public final class LoginActivity extends BaseActivity implements LoginView {
     public static final String ARG_ACCOUNT_NAME = "name";
     public static final String ARG_DOMAIN_NAME = "domain";
 

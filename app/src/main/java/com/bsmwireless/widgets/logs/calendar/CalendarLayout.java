@@ -19,7 +19,7 @@ import java.util.List;
 
 import app.bsmuniversal.com.R;
 
-public class CalendarLayout extends LinearLayout implements View.OnClickListener {
+public final class CalendarLayout extends LinearLayout implements View.OnClickListener {
 
     private static final int DEFAULT_DAYS_COUNT = 30;
 
@@ -55,9 +55,9 @@ public class CalendarLayout extends LinearLayout implements View.OnClickListener
         mDaysCount = typedArray.getInt(R.styleable.CalendarLayout_daysCount, DEFAULT_DAYS_COUNT);
         typedArray.recycle();
 
-        mRecyclerView = (RecyclerView) mRootView.findViewById(R.id.recycler_view);
-        mLeftButton = (Button) mRootView.findViewById(R.id.left);
-        mRightButton = (Button) mRootView.findViewById(R.id.right);
+        mRecyclerView = mRootView.findViewById(R.id.recycler_view);
+        mLeftButton = mRootView.findViewById(R.id.left);
+        mRightButton = mRootView.findViewById(R.id.right);
         mLeftButton.setOnClickListener(v -> onLeftClicked());
         mRightButton.setOnClickListener(v -> onRightClicked());
     }

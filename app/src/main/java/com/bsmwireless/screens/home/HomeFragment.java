@@ -10,7 +10,7 @@ import com.bsmwireless.screens.common.BaseFragment;
 import app.bsmuniversal.com.R;
 import butterknife.ButterKnife;
 
-public class HomeFragment extends BaseFragment {
+public final class HomeFragment extends BaseFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

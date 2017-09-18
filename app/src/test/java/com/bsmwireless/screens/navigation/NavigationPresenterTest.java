@@ -17,7 +17,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import app.bsmuniversal.com.RxSchedulerRule;
 import io.reactivex.Flowable;
@@ -34,7 +34,7 @@ import static org.mockito.Mockito.when;
  * Tests for NavigationPresenter.
  */
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class NavigationPresenterTest {
 
     @ClassRule

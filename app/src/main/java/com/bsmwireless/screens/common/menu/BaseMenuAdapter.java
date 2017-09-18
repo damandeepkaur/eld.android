@@ -27,7 +27,7 @@ public class BaseMenuAdapter extends ArrayAdapter<BaseMenuAdapter.DutyItem> {
 
     @NonNull
     @Override
-    public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+    public final View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         Holder holder;
         if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -42,7 +42,7 @@ public class BaseMenuAdapter extends ArrayAdapter<BaseMenuAdapter.DutyItem> {
         return convertView;
     }
 
-    static class Holder {
+    static final class Holder {
         @BindView(R.id.dashboard_title)
         TextView mTitleText;
 
@@ -59,7 +59,7 @@ public class BaseMenuAdapter extends ArrayAdapter<BaseMenuAdapter.DutyItem> {
         }
     }
 
-    public static class DutyItem {
+    public static final class DutyItem {
         private DutyType mDutyType;
         private boolean mIsEnabled;
 

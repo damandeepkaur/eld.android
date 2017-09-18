@@ -25,6 +25,7 @@ import io.reactivex.plugins.RxJavaPlugins;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
 
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -66,12 +67,12 @@ public class LockScreenPresenterTest {
 
     @Test
     public void testStatuses() throws Exception {
-        when(mDutyTypeManager.getDutyTypeTime(DutyType.DRIVING)).thenReturn(1L);
-        when(mDutyTypeManager.getDutyTypeTime(DutyType.SLEEPER_BERTH)).thenReturn(2L);
-        when(mDutyTypeManager.getDutyTypeTime(DutyType.ON_DUTY)).thenReturn(3L);
-        when(mDutyTypeManager.getDutyTypeTime(DutyType.OFF_DUTY)).thenReturn(4L);
+        given(mDutyTypeManager.getDutyTypeTime(DutyType.DRIVING)).willReturn(1L);
+        given(mDutyTypeManager.getDutyTypeTime(DutyType.SLEEPER_BERTH)).willReturn(2L);
+        given(mDutyTypeManager.getDutyTypeTime(DutyType.ON_DUTY)).willReturn(3L);
+        given(mDutyTypeManager.getDutyTypeTime(DutyType.OFF_DUTY)).willReturn(4L);
 
-        when(mBlackBox.getDataObservable()).thenReturn(Observable.empty());
+        given(mBlackBox.getDataObservable()).willReturn(Observable.empty());
 
         mPresenter.onStart(mLockScreenView);
         verify(mLockScreenView).setTimeForDutyType(DutyType.DRIVING, 1L);
@@ -88,7 +89,7 @@ public class LockScreenPresenterTest {
 
     @Test
     public void testSwitchCoDriver() throws Exception {
-        when(mBlackBox.getDataObservable()).thenReturn(Observable.empty());
+        given(mBlackBox.getDataObservable()).willReturn(Observable.empty());
         mPresenter.onStart(mLockScreenView);
         mPresenter.switchCoDriver();
         verify(mLockScreenView).openCoDriverDialog();
@@ -96,7 +97,7 @@ public class LockScreenPresenterTest {
 
     @Test
     public void startMonitoring() throws Exception {
-        when(mBlackBox.getDataObservable()).thenReturn(Observable.empty());
+        given(mBlackBox.getDataObservable()).willReturn(Observable.empty());
         mPresenter.onStart(mLockScreenView);
         verify(mLockScreenView).removeAnyPopup();
     }
@@ -105,15 +106,15 @@ public class LockScreenPresenterTest {
     public void idling() throws Exception {
 
         final BlackBoxModel stoppedMock = mock(BlackBoxModel.class);
-        when(stoppedMock.getResponseType()).thenReturn(BlackBoxResponseModel.ResponseType.STOPPED);
+        given(stoppedMock.getResponseType()).willReturn(BlackBoxResponseModel.ResponseType.STOPPED);
 
         final BlackBoxModel anyMock = mock(BlackBoxModel.class);
-        when(anyMock.getResponseType()).thenReturn(BlackBoxResponseModel.ResponseType.MOVING);
+        given(anyMock.getResponseType()).willReturn(BlackBoxResponseModel.ResponseType.MOVING);
 
         final BehaviorSubject<BlackBoxModel> subject = BehaviorSubject.create();
-        when(mBlackBox.getDataObservable()).thenReturn(subject);
+        given(mBlackBox.getDataObservable()).willReturn(subject);
 
-        when(mELDEventsInteractor.postNewELDEvent(any())).thenReturn(Single.just(1L));
+        given(mELDEventsInteractor.postNewELDEvent(any())).willReturn(Single.just(1L));
 
         mPresenter.onStart(mLockScreenView);
         subject.onNext(stoppedMock);
@@ -126,12 +127,12 @@ public class LockScreenPresenterTest {
     public void startMonitoringIgnitionOff() throws Exception {
 
         final BlackBoxModel ignitionOffMock = mock(BlackBoxModel.class);
-        when(ignitionOffMock.getResponseType()).thenReturn(BlackBoxResponseModel.ResponseType.IGNITION_OFF);
+        given(ignitionOffMock.getResponseType()).willReturn(BlackBoxResponseModel.ResponseType.IGNITION_OFF);
 
         final BehaviorSubject<BlackBoxModel> subject = BehaviorSubject.create();
-        when(mBlackBox.getDataObservable()).thenReturn(subject);
+        given(mBlackBox.getDataObservable()).willReturn(subject);
 
-        when(mELDEventsInteractor.postNewELDEvent(any())).thenReturn(Single.just(1L));
+        given(mELDEventsInteractor.postNewELDEvent(any())).willReturn(Single.just(1L));
 
         mPresenter.onStart(mLockScreenView);
         verify(mLockScreenView).removeAnyPopup();
