@@ -377,6 +377,7 @@ public class UserInteractorTest {
         when(mTokenManager.getPassword(anyString())).thenReturn(mPassword);
         when(mUserDao.getUserSync(anyInt())).thenReturn(userEntity);
         when(mServiceApi.getELDEvents(anyLong(), anyLong())).thenReturn(Observable.just(eldEvents));
+        when(mTokenManager.getAccountName(anyString(), anyString())).thenReturn("str");
 
         // when
         mLoginUserInteractor.loginUser(mName, mPassword, mDomain, mKeepToken, mDriverType)
@@ -424,6 +425,7 @@ public class UserInteractorTest {
         final String driver = "90210"; // parsable to int
         final String fakeToken = "314159265";
 
+        when(mAccountManager.getCurrentDriverAccountName()).thenReturn(accountName);
         when(mPreferencesManager.getDriverAccountName()).thenReturn(accountName);
         when(mTokenManager.getDriver(anyString())).thenReturn(driver);
         when(mAppDatabase.userDao()).thenReturn(mUserDao);
@@ -809,7 +811,7 @@ public class UserInteractorTest {
     @Test
     public void testGetUserName() {
         // given
-        // n/a
+        when(mAccountManager.getCurrentUserAccountName()).thenReturn("any");
 
         // when
         mLoginUserInteractor.getUserName();
@@ -850,7 +852,8 @@ public class UserInteractorTest {
     @Test
     public void testGetDomainName() {
         // given
-        // n/a
+        when(mAccountManager.getCurrentDriverAccountName()).thenReturn("any");
+
 
         // when
         mLoginUserInteractor.getDriverDomainName();
