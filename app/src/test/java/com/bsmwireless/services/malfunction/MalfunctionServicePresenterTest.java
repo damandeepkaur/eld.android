@@ -112,7 +112,7 @@ public class MalfunctionServicePresenterTest {
         BlackBoxModel diagnosticDisappear = spy(new BlackBoxModel());
         when(diagnosticDisappear.getSensorState(BlackBoxSensorState.ECM_CABLE)).thenReturn(true);
         when(diagnosticDisappear.getSensorState(BlackBoxSensorState.ECM_SYNC)).thenReturn(true);
-        when(diagnosticAppear.getResponseType()).thenReturn(BlackBoxResponseModel.ResponseType.STATUS_UPDATE);
+        when(diagnosticDisappear.getResponseType()).thenReturn(BlackBoxResponseModel.ResponseType.STATUS_UPDATE);
 
         Subject<BlackBoxModel> blackBoxObservable = PublishSubject.create();
         when(mConnectionManager.getDataObservable()).thenReturn(blackBoxObservable);
@@ -122,9 +122,8 @@ public class MalfunctionServicePresenterTest {
         ELDEvent diagnosticCleared = mock(ELDEvent.class);
         when(diagnosticCleared.getEventCode()).thenReturn(ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED.getCode());
 
-//        Subject<ELDEvent> eldEventObservable = PublishSubject.create();
-
         when(mELDEventsInteractor.postNewELDEvent(any())).thenReturn(Single.just(1L));
+        when(mELDEventsInteractor.getEvent(any(DutyType.class))).thenReturn(new ELDEvent());
 
         when(mDutyTypeManager.getDutyType()).thenReturn(DutyType.ON_DUTY);
 
@@ -133,15 +132,13 @@ public class MalfunctionServicePresenterTest {
         when(mELDEventsInteractor.getLatestMalfunctionEvent(Malfunction.ENGINE_SYNCHRONIZATION))
                 .thenReturn(Maybe.just(diagnosticCleared));
         blackBoxObservable.onNext(diagnosticAppear);
-//        eldEventObservable.onNext(diagnosticCleared);
 
         when(mELDEventsInteractor.getLatestMalfunctionEvent(Malfunction.ENGINE_SYNCHRONIZATION))
                 .thenReturn(Maybe.just(diagnosticLogged));
-
         blackBoxObservable.onNext(diagnosticDisappear);
-//        eldEventObservable.onNext(diagnosticLogged);
 
         blackBoxObservable.onComplete();
+        mMalfunctionServicePresenter.onDestroy();
 //        eldEventObservable.onComplete();
 
         verify(mELDEventsInteractor, times(2)).postNewELDEvent(any());
@@ -161,6 +158,9 @@ public class MalfunctionServicePresenterTest {
                 .thenReturn(Maybe.empty());
 
         when(mELDEventsInteractor.postNewELDEvent(any())).thenReturn(Single.just(1L));
+        when(mELDEventsInteractor.getEvent(any(DutyType.class))).thenReturn(new ELDEvent());
+
+        when(mDutyTypeManager.getDutyType()).thenReturn(DutyType.ON_DUTY);
 
         mMalfunctionServicePresenter.onCreate();
         verify(mELDEventsInteractor).postNewELDEvent(any());
@@ -180,6 +180,7 @@ public class MalfunctionServicePresenterTest {
 
         when(mELDEventsInteractor.getLatestMalfunctionEvent(Malfunction.ENGINE_SYNCHRONIZATION))
                 .thenReturn(Maybe.empty());
+        when(mELDEventsInteractor.getEvent(any(DutyType.class))).thenReturn(new ELDEvent());
 
         when(mELDEventsInteractor.postNewELDEvent(any())).thenReturn(Single.just(1L));
 

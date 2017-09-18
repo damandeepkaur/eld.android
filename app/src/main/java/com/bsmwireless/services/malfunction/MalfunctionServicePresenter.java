@@ -60,7 +60,13 @@ public final class MalfunctionServicePresenter {
                         == blackBoxModel.getResponseType())
                 .flatMap(blackBoxModel -> mELDEventsInteractor
                                 .getLatestMalfunctionEvent(Malfunction.ENGINE_SYNCHRONIZATION)
-                                .toObservable(),
+                                .toObservable()
+                                .switchIfEmpty(observer -> {
+                                    // create default event with cleared status
+                                    ELDEvent event = mELDEventsInteractor.getEvent(mDutyTypeManager.getDutyType());
+                                    event.setEventCode(ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED.getCode());
+                                    observer.onNext(event);
+                                }),
                         SynchResult::new
                 )
                 .filter(this::isStateAndEventAreDifferent)
