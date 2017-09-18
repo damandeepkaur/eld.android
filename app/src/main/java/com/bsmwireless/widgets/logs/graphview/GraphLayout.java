@@ -128,7 +128,7 @@ public final class GraphLayout extends LinearLayout {
 
     private void init(Context context) {
         mRootView = inflate(context, R.layout.eld_graph, this);
-        mELDGraphView = (ELDGraphView) mRootView.findViewById(R.id.hos_graph);
+        mELDGraphView = mRootView.findViewById(R.id.hos_graph);
     }
 
     @Override

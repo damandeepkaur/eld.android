@@ -11,7 +11,6 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.data.storage.users.UserEntity;
 
 import java.util.List;
@@ -41,9 +40,9 @@ public final class CoDriverAdapter extends ArrayAdapter<SwitchDriverDialog.UserM
             viewHolder = new ViewHolder();
             LayoutInflater inflater = LayoutInflater.from(getContext());
             convertView = inflater.inflate(R.layout.co_driver_item, parent, false);
-            viewHolder.mCoDriverName = (TextView) convertView.findViewById(R.id.co_driver_name);
-            viewHolder.mCoDriverDutyStatus = (ImageView) convertView.findViewById(R.id.duty_icon);
-            viewHolder.mRootView = (RelativeLayout) convertView.findViewById(R.id.item_layout);
+            viewHolder.mCoDriverName = convertView.findViewById(R.id.co_driver_name);
+            viewHolder.mCoDriverDutyStatus = convertView.findViewById(R.id.duty_icon);
+            viewHolder.mRootView = convertView.findViewById(R.id.item_layout);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();

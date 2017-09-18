@@ -13,9 +13,9 @@ import com.bsmwireless.screens.lockscreen.LockScreenActivity;
 import javax.inject.Inject;
 
 
-public class StatusMonitoringService extends Service implements MonitoringServiceView {
+public final class StatusMonitoringService extends Service implements MonitoringServiceView {
 
-    private final IBinder binder = new LocalBinder();
+    private IBinder binder;
 
     @Inject
     MonitoringServicePresenter presenter;
@@ -42,6 +42,7 @@ public class StatusMonitoringService extends Service implements MonitoringServic
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
+        binder = new Binder();
         presenter.startMonitoring();
         return binder;
     }
@@ -57,11 +58,5 @@ public class StatusMonitoringService extends Service implements MonitoringServic
     public void startLockScreen() {
         final Intent intent = LockScreenActivity.createIntent(getApplicationContext());
         startActivity(intent);
-    }
-
-    public class LocalBinder extends Binder {
-        StatusMonitoringService getService() {
-            return StatusMonitoringService.this;
-        }
     }
 }

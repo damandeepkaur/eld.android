@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Toast;
 
 import com.bsmwireless.common.App;
 import com.bsmwireless.common.Constants;

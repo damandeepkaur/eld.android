@@ -40,18 +40,21 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
     @BindView(R.id.co_driver_notification)
     TextView mCoDriverNotification;
 
+    @SuppressWarnings("DesignForExtension")
     @Override
     protected void onStart() {
         super.onStart();
         getPresenter().onStart();
     }
 
+    @SuppressWarnings("DesignForExtension")
     @Override
     protected void onStop() {
         super.onStop();
         getPresenter().onStop();
     }
 
+    @SuppressWarnings("DesignForExtension")
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_alert, menu);
@@ -143,12 +146,12 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
     }
 
     @Override
-    public void showDiagnosticEvents() {
+    public final void showDiagnosticEvents() {
         DiagnosticDialog.newInstance().show(getSupportFragmentManager(), "");
     }
 
     @Override
-    public void changeMalfunctionStatus(boolean hasMalfunctionEvents) {
+    public final void changeMalfunctionStatus(boolean hasMalfunctionEvents) {
 
         if (mMalfunctionItem == null) {
             return;
@@ -157,7 +160,7 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
     }
 
     @Override
-    public void changeDiagnosticStatus(boolean hasMalfunctionEvents) {
+    public final void changeDiagnosticStatus(boolean hasMalfunctionEvents) {
         if (mELDItem == null) {
             return;
         }
@@ -165,7 +168,7 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
     }
 
     @Override
-    public void changeDutyType(DutyType dutyType, String comment) {
+    public final void changeDutyType(DutyType dutyType, String comment) {
         getPresenter().onDutyChanged(dutyType, comment);
     }
 

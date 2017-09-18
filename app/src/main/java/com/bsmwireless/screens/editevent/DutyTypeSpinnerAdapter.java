@@ -37,7 +37,7 @@ public final class DutyTypeSpinnerAdapter extends ArrayAdapter<DutyType> {
             convertView = LayoutInflater.from(parent.getContext()).inflate(android.R.layout.simple_list_item_1, null);
         }
 
-        TextView name = (TextView) convertView.findViewById(android.R.id.text1);
+        TextView name = convertView.findViewById(android.R.id.text1);
         name.setText(getContext().getString(type.getName()));
 
         return convertView;

@@ -124,7 +124,7 @@ public final class EditLogHeaderActivity extends BaseMenuActivity implements Edi
     private void setupExemptions(List<ExemptionModel> exemptions) {
         mExemptions = exemptions;
 
-        LinearLayout list = (LinearLayout) findViewById(R.id.exemptions);
+        LinearLayout list = findViewById(R.id.exemptions);
         for (int i = 0; i < exemptions.size(); i++) {
             ExemptionModel exemption = exemptions.get(i);
             if (!ExemptionModel.NONE.equals(exemption.getName())) {

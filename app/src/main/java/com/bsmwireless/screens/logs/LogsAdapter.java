@@ -140,20 +140,20 @@ public final class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHold
             case VIEW_TYPE_HEADER:
                 view = mLayoutInflater.inflate(R.layout.logs_list_item_header, parent, false);
 
-                mCalendarLayout = (CalendarLayout) view.findViewById(R.id.calendar);
+                mCalendarLayout = view.findViewById(R.id.calendar);
                 mCalendarLayout.setLogs(mLogHeaders);
                 mCalendarLayout.setOnItemSelectedListener(calendarItem -> {
                     updateSignButton();
                     mPresenter.onCalendarDaySelected(calendarItem);
                 });
 
-                mSignLogsheet = (TextView) view.findViewById(R.id.sign_logsheet);
+                mSignLogsheet = view.findViewById(R.id.sign_logsheet);
                 mSigned = view.findViewById(R.id.signed);
 
                 mSignLogsheet.setOnClickListener(v -> mOnLogsStateChangeListener.onSignButtonClicked(
                         mCalendarLayout.getCurrentItem()));
 
-                mGraphLayout = (GraphLayout) view.findViewById(R.id.graphic);
+                mGraphLayout = view.findViewById(R.id.graphic);
                 mGraphLayout.setELDEvents(mEventLogs);
 
                 break;

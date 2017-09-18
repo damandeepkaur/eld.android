@@ -3,7 +3,6 @@ package com.bsmwireless.common.dagger;
 import android.arch.persistence.room.Room;
 import android.content.Context;
 
-
 import com.bsmwireless.data.storage.AppDatabase;
 
 import javax.inject.Singleton;

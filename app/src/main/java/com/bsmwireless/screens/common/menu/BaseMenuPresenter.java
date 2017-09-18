@@ -46,23 +46,25 @@ public abstract class BaseMenuPresenter implements AccountManager.AccountListene
 
     protected abstract BaseMenuView getView();
 
+    @SuppressWarnings("DesignForExtension")
     public void onStart() {
         startMonitoringEvents();
     }
 
+    @SuppressWarnings("DesignForExtension")
     public void onStop() {
         stopEventsMonitoring();
     }
 
-    public void onMalfunctionEventsClick() {
+    public final void onMalfunctionEventsClick() {
         getView().showMalfunctionDialog();
     }
 
-    public void onDiagnosticEventsClick() {
+    public final void onDiagnosticEventsClick() {
         getView().showDiagnosticEvents();
     }
 
-    void onMenuCreated() {
+    final void onMenuCreated() {
         mMenuCreatedSubject.onNext(0);
         mDutyTypeManager.addListener(mListener);
         mDisposables.add(mUserInteractor.getCoDriversNumber()
@@ -153,26 +155,27 @@ public abstract class BaseMenuPresenter implements AccountManager.AccountListene
         mMalfunctionEventsDisposable.dispose();
     }
 
-    protected void add(Disposable disposable) {
+    protected final void add(Disposable disposable) {
         mDisposables.add(disposable);
     }
 
-    protected CompositeDisposable getDisposables() {
+    protected final CompositeDisposable getDisposables() {
         return mDisposables;
     }
 
-    protected UserInteractor getUserInteractor() {
+    protected final UserInteractor getUserInteractor() {
         return mUserInteractor;
     }
 
-    protected ELDEventsInteractor getEventsInteractor() {
+    protected final ELDEventsInteractor getEventsInteractor() {
         return mEventsInteractor;
     }
 
-    protected DutyTypeManager getDutyTypeManager() {
+    protected final DutyTypeManager getDutyTypeManager() {
         return mDutyTypeManager;
     }
 
+    @SuppressWarnings("DesignForExtension")
     @Override
     public void onUserChanged() {
         if (!mAccountManager.isCurrentUserDriver()) {
