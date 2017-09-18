@@ -2,7 +2,7 @@
 ELD app for Android
 
 # Version history
-
+* **1.0.72** - Add Lint inspection (EA-330)
 * **1.0.71** - Fix remember me due to merge conflict
 * **1.0.70** - Malfunction and Data diagnostic indications (_EA-104_, _EA-105_, _EA-106_)
 * **1.0.69** - Lock screen in the driving mode (_EA-82_)
