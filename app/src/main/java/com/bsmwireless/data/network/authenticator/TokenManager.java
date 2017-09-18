@@ -29,7 +29,7 @@ public class TokenManager {
             accountManager.setAuthToken(account, BsmAuthenticator.TOKEN_TYPE, auth.getToken());
 
             //TODO: schedule token expiration
-            SchedulerUtils.s
+            SchedulerUtils.scheduleTokenExpiration(auth.getExpire());
         }
 
         accountManager.setUserData(account, BsmAuthenticator.ACCOUNT_NAME, name);

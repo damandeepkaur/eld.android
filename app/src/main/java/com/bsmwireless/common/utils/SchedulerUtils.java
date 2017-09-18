@@ -17,6 +17,7 @@ import com.bsmwireless.schedulers.alarmmanager.SyncNtpAlarmReceiver;
 import com.bsmwireless.schedulers.jobscheduler.AutoLogoutJobService;
 import com.bsmwireless.schedulers.alarmmanager.AlarmReceiver;
 import com.bsmwireless.schedulers.jobscheduler.SyncNtpJobService;
+import com.bsmwireless.schedulers.jobscheduler.VerifyTokenScheduler;
 
 import java.util.Calendar;
 import java.util.List;
@@ -28,6 +29,7 @@ public class SchedulerUtils {
 
     private static final int JOB_ID = 111;
     private static final int SYNC_NTP_JOB_ID = 222;
+    private static final int VERIFY_TOKEN_JOB_ID = 333;
     private static final int AUTO_LOGOUT_TRIGGER_DURATION = 60;
     private static final int AUTO_LOGOUT_TRIGGER_DURATION_MIN = 55;
     private static final int AUTO_LOGOUT_TRIGGER_DURATION_MAX = 65;
@@ -166,10 +168,9 @@ public class SchedulerUtils {
     public static void scheduleTokenExpiration(long timestamp) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             long diff = Calendar.getInstance().getTimeInMillis() - timestamp;
-            JobInfo.Builder builder = new JobInfo.Builder(SYNC_NTP_JOB_ID, new ComponentName(App.getComponent().context(), SyncNtpJobService.class))
+            JobInfo.Builder builder = new JobInfo.Builder(VERIFY_TOKEN_JOB_ID, new ComponentName(App.getComponent().context(), VerifyTokenScheduler.class))
                     .setRequiredNetworkType(JobInfo.NETWORK_TYPE_METERED)
-                    .setPeriodic(diff)
-                    .setPersisted(false);
+                    .setPeriodic(TimeUnit.MINUTES.toMillis(SYNC_NTP_TRIGGER_PERIOD_MIN));
 
             JobScheduler jobScheduler = (JobScheduler) App.getComponent().context().getSystemService(Context.JOB_SCHEDULER_SERVICE);
             jobScheduler.schedule(builder.build());
