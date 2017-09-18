@@ -6,6 +6,7 @@ import android.content.Context;
 import android.os.Build;
 import android.util.Base64;
 
+import com.bsmwireless.common.utils.SchedulerUtils;
 import com.bsmwireless.models.Auth;
 
 import timber.log.Timber;
@@ -28,6 +29,7 @@ public class TokenManager {
             accountManager.setAuthToken(account, BsmAuthenticator.TOKEN_TYPE, auth.getToken());
 
             //TODO: schedule token expiration
+            SchedulerUtils.s
         }
 
         accountManager.setUserData(account, BsmAuthenticator.ACCOUNT_NAME, name);

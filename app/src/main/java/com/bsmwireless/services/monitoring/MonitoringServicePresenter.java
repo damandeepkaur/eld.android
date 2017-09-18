@@ -21,7 +21,7 @@ import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
 @ActivityScope
-public class MonitoringServicePresenter {
+public final class MonitoringServicePresenter {
 
     final MonitoringServiceView mView;
     private final BlackBoxConnectionManager mBlackBox;

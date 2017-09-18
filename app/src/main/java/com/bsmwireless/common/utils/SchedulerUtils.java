@@ -161,4 +161,16 @@ public class SchedulerUtils {
                 new Intent(App.getComponent().context(), AlarmReceiver.class),
                 PendingIntent.FLAG_NO_CREATE) != null);
     }
+
+    public static void scheduleTokenExpiration(long timestamp) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            JobInfo.Builder builder = new JobInfo.Builder(SYNC_NTP_JOB_ID, new ComponentName(App.getComponent().context(), SyncNtpJobService.class))
+                    .setRequiredNetworkType(JobInfo.NETWORK_TYPE_METERED)
+                    .setPeriodic(TimeUnit.MINUTES.toMillis(timestamp))
+                    .setPersisted(false);
+
+            JobScheduler jobScheduler = (JobScheduler) App.getComponent().context().getSystemService(Context.JOB_SCHEDULER_SERVICE);
+            jobScheduler.schedule(builder.build());
+        }
+    }
 }

@@ -14,4 +14,8 @@ public interface BaseMenuView {
     void showSwitchDriverDialog();
     void showCoDriverView(String name);
     void hideCoDriverView();
+    void showMalfunctionDialog();
+    void showDiagnosticEvents();
+    void changeMalfunctionStatus(boolean hasMalfunctionEvents);
+    void changeDiagnosticStatus(boolean hasMalfunctionEvents);
 }
