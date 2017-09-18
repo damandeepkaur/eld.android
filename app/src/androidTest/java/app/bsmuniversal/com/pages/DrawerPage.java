@@ -19,4 +19,8 @@ public class DrawerPage {
         onView(DrawerLocators.navigation_view).perform(navigateTo(itemId));
     }
 
+    public static void click_on_box_label() {
+        CommonPage.perform_click(DrawerLocators.box_id);
+    }
+
 }

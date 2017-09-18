@@ -13,10 +13,6 @@ public class SelectAssetPage {
         click_on_not_in_vehicle();
     }
 
-    public static void click_on_search() {
-        CommonPage.perform_click(SelectAssetLocators.search_view);
-    }
-
     public static void enter_search_text(String searchText) {
         CommonPage.enter_on_view(SelectAssetLocators.search_input, searchText);
     }
