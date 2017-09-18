@@ -12,6 +12,7 @@ import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.AutoDutyTypeManager;
 import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.data.storage.PreferencesManager;
+import com.bsmwireless.screens.diagnostic.dagger.DiagnosticComponent;
 import com.bsmwireless.screens.lockscreen.dagger.LockScreenComponent;
 import com.bsmwireless.services.monitoring.dagger.MonitoringServiceComponent;
 import com.bsmwireless.widgets.common.FontTextView;
@@ -48,5 +49,8 @@ public interface AppComponent {
     void inject(FontTextView fontTextView);
 
     LockScreenComponent.Builder lockScreenBuilder();
+
+    DiagnosticComponent.Builder diagnosticBuilder();
+
     MonitoringServiceComponent.Builder monitoringServiceBuilder();
 }

@@ -3,13 +3,16 @@ package com.bsmwireless.common.dagger;
 import android.support.annotation.NonNull;
 
 import com.bsmwireless.common.Constants;
-import com.bsmwireless.data.network.ErrorHandlingFactory;
 import com.bsmwireless.data.network.HttpClientManager;
 import com.bsmwireless.data.network.NtpClientManager;
 import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.network.authenticator.TokenManager;
+import com.bsmwireless.data.network.converters.MalfunctionConverter;
 import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.data.storage.PreferencesManager;
+import com.bsmwireless.models.Malfunction;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,6 +36,15 @@ import static okhttp3.logging.HttpLoggingInterceptor.Level.NONE;
 
 @Module
 public class NetworkModule {
+
+    @Provides
+    @Singleton
+    Gson provideGson() {
+        return new GsonBuilder()
+                .registerTypeAdapter(Malfunction.class, new MalfunctionConverter())
+                .create();
+    }
+
     @Singleton
     @Provides
     HttpLoggingInterceptor provideInterceptor() {
@@ -70,11 +82,11 @@ public class NetworkModule {
 
     @Provides
     @Singleton
-    Retrofit provideRetrofit(HttpClientManager clientManager) {
+    Retrofit provideRetrofit(HttpClientManager clientManager, Gson gson) {
         return new Retrofit.Builder()
                 .client(clientManager.getClient())
                 .baseUrl(Constants.BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create(gson))
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build();
     }

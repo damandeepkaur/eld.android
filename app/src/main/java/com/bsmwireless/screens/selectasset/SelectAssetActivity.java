@@ -285,7 +285,8 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
                 .setCancelable(true)
                 .setTitle(R.string.select_asset_dialog_title)
                 .setMessage(R.string.select_asset_information_no_selected_assets)
-                .setPositiveButton(R.string.select_asset_continue, (dialog, which) -> {})
+                .setPositiveButton(R.string.select_asset_continue, (dialog, which) -> {
+                })
                 .setNegativeButton(R.string.select_asset_close, (dialog, which) -> onActionDone())
                 .show();
     }
@@ -297,30 +298,28 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
 
     @Override
     public void showProgress() {
-        if (mSelectAssetProgressBar != null) {
-            mSelectAssetProgressBarContainer.setVisibility(View.VISIBLE);
-            mSelectAssetProgressBar.setIndeterminate(true);
+        mSelectAssetProgressBarContainer.setVisibility(View.VISIBLE);
+        mSelectAssetProgressBar.setIndeterminate(true);
 
-            mSearchRecyclerView.setVisibility(View.GONE);
-            mLastRecyclerView.setVisibility(View.GONE);
+        mSearchRecyclerView.setVisibility(View.GONE);
+        mLastRecyclerView.setVisibility(View.GONE);
 
-            mSelectAssetScanQrCodeButton.setEnabled(false);
-            mSelectAssetNotInVehicleButton.setEnabled(false);
-        }
+        mSelectAssetScanQrCodeButton.setEnabled(false);
+        mSelectAssetNotInVehicleButton.setEnabled(false);
+
     }
 
     @Override
     public void hideProgress() {
-        if (mSelectAssetProgressBar != null) {
-            mSelectAssetProgressBarContainer.setVisibility(View.GONE);
-            mSelectAssetProgressBar.setIndeterminate(false);
+        mSelectAssetProgressBarContainer.setVisibility(View.GONE);
+        mSelectAssetProgressBar.setIndeterminate(false);
 
-            mSearchRecyclerView.setVisibility(View.VISIBLE);
-            mLastRecyclerView.setVisibility(View.VISIBLE);
+        mSearchRecyclerView.setVisibility(View.VISIBLE);
+        mLastRecyclerView.setVisibility(View.VISIBLE);
 
-            mSelectAssetScanQrCodeButton.setEnabled(true);
-            mSelectAssetNotInVehicleButton.setEnabled(true);
-        }
+        mSelectAssetScanQrCodeButton.setEnabled(true);
+        mSelectAssetNotInVehicleButton.setEnabled(true);
+
     }
 
     @Override
