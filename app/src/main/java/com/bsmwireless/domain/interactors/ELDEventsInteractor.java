@@ -164,7 +164,7 @@ public class ELDEventsInteractor {
                                 Constants.MALFUNCTION_CODES),
                         getMalfunctionCount(ELDEvent.MalfunctionCode.MALFUNCTION_CLEARED,
                                 Constants.MALFUNCTION_CODES),
-                        (loggedCount, clearedCount) -> loggedCount.compareTo(clearedCount) != 0);
+                        (loggedCount, clearedCount) -> loggedCount > clearedCount);
     }
 
     public Flowable<Boolean> hasDiagnosticEvents() {
@@ -174,7 +174,7 @@ public class ELDEventsInteractor {
                                 Constants.DIAGNOSTIC_CODES),
                         getMalfunctionCount(ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED,
                                 Constants.DIAGNOSTIC_CODES),
-                        (loggedCount, clearedCount) -> loggedCount.compareTo(clearedCount) != 0);
+                        (loggedCount, clearedCount) -> loggedCount > clearedCount);
     }
 
     /**

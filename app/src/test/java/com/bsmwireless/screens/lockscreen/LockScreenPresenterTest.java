@@ -26,8 +26,10 @@ import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -51,7 +53,7 @@ public class LockScreenPresenterTest {
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-        mPresenter = new LockScreenPresenter(
+        mPresenter = spy(new LockScreenPresenter(
                 mDutyTypeManager,
                 new BlackBoxConnectionManagerImpl(mBlackBox),
                 mPreferencesManager,
@@ -59,13 +61,16 @@ public class LockScreenPresenterTest {
                 mELDEventsInteractor,
                 TimeUnit.MILLISECONDS.toMillis(1),
                 TimeUnit.MILLISECONDS.toMillis(1),
-                mAccountManager);
+                mAccountManager));
         RxAndroidPlugins.setInitMainThreadSchedulerHandler(schedulerCallable -> Schedulers.trampoline());
         RxJavaPlugins.setIoSchedulerHandler(scheduler -> Schedulers.trampoline());
+        RxJavaPlugins.setComputationSchedulerHandler(scheduler -> Schedulers.trampoline());
     }
 
     @Test
     public void testStatuses() throws Exception {
+        doNothing().when(mPresenter).startTimer();
+
         when(mDutyTypeManager.getDutyTypeTime(DutyType.DRIVING)).thenReturn(1L);
         when(mDutyTypeManager.getDutyTypeTime(DutyType.SLEEPER_BERTH)).thenReturn(2L);
         when(mDutyTypeManager.getDutyTypeTime(DutyType.ON_DUTY)).thenReturn(3L);
@@ -89,6 +94,8 @@ public class LockScreenPresenterTest {
     @Test
     public void testSwitchCoDriver() throws Exception {
         when(mBlackBox.getDataObservable()).thenReturn(Observable.empty());
+        doNothing().when(mPresenter).startTimer();
+
         mPresenter.onStart(mLockScreenView);
         mPresenter.switchCoDriver();
         verify(mLockScreenView).openCoDriverDialog();
@@ -97,6 +104,8 @@ public class LockScreenPresenterTest {
     @Test
     public void startMonitoring() throws Exception {
         when(mBlackBox.getDataObservable()).thenReturn(Observable.empty());
+        doNothing().when(mPresenter).startTimer();
+
         mPresenter.onStart(mLockScreenView);
         verify(mLockScreenView).removeAnyPopup();
     }
@@ -114,10 +123,10 @@ public class LockScreenPresenterTest {
         when(mBlackBox.getDataObservable()).thenReturn(subject);
 
         when(mELDEventsInteractor.postNewELDEvent(any())).thenReturn(Single.just(1L));
+        doNothing().when(mPresenter).startTimer();
 
         mPresenter.onStart(mLockScreenView);
         subject.onNext(stoppedMock);
-        subject.onNext(anyMock);
         subject.onComplete();
         verify(mLockScreenView).closeLockScreen();
     }
@@ -132,10 +141,13 @@ public class LockScreenPresenterTest {
         when(mBlackBox.getDataObservable()).thenReturn(subject);
 
         when(mELDEventsInteractor.postNewELDEvent(any())).thenReturn(Single.just(1L));
+        doNothing().when(mPresenter).startTimer();
 
         mPresenter.onStart(mLockScreenView);
         verify(mLockScreenView).removeAnyPopup();
         subject.onNext(ignitionOffMock);
+
+
         verify(mELDEventsInteractor).postNewELDEvent(any());
         verify(mLockScreenView).showIgnitionOffDetectedDialog();
 
