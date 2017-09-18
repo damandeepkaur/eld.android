@@ -3,6 +3,8 @@ package com.bsmwireless.services.malfunction;
 import android.support.annotation.NonNull;
 
 import com.bsmwireless.common.dagger.ActivityScope;
+import com.bsmwireless.common.utils.SettingsManager;
+import com.bsmwireless.data.network.NtpClientManager;
 import com.bsmwireless.data.network.blackbox.BlackBoxConnectionManager;
 import com.bsmwireless.data.network.blackbox.models.BlackBoxResponseModel;
 import com.bsmwireless.data.storage.DutyTypeManager;
@@ -11,6 +13,8 @@ import com.bsmwireless.models.BlackBoxModel;
 import com.bsmwireless.models.BlackBoxSensorState;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.Malfunction;
+
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
@@ -27,15 +31,21 @@ public final class MalfunctionServicePresenter {
     final BlackBoxConnectionManager mBlackBoxConnectionManager;
     final ELDEventsInteractor mELDEventsInteractor;
     private final DutyTypeManager mDutyTypeManager;
+    final NtpClientManager mNtpClientManager;
+    final SettingsManager mSettingsManager;
     private final CompositeDisposable mCompositeDisposable;
 
     @Inject
     public MalfunctionServicePresenter(BlackBoxConnectionManager blackBoxConnectionManager,
                                        ELDEventsInteractor eldEventsInteractor,
-                                       DutyTypeManager dutyTypeManager) {
+                                       DutyTypeManager dutyTypeManager,
+                                       NtpClientManager ntpClientManager,
+                                       SettingsManager settingsManager) {
         mBlackBoxConnectionManager = blackBoxConnectionManager;
         mELDEventsInteractor = eldEventsInteractor;
         mDutyTypeManager = dutyTypeManager;
+        mNtpClientManager = ntpClientManager;
+        mSettingsManager = settingsManager;
         mCompositeDisposable = new CompositeDisposable();
     }
 
@@ -44,6 +54,7 @@ public final class MalfunctionServicePresenter {
         Timber.d("Start malfunction monitoring");
 
         startSynchronizationMonitoring();
+        startTimeMonitoring();
     }
 
     public void stopMonitoring() {
@@ -52,7 +63,7 @@ public final class MalfunctionServicePresenter {
         mCompositeDisposable.dispose();
     }
 
-    private Observable<BlackBoxModel> getBaseObservable() {
+    private Observable<BlackBoxModel> getBlackBoxDataObservable() {
         return mBlackBoxConnectionManager.getDataObservable()
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.computation());
@@ -60,23 +71,15 @@ public final class MalfunctionServicePresenter {
 
     private void startSynchronizationMonitoring() {
 
-        Disposable disposable = getBaseObservable()
+        Disposable disposable = getBlackBoxDataObservable()
                 .filter(blackBoxModel -> BlackBoxResponseModel.ResponseType.STATUS_UPDATE
                         == blackBoxModel.getResponseType())
-                .flatMap(blackBoxModel -> mELDEventsInteractor
-                                .getLatestMalfunctionEvent(Malfunction.ENGINE_SYNCHRONIZATION)
-                                .toObservable()
-                                .switchIfEmpty(observer -> {
-                                    // create default event with cleared status
-                                    ELDEvent event = mELDEventsInteractor.getEvent(mDutyTypeManager.getDutyType());
-                                    event.setEventCode(ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED.getCode());
-                                    observer.onNext(event);
-                                }),
-                        SynchResult::new
+                .flatMap(blackBoxModel -> loadLatestSynchronizationEvent(), SynchResult::new
                 )
                 .filter(this::isStateAndEventAreDifferent)
-                .map(unused -> createSynchDiagnosticEvent())
-                .flatMap(eldEvent -> mELDEventsInteractor.postNewELDEvent(eldEvent).toObservable())
+                .map(result -> createEvent(Malfunction.ENGINE_SYNCHRONIZATION,
+                        createCodeForDiagnostic(result.mELDEvent)))
+                .flatMap(this::saveEvent)
                 .onErrorReturn(throwable -> {
                     Timber.e(throwable, "Error handle synchronization event");
                     return -1L;
@@ -84,6 +87,18 @@ public final class MalfunctionServicePresenter {
                 .subscribeOn(Schedulers.io())
                 .subscribe();
         mCompositeDisposable.add(disposable);
+    }
+
+    private Observable<ELDEvent> loadLatestSynchronizationEvent() {
+        return mELDEventsInteractor
+                .getLatestMalfunctionEvent(Malfunction.ENGINE_SYNCHRONIZATION)
+                .toObservable()
+                .switchIfEmpty(observer -> {
+                    // create default event with cleared status
+                    ELDEvent event = mELDEventsInteractor.getEvent(mDutyTypeManager.getDutyType());
+                    event.setEventCode(ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED.getCode());
+                    observer.onNext(event);
+                });
     }
 
     /**
@@ -107,11 +122,65 @@ public final class MalfunctionServicePresenter {
         return true;
     }
 
+    private void startTimeMonitoring() {
+        Disposable disposable = Observable.interval(1, TimeUnit.MINUTES)
+                .zipWith(loadLatestTimingEvent(), (unused, eldEvent) -> eldEvent)
+                .filter(this::isCurrentTimingEventAndStateDifferent)
+                .map(eldEvent -> createEvent(Malfunction.TIMING_COMPLIANCE,
+                        createCodeForMalfunction(eldEvent)))
+                .subscribe();
+        mCompositeDisposable.add(disposable);
+    }
+
+    private Observable<ELDEvent> loadLatestTimingEvent() {
+        return mELDEventsInteractor
+                .getLatestMalfunctionEvent(Malfunction.TIMING_COMPLIANCE)
+                .toObservable()
+                .switchIfEmpty(observer -> {
+                    // create default event with cleared status
+                    ELDEvent event = mELDEventsInteractor.getEvent(mDutyTypeManager.getDutyType());
+                    event.setEventCode(ELDEvent.MalfunctionCode.MALFUNCTION_CLEARED.getCode());
+                    observer.onNext(event);
+                });
+    }
+
+    private Observable<Long> saveEvent(ELDEvent eldEvent) {
+        return mELDEventsInteractor.postNewELDEvent(eldEvent).toObservable();
+    }
+
+    private boolean isCurrentTimingEventAndStateDifferent(ELDEvent eldEvent) {
+
+        long realTimeInMillisDiff = mNtpClientManager.getRealTimeInMillisDiff();
+        long timingMalfunctionDiff = mSettingsManager.getTimingMalfunctionDiff();
+        int eventCode = eldEvent.getEventCode();
+
+        if (realTimeInMillisDiff > timingMalfunctionDiff) {
+            //Compliance detected, check current event
+            if (eventCode == ELDEvent.MalfunctionCode.MALFUNCTION_CLEARED.getCode()) return true;
+        } else {
+            if (eventCode == ELDEvent.MalfunctionCode.MALFUNCTION_LOGGED.getCode()) return true;
+        }
+
+        return false;
+    }
+
+    private ELDEvent.MalfunctionCode createCodeForDiagnostic(ELDEvent eldEvent) {
+        return eldEvent.getEventCode() == ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED.getCode() ?
+                ELDEvent.MalfunctionCode.DIAGNOSTIC_LOGGED :
+                ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED;
+    }
+
+    private ELDEvent.MalfunctionCode createCodeForMalfunction(ELDEvent eldEvent) {
+        return eldEvent.getEventCode() == ELDEvent.MalfunctionCode.MALFUNCTION_CLEARED.getCode() ?
+                ELDEvent.MalfunctionCode.MALFUNCTION_LOGGED :
+                ELDEvent.MalfunctionCode.MALFUNCTION_CLEARED;
+    }
+
     @NonNull
-    private ELDEvent createSynchDiagnosticEvent() {
+    private ELDEvent createEvent(Malfunction malfunction, ELDEvent.MalfunctionCode malfunctionCode) {
         ELDEvent eldEvent = mELDEventsInteractor.getEvent(mDutyTypeManager.getDutyType());
-        eldEvent.setMalCode(Malfunction.ENGINE_SYNCHRONIZATION);
-        eldEvent.setEventCode(ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED.getCode());
+        eldEvent.setMalCode(malfunction);
+        eldEvent.setEventCode(malfunctionCode.getCode());
         eldEvent.setEventType(ELDEvent.EventType.DATA_DIAGNOSTIC.getValue());
         return eldEvent;
     }

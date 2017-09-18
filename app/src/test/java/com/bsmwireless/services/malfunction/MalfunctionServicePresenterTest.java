@@ -51,7 +51,7 @@ public class MalfunctionServicePresenterTest {
 
         mMalfunctionServicePresenter = new MalfunctionServicePresenter(mConnectionManager,
                 mELDEventsInteractor,
-                mDutyTypeManager);
+                mDutyTypeManager, ntpClientManager, preferencesManager);
     }
 
     @Test
