@@ -1,6 +1,7 @@
 package com.bsmwireless.domain.interactors;
 
 import com.bsmwireless.data.network.RetrofitException;
+import com.bsmwireless.common.Constants;
 import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.network.authenticator.TokenManager;
 import com.bsmwireless.data.storage.AccountManager;
@@ -18,6 +19,7 @@ import com.bsmwireless.widgets.alerts.DutyType;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -136,6 +138,49 @@ public final class ELDEventsInteractor {
                             });
                 })
                 .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
+    }
+
+    /**
+     * Load all active diagnostic events
+     *
+     * @return
+     */
+    public Flowable<List<ELDEvent>> getDiagnosticEvents() {
+        return Flowable.just(Collections.emptyList());
+    }
+
+    /**
+     * Load all active malfunction events
+     *
+     * @return
+     */
+    public Flowable<List<ELDEvent>> getMalfunctionEvents() {
+        return Flowable.just(Collections.emptyList());
+    }
+
+    public Flowable<Boolean> hasMalfunctionEvents() {
+        return Flowable
+                .combineLatest(
+                        getMalfunctionCount(ELDEvent.MalfunctionCode.MALFUNCTION_LOGGED,
+                                Constants.MALFUNCTION_CODES),
+                        getMalfunctionCount(ELDEvent.MalfunctionCode.MALFUNCTION_CLEARED,
+                                Constants.MALFUNCTION_CODES),
+                        (loggedCount, clearedCount) -> loggedCount.compareTo(clearedCount) != 0);
+    }
+
+    public Flowable<Boolean> hasDiagnosticEvents() {
+        return Flowable
+                .combineLatest(
+                        getMalfunctionCount(ELDEvent.MalfunctionCode.DIAGNOSTIC_LOGGED,
+                                Constants.DIAGNOSTIC_CODES),
+                        getMalfunctionCount(ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED,
+                                Constants.DIAGNOSTIC_CODES),
+                        (loggedCount, clearedCount) -> loggedCount.compareTo(clearedCount) != 0);
+    }
+
+    private Flowable<Integer> getMalfunctionCount(ELDEvent.MalfunctionCode code, String[] codes) {
+        return mELDEventDao.getMalfunctionEventCount(ELDEvent.EventType.DATA_DIAGNOSTIC.getValue(),
+                code.getCode(), codes);
     }
 
     private ArrayList<ELDEvent> getEvents(DutyType dutyType, String comment) {

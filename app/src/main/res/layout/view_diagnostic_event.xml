@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/even_icon"
+        android:layout_width="@dimen/malfunction_event_icon_size"
+        android:layout_height="@dimen/malfunction_event_icon_size"
+        android:layout_gravity="center_vertical"
+        android:layout_margin="@dimen/default_margin"
+        android:background="@drawable/square"
+        android:fontFamily="sans-serif-black"
+        android:gravity="center"
+        android:textColor="#ffffff"
+        android:textSize="@dimen/malfunction_event_icon_text_size"
+        android:textStyle="normal"
+        tools:text="1"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/default_margin"
+        android:layout_marginLeft="@dimen/malfunction_event_description_margin"
+        android:layout_marginRight="@dimen/malfunction_event_description_margin"
+        android:layout_marginTop="@dimen/default_margin"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/event_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/AppTheme.TextAppearance.Subhead"
+            tools:text="Power Diagnostic"/>
+
+        <TextView
+            android:id="@+id/event_time"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/AppTheme.TextAppearance.Description"
+            tools:text="12:57 PM, Aug 04, 2016"/>
+
+    </LinearLayout>
+
+
+</FrameLayout>

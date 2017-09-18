@@ -1,9 +1,9 @@
 package com.bsmwireless.screens.driverprofile;
 
 import com.bsmwireless.common.dagger.ActivityScope;
+import com.bsmwireless.data.network.RetrofitException;
 import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.data.storage.DutyTypeManager;
-import com.bsmwireless.data.network.RetrofitException;
 import com.bsmwireless.data.storage.carriers.CarrierEntity;
 import com.bsmwireless.data.storage.hometerminals.HomeTerminalEntity;
 import com.bsmwireless.data.storage.users.FullUserEntity;
@@ -21,7 +21,6 @@ import javax.inject.Inject;
 
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
@@ -42,21 +41,19 @@ public final class DriverProfilePresenter extends BaseMenuPresenter {
     private CarrierEntity mCarrier;
 
     @Inject
-    public DriverProfilePresenter(DriverProfileView view, UserInteractor userInteractor,
-                                  DutyTypeManager dutyTypeManager, ELDEventsInteractor eventsInteractor,
+    public DriverProfilePresenter(DriverProfileView view,
+                                  UserInteractor userInteractor,
+                                  DutyTypeManager dutyTypeManager,
+                                  ELDEventsInteractor eventsInteractor,
                                   AccountManager accountManager) {
+        super(dutyTypeManager, eventsInteractor, userInteractor, accountManager);
         mView = view;
-        mUserInteractor = userInteractor;
-        mDutyTypeManager = dutyTypeManager;
-        mEventsInteractor = eventsInteractor;
-        mAccountManager = accountManager;
-        mDisposables = new CompositeDisposable();
 
         Timber.d("CREATED");
     }
 
     public void onNeedUpdateUserInfo() {
-        Disposable disposable = Single.fromCallable(() -> mUserInteractor.getFullUserSync())
+        Disposable disposable = Single.fromCallable(() -> getUserInteractor().getFullUserSync())
                                       .subscribeOn(Schedulers.io())
                                       .observeOn(AndroidSchedulers.mainThread())
                                       .subscribe(userEntity -> {
@@ -81,7 +78,7 @@ public final class DriverProfilePresenter extends BaseMenuPresenter {
                                            }
                                        },
                                        throwable -> Timber.e(throwable.getMessage()));
-        mDisposables.add(disposable);
+        getDisposables().add(disposable);
     }
 
     @Override
@@ -98,7 +95,7 @@ public final class DriverProfilePresenter extends BaseMenuPresenter {
 
             mFullUserEntity.getUserEntity().setSignature(signature);
 
-            Disposable disposable = mUserInteractor.updateDriverSignature(signature)
+            Disposable disposable = getUserInteractor().updateDriverSignature(signature)
                                                    .subscribeOn(Schedulers.io())
                                                    .observeOn(AndroidSchedulers.mainThread())
                                                    .subscribe(wasUpdated -> {
@@ -115,7 +112,7 @@ public final class DriverProfilePresenter extends BaseMenuPresenter {
                                                                    mView.showError((RetrofitException) throwable);
                                                                }
                                                            });
-            mDisposables.add(disposable);
+            getDisposables().add(disposable);
         } else {
             mView.showError(DriverProfileView.Error.ERROR_INVALID_USER);
         }
@@ -132,7 +129,7 @@ public final class DriverProfilePresenter extends BaseMenuPresenter {
     public void onChangePasswordClick(String oldPwd, String newPwd, String confirmPwd) {
         DriverProfileView.Error validationError = validatePassword(oldPwd, newPwd, confirmPwd);
         if (validationError.equals(VALID_PASSWORD)) {
-            Disposable disposable = mUserInteractor.updateDriverPassword(oldPwd, newPwd)
+            Disposable disposable = getUserInteractor().updateDriverPassword(oldPwd, newPwd)
                                                    .subscribeOn(Schedulers.io())
                                                    .observeOn(AndroidSchedulers.mainThread())
                                                    .subscribe(passwordUpdated -> {
@@ -148,7 +145,7 @@ public final class DriverProfilePresenter extends BaseMenuPresenter {
                                                                    mView.showError((RetrofitException) throwable);
                                                                }
                                                            });
-            mDisposables.add(disposable);
+            getDisposables().add(disposable);
         } else {
             mView.showError(validationError);
         }
@@ -160,7 +157,7 @@ public final class DriverProfilePresenter extends BaseMenuPresenter {
 
             mFullUserEntity.getUserEntity().setHomeTermId(homeTerminal.getId());
 
-            Disposable disposable = mUserInteractor.updateDriverHomeTerminal(homeTerminal.getId())
+            Disposable disposable = getUserInteractor().updateDriverHomeTerminal(homeTerminal.getId())
                                                    .subscribeOn(Schedulers.io())
                                                    .observeOn(AndroidSchedulers.mainThread())
                                                    .subscribe(wasUpdated -> {
@@ -173,7 +170,7 @@ public final class DriverProfilePresenter extends BaseMenuPresenter {
                                                            mView.showError((RetrofitException) throwable);
                                                        }
                                                    });
-            mDisposables.add(disposable);
+            getDisposables().add(disposable);
 
             mView.setHomeTerminalInfo(homeTerminal);
         } else {
