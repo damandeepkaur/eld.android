@@ -18,6 +18,7 @@ import com.bsmwireless.schedulers.jobscheduler.AutoLogoutJobService;
 import com.bsmwireless.schedulers.alarmmanager.AlarmReceiver;
 import com.bsmwireless.schedulers.jobscheduler.SyncNtpJobService;
 
+import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -164,9 +165,10 @@ public class SchedulerUtils {
 
     public static void scheduleTokenExpiration(long timestamp) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            long diff = Calendar.getInstance().getTimeInMillis() - timestamp;
             JobInfo.Builder builder = new JobInfo.Builder(SYNC_NTP_JOB_ID, new ComponentName(App.getComponent().context(), SyncNtpJobService.class))
                     .setRequiredNetworkType(JobInfo.NETWORK_TYPE_METERED)
-                    .setPeriodic(TimeUnit.MINUTES.toMillis(timestamp))
+                    .setPeriodic(diff)
                     .setPersisted(false);
 
             JobScheduler jobScheduler = (JobScheduler) App.getComponent().context().getSystemService(Context.JOB_SCHEDULER_SERVICE);
