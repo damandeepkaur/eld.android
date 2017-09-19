@@ -16,7 +16,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
-public class LogsTitleView extends FrameLayout {
+public final class LogsTitleView extends FrameLayout {
     private final int ANIM_DURATION = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
     @BindView(R.id.list_item_title)

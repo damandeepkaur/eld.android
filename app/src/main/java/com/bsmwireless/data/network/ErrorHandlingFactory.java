@@ -16,7 +16,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
-public class ErrorHandlingFactory extends CallAdapter.Factory {
+public final class ErrorHandlingFactory extends CallAdapter.Factory {
     private final RxJava2CallAdapterFactory mOriginalFactory;
 
     private ErrorHandlingFactory() {
@@ -32,7 +32,7 @@ public class ErrorHandlingFactory extends CallAdapter.Factory {
         return new RxCallAdapterWrapper<>(mOriginalFactory.get(returnType, annotations, retrofit));
     }
 
-    private static class RxCallAdapterWrapper<R> implements CallAdapter<R, Observable<R>> {
+    private static final class RxCallAdapterWrapper<R> implements CallAdapter<R, Observable<R>> {
         private final CallAdapter<R, ?> mWrappedCallAdapter;
 
         public RxCallAdapterWrapper(final CallAdapter<R, ?> wrapped) {

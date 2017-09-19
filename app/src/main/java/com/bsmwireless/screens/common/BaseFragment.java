@@ -10,12 +10,14 @@ public abstract class BaseFragment extends Fragment {
     protected Unbinder mUnbinder;
     protected Context mContext;
 
+    @SuppressWarnings("DesignForExtension")
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         mContext = context;
     }
 
+    @SuppressWarnings("DesignForExtension")
     @Override
     public void onDestroyView() {
         if (mUnbinder != null) {

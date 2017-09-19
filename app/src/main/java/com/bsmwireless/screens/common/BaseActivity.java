@@ -20,6 +20,7 @@ public abstract class BaseActivity extends AppCompatActivity{
     boolean mIsLockScreenDetectionServiceBound = false;
     boolean mIsMalfunctionServiceBound = false;
 
+    @SuppressWarnings("DesignForExtension")
     @Override
     protected void onStart() {
         super.onStart();
@@ -34,6 +35,7 @@ public abstract class BaseActivity extends AppCompatActivity{
         }
     }
 
+    @SuppressWarnings("DesignForExtension")
     @Override
     protected void onStop() {
         super.onStop();
@@ -47,6 +49,7 @@ public abstract class BaseActivity extends AppCompatActivity{
         }
     }
 
+    @SuppressWarnings("DesignForExtension")
     @Override
     protected void onDestroy() {
         if (mUnbinder != null) {

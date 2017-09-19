@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import retrofit2.Response;
 
-public class RetrofitException extends RuntimeException {
+public final class RetrofitException extends RuntimeException {
     public static final int NETWORK_ERROR_CODE = 1;
     public static final int UNEXPECTED_ERROR_CODE = 0;
 
@@ -42,6 +42,16 @@ public class RetrofitException extends RuntimeException {
 
     public int getCode() {
         return mCode;
+    }
+
+    private void writeObject(java.io.ObjectOutputStream stream)
+            throws IOException {
+        throw new IOException("Not defined");
+    }
+
+    private void readObject(java.io.ObjectInputStream stream)
+            throws IOException, ClassNotFoundException {
+        throw new IOException("Not defined");
     }
 }
 

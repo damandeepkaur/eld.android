@@ -3,6 +3,7 @@ package com.bsmwireless.domain.interactors;
 import com.bsmwireless.common.Constants;
 import com.bsmwireless.data.network.RetrofitException;
 import com.bsmwireless.common.Constants;
+import com.bsmwireless.data.network.RetrofitException;
 import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.network.authenticator.TokenManager;
 import com.bsmwireless.data.storage.AccountManager;
@@ -34,7 +35,7 @@ import io.reactivex.Single;
 import static com.bsmwireless.common.Constants.SUCCESS;
 import static com.bsmwireless.common.utils.DateUtils.SEC_IN_HOUR;
 
-public class ELDEventsInteractor {
+public final class ELDEventsInteractor {
 
     private static String mTimezone = "";
     private ServiceApi mServiceApi;

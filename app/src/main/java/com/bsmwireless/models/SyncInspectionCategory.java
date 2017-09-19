@@ -12,7 +12,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SyncInspectionCategory implements Parcelable {
+public final class SyncInspectionCategory implements Parcelable {
 
     @SerializedName("groupId")
     @Expose

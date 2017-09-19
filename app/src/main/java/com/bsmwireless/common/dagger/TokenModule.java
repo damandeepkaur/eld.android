@@ -10,7 +10,7 @@ import dagger.Module;
 import dagger.Provides;
 
 @Module
-public class TokenModule {
+public final class TokenModule {
     @Singleton
     @Provides
     public TokenManager provideTokenManager(Context context) {

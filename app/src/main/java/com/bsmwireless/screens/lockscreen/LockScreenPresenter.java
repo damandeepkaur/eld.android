@@ -34,7 +34,7 @@ import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
 @ActivityScope
-public class LockScreenPresenter {
+public final class LockScreenPresenter {
 
     LockScreenView mView;
     final DutyTypeManager mDutyManager;

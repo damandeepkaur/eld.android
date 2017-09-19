@@ -11,7 +11,7 @@ import android.os.Bundle;
 
 import com.bsmwireless.screens.login.LoginActivity;
 
-public class BsmAuthenticator extends AbstractAccountAuthenticator {
+public final class BsmAuthenticator extends AbstractAccountAuthenticator {
     public static final String ACCOUNT_NAME = "com.bsmwireless.account.name";
     public static final String ACCOUNT_PASS = "com.bsmwireless.account.pass";
     public static final String ACCOUNT_DRIVER = "com.bsmwireless.account.driver";

@@ -5,7 +5,7 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 
 @Entity(tableName = "home_terminals")
-public class HomeTerminalEntity {
+public final class HomeTerminalEntity {
 
     @PrimaryKey
     @ColumnInfo(name = "id")

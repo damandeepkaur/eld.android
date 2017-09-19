@@ -11,7 +11,7 @@ import javax.inject.Inject;
 
 import io.reactivex.Observable;
 
-public class InspectionsInteractor {
+public final class InspectionsInteractor {
 
     private ServiceApi mServiceApi;
     private PreferencesManager mPreferencesManager;
