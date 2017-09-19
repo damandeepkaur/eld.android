@@ -28,6 +28,7 @@ public class SynchronizationJob extends BaseMalfunctionJob implements Malfunctio
 
     @Override
     public void start() {
+        Timber.d("Start synchronization compliance detection");
         Disposable disposable = mBoxConnectionManager.getDataObservable()
                 .filter(blackBoxModel -> BlackBoxResponseModel.ResponseType.STATUS_UPDATE
                         == blackBoxModel.getResponseType())
@@ -48,7 +49,8 @@ public class SynchronizationJob extends BaseMalfunctionJob implements Malfunctio
 
     @Override
     public void stop() {
-
+        Timber.d("Start synchronization compliance detection");
+        dispose();
     }
 
     private Observable<ELDEvent> loadLatestSynchronizationEvent() {

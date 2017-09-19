@@ -13,6 +13,7 @@ import javax.inject.Inject;
 
 import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
+import timber.log.Timber;
 
 public class TimingJob extends BaseMalfunctionJob implements MalfunctionJob {
 
@@ -31,6 +32,7 @@ public class TimingJob extends BaseMalfunctionJob implements MalfunctionJob {
 
     @Override
     public void start() {
+        Timber.d("Start timing compliance detection");
         Disposable disposable = Observable.interval(1, TimeUnit.MINUTES)
                 .zipWith(loadLatestTimingEvent(), (unused, eldEvent) -> eldEvent)
                 .filter(this::isCurrentTimingEventAndStateDifferent)
@@ -42,6 +44,7 @@ public class TimingJob extends BaseMalfunctionJob implements MalfunctionJob {
 
     @Override
     public void stop() {
+        Timber.d("Stop timing compliance detection");
         dispose();
     }
 
