@@ -16,7 +16,7 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
-public class SynchronizationJob extends BaseMalfunctionJob implements MalfunctionJob {
+public final class SynchronizationJob extends BaseMalfunctionJob implements MalfunctionJob {
 
     private final BlackBoxConnectionManager mBoxConnectionManager;
 
@@ -32,8 +32,7 @@ public class SynchronizationJob extends BaseMalfunctionJob implements Malfunctio
         Disposable disposable = mBoxConnectionManager.getDataObservable()
                 .filter(blackBoxModel -> BlackBoxResponseModel.ResponseType.STATUS_UPDATE
                         == blackBoxModel.getResponseType())
-                .flatMap(blackBoxModel -> loadLatestSynchronizationEvent(), SynchResult::new
-                )
+                .flatMap(blackBoxModel -> loadLatestSynchronizationEvent(), SynchResult::new)
                 .filter(this::isStateAndEventAreDifferent)
                 .map(result -> createEvent(Malfunction.ENGINE_SYNCHRONIZATION,
                         createCodeForDiagnostic(result.mELDEvent)))

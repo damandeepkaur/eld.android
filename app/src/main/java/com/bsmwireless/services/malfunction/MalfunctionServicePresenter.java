@@ -16,7 +16,7 @@ public final class MalfunctionServicePresenter {
     private final List<MalfunctionJob> mMalfunctionJobs;
 
     @Inject
-    public MalfunctionServicePresenter(List<MalfunctionJob> malfunctionJobs) {
+    MalfunctionServicePresenter(List<MalfunctionJob> malfunctionJobs) {
 
         mMalfunctionJobs = malfunctionJobs;
     }
