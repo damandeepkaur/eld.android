@@ -1,5 +1,7 @@
 package com.bsmwireless.services.malfunction;
 
+import com.bsmwireless.common.utils.SettingsManager;
+import com.bsmwireless.data.network.NtpClientManager;
 import com.bsmwireless.data.network.blackbox.BlackBoxConnectionManager;
 import com.bsmwireless.data.network.blackbox.models.BlackBoxResponseModel;
 import com.bsmwireless.data.storage.DutyTypeManager;
@@ -39,6 +41,10 @@ public class MalfunctionServicePresenterTest {
     ELDEventsInteractor mELDEventsInteractor;
     @Mock
     DutyTypeManager mDutyTypeManager;
+    @Mock
+    NtpClientManager mNtpClientManager;
+    @Mock
+    SettingsManager mSettingsManager;
 
     private MalfunctionServicePresenter mMalfunctionServicePresenter;
 
@@ -51,7 +57,9 @@ public class MalfunctionServicePresenterTest {
 
         mMalfunctionServicePresenter = new MalfunctionServicePresenter(mConnectionManager,
                 mELDEventsInteractor,
-                mDutyTypeManager, ntpClientManager, preferencesManager);
+                mDutyTypeManager,
+                mNtpClientManager,
+                mSettingsManager);
     }
 
     @Test

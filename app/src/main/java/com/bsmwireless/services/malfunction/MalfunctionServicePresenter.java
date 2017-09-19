@@ -79,7 +79,7 @@ public final class MalfunctionServicePresenter {
                 .filter(this::isStateAndEventAreDifferent)
                 .map(result -> createEvent(Malfunction.ENGINE_SYNCHRONIZATION,
                         createCodeForDiagnostic(result.mELDEvent)))
-                .flatMap(this::saveEvent)
+                .flatMap(this::saveEvents)
                 .onErrorReturn(throwable -> {
                     Timber.e(throwable, "Error handle synchronization event");
                     return -1L;
@@ -144,7 +144,7 @@ public final class MalfunctionServicePresenter {
                 });
     }
 
-    private Observable<Long> saveEvent(ELDEvent eldEvent) {
+    private Observable<Long> saveEvents(ELDEvent eldEvent) {
         return mELDEventsInteractor.postNewELDEvent(eldEvent).toObservable();
     }
 
