@@ -173,7 +173,7 @@ public class DateUtils {
      * @param time unix time in ms
      * @return long with format time like 20170708
      */
-    public static long convertTimeToDayNumber(String zone, long time) {
+    public static long convertTimeToLogDay(String zone, long time) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
         Calendar calendar = Calendar.getInstance();
         TimeZone timeZone = TimeZone.getTimeZone(zone);
@@ -188,7 +188,7 @@ public class DateUtils {
      * @param time unix time in ms
      * @return long with format time like 20170708
      */
-    public static long convertTimeToDayNumber(TimeZone timeZone, long time) {
+    public static long convertTimeToLogDay(TimeZone timeZone, long time) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeZone(timeZone);
@@ -203,19 +203,19 @@ public class DateUtils {
      */
     public static long getLogDayForDaysAgo(int daysAgo) {
         Calendar calendar = Calendar.getInstance();
-        return DateUtils.convertTimeToDayNumber(calendar.getTimeZone(), calendar.getTimeInMillis()
+        return DateUtils.convertTimeToLogDay(calendar.getTimeZone(), calendar.getTimeInMillis()
                 - MS_IN_DAY * daysAgo);
     }
 
     /**
-     * @param logday long with format time like 20170708
+     * @param logDay long with format time like 20170708
      * @return long unix time in ms
      */
-    public static long convertDayNumberToUnixMs(long logday) {
+    public static long convertLogDayToUnixMs(long logDay) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd", Locale.US);
         Date date = null;
         try {
-            date = sdf.parse(String.valueOf(logday));
+            date = sdf.parse(String.valueOf(logDay));
         } catch (ParseException e) {
             e.printStackTrace();
         }

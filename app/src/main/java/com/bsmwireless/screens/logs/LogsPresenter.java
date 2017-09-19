@@ -98,8 +98,8 @@ public final class LogsPresenter implements AccountManager.AccountListener {
                             mUser = user;
                             mTimeZone = user.getTimezone();
                             long currentTime = Calendar.getInstance().getTimeInMillis();
-                            long todayDateLong = DateUtils.convertTimeToDayNumber(mTimeZone, currentTime);
-                            long monthAgoLong = DateUtils.convertTimeToDayNumber(mTimeZone, currentTime
+                            long todayDateLong = DateUtils.convertTimeToLogDay(mTimeZone, currentTime);
+                            long monthAgoLong = DateUtils.convertTimeToLogDay(mTimeZone, currentTime
                                     - MS_IN_DAY * Constants.DEFAULT_CALENDAR_DAYS_COUNT);
                             return mLogSheetInteractor.getLogSheetHeaders(monthAgoLong, todayDateLong);
                         })
@@ -179,7 +179,7 @@ public final class LogsPresenter implements AccountManager.AccountListener {
 
     public void setLogHeaderForDay(Calendar calendar) {
         long startDayTime = DateUtils.getStartDate(mTimeZone, calendar);
-        long logDay = DateUtils.convertTimeToDayNumber(mTimeZone, startDayTime);
+        long logDay = DateUtils.convertTimeToLogDay(mTimeZone, startDayTime);
         LogSheetHeader logSheetHeader = mLogSheetHeadersMap.get(logDay);
 
         if (logSheetHeader == null) {
@@ -296,23 +296,15 @@ public final class LogsPresenter implements AccountManager.AccountListener {
     }
 
     public void onSignLogsheetButtonClicked(CalendarItem calendarItem) {
-        LogSheetHeader logSheetHeader = calendarItem.getAssociatedLogSheet();
-        logSheetHeader.setSigned(true);
-        mLogSheetInteractor.updateLogSheetHeader(logSheetHeader)
+        mLogSheetInteractor.signLogSheet(calendarItem.getLogDay())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                        response -> {
+                        logSheetHeader -> {
                             mLogSheetHeadersMap.put(logSheetHeader.getLogDay(), logSheetHeader);
                             mView.setLogSheetHeaders(new ArrayList<>(mLogSheetHeadersMap.values()));
                         },
-                        throwable -> {
-                            Timber.e(throwable.getMessage());
-                            logSheetHeader.setSigned(false);
-                            if (throwable instanceof RetrofitException) {
-                                mView.showError((RetrofitException) throwable);
-                            }
-                        }
+                        Timber::e
                 );
     }
 
@@ -397,7 +389,7 @@ public final class LogsPresenter implements AccountManager.AccountListener {
         }
 
         mDisposables.add(mLogSheetInteractor.updateLogSheetHeader(mSelectedLogHeader)
-                .flatMapSingle(isLogSheetUpdated -> mUserInteractor.updateDriverRule(
+                .flatMap(isLogSheetUpdated -> mUserInteractor.updateDriverRule(
                         logHeaderModel.getSelectedExemptions(), mUser.getDutyCycle()))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -418,24 +410,6 @@ public final class LogsPresenter implements AccountManager.AccountListener {
         mGetEventsFromDBDisposable.dispose();
         mDisposables.dispose();
         Timber.d("DESTROYED");
-    }
-
-    private ELDEvent createCertEvent(LogSheetHeader logSheetHeader) {
-        long certDay = DateUtils.convertDayNumberToUnixMs(logSheetHeader.getLogDay());
-        ELDEvent event = new ELDEvent();
-        event.setStatus(ELDEvent.StatusCode.ACTIVE.getValue());
-        event.setOrigin(ELDEvent.EventOrigin.DRIVER.getValue());
-        event.setEventType(ELDEvent.EventType.CERTIFICATION_OF_RECORDS.getValue());
-        event.setEventCode(1);
-        event.setLogSheet(logSheetHeader.getLogDay());
-        event.setDriverId(logSheetHeader.getDriverId());
-        event.setVehicleId(logSheetHeader.getVehicleId());
-        event.setEventTime(certDay);
-        event.setMobileTime(Calendar.getInstance().getTimeInMillis());
-        event.setTimezone(mTimeZone);
-        event.setBoxId(logSheetHeader.getBoxId());
-        event.setMobileTime(Calendar.getInstance().getTimeInMillis());
-        return event;
     }
 
     private List<EventLogModel> preparingLogs(List<ELDEvent> events, long startDayTime, long endDayTime) {

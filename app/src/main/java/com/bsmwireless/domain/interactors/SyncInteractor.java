@@ -34,6 +34,7 @@ import timber.log.Timber;
 
 import static com.bsmwireless.common.Constants.SUCCESS;
 import static com.bsmwireless.common.utils.DateUtils.MS_IN_DAY;
+import static com.bsmwireless.data.storage.eldevents.ELDEventEntity.SyncType.SYNC;
 import static com.bsmwireless.data.storage.logsheets.LogSheetEntity.SyncType.UNSYNC;
 
 public final class SyncInteractor {
@@ -83,8 +84,8 @@ public final class SyncInteractor {
                 .take(3)
                 .map(aLong -> mAccountManager.getCurrentUserId())
                 .map(userId -> ELDEventConverter.toModelList(mELDEventDao.getUpdateUnsyncEvents(userId)))
-                .map(dbEvents -> filterInactiveEvents(dbEvents))
-                .filter(eldEvents -> eldEvents.isEmpty())
+                .map(this::filterInactiveEvents)
+                .filter(List::isEmpty)
                 .flatMap(eldEvents -> mServiceApi.getELDEvents(startTime, endTime))
                 .subscribe(eldEventsFromServer -> {
                             List<ELDEventEntity> entities = mELDEventDao.getEventsFromStartToEndTimeSync(
@@ -105,7 +106,7 @@ public final class SyncInteractor {
         if (NetworkUtils.isOnlineMode()) {
             mServiceApi.getELDEvents(start, end)
                     .subscribeOn(Schedulers.io())
-                    .map(eldEvents -> ELDEventConverter.toEntityArray(eldEvents))
+                    .map(eldEvents -> ELDEventConverter.toEntityArray(eldEvents, SYNC))
                     .subscribe(eldEventEntities -> mELDEventDao.insertAll(eldEventEntities),
                             Timber::e);
         }
@@ -119,7 +120,7 @@ public final class SyncInteractor {
                 .map(t -> mAccountManager.getCurrentUserId())
                 .map(userId -> ELDEventConverter.toModelList(mELDEventDao.getNewUnsyncEvents(userId)))
                 .filter(eldEvents -> !eldEvents.isEmpty())
-                .map(events -> filterIncorrectEvents(events))
+                .map(this::filterIncorrectEvents)
                 .filter(eldEvents -> !eldEvents.isEmpty())
                 .flatMap(events -> Observable.fromIterable(parseELDEventsList(events)))
                 .flatMap(events -> mServiceApi.postNewELDEvents(events)
@@ -133,11 +134,11 @@ public final class SyncInteractor {
                         .doOnNext(serverEvents -> {
                             ELDEventEntity[] oldEntities = ELDEventConverter.toEntityArray(dbEvents);
                             mELDEventDao.deleteAll(oldEntities);
-                            ELDEventEntity[] entities = ELDEventConverter.toEntityArray(serverEvents);
+                            ELDEventEntity[] entities = ELDEventConverter.toEntityArray(serverEvents, SYNC);
                             mELDEventDao.insertAll(entities);
                         }))
                 .subscribe(events -> Timber.d("Sync added events:" + events),
-                        error -> Timber.e(error))
+                        Timber::e)
         );
     }
 
@@ -149,10 +150,10 @@ public final class SyncInteractor {
                 .map(t -> mAccountManager.getCurrentUserId())
                 .map(userId -> ELDEventConverter.toModelList(mELDEventDao.getUpdateUnsyncEvents(userId)))
                 .filter(dbEvents -> !dbEvents.isEmpty())
-                .map(dbEvents -> filterIncorrectEvents(dbEvents))
+                .map(this::filterIncorrectEvents)
                 .filter(dbEvents -> !dbEvents.isEmpty())
                 .flatMap(dbEvents -> Observable.fromIterable(parseELDEventsList(dbEvents)))
-                .map(dbEvents -> filterInactiveEvents(dbEvents))
+                .map(this::filterInactiveEvents)
                 .filter(activeDbEvents -> activeDbEvents.size() > 0)
                 .flatMap(dbEvents -> mServiceApi.updateELDEvents(dbEvents)
                         .onErrorResumeNext(Observable.just(mErrorResponse))
@@ -169,7 +170,7 @@ public final class SyncInteractor {
                         })
                         .map(serverEvents -> dbEvents))
                 .subscribe(dbEvents -> Timber.d("Sync updated events:" + dbEvents),
-                        error -> Timber.e(error))
+                        Timber::e)
         );
     }
 
@@ -192,13 +193,13 @@ public final class SyncInteractor {
                         )
                         .filter(logSheetEntity -> logSheetEntity.getSync() == LogSheetEntity.SyncType.SYNC.ordinal())
                         .doOnNext(logSheetEntity -> mLogSheetDao.insert(logSheetEntity))
-                        .subscribe(logSheetEntity -> Timber.d("Sync logsheet: " + LogSheetConverter.toModel(logSheetEntity)),
-                                error -> Timber.e(error)));
+                        .subscribe(logSheetEntity -> Timber.d("Sync LogSheetHeaders: " + LogSheetConverter.toModel(logSheetEntity)),
+                                Timber::e));
     }
 
     public void syncLogSheetHeadersForDaysAgo(int days) {
         mServiceApi.getLogSheets(DateUtils.getLogDayForDaysAgo(days), DateUtils.getLogDayForDaysAgo(0))
-                .map(logSheetHeaders -> LogSheetConverter.toEntityList(logSheetHeaders))
+                .map(LogSheetConverter::toEntityList)
                 .doOnNext(logSheetEntities -> mLogSheetDao.insert(logSheetEntities))
                 .doOnNext(logSheetHeaders -> createMissingLogSheets(logSheetHeaders, days))
                 .subscribe();

@@ -19,6 +19,7 @@ import com.bsmwireless.widgets.alerts.DutyType;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -43,12 +44,14 @@ public final class ELDEventsInteractor {
     private PreferencesManager mPreferencesManager;
     private AccountManager mAccountManager;
     private TokenManager mTokenManager;
+    private LogSheetInteractor mLogSheetInteractor;
 
     @Inject
     public ELDEventsInteractor(ServiceApi serviceApi, PreferencesManager preferencesManager,
                                AppDatabase appDatabase, UserInteractor userInteractor,
                                BlackBoxInteractor blackBoxInteractor, DutyTypeManager dutyTypeManager,
-                               AccountManager accountManager, TokenManager tokenManager) {
+                               AccountManager accountManager, TokenManager tokenManager,
+                               LogSheetInteractor logSheetInteractor) {
         mServiceApi = serviceApi;
         mPreferencesManager = preferencesManager;
         mUserInteractor = userInteractor;
@@ -59,6 +62,7 @@ public final class ELDEventsInteractor {
         mPreferencesManager = preferencesManager;
         mAccountManager = accountManager;
         mTokenManager = tokenManager;
+        mLogSheetInteractor = logSheetInteractor;
 
         mUserInteractor.getTimezone().subscribe(timezone -> mTimezone = timezone);
     }
@@ -80,17 +84,20 @@ public final class ELDEventsInteractor {
 
     public Observable<long[]> updateELDEvents(List<ELDEvent> events) {
         return Observable.fromCallable(() ->
-                mELDEventDao.insertAll(ELDEventConverter.toEntityArray(events, ELDEventEntity.SyncType.UPDATE_UNSYNC)));
+                mELDEventDao.insertAll(ELDEventConverter.toEntityArray(events, ELDEventEntity.SyncType.UPDATE_UNSYNC)))
+                .doOnNext(longs -> mLogSheetInteractor.resetLogSheetHeaderSigning(events));
     }
 
     public Single<Long> postNewELDEvent(ELDEvent event) {
         return Single.fromCallable(() ->
-                mELDEventDao.insertEvent(ELDEventConverter.toEntity(event, ELDEventEntity.SyncType.NEW_UNSYNC)));
+                mELDEventDao.insertEvent(ELDEventConverter.toEntity(event, ELDEventEntity.SyncType.NEW_UNSYNC)))
+                .doOnSuccess(aLong -> mLogSheetInteractor.resetLogSheetHeaderSigning(Arrays.asList(event)));
     }
 
     public Observable<long[]> postNewELDEvents(List<ELDEvent> events) {
         return Observable.fromCallable(() ->
-                mELDEventDao.insertAll(ELDEventConverter.toEntityArray(events, ELDEventEntity.SyncType.NEW_UNSYNC)));
+                mELDEventDao.insertAll(ELDEventConverter.toEntityArray(events, ELDEventEntity.SyncType.NEW_UNSYNC)))
+                .doOnNext(longs -> mLogSheetInteractor.resetLogSheetHeaderSigning(events));
     }
 
     public void storeUnidentifiedEvents(List<ELDEvent> events) {
