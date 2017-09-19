@@ -23,7 +23,17 @@ import javax.inject.Singleton;
 import dagger.Component;
 
 @Singleton
-@Component(modules = {ContextModule.class, NetworkModule.class, DatabaseModule.class, TokenModule.class, PreferencesModule.class, CacheModule.class, BlackBoxModule.class, DutyModule.class, AutoDutyModule.class, AccountModule.class})
+@Component(modules = {ContextModule.class,
+        NetworkModule.class,
+        DatabaseModule.class,
+        TokenModule.class,
+        PreferencesModule.class,
+        CacheModule.class,
+        BlackBoxModule.class,
+        DutyModule.class,
+        AutoDutyModule.class,
+        AccountModule.class,
+        MalfunctionModule.class})
 public interface AppComponent {
     Context context();
 
