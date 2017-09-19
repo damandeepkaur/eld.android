@@ -35,6 +35,8 @@ public class SchedulerUtils {
     private static final int AUTO_LOGOUT_TRIGGER_DURATION_MAX = 65;
     private static final int SYNC_NTP_TRIGGER_PERIOD_MIN = 5;
 
+    private static final int[] CANCELABLE_JOBS = {JOB_ID, SYNC_NTP_JOB_ID};
+
     private static PendingIntent mPendingIntent;
 
     public static void schedule() {
@@ -82,7 +84,7 @@ public class SchedulerUtils {
 
     public static void cancel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            cancelAllJobs();
+            cancelAllCancelableJobs();
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
             cancelAlarm();
         }
@@ -137,9 +139,11 @@ public class SchedulerUtils {
     }
 
     @TargetApi(21)
-    private static void cancelAllJobs() {
+    private static void cancelAllCancelableJobs() {
         JobScheduler jobScheduler = (JobScheduler) App.getComponent().context().getSystemService(Context.JOB_SCHEDULER_SERVICE);
-        jobScheduler.cancelAll();
+        for (int id : CANCELABLE_JOBS) {
+            jobScheduler.cancel(id);
+        }
     }
 
     @TargetApi(21)
@@ -170,7 +174,8 @@ public class SchedulerUtils {
             long diff = Calendar.getInstance().getTimeInMillis() - timestamp;
             JobInfo.Builder builder = new JobInfo.Builder(VERIFY_TOKEN_JOB_ID, new ComponentName(App.getComponent().context(), VerifyTokenScheduler.class))
                     .setRequiredNetworkType(JobInfo.NETWORK_TYPE_METERED)
-                    .setPeriodic(TimeUnit.MINUTES.toMillis(SYNC_NTP_TRIGGER_PERIOD_MIN));
+                    .setMinimumLatency(300000)
+                    .setPersisted(true);
 
             JobScheduler jobScheduler = (JobScheduler) App.getComponent().context().getSystemService(Context.JOB_SCHEDULER_SERVICE);
             jobScheduler.schedule(builder.build());
