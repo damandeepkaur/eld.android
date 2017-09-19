@@ -58,7 +58,7 @@ public abstract class BaseActivity extends AppCompatActivity{
         super.onDestroy();
     }
 
-    protected RetainFragment getRetainFragment(){
+    protected final RetainFragment getRetainFragment(){
         Fragment fragment = getSupportFragmentManager().findFragmentByTag(RETAIN_FRAGMENT);
         if (fragment == null) {
             fragment = RetainFragment.createFragment();

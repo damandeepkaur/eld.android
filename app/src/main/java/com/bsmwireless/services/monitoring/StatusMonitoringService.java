@@ -15,7 +15,7 @@ import javax.inject.Inject;
 
 public final class StatusMonitoringService extends Service implements MonitoringServiceView {
 
-    private final IBinder mBinder = new LocalBinder();
+    private final IBinder mBinder = new Binder();
 
     @Inject
     MonitoringServicePresenter mPresenter;
@@ -57,10 +57,5 @@ public final class StatusMonitoringService extends Service implements Monitoring
     public void startLockScreen() {
         final Intent intent = LockScreenActivity.createIntent(getApplicationContext());
         startActivity(intent);
-    }
-    public class LocalBinder extends Binder {
-        StatusMonitoringService getService() {
-            return StatusMonitoringService.this;
-        }
     }
 }

@@ -178,10 +178,11 @@ public class MalfunctionServicePresenterTest {
 
         when(mConnectionManager.getDataObservable()).thenReturn(Observable.just(blackBoxModel));
 
+        when(mDutyTypeManager.getDutyType()).thenReturn(DutyType.ON_DUTY);
+
         when(mELDEventsInteractor.getLatestMalfunctionEvent(Malfunction.ENGINE_SYNCHRONIZATION))
                 .thenReturn(Maybe.empty());
         when(mELDEventsInteractor.getEvent(any(DutyType.class))).thenReturn(new ELDEvent());
-
         when(mELDEventsInteractor.postNewELDEvent(any())).thenReturn(Single.just(1L));
 
         mMalfunctionServicePresenter.startMonitoring();
