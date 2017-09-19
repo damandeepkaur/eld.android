@@ -1,6 +1,7 @@
 package com.bsmwireless.common.dagger;
 
 import com.bsmwireless.common.utils.SettingsManager;
+import com.bsmwireless.common.utils.StorageUtil;
 import com.bsmwireless.common.utils.malfunction.MalfunctionJob;
 import com.bsmwireless.common.utils.malfunction.StorageCapacityJob;
 import com.bsmwireless.common.utils.malfunction.SynchronizationJob;
@@ -37,8 +38,9 @@ public class MalfunctionModule {
     @Provides
     static StorageCapacityJob storageCapacityJob(ELDEventsInteractor eldEventsInteractor,
                                                  DutyTypeManager dutyTypeManager,
-                                                 SettingsManager settingsManager){
-        return new StorageCapacityJob(eldEventsInteractor, dutyTypeManager, settingsManager);
+                                                 SettingsManager settingsManager,
+                                                 StorageUtil storageUtil){
+        return new StorageCapacityJob(eldEventsInteractor, dutyTypeManager, settingsManager, storageUtil);
     }
 
     @Provides

@@ -66,12 +66,7 @@ public final class TimingJob extends BaseMalfunctionJob implements MalfunctionJo
         return getELDEventsInteractor()
                 .getLatestMalfunctionEvent(Malfunction.TIMING_COMPLIANCE)
                 .toObservable()
-                .switchIfEmpty(observer -> {
-                    // create default event with cleared status
-                    ELDEvent event = getELDEventsInteractor().getEvent(getDutyTypeManager().getDutyType());
-                    event.setEventCode(ELDEvent.MalfunctionCode.MALFUNCTION_CLEARED.getCode());
-                    observer.onNext(event);
-                });
+                .switchIfEmpty(this::switchToDefaultMalfunctionCleared);
     }
 
     private boolean isCurrentTimingEventAndStateDifferent(ELDEvent eldEvent) {

@@ -8,6 +8,7 @@ import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.Malfunction;
 
 import io.reactivex.Observable;
+import io.reactivex.Observer;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 
@@ -53,6 +54,12 @@ abstract class BaseMalfunctionJob {
         return eldEvent.getEventCode() == ELDEvent.MalfunctionCode.MALFUNCTION_CLEARED.getCode() ?
                 ELDEvent.MalfunctionCode.MALFUNCTION_LOGGED :
                 ELDEvent.MalfunctionCode.MALFUNCTION_CLEARED;
+    }
+
+    protected void switchToDefaultMalfunctionCleared(Observer<? super ELDEvent> observer){
+        ELDEvent event = getELDEventsInteractor().getEvent(getDutyTypeManager().getDutyType());
+        event.setEventCode(ELDEvent.MalfunctionCode.MALFUNCTION_CLEARED.getCode());
+        observer.onNext(event);
     }
 
     @NonNull

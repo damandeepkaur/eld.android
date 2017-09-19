@@ -3,8 +3,11 @@ package com.bsmwireless.common.utils.malfunction;
 import android.support.annotation.VisibleForTesting;
 
 import com.bsmwireless.common.utils.SettingsManager;
+import com.bsmwireless.common.utils.StorageUtil;
 import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
+import com.bsmwireless.models.ELDEvent;
+import com.bsmwireless.models.Malfunction;
 
 import java.util.concurrent.TimeUnit;
 
@@ -17,19 +20,22 @@ import io.reactivex.schedulers.Schedulers;
 public class StorageCapacityJob extends BaseMalfunctionJob implements MalfunctionJob {
 
     private final SettingsManager mSettingsManager;
+    private final StorageUtil mStorageUtil;
 
     @Inject
     public StorageCapacityJob(ELDEventsInteractor eldEventsInteractor,
                               DutyTypeManager dutyTypeManager,
-                              SettingsManager settingsManager) {
+                              SettingsManager settingsManager, StorageUtil storageUtil) {
         super(eldEventsInteractor, dutyTypeManager);
         mSettingsManager = settingsManager;
+        mStorageUtil = storageUtil;
     }
 
     @Override
     public void start() {
         Disposable disposable = getIntervalObservable()
-                .filter(unused -> isStateEndEventAreDifferent())
+                .flatMap(unused -> loadLatest())
+                .filter(this::isStateEndEventAreDifferent)
                 .flatMap(unused -> Observable.fromCallable(() ->
                         getELDEventsInteractor().getEvent(getDutyTypeManager().getDutyType())))
                 .flatMap(this::saveEvents)
@@ -48,13 +54,32 @@ public class StorageCapacityJob extends BaseMalfunctionJob implements Malfunctio
         return Observable.interval(1, TimeUnit.MILLISECONDS);
     }
 
-    private boolean isStateEndEventAreDifferent(){
-        return true;
+    Observable<ELDEvent> loadLatest(){
+        return getELDEventsInteractor()
+                .getLatestMalfunctionEvent(Malfunction.DATA_RECORDING_COMPLIANCE)
+                .toObservable()
+                .switchIfEmpty(this::switchToDefaultMalfunctionCleared);
+    }
+
+    private boolean isStateEndEventAreDifferent(ELDEvent eldEvent){
+
+        int eventCode = eldEvent.getEventCode();
+
+        if (isFreeSpaceEnough()) {
+            if (eventCode == ELDEvent.MalfunctionCode.MALFUNCTION_LOGGED.getCode()) return true;
+        } else {
+            if (eventCode == ELDEvent.MalfunctionCode.MALFUNCTION_CLEARED.getCode()) return true;
+        }
+
+        return false;
     }
 
     private boolean isFreeSpaceEnough(){
-        return true;
+
+        long storageFreeSpace = mStorageUtil.getAvailableSpace();
+        long totalSpace = mStorageUtil.getTotalSpace();
+        System.out.println((double)totalSpace / storageFreeSpace);
+        System.out.println(mSettingsManager.getFreeSpaceThreshold());
+        return ((double)storageFreeSpace / totalSpace) > mSettingsManager.getFreeSpaceThreshold();
     }
-
-
 }
