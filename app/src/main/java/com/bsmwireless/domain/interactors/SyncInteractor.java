@@ -36,7 +36,7 @@ import static com.bsmwireless.common.Constants.SUCCESS;
 import static com.bsmwireless.common.utils.DateUtils.MS_IN_DAY;
 import static com.bsmwireless.data.storage.logsheets.LogSheetEntity.SyncType.UNSYNC;
 
-public class SyncInteractor {
+public final class SyncInteractor {
     private static final int MAX_EVENTS_IN_REQUEST = 5;
     private CompositeDisposable mSyncCompositeDisposable;
     private ServiceApi mServiceApi;

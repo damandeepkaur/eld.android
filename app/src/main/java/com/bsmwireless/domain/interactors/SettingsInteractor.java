@@ -5,7 +5,7 @@ import com.bsmwireless.data.storage.PreferencesManager;
 
 import javax.inject.Inject;
 
-public class SettingsInteractor {
+public final class SettingsInteractor {
 
     private AppDatabase mAppDatabase;
     private PreferencesManager mPreferencesManager;

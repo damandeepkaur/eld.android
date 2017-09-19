@@ -23,7 +23,7 @@ import io.reactivex.Single;
 
 import static com.bsmwireless.data.storage.logsheets.LogSheetEntity.SyncType.UNSYNC;
 
-public class LogSheetInteractor {
+public final class LogSheetInteractor {
 
     private ServiceApi mServiceApi;
     private PreferencesManager mPreferencesManager;

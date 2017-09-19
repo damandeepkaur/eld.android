@@ -10,7 +10,7 @@ import com.bsmwireless.models.Auth;
 
 import timber.log.Timber;
 
-public class TokenManager {
+public final class TokenManager {
     private Context mContext;
 
     public TokenManager(Context context) {

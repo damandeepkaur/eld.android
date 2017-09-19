@@ -5,7 +5,7 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 
 @Entity(tableName = "events")
-public class ELDEventEntity {
+public final class ELDEventEntity {
     public enum SyncType {
         SYNC,
         UPDATE_UNSYNC,

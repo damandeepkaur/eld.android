@@ -12,7 +12,7 @@ import com.bsmwireless.screens.common.BaseFragment;
 import me.dm7.barcodescanner.core.IViewFinder;
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
-public class BarcodeScannerFragment extends BaseFragment {
+public final class BarcodeScannerFragment extends BaseFragment {
 
     private static final String TAG = BarcodeScannerFragment.class.getSimpleName();
 

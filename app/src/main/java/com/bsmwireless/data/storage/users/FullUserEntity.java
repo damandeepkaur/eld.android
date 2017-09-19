@@ -2,7 +2,6 @@ package com.bsmwireless.data.storage.users;
 
 import android.arch.persistence.room.Embedded;
 import android.arch.persistence.room.Relation;
-import android.content.res.Configuration;
 
 import com.bsmwireless.data.storage.carriers.CarrierEntity;
 import com.bsmwireless.data.storage.configurations.ConfigurationEntity;
@@ -10,7 +9,7 @@ import com.bsmwireless.data.storage.hometerminals.HomeTerminalEntity;
 
 import java.util.List;
 
-public class FullUserEntity {
+public final class FullUserEntity {
     @Embedded
     private UserEntity mUserEntity;
     @Relation(parentColumn = "id", entityColumn = "user_id", entity = CarrierEntity.class)

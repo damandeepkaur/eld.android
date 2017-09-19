@@ -24,7 +24,7 @@ import butterknife.Unbinder;
 
 import static com.bsmwireless.common.utils.DateUtils.MS_IN_DAY;
 
-public class GraphLayout extends LinearLayout {
+public final class GraphLayout extends LinearLayout {
 
     ELDGraphView mELDGraphView;
     @BindView(R.id.time_on)
@@ -130,7 +130,7 @@ public class GraphLayout extends LinearLayout {
 
     private void init(Context context) {
         mRootView = inflate(context, R.layout.eld_graph, this);
-        mELDGraphView = (ELDGraphView) mRootView.findViewById(R.id.hos_graph);
+        mELDGraphView = mRootView.findViewById(R.id.hos_graph);
     }
 
     @Override

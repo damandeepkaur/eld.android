@@ -8,7 +8,7 @@ import javax.inject.Inject;
 
 import io.reactivex.Observable;
 
-public class BlackBoxInteractor {
+public final class BlackBoxInteractor {
 
     private BlackBoxConnectionManager mConnectionManager;
 

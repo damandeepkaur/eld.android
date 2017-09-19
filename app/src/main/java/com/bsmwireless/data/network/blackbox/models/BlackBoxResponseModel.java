@@ -2,7 +2,7 @@ package com.bsmwireless.data.network.blackbox.models;
 
 import com.bsmwireless.models.BlackBoxModel;
 
-public class BlackBoxResponseModel {
+public final class BlackBoxResponseModel {
 
     private ResponseType mResponseType = ResponseType.NONE;
     private int mCheckSum;

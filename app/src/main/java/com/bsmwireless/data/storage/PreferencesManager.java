@@ -2,7 +2,7 @@ package com.bsmwireless.data.storage;
 
 import android.content.SharedPreferences;
 
-public class PreferencesManager {
+public final class PreferencesManager {
     private static final String KEY_DRIVER_ACCOUNT_NAME = "driver_account_name";
     private static final String KEY_USER_ACCOUNT_NAME = "user_account_name";
     private static final String KEY_DRIVER_ID = "driver_id";
@@ -119,9 +119,9 @@ public class PreferencesManager {
     }
 
     public void clearValues() {
-        boolean isRememberEnabled = isRememberUserEnabled();
+        boolean rememberMeEnabled = isRememberUserEnabled();
         mPreferences.edit().clear().apply();
-        setRememberUserEnabled(isRememberEnabled);
+        setRememberUserEnabled(rememberMeEnabled);
     }
 
     public void setBoxGPSEnabled(boolean boxGPSEnabled) {

@@ -46,7 +46,7 @@ import static com.bsmwireless.common.Constants.DEFAULT_CALENDAR_DAYS_COUNT;
 import static com.bsmwireless.common.Constants.SUCCESS;
 import static com.bsmwireless.common.utils.DateUtils.MS_IN_WEEK;
 
-public class UserInteractor {
+public final class UserInteractor {
 
     private ServiceApi mServiceApi;
     private AppDatabase mAppDatabase;

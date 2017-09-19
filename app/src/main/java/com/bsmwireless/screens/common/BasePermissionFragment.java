@@ -18,7 +18,7 @@ public abstract class BasePermissionFragment extends BaseFragment {
     abstract protected void onPermissionGranted();
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+    public final void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
         if (hasAllPermissions(getDesiredPermissions())) {
@@ -29,7 +29,7 @@ public abstract class BasePermissionFragment extends BaseFragment {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public final void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_PERMISSION) {
             if (hasAllPermissions(getDesiredPermissions())) {
@@ -50,7 +50,7 @@ public abstract class BasePermissionFragment extends BaseFragment {
         return(true);
     }
 
-    protected boolean hasPermission(String permission) {
+    protected final boolean hasPermission(String permission) {
         return ContextCompat.checkSelfPermission(getContext(), permission) == PackageManager.PERMISSION_GRANTED;
     }
 

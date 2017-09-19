@@ -10,7 +10,7 @@ import com.google.gson.annotations.SerializedName;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-public class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheckable {
+public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheckable {
     public enum EventType {
         DUTY_STATUS_CHANGING(1),
         INTERMEDIATE_LOG(2),
@@ -748,7 +748,7 @@ public class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheckable {
     };
 
     @Override
-    public ELDEvent clone() {
+    public final ELDEvent clone() {
         Parcel parcel = Parcel.obtain();
         parcel.writeValue(this);
         parcel.setDataPosition(0);

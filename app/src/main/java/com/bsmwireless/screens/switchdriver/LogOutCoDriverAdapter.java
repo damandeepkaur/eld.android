@@ -16,7 +16,7 @@ import java.util.List;
 
 import app.bsmuniversal.com.R;
 
-public class LogOutCoDriverAdapter extends ArrayAdapter<SwitchDriverDialog.UserModel> {
+public final class LogOutCoDriverAdapter extends ArrayAdapter<SwitchDriverDialog.UserModel> {
 
     private int mSelectedPosition;
 
@@ -36,8 +36,8 @@ public class LogOutCoDriverAdapter extends ArrayAdapter<SwitchDriverDialog.UserM
             viewHolder = new ViewHolder();
             LayoutInflater inflater = LayoutInflater.from(getContext());
             convertView = inflater.inflate(R.layout.log_out_co_driver_item, parent, false);
-            viewHolder.mCoDriverRB = (RadioButton) convertView.findViewById(R.id.co_driver_radio_button);
-            viewHolder.mCoDriverDutyStatus = (ImageView) convertView.findViewById(R.id.duty_icon);
+            viewHolder.mCoDriverRB = convertView.findViewById(R.id.co_driver_radio_button);
+            viewHolder.mCoDriverDutyStatus = convertView.findViewById(R.id.duty_icon);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
