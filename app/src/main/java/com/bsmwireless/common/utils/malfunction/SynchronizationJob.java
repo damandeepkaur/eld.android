@@ -16,7 +16,7 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
-public class SynchronizationJob extends BaseMalfunctionJob implements MalfunctionJob {
+public final class SynchronizationJob extends BaseMalfunctionJob implements MalfunctionJob {
 
     private final BlackBoxConnectionManager mBoxConnectionManager;
 
@@ -28,11 +28,11 @@ public class SynchronizationJob extends BaseMalfunctionJob implements Malfunctio
 
     @Override
     public void start() {
+        Timber.d("Start synchronization compliance detection");
         Disposable disposable = mBoxConnectionManager.getDataObservable()
                 .filter(blackBoxModel -> BlackBoxResponseModel.ResponseType.STATUS_UPDATE
                         == blackBoxModel.getResponseType())
-                .flatMap(blackBoxModel -> loadLatestSynchronizationEvent(), SynchResult::new
-                )
+                .flatMap(blackBoxModel -> loadLatestSynchronizationEvent(), SynchResult::new)
                 .filter(this::isStateAndEventAreDifferent)
                 .map(result -> createEvent(Malfunction.ENGINE_SYNCHRONIZATION,
                         createCodeForDiagnostic(result.mELDEvent)))
@@ -48,7 +48,8 @@ public class SynchronizationJob extends BaseMalfunctionJob implements Malfunctio
 
     @Override
     public void stop() {
-
+        Timber.d("Start synchronization compliance detection");
+        dispose();
     }
 
     private Observable<ELDEvent> loadLatestSynchronizationEvent() {

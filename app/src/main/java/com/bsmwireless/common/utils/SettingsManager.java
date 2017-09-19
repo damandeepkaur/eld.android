@@ -13,10 +13,18 @@ public final class SettingsManager {
     }
 
     /**
-     * Return difference between ELD time and UTC for generating malfunction event
+     * Returns difference between ELD time and UTC for generating malfunction event
      * @return diff in millisecond
      */
     public long getTimingMalfunctionDiff(){
         return TimeUnit.MINUTES.toMillis(10);
+    }
+
+    /**
+     * Returns time interval for running a timing check
+     * @return time interval in milliseconds
+     */
+    public long getIntervalForCheckTime(){
+        return TimeUnit.MINUTES.toMillis(1);
     }
 }

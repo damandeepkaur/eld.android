@@ -11,13 +11,13 @@ import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 
-public class BaseMalfunctionJob {
+abstract class BaseMalfunctionJob {
 
     private final ELDEventsInteractor mELDEventsInteractor;
     private final CompositeDisposable mCompositeDisposable;
     private final DutyTypeManager mDutyTypeManager;
 
-    public BaseMalfunctionJob(ELDEventsInteractor eldEventsInteractor, DutyTypeManager dutyTypeManager) {
+    BaseMalfunctionJob(ELDEventsInteractor eldEventsInteractor, DutyTypeManager dutyTypeManager) {
         mELDEventsInteractor = eldEventsInteractor;
         mDutyTypeManager = dutyTypeManager;
         mCompositeDisposable = new CompositeDisposable();
