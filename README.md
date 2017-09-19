@@ -3,6 +3,7 @@ ELD app for Android
 
 # Version history
 
+* **1.0.73** - Engine Synchronization Compliance Monitoring (_EA-222_)
 * **1.0.72** - Add Lint inspection (EA-330)
 * **1.0.71** - Fix remember me due to merge conflict
 * **1.0.70** - Malfunction and Data diagnostic indications (_EA-104_, _EA-105_, _EA-106_)
