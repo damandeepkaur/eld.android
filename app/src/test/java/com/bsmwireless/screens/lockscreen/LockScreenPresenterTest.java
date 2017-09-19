@@ -25,10 +25,11 @@ import io.reactivex.plugins.RxJavaPlugins;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
 
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -52,7 +53,7 @@ public class LockScreenPresenterTest {
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-        mPresenter = new LockScreenPresenter(
+        mPresenter = spy(new LockScreenPresenter(
                 mDutyTypeManager,
                 new BlackBoxConnectionManagerImpl(mBlackBox),
                 mPreferencesManager,
@@ -60,19 +61,22 @@ public class LockScreenPresenterTest {
                 mELDEventsInteractor,
                 TimeUnit.MILLISECONDS.toMillis(1),
                 TimeUnit.MILLISECONDS.toMillis(1),
-                mAccountManager);
+                mAccountManager));
         RxAndroidPlugins.setInitMainThreadSchedulerHandler(schedulerCallable -> Schedulers.trampoline());
         RxJavaPlugins.setIoSchedulerHandler(scheduler -> Schedulers.trampoline());
+        RxJavaPlugins.setComputationSchedulerHandler(scheduler -> Schedulers.trampoline());
     }
 
     @Test
     public void testStatuses() throws Exception {
-        given(mDutyTypeManager.getDutyTypeTime(DutyType.DRIVING)).willReturn(1L);
-        given(mDutyTypeManager.getDutyTypeTime(DutyType.SLEEPER_BERTH)).willReturn(2L);
-        given(mDutyTypeManager.getDutyTypeTime(DutyType.ON_DUTY)).willReturn(3L);
-        given(mDutyTypeManager.getDutyTypeTime(DutyType.OFF_DUTY)).willReturn(4L);
+        doNothing().when(mPresenter).startTimer();
 
-        given(mBlackBox.getDataObservable()).willReturn(Observable.empty());
+        when(mDutyTypeManager.getDutyTypeTime(DutyType.DRIVING)).thenReturn(1L);
+        when(mDutyTypeManager.getDutyTypeTime(DutyType.SLEEPER_BERTH)).thenReturn(2L);
+        when(mDutyTypeManager.getDutyTypeTime(DutyType.ON_DUTY)).thenReturn(3L);
+        when(mDutyTypeManager.getDutyTypeTime(DutyType.OFF_DUTY)).thenReturn(4L);
+
+        when(mBlackBox.getDataObservable()).thenReturn(Observable.empty());
 
         mPresenter.onStart(mLockScreenView);
         verify(mLockScreenView).setTimeForDutyType(DutyType.DRIVING, 1L);
@@ -89,7 +93,9 @@ public class LockScreenPresenterTest {
 
     @Test
     public void testSwitchCoDriver() throws Exception {
-        given(mBlackBox.getDataObservable()).willReturn(Observable.empty());
+        when(mBlackBox.getDataObservable()).thenReturn(Observable.empty());
+        doNothing().when(mPresenter).startTimer();
+
         mPresenter.onStart(mLockScreenView);
         mPresenter.switchCoDriver();
         verify(mLockScreenView).openCoDriverDialog();
@@ -97,7 +103,9 @@ public class LockScreenPresenterTest {
 
     @Test
     public void startMonitoring() throws Exception {
-        given(mBlackBox.getDataObservable()).willReturn(Observable.empty());
+        when(mBlackBox.getDataObservable()).thenReturn(Observable.empty());
+        doNothing().when(mPresenter).startTimer();
+
         mPresenter.onStart(mLockScreenView);
         verify(mLockScreenView).removeAnyPopup();
     }
@@ -106,19 +114,19 @@ public class LockScreenPresenterTest {
     public void idling() throws Exception {
 
         final BlackBoxModel stoppedMock = mock(BlackBoxModel.class);
-        given(stoppedMock.getResponseType()).willReturn(BlackBoxResponseModel.ResponseType.STOPPED);
+        when(stoppedMock.getResponseType()).thenReturn(BlackBoxResponseModel.ResponseType.STOPPED);
 
         final BlackBoxModel anyMock = mock(BlackBoxModel.class);
-        given(anyMock.getResponseType()).willReturn(BlackBoxResponseModel.ResponseType.MOVING);
+        when(anyMock.getResponseType()).thenReturn(BlackBoxResponseModel.ResponseType.MOVING);
 
         final BehaviorSubject<BlackBoxModel> subject = BehaviorSubject.create();
-        given(mBlackBox.getDataObservable()).willReturn(subject);
+        when(mBlackBox.getDataObservable()).thenReturn(subject);
 
-        given(mELDEventsInteractor.postNewELDEvent(any())).willReturn(Single.just(1L));
+        when(mELDEventsInteractor.postNewELDEvent(any())).thenReturn(Single.just(1L));
+        doNothing().when(mPresenter).startTimer();
 
         mPresenter.onStart(mLockScreenView);
         subject.onNext(stoppedMock);
-        subject.onNext(anyMock);
         subject.onComplete();
         verify(mLockScreenView).closeLockScreen();
     }
@@ -127,16 +135,19 @@ public class LockScreenPresenterTest {
     public void startMonitoringIgnitionOff() throws Exception {
 
         final BlackBoxModel ignitionOffMock = mock(BlackBoxModel.class);
-        given(ignitionOffMock.getResponseType()).willReturn(BlackBoxResponseModel.ResponseType.IGNITION_OFF);
+        when(ignitionOffMock.getResponseType()).thenReturn(BlackBoxResponseModel.ResponseType.IGNITION_OFF);
 
         final BehaviorSubject<BlackBoxModel> subject = BehaviorSubject.create();
-        given(mBlackBox.getDataObservable()).willReturn(subject);
+        when(mBlackBox.getDataObservable()).thenReturn(subject);
 
-        given(mELDEventsInteractor.postNewELDEvent(any())).willReturn(Single.just(1L));
+        when(mELDEventsInteractor.postNewELDEvent(any())).thenReturn(Single.just(1L));
+        doNothing().when(mPresenter).startTimer();
 
         mPresenter.onStart(mLockScreenView);
         verify(mLockScreenView).removeAnyPopup();
         subject.onNext(ignitionOffMock);
+
+
         verify(mELDEventsInteractor).postNewELDEvent(any());
         verify(mLockScreenView).showIgnitionOffDetectedDialog();
 

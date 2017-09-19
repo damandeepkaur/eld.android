@@ -2,6 +2,7 @@ package com.bsmwireless.screens.lockscreen;
 
 
 import android.support.annotation.NonNull;
+import android.support.annotation.VisibleForTesting;
 
 import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.common.utils.BlackBoxStateChecker;
@@ -121,7 +122,8 @@ public final class LockScreenPresenter {
         mDutyManager.setDutyType(dutyType, true);
     }
 
-    private void startTimer() {
+    @VisibleForTesting
+    void startTimer() {
         final Disposable disposable = Observable.interval(1, TimeUnit.SECONDS)
                 .map(interval -> mDutyManager.getDutyTypeTime(DutyType.DRIVING))
                 .observeOn(AndroidSchedulers.mainThread())
