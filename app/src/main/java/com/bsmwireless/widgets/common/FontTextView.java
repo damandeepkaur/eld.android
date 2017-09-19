@@ -60,7 +60,7 @@ public class FontTextView extends AppCompatTextView {
         App.getComponent().inject(this);
 
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.FontTextView, defStyleAttr, 0);
-        FontType type = FontType.fromId(typedArray.getInt(R.styleable.FontTextView_font, 0));
+        FontType type = FontType.fromId(typedArray.getInt(R.styleable.FontTextView_textFont, 0));
 
         setFont(type);
 

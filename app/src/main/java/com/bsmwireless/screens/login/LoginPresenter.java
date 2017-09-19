@@ -31,7 +31,9 @@ public class LoginPresenter {
     }
 
     public void onViewCreated() {
-        if (mUserInteractor.isLoginActive()) {
+        if (mUserInteractor.isSelectAssetScreenActive()) {
+            mView.goToSelectAssetScreen();
+        } else if (mUserInteractor.isLoginActive()) {
             mView.goToNavigationScreen();
         } else if (mUserInteractor.isRememberMeEnabled()) {
             mView.loadUserData(mUserInteractor.getDriverName(), mUserInteractor.getDriverDomainName(), mUserInteractor.isRememberMeEnabled());

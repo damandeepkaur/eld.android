@@ -1,5 +1,7 @@
 package com.bsmwireless.screens.selectasset;
 
+import android.util.Log;
+
 import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.data.network.RetrofitException;
 import com.bsmwireless.data.network.blackbox.BlackBoxConnectionException;
@@ -38,6 +40,8 @@ public class SelectAssetPresenter {
     }
 
     public void onViewCreated() {
+        mUserInteractor.setShowSelectAssetScreenEnabled(false);
+
         mDisposables.add(mVehiclesInteractor.cleanSelectedVehicle()
                 .andThen(mVehiclesInteractor.getLastVehicles())
                 .subscribeOn(Schedulers.io())
@@ -110,28 +114,9 @@ public class SelectAssetPresenter {
         }
     }
 
-    public void onCancelDialogButtonClicked() {
-        mDisposables.add(mEventsInteractor.postLogoutEvent()
-                .doOnNext(isSuccess -> mUserInteractor.deleteDriver())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        status -> {
-                            Timber.i("Logout status = %b", status);
-                            if (status) {
-                                mView.onActionDone();
-                            }
-                        },
-                        error -> {
-                            Timber.e("Logout error: %s", error);
-                            if (error instanceof RetrofitException) {
-                                mView.showErrorMessage((RetrofitException) error);
-                            }
-                        }
-                ));
-    }
-
     public void onBackButtonPressed() {
+        mUserInteractor.setShowSelectAssetScreenEnabled(true);
+
         mView.showConfirmationDialog();
     }
 

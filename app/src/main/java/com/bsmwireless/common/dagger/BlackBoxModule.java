@@ -1,5 +1,7 @@
 package com.bsmwireless.common.dagger;
 
+import com.bsmwireless.common.utils.BlackBoxSimpleChecker;
+import com.bsmwireless.common.utils.BlackBoxStateChecker;
 import com.bsmwireless.data.network.blackbox.BlackBox;
 import com.bsmwireless.data.network.blackbox.BlackBoxConnectionManager;
 import com.bsmwireless.data.network.blackbox.BlackBoxConnectionManagerImpl;
@@ -14,13 +16,19 @@ import dagger.Provides;
 public class BlackBoxModule {
 
     @Provides
-    BlackBox provideBlackBox() {
+    static BlackBox provideBlackBox() {
         return new BlackBoxImpl();
     }
 
     @Provides
     @Singleton
-    BlackBoxConnectionManager provideConnectionManager(BlackBox blackBox) {
+    static BlackBoxConnectionManager provideConnectionManager(BlackBox blackBox) {
         return new BlackBoxConnectionManagerImpl(blackBox);
+    }
+
+    @Provides
+    @Singleton
+    static BlackBoxStateChecker provideChecker() {
+        return new BlackBoxSimpleChecker();
     }
 }
