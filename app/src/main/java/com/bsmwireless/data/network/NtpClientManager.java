@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import io.reactivex.Flowable;
 
-public class NtpClientManager {
+public final class NtpClientManager {
 
     private TrueTimeRx mTrueTimeRx;
     private AtomicLong mRealTimeInMillisDiff;

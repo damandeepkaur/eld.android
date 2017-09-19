@@ -9,7 +9,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-public class CalendarItem {
+public final class CalendarItem {
 
     public static final int ONE_DAY_MS = 24 * 60 * 60 * 1000;
 

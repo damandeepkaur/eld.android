@@ -5,7 +5,7 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 
 @Entity(tableName = "vehicles")
-public class VehicleEntity {
+public final class VehicleEntity {
     @PrimaryKey
     @ColumnInfo(name = "id")
     private Integer mId;

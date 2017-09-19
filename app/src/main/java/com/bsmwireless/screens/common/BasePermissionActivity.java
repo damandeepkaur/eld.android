@@ -17,6 +17,7 @@ public abstract class BasePermissionActivity extends BaseActivity {
 
     abstract protected void onPermissionGranted();
 
+    @SuppressWarnings("DesignForExtension")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -29,7 +30,7 @@ public abstract class BasePermissionActivity extends BaseActivity {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public final void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_PERMISSION) {
             if (hasAllPermissions(getDesiredPermissions())) {
@@ -40,7 +41,7 @@ public abstract class BasePermissionActivity extends BaseActivity {
         }
     }
 
-    protected boolean hasAllPermissions(String[] perms) {
+    protected final boolean hasAllPermissions(String[] perms) {
         for (String perm : perms) {
             if (!hasPermission(perm)) {
                 return(false);
@@ -50,7 +51,7 @@ public abstract class BasePermissionActivity extends BaseActivity {
         return(true);
     }
 
-    protected boolean hasPermission(String perm) {
+    protected final boolean hasPermission(String perm) {
         return ContextCompat.checkSelfPermission(this, perm) == PackageManager.PERMISSION_GRANTED;
     }
 

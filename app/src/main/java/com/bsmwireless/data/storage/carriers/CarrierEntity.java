@@ -5,7 +5,7 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 
 @Entity(tableName = "carriers")
-public class CarrierEntity {
+public final class CarrierEntity {
 
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")

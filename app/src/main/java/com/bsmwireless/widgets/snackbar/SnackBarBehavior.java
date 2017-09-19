@@ -9,7 +9,7 @@ import android.widget.ScrollView;
 
 import app.bsmuniversal.com.R;
 
-public class SnackBarBehavior extends AppBarLayout.ScrollingViewBehavior {
+public final class SnackBarBehavior extends AppBarLayout.ScrollingViewBehavior {
     private final float OFFSET;
 
     public SnackBarBehavior(Context context, AttributeSet attrs) {

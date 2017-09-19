@@ -24,7 +24,7 @@ import timber.log.Timber;
 
 import static com.bsmwireless.common.Constants.SUCCESS;
 
-public class LogSheetInteractor {
+public final class LogSheetInteractor {
 
     private ServiceApi mServiceApi;
     private PreferencesManager mPreferencesManager;

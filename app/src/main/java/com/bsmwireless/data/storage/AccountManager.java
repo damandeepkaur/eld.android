@@ -6,7 +6,7 @@ import android.support.annotation.NonNull;
 import java.util.HashSet;
 import java.util.Set;
 
-public class AccountManager {
+public final class AccountManager {
 
     private PreferencesManager mPreferencesManager;
 
