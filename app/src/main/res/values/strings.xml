@@ -514,6 +514,7 @@
 
     <string name="on_duty_dialog_title">Confirmation required</string>
     <string name="on_duty_dialog_message">Your vehicle hasn\'t been in-motion for 5 minutes. Please confirm your driving status or switch to the proper duty status.</string>
+    <string name="token_expired_dialog_message">Token has been expired. Please login again</string>
     <string name="on_duty_cancel">Switch to On Duty</string>
     <string name="on_duty_accept">Confirm</string>
 

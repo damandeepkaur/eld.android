@@ -10,26 +10,35 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.os.Bundle;
+import android.os.PersistableBundle;
+import android.os.SystemClock;
 
 import com.bsmwireless.common.App;
 import com.bsmwireless.schedulers.alarmmanager.AlarmBootReceiver;
+import com.bsmwireless.schedulers.alarmmanager.AlarmReceiver;
 import com.bsmwireless.schedulers.alarmmanager.SyncNtpAlarmReceiver;
 import com.bsmwireless.schedulers.jobscheduler.AutoLogoutJobService;
-import com.bsmwireless.schedulers.alarmmanager.AlarmReceiver;
 import com.bsmwireless.schedulers.jobscheduler.SyncNtpJobService;
 import com.bsmwireless.schedulers.jobscheduler.VerifyTokenScheduler;
 
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import android.os.SystemClock;
+import timber.log.Timber;
+
+import static android.app.AlarmManager.RTC_WAKEUP;
+import static com.bsmwireless.data.network.authenticator.BsmAuthenticator.ACCOUNT_NAME;
+import static com.bsmwireless.data.network.authenticator.BsmAuthenticator.ACCOUNT_TYPE;
 
 public class SchedulerUtils {
 
     private static final int JOB_ID = 111;
     private static final int SYNC_NTP_JOB_ID = 222;
-    private static final int VERIFY_TOKEN_JOB_ID = 333;
+    private static final int VERIFY_TOKEN_REQUEST = 333;
     private static final int AUTO_LOGOUT_TRIGGER_DURATION = 60;
     private static final int AUTO_LOGOUT_TRIGGER_DURATION_MIN = 55;
     private static final int AUTO_LOGOUT_TRIGGER_DURATION_MAX = 65;
@@ -38,6 +47,7 @@ public class SchedulerUtils {
     private static final int[] CANCELABLE_JOBS = {JOB_ID, SYNC_NTP_JOB_ID};
 
     private static PendingIntent mPendingIntent;
+    private static Map<String, PendingIntent> mTokenExpirationMap = new HashMap<>();
 
     public static void schedule() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -59,16 +69,17 @@ public class SchedulerUtils {
         mPendingIntent = PendingIntent.getBroadcast(App.getComponent().context(), 0, intent, 0);
         AlarmManager alarmManager = (AlarmManager) App.getComponent().context().getSystemService(Context.ALARM_SERVICE);
 
-        setExactAlarmManager(alarmManager);
+        setExactAlarmManager(alarmManager,
+                SystemClock.elapsedRealtime() + TimeUnit.MINUTES.toMillis(AUTO_LOGOUT_TRIGGER_DURATION),
+                mPendingIntent, AlarmManager.ELAPSED_REALTIME_WAKEUP);
     }
 
-    private static void setExactAlarmManager(AlarmManager alarmManager) {
+    private static void setExactAlarmManager(AlarmManager alarmManager, long time,
+                                             PendingIntent intent, int alarmType) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            alarmManager.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                    SystemClock.elapsedRealtime() + TimeUnit.MINUTES.toMillis(AUTO_LOGOUT_TRIGGER_DURATION), mPendingIntent);
+            alarmManager.setExact(alarmType, time, intent);
         } else {
-            alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                    SystemClock.elapsedRealtime() + TimeUnit.MINUTES.toMillis(AUTO_LOGOUT_TRIGGER_DURATION), mPendingIntent);
+            alarmManager.set(alarmType, time, intent);
         }
     }
 
@@ -169,16 +180,47 @@ public class SchedulerUtils {
                 PendingIntent.FLAG_NO_CREATE) != null);
     }
 
-    public static void scheduleTokenExpiration(long timestamp) {
+    public static void scheduleTokenExpiration(String accountType, String name, long timestamp) {
+        Timber.d("scheduleTokenExpiration: " + accountType + " " + name);
+        long diff = timestamp - Calendar.getInstance().getTimeInMillis();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            long diff = Calendar.getInstance().getTimeInMillis() - timestamp;
-            JobInfo.Builder builder = new JobInfo.Builder(VERIFY_TOKEN_JOB_ID, new ComponentName(App.getComponent().context(), VerifyTokenScheduler.class))
-                    .setRequiredNetworkType(JobInfo.NETWORK_TYPE_METERED)
-                    .setMinimumLatency(300000)
+            PersistableBundle bundle = new PersistableBundle();
+            bundle.putString(ACCOUNT_NAME, name);
+            bundle.putString(ACCOUNT_TYPE, accountType);
+            JobInfo.Builder builder = new JobInfo.Builder(name.hashCode(), new ComponentName(App.getComponent().context(), VerifyTokenScheduler.class))
+                    .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+                    .setMinimumLatency(diff)
+                    .setExtras(bundle)
                     .setPersisted(true);
 
             JobScheduler jobScheduler = (JobScheduler) App.getComponent().context().getSystemService(Context.JOB_SCHEDULER_SERVICE);
             jobScheduler.schedule(builder.build());
+        } else {
+            if (mTokenExpirationMap.containsKey(name)) {
+                cancelTokenExpiration(name);
+            }
+            Intent intent = new Intent(App.getComponent().context(), AlarmReceiver.class);
+            Bundle bundle = new Bundle();
+            bundle.putString(ACCOUNT_NAME, name);
+            bundle.putString(ACCOUNT_TYPE, accountType);
+            intent.putExtras(bundle);
+            mTokenExpirationMap.put(name, PendingIntent.getBroadcast(App.getComponent().context(), name.hashCode(), intent, 0));
+            AlarmManager alarmManager = (AlarmManager) App.getComponent().context().getSystemService(Context.ALARM_SERVICE);
+            setExactAlarmManager(alarmManager, timestamp, mTokenExpirationMap.get(name), RTC_WAKEUP);
+        }
+    }
+
+    public static void cancelTokenExpiration(String name) {
+        Timber.v("cancelTokenExpiration: ");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            JobScheduler jobScheduler = (JobScheduler) App.getComponent().context().getSystemService(Context.JOB_SCHEDULER_SERVICE);
+            jobScheduler.cancel(name.hashCode());
+        } else {
+            AlarmManager alarmManager = (AlarmManager) App.getComponent().context().getSystemService(Context.ALARM_SERVICE);
+            if (alarmManager != null && mTokenExpirationMap.containsKey(name)) {
+                alarmManager.cancel(mTokenExpirationMap.get(name));
+                mTokenExpirationMap.remove(name).cancel();
+            }
         }
     }
 }

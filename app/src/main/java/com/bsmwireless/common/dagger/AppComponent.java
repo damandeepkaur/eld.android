@@ -12,6 +12,7 @@ import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.AutoDutyTypeManager;
 import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.data.storage.PreferencesManager;
+import com.bsmwireless.schedulers.alarmmanager.TokenExpirationService;
 import com.bsmwireless.schedulers.jobscheduler.VerifyTokenScheduler;
 import com.bsmwireless.screens.diagnostic.dagger.DiagnosticComponent;
 import com.bsmwireless.screens.lockscreen.dagger.LockScreenComponent;
@@ -50,6 +51,10 @@ public interface AppComponent {
     void inject(FontTextView fontTextView);
 
     void inject(VerifyTokenScheduler scheduler);
+
+    void inject(TokenManager.TokenExpirationHandler handler);
+
+    void inject(TokenExpirationService service);
 
     LockScreenComponent.Builder lockScreenBuilder();
 
