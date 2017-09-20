@@ -3,6 +3,8 @@ ELD app for Android
 
 # Version history
 
+* **1.0.74** - Add progress bar for selecting assets and pairing to black box
+* **1.0.73** - Add driver cycles list to the profile (_EA-315_)
 * **1.0.72** - Add Lint inspection (EA-330)
 * **1.0.71** - Fix remember me due to merge conflict
 * **1.0.70** - Malfunction and Data diagnostic indications (_EA-104_, _EA-105_, _EA-106_)
