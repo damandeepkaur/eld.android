@@ -9,7 +9,7 @@ import com.google.gson.annotations.SerializedName;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-public class HOSAlert implements Parcelable {
+public final class HOSAlert implements Parcelable {
 
     @SerializedName("driverid")
     @Expose

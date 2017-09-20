@@ -9,7 +9,7 @@ import dagger.Module;
 import dagger.Provides;
 
 @Module
-public class EditLogHeaderModule {
+public final class EditLogHeaderModule {
     private final EditLogHeaderView mHomeView;
 
     public EditLogHeaderModule(@NonNull EditLogHeaderView view) {

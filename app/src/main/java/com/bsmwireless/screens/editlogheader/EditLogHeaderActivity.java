@@ -26,7 +26,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class EditLogHeaderActivity extends BaseMenuActivity implements EditLogHeaderView {
+public final class EditLogHeaderActivity extends BaseMenuActivity implements EditLogHeaderView {
 
     public final static String OLD_LOG_HEADER_EXTRA = "old_log_header_extra";
     public final static String NEW_LOG_HEADER_EXTRA = "new_log_header_extra";
@@ -124,7 +124,7 @@ public class EditLogHeaderActivity extends BaseMenuActivity implements EditLogHe
     private void setupExemptions(List<ExemptionModel> exemptions) {
         mExemptions = exemptions;
 
-        LinearLayout list = (LinearLayout) findViewById(R.id.exemptions);
+        LinearLayout list = findViewById(R.id.exemptions);
         for (int i = 0; i < exemptions.size(); i++) {
             ExemptionModel exemption = exemptions.get(i);
             if (!ExemptionModel.NONE.equals(exemption.getName())) {
@@ -182,7 +182,7 @@ public class EditLogHeaderActivity extends BaseMenuActivity implements EditLogHe
         }
     }
 
-    public class ExemptionModel {
+    public static final class ExemptionModel {
         public static final String NONE = "NONE";
 
         private String exemptionName;

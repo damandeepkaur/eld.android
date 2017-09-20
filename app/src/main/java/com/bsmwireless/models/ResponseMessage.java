@@ -9,7 +9,7 @@ import com.google.gson.annotations.SerializedName;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-public class ResponseMessage implements Parcelable {
+public final class ResponseMessage implements Parcelable {
 
     @SerializedName("message")
     @Expose

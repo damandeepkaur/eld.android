@@ -27,7 +27,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 
-public class LoginActivity extends BaseActivity implements LoginView {
+public final class LoginActivity extends BaseActivity implements LoginView {
     public static final String ARG_ACCOUNT_NAME = "name";
     public static final String ARG_DOMAIN_NAME = "domain";
 
@@ -58,7 +58,7 @@ public class LoginActivity extends BaseActivity implements LoginView {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        doBindToService(false);
         DaggerLoginComponent.builder().appComponent(App.getComponent()).loginModule(new LoginModule(this)).build().inject(this);
 
         setContentView(R.layout.activity_login);

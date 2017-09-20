@@ -11,7 +11,7 @@ import com.google.zxing.Result;
 import app.bsmuniversal.com.R;
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
-public class BarcodeScannerActivity extends BasePermissionActivity implements ZXingScannerView.ResultHandler {
+public final class BarcodeScannerActivity extends BasePermissionActivity implements ZXingScannerView.ResultHandler {
 
     private static final String TAG = BarcodeScannerActivity.class.getSimpleName();
 

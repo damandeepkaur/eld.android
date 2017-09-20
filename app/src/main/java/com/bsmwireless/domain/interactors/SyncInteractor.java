@@ -30,7 +30,7 @@ import timber.log.Timber;
 import static com.bsmwireless.common.Constants.SUCCESS;
 import static com.bsmwireless.common.utils.DateUtils.MS_IN_DAY;
 
-public class SyncInteractor {
+public final class SyncInteractor {
     private static final int MAX_EVENTS_IN_REQUEST = 5;
     private CompositeDisposable mSyncCompositeDisposable;
     private ServiceApi mServiceApi;

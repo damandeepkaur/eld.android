@@ -6,7 +6,7 @@ import android.support.annotation.NonNull;
 import java.util.HashSet;
 import java.util.Set;
 
-public class AccountManager {
+public final class AccountManager {
 
     private PreferencesManager mPreferencesManager;
 
@@ -69,6 +69,10 @@ public class AccountManager {
         setCurrentUser(getCurrentDriverId(), getCurrentDriverAccountName());
     }
 
+    /**
+     * Check current driver and current user.
+     * @return true if current user is a driver
+     */
     public boolean isCurrentUserDriver() {
         return getCurrentUserId() == getCurrentDriverId();
     }

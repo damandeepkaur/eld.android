@@ -35,7 +35,7 @@ import static android.view.View.VISIBLE;
 import static com.bsmwireless.widgets.logs.LogsTitleView.Type.EVENTS;
 import static com.bsmwireless.widgets.logs.LogsTitleView.Type.LOG_HEADER;
 
-public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
+public final class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
     private static final int VIEW_TYPE_HEADER = 0;
     private static final int VIEW_TYPE_EVENTS_TITLE = 1;
     private static final int VIEW_TYPE_EVENTS_ITEM = 2;
@@ -140,20 +140,20 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
             case VIEW_TYPE_HEADER:
                 view = mLayoutInflater.inflate(R.layout.logs_list_item_header, parent, false);
 
-                mCalendarLayout = (CalendarLayout) view.findViewById(R.id.calendar);
+                mCalendarLayout = view.findViewById(R.id.calendar);
                 mCalendarLayout.setLogs(mLogHeaders);
                 mCalendarLayout.setOnItemSelectedListener(calendarItem -> {
                     updateSignButton();
                     mPresenter.onCalendarDaySelected(calendarItem);
                 });
 
-                mSignLogsheet = (TextView) view.findViewById(R.id.sign_logsheet);
+                mSignLogsheet = view.findViewById(R.id.sign_logsheet);
                 mSigned = view.findViewById(R.id.signed);
 
                 mSignLogsheet.setOnClickListener(v -> mOnLogsStateChangeListener.onSignButtonClicked(
                         mCalendarLayout.getCurrentItem()));
 
-                mGraphLayout = (GraphLayout) view.findViewById(R.id.graphic);
+                mGraphLayout = view.findViewById(R.id.graphic);
                 mGraphLayout.setELDEvents(mEventLogs);
 
                 break;
@@ -325,7 +325,7 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
         void onSignButtonClicked(CalendarItem calendarItem);
     }
 
-    static class LogsHolder extends RecyclerView.ViewHolder {
+    static final class LogsHolder extends RecyclerView.ViewHolder {
         //event
         @Nullable
         @BindView(R.id.event_changed)

@@ -29,7 +29,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
-public class MultidayFragment extends BaseFragment implements MultidayView, AdapterView.OnItemSelectedListener {
+public final class MultidayFragment extends BaseFragment implements MultidayView, AdapterView.OnItemSelectedListener {
 
     public Unbinder mUnbinder;
 

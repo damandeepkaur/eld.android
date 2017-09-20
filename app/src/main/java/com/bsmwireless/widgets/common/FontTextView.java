@@ -14,7 +14,7 @@ import javax.inject.Inject;
 
 import app.bsmuniversal.com.R;
 
-public class FontTextView extends AppCompatTextView {
+public final class FontTextView extends AppCompatTextView {
 
     public enum FontType {
         NONE(0),
@@ -60,7 +60,7 @@ public class FontTextView extends AppCompatTextView {
         App.getComponent().inject(this);
 
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.FontTextView, defStyleAttr, 0);
-        FontType type = FontType.fromId(typedArray.getInt(R.styleable.FontTextView_font, 0));
+        FontType type = FontType.fromId(typedArray.getInt(R.styleable.FontTextView_textFont, 0));
 
         setFont(type);
 

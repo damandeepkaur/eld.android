@@ -15,7 +15,7 @@ import javax.net.ssl.SSLSocketFactory;
  * @link https://developer.android.com/reference/javax/net/ssl/SSLSocket.html
  * @see SSLSocketFactory
  */
-class TLS12SocketFactory extends SSLSocketFactory {
+final class TLS12SocketFactory extends SSLSocketFactory {
     static final String TLS_V12 = "TLSv1.2";
 
     private final SSLSocketFactory mDelegate;

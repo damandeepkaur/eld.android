@@ -7,7 +7,7 @@ import java.util.HashMap;
 
 import timber.log.Timber;
 
-public class FontCache {
+public final class FontCache {
     public static final String SANS_SERIF = "sans_serif";
     public static final String BEBAS_NEUE = "fonts/BebasNeue.otf";
     public static final String FONTY = "fonts/Fonty.ttf";
