@@ -11,6 +11,7 @@ import com.bsmwireless.models.BlackBoxModel;
 import com.bsmwireless.models.BlackBoxSensorState;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.Malfunction;
+import com.bsmwireless.services.MonitoringPresenter;
 
 import javax.inject.Inject;
 
@@ -22,7 +23,7 @@ import timber.log.Timber;
 
 
 @ActivityScope
-public final class MalfunctionServicePresenter {
+public final class MalfunctionServicePresenter implements MonitoringPresenter {
 
     final BlackBoxConnectionManager mBlackBoxConnectionManager;
     final ELDEventsInteractor mELDEventsInteractor;
@@ -39,16 +40,15 @@ public final class MalfunctionServicePresenter {
         mCompositeDisposable = new CompositeDisposable();
     }
 
+    @Override
     public void startMonitoring() {
-
         Timber.d("Start malfunction monitoring");
-
         startSynchronizationMonitoring();
     }
 
+    @Override
     public void stopMonitoring() {
         Timber.d("Stop malfunction monitoring");
-
         mCompositeDisposable.dispose();
     }
 
@@ -97,14 +97,14 @@ public final class MalfunctionServicePresenter {
      */
     private boolean isStateAndEventAreDifferent(SynchResult synchResult) {
 
-        if (ELDEvent.MalfunctionCode.DIAGNOSTIC_LOGGED.getCode() == synchResult.mELDEvent.getEventCode()) {
-            return synchResult.mBlackBoxModel.getSensorState(BlackBoxSensorState.ECM_CABLE)
-                    && synchResult.mBlackBoxModel.getSensorState(BlackBoxSensorState.ECM_SYNC);
-        } else if (ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED.getCode() == synchResult.mELDEvent.getEventCode()) {
-            return !synchResult.mBlackBoxModel.getSensorState(BlackBoxSensorState.ECM_CABLE)
-                    || !synchResult.mBlackBoxModel.getSensorState(BlackBoxSensorState.ECM_SYNC);
+        boolean isEcmOk = synchResult.mBlackBoxModel.getSensorState(BlackBoxSensorState.ECM_CABLE)
+                && synchResult.mBlackBoxModel.getSensorState(BlackBoxSensorState.ECM_SYNC);
+
+        if (isEcmOk) {
+            return ELDEvent.MalfunctionCode.DIAGNOSTIC_LOGGED.getCode() == synchResult.mELDEvent.getEventCode();
+        } else {
+            return ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED.getCode() == synchResult.mELDEvent.getEventCode();
         }
-        return true;
     }
 
     @NonNull
