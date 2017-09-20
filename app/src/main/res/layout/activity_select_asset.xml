@@ -9,29 +9,29 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
         android:background="@android:color/white"
+        android:orientation="vertical"
         tools:context="com.bsmwireless.screens.selectasset.SelectAssetActivity">
 
         <android.support.design.widget.AppBarLayout
-            style="@style/ActionBarTheme"
             android:id="@+id/select_asset_app_bar"
+            style="@style/ActionBarTheme"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:background="@drawable/toolbar_gradient">
+                android:background="@drawable/toolbar_gradient"
+                android:orientation="vertical">
 
                 <android.support.v7.widget.Toolbar
                     android:id="@+id/select_asset_toolbar"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingTop="@dimen/default_toolbar_padding"
-                    app:titleTextAppearance="@style/ActionBarTitleTextStyle"
-                    app:popupTheme="@style/ThemeOverlay.AppCompat.Dark"/>
+                    app:popupTheme="@style/ThemeOverlay.AppCompat.Dark"
+                    app:titleTextAppearance="@style/ActionBarTitleTextStyle"/>
 
                 <android.support.v7.widget.SearchView
                     android:id="@+id/select_asset_search_view"
@@ -40,13 +40,33 @@
                     android:layout_margin="@dimen/select_asset_search_margin"
                     android:background="@android:color/white"
                     app:iconifiedByDefault="false"
-                    app:searchHintIcon="@null"
                     app:queryBackground="@null"
-                    app:queryHint="@string/select_asset_search_hint"/>
+                    app:queryHint="@string/select_asset_search_hint"
+                    app:searchHintIcon="@null"/>
 
             </LinearLayout>
 
         </android.support.design.widget.AppBarLayout>
+
+        <FrameLayout
+            android:id="@+id/select_asset_progress_bar_container"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/select_asset_progress_bar_container_height"
+            android:layout_below="@id/select_asset_app_bar"
+            android:visibility="gone">
+
+            <ProgressBar
+                android:id="@+id/select_asset_progress_bar"
+                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/select_asset_progress_bar_top_margin"
+                android:indeterminate="false"
+                android:indeterminateTint="@color/accent"
+                android:indeterminateTintMode="src_in"
+                android:theme="@style/AppTheme.IndeterminateAppearance.ProgressBar"/>
+
+        </FrameLayout>
 
         <TextView
             android:id="@+id/select_asset_previous_text"
@@ -54,16 +74,16 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/select_asset_app_bar"
             android:layout_margin="@dimen/select_asset_item_padding"
-            android:textSize="@dimen/text_size_small"
+            android:text="@string/select_asset_previous_assets"
             android:textColor="@color/accent"
-            android:text="@string/select_asset_previous_assets"/>
+            android:textSize="@dimen/text_size_small"/>
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/select_asset_last_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/select_asset_previous_text"
-            android:layout_above="@+id/select_asset_buttons_layout"/>
+            android:layout_above="@+id/select_asset_buttons_layout"
+            android:layout_below="@+id/select_asset_previous_text"/>
 
         <LinearLayout
             android:id="@+id/select_asset_buttons_layout"
@@ -71,14 +91,15 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_margin="@dimen/default_margin"
-            android:orientation="horizontal"
-            android:gravity="center">
+            android:gravity="center"
+            android:orientation="horizontal">
 
             <android.support.v7.widget.AppCompatButton
                 android:id="@+id/select_asset_scan_qr_code_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="@dimen/default_margin"
+                android:layout_marginRight="@dimen/default_margin"
                 android:padding="@dimen/default_margin"
                 android:text="@string/select_asset_scan_qr_code"
                 android:textColor="@android:color/white"
@@ -95,6 +116,7 @@
                 android:textSize="@dimen/text_size_small"
                 app:backgroundTint="@color/accent"/>
 
+
         </LinearLayout>
 
         <android.support.v7.widget.CardView
@@ -102,9 +124,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/select_asset_app_bar"
-            android:layout_marginTop="@dimen/select_asset_card_top_margin"
             android:layout_marginLeft="@dimen/select_asset_card_side_margin"
             android:layout_marginRight="@dimen/select_asset_card_side_margin"
+            android:layout_marginTop="@dimen/select_asset_card_top_margin"
             android:visibility="gone"
             app:cardCornerRadius="0dp"
             app:cardElevation="@dimen/select_asset_card_elevation">
