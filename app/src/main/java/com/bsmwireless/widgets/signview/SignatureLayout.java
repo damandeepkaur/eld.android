@@ -14,7 +14,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 
-public class SignatureLayout extends LinearLayout {
+public final class SignatureLayout extends LinearLayout {
 
     public final int ANIMATION_DURATION = getResources().getInteger(android.R.integer.config_shortAnimTime);
 

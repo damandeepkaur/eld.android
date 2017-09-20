@@ -10,18 +10,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.os.SystemClock;
 
 import com.bsmwireless.common.App;
 import com.bsmwireless.schedulers.alarmmanager.AlarmBootReceiver;
+import com.bsmwireless.schedulers.alarmmanager.AlarmReceiver;
 import com.bsmwireless.schedulers.alarmmanager.SyncNtpAlarmReceiver;
 import com.bsmwireless.schedulers.jobscheduler.AutoLogoutJobService;
-import com.bsmwireless.schedulers.alarmmanager.AlarmReceiver;
 import com.bsmwireless.schedulers.jobscheduler.SyncNtpJobService;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
-import android.os.SystemClock;
 
 public class SchedulerUtils {
 

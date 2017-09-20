@@ -12,7 +12,7 @@ import dagger.Module;
 import dagger.Provides;
 
 @Module
-public class PreferencesModule {
+public final class PreferencesModule {
     @Singleton
     @Provides
     SharedPreferences provideSharedPreferences(Context context) {

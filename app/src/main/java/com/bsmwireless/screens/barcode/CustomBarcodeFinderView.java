@@ -9,7 +9,7 @@ import android.util.AttributeSet;
 
 import me.dm7.barcodescanner.core.ViewFinderView;
 
-public class CustomBarcodeFinderView extends ViewFinderView {
+public final class CustomBarcodeFinderView extends ViewFinderView {
 
     public final Paint PAINT = new Paint();
 

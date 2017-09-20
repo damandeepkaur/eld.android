@@ -14,7 +14,7 @@ import timber.log.Timber;
 import static com.bsmwireless.common.Constants.COMMENT_VALIDATE_PATTERN;
 
 @ActivityScope
-public class DashboardPresenter {
+public final class DashboardPresenter {
     private DashboardView mView;
 
     private DutyTypeManager mDutyTypeManager;

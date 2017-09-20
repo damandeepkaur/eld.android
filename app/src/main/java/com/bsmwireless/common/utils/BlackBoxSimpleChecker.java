@@ -5,7 +5,7 @@ import android.support.annotation.NonNull;
 import com.bsmwireless.data.network.blackbox.models.BlackBoxResponseModel;
 import com.bsmwireless.models.BlackBoxModel;
 
-public class BlackBoxSimpleChecker implements BlackBoxStateChecker {
+public final class BlackBoxSimpleChecker implements BlackBoxStateChecker {
     @Override
     public boolean isMoving(@NonNull BlackBoxModel blackBoxModel) {
         return BlackBoxResponseModel.ResponseType.MOVING == blackBoxModel.getResponseType();

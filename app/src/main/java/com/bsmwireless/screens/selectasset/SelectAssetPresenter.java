@@ -17,7 +17,7 @@ import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
 @ActivityScope
-public class SelectAssetPresenter {
+public final class SelectAssetPresenter {
     private SelectAssetView mView;
     private VehiclesInteractor mVehiclesInteractor;
     private CompositeDisposable mDisposables;

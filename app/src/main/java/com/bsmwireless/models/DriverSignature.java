@@ -5,10 +5,11 @@ import android.os.Parcelable;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-public class DriverSignature implements Parcelable {
+public final class DriverSignature implements Parcelable {
 
     @SerializedName("driverId")
     @Expose

@@ -16,7 +16,7 @@ import com.bsmwireless.widgets.alerts.DutyType;
 import app.bsmuniversal.com.R;
 
 
-public class PromtDialog extends DialogFragment {
+public final class PromtDialog extends DialogFragment {
 
     public static final String DIALOG_TYPE = "DIALOG_TYPE";
 
@@ -39,6 +39,7 @@ public class PromtDialog extends DialogFragment {
         return dialog;
     }
 
+    @SuppressWarnings("DesignForExtension")
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -53,7 +54,7 @@ public class PromtDialog extends DialogFragment {
 
     }
 
-    public void setPromtDialogListener(PromtDialogListener promtDialogListener) {
+    public final void setPromtDialogListener(PromtDialogListener promtDialogListener) {
         mPromtDialogListener = promtDialogListener;
     }
 
@@ -122,7 +123,7 @@ public class PromtDialog extends DialogFragment {
         return view;
     }
 
-    void handleClick(DutyType dutyType) {
+    final void handleClick(DutyType dutyType) {
         dismiss();
         if (mPromtDialogListener != null) {
             mPromtDialogListener.onDutyStatusSelected(dutyType);

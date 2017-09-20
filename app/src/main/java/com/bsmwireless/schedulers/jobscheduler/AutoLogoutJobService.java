@@ -10,7 +10,7 @@ import com.bsmwireless.screens.autologout.AutoDutyDialogActivity;
 import static com.bsmwireless.screens.autologout.AutoDutyDialogActivity.EXTRA_AUTO_LOGOUT;
 
 @TargetApi(21)
-public class AutoLogoutJobService extends JobService {
+public final class AutoLogoutJobService extends JobService {
 
     @Override
     public boolean onStartJob(JobParameters params) {

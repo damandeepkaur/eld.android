@@ -21,7 +21,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bsmwireless.common.App;
-import com.bsmwireless.models.User;
 import com.bsmwireless.screens.autologout.AutoDutyDialogActivity;
 import com.bsmwireless.screens.common.menu.BaseMenuActivity;
 import com.bsmwireless.screens.common.menu.BaseMenuPresenter;
@@ -43,9 +42,8 @@ import butterknife.Unbinder;
 import static com.bsmwireless.screens.autologout.AutoDutyDialogActivity.EXTRA_AUTO_DRIVING;
 import static com.bsmwireless.screens.autologout.AutoDutyDialogActivity.EXTRA_AUTO_DRIVING_WITHOUT_CONFIRM;
 import static com.bsmwireless.screens.autologout.AutoDutyDialogActivity.EXTRA_AUTO_ON_DUTY;
-import static com.bsmwireless.screens.driverprofile.DriverProfileActivity.EXTRA_USER;
 
-public class NavigationActivity extends BaseMenuActivity implements OnNavigationItemSelectedListener, NavigateView, ViewPager.OnPageChangeListener {
+public final class NavigationActivity extends BaseMenuActivity implements OnNavigationItemSelectedListener, NavigateView, ViewPager.OnPageChangeListener {
 
     private static final int REQUEST_CODE_UPDATE_USER = 101;
 
@@ -255,23 +253,6 @@ public class NavigationActivity extends BaseMenuActivity implements OnNavigation
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode) {
-            case REQUEST_CODE_UPDATE_USER: {
-                if (data != null && data.hasExtra(EXTRA_USER)) {
-                    User user = data.getParcelableExtra(EXTRA_USER);
-                    mPresenter.onUserUpdated(user);
-                }
-                break;
-            }
-            default: {
-                break;
-            }
-        }
-    }
-
-    @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
     }
@@ -320,7 +301,7 @@ public class NavigationActivity extends BaseMenuActivity implements OnNavigation
         startActivity(dialogIntent);
     }
 
-    protected static class HeaderViewHolder {
+    protected static final class HeaderViewHolder {
         @BindView(R.id.driver_name)
         TextView driverName;
 
@@ -346,7 +327,7 @@ public class NavigationActivity extends BaseMenuActivity implements OnNavigation
         }
     }
 
-    private class SmoothActionBarDrawerToggle extends ActionBarDrawerToggle {
+    private static final class SmoothActionBarDrawerToggle extends ActionBarDrawerToggle {
 
         private Runnable mRunnable;
 
