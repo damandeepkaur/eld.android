@@ -45,7 +45,7 @@ public class LogSheetConverter {
             entity.setCoDriverIds(model.getCoDriverIds());
             entity.setComment(model.getComment());
             entity.setDutyCycle(model.getDutyCycle());
-            entity.setHomeTerminal(HomeTerminalConverter.toEntity(model.getHomeTerminal(), null));
+            entity.setHomeTerminal(HomeTerminalConverter.toEntity(model.getHomeTerminal()));
             entity.setAdditions(model.getAdditions());
             entity.setSigned(model.getSigned());
         }
