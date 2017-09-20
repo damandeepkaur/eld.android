@@ -4,7 +4,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
+import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
@@ -74,6 +76,9 @@ public final class DriverProfileActivity extends BaseMenuActivity implements Dri
     @BindView(R.id.confirm_password_layout)
     TextInputLayout mConfirmPasswordLayout;
 
+    @BindView(R.id.change_password_button)
+    AppCompatButton mButtonChangePass;
+
     @BindView(R.id.role)
     TextInputEditText mRole;
 
@@ -115,6 +120,18 @@ public final class DriverProfileActivity extends BaseMenuActivity implements Dri
 
         setContentView(R.layout.activity_driver_profile);
         mUnbinder = ButterKnife.bind(this);
+
+        boolean isAppOnline = NetworkUtils.isOnlineMode();
+        mCurrentPasswordTextView.setFocusable(false);
+        mNewPasswordTextView.setFocusable(false);
+        mConfirmPasswordTextView.setFocusable(false);
+
+        mNewPasswordTextView.setEnabled(isAppOnline);
+        mConfirmPasswordTextView.setEnabled(isAppOnline);
+        mCurrentPasswordTextView.setEnabled(isAppOnline);
+
+        mButtonChangePass.setTextColor(ContextCompat.getColor(this, R.color.default_hint));
+        mButtonChangePass.setEnabled(isAppOnline);
 
         initToolbar();
 
@@ -209,8 +226,8 @@ public final class DriverProfileActivity extends BaseMenuActivity implements Dri
     @OnClick(R.id.change_password_button)
     void onChangePasswordClick() {
         mPresenter.onChangePasswordClick(mCurrentPasswordTextView.getText().toString(),
-                                         mNewPasswordTextView.getText().toString(),
-                                         mConfirmPasswordTextView.getText().toString());
+                mNewPasswordTextView.getText().toString(),
+                mConfirmPasswordTextView.getText().toString());
     }
 
     private void initToolbar() {
@@ -224,28 +241,28 @@ public final class DriverProfileActivity extends BaseMenuActivity implements Dri
 
     private void showChangeSignSnackBar() {
         mSnackBarLayout.setOnReadyListener(snackBar -> {
-                           snackBar.reset()
-                                   .setPositiveLabel(getString(R.string.ok), v -> mPresenter.onSaveSignatureClicked(mSignatureLayout.getImageData()))
-                                   .setNegativeLabel(getString(R.string.clear), v -> mSignatureLayout.clear())
-                                   .setHideableOnFocusLost(true)
-                                   .setOnCloseListener(new SnackBarLayout.OnCloseListener() {
-                                       @Override
-                                       public void onClose(SnackBarLayout snackBar) {
-                                           mSignatureLayout.setEditable(false);
-                                       }
+            snackBar.reset()
+                    .setPositiveLabel(getString(R.string.ok), v -> mPresenter.onSaveSignatureClicked(mSignatureLayout.getImageData()))
+                    .setNegativeLabel(getString(R.string.clear), v -> mSignatureLayout.clear())
+                    .setHideableOnFocusLost(true)
+                    .setOnCloseListener(new SnackBarLayout.OnCloseListener() {
+                        @Override
+                        public void onClose(SnackBarLayout snackBar) {
+                            mSignatureLayout.setEditable(false);
+                        }
 
-                                       @Override
-                                       public void onOpen(SnackBarLayout snackBar) {
-                                           mSignatureLayout.setEditable(true);
-                                       }
-                                   });
-                       })
-                       .showSnackbar();
+                        @Override
+                        public void onOpen(SnackBarLayout snackBar) {
+                            mSignatureLayout.setEditable(true);
+                        }
+                    });
+        })
+                .showSnackbar();
     }
 
     private void showNotificationSnackBar(String message) {
         mSnackBarLayout.setOnReadyListener(snackBar -> snackBar.reset().setMessage(message).setHideableOnTimeout(SnackBarLayout.DURATION_LONG))
-                       .showSnackbar();
+                .showSnackbar();
     }
 
     @Override
