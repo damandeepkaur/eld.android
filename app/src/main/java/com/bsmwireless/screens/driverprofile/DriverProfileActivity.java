@@ -39,7 +39,7 @@ import timber.log.Timber;
 
 import static com.bsmwireless.common.utils.DateUtils.getFullTimeZone;
 
-public class DriverProfileActivity extends BaseMenuActivity implements DriverProfileView, SignatureLayout.OnSaveSignatureListener {
+public final class DriverProfileActivity extends BaseMenuActivity implements DriverProfileView, SignatureLayout.OnSaveSignatureListener {
 
     @BindView(R.id.toolbar)
     Toolbar mToolbar;

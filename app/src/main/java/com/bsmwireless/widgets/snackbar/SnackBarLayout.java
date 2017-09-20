@@ -21,7 +21,7 @@ import butterknife.Unbinder;
 import static android.support.design.widget.BottomSheetBehavior.STATE_EXPANDED;
 import static android.support.design.widget.BottomSheetBehavior.STATE_HIDDEN;
 
-public class SnackBarLayout extends RelativeLayout {
+public final class SnackBarLayout extends RelativeLayout {
     public static final int DURATION_SHORT = 1000;
     public static final int DURATION_LONG = 5000;
     public static final int DURATION_INFINITE = 0;

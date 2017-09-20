@@ -4,11 +4,11 @@ import android.arch.persistence.room.Database;
 import android.arch.persistence.room.RoomDatabase;
 
 import com.bsmwireless.data.storage.carriers.CarrierDao;
+import com.bsmwireless.data.storage.carriers.CarrierEntity;
 import com.bsmwireless.data.storage.configurations.ConfigurationDao;
 import com.bsmwireless.data.storage.configurations.ConfigurationEntity;
 import com.bsmwireless.data.storage.eldevents.ELDEventDao;
 import com.bsmwireless.data.storage.eldevents.ELDEventEntity;
-import com.bsmwireless.data.storage.carriers.CarrierEntity;
 import com.bsmwireless.data.storage.hometerminals.HomeTerminalDao;
 import com.bsmwireless.data.storage.hometerminals.HomeTerminalEntity;
 import com.bsmwireless.data.storage.hometerminals.userhometerminal.UserHomeTerminalDao;

@@ -6,7 +6,7 @@ import com.google.gson.annotations.SerializedName;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-public class LoginModel {
+public final class LoginModel {
     @SerializedName("username")
     private String mUsername;
 

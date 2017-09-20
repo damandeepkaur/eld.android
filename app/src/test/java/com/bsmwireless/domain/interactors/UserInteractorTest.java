@@ -33,7 +33,7 @@ import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 
 import java.util.ArrayList;
@@ -58,7 +58,7 @@ import static org.mockito.Mockito.when;
  * Unit tests for UserInteractor
  */
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class UserInteractorTest {
 
     // defaults for testing //
@@ -80,7 +80,7 @@ public class UserInteractorTest {
     private final ArgumentMatcher<ELDEvent> mEldEventLogoutCodeMatcher = new ArgumentMatcher<ELDEvent>(){
 
         @Override
-        public boolean matches(Object argument) {
+        public boolean matches(ELDEvent argument) {
             return ((ELDEvent) argument).getEventType() == 5 // ELD 7.20, Table 6 (5 = login/logout) & ELD 7.25, Table 9
                     && ((ELDEvent) argument).getEventCode() == 2; // ELD 7.20, Table 6 (2 = Authenticated driver's ELD logout activity)
         }
@@ -94,7 +94,7 @@ public class UserInteractorTest {
      */
     private final ArgumentMatcher<ELDEvent> mEldEventActiveStatusCodeMatcher = new ArgumentMatcher<ELDEvent>() {
         @Override
-        public boolean matches(Object argument) {
+        public boolean matches(ELDEvent argument) {
             ELDEvent arg = (ELDEvent) argument;
             return arg.getStatus() == 1; // ELD 7.23 (1 = active)
         }
@@ -108,7 +108,7 @@ public class UserInteractorTest {
      */
     private final ArgumentMatcher<ELDEvent> mEldEventDriverEditOriginCodeMatcher = new ArgumentMatcher<ELDEvent>() {
         @Override
-        public boolean matches(Object argument) {
+        public boolean matches(ELDEvent argument) {
             ELDEvent arg = (ELDEvent) argument;
             return arg.getOrigin() == 2; // ELD 7.22 (2 = edited or entered by the driver)
         }
@@ -384,6 +384,7 @@ public class UserInteractorTest {
         when(mTokenManager.getPassword(anyString())).thenReturn(mPassword);
         when(mUserDao.getUserSync(anyInt())).thenReturn(userEntity);
         when(mServiceApi.getELDEvents(anyLong(), anyLong())).thenReturn(Observable.just(eldEvents));
+        when(mTokenManager.getAccountName(anyString(), anyString())).thenReturn("str");
 
         // when
         mLoginUserInteractor.loginUser(mName, mPassword, mDomain, mKeepToken, mDriverType)
@@ -431,6 +432,7 @@ public class UserInteractorTest {
         final String driver = "90210"; // parsable to int
         final String fakeToken = "314159265";
 
+        when(mAccountManager.getCurrentDriverAccountName()).thenReturn(accountName);
         when(mPreferencesManager.getDriverAccountName()).thenReturn(accountName);
         when(mTokenManager.getDriver(anyString())).thenReturn(driver);
         when(mAppDatabase.userDao()).thenReturn(mUserDao);
@@ -816,7 +818,7 @@ public class UserInteractorTest {
     @Test
     public void testGetUserName() {
         // given
-        // n/a
+        when(mAccountManager.getCurrentUserAccountName()).thenReturn("any");
 
         // when
         mLoginUserInteractor.getUserName();
@@ -857,7 +859,8 @@ public class UserInteractorTest {
     @Test
     public void testGetDomainName() {
         // given
-        // n/a
+        when(mAccountManager.getCurrentDriverAccountName()).thenReturn("any");
+
 
         // when
         mLoginUserInteractor.getDriverDomainName();

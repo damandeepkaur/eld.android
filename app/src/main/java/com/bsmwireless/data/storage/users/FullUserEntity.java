@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class FullUserEntity {
+public final class FullUserEntity {
 
     @Embedded
     private UserEntity mUserEntity;

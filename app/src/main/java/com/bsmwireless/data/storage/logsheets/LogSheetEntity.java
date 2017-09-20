@@ -8,7 +8,7 @@ import android.arch.persistence.room.PrimaryKey;
 import com.bsmwireless.data.storage.hometerminals.HomeTerminalEntity;
 
 @Entity(tableName = "log_sheet_header")
-public class LogSheetEntity {
+public final class LogSheetEntity {
     @PrimaryKey
     @ColumnInfo(name = "log_day")
     private Long mLogDay;

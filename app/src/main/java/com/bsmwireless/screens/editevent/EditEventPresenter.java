@@ -25,7 +25,7 @@ import timber.log.Timber;
 import static com.bsmwireless.common.Constants.COMMENT_VALIDATE_PATTERN;
 
 @ActivityScope
-public class EditEventPresenter extends BaseMenuPresenter {
+public final class EditEventPresenter extends BaseMenuPresenter {
 
     private EditEventView mView;
     private ELDEvent mELDEvent;

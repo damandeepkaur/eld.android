@@ -40,7 +40,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 
-public class DashboardFragment extends BaseFragment implements DashboardView {
+public final class DashboardFragment extends BaseFragment implements DashboardView {
     private static final int TIMER_DELAY = 1000;
 
     @Inject

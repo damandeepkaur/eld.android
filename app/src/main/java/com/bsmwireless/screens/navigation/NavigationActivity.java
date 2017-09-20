@@ -43,7 +43,7 @@ import static com.bsmwireless.screens.autologout.AutoDutyDialogActivity.EXTRA_AU
 import static com.bsmwireless.screens.autologout.AutoDutyDialogActivity.EXTRA_AUTO_DRIVING_WITHOUT_CONFIRM;
 import static com.bsmwireless.screens.autologout.AutoDutyDialogActivity.EXTRA_AUTO_ON_DUTY;
 
-public class NavigationActivity extends BaseMenuActivity implements OnNavigationItemSelectedListener, NavigateView, ViewPager.OnPageChangeListener {
+public final class NavigationActivity extends BaseMenuActivity implements OnNavigationItemSelectedListener, NavigateView, ViewPager.OnPageChangeListener {
 
     private static final int REQUEST_CODE_UPDATE_USER = 101;
 
@@ -301,7 +301,7 @@ public class NavigationActivity extends BaseMenuActivity implements OnNavigation
         startActivity(dialogIntent);
     }
 
-    protected static class HeaderViewHolder {
+    protected static final class HeaderViewHolder {
         @BindView(R.id.driver_name)
         TextView driverName;
 
@@ -327,7 +327,7 @@ public class NavigationActivity extends BaseMenuActivity implements OnNavigation
         }
     }
 
-    private class SmoothActionBarDrawerToggle extends ActionBarDrawerToggle {
+    private static final class SmoothActionBarDrawerToggle extends ActionBarDrawerToggle {
 
         private Runnable mRunnable;
 

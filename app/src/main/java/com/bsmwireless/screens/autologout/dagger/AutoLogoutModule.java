@@ -9,7 +9,7 @@ import dagger.Module;
 import dagger.Provides;
 
 @Module
-public class AutoLogoutModule {
+public final class AutoLogoutModule {
 
     private final AutoDutyDialogView mAutoDutyDialogView;
 

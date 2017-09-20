@@ -35,7 +35,7 @@ import static okhttp3.logging.HttpLoggingInterceptor.Level.BODY;
 import static okhttp3.logging.HttpLoggingInterceptor.Level.NONE;
 
 @Module
-public class NetworkModule {
+public final class NetworkModule {
 
     @Provides
     @Singleton
