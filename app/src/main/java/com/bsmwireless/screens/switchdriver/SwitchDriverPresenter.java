@@ -1,6 +1,7 @@
 package com.bsmwireless.screens.switchdriver;
 
 import com.bsmwireless.common.dagger.ActivityScope;
+import com.bsmwireless.common.utils.DateUtils;
 import com.bsmwireless.data.network.RetrofitException;
 import com.bsmwireless.data.network.blackbox.BlackBoxConnectionManager;
 import com.bsmwireless.data.network.blackbox.models.BlackBoxResponseModel;
@@ -235,7 +236,7 @@ public final class SwitchDriverPresenter {
 
     private List<SwitchDriverDialog.UserModel> updateStatus(List<SwitchDriverDialog.UserModel> userEntities) {
         for (SwitchDriverDialog.UserModel user : userEntities) {
-            List<ELDEvent> events = mELDEventsInteractor.getLatestActiveDutyEventFromDBSync(System.currentTimeMillis(), user.getUser().getId());
+            List<ELDEvent> events = mELDEventsInteractor.getLatestActiveDutyEventFromDBSync(DateUtils.currentTimeMillis(), user.getUser().getId());
             if (events != null && !events.isEmpty()) {
                 ELDEvent event = events.get(events.size() - 1);
                 user.setDutyType(DutyType.getTypeByCode(event.getEventType(), event.getEventCode()));

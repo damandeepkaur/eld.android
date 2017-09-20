@@ -4,6 +4,8 @@ package com.bsmwireless.data.network;
 import android.content.Context;
 
 import com.bsmwireless.common.Constants;
+import com.bsmwireless.common.utils.DateUtils;
+import com.bsmwireless.models.ELDEvent;
 import com.instacart.library.truetime.TrueTimeRx;
 
 import java.util.Date;
@@ -17,7 +19,7 @@ public final class NtpClientManager {
     private AtomicLong mRealTimeInMillisDiff;
 
     public NtpClientManager() {
-        mRealTimeInMillisDiff = new AtomicLong();
+        mRealTimeInMillisDiff = new AtomicLong(0);
         mTrueTimeRx = TrueTimeRx.build();
     }
 
@@ -25,7 +27,6 @@ public final class NtpClientManager {
         return mTrueTimeRx.withConnectionTimeout((int) Constants.CONNECTION_TIMEOUT)
                 .withRetryCount(Constants.SYNC_NTP_RETRY_COUNT)
                 .withSharedPreferences(context)
-                .withLoggingEnabled(true)
                 .initializeRx(Constants.NTP_POOL_SERVER);
     }
 

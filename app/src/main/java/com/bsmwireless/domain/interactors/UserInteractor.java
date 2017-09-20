@@ -97,7 +97,7 @@ public final class UserInteractor {
                     mAccountManager.setCurrentUser(user.getAuth().getDriverId(), accountName);
 
                     // get last 7 days events
-                    long current = System.currentTimeMillis();
+                    long current = DateUtils.currentTimeMillis();
                     long start = DateUtils.getStartDayTimeInMs(user.getTimezone(), current - MS_IN_WEEK);
                     long end = DateUtils.getEndDayTimeInMs(user.getTimezone(), current);
                     return mServiceApi.getELDEvents(start, end);
@@ -174,7 +174,7 @@ public final class UserInteractor {
                 })
                 .flatMap(user -> {
                     // get last 7 days events
-                    long current = System.currentTimeMillis();
+                    long current = DateUtils.currentTimeMillis();
                     long start = DateUtils.getStartDayTimeInMs(user.getTimezone(), current - MS_IN_WEEK);
                     long end = DateUtils.getEndDayTimeInMs(user.getTimezone(), current);
                     String token = user.getAuth().getToken();

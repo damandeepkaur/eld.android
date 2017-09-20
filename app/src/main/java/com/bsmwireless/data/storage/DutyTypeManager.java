@@ -3,6 +3,7 @@ package com.bsmwireless.data.storage;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 
+import com.bsmwireless.common.utils.DateUtils;
 import com.bsmwireless.widgets.alerts.DutyType;
 
 import java.util.ArrayList;
@@ -37,7 +38,7 @@ public final class DutyTypeManager {
     private PreferencesManager mPreferencesManager;
 
     private DutyType mDutyType = OFF_DUTY;
-    private long mStart = System.currentTimeMillis();
+    private long mStart = DateUtils.currentTimeMillis();
 
     private final ArrayList<DutyTypeListener> mListeners = new ArrayList<>();
 
@@ -90,7 +91,7 @@ public final class DutyTypeManager {
             dutyType = OFF_DUTY;
         }
 
-        long current = System.currentTimeMillis();
+        long current = DateUtils.currentTimeMillis();
 
         if (setTime) {
             setDutyTypeTime(mDutyType, (int) ((current - mStart) / MS_IN_SEC));
@@ -130,7 +131,7 @@ public final class DutyTypeManager {
         }
 
         if (mDutyType == dutyType) {
-            time += (System.currentTimeMillis() - mStart);
+            time += (DateUtils.currentTimeMillis() - mStart);
         }
 
         return time;

@@ -87,7 +87,7 @@ public final class EditEventPresenter extends BaseMenuPresenter {
         long eventTime = DateUtils.convertStringAMPMToTime(startTime, mEventDay, mTimezone);
         ELDEvent newEvent;
 
-        if (eventTime > System.currentTimeMillis()) {
+        if (eventTime > DateUtils.currentTimeMillis()) {
             mView.showError(EditEventView.Error.ERROR_INVALID_TIME);
             return;
         }

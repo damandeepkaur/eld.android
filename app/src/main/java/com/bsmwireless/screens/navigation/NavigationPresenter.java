@@ -129,7 +129,7 @@ public final class NavigationPresenter extends BaseMenuPresenter {
         mResetTimeDisposable.dispose();
         mResetTimeDisposable = getUserInteractor().getTimezone()
               .flatMap(timeZone -> {
-                  long current = System.currentTimeMillis();
+                  long current = DateUtils.currentTimeMillis();
                   time[0] = DateUtils.getStartDayTimeInMs(timeZone, current);
                   time[1] = DateUtils.getEndDayTimeInMs(timeZone, current);
 
@@ -196,7 +196,7 @@ public final class NavigationPresenter extends BaseMenuPresenter {
             }
         }
 
-        long[] times = DutyTypeManager.getDutyTypeTimes(new ArrayList<>(events), startOfDay, System.currentTimeMillis());
+        long[] times = DutyTypeManager.getDutyTypeTimes(new ArrayList<>(events), startOfDay, DateUtils.currentTimeMillis());
 
         getDutyTypeManager().setDutyTypeTime(
                 (int) (times[DutyType.ON_DUTY.ordinal()]),

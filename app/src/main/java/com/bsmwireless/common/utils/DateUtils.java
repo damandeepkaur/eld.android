@@ -3,6 +3,8 @@ package com.bsmwireless.common.utils;
 import android.content.Context;
 
 import com.bsmwireless.common.App;
+import com.bsmwireless.common.dagger.AppComponent;
+import com.bsmwireless.data.network.NtpClientManager;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -254,10 +256,21 @@ public class DateUtils {
     /**
      * @return real time which is sync with the ntp server
      */
-    public static Long currentTimeMillis() {
-        long realTimeInMilisecondsDiff = App.getComponent().ntpClientManager().getRealTimeInMillisDiff();
-        long realTimeInMiliseconds = System.currentTimeMillis() + realTimeInMilisecondsDiff;
-        return realTimeInMiliseconds;
+    public static long currentTimeMillis() {
+        AppComponent appComponent = App.getComponent();
+        if (appComponent == null) {
+            return System.currentTimeMillis();
+        }
+
+        NtpClientManager ntpClientManager = appComponent.ntpClientManager();
+        long realTimeInMillisecondsDiff = ntpClientManager.getRealTimeInMillisDiff();
+        // We shouldn't use ntp time if sync failed or not triggered
+        if (realTimeInMillisecondsDiff != 0) {
+            Date date = new Date(System.currentTimeMillis() + realTimeInMillisecondsDiff);
+            return date.getTime();
+        }
+
+        return System.currentTimeMillis();
     }
 
     public static String convertToFullTime(String timezone, Date date) {
@@ -265,5 +278,4 @@ public class DateUtils {
         dateFormat.setTimeZone(TimeZone.getTimeZone(timezone));
         return dateFormat.format(date);
     }
-
 }
