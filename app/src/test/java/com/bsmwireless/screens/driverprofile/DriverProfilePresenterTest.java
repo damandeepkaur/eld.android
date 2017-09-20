@@ -8,7 +8,6 @@ import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.data.storage.carriers.CarrierEntity;
 import com.bsmwireless.data.storage.hometerminals.HomeTerminalEntity;
 import com.bsmwireless.data.storage.users.FullUserEntity;
-import com.bsmwireless.data.storage.users.UserConverter;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
 import com.bsmwireless.domain.interactors.UserInteractor;
 
@@ -238,31 +237,6 @@ public class DriverProfilePresenterTest {
         // then
         verify(mView).showError(eq(DriverProfileView.Error.ERROR_SIGNATURE_LENGTH));
         assertTrue(mFakeFullUserEntity.getUserEntity().getSignature().length() <= MAX_SIGNATURE_LENGTH);  // check cropped
-    }
-
-    @Test
-    public void testOnSaveUserInfoNullUser() {
-        // given
-        setUserToNull();
-        when(mResources.getString(any(Integer.class))).thenReturn("mock resource string");
-
-        // when
-        mDriverProfilePresenter.onSaveUserInfo();
-
-        // then
-        verify(mView).showError(eq(DriverProfileView.Error.ERROR_INVALID_USER));
-    }
-
-    @Test
-    public void testOnSaveUserValidUser() {
-        // given
-        setUserToNotNull();
-
-        // when
-        mDriverProfilePresenter.onSaveUserInfo();
-
-        // then
-        verify(mView).setResults(eq(UserConverter.toUser(mFakeFullUserEntity.getUserEntity())));
     }
 
     @Test

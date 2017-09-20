@@ -76,7 +76,7 @@ public abstract class BaseMenuPresenter implements AccountManager.AccountListene
             Disposable disposable = Single.fromCallable(mUserInteractor::getFullUserNameSync)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(name -> getView().showCoDriverView(name));
+                    .subscribe(name -> getView().showCoDriverView(name), Timber::e);
             mDisposables.add(disposable);
         } else {
             getView().hideCoDriverView();
