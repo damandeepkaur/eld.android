@@ -27,7 +27,7 @@ public final class FullUserEntity {
     @Relation(parentColumn = "id",
               entityColumn = "user_id",
               entity = UserHomeTerminalEntity.class)
-    private List<UserHomeTerminalEntity> mHomeTerminalIds;
+    private List<UserHomeTerminalEntity> mHomeTerminalIdsEntity;
 
     @Relation(parentColumn = "id", entityColumn = "user_id", entity = ConfigurationEntity.class)
     private List<ConfigurationEntity> mConfigurationEntities;
@@ -56,13 +56,18 @@ public final class FullUserEntity {
         mCarriers = carriers;
     }
 
-    public void setHomeTerminalIds(List<UserHomeTerminalEntity> homeTerminalIds) {
-        mHomeTerminalIds = homeTerminalIds;
+
+    public void setHomeTerminalIdsEntity(List<UserHomeTerminalEntity> homeTerminalIds) {
+        mHomeTerminalIdsEntity = homeTerminalIds;
+    }
+
+    public List<UserHomeTerminalEntity> getHomeTerminalIdsEntity(){
+        return mHomeTerminalIdsEntity;
     }
 
     public List<Integer> getHomeTerminalIds() {
-        List<Integer> ids = new ArrayList<>(mHomeTerminalIds.size());
-        for (UserHomeTerminalEntity entity: mHomeTerminalIds) {
+        List<Integer> ids = new ArrayList<>(mHomeTerminalIdsEntity.size());
+        for (UserHomeTerminalEntity entity: mHomeTerminalIdsEntity) {
             ids.add(entity.getHomeTerminalId());
         }
         return ids;
