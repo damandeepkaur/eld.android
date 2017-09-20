@@ -62,7 +62,7 @@ public interface ELDEventDao {
      * @param malCode malfunction code. For non-malfunction event should be empty
      * @return latest ELD event
      */
-    @Query("SELECT * FROM events WHERE driverId = :driverId AND event_type = :type AND mal_code = :malCode ORDER BY event_time LIMIT 1")
+    @Query("SELECT * FROM events WHERE driverId = :driverId AND event_type = :type AND mal_code = :malCode ORDER BY event_time DESC LIMIT 1")
     Maybe<ELDEventEntity> getLatestEvent(int driverId, int type, String malCode);
 
     @Delete
