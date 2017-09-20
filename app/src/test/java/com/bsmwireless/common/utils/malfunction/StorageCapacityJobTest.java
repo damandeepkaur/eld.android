@@ -20,6 +20,7 @@ import io.reactivex.plugins.RxJavaPlugins;
 import io.reactivex.schedulers.Schedulers;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
@@ -66,9 +67,9 @@ public class StorageCapacityJobTest extends BaseTest {
         mStorageCapacityJob.start();
         mStorageCapacityJob.stop();
         verify(mELDEventsInteractor, never()).postNewELDEvent(any());
-        verify(mStorageUtil).getTotalSpace();
-        verify(mStorageUtil).getAvailableSpace();
-        verify(mSettingsManager).getFreeSpaceThreshold();
+        verify(mStorageUtil, atLeastOnce()).getTotalSpace();
+        verify(mStorageUtil, atLeastOnce()).getAvailableSpace();
+        verify(mSettingsManager, atLeastOnce()).getFreeSpaceThreshold();
     }
 
     @Test
@@ -90,8 +91,8 @@ public class StorageCapacityJobTest extends BaseTest {
         mStorageCapacityJob.start();
         mStorageCapacityJob.stop();
         verify(mELDEventsInteractor).postNewELDEvent(any());
-        verify(mStorageUtil).getTotalSpace();
-        verify(mStorageUtil).getAvailableSpace();
-        verify(mSettingsManager).getFreeSpaceThreshold();
+        verify(mStorageUtil, atLeastOnce()).getTotalSpace();
+        verify(mStorageUtil, atLeastOnce()).getAvailableSpace();
+        verify(mSettingsManager, atLeastOnce()).getFreeSpaceThreshold();
     }
 }

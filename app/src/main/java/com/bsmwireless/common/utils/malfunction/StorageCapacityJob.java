@@ -75,11 +75,8 @@ public class StorageCapacityJob extends BaseMalfunctionJob implements Malfunctio
     }
 
     private boolean isFreeSpaceEnough(){
-
         long storageFreeSpace = mStorageUtil.getAvailableSpace();
         long totalSpace = mStorageUtil.getTotalSpace();
-        System.out.println((double)totalSpace / storageFreeSpace);
-        System.out.println(mSettingsManager.getFreeSpaceThreshold());
         return ((double)storageFreeSpace / totalSpace) > mSettingsManager.getFreeSpaceThreshold();
     }
 }
