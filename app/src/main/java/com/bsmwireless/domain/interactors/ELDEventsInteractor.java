@@ -2,8 +2,6 @@ package com.bsmwireless.domain.interactors;
 
 import com.bsmwireless.common.Constants;
 import com.bsmwireless.data.network.RetrofitException;
-import com.bsmwireless.common.Constants;
-import com.bsmwireless.data.network.RetrofitException;
 import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.network.authenticator.TokenManager;
 import com.bsmwireless.data.storage.AccountManager;
@@ -181,17 +179,24 @@ public final class ELDEventsInteractor {
 
     /**
      * Returns the latest malfunction event with malfunction code
+     *
      * @param malfunction malfunction code
      * @return latest malfunction ELD event
      */
-    public Maybe<ELDEvent> getLatestMalfunctionEvent(Malfunction malfunction){
-        return mELDEventDao.getLatestEvent(ELDEvent.EventType.DATA_DIAGNOSTIC.getValue(), malfunction.getCode())
+    public Maybe<ELDEvent> getLatestMalfunctionEvent(Malfunction malfunction) {
+        return mELDEventDao
+                .getLatestEvent(mAccountManager.getCurrentUserId(),
+                        ELDEvent.EventType.DATA_DIAGNOSTIC.getValue(),
+                        malfunction.getCode())
                 .map(ELDEventConverter::toModel);
     }
 
     private Flowable<Integer> getMalfunctionCount(ELDEvent.MalfunctionCode code, String[] codes) {
-        return mELDEventDao.getMalfunctionEventCount(ELDEvent.EventType.DATA_DIAGNOSTIC.getValue(),
-                code.getCode(), codes);
+        return mELDEventDao
+                .getMalfunctionEventCount(mAccountManager.getCurrentUserId(),
+                        ELDEvent.EventType.DATA_DIAGNOSTIC.getValue(),
+                        code.getCode(),
+                        codes);
     }
 
     private ArrayList<ELDEvent> getEvents(DutyType dutyType, String comment) {
