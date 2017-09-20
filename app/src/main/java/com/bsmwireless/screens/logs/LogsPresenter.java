@@ -270,7 +270,7 @@ public final class LogsPresenter implements AccountManager.AccountListener {
                 }
                 model.setTrailers(mSelectedLogHeader.getTrailerIds());
 
-                if(mSelectedLogHeader.getHomeTerminal() != null) {
+                if (mSelectedLogHeader.getHomeTerminal() != null) {
                     model.setHomeTerminalAddress(mSelectedLogHeader.getHomeTerminal().getAddress());
                     model.setHomeTerminalName(mSelectedLogHeader.getHomeTerminal().getName());
                 }
