@@ -6,7 +6,7 @@ import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 
 @Entity(tableName = "user_home_terminal")
-public class UserHomeTerminalEntity {
+public final class UserHomeTerminalEntity {
 
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")
