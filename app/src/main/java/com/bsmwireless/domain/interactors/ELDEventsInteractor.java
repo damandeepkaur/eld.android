@@ -2,8 +2,6 @@ package com.bsmwireless.domain.interactors;
 
 import com.bsmwireless.common.Constants;
 import com.bsmwireless.data.network.RetrofitException;
-import com.bsmwireless.common.Constants;
-import com.bsmwireless.data.network.RetrofitException;
 import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.network.authenticator.TokenManager;
 import com.bsmwireless.data.storage.AccountManager;
@@ -289,6 +287,8 @@ public final class ELDEventsInteractor {
     private ELDEvent getEvent(BlackBoxModel blackBoxModel, boolean isAuto) {
         long currentTime = System.currentTimeMillis();
         int driverId = mAccountManager.getCurrentUserId();
+
+        ELDEvent.LatLngFlag latLngFlag;
 
         ELDEvent event = new ELDEvent();
         event.setEventTime(currentTime);
