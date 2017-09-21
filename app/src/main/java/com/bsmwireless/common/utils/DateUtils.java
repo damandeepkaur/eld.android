@@ -190,10 +190,8 @@ public class DateUtils {
      */
     public static long convertTimeToLogDay(TimeZone timeZone, long time) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeZone(timeZone);
-        calendar.setTimeInMillis(time);
-        String todayDate = dateFormat.format(calendar.getTime());
+        dateFormat.setTimeZone(timeZone);
+        String todayDate = dateFormat.format(time);
         return Long.parseLong(todayDate);
     }
 

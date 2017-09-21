@@ -4,13 +4,9 @@ import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
 
-import com.bsmwireless.data.storage.eldevents.ELDEventEntity;
-import com.bsmwireless.data.storage.users.UserEntity;
-
 import java.util.List;
 
 import io.reactivex.Flowable;
-import io.reactivex.Single;
 
 import static android.arch.persistence.room.OnConflictStrategy.REPLACE;
 

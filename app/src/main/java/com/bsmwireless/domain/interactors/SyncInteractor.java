@@ -193,7 +193,7 @@ public final class SyncInteractor {
                         )
                         .filter(logSheetEntity -> logSheetEntity.getSync() == LogSheetEntity.SyncType.SYNC.ordinal())
                         .doOnNext(logSheetEntity -> mLogSheetDao.insert(logSheetEntity))
-                        .subscribe(logSheetEntity -> Timber.d("Sync LogSheetHeaders: " + LogSheetConverter.toModel(logSheetEntity)),
+                        .subscribe(logSheetEntity -> Timber.d("Sync LogSheetHeader: " + LogSheetConverter.toModel(logSheetEntity)),
                                 Timber::e));
     }
 
