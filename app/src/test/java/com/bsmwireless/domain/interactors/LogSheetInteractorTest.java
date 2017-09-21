@@ -1,15 +1,15 @@
 package com.bsmwireless.domain.interactors;
 
-import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.data.storage.hometerminals.HomeTerminalDao;
 import com.bsmwireless.data.storage.hometerminals.HomeTerminalEntity;
+import com.bsmwireless.data.storage.logsheets.LogSheetDao;
+import com.bsmwireless.data.storage.logsheets.LogSheetEntity;
 import com.bsmwireless.data.storage.users.UserDao;
 import com.bsmwireless.data.storage.users.UserEntity;
 import com.bsmwireless.models.LogSheetHeader;
-import com.bsmwireless.models.ResponseMessage;
 
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -23,9 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import app.bsmuniversal.com.RxSchedulerRule;
-import io.reactivex.Observable;
-import io.reactivex.Single;
-import io.reactivex.observers.TestObserver;
+import io.reactivex.Flowable;
 import io.reactivex.subscribers.TestSubscriber;
 
 import static org.mockito.Matchers.any;
@@ -40,13 +38,8 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class LogSheetInteractorTest {
 
-    private static final String SUCCESS = "ACK"; // from API specs
-
     @ClassRule
     public static final RxSchedulerRule RULE = new RxSchedulerRule();
-
-    @Mock
-    ServiceApi mServiceApi;
 
     @Mock
     PreferencesManager mPreferencesManager;
@@ -63,6 +56,9 @@ public class LogSheetInteractorTest {
     @Mock
     AccountManager mAccountManager;
 
+    @Mock
+    LogSheetDao mLogSheetDao;
+
 
     private LogSheetInteractor mLogSheetInteractor;
 
@@ -70,84 +66,29 @@ public class LogSheetInteractorTest {
     public void before() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        mLogSheetInteractor = new LogSheetInteractor(mServiceApi, mPreferencesManager, mAppDatabase, mAccountManager);
+        when(mAppDatabase.logSheetDao()).thenReturn(mLogSheetDao);
+
+        mLogSheetInteractor = new LogSheetInteractor(mPreferencesManager, mAppDatabase, mAccountManager);
     }
 
     @Test
-    public void testGetLogSheetHeadersApiCall() {
+    public void testGetLogSheetHeaders() {
         // given
         final Long startLogDay = 1503014401L; // validity of date doesn't matter for these tests
         final Long endLogDay = 1503100801L; // validity of date doesn't matter for these tests
 
-        final LogSheetHeader[] logSheets = {new LogSheetHeader(), new LogSheetHeader()};
-        final List<LogSheetHeader> logHeaderList = Arrays.asList(logSheets);
+        final LogSheetEntity[] logSheets = {new LogSheetEntity(), new LogSheetEntity()};
+        final List<LogSheetEntity> logHeaderList = Arrays.asList(logSheets);
 
         TestSubscriber<List<LogSheetHeader>> testSubscriber = TestSubscriber.create();
 
-        when(mServiceApi.getLogSheets(any(Long.class), any(Long.class))).thenReturn(Observable.just(logHeaderList));
+        when(mLogSheetDao.getLogSheets(any(Long.class), any(Long.class), anyInt())).thenReturn(Flowable.just(logHeaderList));
 
         // when
         mLogSheetInteractor.getLogSheetHeaders(startLogDay, endLogDay).subscribe(testSubscriber);
 
         // then
-        verify(mServiceApi).getLogSheets(eq(startLogDay), eq(endLogDay));
-    }
-
-    @Test
-    public void testUpdateLogSheetHeaderApiSuccess() {
-        // given
-        LogSheetHeader logSheetHeader = new LogSheetHeader();
-
-        TestObserver<Boolean> testObserver = TestObserver.create();
-
-        when(mServiceApi.updateLogSheetHeader(any(LogSheetHeader.class))).thenReturn(Single.just(getSuccessResponse()));
-
-
-        // when
-        mLogSheetInteractor.updateLogSheetHeader(logSheetHeader).subscribe(testObserver);
-
-        // then
-        verify(mServiceApi).updateLogSheetHeader(eq(logSheetHeader));
-        testObserver.assertResult(true);
-    }
-
-    /**
-     * Tests when API returns 200 code with unexpected response (!= "ACK")
-     */
-    @Test
-    public void testUpdateLogSheetHeaderApiBug() {
-        // given
-        LogSheetHeader logSheetHeader = new LogSheetHeader();
-
-        String unexpectedMessage = "this is not ACK";
-        ResponseMessage wrongResponse = buildResponseMessage(unexpectedMessage);
-
-        TestObserver<Boolean> testObserver = TestObserver.create();
-
-        when(mServiceApi.updateLogSheetHeader(any(LogSheetHeader.class))).thenReturn(Single.just(wrongResponse));
-
-        // when
-        mLogSheetInteractor.updateLogSheetHeader(logSheetHeader).subscribe(testObserver);
-
-        // then
-        testObserver.assertResult(false);
-    }
-
-    @Test
-    public void testUpdateLogSheetHeaderApiError() {
-        // given
-        LogSheetHeader logSheetHeader = new LogSheetHeader();
-        String fakeErrorMessage = "busted";
-
-        TestObserver<Boolean> testObserver = TestObserver.create();
-
-        when(mServiceApi.updateLogSheetHeader(any(LogSheetHeader.class))).thenReturn(Single.error(new RuntimeException(fakeErrorMessage)));
-
-        // when
-        mLogSheetInteractor.updateLogSheetHeader(logSheetHeader).subscribe(testObserver);
-
-        // then
-        testObserver.assertErrorMessage(fakeErrorMessage);
+        verify(mLogSheetDao).getLogSheets(eq(startLogDay), eq(endLogDay), anyInt());
     }
 
     @Test
@@ -173,10 +114,9 @@ public class LogSheetInteractorTest {
         when(mAppDatabase.homeTerminalDao()).thenReturn(mHomeTerminalDao);
         when(mHomeTerminalDao.getHomeTerminalSync(any(Integer.class))).thenReturn(fakeHomeTerminalentity);
 
-        TestObserver<LogSheetHeader> testObserver = TestObserver.create();
 
         // when
-        mLogSheetInteractor.createLogSheetHeader(startLogDay).subscribe(testObserver);
+        LogSheetHeader result = mLogSheetInteractor.createLogSheetHeaderModel(startLogDay);
 
         // then
         verify(mAccountManager).getCurrentDriverId();
@@ -187,30 +127,5 @@ public class LogSheetInteractorTest {
 
         // TODO: add more once LogSheetInteractor#createLogSheetHeader is completed
     }
-
-
-
-    /**
-     * Produces a ResponseMessage that imitates API call success.
-     *
-     * @return success ResponseMessage
-     */
-    private ResponseMessage getSuccessResponse() {
-        return buildResponseMessage(SUCCESS);
-    }
-
-    /**
-     * Produces a ResponseMessage with a given message.
-     *
-     * @param message a message
-     * @return a ResponseMessage with a given message
-     */
-    private ResponseMessage buildResponseMessage(String message) {
-        ResponseMessage response = new ResponseMessage();
-        response.setMessage(message);
-        return response;
-    }
-
-
 
 }

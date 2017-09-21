@@ -96,9 +96,6 @@ public class BlackBoxParserTest {
         }
     }
 
-//    private byte[] buildAckBody(int packetId, String vin) {
-//
-//    }
 
     @Test
     public void testVinToBytes() {
@@ -154,6 +151,12 @@ public class BlackBoxParserTest {
     }
 
 
+    /**
+     * Prints a raw string representation of a box command.
+     *
+     * @param boxCommand
+     * @return
+     */
     private String boxToString(byte[] boxCommand) {
         StringBuilder dataStr = new StringBuilder();
 
@@ -164,6 +167,12 @@ public class BlackBoxParserTest {
         return dataStr.toString();
     }
 
+    /**
+     * Produces a human-readable string for a box command.
+     *
+     * @param boxCommand
+     * @return
+     */
     private String boxToDebugHexString(byte[] boxCommand) {
         StringBuilder hexStr = new StringBuilder();
 
@@ -174,6 +183,12 @@ public class BlackBoxParserTest {
         return hexStr.toString();
     }
 
+    /**
+     * Produces a compact hex string for a box command.
+     *
+     * @param boxCommand
+     * @return
+     */
     private String boxToCompactHexString(byte[] boxCommand) {
         StringBuilder hexStr = new StringBuilder();
 
@@ -184,6 +199,12 @@ public class BlackBoxParserTest {
         return hexStr.toString();
     }
 
+    /**
+     * Produces escaped hex string for a box command.
+     *
+     * @param boxCommand
+     * @return
+     */
     private String boxToEscapedHexString(byte[] boxCommand) {
         StringBuilder hexStr = new StringBuilder();
 
@@ -192,6 +213,21 @@ public class BlackBoxParserTest {
         }
 
         return hexStr.toString();
+    }
+
+    /**
+     * Calculates checksum for black box.
+     *
+     * @param bytes
+     * @param start
+     * @return
+     */
+    private byte checksum(byte[] bytes, int start) {
+        byte sum = 0;
+        for (int i=start; i<bytes.length; i++) {
+            sum ^= bytes[i];
+        }
+        return sum;
     }
 
 

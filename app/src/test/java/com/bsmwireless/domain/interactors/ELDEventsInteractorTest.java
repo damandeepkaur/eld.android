@@ -83,6 +83,9 @@ public class ELDEventsInteractorTest {
     @Mock
     private TokenManager mTokenManager;
 
+    @Mock
+    private LogSheetInteractor mLogSheetInteractor;
+
 
     private ELDEventsInteractor mEldEventsInteractor;
 
@@ -96,7 +99,7 @@ public class ELDEventsInteractorTest {
 
         mEldEventsInteractor = new ELDEventsInteractor(mServiceApi, mPreferencesManager,
                 mAppDatabase, mUserInteractor, mBlackBoxInteractor, mDutyTypeManager,
-                mAccountManager, mTokenManager);
+                mAccountManager, mTokenManager, mLogSheetInteractor);
 
     }
 
