@@ -18,6 +18,7 @@ public class ELDEventConverter {
             event.setStatus(entity.getStatus());
             event.setOrigin(entity.getOrigin());
             event.setEventTime(entity.getEventTime());
+            event.setLogSheet(entity.getLogSheet());
             event.setOdometer(entity.getOdometer());
             event.setEngineHours(entity.getEngineHours());
             event.setLat(entity.getLat());
@@ -56,6 +57,7 @@ public class ELDEventConverter {
             entity.setStatus(event.getStatus());
             entity.setOrigin(event.getOrigin());
             entity.setEventTime(event.getEventTime());
+            entity.setLogSheet(event.getLogSheet());
             entity.setOdometer(event.getOdometer());
             entity.setEngineHours(event.getEngineHours());
             entity.setLat(event.getLat());
