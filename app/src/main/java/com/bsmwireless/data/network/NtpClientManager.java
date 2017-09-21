@@ -43,4 +43,8 @@ public final class NtpClientManager {
     public long getRealTimeInMillisDiff() {
         return mRealTimeInMillisDiff.get();
     }
+
+    public void resetRealTimeInMillisDiff() {
+        mRealTimeInMillisDiff.set(0);
+    }
 }

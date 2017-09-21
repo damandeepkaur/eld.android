@@ -28,6 +28,7 @@ public final class SyncNtpJobService extends JobService {
                         },
                         throwable -> {
                             Timber.e("Something went wrong when trying to initializeRx TrueTime: %s", throwable);
+                            NtpClientManager.resetRealTimeInMillisDiff();
                             jobFinished(params, false);
                         });
         return true;
