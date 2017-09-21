@@ -62,6 +62,12 @@ abstract class BaseMalfunctionJob {
         observer.onNext(event);
     }
 
+    protected void switchToDefaultDiagnosticCleared(Observer<? super ELDEvent> observer){
+        ELDEvent event = getELDEventsInteractor().getEvent(getDutyTypeManager().getDutyType());
+        event.setEventCode(ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED.getCode());
+        observer.onNext(event);
+    }
+
     @NonNull
     protected ELDEvent createEvent(Malfunction malfunction, ELDEvent.MalfunctionCode malfunctionCode) {
         ELDEvent eldEvent = mELDEventsInteractor.getEvent(mDutyTypeManager.getDutyType());

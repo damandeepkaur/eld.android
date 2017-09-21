@@ -9,6 +9,7 @@ import java.util.List;
 
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
+import io.reactivex.Single;
 
 import static android.arch.persistence.room.OnConflictStrategy.REPLACE;
 
@@ -73,6 +74,9 @@ public interface ELDEventDao {
      */
     @Query("SELECT * FROM events WHERE event_type = :type and mal_code = :malCode ORDER BY event_time LIMIT 1")
     ELDEventEntity getLatestEventSync(int type, String malCode);
+
+    @Query("SELECT count(id) FROM events WHERE driver_id = :driverId AND latlng_code IN (:latLngCode)")
+    Single<Integer> getCountForChangingLocationEvent(int driverId, String[] latLngCode);
 
     @Delete
     void delete(ELDEventEntity event);

@@ -75,14 +75,14 @@ public final class SynchronizationJob extends BaseMalfunctionJob implements Malf
      */
     private boolean isStateAndEventAreDifferent(SynchResult synchResult) {
 
-        if (ELDEvent.MalfunctionCode.DIAGNOSTIC_LOGGED.getCode() == synchResult.mELDEvent.getEventCode()) {
-            return synchResult.mBlackBoxModel.getSensorState(BlackBoxSensorState.ECM_CABLE)
-                    && synchResult.mBlackBoxModel.getSensorState(BlackBoxSensorState.ECM_SYNC);
-        } else if (ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED.getCode() == synchResult.mELDEvent.getEventCode()) {
-            return !synchResult.mBlackBoxModel.getSensorState(BlackBoxSensorState.ECM_CABLE)
-                    || !synchResult.mBlackBoxModel.getSensorState(BlackBoxSensorState.ECM_SYNC);
+        boolean isEcmOk = synchResult.mBlackBoxModel.getSensorState(BlackBoxSensorState.ECM_CABLE)
+                && synchResult.mBlackBoxModel.getSensorState(BlackBoxSensorState.ECM_SYNC);
+
+        if (isEcmOk) {
+            return ELDEvent.MalfunctionCode.DIAGNOSTIC_LOGGED.getCode() == synchResult.mELDEvent.getEventCode();
+        } else {
+            return ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED.getCode() == synchResult.mELDEvent.getEventCode();
         }
-        return true;
     }
 
     private final static class SynchResult {

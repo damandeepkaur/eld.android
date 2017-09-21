@@ -178,6 +178,7 @@ public final class ELDEventsInteractor {
                         (loggedCount, clearedCount) -> loggedCount > clearedCount);
     }
 
+
     /**
      * Returns the latest malfunction event with malfunction code
      *
@@ -191,6 +192,15 @@ public final class ELDEventsInteractor {
                         malfunction.getCode())
                 .map(ELDEventConverter::toModel);
     }
+
+    public Single<Boolean> isLocationUpdateEventExists(){
+        // FIXME: 21.09.2017 Need to exclude events for which modified events with updated coordinates are exist
+        return mELDEventDao
+                .getCountForChangingLocationEvent(mAccountManager.getCurrentUserId(),
+                        new String[] {ELDEvent.LatLngFlag.FLAG_E.getCode(), ELDEvent.LatLngFlag.FLAG_X.getCode()})
+                .map(count -> count != 0);
+    }
+
 
     private Flowable<Integer> getMalfunctionCount(ELDEvent.MalfunctionCode code, String[] codes) {
         return mELDEventDao

@@ -3,6 +3,7 @@ package com.bsmwireless.common.dagger;
 import com.bsmwireless.common.utils.SettingsManager;
 import com.bsmwireless.common.utils.StorageUtil;
 import com.bsmwireless.common.utils.malfunction.MalfunctionJob;
+import com.bsmwireless.common.utils.malfunction.MissingDataJob;
 import com.bsmwireless.common.utils.malfunction.StorageCapacityJob;
 import com.bsmwireless.common.utils.malfunction.SynchronizationJob;
 import com.bsmwireless.common.utils.malfunction.TimingJob;
@@ -18,7 +19,13 @@ import dagger.Module;
 import dagger.Provides;
 
 @Module
-public class MalfunctionModule {
+public final class MalfunctionModule {
+
+    @Provides
+    static MissingDataJob missingDataJob(ELDEventsInteractor eldEventsInteractor,
+                                         DutyTypeManager dutyTypeManager){
+        return new MissingDataJob(eldEventsInteractor, dutyTypeManager);
+    }
 
     @Provides
     static TimingJob timingJob(ELDEventsInteractor eldEventsInteractor,
@@ -46,7 +53,8 @@ public class MalfunctionModule {
     @Provides
     static List<MalfunctionJob> provideJobs(SynchronizationJob synchronizationJob,
                                             TimingJob timingJob,
-                                            StorageCapacityJob storageCapacityJob){
-        return Arrays.asList(synchronizationJob, timingJob, storageCapacityJob);
+                                            StorageCapacityJob storageCapacityJob,
+                                            MissingDataJob missingDataJob){
+        return Arrays.asList(synchronizationJob, timingJob, storageCapacityJob, missingDataJob);
     }
 }
