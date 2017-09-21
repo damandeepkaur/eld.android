@@ -65,6 +65,15 @@ public interface ELDEventDao {
     @Query("SELECT * FROM events WHERE event_type = :type and mal_code = :malCode ORDER BY event_time LIMIT 1")
     Maybe<ELDEventEntity> getLatestEvent(int type, String malCode);
 
+    /**
+     * Returns the latest event from a database
+     * @param type event type
+     * @param malCode malfunction code. For non-malfunction event should be empty
+     * @return latest ELD event
+     */
+    @Query("SELECT * FROM events WHERE event_type = :type and mal_code = :malCode ORDER BY event_time LIMIT 1")
+    ELDEventEntity getLatestEventSync(int type, String malCode);
+
     @Delete
     void delete(ELDEventEntity event);
 

@@ -402,6 +402,10 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
         this.mLng = lng;
     }
 
+    public void setLatLngFlag(LatLngFlag latLngFlag) {
+        mLatLngFlag = latLngFlag;
+    }
+
     public Integer getDistance() {
         return mDistance;
     }

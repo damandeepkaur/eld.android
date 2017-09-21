@@ -13,6 +13,7 @@ import com.bsmwireless.data.storage.eldevents.ELDEventDao;
 import com.bsmwireless.data.storage.eldevents.ELDEventEntity;
 import com.bsmwireless.data.storage.users.UserDao;
 import com.bsmwireless.models.BlackBoxModel;
+import com.bsmwireless.models.BlackBoxSensorState;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.Malfunction;
 import com.bsmwireless.models.ResponseMessage;
@@ -288,13 +289,12 @@ public final class ELDEventsInteractor {
         long currentTime = System.currentTimeMillis();
         int driverId = mAccountManager.getCurrentUserId();
 
-        ELDEvent.LatLngFlag latLngFlag;
-
         ELDEvent event = new ELDEvent();
         event.setEventTime(currentTime);
         event.setEngineHours(blackBoxModel.getEngineHours());
         event.setLat(blackBoxModel.getLat());
         event.setLng(blackBoxModel.getLon());
+        event.setLatLngFlag(getLatLngFlag(blackBoxModel));
         event.setLocation("");
         event.setDistance(0);
         event.setMalfunction(false);
@@ -307,6 +307,24 @@ public final class ELDEventsInteractor {
         event.setOrigin(isAuto ? ELDEvent.EventOrigin.AUTOMATIC_RECORD.getValue() : ELDEvent.EventOrigin.DRIVER.getValue());
 
         return event;
+    }
+
+    private ELDEvent.LatLngFlag getLatLngFlag(BlackBoxModel blackBoxModel){
+        ELDEventEntity latestEvent = mELDEventDao.getLatestEventSync(
+                ELDEvent.EventType.DATA_DIAGNOSTIC.getValue(),
+                Malfunction.POSITIONING_COMPLIANCE.getCode());
+
+        ELDEvent.LatLngFlag latLngFlag;
+
+        if (latestEvent != null &&
+                latestEvent.getEventType() == ELDEvent.MalfunctionCode.DIAGNOSTIC_LOGGED.getCode()) {
+            latLngFlag = ELDEvent.LatLngFlag.FLAG_E;
+        } else if (!blackBoxModel.getSensorState(BlackBoxSensorState.GPS)) {
+            latLngFlag = ELDEvent.LatLngFlag.FLAG_X;
+        } else {
+            latLngFlag = ELDEvent.LatLngFlag.FLAG_NONE;
+        }
+        return latLngFlag;
     }
 
     private BlackBoxModel getBlackBoxState(boolean isInPersonalUse) {
