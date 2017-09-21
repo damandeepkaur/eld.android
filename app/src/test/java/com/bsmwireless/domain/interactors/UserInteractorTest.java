@@ -155,6 +155,9 @@ public class UserInteractorTest {
     @Mock
     AccountManager mAccountManager;
 
+    @Mock
+    SyncInteractor mSyncInteractor;
+
 
     private UserInteractor mLoginUserInteractor;
 
@@ -166,7 +169,7 @@ public class UserInteractorTest {
         MockitoAnnotations.initMocks(this);
 
 
-        mLoginUserInteractor = new UserInteractor(mServiceApi, mPreferencesManager, mAppDatabase, mTokenManager, mAccountManager);
+        mLoginUserInteractor = new UserInteractor(mServiceApi, mPreferencesManager, mAppDatabase, mTokenManager, mAccountManager, mSyncInteractor);
     }
 
     /**

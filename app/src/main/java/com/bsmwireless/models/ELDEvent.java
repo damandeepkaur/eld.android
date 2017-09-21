@@ -131,6 +131,9 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
     @SerializedName("eventTime")
     @Expose
     private Long mEventTime;
+    @SerializedName("logsheet")
+    @Expose
+    private Long mLogSheet;
     @SerializedName("odometer")
     @Expose
     private Integer mOdometer;
@@ -212,6 +215,10 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
         notNull = in.readByte() == 1;
         if (notNull) {
             this.mEventTime = in.readLong();
+        }
+        notNull = in.readByte() == 1;
+        if (notNull) {
+            this.mLogSheet = in.readLong();
         }
         notNull = in.readByte() == 1;
         if (notNull) {
@@ -335,8 +342,12 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
         mEventTime = eventTime;
     }
 
-    public void setEventCode(Long eventTime) {
-        this.mEventTime = eventTime;
+    public Long getLogSheet() {
+        return mLogSheet;
+    }
+
+    public void setLogSheet(Long logSheet) {
+        mLogSheet = logSheet;
     }
 
     public Integer getOdometer() {
@@ -527,6 +538,7 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
                 .append(mEventType, rhs.mEventType)
                 .append(mEventCode, rhs.mEventCode)
                 .append(mEventTime, rhs.mEventTime)
+                .append(mLogSheet, rhs.mLogSheet)
                 .append(mOdometer, rhs.mOdometer)
                 .append(mEngineHours, rhs.mEngineHours)
                 .append(mLat, rhs.mLat)
@@ -558,6 +570,7 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
                 .append(mEventType)
                 .append(mEventCode)
                 .append(mEventTime)
+                .append(mLogSheet)
                 .append(mOdometer)
                 .append(mEngineHours)
                 .append(mLat)
@@ -611,6 +624,11 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
         dest.writeByte(this.mEventTime == null ? (byte) 0 : 1);
         if (this.mEventTime != null) {
             dest.writeLong(this.mEventTime);
+        }
+
+        dest.writeByte(this.mLogSheet == null ? (byte) 0 : 1);
+        if (this.mLogSheet != null) {
+            dest.writeLong(this.mLogSheet);
         }
 
         dest.writeByte(this.mOdometer == null ? (byte) 0 : 1);
@@ -744,6 +762,7 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
         sb.append(", mStatus=").append(mStatus);
         sb.append(", mOrigin=").append(mOrigin);
         sb.append(", mEventTime=").append(mEventTime);
+        sb.append(", mLogSheet=").append(mLogSheet);
         sb.append(", mOdometer=").append(mOdometer);
         sb.append(", mEngineHours=").append(mEngineHours);
         sb.append(", mLat=").append(mLat);
