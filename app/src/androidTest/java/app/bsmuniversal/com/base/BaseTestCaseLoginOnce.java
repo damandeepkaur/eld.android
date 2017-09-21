@@ -18,7 +18,7 @@ import app.bsmuniversal.com.pages.SelectAssetPage;
 import app.bsmuniversal.com.utils.Users;
 
 /**
- * Base class for general purpose tests in case when uset should be logged in once for all test
+ * Base class for general purpose tests in case when user should be logged in once for all test
  */
 public class BaseTestCaseLoginOnce extends BaseTestClass {
 
@@ -53,7 +53,7 @@ public class BaseTestCaseLoginOnce extends BaseTestClass {
     public static void logoutAfter() {
         if (loggedIn) {
             if (getCurrentActivity() == null) {
-                launchActivity();
+                launchLoginActivity();
             }
             logout();
             wait_for_view(REQUEST_TIMEOUT, LoginLocators.execute_login);
@@ -62,7 +62,7 @@ public class BaseTestCaseLoginOnce extends BaseTestClass {
         activeUser = null;
     }
 
-    private static void launchActivity() {
+    private static void launchLoginActivity() {
         ActivityTestRule<LoginActivity> loginActivityTestRule = new ActivityTestRule<>(LoginActivity.class);
         loginActivityTestRule.launchActivity(new Intent());
         wait_for_view(REQUEST_TIMEOUT, DrawerLocators.navigation_drawer);
