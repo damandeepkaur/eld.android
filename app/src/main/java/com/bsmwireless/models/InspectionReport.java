@@ -11,7 +11,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.util.List;
 
-public class InspectionReport implements Parcelable {
+public final class InspectionReport implements Parcelable {
 
     @SerializedName("inspections")
     @Expose

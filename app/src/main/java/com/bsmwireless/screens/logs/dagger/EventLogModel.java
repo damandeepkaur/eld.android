@@ -4,7 +4,7 @@ import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.widgets.alerts.DutyType;
 
-public class EventLogModel implements DutyTypeManager.DutyTypeCheckable {
+public final class EventLogModel implements DutyTypeManager.DutyTypeCheckable {
 
     private ELDEvent mEvent;
     private Long mDuration;

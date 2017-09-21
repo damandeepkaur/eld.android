@@ -21,7 +21,7 @@ import static com.bsmwireless.data.network.authenticator.BsmAuthenticator.ACCOUN
  */
 
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-public class VerifyTokenScheduler extends JobService {
+public final class VerifyTokenScheduler extends JobService {
     @Inject
     TokenManager mTokenManager;
 

@@ -8,7 +8,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.util.Date;
 
-public class BlackBoxModel {
+public final class BlackBoxModel {
     private int mOdometer;
     private double mLat;
     private double mLon;

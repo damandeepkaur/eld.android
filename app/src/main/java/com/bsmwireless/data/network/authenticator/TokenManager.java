@@ -21,12 +21,12 @@ import javax.inject.Inject;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+import retrofit2.http.HEAD;
 import timber.log.Timber;
 
-import static android.R.attr.accountType;
 import static com.bsmwireless.screens.autologout.AutoDutyDialogActivity.EXTRA_TOKEN_EXPIRED;
 
-public class TokenManager {
+public final class TokenManager {
     private final Context mContext;
     private TokenExpirationHandler mTokenExpirationHandler;
 

@@ -3,7 +3,6 @@ package com.bsmwireless.common;
 import com.bsmwireless.models.Malfunction;
 
 import java.util.concurrent.TimeUnit;
-
 import java.util.regex.Pattern;
 
 public interface Constants {
@@ -29,6 +28,7 @@ public interface Constants {
 
     Pattern COMMENT_VALIDATE_PATTERN = Pattern.compile("[^A-Za-z0-9`!@#$%^&* ()_\\-+=\\[\\]\\\\/?><.,;:'|\"{}~]", Pattern.CASE_INSENSITIVE);
 
+    @SuppressWarnings("PublicStaticArrayField")
     String[] MALFUNCTION_CODES = new String[]{
             Malfunction.POWER_COMPLIANCE.getCode(),
             Malfunction.ENGINE_SYNCHRONIZATION_COMPLIANCE.getCode(),
@@ -39,6 +39,7 @@ public interface Constants {
             Malfunction.OTHER_COMPLIANCE.getCode()
     };
 
+    @SuppressWarnings("PublicStaticArrayField")
     String[] DIAGNOSTIC_CODES = new String[]{
             Malfunction.POWER_DATA_DIAGNOSTIC.getCode(),
             Malfunction.ENGINE_SYNCHRONIZATION.getCode(),

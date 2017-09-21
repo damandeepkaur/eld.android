@@ -17,7 +17,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import app.bsmuniversal.com.RxSchedulerRule;
 import io.reactivex.Flowable;
@@ -34,7 +34,7 @@ import static org.mockito.Mockito.when;
  * Tests for NavigationPresenter.
  */
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class NavigationPresenterTest {
 
     @ClassRule
@@ -154,37 +154,4 @@ public class NavigationPresenterTest {
         verify(mView).setBoxId(eq(boxId));
         verify(mView).setAssetsNumber(eq(assetNumber));
     }
-
-    /**
-     * Test API call to update user.
-     */
-    @Test
-    public void testOnUserUpdated() {
-        // given
-        User user = new User();
-        user.setId(0);
-
-        when(mUserInteractor.getUserFromDBSync(user.getId())).thenReturn(UserConverter.toEntity(user));
-        when(mUserInteractor.syncDriverProfile(any(UserEntity.class))).thenReturn(Observable.just(true)); // prevent null pointer exception
-
-        // when
-        mNavigationPresenter.onUserUpdated(user);
-
-        // then
-        verify(mUserInteractor).getUserFromDBSync(eq(user.getId()));
-        verify(mUserInteractor).syncDriverProfile(any(UserEntity.class));
-    }
-
-    @Test
-    public void testOnUserUpdatedNullUser() {
-        // given
-        // n/a
-
-        // when
-        mNavigationPresenter.onUserUpdated(null);
-
-        // then
-        verify(mUserInteractor, never()).syncDriverProfile(any(UserEntity.class));
-    }
-
 }

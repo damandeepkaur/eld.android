@@ -19,7 +19,7 @@ import app.bsmuniversal.com.R;
 
 import static com.bsmwireless.common.utils.DateUtils.MS_IN_MIN;
 
-public class AutoDutyDialogActivity extends BaseActivity implements AutoDutyDialogView {
+public final class AutoDutyDialogActivity extends BaseActivity implements AutoDutyDialogView {
 
     private static final String TAG = AutoDutyDialogActivity.class.getSimpleName();
 
@@ -48,8 +48,17 @@ public class AutoDutyDialogActivity extends BaseActivity implements AutoDutyDial
 
         DaggerAutoLogoutComponent.builder().appComponent(App.getComponent()).autoLogoutModule(new AutoLogoutModule(this)).build().inject(this);
 
-        Intent intent = getIntent();
+        checkIntent(getIntent());
+    }
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+
+        checkIntent(intent);
+    }
+
+    private void checkIntent(Intent intent) {
         if (intent != null) {
             if (intent.hasExtra(EXTRA_AUTO_LOGOUT)) {
                 showAutoLogoutDialog();

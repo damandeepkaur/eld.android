@@ -80,7 +80,8 @@
         <activity
             android:name="com.bsmwireless.screens.lockscreen.LockScreenActivity"/>
 
-        <service android:name="com.bsmwireless.data.network.authenticator.BsmAuthenticatorService">
+        <service android:name="com.bsmwireless.data.network.authenticator.BsmAuthenticatorService"
+            android:exported="false">
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator"/>
             </intent-filter>

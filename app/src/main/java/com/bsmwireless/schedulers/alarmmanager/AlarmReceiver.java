@@ -9,7 +9,7 @@ import timber.log.Timber;
 import static com.bsmwireless.data.network.authenticator.BsmAuthenticator.ACCOUNT_NAME;
 import static com.bsmwireless.data.network.authenticator.BsmAuthenticator.ACCOUNT_TYPE;
 
-public class AlarmReceiver extends WakefulBroadcastReceiver {
+public final class AlarmReceiver extends WakefulBroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {

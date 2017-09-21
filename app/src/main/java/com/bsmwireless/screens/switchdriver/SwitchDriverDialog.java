@@ -29,7 +29,7 @@ import app.bsmuniversal.com.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class SwitchDriverDialog implements SwitchDriverView, DriverDialog {
+public final class SwitchDriverDialog implements SwitchDriverView, DriverDialog {
 
     private Context mContext;
 
@@ -368,7 +368,7 @@ public class SwitchDriverDialog implements SwitchDriverView, DriverDialog {
         mDialog.show();
     }
 
-    public static class UserModel {
+    public static final class UserModel {
         private UserEntity mUser;
         private DutyType mDutyType;
 

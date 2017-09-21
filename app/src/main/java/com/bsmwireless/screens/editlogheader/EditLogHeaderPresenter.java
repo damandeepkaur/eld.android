@@ -14,7 +14,7 @@ import javax.inject.Inject;
 import timber.log.Timber;
 
 @ActivityScope
-public class EditLogHeaderPresenter extends BaseMenuPresenter {
+public final class EditLogHeaderPresenter extends BaseMenuPresenter {
 
     private EditLogHeaderView mView;
     private LogHeaderModel mLogHeaderModel;

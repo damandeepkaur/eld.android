@@ -79,7 +79,7 @@ public final class MonitoringServicePresenter {
                 (result.dutyType != DutyType.PERSONAL_USE && result.dutyType != DutyType.YARD_MOVES);
     }
 
-    private final class DutyManagerObservable extends Observable<DutyType> {
+    private static final class DutyManagerObservable extends Observable<DutyType> {
 
         private final DutyTypeManager manager;
 

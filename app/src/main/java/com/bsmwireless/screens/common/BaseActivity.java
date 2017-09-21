@@ -19,6 +19,7 @@ public abstract class BaseActivity extends AppCompatActivity{
     private boolean mDoBind = true;
     boolean mIsBound = false;
 
+    @SuppressWarnings("DesignForExtension")
     @Override
     protected void onStart() {
         super.onStart();
@@ -28,6 +29,7 @@ public abstract class BaseActivity extends AppCompatActivity{
         }
     }
 
+    @SuppressWarnings("DesignForExtension")
     @Override
     protected void onStop() {
         super.onStop();
@@ -37,6 +39,7 @@ public abstract class BaseActivity extends AppCompatActivity{
         }
     }
 
+    @SuppressWarnings("DesignForExtension")
     @Override
     protected void onDestroy() {
         if (mUnbinder != null) {
@@ -51,11 +54,11 @@ public abstract class BaseActivity extends AppCompatActivity{
      * Call this method in {@link android.app.Activity#onCreate(Bundle)}
      * @param doBind true if need to bind service, otherwise false
      */
-    protected void doBindToService(boolean doBind) {
+    protected final void doBindToService(boolean doBind) {
         this.mDoBind = doBind;
     }
 
-    protected RetainFragment getRetainFragment(){
+    protected final RetainFragment getRetainFragment(){
         Fragment fragment = getSupportFragmentManager().findFragmentByTag(RETAIN_FRAGMENT);
         if (fragment == null) {
             fragment = RetainFragment.createFragment();

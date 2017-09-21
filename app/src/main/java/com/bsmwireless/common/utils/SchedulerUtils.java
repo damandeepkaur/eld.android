@@ -34,11 +34,10 @@ import static android.app.AlarmManager.RTC_WAKEUP;
 import static com.bsmwireless.data.network.authenticator.BsmAuthenticator.ACCOUNT_NAME;
 import static com.bsmwireless.data.network.authenticator.BsmAuthenticator.ACCOUNT_TYPE;
 
-public class SchedulerUtils {
+public final class SchedulerUtils {
 
     private static final int JOB_ID = 111;
     private static final int SYNC_NTP_JOB_ID = 222;
-    private static final int VERIFY_TOKEN_REQUEST = 333;
     private static final int AUTO_LOGOUT_TRIGGER_DURATION = 60;
     private static final int AUTO_LOGOUT_TRIGGER_DURATION_MIN = 55;
     private static final int AUTO_LOGOUT_TRIGGER_DURATION_MAX = 65;

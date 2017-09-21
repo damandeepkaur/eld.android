@@ -13,7 +13,7 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
-public class AutoDutyDialogPresenter {
+public final class AutoDutyDialogPresenter {
 
     private UserInteractor mUserInteractor;
     private ELDEventsInteractor mEventsInteractor;
