@@ -23,40 +23,40 @@ abstract class BaseMalfunctionJob {
         mCompositeDisposable = new CompositeDisposable();
     }
 
-    protected void add(Disposable disposable) {
+    protected final void add(Disposable disposable) {
         mCompositeDisposable.add(disposable);
     }
 
-    protected void dispose(){
+    protected final void dispose(){
         mCompositeDisposable.dispose();
     }
 
-    protected Observable<Long> saveEvents(ELDEvent eldEvent) {
+    protected final Observable<Long> saveEvents(ELDEvent eldEvent) {
         return mELDEventsInteractor.postNewELDEvent(eldEvent).toObservable();
     }
 
-    protected ELDEventsInteractor getELDEventsInteractor(){
+    protected final ELDEventsInteractor getELDEventsInteractor(){
         return mELDEventsInteractor;
     }
 
-    protected DutyTypeManager getDutyTypeManager(){
+    protected final DutyTypeManager getDutyTypeManager(){
         return mDutyTypeManager;
     }
 
-    protected ELDEvent.MalfunctionCode createCodeForDiagnostic(ELDEvent eldEvent) {
+    protected final ELDEvent.MalfunctionCode createCodeForDiagnostic(ELDEvent eldEvent) {
         return eldEvent.getEventCode() == ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED.getCode() ?
                 ELDEvent.MalfunctionCode.DIAGNOSTIC_LOGGED :
                 ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED;
     }
 
-    protected ELDEvent.MalfunctionCode createCodeForMalfunction(ELDEvent eldEvent) {
+    protected final ELDEvent.MalfunctionCode createCodeForMalfunction(ELDEvent eldEvent) {
         return eldEvent.getEventCode() == ELDEvent.MalfunctionCode.MALFUNCTION_CLEARED.getCode() ?
                 ELDEvent.MalfunctionCode.MALFUNCTION_LOGGED :
                 ELDEvent.MalfunctionCode.MALFUNCTION_CLEARED;
     }
 
     @NonNull
-    protected ELDEvent createEvent(Malfunction malfunction, ELDEvent.MalfunctionCode malfunctionCode) {
+    protected final ELDEvent createEvent(Malfunction malfunction, ELDEvent.MalfunctionCode malfunctionCode) {
         ELDEvent eldEvent = mELDEventsInteractor.getEvent(mDutyTypeManager.getDutyType());
         eldEvent.setMalCode(malfunction);
         eldEvent.setEventCode(malfunctionCode.getCode());

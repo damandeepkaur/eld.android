@@ -16,7 +16,7 @@ import dagger.Module;
 import dagger.Provides;
 
 @Module
-public class MalfunctionModule {
+public final class MalfunctionModule {
 
     @Provides
     static TimingJob timingJob(ELDEventsInteractor eldEventsInteractor,

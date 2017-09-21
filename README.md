@@ -3,6 +3,7 @@ ELD app for Android
 
 # Version history
 
+* **1.0.76** - Timing Compliance Monitoring (_EA-224_)
 * **1.0.75** - Engine Synchronization Compliance Monitoring (_EA-222_)
 * **1.0.74** - Add progress bar for selecting assets and pairing to black box
 * **1.0.73** - Add driver cycles list to the profile (_EA-315_)

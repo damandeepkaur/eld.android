@@ -33,9 +33,4 @@ public final class StatusMonitoringService extends BaseMonitoringService impleme
         final Intent intent = LockScreenActivity.createIntent(getApplicationContext());
         startActivity(intent);
     }
-    public class LocalBinder extends Binder {
-        StatusMonitoringService getService() {
-            return StatusMonitoringService.this;
-        }
-    }
 }

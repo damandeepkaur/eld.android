@@ -1,16 +1,8 @@
 package com.bsmwireless.services.malfunction;
 
 import com.bsmwireless.common.dagger.ActivityScope;
-import com.bsmwireless.data.network.blackbox.BlackBoxConnectionManager;
-import com.bsmwireless.data.network.blackbox.models.BlackBoxResponseModel;
-import com.bsmwireless.data.storage.DutyTypeManager;
-import com.bsmwireless.domain.interactors.ELDEventsInteractor;
-import com.bsmwireless.models.BlackBoxModel;
-import com.bsmwireless.models.BlackBoxSensorState;
-import com.bsmwireless.models.ELDEvent;
-import com.bsmwireless.models.Malfunction;
-import com.bsmwireless.services.MonitoringPresenter;
 import com.bsmwireless.common.utils.malfunction.MalfunctionJob;
+import com.bsmwireless.services.MonitoringPresenter;
 
 import java.util.List;
 
@@ -25,7 +17,7 @@ public final class MalfunctionServicePresenter implements MonitoringPresenter {
     private final List<MalfunctionJob> mMalfunctionJobs;
 
     @Inject
-    MalfunctionServicePresenter(List<MalfunctionJob> malfunctionJobs) {
+    public MalfunctionServicePresenter(List<MalfunctionJob> malfunctionJobs) {
 
         mMalfunctionJobs = malfunctionJobs;
     }
