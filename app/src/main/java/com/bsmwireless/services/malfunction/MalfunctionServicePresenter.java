@@ -2,6 +2,7 @@ package com.bsmwireless.services.malfunction;
 
 import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.common.utils.malfunction.MalfunctionJob;
+import com.bsmwireless.services.MonitoringPresenter;
 
 import java.util.List;
 
@@ -16,7 +17,7 @@ public final class MalfunctionServicePresenter implements MonitoringPresenter {
     private final List<MalfunctionJob> mMalfunctionJobs;
 
     @Inject
-    MalfunctionServicePresenter(List<MalfunctionJob> malfunctionJobs) {
+    public MalfunctionServicePresenter(List<MalfunctionJob> malfunctionJobs) {
 
         mMalfunctionJobs = malfunctionJobs;
     }

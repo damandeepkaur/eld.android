@@ -20,8 +20,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 
+import io.reactivex.Flowable;
+
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 public class ELDEventsInteractorTest extends BaseTest {
@@ -56,6 +59,8 @@ public class ELDEventsInteractorTest extends BaseTest {
         when(mAppDatabase.ELDEventDao()).thenReturn(mELDEventDao);
         when(mAppDatabase.userDao()).thenReturn(mUserDao);
 
+        when(mUserInteractor.getTimezone()).thenReturn(Flowable.empty());
+
         mELDEventsInteractor = new ELDEventsInteractor(mServiceApi,
                 mPreferencesManager,
                 mAppDatabase,
@@ -68,6 +73,9 @@ public class ELDEventsInteractorTest extends BaseTest {
 
     @Test
     public void getEventPositionCompliance() throws Exception {
+        BlackBoxModel blackBoxModel = spy(BlackBoxModel.class);
+        when(blackBoxModel.getSensorState(BlackBoxSensorState.GPS)).thenReturn(true);
+        when(mBlackBoxInteractor.getLastData()).thenReturn(blackBoxModel);
 
         ELDEventEntity eldEventEntity = mock(ELDEventEntity.class);
         when(eldEventEntity.getEventType())
@@ -85,6 +93,10 @@ public class ELDEventsInteractorTest extends BaseTest {
     @Test
     public void getEventPositionComplianceCleared() throws Exception {
 
+        BlackBoxModel blackBoxModel = spy(BlackBoxModel.class);
+        when(blackBoxModel.getSensorState(BlackBoxSensorState.GPS)).thenReturn(true);
+        when(mBlackBoxInteractor.getLastData()).thenReturn(blackBoxModel);
+
         ELDEventEntity eldEventEntity = mock(ELDEventEntity.class);
         when(eldEventEntity.getEventType())
                 .thenReturn(ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED.getCode());
@@ -100,7 +112,7 @@ public class ELDEventsInteractorTest extends BaseTest {
     @Test
     public void getEventNoCompliance() throws Exception {
 
-        BlackBoxModel blackBoxModel = mock(BlackBoxModel.class);
+        BlackBoxModel blackBoxModel = spy(BlackBoxModel.class);
         when(blackBoxModel.getSensorState(BlackBoxSensorState.GPS)).thenReturn(true);
 
         when(mBlackBoxInteractor.getLastData()).thenReturn(blackBoxModel);
@@ -119,7 +131,7 @@ public class ELDEventsInteractorTest extends BaseTest {
     public void getEventGpsNoFixNoCompliance() throws Exception {
 
         BlackBoxModel blackBoxModel = mock(BlackBoxModel.class);
-        when(blackBoxModel.getSensorState(BlackBoxSensorState.GPS)).thenReturn(true);
+        when(blackBoxModel.getSensorState(BlackBoxSensorState.GPS)).thenReturn(false);
 
         when(mBlackBoxInteractor.getLastData()).thenReturn(blackBoxModel);
 
