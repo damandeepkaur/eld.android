@@ -56,11 +56,13 @@ public interface Constants {
             Malfunction.OTHER_COMPLIANCE.getCode()
     };
 
+    @SuppressWarnings("PublicStaticCollectionField")
     Set<Class> NOT_RUNNING_DRIVING_MONITORING_ACTIVITY = Collections
             .unmodifiableSet(new HashSet<>(Arrays.asList(LoginActivity.class,
                     LockScreenActivity.class,
                     SelectAssetActivity.class)));
 
+    @SuppressWarnings("PublicStaticCollectionField")
     Set<Class> NOT_RUNNING_MALFUNCTIONS_MONITORING_ACTIVITY = Collections
             .unmodifiableSet(new HashSet<>(Arrays.asList(LoginActivity.class,
                     SelectAssetActivity.class)));
