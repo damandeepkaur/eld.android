@@ -22,6 +22,8 @@
     <dimen name="select_asset_card_top_margin">-12dp</dimen>
     <dimen name="select_asset_card_side_margin">4dp</dimen>
     <dimen name="select_asset_card_elevation">4dp</dimen>
+    <dimen name="select_asset_progress_bar_container_height">8dp</dimen>
+    <dimen name="select_asset_progress_bar_top_margin">-6dp</dimen>
 
     <!-- START OLD DIMENS -->
     <dimen name="small_margin">5dp</dimen>

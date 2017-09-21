@@ -11,7 +11,7 @@ import timber.log.Timber;
 
 
 @ActivityScope
-public final class MalfunctionServicePresenter {
+public final class MalfunctionServicePresenter implements MonitoringPresenter {
 
     private final List<MalfunctionJob> mMalfunctionJobs;
 
@@ -21,6 +21,7 @@ public final class MalfunctionServicePresenter {
         mMalfunctionJobs = malfunctionJobs;
     }
 
+    @Override
     public void startMonitoring() {
         Timber.d("Start malfunction monitoring");
         for (MalfunctionJob job : mMalfunctionJobs) {
@@ -28,6 +29,7 @@ public final class MalfunctionServicePresenter {
         }
     }
 
+    @Override
     public void stopMonitoring() {
         Timber.d("Stop malfunction monitoring");
         for (MalfunctionJob job : mMalfunctionJobs) {

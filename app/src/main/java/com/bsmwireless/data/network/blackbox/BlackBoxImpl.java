@@ -58,9 +58,9 @@ public final class BlackBoxImpl implements BlackBox {
     @Override
     public void connect(int boxId) throws Exception {
         Timber.d("connect");
-        if (ConnectionUtils.isEmulator()) {
-            return;
-        }
+       // if (ConnectionUtils.isEmulator()) {
+       //     return;
+       // }
         if (!isConnected() && (mDisposable == null || mDisposable.isDisposed())) {
             mBoxId = boxId;
             mDisposable = Observable.interval(RETRY_CONNECT_DELAY, TimeUnit.MILLISECONDS)
