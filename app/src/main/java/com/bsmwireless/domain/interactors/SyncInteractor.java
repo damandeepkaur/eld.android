@@ -197,11 +197,11 @@ public final class SyncInteractor {
                                 Timber::e));
     }
 
-    public void syncLogSheetHeadersForDaysAgo(int days) {
-        mServiceApi.getLogSheets(DateUtils.getLogDayForDaysAgo(days), DateUtils.getLogDayForDaysAgo(0))
+    public void syncLogSheetHeadersForDaysAgo(int days, String timezone) {
+        mServiceApi.getLogSheets(DateUtils.getLogDayForDaysAgo(days, timezone), DateUtils.getLogDayForDaysAgo(0, timezone))
                 .map(LogSheetConverter::toEntityList)
                 .doOnNext(logSheetEntities -> mLogSheetDao.insert(logSheetEntities))
-                .doOnNext(logSheetHeaders -> createMissingLogSheets(logSheetHeaders, days))
+                .doOnNext(logSheetHeaders -> createMissingLogSheets(logSheetHeaders, days, timezone))
                 .subscribe();
     }
 	
@@ -246,12 +246,12 @@ public final class SyncInteractor {
         return list;
     }
 
-    private void createMissingLogSheets(List<LogSheetEntity> logSheetHeaders, int days) {
+    private void createMissingLogSheets(List<LogSheetEntity> logSheetHeaders, int days, String timezone) {
         if (logSheetHeaders.size() < days) {
             int createdCount = 0;
             int userId = mAccountManager.getCurrentUserId();
             for (int i = 0; i < days; i++) {
-                long logDay = DateUtils.getLogDayForDaysAgo(i);
+                long logDay = DateUtils.getLogDayForDaysAgo(i, timezone);
                 LogSheetEntity entity = mLogSheetDao.getByLogDaySync(logDay, userId);
                 if (entity == null) {
                     LogSheetEntity prevEntity = mLogSheetDao.getLatestLogSheet(logDay, userId);

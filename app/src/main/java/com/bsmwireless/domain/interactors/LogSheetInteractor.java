@@ -76,7 +76,7 @@ public final class LogSheetInteractor {
                 logSheetHeader.getLogDay(), mAccountManager.getCurrentUserId()))
                 .map(certificationEvents -> {
                     int code = 1;
-                    if (certificationEvents != null && !certificationEvents.isEmpty()) {
+                    if (!certificationEvents.isEmpty()) {
                         code = Math.min((certificationEvents.get(0).getEventCode() + 1), MAX_CERTIFICATION_CODE);
                     }
                     return code;

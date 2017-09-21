@@ -98,7 +98,7 @@ public final class UserInteractor {
                     mAccountManager.setCurrentUser(user.getAuth().getDriverId(), accountName);
 
                     mSyncInteractor.syncEventsForDaysAgo(DEFAULT_CALENDAR_DAYS_COUNT, user.getTimezone());
-                    mSyncInteractor.syncLogSheetHeadersForDaysAgo(DEFAULT_CALENDAR_DAYS_COUNT);
+                    mSyncInteractor.syncLogSheetHeadersForDaysAgo(DEFAULT_CALENDAR_DAYS_COUNT, user.getTimezone());
                 })
                 .switchMap(user -> Observable.just(true));
     }

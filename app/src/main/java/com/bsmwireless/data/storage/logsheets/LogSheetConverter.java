@@ -60,7 +60,7 @@ public class LogSheetConverter {
     }
 
     public static List<LogSheetHeader> toModelList(List<LogSheetEntity> entities) {
-        List<LogSheetHeader> logSheetHeaders = Collections.EMPTY_LIST;
+        List<LogSheetHeader> logSheetHeaders = Collections.emptyList();
         if (entities != null) {
             logSheetHeaders = new ArrayList<>(entities.size());
             for (LogSheetEntity entity : entities) {
@@ -71,7 +71,7 @@ public class LogSheetConverter {
     }
 
     public static List<LogSheetEntity> toEntityList(List<LogSheetHeader> models) {
-        List<LogSheetEntity> entities = Collections.EMPTY_LIST;
+        List<LogSheetEntity> entities = Collections.emptyList();
         if (models != null) {
             entities = new ArrayList<>(models.size());
             for (LogSheetHeader model : models) {
@@ -82,7 +82,7 @@ public class LogSheetConverter {
     }
 
     public static List<LogSheetEntity> toEntityList(List<LogSheetHeader> models, LogSheetEntity.SyncType syncType) {
-        List<LogSheetEntity> entities = Collections.EMPTY_LIST;
+        List<LogSheetEntity> entities = Collections.emptyList();
         if (models != null) {
             entities = new ArrayList<>(models.size());
             for (LogSheetHeader model : models) {

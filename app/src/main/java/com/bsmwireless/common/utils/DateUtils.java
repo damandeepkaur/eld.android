@@ -199,11 +199,12 @@ public class DateUtils {
 
     /**
      * @param daysAgo days ago
+     * @param timezone user timezone
+     *
      * @return long with format time like 20170708
      */
-    public static long getLogDayForDaysAgo(int daysAgo) {
-        Calendar calendar = Calendar.getInstance();
-        return DateUtils.convertTimeToLogDay(calendar.getTimeZone(), calendar.getTimeInMillis()
+    public static long getLogDayForDaysAgo(int daysAgo, String timezone) {
+        return DateUtils.convertTimeToLogDay(timezone, System.currentTimeMillis()
                 - MS_IN_DAY * daysAgo);
     }
 
