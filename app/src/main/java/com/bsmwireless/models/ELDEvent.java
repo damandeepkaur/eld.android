@@ -350,10 +350,6 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
         mLogSheet = logSheet;
     }
 
-    public void setEventCode(Long eventTime) {
-        this.mEventTime = eventTime;
-    }
-
     public Integer getOdometer() {
         return mOdometer;
     }
