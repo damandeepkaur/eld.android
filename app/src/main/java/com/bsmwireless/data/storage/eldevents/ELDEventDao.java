@@ -8,6 +8,7 @@ import android.arch.persistence.room.Query;
 import java.util.List;
 
 import io.reactivex.Flowable;
+import io.reactivex.Maybe;
 
 import static android.arch.persistence.room.OnConflictStrategy.REPLACE;
 
@@ -52,8 +53,17 @@ public interface ELDEventDao {
             "and driver_id = :driverId and (event_type = 1 or event_type = 3) and status = 1 ORDER BY event_time")
     List<ELDEventEntity> getActiveEventsFromStartToEndTimeSync(long startTime, long endTime, int driverId);
 
-    @Query("SELECT count(id) FROM events WHERE event_type = :type and event_code = :code and mal_code IN (:malCodes)")
-    Flowable<Integer> getMalfunctionEventCount(int type, int code, String[] malCodes);
+    @Query("SELECT count(id) FROM events WHERE driver_id = :driverId AND event_type = :type and event_code = :code and mal_code IN (:malCodes)")
+    Flowable<Integer> getMalfunctionEventCount(int driverId, int type, int code, String[] malCodes);
+
+    /**
+     * Returns the latest event from a database
+     * @param type event type
+     * @param malCode malfunction code. For non-malfunction event should be empty
+     * @return latest ELD event
+     */
+    @Query("SELECT * FROM events WHERE driver_id = :driverId AND event_type = :type AND mal_code = :malCode ORDER BY event_time DESC LIMIT 1")
+    Maybe<ELDEventEntity> getLatestEvent(int driverId, int type, String malCode);
 
     @Delete
     void delete(ELDEventEntity event);
