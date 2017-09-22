@@ -448,6 +448,7 @@
     <string name="odometer">Odometer(%1$s)</string>
     <string name="add_event">Add event</string>
     <string name="edit">Edit</string>
+    <string name="assign">Assign</string>
     <string name="remove">Remove</string>
     <string name="km">km</string>
     <string name="ml">ml</string>
@@ -621,13 +622,17 @@
     <string name="switch_driver_log_out">Log out</string>
     <string name="switch_driver_add_co_driver">Add co-driver</string>
     <string name="switch_driver_driver_seat">Driver\'s seat</string>
+    <string name="switch_driver_reassign_event">Assign event to</string>
     <string name="switch_driver_co_drivers">Co-drivers</string>
     <string name="switch_driver_co_driver_log_out">Driver Log out</string>
     <string name="switch_driver_confirm_driver_seat">Confirm</string>
     <string name="switch_driver_invalid_credentials">Invalid credentials</string>
     <string name="switch_driver_error_login_codriver">Co-driver was not logged in</string>
+    <string name="switch_driver_error_logout_codriver">Co-driver log out error</string>
+    <string name="switch_driver_error_reassign_event">Event was not reassigned</string>
     <string name="switch_driver_login_error">Login error</string>
     <string name="switch_driver_co_driver_view">You are in co-driver view</string>
+    <string name="switch_driver_event_reassigned">Event was reassigned</string>
 
     <!-- Diagnostic events -->
     <string name="diagnostic_events_title">Data diagnostics events</string>
