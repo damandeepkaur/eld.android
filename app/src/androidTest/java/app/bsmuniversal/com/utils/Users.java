@@ -29,6 +29,7 @@ public class Users {
         return new User("mera2", "", "mera");
     }
 
+
     public static User getUserEmptyCompany() {
         return new User("mera2", "pass789", "");
     }
@@ -40,6 +41,7 @@ public class Users {
     public static User getEmptyUser() {
         return new User("", "", "");
     }
+
 
     public static class User {
 
