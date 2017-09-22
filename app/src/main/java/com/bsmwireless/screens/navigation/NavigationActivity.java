@@ -22,6 +22,8 @@ import android.widget.Toast;
 
 import com.bsmwireless.common.App;
 import com.bsmwireless.screens.autologout.AutoDutyDialogActivity;
+import com.bsmwireless.screens.carrieredit.CarrierEditActivity;
+import com.bsmwireless.screens.carrieredit.CarrierEditView;
 import com.bsmwireless.screens.common.menu.BaseMenuActivity;
 import com.bsmwireless.screens.common.menu.BaseMenuPresenter;
 import com.bsmwireless.screens.driverprofile.DriverProfileActivity;
@@ -138,6 +140,10 @@ public final class NavigationActivity extends BaseMenuActivity implements OnNavi
             case R.id.nav_logout:
                 mPresenter.onLogoutItemSelected();
                 break;
+            case R.id.nav_carrier_edit:
+                //TODO: ea_235
+                mDrawerToggle.runWhenIdle(() -> goToCarrierEditScreen());
+                break;
             default:
                 break;
         }
@@ -202,6 +208,13 @@ public final class NavigationActivity extends BaseMenuActivity implements OnNavi
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
         finish();
+    }
+
+    @Override
+    public void goToCarrierEditScreen() {
+        //TODO: ea_235
+        Intent intent = new Intent(this, CarrierEditActivity.class);
+        startActivity(intent);
     }
 
     @Override

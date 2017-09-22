@@ -40,6 +40,11 @@
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="stateHidden|adjustResize"/>
         <activity
+            android:name="com.bsmwireless.screens.carrieredit.CarrierEditActivity"
+            android:theme="@style/AppTheme"
+            android:parentActivityName="com.bsmwireless.screens.navigation.NavigationActivity"
+            android:windowSoftInputMode="stateAlwaysHidden"/>
+        <activity
             android:name="com.bsmwireless.screens.navigation.NavigationActivity"
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="stateHidden|adjustResize">
