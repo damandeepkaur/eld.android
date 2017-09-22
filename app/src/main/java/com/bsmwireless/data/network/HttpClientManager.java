@@ -30,7 +30,7 @@ import timber.log.Timber;
 import static com.bsmwireless.common.Constants.CONNECTION_TIMEOUT;
 import static com.bsmwireless.common.Constants.READ_TIMEOUT;
 
-public class HttpClientManager {
+public final class HttpClientManager {
     private OkHttpClient mClient;
 
     public HttpClientManager(HttpLoggingInterceptor logger, TokenManager tokenManager,

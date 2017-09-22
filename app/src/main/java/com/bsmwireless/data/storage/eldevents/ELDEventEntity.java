@@ -5,7 +5,7 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 
 @Entity(tableName = "events")
-public class ELDEventEntity {
+public final class ELDEventEntity {
     public enum SyncType {
         SYNC,
         UPDATE_UNSYNC,
@@ -27,6 +27,8 @@ public class ELDEventEntity {
     private Integer mOrigin;
     @ColumnInfo(name = "event_time")
     private Long mEventTime;
+    @ColumnInfo(name = "log_sheet")
+    private Long mLogSheet;
     @ColumnInfo(name = "odometer")
     private Integer mOdometer;
     @ColumnInfo(name = "engine_hours")
@@ -120,6 +122,14 @@ public class ELDEventEntity {
 
     public void setEventTime(Long eventTime) {
         mEventTime = eventTime;
+    }
+
+    public Long getLogSheet() {
+        return mLogSheet;
+    }
+
+    public void setLogSheet(Long logSheet) {
+        mLogSheet = logSheet;
     }
 
     public Integer getOdometer() {

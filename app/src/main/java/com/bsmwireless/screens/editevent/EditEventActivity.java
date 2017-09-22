@@ -14,9 +14,9 @@ import android.view.View;
 import android.widget.AdapterView;
 
 import com.bsmwireless.common.App;
-import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.common.utils.NetworkUtils;
 import com.bsmwireless.data.network.RetrofitException;
+import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.screens.common.menu.BaseMenuActivity;
 import com.bsmwireless.screens.common.menu.BaseMenuPresenter;
@@ -26,6 +26,7 @@ import com.bsmwireless.widgets.alerts.DutyType;
 import com.bsmwireless.widgets.snackbar.SnackBarLayout;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -34,7 +35,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class EditEventActivity extends BaseMenuActivity implements EditEventView, AdapterView.OnItemSelectedListener {
+public final class EditEventActivity extends BaseMenuActivity implements EditEventView, AdapterView.OnItemSelectedListener {
 
     public final static String DAY_TIME_EXTRA = "day_time_extra";
     public final static String OLD_ELD_EVENT_EXTRA = "old_eld_event_extra";
@@ -212,7 +213,7 @@ public class EditEventActivity extends BaseMenuActivity implements EditEventView
 
     private void initStatusSpinner() {
         //TODO: set correct types
-        DutyType[] types = DutyTypeManager.DRIVER_DUTY_EXTENDED_WITH_CLEAR;
+        List<DutyType> types = DutyTypeManager.DRIVER_DUTY_EXTENDED_WITH_CLEAR;
         mEventStatus.setAdapter(new DutyTypeSpinnerAdapter(this, types));
         mEventStatus.setOnItemSelectedListener(this);
     }

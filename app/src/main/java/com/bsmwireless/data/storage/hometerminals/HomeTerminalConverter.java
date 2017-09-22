@@ -1,5 +1,6 @@
 package com.bsmwireless.data.storage.hometerminals;
 
+import com.bsmwireless.data.storage.hometerminals.userhometerminal.UserHomeTerminalEntity;
 import com.bsmwireless.models.HomeTerminal;
 
 import java.util.ArrayList;
@@ -20,7 +21,7 @@ public class HomeTerminalConverter {
         return homeTerminal;
     }
 
-    public static HomeTerminalEntity toEntity(HomeTerminal homeTerminal, Integer userId) {
+    public static HomeTerminalEntity toEntity(HomeTerminal homeTerminal) {
         HomeTerminalEntity entity = null;
 
         if (homeTerminal != null) {
@@ -29,7 +30,6 @@ public class HomeTerminalConverter {
             entity.setAddress(homeTerminal.getAddress());
             entity.setName(homeTerminal.getName());
             entity.setTimezone(homeTerminal.getTimezone());
-            entity.setUserId(userId);
         }
 
         return entity;
@@ -46,12 +46,23 @@ public class HomeTerminalConverter {
         return homeTerminals;
     }
 
-    public static List<HomeTerminalEntity> toEntityList(List<HomeTerminal> homeTerminals, Integer userId) {
+    public static List<HomeTerminalEntity> toEntityList(List<HomeTerminal> homeTerminals) {
         List<HomeTerminalEntity> entities = null;
         if (homeTerminals != null) {
             entities = new ArrayList<>();
             for (HomeTerminal homeTerminal : homeTerminals) {
-                entities.add(toEntity(homeTerminal, userId));
+                entities.add(toEntity(homeTerminal));
+            }
+        }
+        return entities;
+    }
+
+    public static List<UserHomeTerminalEntity> toUserRelation(List<HomeTerminal> homeTerminals, int userId) {
+        List<UserHomeTerminalEntity> entities = null;
+        if (homeTerminals != null) {
+            entities = new ArrayList<>(homeTerminals.size());
+            for (HomeTerminal homeTerminal : homeTerminals) {
+                entities.add(new UserHomeTerminalEntity(homeTerminal.getId(), userId));
             }
         }
         return entities;

@@ -11,7 +11,7 @@ import com.bsmwireless.data.network.NtpClientManager;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
-public class SyncNtpService extends IntentService {
+public final class SyncNtpService extends IntentService {
 
     public static final String TAG = SyncNtpService.class.getSimpleName();
 
