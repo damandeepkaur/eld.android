@@ -79,9 +79,11 @@ public final class SynchronizationJob extends BaseMalfunctionJob implements Malf
                 && synchResult.mBlackBoxModel.getSensorState(BlackBoxSensorState.ECM_SYNC);
 
         if (isEcmOk) {
-            return ELDEvent.MalfunctionCode.DIAGNOSTIC_LOGGED.getCode() == synchResult.mELDEvent.getEventCode();
+            return ELDEvent.MalfunctionCode.DIAGNOSTIC_LOGGED.getCode()
+                    == synchResult.mELDEvent.getEventCode();
         } else {
-            return ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED.getCode() == synchResult.mELDEvent.getEventCode();
+            return ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED.getCode()
+                    == synchResult.mELDEvent.getEventCode();
         }
     }
 

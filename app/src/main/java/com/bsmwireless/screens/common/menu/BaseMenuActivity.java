@@ -28,7 +28,7 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
     private MenuItem mELDItem;
     private MenuItem mDutyItem;
     private MenuItem mOccupancyItem;
-    private MenuItem mMalfunctionItem;
+    private MenuItem mDiagnosticItem;
 
     protected AlertDialog mDutyDialog;
 
@@ -59,10 +59,10 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_alert, menu);
 
-        mELDItem = menu.findItem(R.id.action_diagnostic);
+        mELDItem = menu.findItem(R.id.action_malfunction);
         mDutyItem = menu.findItem(R.id.action_duty);
         mOccupancyItem = menu.findItem(R.id.action_occupancy);
-        mMalfunctionItem = menu.findItem(R.id.action_malfunction);
+        mDiagnosticItem = menu.findItem(R.id.action_diagnostic);
 
         mSwitchDriverDialog = new SwitchDriverDialog(this);
 
@@ -83,10 +83,9 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
             case R.id.action_occupancy:
                 showSwitchDriverDialog();
                 break;
-            case android.R.id.home: {
+            case android.R.id.home:
                 onHomePress();
                 break;
-            }
             case R.id.action_malfunction:
                 getPresenter().onMalfunctionEventsClick();
                 break;
@@ -153,18 +152,18 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
     @Override
     public final void changeMalfunctionStatus(boolean hasMalfunctionEvents) {
 
-        if (mMalfunctionItem == null) {
-            return;
-        }
-        mMalfunctionItem.setIcon(hasMalfunctionEvents ? R.drawable.ic_ico_dd_red : R.drawable.ic_ico_dd_green);
-    }
-
-    @Override
-    public final void changeDiagnosticStatus(boolean hasMalfunctionEvents) {
         if (mELDItem == null) {
             return;
         }
         mELDItem.setIcon(hasMalfunctionEvents ? R.drawable.ic_eld_red : R.drawable.ic_eld_green);
+    }
+
+    @Override
+    public final void changeDiagnosticStatus(boolean hasMalfunctionEvents) {
+        if (mDiagnosticItem == null) {
+            return;
+        }
+        mDiagnosticItem.setIcon(hasMalfunctionEvents ? R.drawable.ic_ico_dd_red : R.drawable.ic_ico_dd_green);
     }
 
     @Override

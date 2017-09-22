@@ -21,6 +21,7 @@ import io.reactivex.schedulers.Schedulers;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
@@ -56,7 +57,7 @@ public class StorageCapacityJobTest extends BaseTest {
 
         when(mSettingsManager.getFreeSpaceThreshold()).thenReturn(0.05);
 
-        when(mStorageCapacityJob.getIntervalObservable()).thenReturn(Observable.just(1L));
+        doReturn(Observable.just(1L)).when(mStorageCapacityJob).getIntervalObservable();
 
         when(mELDEventsInteractor.getLatestMalfunctionEvent(Malfunction.DATA_RECORDING_COMPLIANCE))
                 .thenReturn(Maybe.empty());
@@ -80,7 +81,7 @@ public class StorageCapacityJobTest extends BaseTest {
 
         when(mSettingsManager.getFreeSpaceThreshold()).thenReturn(0.15);
 
-        when(mStorageCapacityJob.getIntervalObservable()).thenReturn(Observable.just(1L));
+        doReturn(Observable.just(1L)).when(mStorageCapacityJob).getIntervalObservable();
 
         when(mELDEventsInteractor.getLatestMalfunctionEvent(Malfunction.DATA_RECORDING_COMPLIANCE))
                 .thenReturn(Maybe.empty());

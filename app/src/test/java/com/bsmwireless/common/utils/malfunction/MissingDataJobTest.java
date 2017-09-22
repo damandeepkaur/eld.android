@@ -53,7 +53,8 @@ public class MissingDataJobTest extends BaseTest {
         when(mELDEventsInteractor.getLatestMalfunctionEvent(Malfunction.MISSING_REQUIRED_DATA_ELEMENTS))
                 .thenReturn(Maybe.empty());
         when(mELDEventsInteractor.postNewELDEvent(any())).thenReturn(Single.just(1L));
-        ELDEvent eldEvent = spy(ELDEvent.class);
+        ELDEvent eldEvent = mock(ELDEvent.class);
+        when(eldEvent.getEventCode()).thenReturn(ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED.getCode());
         when(mELDEventsInteractor.getEvent(any(DutyType.class)))
                 .thenReturn(eldEvent);
 
@@ -78,7 +79,7 @@ public class MissingDataJobTest extends BaseTest {
         when(mELDEventsInteractor.getLatestMalfunctionEvent(Malfunction.MISSING_REQUIRED_DATA_ELEMENTS))
                 .thenReturn(Maybe.empty());
         when(mELDEventsInteractor.postNewELDEvent(any())).thenReturn(Single.just(1L));
-        ELDEvent eldEvent = spy(ELDEvent.class);
+        ELDEvent eldEvent = mock(ELDEvent.class);
         when(mELDEventsInteractor.getEvent(any(DutyType.class)))
                 .thenReturn(eldEvent);
 
@@ -106,7 +107,7 @@ public class MissingDataJobTest extends BaseTest {
         when(mELDEventsInteractor.getLatestMalfunctionEvent(Malfunction.MISSING_REQUIRED_DATA_ELEMENTS))
                 .thenReturn(Maybe.just(currentEvent));
         when(mELDEventsInteractor.postNewELDEvent(any())).thenReturn(Single.just(1L));
-        ELDEvent eldEvent = spy(ELDEvent.class);
+        ELDEvent eldEvent = mock(ELDEvent.class);
         when(mELDEventsInteractor.getEvent(any(DutyType.class)))
                 .thenReturn(eldEvent);
 
@@ -142,7 +143,7 @@ public class MissingDataJobTest extends BaseTest {
         when(mELDEventsInteractor.getLatestMalfunctionEvent(Malfunction.MISSING_REQUIRED_DATA_ELEMENTS))
                 .thenReturn(Maybe.just(cleared), Maybe.just(logged));
         when(mELDEventsInteractor.postNewELDEvent(any())).thenReturn(Single.just(1L));
-        ELDEvent eldEvent = spy(ELDEvent.class);
+        ELDEvent eldEvent = mock(ELDEvent.class);
         when(mELDEventsInteractor.getEvent(any(DutyType.class)))
                 .thenReturn(eldEvent);
 

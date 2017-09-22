@@ -59,7 +59,7 @@ public final class TimingJob extends BaseMalfunctionJob implements MalfunctionJo
 
     @VisibleForTesting
     Observable<Long> getIntervalObservable(){
-        return Observable.interval(1, TimeUnit.MILLISECONDS);
+        return Observable.interval(mSettingsManager.getIntervalForCheckTime(), TimeUnit.MILLISECONDS);
     }
 
     private Observable<ELDEvent> loadLatestTimingEvent() {

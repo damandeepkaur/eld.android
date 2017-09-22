@@ -24,6 +24,7 @@ import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.Subject;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -68,8 +69,8 @@ public class TimingJobTest extends BaseTest {
         final long timeDiffForTriggered = TimeUnit.MILLISECONDS.toMillis(5);
         when(mNtpClientManager.getRealTimeInMillisDiff()).thenReturn(timeDiffForTriggered - 1);
         when(mSettingsManager.getTimingMalfunctionDiff()).thenReturn(timeDiffForTriggered);
-        when(mTimingJob.getIntervalObservable()).thenReturn(Observable.just(1L));
 
+        doReturn(Observable.just(1L)).when(mTimingJob).getIntervalObservable();
 
         mTimingJob.start();
         mTimingJob.stop();
@@ -93,7 +94,7 @@ public class TimingJobTest extends BaseTest {
         when(mNtpClientManager.getRealTimeInMillisDiff()).thenReturn(timeDiffForTriggered + 1);
         when(mSettingsManager.getTimingMalfunctionDiff()).thenReturn(timeDiffForTriggered);
 
-        when(mTimingJob.getIntervalObservable()).thenReturn(Observable.just(1L));
+        doReturn(Observable.just(1L)).when(mTimingJob).getIntervalObservable();
 
         mTimingJob.start();
         mTimingJob.stop();
@@ -122,7 +123,7 @@ public class TimingJobTest extends BaseTest {
         when(mNtpClientManager.getRealTimeInMillisDiff()).thenReturn(timeDiffForTriggered + 1);
         when(mSettingsManager.getTimingMalfunctionDiff()).thenReturn(timeDiffForTriggered);
 
-        when(mTimingJob.getIntervalObservable()).thenReturn(Observable.just(1L));
+        doReturn(Observable.just(1L)).when(mTimingJob).getIntervalObservable();
 
         mTimingJob.start();
         mTimingJob.stop();
@@ -151,7 +152,7 @@ public class TimingJobTest extends BaseTest {
         when(mNtpClientManager.getRealTimeInMillisDiff()).thenReturn(timeDiffForTriggered + 1);
         when(mSettingsManager.getTimingMalfunctionDiff()).thenReturn(timeDiffForTriggered);
 
-        when(mTimingJob.getIntervalObservable()).thenReturn(Observable.just(1L));
+        doReturn(Observable.just(1L)).when(mTimingJob).getIntervalObservable();
 
         mTimingJob.start();
         mTimingJob.stop();
@@ -188,7 +189,8 @@ public class TimingJobTest extends BaseTest {
         when(mSettingsManager.getTimingMalfunctionDiff()).thenReturn(timeDiffForTriggered);
 
         Subject<Long> subject = BehaviorSubject.create();
-        when(mTimingJob.getIntervalObservable()).thenReturn(subject);
+
+        doReturn(subject).when(mTimingJob).getIntervalObservable();
 
         mTimingJob.start();
         subject.onNext(1L);

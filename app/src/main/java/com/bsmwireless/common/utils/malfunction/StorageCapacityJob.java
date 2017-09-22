@@ -51,7 +51,7 @@ public final class StorageCapacityJob extends BaseMalfunctionJob implements Malf
 
     @VisibleForTesting
     Observable<Long> getIntervalObservable(){
-        return Observable.interval(1, TimeUnit.MILLISECONDS);
+        return Observable.interval(mSettingsManager.getIntervalForCheckStorageCapacity(), TimeUnit.MILLISECONDS);
     }
 
     Observable<ELDEvent> loadLatest(){

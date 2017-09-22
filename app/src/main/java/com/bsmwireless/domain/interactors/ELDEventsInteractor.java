@@ -31,6 +31,7 @@ import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Single;
+import timber.log.Timber;
 
 import static com.bsmwireless.common.Constants.SUCCESS;
 import static com.bsmwireless.common.utils.DateUtils.SEC_IN_HOUR;
@@ -199,7 +200,10 @@ public final class ELDEventsInteractor {
                                 Constants.MALFUNCTION_CODES),
                         getMalfunctionCount(ELDEvent.MalfunctionCode.MALFUNCTION_CLEARED,
                                 Constants.MALFUNCTION_CODES),
-                        (loggedCount, clearedCount) -> loggedCount > clearedCount);
+                        (loggedCount, clearedCount) -> {
+                            Timber.d("Count malfunction events: logged %1$d, cleared %2$d", loggedCount, clearedCount);
+                            return loggedCount > clearedCount;
+                        });
     }
 
     public Flowable<Boolean> hasDiagnosticEvents() {
@@ -209,9 +213,11 @@ public final class ELDEventsInteractor {
                                 Constants.DIAGNOSTIC_CODES),
                         getMalfunctionCount(ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED,
                                 Constants.DIAGNOSTIC_CODES),
-                        (loggedCount, clearedCount) -> loggedCount > clearedCount);
+                        (loggedCount, clearedCount) -> {
+                            Timber.d("Count diagnostic events: logged %1$d, cleared %2$d", loggedCount, clearedCount);
+                            return loggedCount > clearedCount;
+                        });
     }
-
 
     /**
      * Returns the latest malfunction event with malfunction code
