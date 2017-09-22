@@ -17,7 +17,7 @@ import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
-public class StorageCapacityJob extends BaseMalfunctionJob implements MalfunctionJob {
+public final class StorageCapacityJob extends BaseMalfunctionJob implements MalfunctionJob {
 
     private final SettingsManager mSettingsManager;
     private final StorageUtil mStorageUtil;

@@ -7,7 +7,7 @@ import android.os.StatFs;
 
 import javax.inject.Inject;
 
-public class StorageUtil {
+public final class StorageUtil {
 
     private final StatsFsInternal mStatsFsInternal;
 

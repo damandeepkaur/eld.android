@@ -11,7 +11,7 @@ import com.google.gson.JsonSerializer;
 
 import java.lang.reflect.Type;
 
-public class LatLngFlagConverter implements JsonDeserializer<ELDEvent.LatLngFlag>, JsonSerializer<ELDEvent.LatLngFlag> {
+public final class LatLngFlagConverter implements JsonDeserializer<ELDEvent.LatLngFlag>, JsonSerializer<ELDEvent.LatLngFlag> {
     @Override
     public ELDEvent.LatLngFlag deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
         return json.isJsonNull() ?

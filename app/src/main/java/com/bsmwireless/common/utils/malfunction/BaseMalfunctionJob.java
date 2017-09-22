@@ -11,6 +11,7 @@ import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
+import timber.log.Timber;
 
 abstract class BaseMalfunctionJob {
 
@@ -33,6 +34,7 @@ abstract class BaseMalfunctionJob {
     }
 
     protected Observable<Long> saveEvents(ELDEvent eldEvent) {
+        Timber.d("Save a new event: %1$s", eldEvent.toString());
         return mELDEventsInteractor.postNewELDEvent(eldEvent).toObservable();
     }
 
