@@ -648,6 +648,8 @@
     <string name="malfunction_other">Other</string>
 
 
-
+    <!--Carrier Edit-->
+    <string name="unassigned_events">Unassigned</string>
+    <string name="edited_events">Edited</string>
 
 </resources>
