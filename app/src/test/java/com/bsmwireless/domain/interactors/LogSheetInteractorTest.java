@@ -1,5 +1,7 @@
 package com.bsmwireless.domain.interactors;
 
+import android.util.Log;
+
 import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.PreferencesManager;
@@ -15,7 +17,9 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -24,11 +28,15 @@ import java.util.List;
 
 import app.bsmuniversal.com.RxSchedulerRule;
 import io.reactivex.Flowable;
+import io.reactivex.observers.TestObserver;
 import io.reactivex.subscribers.TestSubscriber;
 
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -37,6 +45,9 @@ import static org.mockito.Mockito.when;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class LogSheetInteractorTest {
+
+    private static final int INT_USYNC = LogSheetEntity.SyncType.UNSYNC.ordinal();
+    private static final int INT_SYNC = LogSheetEntity.SyncType.SYNC.ordinal();
 
     @ClassRule
     public static final RxSchedulerRule RULE = new RxSchedulerRule();
@@ -92,7 +103,97 @@ public class LogSheetInteractorTest {
     }
 
     @Test
-    public void testCreateLogSheetHeader() {
+    public void testGetLogSheet() {
+        // given
+        final Long logDay = 1503014401L;
+        TestObserver<LogSheetHeader> testObserver = TestObserver.create();
+        LogSheetInteractor spy = Mockito.spy(mLogSheetInteractor);
+
+        // when
+        spy.getLogSheet(logDay).subscribe(testObserver);
+
+        // then
+        verify(spy).getLogSheetEntity(eq(logDay));
+    }
+
+    @Test
+    public void testUpdateLogSheetHeader() {
+        // given
+        LogSheetHeader logSheetHeader = new LogSheetHeader();
+        TestObserver<Long> testObserver = TestObserver.create();
+
+        // when
+        mLogSheetInteractor.updateLogSheetHeader(logSheetHeader).subscribe(testObserver);
+
+        // then
+        verify(mLogSheetDao).insert(argThat(new ArgumentMatcher<LogSheetEntity>(){
+
+            @Override
+            public boolean matches(LogSheetEntity argument) {
+                return argument.getSync() == INT_USYNC;
+            }
+        }));
+    }
+
+    @Test
+    public void testSignLogSheetNotAlreadySigned() {
+        // given
+        LogSheetInteractor spy = Mockito.spy(mLogSheetInteractor);
+
+        long logDay = 20000000L;
+        TestObserver<LogSheetHeader> testObserver = TestObserver.create();
+
+        LogSheetEntity logSheetEntity = new LogSheetEntity();
+        logSheetEntity.setSigned(false);
+
+        when(mLogSheetDao.getByLogDaySync(anyLong(), anyInt())).thenReturn(logSheetEntity);
+
+        // when
+        spy.signLogSheet(logDay).subscribe(testObserver);
+
+        // then
+        verify(mLogSheetDao).insert(argThat(new ArgumentMatcher<LogSheetEntity>() {
+            @Override
+            public boolean matches(LogSheetEntity argument) {
+                return logSheetEntity.getSigned() == true
+                        && logSheetEntity.getSync() == INT_USYNC;
+            }
+        }));
+
+        // TODO: verify addCertificationEvent
+    }
+
+
+    @Test
+    public void testSignLogSheetAlreadySigned() {
+        // given
+        LogSheetInteractor spy = Mockito.spy(mLogSheetInteractor);
+
+        long logDay = 20000000L;
+        TestObserver<LogSheetHeader> testObserver = TestObserver.create();
+
+        LogSheetEntity logSheetEntity = new LogSheetEntity();
+        logSheetEntity.setSigned(true);
+
+        when(mLogSheetDao.getByLogDaySync(anyLong(), anyInt())).thenReturn(logSheetEntity);
+
+        // when
+        spy.signLogSheet(logDay).subscribe(testObserver);
+
+        // then
+        verify(mLogSheetDao, never()).insert(any(LogSheetEntity.class));
+    }
+
+
+    // TODO: test addCertificationEvent
+
+
+    // TODO: resetLogSheetHeaderSignging()
+    // TODO: getLogSheetEntity()
+
+
+    @Test
+    public void testCreateLogSheetHeaderModel() {
         // given
         final Long startLogDay = 1503014401L;
         int driverId = 111111;
