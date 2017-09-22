@@ -266,8 +266,7 @@ public class DateUtils {
         long realTimeInMillisecondsDiff = ntpClientManager.getRealTimeInMillisDiff();
         // We shouldn't use ntp time if sync failed or not triggered
         if (realTimeInMillisecondsDiff != 0) {
-            Date date = new Date(System.currentTimeMillis() + realTimeInMillisecondsDiff);
-            return date.getTime();
+            return System.currentTimeMillis() + realTimeInMillisecondsDiff;
         }
 
         return System.currentTimeMillis();
