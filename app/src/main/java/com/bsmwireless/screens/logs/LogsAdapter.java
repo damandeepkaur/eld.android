@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.bsmwireless.common.utils.DateUtils;
+import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.LogSheetHeader;
 import com.bsmwireless.screens.logs.dagger.EventLogModel;
 import com.bsmwireless.widgets.alerts.DutyType;
@@ -100,14 +101,10 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
         notifyDataSetChanged();
     }
 
-    public void setHOSTimes(HOSTimesModel hosTimes) {
+    public void setPrevDayEvent(ELDEvent event) {
         if (mGraphLayout != null) {
-            mGraphLayout.setHOSTimerSleeperBerth(hosTimes.getSleeperBerthTime());
-            mGraphLayout.setHOSTimerDriving(hosTimes.getDrivingTime());
-            mGraphLayout.setHOSTimerOffDuty(hosTimes.getOffDutyTime());
-            mGraphLayout.setHOSTimerOnDuty(hosTimes.getOnDutyTime());
+            mGraphLayout.setPrevDayEvent(event);
         }
-        notifyDataSetChanged();
     }
 
     public void setLogHeader(LogHeaderModel logHeaderModel) {
@@ -149,7 +146,6 @@ public class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHolder> {
                     updateSignButton();
                     mPresenter.onCalendarDaySelected(calendarItem);
                 });
-                mCalendarLayout.setOnWeekChangedListener((startWeekDay) -> mPresenter.onWeekChanged(startWeekDay));
 
                 mSignLogsheet = (TextView) view.findViewById(R.id.sign_logsheet);
                 mSigned = view.findViewById(R.id.signed);

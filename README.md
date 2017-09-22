@@ -3,8 +3,15 @@ ELD app for Android
 
 # Version history
 
+* **1.0.71** - Fix remember me due to merge conflict
+* **1.0.70** - Malfunction and Data diagnostic indications (_EA-104_, _EA-105_, _EA-106_)
+* **1.0.69** - Lock screen in the driving mode (_EA-82_)
+* **1.0.68** - Update Dashboard, fix comment validation (_EA-387_, _EA-326_)
+* **1.0.67** - Not show 'helper' midnight event in logs screen (_EA-349_)
+* **1.0.66** - Fix seconds value for manually added event (_EA-308_)
+* **1.0.65** - Unable to show the original duty status
 * **1.0.64** - Fixed remember me enable by default
-* **1.0.63** - Fix for crash on login/logout 
+* **1.0.63** - Fix for crash on login/logout
 * **1.0.62** - Added co-driver view notification
 * **1.0.61** - Add NTP sync
 * **1.0.60** - Fix remember me

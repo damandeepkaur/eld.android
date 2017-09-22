@@ -16,11 +16,11 @@ public interface ELDEventDao {
     @Query("SELECT * FROM events")
     List<ELDEventEntity> getAll();
 
-    @Query("SELECT * FROM events WHERE sync = 1 ORDER BY event_time")
-    List<ELDEventEntity> getUpdateUnsyncEvents();
+    @Query("SELECT * FROM events WHERE sync = 1 and driver_id=:userId ORDER BY event_time")
+    List<ELDEventEntity> getUpdateUnsyncEvents(int userId);
 
-    @Query("SELECT * FROM events WHERE sync = 2 ORDER BY event_time")
-    List<ELDEventEntity> getNewUnsyncEvents();
+    @Query("SELECT * FROM events WHERE sync = 2 and driver_id=:userId ORDER BY event_time")
+    List<ELDEventEntity> getNewUnsyncEvents(int userId);
 
     @Query("SELECT * FROM events WHERE event_time > :startTime AND event_time < :endTime")
     List<ELDEventEntity> getEventsForInterval(long startTime, long endTime);
@@ -52,6 +52,9 @@ public interface ELDEventDao {
             "and driver_id = :driverId and (event_type = 1 or event_type = 3) and status = 1 ORDER BY event_time")
     List<ELDEventEntity> getActiveEventsFromStartToEndTimeSync(long startTime, long endTime, int driverId);
 
+    @Query("SELECT count(id) FROM events WHERE event_type = :type and event_code = :code and mal_code IN (:malCodes)")
+    Flowable<Integer> getMalfunctionEventCount(int type, int code, String[] malCodes);
+
     @Delete
     void delete(ELDEventEntity event);
 
@@ -63,4 +66,5 @@ public interface ELDEventDao {
 
     @Insert(onConflict = REPLACE)
     long[] insertAll(ELDEventEntity... events);
+
 }

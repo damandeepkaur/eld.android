@@ -175,8 +175,8 @@ public class LogsFragment extends BaseFragment implements LogsView {
     }
 
     @Override
-    public void setHOSTimes(HOSTimesModel hosTimes) {
-        mAdapter.setHOSTimes(hosTimes);
+    public void setPrevDayEvent(ELDEvent event) {
+        mAdapter.setPrevDayEvent(event);
     }
 
     @Override

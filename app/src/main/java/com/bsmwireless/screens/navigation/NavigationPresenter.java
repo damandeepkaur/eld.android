@@ -1,13 +1,14 @@
 package com.bsmwireless.screens.navigation;
 
 import com.bsmwireless.common.utils.DateUtils;
+import com.bsmwireless.common.utils.SchedulerUtils;
 import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.data.storage.AutoDutyTypeManager;
 import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.data.storage.users.UserConverter;
 import com.bsmwireless.data.storage.users.UserEntity;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
-import com.bsmwireless.domain.interactors.SyncEventsInteractor;
+import com.bsmwireless.domain.interactors.SyncInteractor;
 import com.bsmwireless.domain.interactors.UserInteractor;
 import com.bsmwireless.domain.interactors.VehiclesInteractor;
 import com.bsmwireless.models.ELDEvent;
@@ -24,7 +25,6 @@ import javax.inject.Inject;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.disposables.Disposables;
 import io.reactivex.schedulers.Schedulers;
@@ -35,7 +35,7 @@ public class NavigationPresenter extends BaseMenuPresenter {
     private NavigateView mView;
     private VehiclesInteractor mVehiclesInteractor;
     private Disposable mResetTimeDisposable;
-    private SyncEventsInteractor mSyncEventsInteractor;
+    private SyncInteractor mSyncInteractor;
     private AutoDutyTypeManager mAutoDutyTypeManager;
 
     private AutoDutyTypeManager.AutoDutyTypeListener mListener = new AutoDutyTypeManager.AutoDutyTypeListener() {
@@ -56,17 +56,19 @@ public class NavigationPresenter extends BaseMenuPresenter {
     };
 
     @Inject
-    public NavigationPresenter(NavigateView view, UserInteractor userInteractor, VehiclesInteractor vehiclesInteractor, ELDEventsInteractor eventsInteractor,
-                               DutyTypeManager dutyTypeManager, AutoDutyTypeManager autoDutyTypeManager, SyncEventsInteractor syncEventsInteractor, AccountManager accountManager) {
+    public NavigationPresenter(NavigateView view,
+                               UserInteractor userInteractor,
+                               VehiclesInteractor vehiclesInteractor,
+                               ELDEventsInteractor eventsInteractor,
+                               DutyTypeManager dutyTypeManager,
+                               AutoDutyTypeManager autoDutyTypeManager,
+                               SyncInteractor syncInteractor,
+                               AccountManager accountManager) {
+        super(dutyTypeManager, eventsInteractor, userInteractor, accountManager);
         mView = view;
-        mUserInteractor = userInteractor;
         mVehiclesInteractor = vehiclesInteractor;
-        mEventsInteractor = eventsInteractor;
-        mDutyTypeManager = dutyTypeManager;
         mAutoDutyTypeManager = autoDutyTypeManager;
-        mSyncEventsInteractor = syncEventsInteractor;
-        mAccountManager = accountManager;
-        mDisposables = new CompositeDisposable();
+        mSyncInteractor = syncInteractor;
         mResetTimeDisposable = Disposables.disposed();
 
         mAutoDutyTypeManager.setListener(mListener);
@@ -75,20 +77,21 @@ public class NavigationPresenter extends BaseMenuPresenter {
     @Override
     public void onDestroy() {
         mResetTimeDisposable.dispose();
-        mSyncEventsInteractor.stopSync();
+        mSyncInteractor.stopSync();
         mAutoDutyTypeManager.removeListener();
         super.onDestroy();
     }
 
     public void onLogoutItemSelected() {
-        Disposable disposable = mEventsInteractor.postLogoutEvent()
-                .doOnNext(isSuccess -> mUserInteractor.deleteDriver())
+        Disposable disposable = getEventsInteractor().postLogoutEvent()
+                .doOnNext(isSuccess -> getUserInteractor().deleteDriver())
                                                .subscribeOn(Schedulers.io())
                                                .observeOn(AndroidSchedulers.mainThread())
                                                .subscribe(
                                                        status -> {
                                                            Timber.i("LoginUser status = %b", status);
                                                            if (status) {
+                                                               SchedulerUtils.cancel();
                                                                mView.goToLoginScreen();
                                                            } else {
                                                                mView.showErrorMessage("Logout failed");
@@ -99,12 +102,11 @@ public class NavigationPresenter extends BaseMenuPresenter {
                                                            mView.showErrorMessage("Exception:" + error.toString());
                                                        }
                                                );
-        mDisposables.add(disposable);
-
+        add(disposable);
     }
 
     public void onViewCreated() {
-        mDisposables.add(mUserInteractor.getFullDriverName()
+        add(getUserInteractor().getFullDriverName()
                                         .subscribeOn(Schedulers.io())
                                         .observeOn(AndroidSchedulers.mainThread())
                                         .subscribe(name -> mView.setDriverName(name)));
@@ -112,12 +114,12 @@ public class NavigationPresenter extends BaseMenuPresenter {
         mView.setBoxId(mVehiclesInteractor.getBoxId());
         mView.setAssetsNumber(mVehiclesInteractor.getAssetsNumber());
 
-        mDisposables.add(mUserInteractor.getCoDriversNumber()
+        add(getUserInteractor().getCoDriversNumber()
                                         .subscribeOn(Schedulers.io())
                                         .observeOn(AndroidSchedulers.mainThread())
                                         .subscribe(count -> mView.setCoDriversNumber(count)));
         mAutoDutyTypeManager.validateBlackBoxState();
-        mSyncEventsInteractor.startSync();
+        mSyncInteractor.startSync();
     }
 
     public void onResetTime() {
@@ -125,7 +127,7 @@ public class NavigationPresenter extends BaseMenuPresenter {
         long[] time = new long[2];
 
         mResetTimeDisposable.dispose();
-        mResetTimeDisposable = mUserInteractor.getTimezone()
+        mResetTimeDisposable = getUserInteractor().getTimezone()
               .flatMap(timeZone -> {
                   long current = System.currentTimeMillis();
                   time[0] = DateUtils.getStartDayTimeInMs(timeZone, current);
@@ -133,10 +135,10 @@ public class NavigationPresenter extends BaseMenuPresenter {
 
                   mView.setResetTime(time[1]);
 
-                  return mEventsInteractor
+                  return getEventsInteractor()
                           .getDutyEventsFromDB(time[0], time[1])
                           .map(selectedDayEvents -> {
-                              List<ELDEvent> prevDayLatestEvents = mEventsInteractor.getLatestActiveDutyEventFromDBSync(time[0], mUserInteractor.getUserId());
+                              List<ELDEvent> prevDayLatestEvents = getEventsInteractor().getLatestActiveDutyEventFromDBSync(time[0], getUserInteractor().getUserId());
                               if (!prevDayLatestEvents.isEmpty()) {
                                   selectedDayEvents.add(0, prevDayLatestEvents.get(prevDayLatestEvents.size() - 1));
                               }
@@ -147,7 +149,7 @@ public class NavigationPresenter extends BaseMenuPresenter {
               .subscribe(
                       events -> resetTime(events, time[0]),
                       error -> {
-                          mDutyTypeManager.setDutyTypeTime(0, 0, 0, DutyType.OFF_DUTY);
+                          getDutyTypeManager().setDutyTypeTime(0, 0, 0, DutyType.OFF_DUTY);
                           Timber.e("Get timezone error: %s", error);
                       }
               );
@@ -196,7 +198,7 @@ public class NavigationPresenter extends BaseMenuPresenter {
 
         long[] times = DutyTypeManager.getDutyTypeTimes(new ArrayList<>(events), startOfDay, System.currentTimeMillis());
 
-        mDutyTypeManager.setDutyTypeTime(
+        getDutyTypeManager().setDutyTypeTime(
                 (int) (times[DutyType.ON_DUTY.ordinal()]),
                 (int) (times[DutyType.DRIVING.ordinal()]),
                 (int) (times[DutyType.SLEEPER_BERTH.ordinal()]), dutyType
@@ -210,7 +212,7 @@ public class NavigationPresenter extends BaseMenuPresenter {
 
     public void onUserUpdated(User user) {
         if (user != null) {
-            Disposable disposable = Observable.fromCallable(() -> mUserInteractor.getUserFromDBSync(user.getId()))
+            Disposable disposable = Observable.fromCallable(() -> getUserInteractor().getUserFromDBSync(user.getId()))
                                               .subscribeOn(Schedulers.io())
                                               .map(userEntity -> {
                                                   UserEntity updatedUser = UserConverter.toEntity(user);
@@ -219,11 +221,11 @@ public class NavigationPresenter extends BaseMenuPresenter {
                                                   updatedUser.setCoDriversIds(userEntity.getCoDriversIds());
                                                   return updatedUser;
                                               })
-                                              .flatMap(userEntity -> mUserInteractor.syncDriverProfile(userEntity))
+                                              .flatMap(userEntity -> getUserInteractor().syncDriverProfile(userEntity))
                                               .observeOn(AndroidSchedulers.mainThread())
                                               .subscribe(userUpdated -> {},
-                                                         throwable -> mView.showErrorMessage(throwable.getMessage()));
-            mDisposables.add(disposable);
+                                                         Timber::e);
+            add(disposable);
         }
     }
 
@@ -236,10 +238,10 @@ public class NavigationPresenter extends BaseMenuPresenter {
     @Override
     public void onDriverChanged() {
         super.onDriverChanged();
-        Disposable disposable = Single.fromCallable(() -> mUserInteractor.getFullDriverNameSync())
+        Disposable disposable = Single.fromCallable(() -> getUserInteractor().getFullDriverNameSync())
                                       .subscribeOn(Schedulers.io())
                                       .observeOn(AndroidSchedulers.mainThread())
                                       .subscribe(name -> mView.setDriverName(name));
-        mDisposables.add(disposable);
+        add(disposable);
     }
 }

@@ -1,8 +1,11 @@
 package app.bsmuniversal.com.base;
 
+import android.app.Activity;
+import android.app.Instrumentation;
 import android.content.Context;
 import android.support.test.espresso.Espresso;
 import android.support.test.espresso.NoMatchingViewException;
+import android.support.test.runner.lifecycle.ActivityLifecycleMonitorRegistry;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
@@ -11,6 +14,8 @@ import junit.framework.AssertionFailedError;
 import org.hamcrest.Matcher;
 import org.junit.Assert;
 
+import java.util.Collection;
+
 import app.bsmuniversal.com.locators.DrawerLocators;
 import app.bsmuniversal.com.locators.LoginLocators;
 import app.bsmuniversal.com.pages.CommonPage;
@@ -18,6 +23,7 @@ import app.bsmuniversal.com.pages.DrawerPage;
 import app.bsmuniversal.com.utils.SystemUtil;
 import app.bsmuniversal.com.utils.Users;
 
+import static android.support.test.InstrumentationRegistry.getInstrumentation;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.assertion.ViewAssertions.doesNotExist;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
@@ -32,7 +38,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.isEnabled;
 import static android.support.test.espresso.matcher.ViewMatchers.isNotChecked;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
-import android.support.test.espresso.ViewInteraction;
+import static android.support.test.runner.lifecycle.Stage.RESUMED;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 
@@ -43,7 +49,7 @@ public abstract class BaseTestClass {
 
     protected static final int REQUEST_TIMEOUT = 5;
 
-    protected void login(Users.User user, boolean rememberMe) {
+    protected static void login(Users.User user, boolean rememberMe) {
         CommonPage.enter_on_view(LoginLocators.username, user.getUsername());
         CommonPage.enter_on_view(LoginLocators.password, user.getPassword());
         CommonPage.enter_on_view(LoginLocators.domain, user.getDomain(), false, true);
@@ -51,13 +57,13 @@ public abstract class BaseTestClass {
         CommonPage.perform_click(LoginLocators.execute_login);
     }
 
-    protected void logout() {
+    protected static void logout() {
         DrawerPage.open_navigation_drawer();
         assert_navigation_drawer_opened(DrawerLocators.navigation_drawer, true);
         DrawerPage.click_on_navigation_item(DrawerLocators.nav_logout_item);
     }
 
-    protected void assert_snack_bar_with_message_displayed(Matcher<View> view, String message) {
+    protected static void assert_snack_bar_with_message_displayed(Matcher<View> view, String message) {
         wait_for_view(REQUEST_TIMEOUT, view);
         assert_something_displayed(view, true);
         assert_text_displayed(message, true);
@@ -150,4 +156,22 @@ public abstract class BaseTestClass {
         return false;
     }
 
+    /**
+     * A helper method to get the currently running activity under test when a test run spans across multiple
+     * activities. The only returns the initial activity that was started.
+     */
+    public static final Activity getCurrentActivity() {
+
+        Instrumentation inst = getInstrumentation();
+
+        final Activity[] currentActivity = new Activity[1];
+        inst.runOnMainSync(() -> {
+            Collection<Activity> resumedActivities =
+                    ActivityLifecycleMonitorRegistry.getInstance().getActivitiesInStage(RESUMED);
+            if (resumedActivities.iterator().hasNext()) {
+                currentActivity[0] = resumedActivities.iterator().next();
+            }
+        });
+        return currentActivity[0];
+    }
 }

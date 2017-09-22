@@ -50,7 +50,6 @@ public class SelectAssetTest extends BaseTestClass {
 
     @Test
     public void test_clearText() {
-        SelectAssetPage.click_on_search();
         SelectAssetPage.enter_search_text("w");
         assert_something_displayed(SelectAssetLocators.search_clear_text, true);
         SelectAssetPage.go_to_home_screen();
@@ -58,7 +57,6 @@ public class SelectAssetTest extends BaseTestClass {
 
     @Test
     public void test_lessThanThree() {
-        SelectAssetPage.click_on_search();
         SelectAssetPage.enter_search_text("bc");
         wait_for_view(REQUEST_TIMEOUT, SelectAssetLocators.search_list);
         assert_text_displayed(SelectAssetLocators.less_characters_text, true);
@@ -67,7 +65,6 @@ public class SelectAssetTest extends BaseTestClass {
 
     @Test
     public void test_moreThanThree() {
-        SelectAssetPage.click_on_search();
         SelectAssetPage.enter_search_text("1234");
         wait_for_view(REQUEST_TIMEOUT, SelectAssetLocators.search_list);
         assert_list_contains_text(SelectAssetLocators.search_list, "1234");
@@ -77,7 +74,6 @@ public class SelectAssetTest extends BaseTestClass {
 
     @Test
     public void test_unExistingAsset() {
-        SelectAssetPage.click_on_search();
         SelectAssetPage.enter_search_text("unexisting");
         wait_for_view(REQUEST_TIMEOUT, SelectAssetLocators.search_list);
         assert_text_displayed(SelectAssetLocators.find_nothing_text, true);
@@ -100,7 +96,6 @@ public class SelectAssetTest extends BaseTestClass {
 
     @Test
     public void test_hintAfterClear() {
-        SelectAssetPage.click_on_search();
         SelectAssetPage.enter_search_text("a");
         SelectAssetPage.click_on_clear_text();
         assert_something_displayed(SelectAssetLocators.search_hint, true);
@@ -109,7 +104,6 @@ public class SelectAssetTest extends BaseTestClass {
 
     @Test
     public void test_keyboardAfterClear() {
-        SelectAssetPage.click_on_search();
         SelectAssetPage.enter_search_text("a");
         SelectAssetPage.click_on_clear_text();
         assert_keyboard(true);
@@ -118,7 +112,6 @@ public class SelectAssetTest extends BaseTestClass {
 
     @Test
     public void test_fullBox() {
-        SelectAssetPage.click_on_search();
         SelectAssetPage.enter_search_text("4343455");
         wait_for_view(REQUEST_TIMEOUT, SelectAssetLocators.search_list);
         assert_list_contains_text(SelectAssetLocators.search_list, "4343455");
@@ -128,7 +121,6 @@ public class SelectAssetTest extends BaseTestClass {
 
     @Test
     public void test_licensePlate() {
-        SelectAssetPage.click_on_search();
         SelectAssetPage.enter_search_text("TD123");
         wait_for_view(REQUEST_TIMEOUT, SelectAssetLocators.search_list);
         assert_list_contains_text(SelectAssetLocators.search_list, "1234");
@@ -138,7 +130,6 @@ public class SelectAssetTest extends BaseTestClass {
 
     @Test
     public void test_keyword() {
-        SelectAssetPage.click_on_search();
         SelectAssetPage.enter_search_text("box test123");
         wait_for_view(REQUEST_TIMEOUT, SelectAssetLocators.search_list);
         assert_list_contains_text(SelectAssetLocators.search_list, "box test123");
@@ -150,5 +141,6 @@ public class SelectAssetTest extends BaseTestClass {
     public void tearDown() throws Exception {
         logout();
         wait_for_view(REQUEST_TIMEOUT, LoginLocators.execute_login);
+
     }
 }

@@ -69,6 +69,10 @@ public class AccountManager {
         setCurrentUser(getCurrentDriverId(), getCurrentDriverAccountName());
     }
 
+    /**
+     * Check current driver and current user.
+     * @return true if current user is a driver
+     */
     public boolean isCurrentUserDriver() {
         return getCurrentUserId() == getCurrentDriverId();
     }

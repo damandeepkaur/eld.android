@@ -1,17 +1,28 @@
 package com.bsmwireless.screens.dashboard;
 
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.res.ColorStateList;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.design.widget.TextInputEditText;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.view.ContextThemeWrapper;
+import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.CardView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bsmwireless.common.App;
+import com.bsmwireless.common.utils.ViewUtils;
 import com.bsmwireless.screens.common.BaseFragment;
 import com.bsmwireless.screens.dashboard.dagger.DaggerDashboardComponent;
 import com.bsmwireless.screens.dashboard.dagger.DashboardModule;
@@ -51,10 +62,13 @@ public class DashboardFragment extends BaseFragment implements DashboardView {
     CardView mIndicatorView;
 
     @BindView(R.id.dashboard_indicator)
-    TextView mIndicatorText;
+    AppCompatButton mIndicatorButton;
 
     @BindView(R.id.dashboard_indicator_title)
     TextView mIndicatorTitleText;
+
+    @BindView(R.id.dashboard_status_layout)
+    LinearLayout mStatusLayout;
 
     private Drawable mIndicatorDrawable;
 
@@ -71,6 +85,8 @@ public class DashboardFragment extends BaseFragment implements DashboardView {
             mHandler.postDelayed(this, TIMER_DELAY);
         }
     };
+
+    private AlertDialog mAlertDialog;
 
     @Override
     public void onAttach(Context context) {
@@ -96,6 +112,10 @@ public class DashboardFragment extends BaseFragment implements DashboardView {
 
     @Override
     public void onDestroyView() {
+        if (mAlertDialog != null) {
+            mAlertDialog.dismiss();
+        }
+
         super.onDestroyView();
         mUnbinder.unbind();
         mPresenter.onDestroy();
@@ -121,7 +141,76 @@ public class DashboardFragment extends BaseFragment implements DashboardView {
 
     @OnClick(R.id.dashboard_indicator)
     public void onClearClick() {
-        mNavigateView.changeDutyType(mDutyType == DutyType.PERSONAL_USE ? DutyType.OFF_DUTY : DutyType.ON_DUTY);
+        mNavigateView.changeDutyType(mDutyType == DutyType.PERSONAL_USE ? DutyType.OFF_DUTY : DutyType.ON_DUTY, null);
+    }
+
+    @OnClick(R.id.dashboard_pu_status)
+    public void onPersonalUseClick() {
+        changeToSpecialStatus(DutyType.PERSONAL_USE);
+    }
+
+    @OnClick(R.id.dashboard_ym_status)
+    public void onYardMovesClick() {
+        changeToSpecialStatus(DutyType.YARD_MOVES);
+    }
+
+    private void changeToSpecialStatus(DutyType dutyType) {
+        if (mAlertDialog != null) {
+            mAlertDialog.dismiss();
+        }
+
+        int padding = mContext.getResources().getDimensionPixelSize(R.dimen.default_margin);
+
+        View view = LayoutInflater.from(new ContextThemeWrapper(mContext, R.style.TextInputEditText)).inflate(R.layout.view_comment, null);
+        view.setPadding(padding, padding, padding, 0);
+
+        mAlertDialog = new AlertDialog.Builder(mContext)
+                .setTitle(dutyType.getName())
+                .setMessage(dutyType == DutyType.PERSONAL_USE ? R.string.pu_dialog_message : R.string.ym_dialog_message)
+                .setView(view)
+                .setPositiveButton(R.string.special_status_dialog_accept, null)
+                .setNegativeButton(R.string.special_status_dialog_cancel, null)
+                .setOnDismissListener(dialog -> {
+                    if (getActivity() != null) {
+                        ViewUtils.hideSoftKeyboard(getActivity());
+                    }
+                })
+                .show();
+
+        TextInputLayout inputLayout = ButterKnife.findById(mAlertDialog, R.id.comment_layout);
+        TextInputEditText inputText = ButterKnife.findById(mAlertDialog, R.id.comment);
+
+        inputLayout.setHintEnabled(false);
+        inputText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                inputLayout.setError(null);
+            }
+        });
+
+        mAlertDialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(v -> {
+            String comment = inputText.getText().toString();
+            Error error = mPresenter.validateComment(comment);
+
+            if (error == Error.INVALID_COMMENT_LENGTH) {
+                inputLayout.setError(mContext.getString(R.string.edit_event_comment_length_error));
+            } else if (error == Error.INVALID_COMMENT) {
+                inputLayout.setError(mContext.getString(R.string.edit_event_comment_error));
+            } else {
+                mNavigateView.changeDutyType(dutyType, comment);
+                mAlertDialog.dismiss();
+            }
+        });
     }
 
     @Override
@@ -162,22 +251,25 @@ public class DashboardFragment extends BaseFragment implements DashboardView {
     }
 
     private void updateDutyView(DutyView dutyView, DutyType dutyType) {
-        dutyView.setDutyType(dutyType);
-        dutyView.setTime(mPresenter.getDutyTypeTime(dutyView.getDutyType()));
+        if (dutyView != null) {
+            dutyView.setDutyType(dutyType);
+            dutyView.setTime(mPresenter.getDutyTypeTime(dutyView.getDutyType()));
+        }
     }
 
     private void updateIndicator(DutyType dutyType) {
         if (dutyType == DutyType.PERSONAL_USE || dutyType == DutyType.YARD_MOVES) {
             int color = ContextCompat.getColor(getContext(), dutyType.getColor());
-            String newDuty = mContext.getString(dutyType == DutyType.PERSONAL_USE ? DutyType.OFF_DUTY.getName() : DutyType.ON_DUTY.getName());
             String currentDuty = mContext.getString(dutyType.getName());
             mIndicatorDrawable.setColorFilter(color, android.graphics.PorterDuff.Mode.SRC_IN);
             mIndicatorTitleText.setText(String.format(Locale.US, mContext.getString(R.string.duty_indicator_title), currentDuty));
-            mIndicatorText.setText(String.format(Locale.US, mContext.getString(R.string.duty_indicator), newDuty));
-            mIndicatorText.setBackgroundColor(color);
+            mIndicatorButton.setText(String.format(Locale.US, mContext.getString(R.string.duty_indicator), currentDuty));
+            mIndicatorButton.setSupportBackgroundTintList(ColorStateList.valueOf(color));
             mIndicatorView.setVisibility(View.VISIBLE);
+            mStatusLayout.setVisibility(View.GONE);
         } else {
             mIndicatorView.setVisibility(View.GONE);
+            mStatusLayout.setVisibility(View.VISIBLE);
         }
     }
 }

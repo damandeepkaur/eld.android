@@ -35,7 +35,7 @@
     </declare-styleable>
 
     <declare-styleable name="FontTextView">
-        <attr name="font">
+        <attr name="textFont">
             <enum name="none" value="0"/>
             <enum name="sans_serif" value="1"/>
             <enum name="bebasNeue" value="2"/>
@@ -55,6 +55,13 @@
     <declare-styleable name="DutyView">
         <attr name="dutyType"/>
         <attr name="size"/>
+    </declare-styleable>
+
+    <declare-styleable name="StatusView">
+        <attr name="sv_text" format="string"/>
+        <attr name="sv_color" format="color"/>
+        <attr name="sv_background_color" format="color"/>
+        <attr name="sv_line_enabled" format="boolean"/>
     </declare-styleable>
 
 </resources>
