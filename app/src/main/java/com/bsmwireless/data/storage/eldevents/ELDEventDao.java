@@ -22,8 +22,8 @@ public interface ELDEventDao {
     @Query("SELECT * FROM events WHERE sync = 2 and driver_id=:userId ORDER BY event_time")
     List<ELDEventEntity> getNewUnsyncEvents(int userId);
 
-    @Query("SELECT * FROM events WHERE event_time > :startTime AND event_time < :endTime")
-    List<ELDEventEntity> getEventsForInterval(long startTime, long endTime);
+    @Query("SELECT * FROM events WHERE event_time > :startTime AND event_time < :endTime and driver_id = :driverId")
+    Flowable <List<ELDEventEntity>> getEventsFromStartToEndTime(long startTime, long endTime, int driverId);
 
     @Query("SELECT * FROM events WHERE id = :id")
     Flowable<ELDEventEntity> getEventById(int id);
@@ -44,6 +44,9 @@ public interface ELDEventDao {
             "and (event_type = 1 or event_type = 3) and status = 1 ORDER BY event_time DESC) and driver_id = :driverId")
     List<ELDEventEntity> getLatestActiveDutyEventSync(long latestTime, int driverId);
 
+    @Query("SELECT * FROM events WHERE event_time < :latestTime AND driver_id = :driverId AND status = 1 ORDER BY event_time DESC LIMIT 1")
+    ELDEventEntity getLatestActiveEventSync(long latestTime, int driverId);
+
     @Query("SELECT * FROM events WHERE event_time > :startTime and event_time < :endTime " +
             "and driver_id = :driverId and event_type = 1 and status = 1 ORDER BY event_time")
     Flowable<List<ELDEventEntity>> getActiveDutyEventsAndFromStartToEndTime(long startTime, long endTime, int driverId);
@@ -54,6 +57,12 @@ public interface ELDEventDao {
 
     @Query("SELECT count(id) FROM events WHERE event_type = :type and event_code = :code and mal_code IN (:malCodes)")
     Flowable<Integer> getMalfunctionEventCount(int type, int code, String[] malCodes);
+
+    @Query("SELECT count(id) FROM events WHERE event_time > :startTime AND event_time < :endTime AND driver_id = :driverId AND event_type = 7 AND (event_code = 1 OR event_code = 2)")
+    Integer getMalfunctionEventCountSync(int driverId, long startTime, long endTime);
+
+    @Query("SELECT count(id) FROM events WHERE event_time > :startTime AND event_time < :endTime AND driver_id = :driverId AND event_type = 7 AND (event_code = 3 OR event_code = 4)")
+    Integer getDiagnosticEventCountSync(int driverId, long startTime, long endTime);
 
     @Delete
     void delete(ELDEventEntity event);

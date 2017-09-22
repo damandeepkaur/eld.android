@@ -9,6 +9,7 @@ import com.bsmwireless.data.storage.hometerminals.HomeTerminalEntity;
 import com.bsmwireless.data.storage.logsheets.LogSheetConverter;
 import com.bsmwireless.data.storage.logsheets.LogSheetEntity;
 import com.bsmwireless.data.storage.users.UserEntity;
+import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.HomeTerminal;
 import com.bsmwireless.models.LogSheetHeader;
 
@@ -30,20 +31,28 @@ public final class LogSheetInteractor {
     private PreferencesManager mPreferencesManager;
     private AppDatabase mAppDatabase;
     private AccountManager mAccountManager;
+    private ELDEventsInteractor mEventsInteractor;
 
     @Inject
     public LogSheetInteractor(ServiceApi serviceApi, PreferencesManager preferencesManager,
-                              AppDatabase appDatabase, AccountManager accountManager) {
+                              AppDatabase appDatabase, AccountManager accountManager, ELDEventsInteractor eventsInteractor) {
         mServiceApi = serviceApi;
         mPreferencesManager = preferencesManager;
         mAppDatabase = appDatabase;
         mAccountManager = accountManager;
+        mEventsInteractor = eventsInteractor;
     }
 
     public Flowable<List<LogSheetHeader>> getLogSheetHeaders(Long startLogDay, Long endLogDay) {
         return mServiceApi.getLogSheets(startLogDay, endLogDay)
                 .doOnNext(logSheetHeaders -> mAppDatabase.logSheetDao().insert(LogSheetConverter.toEntityList(logSheetHeaders)))
                 .toFlowable(BackpressureStrategy.LATEST);
+    }
+
+    public Flowable<LogSheetHeader> getLogSheetHeadersFromDB(long logDay) {
+        int driverId = mAccountManager.getCurrentUserId();
+        return mAppDatabase.logSheetDao().getLogSheet(logDay, driverId)
+                .map(LogSheetConverter::toModel);
     }
 
     public Single<LogSheetHeader> getLogSheet(Long logDay) {
@@ -105,6 +114,11 @@ public final class LogSheetInteractor {
         logSheetHeader.setTrailerIds("");
         logSheetHeader.setStartOfDay(0L);
         return logSheetHeader;
+    }
+
+    public Single<Boolean> sendReport(long start, long end, int option, String comment) {
+        ELDEvent report = mEventsInteractor.getLogSheetEvent(comment);
+        return mServiceApi.sendReport(start, end, option, report).map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
     }
 
 }

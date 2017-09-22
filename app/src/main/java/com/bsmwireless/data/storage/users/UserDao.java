@@ -22,6 +22,9 @@ public interface UserDao {
     @Query("SELECT * FROM users WHERE id = :id LIMIT 1")
     UserEntity getUserSync(int id);
 
+    @Query("SELECT * FROM users WHERE id IN (:id)")
+    List<UserEntity> getUsersSync(List<Integer> id);
+
     @Query("SELECT * FROM users WHERE id = :id LIMIT 1")
     Flowable<FullUserEntity> getFullUser(int id);
 

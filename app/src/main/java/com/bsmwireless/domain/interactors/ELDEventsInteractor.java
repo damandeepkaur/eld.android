@@ -12,10 +12,12 @@ import com.bsmwireless.data.storage.eldevents.ELDEventConverter;
 import com.bsmwireless.data.storage.eldevents.ELDEventDao;
 import com.bsmwireless.data.storage.eldevents.ELDEventEntity;
 import com.bsmwireless.data.storage.users.UserDao;
+import com.bsmwireless.models.AppInfo;
 import com.bsmwireless.models.BlackBoxModel;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.ResponseMessage;
 import com.bsmwireless.widgets.alerts.DutyType;
+import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -63,6 +65,12 @@ public final class ELDEventsInteractor {
         mUserInteractor.getTimezone().subscribe(timezone -> mTimezone = timezone);
     }
 
+    public Flowable<List<ELDEvent>> getEventsFromDB(long startTime, long endTime) {
+        int driverId = mAccountManager.getCurrentUserId();
+        return mELDEventDao.getEventsFromStartToEndTime(startTime, endTime, driverId)
+                .map(ELDEventConverter::toModelList);
+    }
+
     public Flowable<List<ELDEvent>> getDutyEventsFromDB(long startTime, long endTime) {
         int driverId = mAccountManager.getCurrentUserId();
         return mELDEventDao.getDutyEventsFromStartToEndTime(startTime, endTime, driverId)
@@ -71,6 +79,11 @@ public final class ELDEventsInteractor {
 
     public List<ELDEvent> getLatestActiveDutyEventFromDBSync(long latestTime, int userId) {
         return ELDEventConverter.toModelList(mELDEventDao.getLatestActiveDutyEventSync(latestTime, userId));
+    }
+
+    public Flowable<List<ELDEvent>> getLatestActiveDutyEventFromDB(long latestTime, int userId) {
+        return mELDEventDao.getLatestActiveDutyEvent(latestTime, userId)
+                .map(ELDEventConverter::toModelList);
     }
 
     public List<ELDEvent> getActiveEventsFromDBSync(long startTime, long endTime) {
@@ -180,6 +193,14 @@ public final class ELDEventsInteractor {
                 code.getCode(), codes);
     }
 
+    public Integer getMalfunctionCountSync(int driverId, long startTime, long endTime) {
+        return mELDEventDao.getMalfunctionEventCountSync(driverId, startTime, endTime);
+    }
+
+    public Integer getDiagnosticCountSync(int driverId, long startTime, long endTime) {
+        return mELDEventDao.getDiagnosticEventCountSync(driverId, startTime, endTime);
+    }
+
     private ArrayList<ELDEvent> getEvents(DutyType dutyType, String comment) {
         ArrayList<ELDEvent> events = new ArrayList<>();
         DutyType current = mDutyTypeManager.getDutyType();
@@ -279,6 +300,7 @@ public final class ELDEventsInteractor {
         ELDEvent event = new ELDEvent();
         event.setEventTime(currentTime);
         event.setEngineHours(blackBoxModel.getEngineHours());
+        event.setOdometer(blackBoxModel.getOdometer());
         event.setLat(blackBoxModel.getLat());
         event.setLng(blackBoxModel.getLon());
         event.setLocation("");
@@ -291,6 +313,27 @@ public final class ELDEventsInteractor {
         event.setVehicleId(mPreferencesManager.getVehicleId());
         event.setMobileTime(currentTime);
         event.setOrigin(isAuto ? ELDEvent.EventOrigin.AUTOMATIC_RECORD.getValue() : ELDEvent.EventOrigin.DRIVER.getValue());
+
+        return event;
+    }
+
+    public ELDEvent getLogSheetEvent(String comment) {
+        BlackBoxModel blackBoxModel = getBlackBoxState(mDutyTypeManager.getDutyType() == DutyType.PERSONAL_USE);
+        long currentTime = System.currentTimeMillis();
+        int driverId = mAccountManager.getCurrentUserId();
+
+        ELDEvent event = new ELDEvent();
+        event.setDriverId(driverId);
+        event.setVehicleId(mPreferencesManager.getVehicleId());
+        event.setEventTime(currentTime);
+        event.setEngineHours(blackBoxModel.getEngineHours());
+        event.setOdometer(blackBoxModel.getOdometer());
+        event.setLat(blackBoxModel.getLat());
+        event.setLng(blackBoxModel.getLon());
+        event.setTimezone(mTimezone);
+        event.setMobileTime(currentTime);
+        event.setComment(comment);
+        event.setAppInfo(new Gson().toJson(new AppInfo()));
 
         return event;
     }

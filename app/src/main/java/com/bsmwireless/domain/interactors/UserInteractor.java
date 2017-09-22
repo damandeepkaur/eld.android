@@ -314,6 +314,10 @@ public final class UserInteractor {
         return mAppDatabase.userDao().getFullUserSync(getUserId());
     }
 
+    public FullUserEntity getFullUserSync(int id) {
+        return mAppDatabase.userDao().getFullUserSync(id);
+    }
+
     public Flowable<User> getFullUser() {
         return mAppDatabase.userDao().getFullUser(getDriverId())
                 .map(fullUserEntity -> UserConverter.toFullUser(fullUserEntity));
@@ -357,6 +361,10 @@ public final class UserInteractor {
 
     public UserEntity getUserFromDBSync(int userId) {
         return mAppDatabase.userDao().getUserSync(userId);
+    }
+
+    public List<UserEntity> getUsersFromDBSync(String ids) {
+        return mAppDatabase.userDao().getUsersSync(ListConverter.toIntegerList(ids));
     }
 
     private List<Integer> saveCoDrivers(int driverId, List<Integer> coDriverIds) {
