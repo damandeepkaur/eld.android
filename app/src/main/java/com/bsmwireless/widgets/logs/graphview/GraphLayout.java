@@ -71,7 +71,9 @@ public final class GraphLayout extends LinearLayout {
     public void setPrevDayEvent(ELDEvent event) {
         if (mELDGraphView != null) {
             mPrevDayEvent = event;
-            mStartDayUnixTimeInMs = event.getEventTime();
+            if (event != null) {
+                mStartDayUnixTimeInMs = event.getEventTime();
+            }
         }
     }
 
