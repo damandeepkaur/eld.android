@@ -23,6 +23,7 @@ public final class PreferencesManager {
     private static final String KEY_DUTY_DAY = "duty_day";
 
     public static final int NOT_FOUND_VALUE = -1;
+    public static final int VEHICLE_NOT_FOUND_VALUE = -1;
 
     private SharedPreferences mPreferences;
 
@@ -85,7 +86,7 @@ public final class PreferencesManager {
     }
 
     public int getVehicleId() {
-        return mPreferences.getInt(KEY_SELECTED_VEHICLE_ID, NOT_FOUND_VALUE);
+        return mPreferences.getInt(KEY_SELECTED_VEHICLE_ID, VEHICLE_NOT_FOUND_VALUE);
     }
 
     public void setBoxId(int boxId) {

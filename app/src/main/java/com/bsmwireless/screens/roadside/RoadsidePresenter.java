@@ -69,7 +69,7 @@ public final class RoadsidePresenter {
                     long startTime = DateUtils.getStartDate(timezone, calendar);
                     long endTime = startTime + MS_IN_DAY;
 
-                    long logDay = DateUtils.convertTimeToDayNumber(timezone, startTime);
+                    long logDay = DateUtils.convertTimeToLogDay(timezone, startTime);
 
                     int driverId = mUserInteractor.getDriverId();
 

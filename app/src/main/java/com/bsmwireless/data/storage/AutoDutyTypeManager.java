@@ -72,12 +72,11 @@ public final class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListen
             mBlackBoxDisposable.dispose();
         }
 
-        mBlackBoxDisposable = (mBlackBoxInteractor.getData(boxId)
+        mBlackBoxDisposable = mBlackBoxInteractor.getData(boxId)
                 .subscribeOn(Schedulers.io())
                 .subscribe(
                         blackBoxState -> processBlackBoxState(blackBoxState),
-                        error -> Timber.e("BlackBox error: %s", error)
-        ));
+                        error -> Timber.e("BlackBox error: %s", error));
     }
 
     private void processBlackBoxState(BlackBoxModel blackBoxState) {
@@ -116,11 +115,10 @@ public final class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListen
 
                 if (mDutyTypeManager.getDutyType() != DutyType.PERSONAL_USE && mDutyTypeManager.getDutyType() != DutyType.YARD_MOVES) {
                     events.add(mEventsInteractor.getEvent(DutyType.DRIVING, null, true));
+                }
 
-                } else if (mDutyTypeManager.getDutyType() == DutyType.PERSONAL_USE) {
-                    if (mListener != null) {
-                        mListener.onAutoDrivingWithoutConfirm();
-                    }
+                if (mListener != null) {
+                    mListener.onAutoDrivingWithoutConfirm();
                 }
                 break;
 

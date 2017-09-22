@@ -159,7 +159,7 @@ public final class RoadsideFragment extends BaseFragment implements RoadsideView
     public List<String> getHeadersData(LogSheetHeader header, ELDEvent lastEvent, Vehicle vehicle) {
         List<String> data = new ArrayList<>();
 
-        long time = DateUtils.convertDayNumberToUnixMs(header.getLogDay());
+        long time = DateUtils.convertLogDayToUnixMs(header.getLogDay());
 
         HomeTerminal terminal = header.getHomeTerminal();
         TimeZone timeZone = TimeZone.getTimeZone(terminal == null ? "UTC" : header.getHomeTerminal().getTimezone());

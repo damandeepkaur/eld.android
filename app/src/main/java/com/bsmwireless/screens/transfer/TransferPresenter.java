@@ -5,7 +5,6 @@ import com.bsmwireless.common.utils.DateUtils;
 import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
-import com.bsmwireless.domain.interactors.LogSheetInteractor;
 import com.bsmwireless.domain.interactors.UserInteractor;
 import com.bsmwireless.screens.common.menu.BaseMenuPresenter;
 import com.bsmwireless.screens.common.menu.BaseMenuView;
@@ -24,7 +23,6 @@ import static com.bsmwireless.common.utils.DateUtils.MS_IN_DAY;
 @ActivityScope
 public final class TransferPresenter extends BaseMenuPresenter {
 
-    private LogSheetInteractor mLogSheetInteractor;
     private TransferView mView;
 
     @Inject
@@ -32,10 +30,8 @@ public final class TransferPresenter extends BaseMenuPresenter {
                              UserInteractor userInteractor,
                              DutyTypeManager dutyTypeManager,
                              ELDEventsInteractor eventsInteractor,
-                             LogSheetInteractor logSheetInteractor,
                              AccountManager accountManager) {
         super(dutyTypeManager, eventsInteractor, userInteractor, accountManager);
-        mLogSheetInteractor = logSheetInteractor;
         mView = view;
 
         Timber.d("CREATED");
@@ -59,9 +55,9 @@ public final class TransferPresenter extends BaseMenuPresenter {
     void onConfirmClick(String comment, int option) {
         getDisposables().add(getUserInteractor().getTimezone()
                 .flatMap(timezone -> {
-                    long endDay = DateUtils.convertTimeToDayNumber(timezone, System.currentTimeMillis());
-                    long startDay = DateUtils.convertTimeToDayNumber(timezone, System.currentTimeMillis() - 8 * MS_IN_DAY);
-                    return mLogSheetInteractor.sendReport(startDay, endDay, option, comment).toFlowable();
+                    long endDay = DateUtils.convertTimeToLogDay(timezone, System.currentTimeMillis());
+                    long startDay = DateUtils.convertTimeToLogDay(timezone, System.currentTimeMillis() - 8 * MS_IN_DAY);
+                    return getEventsInteractor().sendReport(startDay, endDay, option, comment).toFlowable();
                 })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

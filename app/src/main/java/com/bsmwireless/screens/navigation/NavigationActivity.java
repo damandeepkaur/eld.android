@@ -21,7 +21,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bsmwireless.common.App;
-import com.bsmwireless.models.User;
 import com.bsmwireless.screens.autologout.AutoDutyDialogActivity;
 import com.bsmwireless.screens.common.menu.BaseMenuActivity;
 import com.bsmwireless.screens.common.menu.BaseMenuPresenter;
@@ -45,7 +44,6 @@ import butterknife.Unbinder;
 import static com.bsmwireless.screens.autologout.AutoDutyDialogActivity.EXTRA_AUTO_DRIVING;
 import static com.bsmwireless.screens.autologout.AutoDutyDialogActivity.EXTRA_AUTO_DRIVING_WITHOUT_CONFIRM;
 import static com.bsmwireless.screens.autologout.AutoDutyDialogActivity.EXTRA_AUTO_ON_DUTY;
-import static com.bsmwireless.screens.driverprofile.DriverProfileActivity.EXTRA_USER;
 
 public final class NavigationActivity extends BaseMenuActivity implements OnNavigationItemSelectedListener, NavigateView, ViewPager.OnPageChangeListener {
 
@@ -257,23 +255,6 @@ public final class NavigationActivity extends BaseMenuActivity implements OnNavi
     @Override
     protected BaseMenuPresenter getPresenter() {
         return mPresenter;
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode) {
-            case REQUEST_CODE_UPDATE_USER: {
-                if (data != null && data.hasExtra(EXTRA_USER)) {
-                    User user = data.getParcelableExtra(EXTRA_USER);
-                    mPresenter.onUserUpdated(user);
-                }
-                break;
-            }
-            default: {
-                break;
-            }
-        }
     }
 
     @Override

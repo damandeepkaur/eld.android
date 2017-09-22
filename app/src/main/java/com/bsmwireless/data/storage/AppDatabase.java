@@ -11,6 +11,8 @@ import com.bsmwireless.data.storage.eldevents.ELDEventDao;
 import com.bsmwireless.data.storage.eldevents.ELDEventEntity;
 import com.bsmwireless.data.storage.hometerminals.HomeTerminalDao;
 import com.bsmwireless.data.storage.hometerminals.HomeTerminalEntity;
+import com.bsmwireless.data.storage.hometerminals.userhometerminal.UserHomeTerminalDao;
+import com.bsmwireless.data.storage.hometerminals.userhometerminal.UserHomeTerminalEntity;
 import com.bsmwireless.data.storage.logsheets.LogSheetDao;
 import com.bsmwireless.data.storage.logsheets.LogSheetEntity;
 import com.bsmwireless.data.storage.users.UserDao;
@@ -20,7 +22,8 @@ import com.bsmwireless.data.storage.vehicles.VehicleEntity;
 
 
 @Database(entities = {UserEntity.class, VehicleEntity.class, ELDEventEntity.class, CarrierEntity.class,
-        HomeTerminalEntity.class, LogSheetEntity.class, ConfigurationEntity.class}, version = 15)
+        HomeTerminalEntity.class, LogSheetEntity.class, ConfigurationEntity.class,
+        UserHomeTerminalEntity.class}, version = 17)
 public abstract class AppDatabase extends RoomDatabase {
     public abstract UserDao userDao();
     public abstract VehicleDao vehicleDao();
@@ -29,4 +32,5 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract HomeTerminalDao homeTerminalDao();
     public abstract ConfigurationDao configurationDao();
     public abstract LogSheetDao logSheetDao();
+    public abstract UserHomeTerminalDao userHomeTerminalDao();
 }

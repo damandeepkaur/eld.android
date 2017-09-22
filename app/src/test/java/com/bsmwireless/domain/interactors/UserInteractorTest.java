@@ -7,6 +7,7 @@ import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.data.storage.carriers.CarrierDao;
 import com.bsmwireless.data.storage.hometerminals.HomeTerminalDao;
+import com.bsmwireless.data.storage.hometerminals.userhometerminal.UserHomeTerminalDao;
 import com.bsmwireless.data.storage.users.FullUserEntity;
 import com.bsmwireless.data.storage.users.UserConverter;
 import com.bsmwireless.data.storage.users.UserDao;
@@ -145,10 +146,16 @@ public class UserInteractorTest {
     HomeTerminalDao mHomeTerminalDao;
 
     @Mock
+    UserHomeTerminalDao mUserHomeTerminalDao;
+
+    @Mock
     ResponseMessage mResponseMessage;
 
     @Mock
     AccountManager mAccountManager;
+
+    @Mock
+    SyncInteractor mSyncInteractor;
 
 
     private UserInteractor mLoginUserInteractor;
@@ -161,7 +168,7 @@ public class UserInteractorTest {
         MockitoAnnotations.initMocks(this);
 
 
-        mLoginUserInteractor = new UserInteractor(mServiceApi, mPreferencesManager, mAppDatabase, mTokenManager, mAccountManager);
+        mLoginUserInteractor = new UserInteractor(mServiceApi, mPreferencesManager, mAppDatabase, mTokenManager, mAccountManager, mSyncInteractor);
     }
 
     /**
@@ -300,13 +307,16 @@ public class UserInteractorTest {
         when(mServiceApi.getELDEvents(anyLong(), anyLong())).thenReturn(Observable.just(eldEvents));
 
         when(mAppDatabase.homeTerminalDao()).thenReturn(mHomeTerminalDao);
+        when(mAppDatabase.userHomeTerminalDao()).thenReturn(mUserHomeTerminalDao);
 
         // when
         mLoginUserInteractor.loginUser(mName, mPassword, mDomain, mKeepToken, mDriverType)
                 .subscribe(testObserver);
 
         // then
+        verify(mUserHomeTerminalDao).deleteUserHomeTerminal(user.getId());
         verify(mHomeTerminalDao).insertHomeTerminals(any(List.class));
+        verify(mUserHomeTerminalDao).insertUserHomeTerminal(any(List.class));
     }
 
     /**

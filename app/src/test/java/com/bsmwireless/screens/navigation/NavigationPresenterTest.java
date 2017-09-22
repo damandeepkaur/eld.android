@@ -3,13 +3,10 @@ package com.bsmwireless.screens.navigation;
 import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.data.storage.AutoDutyTypeManager;
 import com.bsmwireless.data.storage.DutyTypeManager;
-import com.bsmwireless.data.storage.users.UserConverter;
-import com.bsmwireless.data.storage.users.UserEntity;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
 import com.bsmwireless.domain.interactors.SyncInteractor;
 import com.bsmwireless.domain.interactors.UserInteractor;
 import com.bsmwireless.domain.interactors.VehiclesInteractor;
-import com.bsmwireless.models.User;
 
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -23,7 +20,6 @@ import app.bsmuniversal.com.RxSchedulerRule;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
 
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
@@ -154,37 +150,4 @@ public class NavigationPresenterTest {
         verify(mView).setBoxId(eq(boxId));
         verify(mView).setAssetsNumber(eq(assetNumber));
     }
-
-    /**
-     * Test API call to update user.
-     */
-    @Test
-    public void testOnUserUpdated() {
-        // given
-        User user = new User();
-        user.setId(0);
-
-        when(mUserInteractor.getUserFromDBSync(user.getId())).thenReturn(UserConverter.toEntity(user));
-        when(mUserInteractor.syncDriverProfile(any(UserEntity.class))).thenReturn(Observable.just(true)); // prevent null pointer exception
-
-        // when
-        mNavigationPresenter.onUserUpdated(user);
-
-        // then
-        verify(mUserInteractor).getUserFromDBSync(eq(user.getId()));
-        verify(mUserInteractor).syncDriverProfile(any(UserEntity.class));
-    }
-
-    @Test
-    public void testOnUserUpdatedNullUser() {
-        // given
-        // n/a
-
-        // when
-        mNavigationPresenter.onUserUpdated(null);
-
-        // then
-        verify(mUserInteractor, never()).syncDriverProfile(any(UserEntity.class));
-    }
-
 }
