@@ -21,8 +21,9 @@ import com.bsmwireless.widgets.alerts.DutyType;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -145,8 +146,8 @@ public final class ELDEventsInteractor {
      *
      * @return
      */
-    public Flowable<List<ELDEvent>> getDiagnosticEvents() {
-        return Flowable.just(Collections.emptyList());
+    public Single<List<ELDEvent>> getDiagnosticEvents() {
+        return loadLoggedMalfunctionsByParams(Constants.DIAGNOSTIC_CODES);
     }
 
     /**
@@ -154,8 +155,41 @@ public final class ELDEventsInteractor {
      *
      * @return
      */
-    public Flowable<List<ELDEvent>> getMalfunctionEvents() {
-        return Flowable.just(Collections.emptyList());
+    public Single<List<ELDEvent>> getMalfunctionEvents() {
+        return loadLoggedMalfunctionsByParams(Constants.MALFUNCTION_CODES);
+    }
+
+    private Single<List<ELDEvent>> loadLoggedMalfunctionsByParams(String[] malcodes) {
+        return mELDEventDao
+                .loadMalfunctions(mAccountManager.getCurrentUserId(),
+                        ELDEvent.EventType.DATA_DIAGNOSTIC.getValue(),
+                        malcodes)
+                .flatMap(this::removeClearedEvents)
+                .map(ELDEventConverter::toModelList);
+    }
+
+    /**
+     * Removes cleared events from list. Input list must be sortered by event time from early to late
+     *
+     * @param eldEventEntities
+     * @return
+     */
+    private Single<List<ELDEventEntity>> removeClearedEvents(List<ELDEventEntity> eldEventEntities) {
+        return Single.fromCallable(() -> {
+
+            Map<String, ELDEventEntity> items = new LinkedHashMap<>();
+            for (ELDEventEntity entity : eldEventEntities) {
+                if (entity.getEventCode() == ELDEvent.MalfunctionCode.DIAGNOSTIC_LOGGED.getCode() ||
+                        entity.getEventCode() == ELDEvent.MalfunctionCode.MALFUNCTION_LOGGED.getCode()) {
+                    items.put(entity.getMalCode(), entity);
+                } else if (entity.getEventCode() == ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED.getCode() ||
+                        entity.getEventCode() == ELDEvent.MalfunctionCode.MALFUNCTION_CLEARED.getCode()) {
+                    items.remove(entity.getMalCode());
+                }
+            }
+
+            return new ArrayList<>(items.values());
+        });
     }
 
     public Flowable<Boolean> hasMalfunctionEvents() {
@@ -193,11 +227,11 @@ public final class ELDEventsInteractor {
                 .map(ELDEventConverter::toModel);
     }
 
-    public Single<Boolean> isLocationUpdateEventExists(){
+    public Single<Boolean> isLocationUpdateEventExists() {
         // FIXME: 21.09.2017 Need to exclude events for which modified events with updated coordinates are exist
         return mELDEventDao
                 .getCountForChangingLocationEvent(mAccountManager.getCurrentUserId(),
-                        new String[] {ELDEvent.LatLngFlag.FLAG_E.getCode(), ELDEvent.LatLngFlag.FLAG_X.getCode()})
+                        new String[]{ELDEvent.LatLngFlag.FLAG_E.getCode(), ELDEvent.LatLngFlag.FLAG_X.getCode()})
                 .map(count -> count != 0);
     }
 
@@ -326,7 +360,7 @@ public final class ELDEventsInteractor {
         return event;
     }
 
-    private ELDEvent.LatLngFlag getLatLngFlag(BlackBoxModel blackBoxModel){
+    private ELDEvent.LatLngFlag getLatLngFlag(BlackBoxModel blackBoxModel) {
         ELDEventEntity latestEvent = mELDEventDao.getLatestEventSync(
                 ELDEvent.EventType.DATA_DIAGNOSTIC.getValue(),
                 Malfunction.POSITIONING_COMPLIANCE.getCode());

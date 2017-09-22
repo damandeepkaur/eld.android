@@ -57,8 +57,6 @@ public final class MissingDataJob extends BaseMalfunctionJob implements Malfunct
     }
 
     private boolean isStateAndEventAreDifferent(Result result) {
-
-
         ELDEvent latestEvent = result.latestEvent;
         if (result.isEventsForUpdateLocationExist) {
             return latestEvent.getEventCode() == ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED.getCode();

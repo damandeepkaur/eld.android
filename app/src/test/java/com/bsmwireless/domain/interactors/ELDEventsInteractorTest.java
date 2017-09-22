@@ -1,6 +1,7 @@
 package com.bsmwireless.domain.interactors;
 
 import com.bsmwireless.BaseTest;
+import com.bsmwireless.common.Constants;
 import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.network.authenticator.TokenManager;
 import com.bsmwireless.data.storage.AccountManager;
@@ -20,11 +21,18 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 
+import java.util.Arrays;
+import java.util.List;
+
 import io.reactivex.Flowable;
+import io.reactivex.Single;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class ELDEventsInteractorTest extends BaseTest {
@@ -143,5 +151,96 @@ public class ELDEventsInteractorTest extends BaseTest {
 
         assertEquals(ELDEvent.LatLngFlag.FLAG_X, event.getLatLngFlag());
 
+    }
+
+    /**
+     * Test for getting a correct list of diagnostic events
+     *
+     * @throws Exception
+     */
+    @Test
+    public void getDiagnosticEvents() throws Exception {
+
+        final int currentUserId = 1;
+
+        when(mAccountManager.getCurrentUserId()).thenReturn(currentUserId);
+
+        // logged events
+
+        ELDEventEntity powerDiagnosticLogged = mock(ELDEventEntity.class);
+        when(powerDiagnosticLogged.getEventCode())
+                .thenReturn(ELDEvent.MalfunctionCode.DIAGNOSTIC_LOGGED.getCode());
+        when(powerDiagnosticLogged.getMalCode())
+                .thenReturn(Malfunction.POWER_DATA_DIAGNOSTIC.getCode());
+
+        ELDEventEntity engineSynchLogged = mock(ELDEventEntity.class);
+        when(engineSynchLogged.getEventCode())
+                .thenReturn(ELDEvent.MalfunctionCode.DIAGNOSTIC_LOGGED.getCode());
+        when(engineSynchLogged.getMalCode())
+                .thenReturn(Malfunction.ENGINE_SYNCHRONIZATION.getCode());
+
+        ELDEventEntity dataTransferLogged = mock(ELDEventEntity.class);
+        when(dataTransferLogged.getEventCode())
+                .thenReturn(ELDEvent.MalfunctionCode.DIAGNOSTIC_LOGGED.getCode());
+        when(dataTransferLogged.getMalCode())
+                .thenReturn(Malfunction.DATA_TRANSFER.getCode());
+
+        ELDEventEntity secondPowerDiagnosticLogged = mock(ELDEventEntity.class);
+        when(secondPowerDiagnosticLogged.getEventCode())
+                .thenReturn(ELDEvent.MalfunctionCode.DIAGNOSTIC_LOGGED.getCode());
+        when(secondPowerDiagnosticLogged.getMalCode())
+                .thenReturn(Malfunction.POWER_DATA_DIAGNOSTIC.getCode());
+
+        ELDEventEntity unidentifiedLogged = mock(ELDEventEntity.class);
+        when(unidentifiedLogged.getEventCode())
+                .thenReturn(ELDEvent.MalfunctionCode.DIAGNOSTIC_LOGGED.getCode());
+        when(unidentifiedLogged.getMalCode())
+                .thenReturn(Malfunction.UNIDENTIFIED_DRIVING.getCode());
+
+        // cleared events
+        ELDEventEntity powerDiagnosticCleared = mock(ELDEventEntity.class);
+        when(powerDiagnosticCleared.getEventCode())
+                .thenReturn(ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED.getCode());
+        when(powerDiagnosticCleared.getMalCode())
+                .thenReturn(Malfunction.POWER_DATA_DIAGNOSTIC.getCode());
+
+        ELDEventEntity dataTransferCleared = mock(ELDEventEntity.class);
+        when(dataTransferCleared.getEventCode())
+                .thenReturn(ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED.getCode());
+        when(dataTransferCleared.getMalCode())
+                .thenReturn(Malfunction.DATA_TRANSFER.getCode());
+
+        ELDEventEntity unidentifiedCleared = mock(ELDEventEntity.class);
+        when(unidentifiedCleared.getEventCode())
+                .thenReturn(ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED.getCode());
+        when(unidentifiedCleared.getMalCode())
+                .thenReturn(Malfunction.UNIDENTIFIED_DRIVING.getCode());
+
+        ELDEventEntity engineSynchCleared = mock(ELDEventEntity.class);
+        when(engineSynchCleared.getEventCode())
+                .thenReturn(ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED.getCode());
+        when(engineSynchCleared.getMalCode())
+                .thenReturn(Malfunction.ENGINE_SYNCHRONIZATION.getCode());
+
+        List<ELDEventEntity> entities = Arrays.asList(powerDiagnosticLogged, engineSynchLogged,
+                powerDiagnosticCleared, engineSynchCleared, secondPowerDiagnosticLogged,
+                dataTransferLogged, unidentifiedLogged, unidentifiedCleared, dataTransferCleared);
+
+        when(mELDEventDao.loadMalfunctions(anyInt(), anyInt(), any(String[].class)))
+                .thenReturn(Single.just(entities));
+
+        mELDEventsInteractor.getDiagnosticEvents()
+                .test()
+                .assertValue(events -> {
+
+                    if (events.size() != 1) return false;
+                    ELDEvent event = events.get(0);
+
+                    return event.getMalCode() == Malfunction.POWER_DATA_DIAGNOSTIC
+                            && event.getEventCode() == ELDEvent.MalfunctionCode.DIAGNOSTIC_LOGGED.getCode();
+                });
+        verify(mELDEventDao).loadMalfunctions(currentUserId,
+                ELDEvent.EventType.DATA_DIAGNOSTIC.getValue(),
+                Constants.DIAGNOSTIC_CODES);
     }
 }

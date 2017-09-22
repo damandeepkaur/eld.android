@@ -72,11 +72,21 @@ public interface ELDEventDao {
      * @param malCode malfunction code. For non-malfunction event should be empty
      * @return latest ELD event
      */
-    @Query("SELECT * FROM events WHERE event_type = :type and mal_code = :malCode ORDER BY event_time LIMIT 1")
+    @Query("SELECT * FROM events WHERE event_type = :type AND mal_code = :malCode ORDER BY event_time LIMIT 1")
     ELDEventEntity getLatestEventSync(int type, String malCode);
 
     @Query("SELECT count(id) FROM events WHERE driver_id = :driverId AND latlng_code IN (:latLngCode)")
     Single<Integer> getCountForChangingLocationEvent(int driverId, String[] latLngCode);
+
+    /**
+     * Loads all malfunctions by parameters
+     * @param driverId driver id
+     * @param type event type
+     * @param malCodes malcode ranges
+     * @return
+     */
+    @Query("SELECT * FROM events WHERE driver_id = :driverId AND event_type = :type AND mal_code IN (:malCodes) ORDER BY event_time")
+    Single<List<ELDEventEntity>> loadMalfunctions(int driverId, int type, String[] malCodes);
 
     @Delete
     void delete(ELDEventEntity event);
