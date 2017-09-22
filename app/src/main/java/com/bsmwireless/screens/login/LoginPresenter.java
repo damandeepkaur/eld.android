@@ -1,8 +1,11 @@
 package com.bsmwireless.screens.login;
 
 
+import android.util.Log;
+
 import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.common.utils.SchedulerUtils;
+import com.bsmwireless.data.network.RetrofitException;
 import com.bsmwireless.domain.interactors.UserInteractor;
 import com.bsmwireless.models.User;
 
@@ -12,6 +15,8 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+import retrofit2.HttpException;
+import retrofit2.Retrofit;
 import timber.log.Timber;
 
 
@@ -76,6 +81,9 @@ public final class LoginPresenter {
                         },
                         error -> {
                             Timber.e("LoginUser error: %s", error);
+                            if (error instanceof RetrofitException) {
+                                mView.showErrorMessage((RetrofitException) error);
+                            }
                             mView.setLoginButtonEnabled(true);
                             mView.hideProgressBar();
                         }

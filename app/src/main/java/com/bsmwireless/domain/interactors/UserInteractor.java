@@ -41,6 +41,7 @@ import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
+import retrofit2.HttpException;
 
 import static com.bsmwireless.common.Constants.SUCCESS;
 import static com.bsmwireless.common.utils.DateUtils.MS_IN_WEEK;
@@ -116,6 +117,9 @@ public final class UserInteractor {
                     return Observable.just(true);
                 })
                 .onErrorResumeNext(throwable -> {
+                    if (throwable instanceof HttpException) {
+                        return Observable.error(RetrofitException.httpError(((HttpException) throwable).response()));
+                    }
                     return Observable.just(false);
                 });
     }
