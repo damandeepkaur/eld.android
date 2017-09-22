@@ -1,5 +1,7 @@
 package com.bsmwireless.domain.interactors;
 
+import android.util.Log;
+
 import com.bsmwireless.common.utils.DateUtils;
 import com.bsmwireless.common.utils.ListConverter;
 import com.bsmwireless.data.network.RetrofitException;
@@ -43,6 +45,7 @@ import io.reactivex.Observable;
 import io.reactivex.Single;
 import retrofit2.HttpException;
 
+import static com.bsmwireless.common.Constants.DEFAULT_CALENDAR_DAYS_COUNT;
 import static com.bsmwireless.common.Constants.SUCCESS;
 import static com.bsmwireless.common.utils.DateUtils.MS_IN_WEEK;
 
@@ -53,15 +56,17 @@ public final class UserInteractor {
     private TokenManager mTokenManager;
     private PreferencesManager mPreferencesManager;
     private AccountManager mAccountManager;
+    private SyncInteractor mSyncInteractor;
 
     @Inject
     public UserInteractor(ServiceApi serviceApi, PreferencesManager preferencesManager, AppDatabase appDatabase,
-                          TokenManager tokenManager, AccountManager accountManager) {
+                          TokenManager tokenManager, AccountManager accountManager, SyncInteractor syncInteractor) {
         mServiceApi = serviceApi;
         mPreferencesManager = preferencesManager;
         mAppDatabase = appDatabase;
         mTokenManager = tokenManager;
         mAccountManager = accountManager;
+        mSyncInteractor = syncInteractor;
     }
 
     public Observable<Boolean> loginUser(final String name, final String password, final String domain, boolean keepToken, User.DriverType driverType) {
@@ -72,7 +77,6 @@ public final class UserInteractor {
         request.setDriverType(driverType.ordinal());
 
         String accountName = mTokenManager.getAccountName(name, domain);
-
         return mServiceApi.loginUser(request)
                 .doOnNext(user -> saveUserDataInDB(user, accountName))
                 .onErrorResumeNext(throwable -> {
@@ -84,10 +88,16 @@ public final class UserInteractor {
                                 .map(UserConverter::toUser)
                                 .map(user -> user.setAuth(new Auth(Integer.valueOf(driverId))));
                     }
+
+                    if (throwable instanceof HttpException) {
+                        return Observable.error(RetrofitException.httpError(((HttpException) throwable).response()));
+                    }
+
                     return Observable.error(throwable);
                 })
-                .doOnNext(user -> mTokenManager.setToken(accountName, name, password, domain, user.getAuth()))
-                .flatMap(user -> {
+                .doOnNext(user -> {
+                    mTokenManager.setToken(accountName, name, password, domain, user.getAuth());
+
                     //save user data
                     mPreferencesManager.setRememberUserEnabled(keepToken);
                     mPreferencesManager.setShowHomeScreenEnabled(true);
@@ -95,33 +105,10 @@ public final class UserInteractor {
                     mAccountManager.setCurrentDriver(user.getAuth().getDriverId(), accountName);
                     mAccountManager.setCurrentUser(user.getAuth().getDriverId(), accountName);
 
-                    // get last 7 days events
-                    long current = System.currentTimeMillis();
-                    long start = DateUtils.getStartDayTimeInMs(user.getTimezone(), current - MS_IN_WEEK);
-                    long end = DateUtils.getEndDayTimeInMs(user.getTimezone(), current);
-                    return mServiceApi.getELDEvents(start, end);
+                    mSyncInteractor.syncEventsForDaysAgo(DEFAULT_CALENDAR_DAYS_COUNT, user.getTimezone());
+                    mSyncInteractor.syncLogSheetHeadersForDaysAgo(DEFAULT_CALENDAR_DAYS_COUNT, user.getTimezone());
                 })
-                .onErrorResumeNext(throwable -> {
-                    throwable.printStackTrace();
-                    if (throwable instanceof RetrofitException || throwable instanceof UnknownHostException) {
-                        return Observable.just(new ArrayList<>());
-                    }
-                    return Observable.error(throwable);
-                })
-                .switchMap(eldEvents -> {
-                    if (eldEvents == null) {
-                        return Observable.just(false);
-                    }
-                    ELDEventEntity[] entities = ELDEventConverter.toEntityArray(eldEvents);
-                    mAppDatabase.ELDEventDao().insertAll(entities);
-                    return Observable.just(true);
-                })
-                .onErrorResumeNext(throwable -> {
-                    if (throwable instanceof HttpException) {
-                        return Observable.error(RetrofitException.httpError(((HttpException) throwable).response()));
-                    }
-                    return Observable.just(false);
-                });
+                .switchMap(user -> Observable.just(true));
     }
 
     public Completable loginCoDriver(final String name, final String password, User.DriverType driverType) {
@@ -293,13 +280,13 @@ public final class UserInteractor {
 
     public Flowable<FullUserEntity> getFullDriver() {
         return mAppDatabase.userDao()
-                   .getFullUser(getDriverId())
-                   .doOnNext(userEntity -> {
-                       userEntity.setHomeTerminalEntities(
-                           mAppDatabase.homeTerminalDao()
-                                       .getHomeTerminalsSync(userEntity.getHomeTerminalIds())
-                       );
-                   });
+                .getFullUser(getDriverId())
+                .doOnNext(userEntity -> {
+                    userEntity.setHomeTerminalEntities(
+                            mAppDatabase.homeTerminalDao()
+                                    .getHomeTerminalsSync(userEntity.getHomeTerminalIds())
+                    );
+                });
     }
 
     public FullUserEntity getFullUserSync() {
