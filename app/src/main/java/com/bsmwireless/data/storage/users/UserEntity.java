@@ -42,7 +42,7 @@ public final class UserEntity {
     @ColumnInfo(name = "last_vehicle_ids")
     private String mLastVehicleIds;
     @ColumnInfo(name = "co_drivers_ids")
-    private String mCoDriversIds;
+    private String mCoDriversIds = "";
     @ColumnInfo(name = "account_name")
     private String mAccountName;
 
