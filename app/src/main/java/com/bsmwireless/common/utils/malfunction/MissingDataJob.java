@@ -1,5 +1,7 @@
 package com.bsmwireless.common.utils.malfunction;
 
+import android.support.annotation.VisibleForTesting;
+
 import com.bsmwireless.common.utils.observers.DutyManagerObservable;
 import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
@@ -12,7 +14,11 @@ import javax.inject.Inject;
 import io.reactivex.Observable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+import timber.log.Timber;
 
+/**
+ * Job for detecting data diagnostic events according to paragraph 4.6.1.4 (d) of ELD Requirements
+ */
 public final class MissingDataJob extends BaseMalfunctionJob implements MalfunctionJob {
 
     @Inject
@@ -22,11 +28,19 @@ public final class MissingDataJob extends BaseMalfunctionJob implements Malfunct
 
     @Override
     public final void start() {
-        Disposable disposable = DutyManagerObservable.create(getDutyTypeManager())
-                .filter(dutyType -> DutyType.DRIVING == dutyType)
-                .flatMap(unused -> getELDEventsInteractor().isLocationUpdateEventExists().toObservable())
+        Disposable disposable = createDutyTypeObservable()
+                .filter(dutyType -> DutyType.DRIVING != dutyType)
+                .flatMap(unused -> getELDEventsInteractor().isLocationUpdateEventExists()
+                        .toObservable())
                 .zipWith(loadLatest(), Result::new)
                 .filter(this::isStateAndEventAreDifferent)
+                .map(result -> createEvent(Malfunction.MISSING_REQUIRED_DATA_ELEMENTS,
+                        createCodeForDiagnostic(result.latestEvent)))
+                .flatMap(this::saveEvents)
+                .onErrorReturn(throwable -> {
+                    Timber.e(throwable, "Error save the eld event");
+                    return -1L;
+                })
                 .subscribeOn(Schedulers.io())
                 .subscribe();
         add(disposable);
@@ -37,18 +51,25 @@ public final class MissingDataJob extends BaseMalfunctionJob implements Malfunct
         dispose();
     }
 
+    @VisibleForTesting
+    Observable<DutyType> createDutyTypeObservable(){
+        return DutyManagerObservable.create(getDutyTypeManager());
+    }
+
     private boolean isStateAndEventAreDifferent(Result result) {
 
+
+        ELDEvent latestEvent = result.latestEvent;
         if (result.isEventsForUpdateLocationExist) {
-
+            return latestEvent.getEventCode() == ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED.getCode();
         } else {
-
+            return latestEvent.getEventCode() == ELDEvent.MalfunctionCode.DIAGNOSTIC_LOGGED.getCode();
         }
-        return true;
     }
 
     private Observable<ELDEvent> loadLatest() {
-        return getELDEventsInteractor().getLatestMalfunctionEvent(Malfunction.MISSING_REQUIRED_DATA_ELEMENTS)
+        return getELDEventsInteractor()
+                .getLatestMalfunctionEvent(Malfunction.MISSING_REQUIRED_DATA_ELEMENTS)
                 .toObservable()
                 .switchIfEmpty(this::switchToDefaultDiagnosticCleared);
     }
@@ -62,17 +83,4 @@ public final class MissingDataJob extends BaseMalfunctionJob implements Malfunct
             this.latestEvent = latestEvent;
         }
     }
-
-/*    private Observable<Long> createDiagnosticLoggedEvent() {
-
-                .flatMap(eldEvent -> {
-                    if (eldEvent.getEventCode() == ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED.getCode()) {
-                        ELDEvent event = createEvent(Malfunction.MISSING_REQUIRED_DATA_ELEMENTS,
-                                ELDEvent.MalfunctionCode.DIAGNOSTIC_LOGGED);
-                        return saveEvents(event);
-                    }
-                    //already logged, just return a stub
-                    return Observable.just(0L);
-                });
-    }*/
 }

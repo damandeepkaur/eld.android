@@ -58,6 +58,9 @@ android {
         disable 'MissingTranslation', 'ExtraTranslation'
         abortOnError false
     }
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
 }
 
 def getGitCommitVersion() {
