@@ -43,7 +43,7 @@ public class BaseTestCaseLoginOnce extends BaseTestClass {
     public void setUp() throws Exception {
         if (!loggedIn) {
             login(activeUser, true);
-            wait_for_view(REQUEST_TIMEOUT, SelectAssetLocators.not_in_vehicle_button);
+            close_keyboard_and_wait_for_view(SelectAssetLocators.not_in_vehicle_button);
             loggedIn = true;
             SelectAssetPage.go_to_home_screen();
         }
