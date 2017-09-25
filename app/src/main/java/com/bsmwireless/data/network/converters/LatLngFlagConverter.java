@@ -16,7 +16,7 @@ public final class LatLngFlagConverter implements JsonDeserializer<ELDEvent.LatL
     public ELDEvent.LatLngFlag deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
         return json.isJsonNull() ?
                 ELDEvent.LatLngFlag.FLAG_NONE :
-                ELDEvent.LatLngFlag.createbyCode(json.getAsString());
+                ELDEvent.LatLngFlag.createByCode(json.getAsString());
     }
 
     @Override

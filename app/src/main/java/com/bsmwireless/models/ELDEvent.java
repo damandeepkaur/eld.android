@@ -129,7 +129,7 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
             return mCode;
         }
 
-        public static LatLngFlag createbyCode(String code) {
+        public static LatLngFlag createByCode(String code) {
             for (LatLngFlag flag : values()) {
                 if (flag.mCode.equalsIgnoreCase(code)) return flag;
             }
@@ -258,7 +258,7 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
         }
         notNull = in.readByte() == 1;
         if (notNull) {
-            this.mLatLngFlag = LatLngFlag.createbyCode(in.readString());
+            this.mLatLngFlag = LatLngFlag.createByCode(in.readString());
         }
         notNull = in.readByte() == 1;
         if (notNull) {
@@ -790,7 +790,7 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
         sb.append(", mEngineHours=").append(mEngineHours);
         sb.append(", mLat=").append(mLat);
         sb.append(", mLng=").append(mLng);
-        sb.append(", mLatLngFlag").append(mLatLngFlag.mCode);
+        sb.append(", mLatLngFlag").append(mLatLngFlag);
         sb.append(", mDistance=").append(mDistance);
         sb.append(", mComment='").append(mComment).append('\'');
         sb.append(", mLocation='").append(mLocation).append('\'');
