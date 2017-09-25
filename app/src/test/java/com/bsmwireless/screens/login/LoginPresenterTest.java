@@ -1,7 +1,6 @@
 package com.bsmwireless.screens.login;
 
 
-import com.bsmwireless.data.network.NtpClientManager;
 import com.bsmwireless.domain.interactors.UserInteractor;
 import com.bsmwireless.models.User;
 
