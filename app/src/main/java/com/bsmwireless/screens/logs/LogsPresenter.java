@@ -419,7 +419,7 @@ public final class LogsPresenter implements AccountManager.AccountListener {
         }
 
         mDisposables.add(mLogSheetInteractor.updateLogSheetHeader(mSelectedLogHeader)
-                .flatMap(isLogSheetUpdated -> mUserInteractor.updateDriverRule(logHeaderModel.getSelectedExemptions(), mUser.getDutyCycle()))
+                .flatMapObservable(isLogSheetUpdated -> mUserInteractor.updateDriverRule(logHeaderModel.getSelectedExemptions(), mUser.getDutyCycle()))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(result -> {

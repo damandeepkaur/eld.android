@@ -44,16 +44,18 @@ public final class DriverSignature implements Parcelable {
         return mDriverId;
     }
 
-    public void setDriverId(Integer driverId) {
+    public DriverSignature setDriverId(Integer driverId) {
         this.mDriverId = driverId;
+        return this;
     }
 
     public String getSignature() {
         return mSignature;
     }
 
-    public void setSignature(String signature) {
+    public DriverSignature setSignature(String signature) {
         this.mSignature = signature;
+        return this;
     }
 
     @Override
