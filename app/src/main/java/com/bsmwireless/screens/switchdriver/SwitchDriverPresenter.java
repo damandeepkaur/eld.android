@@ -8,8 +8,6 @@ import com.bsmwireless.data.storage.users.UserEntity;
 import com.bsmwireless.domain.interactors.BlackBoxInteractor;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
 import com.bsmwireless.domain.interactors.UserInteractor;
-import com.bsmwireless.models.BlackBoxModel;
-import com.bsmwireless.models.BlackBoxSensorState;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.User;
 import com.bsmwireless.widgets.alerts.DutyType;
@@ -49,12 +47,14 @@ public final class SwitchDriverPresenter {
     @Inject
     public SwitchDriverPresenter(SwitchDriverView view, ELDEventsInteractor eventsInteractor,
                                  UserInteractor userInteractor, AccountManager accountManager,
-                                 BlackBoxInteractor blackBoxInteractor, BlackBoxStateChecker blackBoxStateChecker) {
+                                 BlackBoxInteractor blackBoxInteractor,
+                                 BlackBoxStateChecker blackBoxStateChecker) {
         mView = view;
         mELDEventsInteractor = eventsInteractor;
         mUserInteractor = userInteractor;
         mAccountManager = accountManager;
         mBlackBoxInteractor = blackBoxInteractor;
+        mBlackBoxStateChecker = blackBoxStateChecker;
         mGetUsernameDisposable = Disposables.disposed();
         mGetCoDriversDisposable = Disposables.disposed();
         mLoginDisposable = Disposables.disposed();
@@ -195,7 +195,7 @@ public final class SwitchDriverPresenter {
     }
 
     public void onSwitchDriverDialog() {
-        if (mBlackBoxInteractor.getLastData().getSensorState(BlackBoxSensorState.MOVING)) {
+        if (mBlackBoxStateChecker.isMoving(mBlackBoxInteractor.getLastData())) {
             mView.createSwitchOnlyDialog();
         } else {
             mView.createSwitchDriverDialog();
