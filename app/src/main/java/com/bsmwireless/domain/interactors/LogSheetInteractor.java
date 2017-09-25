@@ -51,7 +51,7 @@ public final class LogSheetInteractor {
                 .map(LogSheetConverter::toModelList);
     }
 
-    public Flowable<LogSheetHeader> getLogSheetHeadersFromDB(long logDay) {
+    public Single<LogSheetHeader> getLogSheetHeadersFromDBOnce(long logDay) {
         int driverId = mAccountManager.getCurrentUserId();
         return mAppDatabase.logSheetDao().getLogSheet(logDay, driverId)
                 .map(LogSheetConverter::toModel);

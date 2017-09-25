@@ -19,7 +19,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import io.reactivex.Flowable;
+import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.disposables.Disposables;
@@ -64,7 +64,7 @@ public final class RoadsidePresenter {
 
     public void onDateChanged(Calendar calendar) {
         mDateDisposable.dispose();
-        mDateDisposable = mUserInteractor.getTimezone()
+        mDateDisposable = mUserInteractor.getTimezoneOnce()
                 .flatMap(timezone -> {
                     long startTime = DateUtils.getStartDate(timezone, calendar);
                     long endTime = startTime + MS_IN_DAY;
@@ -73,10 +73,10 @@ public final class RoadsidePresenter {
 
                     int driverId = mUserInteractor.getDriverId();
 
-                    return Flowable.zip(mEventsInteractor.getEventsFromDB(startTime, endTime),
-                            mLogSheetInteractor.getLogSheetHeadersFromDB(logDay),
-                            mEventsInteractor.getLatestActiveDutyEventFromDB(startTime, driverId),
-                            mEventsInteractor.getLatestActiveDutyEventFromDB(endTime, driverId),
+                    return Single.zip(mEventsInteractor.getEventsFromDBOnce(startTime, endTime),
+                            mLogSheetInteractor.getLogSheetHeadersFromDBOnce(logDay),
+                            mEventsInteractor.getLatestActiveDutyEventFromDBOnce(startTime, driverId),
+                            mEventsInteractor.getLatestActiveDutyEventFromDBOnce(endTime, driverId),
                             (events, header, prevEvents, lastEvents) -> {
                                 ELDEvent prevDayEvent = null;
                                 if (!prevEvents.isEmpty()) {
@@ -158,8 +158,4 @@ public final class RoadsidePresenter {
 
         return logs;
     }
-
-
-
-
 }

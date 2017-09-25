@@ -71,9 +71,9 @@ public final class ELDEventsInteractor {
         mUserInteractor.getTimezone().subscribe(timezone -> mTimezone = timezone);
     }
 
-    public Flowable<List<ELDEvent>> getEventsFromDB(long startTime, long endTime) {
+    public Single<List<ELDEvent>> getEventsFromDBOnce(long startTime, long endTime) {
         int driverId = mAccountManager.getCurrentUserId();
-        return mELDEventDao.getEventsFromStartToEndTime(startTime, endTime, driverId)
+        return mELDEventDao.getEventsFromStartToEndTimeOnce(startTime, endTime, driverId)
                 .map(ELDEventConverter::toModelList);
     }
 
@@ -87,8 +87,8 @@ public final class ELDEventsInteractor {
         return ELDEventConverter.toModelList(mELDEventDao.getLatestActiveDutyEventSync(latestTime, userId));
     }
 
-    public Flowable<List<ELDEvent>> getLatestActiveDutyEventFromDB(long latestTime, int userId) {
-        return mELDEventDao.getLatestActiveDutyEvent(latestTime, userId)
+    public Single<List<ELDEvent>> getLatestActiveDutyEventFromDBOnce(long latestTime, int userId) {
+        return mELDEventDao.getLatestActiveDutyEventOnce(latestTime, userId)
                 .map(ELDEventConverter::toModelList);
     }
 

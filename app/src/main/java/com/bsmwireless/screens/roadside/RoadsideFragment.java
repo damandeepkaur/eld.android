@@ -1,6 +1,5 @@
 package com.bsmwireless.screens.roadside;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
@@ -39,6 +38,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public final class RoadsideFragment extends BaseFragment implements RoadsideView {
+    private final int COLUMN_COUNT = 7;
+    private final ArrayList<Integer> HEADER_TITLE_INDEXES = new ArrayList<>(Arrays.asList(0, 2, 4, 6));
+    private final ArrayList<Integer> EVENT_TITLE_INDEXES = new ArrayList<>(Collections.singletonList(0));
 
     @BindView(R.id.roadside_events)
     RecyclerView mEventsView;
@@ -80,22 +82,24 @@ public final class RoadsideFragment extends BaseFragment implements RoadsideView
     private void init() {
         mCalendarLayout.setOnItemSelectedListener(log -> mPresenter.onDateChanged(mCalendarLayout.getCurrentItem().getCalendar()));
 
-        mHeadersAdapter = new RoadsideAdapter(7, null, new ArrayList<>(Arrays.asList(0, 2, 4, 6)), false);
-        mHeadersView.setLayoutManager(new CustomGridLayoutManager(mContext, 7));
+        mHeadersAdapter = new RoadsideAdapter(COLUMN_COUNT, null, HEADER_TITLE_INDEXES, false);
         mHeadersView.setAdapter(mHeadersAdapter);
+        mEventsView.setNestedScrollingEnabled(false);
 
-        mEventsAdapter = new RoadsideAdapter(7, null, new ArrayList<>(Collections.singletonList(0)), true);
-        mEventsView.setLayoutManager(new CustomGridLayoutManager(mContext, 7));
+        mEventsAdapter = new RoadsideAdapter(COLUMN_COUNT, null, EVENT_TITLE_INDEXES, true);
         mEventsView.setAdapter(mEventsAdapter);
+        mEventsView.setNestedScrollingEnabled(false);
     }
 
     @Override
     public void showEvents(List<String> events) {
+        ((GridLayoutManager) mEventsView.getLayoutManager()).setSpanCount(events.size() / COLUMN_COUNT);
         mEventsAdapter.setData(events);
     }
 
     @Override
     public void showHeaders(List<String> headers) {
+        ((GridLayoutManager) mHeadersView.getLayoutManager()).setSpanCount(headers.size() / COLUMN_COUNT);
         mHeadersAdapter.setData(headers);
     }
 
@@ -115,15 +119,13 @@ public final class RoadsideFragment extends BaseFragment implements RoadsideView
         String last = "";
         String current = "";
 
-        if (!events.isEmpty()) {
-            data.add(getString(R.string.roadside_time));
-            data.add(getString(R.string.roadside_location));
-            data.add(getString(R.string.roadside_odometer));
-            data.add(getString(R.string.roadside_engine));
-            data.add(getString(R.string.roadside_event));
-            data.add(getString(R.string.roadside_origin));
-            data.add(getString(R.string.roadside_comment));
-        }
+        data.add(getString(R.string.roadside_time));
+        data.add(getString(R.string.roadside_location));
+        data.add(getString(R.string.roadside_odometer));
+        data.add(getString(R.string.roadside_engine));
+        data.add(getString(R.string.roadside_event));
+        data.add(getString(R.string.roadside_origin));
+        data.add(getString(R.string.roadside_comment));
 
         for (ELDEvent event : events) {
             dateFormat.setTimeZone(TimeZone.getTimeZone(event.getTimezone()));
@@ -297,14 +299,9 @@ public final class RoadsideFragment extends BaseFragment implements RoadsideView
         return data;
     }
 
-    private static class CustomGridLayoutManager extends GridLayoutManager {
-        CustomGridLayoutManager(Context context, int count) {
-            super(context, count);
-        }
-
-        @Override
-        public boolean canScrollVertically() {
-            return false;
-        }
+    @Override
+    public void onDestroy() {
+        mPresenter.onDestroy();
+        super.onDestroy();
     }
 }

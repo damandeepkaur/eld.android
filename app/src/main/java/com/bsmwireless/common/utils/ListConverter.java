@@ -31,7 +31,9 @@ public class ListConverter {
                 List<String> list = Arrays.asList(s.split("\\s*,\\s*"));
 
                 for (String item : list) {
-                    integers.add(Integer.valueOf(item));
+                    if (!item.isEmpty()) {
+                        integers.add(Integer.valueOf(item));
+                    }
                 }
             }
         } catch (NumberFormatException e) {

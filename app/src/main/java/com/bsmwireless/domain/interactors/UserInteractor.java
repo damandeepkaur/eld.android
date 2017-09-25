@@ -319,6 +319,10 @@ public final class UserInteractor {
         return mAppDatabase.userDao().getUserTimezone(getDriverId());
     }
 
+    public Single<String> getTimezoneOnce() {
+        return mAppDatabase.userDao().getUserTimezoneOnce(getDriverId());
+    }
+
     public boolean isRememberMeEnabled() {
         return mPreferencesManager.isRememberUserEnabled();
     }

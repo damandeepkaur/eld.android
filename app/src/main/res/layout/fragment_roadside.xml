@@ -22,16 +22,12 @@
             android:background="@color/white"
             android:orientation="vertical">
 
-            <HorizontalScrollView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <android.support.v7.widget.RecyclerView
-                    android:id="@+id/roadside_headers"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-
-            </HorizontalScrollView>
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/roadside_headers"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layoutManager="android.support.v7.widget.GridLayoutManager"/>
 
             <com.bsmwireless.widgets.logs.graphview.GraphLayout
                 android:id="@+id/roadside_graph"
@@ -39,16 +35,12 @@
                 android:layout_height="@dimen/logs_list_item_header_sign_graph_height"
                 android:layout_margin="@dimen/margin_small"/>
 
-            <HorizontalScrollView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <android.support.v7.widget.RecyclerView
-                    android:id="@+id/roadside_events"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-
-            </HorizontalScrollView>
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/roadside_events"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layoutManager="android.support.v7.widget.GridLayoutManager"/>
 
         </LinearLayout>
 

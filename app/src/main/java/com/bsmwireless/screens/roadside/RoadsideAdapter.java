@@ -17,6 +17,7 @@ import app.bsmuniversal.com.R;
 public class RoadsideAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private List<String> mItems;
     private int mColumnCount = 1;
+    private int mRowCount = 1;
     private boolean mShowGrid;
 
     private ArrayList<Integer> mTitleRowIndexes = new ArrayList<>();
@@ -29,24 +30,29 @@ public class RoadsideAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         mTitleRowIndexes.addAll(titleIndexes);
     }
 
-    public void setData(List<String> items) {
+    public final void setData(List<String> items) {
         mItems = items;
+        mRowCount = mItems.size() / mColumnCount;
         notifyDataSetChanged();
     }
 
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public final RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         return new ViewHolder(new TextView(new ContextThemeWrapper(parent.getContext(), R.style.GridItem)));
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        ((ViewHolder) holder).bind(mItems.get(position), mTitleRowIndexes.contains(position / mColumnCount), mShowGrid);
+    public final void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        ((ViewHolder) holder).bind(mItems.get(getPosition(position)), mTitleRowIndexes.contains(position % mRowCount), mShowGrid);
     }
 
     @Override
-    public int getItemCount() {
-        return mItems == null || mColumnCount == 0 ? 0 : mItems.size();
+    public final int getItemCount() {
+        return mItems == null ? 0 : mItems.size();
+    }
+
+    private int getPosition(int position) {
+        return position / mRowCount + position % mRowCount * mColumnCount;
     }
 
     private static class ViewHolder extends RecyclerView.ViewHolder {
@@ -65,7 +71,7 @@ public class RoadsideAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             mTextColor = Color.WHITE;
         }
 
-        public void bind(String data, boolean isTitle, boolean showGrid) {
+        public final void bind(String data, boolean isTitle, boolean showGrid) {
             mTextView.setText(data);
 
             if (isTitle) {
