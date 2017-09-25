@@ -90,8 +90,8 @@ public final class SyncInteractor {
         }
 
         mDriverProfileDisposable = Observable.interval(Constants.SYNC_TIMEOUT_IN_MIN, TimeUnit.MINUTES)
-                .filter(t -> NetworkUtils.isOnlineMode())
-                .map(aLong -> mAccountManager.getCurrentUserId())
+                .filter(timeout -> NetworkUtils.isOnlineMode())
+                .map(timeout -> mAccountManager.getCurrentUserId())
                 .map(userId -> mUserDao.getUserSync(Integer.valueOf(userId)))
                 .filter(UserEntity::isOfflineChange)
                 .switchMap(userEntity -> {
@@ -112,9 +112,9 @@ public final class SyncInteractor {
                             .setHomeTermId(userEntity.getHomeTermId()))
                             .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS))
                             .onErrorReturn(throwable -> false);
-                    return Observable.zip(signatureUpdate, driverRuleUpdate, (aBoolean, aBoolean2) -> aBoolean && aBoolean2)
-                            .zipWith(homeTerminalUpdate, (aBoolean, aBoolean2) -> aBoolean && aBoolean2)
-                            .map(aBoolean -> userEntity.setOfflineChange(!aBoolean))
+                    return Observable.zip(signatureUpdate, driverRuleUpdate, (resultFirst, resultSecond) -> resultFirst && resultSecond)
+                            .zipWith(homeTerminalUpdate, (resultFirst, resultSecond) -> resultFirst && resultSecond)
+                            .map(updateSuccess -> userEntity.setOfflineChange(!updateSuccess))
                             .doOnNext(userEntity1 -> mUserDao.insertUser(userEntity1));
                 })
                 .subscribeOn(Schedulers.io())
