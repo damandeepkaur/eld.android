@@ -1,8 +1,9 @@
 package com.bsmwireless.common.utils.malfunction;
 
-import com.bsmwireless.data.network.blackbox.BlackBoxConnectionManager;
 import com.bsmwireless.data.network.blackbox.models.BlackBoxResponseModel;
 import com.bsmwireless.data.storage.DutyTypeManager;
+import com.bsmwireless.data.storage.PreferencesManager;
+import com.bsmwireless.domain.interactors.BlackBoxInteractor;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
 import com.bsmwireless.models.BlackBoxModel;
 import com.bsmwireless.models.BlackBoxSensorState;
@@ -18,18 +19,22 @@ import timber.log.Timber;
 
 public final class SynchronizationJob extends BaseMalfunctionJob implements MalfunctionJob {
 
-    private final BlackBoxConnectionManager mBoxConnectionManager;
+    private final BlackBoxInteractor mBlackBoxInteractor;
+    private final PreferencesManager mPreferencesManager;
 
     @Inject
-    public SynchronizationJob(ELDEventsInteractor eldEventsInteractor, DutyTypeManager dutyTypeManager, BlackBoxConnectionManager boxConnectionManager) {
+    public SynchronizationJob(ELDEventsInteractor eldEventsInteractor,
+                              DutyTypeManager dutyTypeManager,
+                              BlackBoxInteractor blackBoxInteractor, PreferencesManager preferencesManager) {
         super(eldEventsInteractor, dutyTypeManager);
-        mBoxConnectionManager = boxConnectionManager;
+        mBlackBoxInteractor = blackBoxInteractor;
+        mPreferencesManager = preferencesManager;
     }
 
     @Override
     public void start() {
         Timber.d("Start synchronization compliance detection");
-        Disposable disposable = mBoxConnectionManager.getDataObservable()
+        Disposable disposable = mBlackBoxInteractor.getData(mPreferencesManager.getBoxId())
                 .filter(blackBoxModel -> BlackBoxResponseModel.ResponseType.STATUS_UPDATE
                         == blackBoxModel.getResponseType())
                 .flatMap(blackBoxModel -> loadLatestSynchronizationEvent(), SynchResult::new)

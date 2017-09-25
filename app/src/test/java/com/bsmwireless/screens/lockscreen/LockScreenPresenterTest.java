@@ -1,6 +1,7 @@
 package com.bsmwireless.screens.lockscreen;
 
 import com.bsmwireless.common.utils.BlackBoxSimpleChecker;
+import com.bsmwireless.common.utils.AppSettings;
 import com.bsmwireless.data.network.blackbox.BlackBox;
 import com.bsmwireless.data.network.blackbox.BlackBoxConnectionManagerImpl;
 import com.bsmwireless.data.network.blackbox.models.BlackBoxResponseModel;
@@ -15,8 +16,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
-import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
 import io.reactivex.Single;
@@ -47,20 +46,26 @@ public class LockScreenPresenterTest {
     AccountManager mAccountManager;
     @Mock
     ELDEventsInteractor mELDEventsInteractor;
+    @Mock
+    AppSettings mAppSettings;
 
     LockScreenPresenter mPresenter;
 
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
+
+        when(mAppSettings.lockScreenDisconnectionTimeout()).thenReturn(1L);
+        when(mAppSettings.lockScreenIdlingTimeout()).thenReturn(1L);
+
+
         mPresenter = spy(new LockScreenPresenter(
                 mDutyTypeManager,
                 new BlackBoxConnectionManagerImpl(mBlackBox),
                 mPreferencesManager,
                 new BlackBoxSimpleChecker(),
                 mELDEventsInteractor,
-                TimeUnit.MILLISECONDS.toMillis(1),
-                TimeUnit.MILLISECONDS.toMillis(1),
+                mAppSettings,
                 mAccountManager));
         RxAndroidPlugins.setInitMainThreadSchedulerHandler(schedulerCallable -> Schedulers.trampoline());
         RxJavaPlugins.setIoSchedulerHandler(scheduler -> Schedulers.trampoline());

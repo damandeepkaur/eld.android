@@ -2,7 +2,7 @@ package com.bsmwireless.common.utils.malfunction;
 
 import android.support.annotation.VisibleForTesting;
 
-import com.bsmwireless.common.utils.SettingsManager;
+import com.bsmwireless.common.utils.AppSettings;
 import com.bsmwireless.data.network.NtpClientManager;
 import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
@@ -21,16 +21,16 @@ import timber.log.Timber;
 public final class TimingJob extends BaseMalfunctionJob implements MalfunctionJob {
 
     private final NtpClientManager mNtpClientManager;
-    private final SettingsManager mSettingsManager;
+    private final AppSettings mAppSettings;
 
     @Inject
     public TimingJob(ELDEventsInteractor eldEventsInteractor,
                      DutyTypeManager dutyTypeManager,
                      NtpClientManager ntpClientManager,
-                     SettingsManager settingsManager) {
+                     AppSettings appSettings) {
         super(eldEventsInteractor, dutyTypeManager);
         mNtpClientManager = ntpClientManager;
-        mSettingsManager = settingsManager;
+        mAppSettings = appSettings;
     }
 
     @Override
@@ -76,7 +76,7 @@ public final class TimingJob extends BaseMalfunctionJob implements MalfunctionJo
 
     private boolean isCurrentTimingEventAndStateDifferent(ELDEvent eldEvent) {
         long realTimeInMillisDiff = mNtpClientManager.getRealTimeInMillisDiff();
-        long timingMalfunctionDiff = mSettingsManager.getTimingMalfunctionDiff();
+        long timingMalfunctionDiff = mAppSettings.getTimingMalfunctionDiff();
         int eventCode = eldEvent.getEventCode();
 
         if (realTimeInMillisDiff > timingMalfunctionDiff) {

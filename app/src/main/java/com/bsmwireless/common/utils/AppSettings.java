@@ -1,15 +1,18 @@
 package com.bsmwireless.common.utils;
 
-import java.util.concurrent.TimeUnit;
+import com.bsmwireless.common.Constants;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+/**
+ *
+ */
 @Singleton
-public final class SettingsManager {
+public final class AppSettings {
 
     @Inject
-    public SettingsManager() {
+    public AppSettings() {
     }
 
     /**
@@ -17,7 +20,7 @@ public final class SettingsManager {
      * @return diff in millisecond
      */
     public long getTimingMalfunctionDiff(){
-        return TimeUnit.MINUTES.toMillis(10);
+        return Constants.DIFF_FOR_TRIGGER_TIMING_MALFUNCTION_MS;
     }
 
     /**
@@ -25,6 +28,14 @@ public final class SettingsManager {
      * @return time interval in milliseconds
      */
     public long getIntervalForCheckTime(){
-        return TimeUnit.MINUTES.toMillis(1);
+        return Constants.CHECK_TIME_INTERVAL;
+    }
+
+    public long lockScreenIdlingTimeout(){
+        return Constants.LOCK_SCREEN_IDLE_MONITORING_TIMEOUT_MS;
+    }
+
+    public long lockScreenDisconnectionTimeout(){
+        return Constants.LOCK_SCREEN_DISCONNECTION_TIMEOUT_MS;
     }
 }

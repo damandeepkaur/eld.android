@@ -1,7 +1,7 @@
 package com.bsmwireless.common.utils.malfunction;
 
 import com.bsmwireless.BaseTest;
-import com.bsmwireless.common.utils.SettingsManager;
+import com.bsmwireless.common.utils.AppSettings;
 import com.bsmwireless.data.network.NtpClientManager;
 import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
@@ -38,7 +38,7 @@ public class TimingJobTest extends BaseTest {
     @Mock
     NtpClientManager mNtpClientManager;
     @Mock
-    SettingsManager mSettingsManager;
+    AppSettings mAppSettings;
 
     TimingJob mTimingJob;
 
@@ -47,10 +47,10 @@ public class TimingJobTest extends BaseTest {
         RxJavaPlugins.setIoSchedulerHandler(scheduler -> Schedulers.trampoline());
         RxJavaPlugins.setComputationSchedulerHandler(scheduler -> Schedulers.trampoline());
 
-        when(mSettingsManager.getIntervalForCheckTime()).thenReturn(0L);
+        when(mAppSettings.getIntervalForCheckTime()).thenReturn(0L);
 
         mTimingJob = spy(new TimingJob(mELDEventsInteractor, mDutyTypeManager, mNtpClientManager,
-                mSettingsManager));
+                mAppSettings));
     }
 
     @Test
@@ -67,7 +67,7 @@ public class TimingJobTest extends BaseTest {
 
         final long timeDiffForTriggered = TimeUnit.MILLISECONDS.toMillis(5);
         when(mNtpClientManager.getRealTimeInMillisDiff()).thenReturn(timeDiffForTriggered - 1);
-        when(mSettingsManager.getTimingMalfunctionDiff()).thenReturn(timeDiffForTriggered);
+        when(mAppSettings.getTimingMalfunctionDiff()).thenReturn(timeDiffForTriggered);
         when(mTimingJob.getIntervalObservable()).thenReturn(Observable.just(1L));
 
 
@@ -91,7 +91,7 @@ public class TimingJobTest extends BaseTest {
 
         final long timeDiffForTriggered = TimeUnit.MILLISECONDS.toMillis(1);
         when(mNtpClientManager.getRealTimeInMillisDiff()).thenReturn(timeDiffForTriggered + 1);
-        when(mSettingsManager.getTimingMalfunctionDiff()).thenReturn(timeDiffForTriggered);
+        when(mAppSettings.getTimingMalfunctionDiff()).thenReturn(timeDiffForTriggered);
 
         when(mTimingJob.getIntervalObservable()).thenReturn(Observable.just(1L));
 
@@ -120,7 +120,7 @@ public class TimingJobTest extends BaseTest {
 
         final long timeDiffForTriggered = TimeUnit.MILLISECONDS.toMillis(1);
         when(mNtpClientManager.getRealTimeInMillisDiff()).thenReturn(timeDiffForTriggered + 1);
-        when(mSettingsManager.getTimingMalfunctionDiff()).thenReturn(timeDiffForTriggered);
+        when(mAppSettings.getTimingMalfunctionDiff()).thenReturn(timeDiffForTriggered);
 
         when(mTimingJob.getIntervalObservable()).thenReturn(Observable.just(1L));
 
@@ -149,7 +149,7 @@ public class TimingJobTest extends BaseTest {
 
         final long timeDiffForTriggered = TimeUnit.MILLISECONDS.toMillis(1);
         when(mNtpClientManager.getRealTimeInMillisDiff()).thenReturn(timeDiffForTriggered + 1);
-        when(mSettingsManager.getTimingMalfunctionDiff()).thenReturn(timeDiffForTriggered);
+        when(mAppSettings.getTimingMalfunctionDiff()).thenReturn(timeDiffForTriggered);
 
         when(mTimingJob.getIntervalObservable()).thenReturn(Observable.just(1L));
 
@@ -185,7 +185,7 @@ public class TimingJobTest extends BaseTest {
         final long timeDiffForTriggered = TimeUnit.MILLISECONDS.toMillis(5);
         when(mNtpClientManager.getRealTimeInMillisDiff())
                 .thenReturn(timeDiffForTriggered + 1, timeDiffForTriggered - 1);
-        when(mSettingsManager.getTimingMalfunctionDiff()).thenReturn(timeDiffForTriggered);
+        when(mAppSettings.getTimingMalfunctionDiff()).thenReturn(timeDiffForTriggered);
 
         Subject<Long> subject = BehaviorSubject.create();
         when(mTimingJob.getIntervalObservable()).thenReturn(subject);
