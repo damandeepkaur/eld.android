@@ -264,12 +264,7 @@ public class DateUtils {
 
         NtpClientManager ntpClientManager = appComponent.ntpClientManager();
         long realTimeInMillisecondsDiff = ntpClientManager.getRealTimeInMillisDiff();
-        // We shouldn't use ntp time if sync failed or not triggered
-        if (realTimeInMillisecondsDiff != 0) {
-            return System.currentTimeMillis() + realTimeInMillisecondsDiff;
-        }
-
-        return System.currentTimeMillis();
+        return System.currentTimeMillis() + realTimeInMillisecondsDiff;
     }
 
     public static String convertToFullTime(String timezone, Date date) {
