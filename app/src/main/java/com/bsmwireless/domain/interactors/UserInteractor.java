@@ -449,5 +449,13 @@ public final class UserInteractor {
             userDao.setUserLastVehicles(userId, lastVehicles);
         }
     }
+
+    public boolean isSelectAssetScreenActive() {
+        return mPreferencesManager.isShowSelectAssetScreenEnabled();
+    }
+
+    public void setShowSelectAssetScreenEnabled(boolean showSelectAssetScreen) {
+        mPreferencesManager.setShowSelectAssetScreenEnabled(showSelectAssetScreen);
+    }
 }
 
