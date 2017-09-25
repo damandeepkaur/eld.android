@@ -51,32 +51,36 @@ public final class RuleSelectionModel implements Parcelable {
         return mDriverId;
     }
 
-    public void setDriverId(Integer driverId) {
+    public RuleSelectionModel setDriverId(Integer driverId) {
         this.mDriverId = driverId;
+        return this;
     }
 
     public String getDutyCycle() {
         return mDutyCycle;
     }
 
-    public void setDutyCycle(String dutyCycle) {
+    public RuleSelectionModel setDutyCycle(String dutyCycle) {
         this.mDutyCycle = dutyCycle;
+        return this;
     }
 
     public String getRuleException() {
         return mRuleException;
     }
 
-    public void setRuleException(String ruleException) {
+    public RuleSelectionModel setRuleException(String ruleException) {
         this.mRuleException = ruleException;
+        return this;
     }
 
     public Long getApplyTime() {
         return mApplyTime;
     }
 
-    public void setApplyTime(Long applyTime) {
+    public RuleSelectionModel setApplyTime(Long applyTime) {
         this.mApplyTime = applyTime;
+        return this;
     }
 
     @Override
