@@ -1,7 +1,6 @@
 package app.bsmuniversal.com.tests.sidemenu;
 
 import com.bsmwireless.screens.login.LoginActivity;
-import com.bsmwireless.screens.navigation.NavigationActivity;
 
 import org.junit.Test;
 
