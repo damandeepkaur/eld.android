@@ -459,6 +459,7 @@ public final class LogsPresenter implements AccountManager.AccountListener {
 
     @Override
     public void onUserChanged() {
+        mDisposables.dispose();
         onViewCreated();
     }
 
