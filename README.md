@@ -3,7 +3,11 @@ ELD app for Android
 
 # Version history
 
-* **1.0.74** - Update date and time
+* **1.0.78** - Update date and time
+* **1.0.77** - Replace snackbar to floating action button
+* **1.0.76** - Driver’s re-certification of Own Records (_EA-306_)
+* **1.0.75** - Engine Synchronization Compliance Monitoring (_EA-222_)
+* **1.0.74** - Add progress bar for selecting assets and pairing to black box
 * **1.0.73** - Add driver cycles list to the profile (_EA-315_)
 * **1.0.72** - Add Lint inspection (EA-330)
 * **1.0.71** - Fix remember me due to merge conflict

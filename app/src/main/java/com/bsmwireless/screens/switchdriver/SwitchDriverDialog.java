@@ -318,19 +318,6 @@ public final class SwitchDriverDialog implements SwitchDriverView, DriverDialog 
     }
 
     @Override
-    public void createLoadingDialog() {
-
-        View view = View.inflate(mContext, R.layout.view_loading_indicator, null);
-
-        AlertDialog loadingDialog = new AlertDialog.Builder(mContext)
-                .setOnDismissListener(dialog -> mPresenter.onDestroy())
-                .setView(view)
-                .setCancelable(true)
-                .create();
-        showDialog(loadingDialog);
-    }
-
-    @Override
     public void createSwitchOnlyDialog() {
         View view = View.inflate(mContext, R.layout.switch_driver_layout, null);
         ButterKnife.bind(this, view);
