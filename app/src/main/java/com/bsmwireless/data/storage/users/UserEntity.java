@@ -1,19 +1,11 @@
 package com.bsmwireless.data.storage.users;
 
 import android.arch.persistence.room.ColumnInfo;
-import android.arch.persistence.room.Embedded;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 
-import com.bsmwireless.data.storage.configurations.ConfigurationEntity;
-import com.bsmwireless.models.SyncConfiguration;
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
-
-import java.util.List;
-
 @Entity(tableName = "users")
-public class UserEntity {
+public final class UserEntity {
     @PrimaryKey
     @ColumnInfo(name = "id")
     private Integer mId;
@@ -53,6 +45,8 @@ public class UserEntity {
     private String mCoDriversIds;
     @ColumnInfo(name = "account_name")
     private String mAccountName;
+    @ColumnInfo(name = "offline_change")
+    public Boolean mOfflineChange;
 
     public Integer getId() {
         return mId;
@@ -204,5 +198,17 @@ public class UserEntity {
 
     public void setAccountName(String accountName) {
         mAccountName = accountName;
+    }
+
+    public Boolean isOfflineChange() {
+        if (mOfflineChange == null) {
+            mOfflineChange = false;
+        }
+        return mOfflineChange;
+    }
+
+    public UserEntity setOfflineChange(boolean isOfflineChange) {
+        mOfflineChange = isOfflineChange;
+        return this;
     }
 }

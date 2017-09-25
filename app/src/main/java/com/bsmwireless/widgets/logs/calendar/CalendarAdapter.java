@@ -18,7 +18,7 @@ import app.bsmuniversal.com.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.ViewHolder> {
+public final class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.ViewHolder> {
 
     private final int mNastyGreenColor;
     private final int mBlackColor;
@@ -82,7 +82,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.ViewHo
         if (logs != null) {
             clearItems();
             for (LogSheetHeader log : logs) {
-                CalendarItem item = findItemByDate(DateUtils.convertDayNumberToUnixMs(log.getLogDay()));
+                CalendarItem item = findItemByDate(DateUtils.convertLogDayToUnixMs(log.getLogDay()));
                 if (item != null) {
                     item.setAssociatedLog(log);
                 }

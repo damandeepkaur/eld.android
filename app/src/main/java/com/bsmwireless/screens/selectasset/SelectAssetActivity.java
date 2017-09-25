@@ -1,11 +1,11 @@
 package com.bsmwireless.screens.selectasset;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -14,6 +14,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.FrameLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bsmwireless.common.App;
@@ -45,7 +47,7 @@ import timber.log.Timber;
 import static com.bsmwireless.screens.barcode.BarcodeScannerActivity.BARCODE_TYPE;
 import static com.bsmwireless.screens.barcode.BarcodeScannerActivity.BARCODE_UUID;
 
-public class SelectAssetActivity extends BaseActivity implements SelectAssetView {
+public final class SelectAssetActivity extends BaseActivity implements SelectAssetView {
 
     private static final int BARCODE_REQUEST_CODE = 101;
 
@@ -54,6 +56,12 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
 
     @BindView(R.id.select_asset_search_view)
     SearchView mSearchView;
+
+    @BindView(R.id.select_asset_progress_bar_container)
+    FrameLayout mSelectAssetProgressBarContainer;
+
+    @BindView(R.id.select_asset_progress_bar)
+    ProgressBar mSelectAssetProgressBar;
 
     @BindView(R.id.select_asset_search_list)
     RecyclerView mSearchRecyclerView;
@@ -70,6 +78,12 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
     @BindView(R.id.select_asset_snackbar)
     SnackBarLayout mSnackBarLayout;
 
+    @BindView(R.id.select_asset_scan_qr_code_button)
+    AppCompatButton mSelectAssetScanQrCodeButton;
+
+    @BindView(R.id.select_asset_not_in_vehicle_button)
+    AppCompatButton mSelectAssetNotInVehicleButton;
+
     @Inject
     SelectAssetPresenter mPresenter;
 
@@ -83,7 +97,6 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        doBindToService(false);
         DaggerSelectAssetComponent.builder().appComponent(App.getComponent()).selectAssetModule(new SelectAssetModule(this)).build().inject(this);
 
         setContentView(R.layout.activity_select_asset);
@@ -138,6 +151,8 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
         mSnackBarLayout
                 .setHideableOnTimeout(SnackBarLayout.DURATION_LONG)
                 .setHideableOnFocusLost(true);
+
+        hideProgress();
 
         mPresenter.onViewCreated();
     }
@@ -270,7 +285,8 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
                 .setTitle(R.string.select_asset_dialog_title)
                 .setCancelable(false)
                 .setMessage(R.string.select_asset_information_no_selected_assets)
-                .setPositiveButton(R.string.select_asset_continue, (dialog, which) -> {})
+                .setPositiveButton(R.string.select_asset_continue, (dialog, which) -> {
+                })
                 .setNegativeButton(R.string.select_asset_close, (dialog, which) -> onActionDone())
                 .show();
     }
@@ -278,6 +294,32 @@ public class SelectAssetActivity extends BaseActivity implements SelectAssetView
     @Override
     public void onActionDone() {
         finish();
+    }
+
+    @Override
+    public void showProgress() {
+        mSelectAssetProgressBarContainer.setVisibility(View.VISIBLE);
+        mSelectAssetProgressBar.setIndeterminate(true);
+
+        mSearchRecyclerView.setVisibility(View.GONE);
+        mLastRecyclerView.setVisibility(View.GONE);
+
+        mSelectAssetScanQrCodeButton.setEnabled(false);
+        mSelectAssetNotInVehicleButton.setEnabled(false);
+
+    }
+
+    @Override
+    public void hideProgress() {
+        mSelectAssetProgressBarContainer.setVisibility(View.GONE);
+        mSelectAssetProgressBar.setIndeterminate(false);
+
+        mSearchRecyclerView.setVisibility(View.VISIBLE);
+        mLastRecyclerView.setVisibility(View.VISIBLE);
+
+        mSelectAssetScanQrCodeButton.setEnabled(true);
+        mSelectAssetNotInVehicleButton.setEnabled(true);
+
     }
 
     @Override

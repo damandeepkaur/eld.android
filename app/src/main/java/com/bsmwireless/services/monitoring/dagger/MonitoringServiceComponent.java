@@ -7,8 +7,8 @@ import com.bsmwireless.services.monitoring.StatusMonitoringService;
 import dagger.BindsInstance;
 import dagger.Subcomponent;
 
-@Subcomponent
 @ActivityScope
+@Subcomponent(modules = MonitoringServiceModule.class)
 public interface MonitoringServiceComponent {
 
     void inject(StatusMonitoringService statusMonitoringService);

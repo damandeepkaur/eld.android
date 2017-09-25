@@ -9,7 +9,7 @@ import com.google.gson.annotations.SerializedName;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-public class ReportTrailer implements Parcelable {
+public final class ReportTrailer implements Parcelable {
 
     @SerializedName("id")
     @Expose

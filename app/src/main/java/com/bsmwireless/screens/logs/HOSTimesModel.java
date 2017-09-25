@@ -1,6 +1,6 @@
 package com.bsmwireless.screens.logs;
 
-public class HOSTimesModel {
+public final class HOSTimesModel {
     private static final String DEFAULT_TIME = "00:00";
 
     private String mOffDutyTime;

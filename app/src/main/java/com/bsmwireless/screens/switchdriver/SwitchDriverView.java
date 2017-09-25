@@ -41,5 +41,4 @@ public interface SwitchDriverView {
     void createAddCoDriverDialog();
     void createLogOutCoDriverDialog();
     void createDriverSeatDialog();
-    void createLoadingDialog();
 }

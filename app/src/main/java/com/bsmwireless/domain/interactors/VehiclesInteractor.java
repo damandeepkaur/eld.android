@@ -18,7 +18,7 @@ import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
 
-public class VehiclesInteractor {
+public final class VehiclesInteractor {
     private static final int NOT_IN_VEHICLE_ID = -1;
 
     private ServiceApi mServiceApi;

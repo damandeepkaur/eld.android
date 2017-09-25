@@ -29,7 +29,7 @@ import app.bsmuniversal.com.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class SwitchDriverDialog implements SwitchDriverView, DriverDialog {
+public final class SwitchDriverDialog implements SwitchDriverView, DriverDialog {
 
     private Context mContext;
 
@@ -318,19 +318,6 @@ public class SwitchDriverDialog implements SwitchDriverView, DriverDialog {
     }
 
     @Override
-    public void createLoadingDialog() {
-
-        View view = View.inflate(mContext, R.layout.view_loading_indicator, null);
-
-        AlertDialog loadingDialog = new AlertDialog.Builder(mContext)
-                .setOnDismissListener(dialog -> mPresenter.onDestroy())
-                .setView(view)
-                .setCancelable(true)
-                .create();
-        showDialog(loadingDialog);
-    }
-
-    @Override
     public void createSwitchOnlyDialog() {
         View view = View.inflate(mContext, R.layout.switch_driver_layout, null);
         ButterKnife.bind(this, view);
@@ -368,7 +355,7 @@ public class SwitchDriverDialog implements SwitchDriverView, DriverDialog {
         mDialog.show();
     }
 
-    public static class UserModel {
+    public static final class UserModel {
         private UserEntity mUser;
         private DutyType mDutyType;
 

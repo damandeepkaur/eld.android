@@ -16,7 +16,7 @@ import timber.log.Timber;
 
 
 @ActivityScope
-public class LoginPresenter {
+public final class LoginPresenter {
     private LoginView mView;
     private UserInteractor mUserInteractor;
     private CompositeDisposable mDisposables;

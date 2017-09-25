@@ -1,5 +1,6 @@
 package com.bsmwireless.models;
 
+import android.annotation.SuppressLint;
 import android.os.Build;
 
 import com.bsmwireless.common.Constants;
@@ -10,7 +11,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import app.bsmuniversal.com.BuildConfig;
 
-public class AppInfo {
+public final class AppInfo {
     @SerializedName("version")
     private String mVersion;
 
@@ -26,6 +27,7 @@ public class AppInfo {
     @SerializedName("serialNo")
     private String mSerialNumber;
 
+    @SuppressLint("HardwareIds")
     public AppInfo() {
         mVersion = BuildConfig.VERSION_NAME;
         mOs = Build.VERSION.RELEASE;

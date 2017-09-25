@@ -18,8 +18,7 @@ import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
 @ActivityScope
-public class SelectAssetPresenter {
-
+public final class SelectAssetPresenter {
     private SelectAssetView mView;
     private VehiclesInteractor mVehiclesInteractor;
     private UserInteractor mUserInteractor;
@@ -92,12 +91,14 @@ public class SelectAssetPresenter {
     }
 
     public void onVehicleListItemClicked(Vehicle vehicle) {
+        mView.showProgress();
         if (vehicle != null) {
             mDisposables.add(mVehiclesInteractor.pairVehicle(vehicle)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(events -> {
                                 mView.goToHomeScreen();
+                                mView.hideProgress();
                             },
                             error -> {
                                 Timber.e("SelectAsset error: %s", error);
@@ -108,6 +109,7 @@ public class SelectAssetPresenter {
                                 if (error instanceof BlackBoxConnectionException || error instanceof ConnectException) {
                                     mView.showErrorMessage(SelectAssetView.Error.ERROR_BLACKBOX);
                                 }
+                                mView.hideProgress();
                             }));
         }
     }

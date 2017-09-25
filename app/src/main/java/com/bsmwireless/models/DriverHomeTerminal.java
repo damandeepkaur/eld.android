@@ -5,10 +5,11 @@ import android.os.Parcelable;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-public class DriverHomeTerminal implements Parcelable {
+public final class DriverHomeTerminal implements Parcelable {
 
     @SerializedName("driverId")
     @Expose
@@ -42,16 +43,18 @@ public class DriverHomeTerminal implements Parcelable {
         return mDriverId;
     }
 
-    public void setDriverId(Integer driverId) {
+    public DriverHomeTerminal setDriverId(Integer driverId) {
         this.mDriverId = driverId;
+        return this;
     }
 
     public Integer getHomeTermId() {
         return mHomeTermId;
     }
 
-    public void setHomeTermId(Integer homeTermId) {
+    public DriverHomeTerminal setHomeTermId(Integer homeTermId) {
         this.mHomeTermId = homeTermId;
+        return this;
     }
 
     @Override

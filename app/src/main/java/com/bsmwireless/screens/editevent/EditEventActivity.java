@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TextInputEditText;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
@@ -14,9 +15,9 @@ import android.view.View;
 import android.widget.AdapterView;
 
 import com.bsmwireless.common.App;
-import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.common.utils.NetworkUtils;
 import com.bsmwireless.data.network.RetrofitException;
+import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.screens.common.menu.BaseMenuActivity;
 import com.bsmwireless.screens.common.menu.BaseMenuPresenter;
@@ -26,6 +27,7 @@ import com.bsmwireless.widgets.alerts.DutyType;
 import com.bsmwireless.widgets.snackbar.SnackBarLayout;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -34,7 +36,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class EditEventActivity extends BaseMenuActivity implements EditEventView, AdapterView.OnItemSelectedListener {
+public final class EditEventActivity extends BaseMenuActivity implements EditEventView, AdapterView.OnItemSelectedListener {
 
     public final static String DAY_TIME_EXTRA = "day_time_extra";
     public final static String OLD_ELD_EVENT_EXTRA = "old_eld_event_extra";
@@ -64,8 +66,16 @@ public class EditEventActivity extends BaseMenuActivity implements EditEventView
         mUnbinder = ButterKnife.bind(this);
 
         initToolbar();
-        showSnackbar();
         initStatusSpinner();
+    }
+
+    @OnClick(R.id.save_event)
+    void onSaveEventButtonClicked() {
+        DutyType type = (DutyType) mEventStatus.getSelectedItem();
+        String startTime = mStartTime.getText().toString();
+        String comment = mComment.getText().toString();
+
+        mPresenter.onSaveClick(type, startTime, comment);
     }
 
     @Override
@@ -122,42 +132,18 @@ public class EditEventActivity extends BaseMenuActivity implements EditEventView
 
     @Override
     public void showError(Error error) {
-        mSnackBarLayout.setOnReadyListener(snackBar -> {
-            snackBar.reset()
-                    .setMessage(getString(error.getStringId()))
-                    .setHideableOnTimeout(SnackBarLayout.DURATION_LONG)
-                    .setOnCloseListener(new SnackBarLayout.OnCloseListener() {
-                        @Override
-                        public void onClose(SnackBarLayout snackBar) {
-                            showSnackbar();
-                        }
-
-                        @Override
-                        public void onOpen(SnackBarLayout snackBar) {
-
-                        }
-                    });
-        }).showSnackbar();
+        mSnackBarLayout.setOnReadyListener(snackBar -> snackBar.reset()
+                .setMessage(getString(error.getStringId()))
+                .setHideableOnTimeout(SnackBarLayout.DURATION_LONG))
+                .showSnackbar();
     }
 
     @Override
     public void showError(RetrofitException error) {
-        mSnackBarLayout.setOnReadyListener(snackBar -> {
-            snackBar.reset()
-                    .setMessage(NetworkUtils.getErrorMessage(error, this))
-                    .setHideableOnTimeout(SnackBarLayout.DURATION_LONG)
-                    .setOnCloseListener(new SnackBarLayout.OnCloseListener() {
-                        @Override
-                        public void onClose(SnackBarLayout snackBar) {
-                            showSnackbar();
-                        }
-
-                        @Override
-                        public void onOpen(SnackBarLayout snackBar) {
-
-                        }
-                    });
-        }).showSnackbar();
+        mSnackBarLayout.setOnReadyListener(snackBar -> snackBar.reset()
+                .setMessage(NetworkUtils.getErrorMessage(error, this))
+                .setHideableOnTimeout(SnackBarLayout.DURATION_LONG))
+                .showSnackbar();
     }
 
     @Override
@@ -181,7 +167,8 @@ public class EditEventActivity extends BaseMenuActivity implements EditEventView
     }
 
     @Override
-    public void onNothingSelected(AdapterView<?> parent) {}
+    public void onNothingSelected(AdapterView<?> parent) {
+    }
 
     @OnClick(R.id.start_time)
     void onStartTimeClick() {
@@ -197,22 +184,9 @@ public class EditEventActivity extends BaseMenuActivity implements EditEventView
         }
     }
 
-    private void showSnackbar() {
-        mSnackBarLayout.setOnReadyListener(snackBar -> {
-            snackBar.reset()
-                    .setPositiveLabel(getString(R.string.edit_event_save), v -> {
-                        DutyType type = (DutyType) mEventStatus.getSelectedItem();
-                        String startTime = mStartTime.getText().toString();
-                        String comment = mComment.getText().toString();
-
-                        mPresenter.onSaveClick(type, startTime, comment);
-                    }).setHideableOnTouch(false);
-        }).showSnackbar();
-    }
-
     private void initStatusSpinner() {
         //TODO: set correct types
-        DutyType[] types = DutyTypeManager.DRIVER_DUTY_EXTENDED_WITH_CLEAR;
+        List<DutyType> types = DutyTypeManager.DRIVER_DUTY_EXTENDED_WITH_CLEAR;
         mEventStatus.setAdapter(new DutyTypeSpinnerAdapter(this, types));
         mEventStatus.setOnItemSelectedListener(this);
     }

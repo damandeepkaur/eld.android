@@ -46,23 +46,25 @@ public abstract class BaseMenuPresenter implements AccountManager.AccountListene
 
     protected abstract BaseMenuView getView();
 
+    @SuppressWarnings("DesignForExtension")
     public void onStart() {
         startMonitoringEvents();
     }
 
+    @SuppressWarnings("DesignForExtension")
     public void onStop() {
         stopEventsMonitoring();
     }
 
-    public void onMalfunctionEventsClick() {
+    public final void onMalfunctionEventsClick() {
         getView().showMalfunctionDialog();
     }
 
-    public void onDiagnosticEventsClick() {
+    public final void onDiagnosticEventsClick() {
         getView().showDiagnosticEvents();
     }
 
-    void onMenuCreated() {
+    final void onMenuCreated() {
         mMenuCreatedSubject.onNext(0);
         mDutyTypeManager.addListener(mListener);
         mDisposables.add(mUserInteractor.getCoDriversNumber()
@@ -74,14 +76,14 @@ public abstract class BaseMenuPresenter implements AccountManager.AccountListene
             Disposable disposable = Single.fromCallable(mUserInteractor::getFullUserNameSync)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(name -> getView().showCoDriverView(name));
+                    .subscribe(name -> getView().showCoDriverView(name), Timber::e);
             mDisposables.add(disposable);
         } else {
             getView().hideCoDriverView();
         }
     }
 
-    void onDutyChanged(DutyType dutyType, String comment) {
+    final void onDutyChanged(DutyType dutyType, String comment) {
         // don't set the same type
         if (dutyType != mDutyTypeManager.getDutyType()) {
             mDisposables.add(mEventsInteractor.postNewDutyTypeEvent(dutyType, comment)
@@ -96,7 +98,7 @@ public abstract class BaseMenuPresenter implements AccountManager.AccountListene
         }
     }
 
-    public void onChangeDutyClick() {
+    public final void onChangeDutyClick() {
         if (mEventsInteractor.isConnected()) {
             getView().showDutyTypeDialog(mDutyTypeManager.getDutyType());
         } else {
@@ -104,6 +106,7 @@ public abstract class BaseMenuPresenter implements AccountManager.AccountListene
         }
     }
 
+    @SuppressWarnings("DesignForExtension")
     public void onDestroy() {
         mAccountManager.removeListener(this);
         mDutyTypeManager.removeListener(mListener);
@@ -113,10 +116,11 @@ public abstract class BaseMenuPresenter implements AccountManager.AccountListene
         Timber.d("DESTROYED");
     }
 
-    public boolean isUserDriver() {
+    public final boolean isUserDriver() {
         return mUserInteractor.isUserDriver();
     }
 
+    @SuppressWarnings("DesignForExtension")
     private void startMonitoringEvents() {
 
         mDiagnosticEventsDisposable = Flowable
@@ -151,26 +155,27 @@ public abstract class BaseMenuPresenter implements AccountManager.AccountListene
         mMalfunctionEventsDisposable.dispose();
     }
 
-    protected void add(Disposable disposable) {
+    protected final void add(Disposable disposable) {
         mDisposables.add(disposable);
     }
 
-    protected CompositeDisposable getDisposables() {
+    protected final CompositeDisposable getDisposables() {
         return mDisposables;
     }
 
-    protected UserInteractor getUserInteractor() {
+    protected final UserInteractor getUserInteractor() {
         return mUserInteractor;
     }
 
-    protected ELDEventsInteractor getEventsInteractor() {
+    protected final ELDEventsInteractor getEventsInteractor() {
         return mEventsInteractor;
     }
 
-    protected DutyTypeManager getDutyTypeManager() {
+    protected final DutyTypeManager getDutyTypeManager() {
         return mDutyTypeManager;
     }
 
+    @SuppressWarnings("DesignForExtension")
     @Override
     public void onUserChanged() {
         if (!mAccountManager.isCurrentUserDriver()) {

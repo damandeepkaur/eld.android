@@ -18,7 +18,7 @@ import java.util.List;
 
 import app.bsmuniversal.com.R;
 
-public class ELDGraphView extends View {
+public final class ELDGraphView extends View {
 
     private final static int SEC_IN_MIN = 60;
     private final static int MS_IN_MIN = 60 * 1000;
@@ -251,10 +251,11 @@ public class ELDGraphView extends View {
             mHorizontalLinesPaint.setPathEffect(null);
         }
 
+        long currentTime = Calendar.getInstance().getTimeInMillis();
         if (mStartDayUnixTimeInMs + MS_IN_DAY < Calendar.getInstance().getTimeInMillis()) {
             x2 = mGraphWidth + mGraphLeft;
         } else {
-            long timeStamp = log.getDuration() / MS_IN_MIN;
+            long timeStamp = (currentTime - log.getEventTime()) / MS_IN_MIN;
             x2 = x1 + timeStamp * gridUnit;
         }
 

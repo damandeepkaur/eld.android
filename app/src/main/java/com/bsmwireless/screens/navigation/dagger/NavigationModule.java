@@ -9,7 +9,7 @@ import dagger.Module;
 import dagger.Provides;
 
 @Module
-public class NavigationModule {
+public final class NavigationModule {
 
     private final NavigateView mView;
 

@@ -9,7 +9,7 @@ import dagger.Module;
 import dagger.Provides;
 
 @Module
-class DutyModule {
+final class DutyModule {
     @Singleton
     @Provides
     DutyTypeManager provideDutyTypeManager(PreferencesManager preferencesManager) {

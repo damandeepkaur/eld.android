@@ -13,7 +13,7 @@ import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-public class SyncNtpJobService extends JobService {
+public final class SyncNtpJobService extends JobService {
 
     @Override
     public boolean onStartJob(JobParameters params) {
