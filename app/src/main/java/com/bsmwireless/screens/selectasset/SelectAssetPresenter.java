@@ -1,7 +1,5 @@
 package com.bsmwireless.screens.selectasset;
 
-import android.util.Log;
-
 import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.data.network.RetrofitException;
 import com.bsmwireless.data.network.blackbox.BlackBoxConnectionException;
