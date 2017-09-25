@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import app.bsmuniversal.com.R;
 
@@ -35,13 +36,13 @@ public final class CalendarLayout extends LinearLayout implements View.OnClickLi
     private OnItemSelectListener mOnItemSelectListener;
     private List<LogSheetHeader> mLogSheetHeaders;
 
-    private int mSelectPosition = 0;
+    private AtomicReference<CalendarItem> mSelectedItem = new AtomicReference<>();
     private Handler mHandler = new Handler();
     private Runnable mSelectTask = new Runnable() {
         @Override
         public void run() {
             if (mOnItemSelectListener != null) {
-                mOnItemSelectListener.onItemSelected(mAdapter.getItemByPosition(mSelectPosition));
+                mOnItemSelectListener.onItemSelected(mSelectedItem.get());
             }
         }
     };
@@ -108,7 +109,7 @@ public final class CalendarLayout extends LinearLayout implements View.OnClickLi
         int position = mRecyclerView.getChildAdapterPosition(v);
         mAdapter.setSelectedItem(position);
 
-        mSelectPosition = position;
+        mSelectedItem.set(mAdapter.getItemByPosition(position));
 
         mHandler.removeCallbacks(mSelectTask);
         mHandler.postDelayed(mSelectTask, ANIMATION_DURATION);
@@ -166,7 +167,6 @@ public final class CalendarLayout extends LinearLayout implements View.OnClickLi
     @Override
     protected void onDetachedFromWindow() {
         mHandler.removeCallbacks(mSelectTask);
-        mOnItemSelectListener = null;
         super.onDetachedFromWindow();
     }
 }
