@@ -1,6 +1,5 @@
 package com.bsmwireless.domain.interactors;
 
-import android.util.Log;
 
 import com.bsmwireless.common.utils.DateUtils;
 import com.bsmwireless.common.utils.ListConverter;
