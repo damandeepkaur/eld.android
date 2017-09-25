@@ -8,11 +8,11 @@ import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.common.utils.AppSettings;
 import com.bsmwireless.common.utils.BlackBoxStateChecker;
 import com.bsmwireless.data.network.blackbox.BlackBoxConnectionException;
-import com.bsmwireless.data.network.blackbox.BlackBoxConnectionManager;
 import com.bsmwireless.data.network.blackbox.models.BlackBoxResponseModel;
 import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.data.storage.PreferencesManager;
+import com.bsmwireless.domain.interactors.BlackBoxInteractor;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
 import com.bsmwireless.models.BlackBoxModel;
 import com.bsmwireless.models.ELDEvent;
@@ -38,7 +38,7 @@ public final class LockScreenPresenter {
 
     LockScreenView mView;
     final DutyTypeManager mDutyManager;
-    final BlackBoxConnectionManager mBlackBoxConnectionManager;
+    final BlackBoxInteractor mBlackBoxInteractor;
     private final CompositeDisposable mCompositeDisposable;
     private final PreferencesManager mPreferencesManager;
     final BlackBoxStateChecker mChecker;
@@ -52,14 +52,14 @@ public final class LockScreenPresenter {
     @Inject
     public LockScreenPresenter(
             DutyTypeManager dutyManager,
-            BlackBoxConnectionManager connectionManager,
+            BlackBoxInteractor connectionManager,
             PreferencesManager preferencesManager,
             BlackBoxStateChecker checker,
             ELDEventsInteractor eventsInteractor,
             AppSettings appSettings,
             AccountManager accountManager) {
         mDutyManager = dutyManager;
-        mBlackBoxConnectionManager = connectionManager;
+        mBlackBoxInteractor = connectionManager;
         mPreferencesManager = preferencesManager;
         mChecker = checker;
         mEventsInteractor = eventsInteractor;
@@ -75,10 +75,16 @@ public final class LockScreenPresenter {
 
         mView = view;
 
-        mView.setTimeForDutyType(DutyType.DRIVING, mDutyManager.getDutyTypeTime(DutyType.DRIVING));
-        mView.setTimeForDutyType(DutyType.SLEEPER_BERTH, mDutyManager.getDutyTypeTime(DutyType.SLEEPER_BERTH));
-        mView.setTimeForDutyType(DutyType.ON_DUTY, mDutyManager.getDutyTypeTime(DutyType.ON_DUTY));
-        mView.setTimeForDutyType(DutyType.OFF_DUTY, mDutyManager.getDutyTypeTime(DutyType.OFF_DUTY));
+        DutyType currentDutyType = mDutyManager.getDutyType();
+        mView.setTimeForDutyType(currentDutyType, getTimeForDutyType(currentDutyType));
+        mView.setTimeForDutyType(DutyType.SLEEPER_BERTH, getTimeForDutyType(
+                currentDutyType == DutyType.SLEEPER_BERTH ? DutyType.DRIVING : DutyType.SLEEPER_BERTH));
+        mView.setTimeForDutyType(DutyType.ON_DUTY, getTimeForDutyType(
+                currentDutyType == DutyType.ON_DUTY || currentDutyType == DutyType.YARD_MOVES
+                        ? DutyType.DRIVING : DutyType.ON_DUTY));
+        mView.setTimeForDutyType(DutyType.OFF_DUTY, getTimeForDutyType(
+                currentDutyType == DutyType.OFF_DUTY || currentDutyType == DutyType.PERSONAL_USE
+                        ? DutyType.DRIVING : DutyType.OFF_DUTY));
 
         startTimer();
         startMonitoring();
@@ -116,6 +122,10 @@ public final class LockScreenPresenter {
         mCompositeDisposable.add(disposable);
     }
 
+    private long getTimeForDutyType(DutyType dutyType) {
+        return mDutyManager.getDutyTypeTime(dutyType);
+    }
+
     private void resetTime(DutyType dutyType) {
         mDutyManager.setDutyType(dutyType, true);
     }
@@ -123,7 +133,7 @@ public final class LockScreenPresenter {
     @VisibleForTesting
     void startTimer() {
         final Disposable disposable = Observable.interval(1, TimeUnit.SECONDS)
-                .map(interval -> mDutyManager.getDutyTypeTime(DutyType.DRIVING))
+                .map(interval -> mDutyManager.getDutyTypeTime(mDutyManager.getDutyType()))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(mView::setCurrentTime, throwable -> Timber.d(throwable, "Timer error"));
         mCompositeDisposable.add(disposable);
@@ -136,7 +146,8 @@ public final class LockScreenPresenter {
         if (mView != null) {
             mView.removeAnyPopup();
         }
-        mBlackBoxConnectionManager.getDataObservable()
+        mBlackBoxInteractor.getData(mPreferencesManager.getBoxId())
+                .skip(1) // first element already handled, skip it
                 .distinctUntilChanged(BlackBoxModel::getResponseType)
                 .doOnNext(blackBoxModel -> mCurrentResponseType = blackBoxModel.getResponseType())
                 .subscribeOn(Schedulers.io())
@@ -192,8 +203,8 @@ public final class LockScreenPresenter {
     }
 
     void handleMoving() {
-
-        Disposable disposable = createPostNewEventCompletable(mEventsInteractor.getEvent(DutyType.DRIVING))
+        ELDEvent eldEvent = mEventsInteractor.getEvent(mDutyManager.getDutyType());
+        Disposable disposable = createPostNewEventCompletable(eldEvent)
                 .subscribe(() -> {
                     if (mView != null) {
                         mView.removeAnyPopup();
@@ -220,8 +231,7 @@ public final class LockScreenPresenter {
         Completable reconnectCompletable = mReconnectionReference.get();
         if (reconnectCompletable == null) {
             int boxId = mPreferencesManager.getBoxId();
-            reconnectCompletable = mBlackBoxConnectionManager.connectBlackBox(boxId)
-                    .flatMapObservable(BlackBoxConnectionManager::getDataObservable)
+            reconnectCompletable = mBlackBoxInteractor.getData(boxId)
                     .firstOrError()
                     .toCompletable()
                     .timeout(mAppSettings.lockScreenDisconnectionTimeout(), TimeUnit.MILLISECONDS)
@@ -232,8 +242,7 @@ public final class LockScreenPresenter {
                             return Completable.fromAction(mView::showDisconnectionPopup)
                                     .observeOn(Schedulers.io())
                                     .subscribeOn(AndroidSchedulers.mainThread())
-                                    .andThen(mBlackBoxConnectionManager.connectBlackBox(boxId))
-                                    .flatMapObservable(BlackBoxConnectionManager::getDataObservable)
+                                    .andThen(mBlackBoxInteractor.getData(boxId))
                                     .firstOrError()
                                     .toCompletable();
                         }

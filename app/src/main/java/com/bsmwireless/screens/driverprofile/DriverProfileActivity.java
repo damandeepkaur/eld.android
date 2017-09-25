@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.ActionBar;
+import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
@@ -101,6 +102,9 @@ public final class DriverProfileActivity extends BaseMenuActivity implements Dri
     @BindView(R.id.snackbar)
     SnackBarLayout mSnackBarLayout;
 
+    @BindView(R.id.change_password_button)
+    AppCompatButton mChangePassButton;
+
     @Inject
     DriverProfilePresenter mPresenter;
 
@@ -136,6 +140,20 @@ public final class DriverProfileActivity extends BaseMenuActivity implements Dri
         mUnbinder = ButterKnife.bind(this);
 
         initToolbar();
+
+        boolean isOnline = NetworkUtils.isOnlineMode();
+        mCurrentPasswordTextView.setEnabled(isOnline);
+        mConfirmPasswordTextView.setEnabled(isOnline);
+        mNewPasswordTextView.setEnabled(isOnline);
+
+        mCurrentPasswordTextView.setFocusable(isOnline);
+        mConfirmPasswordTextView.setFocusable(isOnline);
+        mNewPasswordTextView.setFocusable(isOnline);
+
+        mChangePassButton.setEnabled(isOnline);
+        if (!isOnline) {
+            mChangePassButton.setTextColor(mChangePassButton.getHintTextColors());
+        }
 
         mPresenter.onNeedUpdateUserInfo();
 
