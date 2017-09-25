@@ -75,6 +75,10 @@ public final class ELDEventsInteractor {
         return ELDEventConverter.toModelList(mELDEventDao.getLatestActiveDutyEventSync(latestTime, userId));
     }
 
+    public Observable<List<ELDEvent>> getUnidentifiedEvents() {
+        return Observable.fromCallable(() -> ELDEventConverter.toModelList(mELDEventDao.getUnidentifiedEvents()));
+    }
+
     public List<ELDEvent> getActiveEventsFromDBSync(long startTime, long endTime) {
         int driverId = mAccountManager.getCurrentUserId();
         return ELDEventConverter.toModelList(mELDEventDao.getActiveEventsFromStartToEndTimeSync(startTime, endTime, driverId));
