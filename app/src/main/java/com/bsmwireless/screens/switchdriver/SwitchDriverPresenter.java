@@ -3,20 +3,19 @@ package com.bsmwireless.screens.switchdriver;
 import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.common.utils.BlackBoxStateChecker;
 import com.bsmwireless.data.network.RetrofitException;
-import com.bsmwireless.data.network.blackbox.BlackBoxConnectionManager;
-import com.bsmwireless.data.network.blackbox.models.BlackBoxResponseModel;
 import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.data.storage.users.UserEntity;
+import com.bsmwireless.domain.interactors.BlackBoxInteractor;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
 import com.bsmwireless.domain.interactors.UserInteractor;
 import com.bsmwireless.models.BlackBoxModel;
+import com.bsmwireless.models.BlackBoxSensorState;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.User;
 import com.bsmwireless.widgets.alerts.DutyType;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
@@ -34,12 +33,11 @@ import static com.bsmwireless.common.Constants.MAX_CODRIVERS;
 @ActivityScope
 public final class SwitchDriverPresenter {
 
-    public static final int GETTING_BLACKBOX_MODEL_TIMEOUT = 10;
     private SwitchDriverView mView;
     private ELDEventsInteractor mELDEventsInteractor;
     private UserInteractor mUserInteractor;
     private AccountManager mAccountManager;
-    private BlackBoxConnectionManager mBlackBox;
+    private BlackBoxInteractor mBlackBoxInteractor;
     private BlackBoxStateChecker mBlackBoxStateChecker;
 
     private Disposable mGetUsernameDisposable;
@@ -51,12 +49,12 @@ public final class SwitchDriverPresenter {
     @Inject
     public SwitchDriverPresenter(SwitchDriverView view, ELDEventsInteractor eventsInteractor,
                                  UserInteractor userInteractor, AccountManager accountManager,
-                                 BlackBoxConnectionManager blackBox, BlackBoxStateChecker blackBoxStateChecker) {
+                                 BlackBoxInteractor blackBoxInteractor, BlackBoxStateChecker blackBoxStateChecker) {
         mView = view;
         mELDEventsInteractor = eventsInteractor;
         mUserInteractor = userInteractor;
         mAccountManager = accountManager;
-        mBlackBox = blackBox;
+        mBlackBoxInteractor = blackBoxInteractor;
         mGetUsernameDisposable = Disposables.disposed();
         mGetCoDriversDisposable = Disposables.disposed();
         mLoginDisposable = Disposables.disposed();
@@ -197,28 +195,11 @@ public final class SwitchDriverPresenter {
     }
 
     public void onSwitchDriverDialog() {
-
-        BlackBoxModel defaultModel = new BlackBoxModel();
-        defaultModel.setResponseType(BlackBoxResponseModel.ResponseType.NONE);
-
-        mView.createLoadingDialog();
-        Disposable disposable = mBlackBox.getDataObservable()
-                .firstOrError()
-                .timeout(GETTING_BLACKBOX_MODEL_TIMEOUT, TimeUnit.SECONDS)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        blackBoxModel -> {
-                            if (mBlackBoxStateChecker.isMoving(blackBoxModel)) {
-                                mView.createSwitchOnlyDialog();
-                            } else {
-                                mView.createSwitchDriverDialog();
-                            }
-                        }, throwable -> {
-                            Timber.e(throwable, "Error getting current blackbox status");
-                            mView.createSwitchDriverDialog();
-                        });
-        mCommonDisposables.add(disposable);
+        if (mBlackBoxInteractor.getLastData().getSensorState(BlackBoxSensorState.MOVING)) {
+            mView.createSwitchOnlyDialog();
+        } else {
+            mView.createSwitchDriverDialog();
+        }
     }
 
     private void getDriverInfo() {

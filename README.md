@@ -3,7 +3,8 @@ ELD app for Android
 
 # Version history
 
-* **1.0.77** - Fixed the lock screen in Personal Use and Yard Moves and switching from background to foreground  (_EA-417_, _EA-436_)
+* **1.0.78** - Fixed the lock screen in Personal Use and Yard Moves and switching from background to foreground  (_EA-417_, _EA-436_)
+* **1.0.77** - Replace snackbar to floating action button
 * **1.0.76** - Driver’s re-certification of Own Records (_EA-306_)
 * **1.0.75** - Engine Synchronization Compliance Monitoring (_EA-222_)
 * **1.0.74** - Add progress bar for selecting assets and pairing to black box
