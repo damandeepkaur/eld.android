@@ -14,7 +14,7 @@ import javax.inject.Inject;
 
 import app.bsmuniversal.com.R;
 
-public class FontTextView extends AppCompatTextView {
+public final class FontTextView extends AppCompatTextView {
 
     public enum FontType {
         NONE(0),

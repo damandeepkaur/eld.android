@@ -9,7 +9,7 @@ import dagger.Module;
 import dagger.Provides;
 
 @Module
-public class DashboardModule {
+public final class DashboardModule {
 
     private final DashboardView mDashboardView;
 

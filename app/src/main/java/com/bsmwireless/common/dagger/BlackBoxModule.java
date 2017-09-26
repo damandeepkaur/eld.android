@@ -13,7 +13,7 @@ import dagger.Module;
 import dagger.Provides;
 
 @Module
-public class BlackBoxModule {
+public final class BlackBoxModule {
 
     @Provides
     static BlackBox provideBlackBox() {

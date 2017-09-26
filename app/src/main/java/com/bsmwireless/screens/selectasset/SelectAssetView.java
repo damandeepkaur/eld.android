@@ -36,4 +36,8 @@ public interface SelectAssetView {
     void showConfirmationDialog();
 
     void onActionDone();
+
+    void showProgress();
+
+    void hideProgress();
 }

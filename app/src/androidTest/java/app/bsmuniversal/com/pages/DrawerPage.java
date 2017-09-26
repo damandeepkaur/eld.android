@@ -3,6 +3,7 @@ package app.bsmuniversal.com.pages;
 import app.bsmuniversal.com.locators.DrawerLocators;
 
 import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.contrib.DrawerActions.close;
 import static android.support.test.espresso.contrib.DrawerActions.open;
 import static android.support.test.espresso.contrib.NavigationViewActions.navigateTo;
 
@@ -13,6 +14,10 @@ public class DrawerPage {
 
     public static void open_navigation_drawer() {
         onView(DrawerLocators.navigation_drawer).perform(open());
+    }
+
+    public static void close_navigation_drawer() {
+        onView(DrawerLocators.navigation_drawer).perform(close());
     }
 
     public static void click_on_navigation_item(int itemId) {

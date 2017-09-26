@@ -11,7 +11,7 @@ import com.bsmwireless.screens.multiday.MultidayFragment;
 
 import app.bsmuniversal.com.R;
 
-public class NavigationAdapter extends FragmentStatePagerAdapter {
+public final class NavigationAdapter extends FragmentStatePagerAdapter {
     private final static int MAX_PAGES = 3;
 
     private Context mContext;

@@ -12,7 +12,7 @@ import app.bsmuniversal.com.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class MultidayAdapter extends RecyclerView.Adapter<MultidayAdapter.ViewHolder> {
+public final class MultidayAdapter extends RecyclerView.Adapter<MultidayAdapter.ViewHolder> {
 
     private List<MultidayItemModel> mItems;
 

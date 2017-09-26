@@ -6,7 +6,7 @@ import android.support.v7.widget.AppCompatTextView;
 import android.text.TextPaint;
 import android.util.AttributeSet;
 
-public class VerticalTextView extends AppCompatTextView {
+public final class VerticalTextView extends AppCompatTextView {
 
     public VerticalTextView(Context context) {
         super(context);

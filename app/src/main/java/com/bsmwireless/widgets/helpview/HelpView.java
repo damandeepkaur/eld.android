@@ -20,7 +20,7 @@ import com.bsmwireless.widgets.common.FontTextView;
 
 import app.bsmuniversal.com.R;
 
-public class HelpView extends RelativeLayout {
+public final class HelpView extends RelativeLayout {
 
     public enum ArrowType {
         CLOCKWISE(R.drawable.ic_arrow_clockwise),
@@ -170,7 +170,7 @@ public class HelpView extends RelativeLayout {
         view.setY(y);
     }
 
-    public static class HelpModel implements Parcelable {
+    public static final class HelpModel implements Parcelable {
         private int mX;
         private int mY;
         private String mMessage;

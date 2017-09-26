@@ -39,7 +39,7 @@ public class SignatureTest extends BaseTestClass {
         SelectAssetPage.go_to_home_screen();
         DrawerPage.open_navigation_drawer();
         assert_navigation_drawer_opened(DrawerLocators.navigation_drawer, true);
-        DrawerPage.click_on_navigation_item(DrawerLocators.nav_driver_profile);
+        DrawerPage.click_on_navigation_item(DrawerLocators.nav_driver_profile_item);
         DriverProfilePage.clear_signature();
 
     }
@@ -51,4 +51,3 @@ public class SignatureTest extends BaseTestClass {
         wait_for_view(REQUEST_TIMEOUT, LoginLocators.execute_login);
     }
 }
-I

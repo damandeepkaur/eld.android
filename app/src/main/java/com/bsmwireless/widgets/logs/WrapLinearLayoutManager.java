@@ -6,7 +6,7 @@ import android.support.v7.widget.RecyclerView;
 
 import timber.log.Timber;
 
-public class WrapLinearLayoutManager extends LinearLayoutManager {
+public final class WrapLinearLayoutManager extends LinearLayoutManager {
 
     public WrapLinearLayoutManager(Context context) {
         super(context);
