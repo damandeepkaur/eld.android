@@ -3,6 +3,7 @@ ELD app for Android
 
 # Version history
 
+* **1.0.79** - Fix not able to add event/change duty status (_EA-422_)
 * **1.0.79** - Fix app returns home screen instead of login screen after selecting close
 * **1.0.78** - Fixed the lock screen in Personal Use and Yard Moves and switching from background to foreground  (_EA-417_, _EA-436_)
 * **1.0.77** - Replace snackbar to floating action button
