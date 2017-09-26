@@ -1,8 +1,6 @@
 package com.bsmwireless.screens.login;
 
 
-import android.util.Log;
-
 import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.common.utils.SchedulerUtils;
 import com.bsmwireless.data.network.RetrofitException;
