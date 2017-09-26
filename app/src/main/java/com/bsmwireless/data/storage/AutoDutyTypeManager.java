@@ -113,7 +113,8 @@ public final class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListen
 
                 mHandler.removeCallbacks(mAutoOnDutyTask);
 
-                if (mDutyTypeManager.getDutyType() != DutyType.PERSONAL_USE && mDutyTypeManager.getDutyType() != DutyType.YARD_MOVES) {
+                DutyType dutyTypeCurr = mDutyTypeManager.getDutyType();
+                if (dutyTypeCurr != DutyType.PERSONAL_USE && dutyTypeCurr != DutyType.YARD_MOVES && dutyTypeCurr != DutyType.DRIVING) {
                     events.add(mEventsInteractor.getEvent(DutyType.DRIVING, null, true));
                 }
 
