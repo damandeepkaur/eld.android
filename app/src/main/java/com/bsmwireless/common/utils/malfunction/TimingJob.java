@@ -42,12 +42,14 @@ public final class TimingJob extends BaseMalfunctionJob implements MalfunctionJo
     public void start() {
         Timber.d("Start timing compliance detection");
         Disposable disposable = getIntervalObservable()
+                .doOnNext(unused -> Timber.d("Check the time compliance"))
                 .flatMap(unsed -> getBlackboxData())
                 .flatMap(this::loadLatestTimingEvent)
                 .filter(result -> isCurrentTimingEventAndStateDifferent(result.mELDEvent))
                 .map(result -> createEvent(Malfunction.TIMING_COMPLIANCE,
                         createCodeForMalfunction(result.mELDEvent),
                         result.mBlackBoxModel))
+                .doOnNext(eldEvent -> Timber.d("Save new timing compliance event: " + eldEvent))
                 .flatMap(this::saveEvents)
                 .onErrorReturn(throwable -> {
                     Timber.e(throwable, "Error save the eld event");

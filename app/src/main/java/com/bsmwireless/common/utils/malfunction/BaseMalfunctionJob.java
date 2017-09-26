@@ -83,6 +83,7 @@ abstract class BaseMalfunctionJob {
     protected final Observable<BlackBoxModel> getBlackboxData(){
         return mBlackBoxInteractor
                 .getData(mPreferencesManager.getBoxId())
+                .onErrorReturn(throwable -> new BlackBoxModel())
                 .switchIfEmpty(observer -> observer.onNext(new BlackBoxModel()));
     }
 
