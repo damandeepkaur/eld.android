@@ -29,19 +29,13 @@ public final class DashboardPresenter {
         mDutyTypeManager = dutyTypeManager;
         mEventsInteractor = eventsInteractor;
 
+        mDutyTypeManager.addListener(mListener);
+
         Timber.d("CREATED");
     }
 
-    void onResume() {
-        mView.setDutyType(mDutyTypeManager.getDutyType());
-        mDutyTypeManager.addListener(mListener);
-    }
-
-    void onPause() {
-        mDutyTypeManager.removeListener(mListener);
-    }
-
     public void onDestroy() {
+        mDutyTypeManager.removeListener(mListener);
         Timber.d("DESTROYED");
     }
 
