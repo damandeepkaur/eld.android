@@ -26,7 +26,7 @@ public final class SynchronizationJob extends BaseMalfunctionJob implements Malf
     public SynchronizationJob(ELDEventsInteractor eldEventsInteractor,
                               DutyTypeManager dutyTypeManager,
                               BlackBoxInteractor blackBoxInteractor, PreferencesManager preferencesManager) {
-        super(eldEventsInteractor, dutyTypeManager);
+        super(eldEventsInteractor, dutyTypeManager, blackBoxInteractor, preferencesManager);
         mBlackBoxInteractor = blackBoxInteractor;
         mPreferencesManager = preferencesManager;
     }
@@ -37,12 +37,14 @@ public final class SynchronizationJob extends BaseMalfunctionJob implements Malf
         Disposable disposable = mBlackBoxInteractor.getData(mPreferencesManager.getBoxId())
                 .filter(blackBoxModel -> BlackBoxResponseModel.ResponseType.STATUS_UPDATE
                         == blackBoxModel.getResponseType())
-                .flatMap(blackBoxModel -> loadLatestSynchronizationEvent(), SynchResult::new)
+                .flatMap(this::loadLatestSynchronizationEvent, SynchResult::new)
                 .filter(this::isStateAndEventAreDifferent)
+                // create event with opposite mal code
                 .map(result -> createEvent(Malfunction.ENGINE_SYNCHRONIZATION,
-                        createCodeForDiagnostic(result.mELDEvent)))
+                        createCodeForDiagnostic(result.mELDEvent), result.mBlackBoxModel))
                 .flatMap(this::saveEvents)
                 .onErrorReturn(throwable -> {
+                    throwable.printStackTrace();
                     Timber.e(throwable, "Error handle synchronization event");
                     return -1L;
                 })
@@ -57,15 +59,17 @@ public final class SynchronizationJob extends BaseMalfunctionJob implements Malf
         dispose();
     }
 
-    private Observable<ELDEvent> loadLatestSynchronizationEvent() {
+    private Observable<ELDEvent> loadLatestSynchronizationEvent(BlackBoxModel blackBoxModel) {
         return getELDEventsInteractor()
                 .getLatestMalfunctionEvent(Malfunction.ENGINE_SYNCHRONIZATION)
                 .toObservable()
                 .switchIfEmpty(observer -> {
                     // create default event with cleared status
-                    ELDEvent event = getELDEventsInteractor().getEvent(getDutyTypeManager().getDutyType());
-                    event.setEventCode(ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED.getCode());
-                    observer.onNext(event);
+                    ELDEvent eldEvent = getELDEventsInteractor()
+                            .getEvent(Malfunction.ENGINE_SYNCHRONIZATION,
+                                    ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED,
+                                    blackBoxModel);
+                    observer.onNext(eldEvent);
                 });
     }
 

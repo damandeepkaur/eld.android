@@ -23,8 +23,11 @@ public final class MalfunctionModule {
     static TimingJob timingJob(ELDEventsInteractor eldEventsInteractor,
                                DutyTypeManager dutyTypeManager,
                                NtpClientManager ntpClientManager,
-                               AppSettings appSettings) {
-        return new TimingJob(eldEventsInteractor, dutyTypeManager, ntpClientManager, appSettings);
+                               AppSettings appSettings,
+                               BlackBoxInteractor blackBoxInteractor,
+                               PreferencesManager preferencesManager) {
+        return new TimingJob(eldEventsInteractor, dutyTypeManager, ntpClientManager, appSettings,
+                blackBoxInteractor, preferencesManager);
     }
 
     @Provides

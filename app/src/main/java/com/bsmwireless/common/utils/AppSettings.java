@@ -5,9 +5,6 @@ import com.bsmwireless.common.Constants;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-/**
- *
- */
 @Singleton
 public final class AppSettings {
 

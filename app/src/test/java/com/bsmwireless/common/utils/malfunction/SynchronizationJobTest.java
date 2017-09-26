@@ -72,14 +72,16 @@ public class SynchronizationJobTest extends BaseTest {
         when(mELDEventsInteractor.getLatestMalfunctionEvent(Malfunction.ENGINE_SYNCHRONIZATION))
                 .thenReturn(Single.just(eldEvent).toMaybe());
         when(mELDEventsInteractor.postNewELDEvent(any())).thenReturn(Single.just(1L));
-        when(mELDEventsInteractor.getEvent(any(DutyType.class))).thenReturn(eldEvent);
+        when(mELDEventsInteractor.getEvent(any(), any(), any())).thenReturn(eldEvent);
 
         when(mDutyTypeManager.getDutyType()).thenReturn(DutyType.ON_DUTY);
 
         mSynchronizationJob.start();
 
         mSynchronizationJob.stop();
-        verify(mELDEventsInteractor).getEvent(DutyType.ON_DUTY);
+        verify(mELDEventsInteractor).getEvent(Malfunction.ENGINE_SYNCHRONIZATION,
+                ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED,
+                blackBoxModel);
         verify(mELDEventsInteractor).postNewELDEvent(any(ELDEvent.class));
     }
 
@@ -126,7 +128,7 @@ public class SynchronizationJobTest extends BaseTest {
         when(diagnosticCleared.getEventCode()).thenReturn(ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED.getCode());
 
         when(mELDEventsInteractor.postNewELDEvent(any())).thenReturn(Single.just(1L));
-        when(mELDEventsInteractor.getEvent(any(DutyType.class))).thenReturn(new ELDEvent());
+        when(mELDEventsInteractor.getEvent(any(), any(), any())).thenReturn(new ELDEvent());
 
         when(mDutyTypeManager.getDutyType()).thenReturn(DutyType.ON_DUTY);
 
@@ -161,14 +163,16 @@ public class SynchronizationJobTest extends BaseTest {
                 .thenReturn(Maybe.empty());
 
         when(mELDEventsInteractor.postNewELDEvent(any())).thenReturn(Single.just(1L));
-        when(mELDEventsInteractor.getEvent(any(DutyType.class))).thenReturn(new ELDEvent());
+
+        ELDEvent defaultEvent = new ELDEvent();
+        defaultEvent.setEventCode(ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED.getCode());
+        when(mELDEventsInteractor.getEvent(any(), any(), any())).thenReturn(defaultEvent);
 
         when(mDutyTypeManager.getDutyType()).thenReturn(DutyType.ON_DUTY);
 
         mSynchronizationJob.start();
         verify(mELDEventsInteractor).postNewELDEvent(any());
         verify(mELDEventsInteractor).getLatestMalfunctionEvent(Malfunction.ENGINE_SYNCHRONIZATION);
-
     }
 
     @Test
@@ -184,7 +188,7 @@ public class SynchronizationJobTest extends BaseTest {
 
         when(mELDEventsInteractor.getLatestMalfunctionEvent(Malfunction.ENGINE_SYNCHRONIZATION))
                 .thenReturn(Maybe.empty());
-        when(mELDEventsInteractor.getEvent(any(DutyType.class))).thenReturn(new ELDEvent());
+        when(mELDEventsInteractor.getEvent(any(), any(), any())).thenReturn(new ELDEvent());
 
         when(mELDEventsInteractor.postNewELDEvent(any())).thenReturn(Single.just(1L));
         when(mDutyTypeManager.getDutyType()).thenReturn(DutyType.ON_DUTY);
