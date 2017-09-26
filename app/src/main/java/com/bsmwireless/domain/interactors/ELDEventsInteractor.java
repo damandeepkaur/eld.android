@@ -317,6 +317,7 @@ public final class ELDEventsInteractor {
         event.setVehicleId(mPreferencesManager.getVehicleId());
         event.setMobileTime(currentTime);
         event.setOrigin(isAuto ? ELDEvent.EventOrigin.AUTOMATIC_RECORD.getValue() : ELDEvent.EventOrigin.DRIVER.getValue());
+        event.setOdometer(blackBoxModel.getOdometer());
 
         return event;
     }

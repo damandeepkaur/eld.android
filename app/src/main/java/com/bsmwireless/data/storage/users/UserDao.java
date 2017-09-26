@@ -19,6 +19,9 @@ public interface UserDao {
     @Query("SELECT * FROM users WHERE users.id IN (:ids)")
     Flowable<List<UserEntity>> getDrivers(List<Integer> ids);
 
+    @Query("SELECT * FROM users WHERE users.id IN (:ids)")
+    List<UserEntity> getDriversSync(List<Integer> ids);
+
     @Query("SELECT * FROM users WHERE id = :id LIMIT 1")
     UserEntity getUserSync(int id);
 

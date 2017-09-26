@@ -4,8 +4,10 @@ package com.bsmwireless.screens.logs;
 import com.bsmwireless.common.Constants;
 import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.common.utils.DateUtils;
+import com.bsmwireless.common.utils.ListConverter;
 import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.data.storage.DutyTypeManager;
+import com.bsmwireless.data.storage.users.UserEntity;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
 import com.bsmwireless.domain.interactors.LogSheetInteractor;
 import com.bsmwireless.domain.interactors.SyncInteractor;
@@ -24,6 +26,7 @@ import com.bsmwireless.widgets.logs.calendar.CalendarItem;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -47,6 +50,9 @@ import static com.bsmwireless.widgets.alerts.DutyType.CLEAR_YM;
 
 @ActivityScope
 public final class LogsPresenter implements AccountManager.AccountListener {
+
+    private static final String DRIVERS_NAME_DIVIDER = ", ";
+
     private LogsView mView;
     private ELDEventsInteractor mELDEventsInteractor;
     private LogSheetInteractor mLogSheetInteractor;
@@ -221,77 +227,83 @@ public final class LogsPresenter implements AccountManager.AccountListener {
     }
 
     private void updateLogHeader() {
-        Single.fromCallable(() -> {
-            LogHeaderModel model = new LogHeaderModel();
-            model.setTimezone(mTimeZone);
 
-            if (mUser != null) {
-                model.setDriverName(mUser.getFirstName() + " " + mUser.getLastName());
-                model.setSelectedExemptions(mUser.getRuleException());
-
-                List<SyncConfiguration> configurations = mUser.getConfigurations();
-                if (configurations != null) {
-                    for (SyncConfiguration configuration : configurations) {
-                        if (SyncConfiguration.Type.EXCEPT.getName().equals(configuration.getName())) {
-                            model.setAllExemptions(configuration.getValue());
-                            break;
-                        }
-                    }
-                } else {
-                    model.setAllExemptions("");
-                }
-
-                //set carrier name
-                List<Carrier> carriers = mUser.getCarriers();
-                if (carriers != null && !carriers.isEmpty()) {
-                    StringBuilder sb = new StringBuilder();
-                    for (Carrier carrier : carriers) {
-                        sb.append(carrier.getName());
-                        sb.append(",");
-                    }
-                    sb.deleteCharAt(sb.length() - 1);
-                    model.setCarrierName(sb.toString());
-                }
-                model.setSelectedExemptions(mUser.getRuleException());
-            }
-
-            if (mSelectedLogHeader != null) {
-                int vehicleId = mSelectedLogHeader.getVehicleId();
-                Vehicle vehicle;
-                if (mVehicleIdToNameMap.containsKey(vehicleId)) {
-                    vehicle = mVehicleIdToNameMap.get(vehicleId);
-                } else {
-                    vehicle = mVehiclesInteractor.getVehicle(vehicleId);
-                }
-                if (vehicle != null) {
-                    model.setVehicleName(vehicle.getName());
-                    model.setVehicleLicense(vehicle.getLicense());
-                }
-                model.setTrailers(mSelectedLogHeader.getTrailerIds());
-
-                if (mSelectedLogHeader.getHomeTerminal() != null) {
-                    model.setHomeTerminalAddress(mSelectedLogHeader.getHomeTerminal().getAddress());
-                    model.setHomeTerminalName(mSelectedLogHeader.getHomeTerminal().getName());
-                }
-
-                model.setShippingId(mSelectedLogHeader.getShippingId());
-
-                String codriverIds = mSelectedLogHeader.getCoDriverIds();
-                //TODO: get codriver names by ids
-                model.setCoDriversName(codriverIds);
-            }
-            //TODO: init by data from black box
-            model.setStartOdometer("0");
-            model.setEndOdometer("0");
-            model.setDistanceDriven("-");
-
-            mLogHeaderModel = model;
-            mLogHeaderModel.setLogSheetHeader(mSelectedLogHeader);
-            return mLogHeaderModel;
-        })
+        loadUserHeaderInfo()
+                .zipWith(loadLogHeaderInfo(), this::mapUserAndHeader)
+                .zipWith(loadOdometerValue(), this::mapOdometerValue)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(logHeaderModel -> mView.setLogHeader(logHeaderModel));
+
+//        Single
+//                .fromCallable(() -> {
+//                    LogHeaderModel model = new LogHeaderModel();
+//                    model.setTimezone(mTimeZone);
+//
+//                    if (mUser != null) {
+//                        model.setDriverName(mUser.getFirstName() + " " + mUser.getLastName());
+//                        model.setSelectedExemptions(mUser.getRuleException());
+//
+//                        List<SyncConfiguration> configurations = mUser.getConfigurations();
+//                        if (configurations != null) {
+//                            for (SyncConfiguration configuration : configurations) {
+//                                if (SyncConfiguration.Type.EXCEPT.getName().equals(configuration.getName())) {
+//                                    model.setAllExemptions(configuration.getValue());
+//                                    break;
+//                                }
+//                            }
+//                        } else {
+//                            model.setAllExemptions("");
+//                        }
+//
+//                        //set carrier name
+//                        List<Carrier> carriers = mUser.getCarriers();
+//                        if (carriers != null && !carriers.isEmpty()) {
+//                            StringBuilder sb = new StringBuilder();
+//                            for (Carrier carrier : carriers) {
+//                                sb.append(carrier.getName());
+//                                sb.append(",");
+//                            }
+//                            sb.deleteCharAt(sb.length() - 1);
+//                            model.setCarrierName(sb.toString());
+//                        }
+//                        model.setSelectedExemptions(mUser.getRuleException());
+//                    }
+//
+//                    if (mSelectedLogHeader != null) {
+//                        int vehicleId = mSelectedLogHeader.getVehicleId();
+//                        Vehicle vehicle;
+//                        if (mVehicleIdToNameMap.containsKey(vehicleId)) {
+//                            vehicle = mVehicleIdToNameMap.get(vehicleId);
+//                        } else {
+//                            vehicle = mVehiclesInteractor.getVehicle(vehicleId);
+//                        }
+//                        if (vehicle != null) {
+//                            model.setVehicleName(vehicle.getName());
+//                            model.setVehicleLicense(vehicle.getLicense());
+//                        }
+//                        model.setTrailers(mSelectedLogHeader.getTrailerIds());
+//
+//                        if (mSelectedLogHeader.getHomeTerminal() != null) {
+//                            model.setHomeTerminalAddress(mSelectedLogHeader.getHomeTerminal().getAddress());
+//                            model.setHomeTerminalName(mSelectedLogHeader.getHomeTerminal().getName());
+//                        }
+//
+//                        model.setShippingId(mSelectedLogHeader.getShippingId());
+//                        model.setCoDriversName(getCoDriversName(mSelectedLogHeader));
+//                    }
+//                    //TODO: init by data from black box
+//                    model.setStartOdometer("0");
+//                    model.setEndOdometer("0");
+//                    model.setDistanceDriven("-");
+//
+//                    mLogHeaderModel = model;
+//                    mLogHeaderModel.setLogSheetHeader(mSelectedLogHeader);
+//                    return mLogHeaderModel;
+//                })
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(logHeaderModel -> mView.setLogHeader(logHeaderModel));
     }
 
     public void onSignLogsheetButtonClicked(CalendarItem calendarItem) {
@@ -457,6 +469,208 @@ public final class LogsPresenter implements AccountManager.AccountListener {
         return logs;
     }
 
+    private Single<UserHeaderInfo> loadUserHeaderInfo() {
+
+        return Single.fromCallable(() -> {
+
+            if (mUser == null) return new UserHeaderInfo();
+
+            String driverName = String.format("%1$s %2$s", mUser.getFirstName(), mUser.getLastName());
+            String selectedExemptions = mUser.getRuleException();
+
+            String allExemptions = null;
+            List<SyncConfiguration> configurations = mUser.getConfigurations();
+            if (configurations != null) {
+                for (SyncConfiguration configuration : configurations) {
+                    if (SyncConfiguration.Type.EXCEPT.getName().equals(configuration.getName())) {
+                        allExemptions = configuration.getValue();
+                        break;
+                    }
+                }
+            }
+
+            //set carrier name
+            String carriername;
+            List<Carrier> carriers = mUser.getCarriers();
+            if (carriers != null && !carriers.isEmpty()) {
+                StringBuilder sb = new StringBuilder();
+                for (Carrier carrier : carriers) {
+                    sb.append(carrier.getName());
+                    sb.append(",");
+                }
+                carriername = sb.substring(0, sb.length() - 1);
+            } else {
+                carriername = "";
+            }
+
+            return new UserHeaderInfo(mTimeZone, driverName, selectedExemptions,
+                    allExemptions != null ? allExemptions : "", carriername);
+        });
+    }
+
+    private Single<SelectedLogHeaderInfo> loadLogHeaderInfo() {
+        return Single.fromCallable(() -> {
+            if (mSelectedLogHeader == null) return new SelectedLogHeaderInfo();
+
+            int vehicleId = mSelectedLogHeader.getVehicleId();
+            Vehicle vehicle;
+            if (mVehicleIdToNameMap.containsKey(vehicleId)) {
+                vehicle = mVehicleIdToNameMap.get(vehicleId);
+            } else {
+                vehicle = mVehiclesInteractor.getVehicle(vehicleId);
+            }
+            String vehicleName;
+            String vehicleLicense;
+            if (vehicle != null) {
+                vehicleName = vehicle.getName();
+                vehicleLicense = vehicle.getLicense();
+            } else {
+                vehicleName = "";
+                vehicleLicense = "";
+            }
+
+            String vehicleTrailers = mSelectedLogHeader.getCoDriverIds();
+
+            String homeTerminalAddress;
+            String homeTerminalName;
+            if (mSelectedLogHeader.getHomeTerminal() != null) {
+                homeTerminalAddress = mSelectedLogHeader.getHomeTerminal().getAddress();
+                homeTerminalName = mSelectedLogHeader.getHomeTerminal().getName();
+            } else {
+                homeTerminalAddress = "";
+                homeTerminalName = "";
+            }
+
+            String shippingId = mSelectedLogHeader.getShippingId();
+            String coDriversname = getCoDriversName(mSelectedLogHeader);
+
+            return new SelectedLogHeaderInfo(vehicleName, vehicleLicense, vehicleTrailers,
+                    homeTerminalAddress, homeTerminalName, shippingId, coDriversname);
+        });
+    }
+
+    private Single<OdometerResult> loadOdometerValue() {
+
+        final long startDate = DateUtils.getStartDate(mTimeZone, mSelectedDayCalendar);
+        final long endDate = startDate + MS_IN_DAY;
+
+        return mELDEventsInteractor.getDutyEventsFromDB(startDate, endDate)
+                .first(Collections.emptyList())
+//                .map(events -> {
+//
+//                    ArrayList<ELDEvent> output = new ArrayList<>(events.size());
+//
+//                    for (ELDEvent event : events) {
+//
+//                        //adds only active duty changing event except PU and YM
+//                        if (event.getEventType() == ELDEvent.EventType.DUTY_STATUS_CHANGING.getValue()
+//                                && event.getEventCode() == ELDEvent.StatusCode.ACTIVE.getValue()) {
+//                            output.add(event);
+//                        }
+//                    }
+//
+//                    return output;
+//                })
+                .flatMap(events -> Single.fromCallable(() -> {
+
+                    final long startValue;
+                    final long endValue;
+                    long distance = 0;
+
+                    if (events.isEmpty()) {
+                        startValue = 0;
+                        endValue = 0;
+                        distance = 0;
+                    } else {
+
+                        Integer firstOdometerValue = events.get(0).getOdometer();
+                        startValue = firstOdometerValue != null ? firstOdometerValue : 0;
+                        int size = events.size();
+                        if (size == 1) {
+                            endValue = startValue;
+                        } else {
+                            Integer odometer = events.get(size - 1).getOdometer();
+                            endValue = odometer != null ? odometer : 0;
+                        }
+
+                        long prevValue = 0;
+                        for (ELDEvent event : events) {
+
+                            if (DutyType.DRIVING.isSame(event.getEventType(), event.getEventCode())) {
+
+                                // start driving event, save odometer value
+                                prevValue = event.getOdometer() != null ? event.getOdometer() : 0;
+
+                            } else {
+                                // stop driving event
+                                Integer odometer = event.getOdometer();
+                                int currentOdometer = odometer != null ? odometer : 0;
+                                distance += currentOdometer - prevValue;
+                                prevValue = 0;
+                            }
+                        }
+                        // subtract a first odometer value for correctness
+                        distance -= startValue;
+                    }
+
+                    return new OdometerResult(startValue, endValue, distance);
+                }));
+    }
+
+    private LogHeaderModel mapUserAndHeader(UserHeaderInfo userHeaderInfo,
+                                            SelectedLogHeaderInfo selectedLogHeaderInfo) {
+
+        LogHeaderModel model = new LogHeaderModel();
+        model.setTimezone(userHeaderInfo.mTimezone);
+        model.setDriverName(userHeaderInfo.mDriverName);
+        model.setSelectedExemptions(userHeaderInfo.mSelectedExemption);
+        model.setAllExemptions(userHeaderInfo.mAllExemptions);
+        model.setCarrierName(userHeaderInfo.mCarrierName);
+
+        model.setVehicleName(selectedLogHeaderInfo.mVehicleName);
+        model.setVehicleLicense(selectedLogHeaderInfo.mVehicleLicense);
+        model.setTrailers(selectedLogHeaderInfo.mTrailers);
+        model.setHomeTerminalAddress(selectedLogHeaderInfo.mHomeTerminalAddress);
+        model.setHomeTerminalName(selectedLogHeaderInfo.mHomeTerminalName);
+        model.setShippingId(selectedLogHeaderInfo.mShippingId);
+        model.setCoDriversName(selectedLogHeaderInfo.mCoDriversName);
+        return model;
+    }
+
+    private LogHeaderModel mapOdometerValue(LogHeaderModel model, OdometerResult odometerResult) {
+
+        model.setStartOdometer(String.valueOf(odometerResult.startValue));
+        model.setEndOdometer(String.valueOf(odometerResult.endValue));
+        model.setDistanceDriven(String.valueOf(odometerResult.distance));
+        return model;
+    }
+
+
+    private String getCoDriversName(LogSheetHeader header) {
+
+        if (header == null) return "";
+
+        String codriverStringIds = header.getCoDriverIds();
+        List<Integer> coDriversIds = ListConverter.toIntegerList(codriverStringIds);
+
+        if (coDriversIds.isEmpty()) return "";
+
+        List<UserEntity> names = mUserInteractor.getCoDriversName(coDriversIds);
+
+        if (names.isEmpty()) {
+            // no users in the database with these ids
+            return "";
+        }
+
+        StringBuilder coDriversNames = new StringBuilder();
+        for (UserEntity userEntity : names) {
+            coDriversNames
+                    .append(userEntity.getFirstName()).append(" ").append(userEntity.getLastName())
+                    .append(DRIVERS_NAME_DIVIDER);
+        }
+        return coDriversNames.substring(0, coDriversNames.length() - DRIVERS_NAME_DIVIDER.length());
+    }
+
     @Override
     public void onUserChanged() {
         mDisposables.dispose();
@@ -465,5 +679,81 @@ public final class LogsPresenter implements AccountManager.AccountListener {
 
     @Override
     public void onDriverChanged() {
+    }
+
+    private static final class UserHeaderInfo {
+        final String mTimezone;
+        final String mDriverName;
+        final String mSelectedExemption;
+        final String mAllExemptions;
+        final String mCarrierName;
+
+        private UserHeaderInfo(String timezone,
+                               String driverName,
+                               String selectedExemption,
+                               String allExemptions,
+                               String carrierName) {
+            this.mTimezone = timezone;
+            this.mDriverName = driverName;
+            this.mSelectedExemption = selectedExemption;
+            this.mAllExemptions = allExemptions;
+            this.mCarrierName = carrierName;
+        }
+
+        public UserHeaderInfo() {
+            mTimezone = "";
+            mDriverName = "";
+            mSelectedExemption = "";
+            mAllExemptions = "";
+            mCarrierName = "";
+        }
+    }
+
+    private static final class SelectedLogHeaderInfo {
+        final String mVehicleName;
+        final String mVehicleLicense;
+        final String mTrailers;
+        final String mHomeTerminalAddress;
+        final String mHomeTerminalName;
+        final String mShippingId;
+        final String mCoDriversName;
+
+        private SelectedLogHeaderInfo(String vehicleName,
+                                      String vehicleLicense,
+                                      String trailers,
+                                      String homeTerminalAddress,
+                                      String homeTerminalName,
+                                      String shippingId,
+                                      String coDriversName) {
+            this.mVehicleName = vehicleName;
+            this.mVehicleLicense = vehicleLicense;
+            this.mTrailers = trailers;
+            this.mHomeTerminalAddress = homeTerminalAddress;
+            this.mHomeTerminalName = homeTerminalName;
+            this.mShippingId = shippingId;
+            this.mCoDriversName = coDriversName;
+        }
+
+        public SelectedLogHeaderInfo() {
+            this.mVehicleName = "";
+            this.mVehicleLicense = "";
+            this.mTrailers = "";
+            this.mHomeTerminalAddress = "";
+            this.mHomeTerminalName = "";
+            this.mShippingId = "";
+            this.mCoDriversName = "";
+        }
+    }
+
+    private static final class OdometerResult {
+        private final long startValue;
+        private final long endValue;
+        private final long distance;
+
+        private OdometerResult(long startValue, long endValue, long distance) {
+            this.startValue = startValue;
+            this.endValue = endValue;
+            this.distance = distance;
+        }
     }
 }
