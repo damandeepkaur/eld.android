@@ -100,7 +100,7 @@ public abstract class BaseMenuPresenter implements AccountManager.AccountListene
         }
     }
 
-    public boolean isDriverConnected() {
+    public final boolean isDriverConnected() {
         return mEventsInteractor.isConnected();
     }
 
@@ -191,7 +191,7 @@ public abstract class BaseMenuPresenter implements AccountManager.AccountListene
         }
     }
 
-    List<DutyType> getAvailableDutyTypes() {
+    final List<DutyType> getAvailableDutyTypes() {
         return mAccountManager.isCurrentUserDriver() && mEventsInteractor.isConnected() ? DutyTypeManager.DRIVER_DUTY : DutyTypeManager.CO_DRIVER_DUTY;
     }
 
