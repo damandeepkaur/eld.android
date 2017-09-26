@@ -107,6 +107,17 @@ public final class ELDEventsInteractor {
         mELDEventDao.insertAll(ELDEventConverter.toEntityArray(events));
     }
 
+    public Observable<long[]> postNewDutyTypeEvent(DutyType dutyType, String comment, long time) {
+        ArrayList<ELDEvent> events = getEvents(dutyType, comment);
+        for (ELDEvent event : events) {
+            event.setEventTime(time);
+            event.setMobileTime(time);
+        }
+
+        return postNewELDEvents(events)
+                .doOnNext(isSuccess -> mDutyTypeManager.setDutyType(dutyType, true));
+    }
+
     public Observable<long[]> postNewDutyTypeEvent(DutyType dutyType, String comment) {
         return postNewELDEvents(getEvents(dutyType, comment))
                 .doOnNext(isSuccess -> mDutyTypeManager.setDutyType(dutyType, true));

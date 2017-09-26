@@ -36,8 +36,8 @@ public final class NavigationPresenter extends BaseMenuPresenter {
 
     private AutoDutyTypeManager.AutoDutyTypeListener mListener = new AutoDutyTypeManager.AutoDutyTypeListener() {
         @Override
-        public void onAutoOnDuty() {
-            mView.setAutoOnDuty();
+        public void onAutoOnDuty(long stoppedTime) {
+            mView.setAutoOnDuty(stoppedTime);
         }
 
         @Override
