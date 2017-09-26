@@ -6,6 +6,10 @@
         android:title="@string/edit"/>
 
     <item
+        android:id="@+id/menu_assign"
+        android:title="@string/assign"/>
+
+    <item
         android:id="@+id/menu_remove"
         android:enabled="false"
         android:title="@string/remove"/>

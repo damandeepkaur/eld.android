@@ -314,6 +314,14 @@ public final class LogsPresenter implements AccountManager.AccountListener {
     public void onRemovedEventClicked(EventLogModel event) {
     }
 
+    public void onReassignEventClicked(EventLogModel event) {
+        if (mVehiclesInteractor.getVehicleId() > 0) {
+            mView.showReassignDialog(event.getEvent());
+        } else {
+            mView.showError(LogsView.Error.ERROR_NOT_IN_VEHICLE);
+        }
+    }
+
     public void onAddEventClicked(CalendarItem day) {
         mView.goToAddEventScreen(day);
     }

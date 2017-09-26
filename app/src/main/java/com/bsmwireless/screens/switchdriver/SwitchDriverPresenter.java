@@ -12,12 +12,14 @@ import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.User;
 import com.bsmwireless.widgets.alerts.DutyType;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
 
 import io.reactivex.Completable;
+import io.reactivex.Flowable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -42,6 +44,7 @@ public final class SwitchDriverPresenter {
     private Disposable mGetCoDriversDisposable;
     private Disposable mLoginDisposable;
     private Disposable mLogoutDisposable;
+    private Disposable mReassignEventDisposable;
     private final CompositeDisposable mCommonDisposables;
 
     @Inject
@@ -59,6 +62,7 @@ public final class SwitchDriverPresenter {
         mGetCoDriversDisposable = Disposables.disposed();
         mLoginDisposable = Disposables.disposed();
         mLogoutDisposable = Disposables.disposed();
+        mReassignEventDisposable = Disposables.disposed();
         mCommonDisposables = new CompositeDisposable();
         Timber.d("CREATED");
     }
@@ -68,6 +72,7 @@ public final class SwitchDriverPresenter {
         mGetCoDriversDisposable.dispose();
         mLoginDisposable.dispose();
         mLogoutDisposable.dispose();
+        mReassignEventDisposable.dispose();
         mCommonDisposables.clear();
     }
 
@@ -113,6 +118,27 @@ public final class SwitchDriverPresenter {
         getDriverInfo();
     }
 
+    public void onReassignEventDialogCreated() {
+        mGetCoDriversDisposable.dispose();
+        mGetCoDriversDisposable = mUserInteractor.getDriver()
+                    .zipWith(mUserInteractor.getCoDriversFromDB(),
+                    (driver, coDrivers) -> {
+                        mAccountManager.getCurrentUserId();
+                        List<SwitchDriverDialog.UserModel> users = SwitchDriverDialog.UserModel.fromEntity(coDrivers);
+                        SwitchDriverDialog.UserModel driverModel = new SwitchDriverDialog.UserModel(driver);
+                        users.add(0, driverModel);
+                        return users;
+                    })
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .doOnNext(users -> mView.setUsersForReassignDialog(users))
+                    .observeOn(Schedulers.io())
+                    .map(this::updateStatus)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .doOnNext(users -> mView.setUsersForReassignDialog(users))
+                    .subscribe();
+    }
+
     public void onAddCoDriverCreated() {
     }
 
@@ -140,11 +166,12 @@ public final class SwitchDriverPresenter {
                     mView.hideProgress();
                 }, throwable -> {
                     Timber.e(throwable);
+                    mView.hideProgress();
                     if (throwable instanceof RetrofitException) {
                         mView.showError((RetrofitException) throwable);
+                    } else {
+                        mView.showError(SwitchDriverView.Error.ERROR_LOGIN_CO_DRIVER);
                     }
-                    mView.loginError();
-                    mView.hideProgress();
                 });
     }
 
@@ -160,8 +187,9 @@ public final class SwitchDriverPresenter {
                     Timber.e(throwable);
                     if (throwable instanceof RetrofitException) {
                         mView.showError((RetrofitException) throwable);
+                    } else {
+                        mView.showError(SwitchDriverView.Error.ERROR_LOGOUT_CO_DRIVER);
                     }
-                    mView.logoutError();
                 });
     }
 
@@ -200,6 +228,42 @@ public final class SwitchDriverPresenter {
         } else {
             mView.createSwitchDriverDialog();
         }
+    }
+
+    public void onReassignDialog() {
+        mView.createReassignDialog();
+    }
+
+    public void reassignEvent(ELDEvent event, UserEntity user) {
+        // Prepare reassigned event
+        ELDEvent reassignedEvent = event.clone();
+        reassignedEvent.setDriverId(user.getId());
+        reassignedEvent.setOrigin(ELDEvent.EventOrigin.NON_DRIVER.getValue());
+        reassignedEvent.setStatus(ELDEvent.StatusCode.INACTIVE_CHANGE_REQUESTED.getValue());
+        // Change original event status
+        event.setStatus(ELDEvent.StatusCode.INACTIVE_CHANGED.getValue());
+        event.setId(null);
+
+        ArrayList<ELDEvent> events = new ArrayList<ELDEvent>() {{
+            add(event);
+            add(reassignedEvent);
+        }};
+
+        mReassignEventDisposable.dispose();
+        mView.showProgress();
+        mReassignEventDisposable = mELDEventsInteractor.updateELDEvents(events)
+                                   .subscribeOn(Schedulers.io())
+                                   .observeOn(AndroidSchedulers.mainThread())
+                                   .doOnEach(notification -> mView.hideProgress())
+                                   .subscribe(result -> mView.eventReassigned(),
+                                           throwable -> {
+                                               Timber.e(throwable);
+                                               if (throwable instanceof RetrofitException) {
+                                                   mView.showError((RetrofitException) throwable);
+                                               } else {
+                                                   mView.showError(SwitchDriverView.Error.ERROR_REASSIGN_EVENT);
+                                               }
+                                           });
     }
 
     private void getDriverInfo() {

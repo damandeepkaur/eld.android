@@ -17,8 +17,8 @@ public interface ELDEventDao {
     @Query("SELECT * FROM events")
     List<ELDEventEntity> getAll();
 
-    @Query("SELECT * FROM events WHERE sync = 1 AND driver_id=:userId ORDER BY event_time")
-    List<ELDEventEntity> getUpdateUnsyncEvents(int userId);
+    @Query("SELECT * FROM events WHERE sync = 1 ORDER BY event_time")
+    List<ELDEventEntity> getUpdateUnsyncEvents();
 
     @Query("SELECT * FROM events WHERE sync = 2 AND driver_id=:userId ORDER BY event_time")
     List<ELDEventEntity> getNewUnsyncEvents(int userId);
