@@ -42,6 +42,7 @@ import javax.inject.Inject;
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import retrofit2.HttpException;
 
 import static com.bsmwireless.common.Constants.DEFAULT_CALENDAR_DAYS_COUNT;
