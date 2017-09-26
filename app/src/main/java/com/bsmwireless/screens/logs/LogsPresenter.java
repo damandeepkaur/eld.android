@@ -320,30 +320,18 @@ public final class LogsPresenter implements AccountManager.AccountListener {
     }
 
     public void onEditEventClicked(EventLogModel event) {
-        if (mVehiclesInteractor.getVehicleId() > 0) {
-            mView.goToEditEventScreen(event);
-        } else {
-            mView.showError(LogsView.Error.ERROR_NOT_IN_VEHICLE);
-        }
+        mView.goToEditEventScreen(event);
     }
 
     public void onRemovedEventClicked(EventLogModel event) {
     }
 
     public void onAddEventClicked(CalendarItem day) {
-        if (mVehiclesInteractor.getVehicleId() > 0) {
-            mView.goToAddEventScreen(day);
-        } else {
-            mView.showError(LogsView.Error.ERROR_NOT_IN_VEHICLE);
-        }
+        mView.goToAddEventScreen(day);
     }
 
     public void onEditLogHeaderClicked() {
-        if (mVehiclesInteractor.getVehicleId() > 0) {
-            mView.goToEditLogHeaderScreen(mLogHeaderModel);
-        } else {
-            mView.showError(LogsView.Error.ERROR_NOT_IN_VEHICLE);
-        }
+        mView.goToEditLogHeaderScreen(mLogHeaderModel);
     }
 
     public void onEventAdded(List<ELDEvent> newEvents) {
