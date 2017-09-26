@@ -86,6 +86,8 @@ public final class LockScreenActivity extends BaseActivity implements LockScreen
 
         DutyView dutyView;
         switch (dutyType) {
+            case YARD_MOVES:
+            case PERSONAL_USE:
             case DRIVING:
                 dutyView = mCurrentDutyView;
                 break;

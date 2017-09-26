@@ -28,7 +28,6 @@ public final class DutyTypeManager {
     public static final List<DutyType> DRIVER_DUTY_EXTENDED_WITH_CLEAR = createDataTypeList(ON_DUTY, OFF_DUTY, SLEEPER_BERTH, DRIVING, YARD_MOVES, PERSONAL_USE, CLEAR);
     @SuppressWarnings("PublicStaticCollectionField")
     public static final List<DutyType> DRIVER_DUTY = createDataTypeList(OFF_DUTY, SLEEPER_BERTH, DRIVING, ON_DUTY);
-
     @SuppressWarnings("PublicStaticCollectionField")
     public static final List<DutyType> CO_DRIVER_DUTY_EXTENDED = createDataTypeList(OFF_DUTY, SLEEPER_BERTH, ON_DUTY, PERSONAL_USE, YARD_MOVES);
     @SuppressWarnings("PublicStaticCollectionField")

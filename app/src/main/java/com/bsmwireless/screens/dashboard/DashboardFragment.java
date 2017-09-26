@@ -226,6 +226,8 @@ public final class DashboardFragment extends BaseFragment implements DashboardVi
 
         updateIndicator(dutyType);
 
+        mStatusLayout.setVisibility(mPresenter.isConnected() ? View.VISIBLE : View.GONE);
+
         initTimer();
     }
 

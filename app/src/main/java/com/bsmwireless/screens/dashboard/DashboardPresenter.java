@@ -50,11 +50,7 @@ public final class DashboardPresenter {
     }
 
     void onDutyClick() {
-        if (mEventsInteractor.isConnected()) {
-            mView.showDutyTypeDialog();
-        } else {
-            mView.showNotInVehicleDialog();
-        }
+        mView.showDutyTypeDialog();
     }
 
     DashboardView.Error validateComment(String comment) {
@@ -66,5 +62,9 @@ public final class DashboardPresenter {
             return DashboardView.Error.INVALID_COMMENT;
         }
         return DashboardView.Error.VALID_COMMENT;
+    }
+
+    boolean isConnected() {
+        return mEventsInteractor.isConnected();
     }
 }

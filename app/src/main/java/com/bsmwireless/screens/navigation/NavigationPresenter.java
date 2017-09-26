@@ -154,6 +154,7 @@ public final class NavigationPresenter extends BaseMenuPresenter {
     private void resetTime(List<ELDEvent> events, long startOfDay) {
         DutyType dutyType = DutyType.OFF_DUTY;
         DutyType eventDutyType;
+        DutyType lastEventType = null;
         ELDEvent event;
 
         boolean isClear = false;
@@ -161,9 +162,12 @@ public final class NavigationPresenter extends BaseMenuPresenter {
         for (int i = events.size() - 1; i >= 0; i--) {
             event = events.get(i);
 
-            //TODO: remove if when request is updated
-            if (event.getEventType() == ELDEvent.EventType.DUTY_STATUS_CHANGING.getValue() || event.getEventType() == ELDEvent.EventType.CHANGE_IN_DRIVER_INDICATION.getValue()) {
+            if (event.isDutyEvent() && event.isActive()) {
                 eventDutyType = DutyType.getTypeByCode(event.getEventType(), event.getEventCode());
+
+                if (lastEventType == null) {
+                    lastEventType = eventDutyType;
+                }
 
                 if (eventDutyType == DutyType.CLEAR) {
                     isClear = true;
@@ -199,6 +203,8 @@ public final class NavigationPresenter extends BaseMenuPresenter {
                 (int) (times[DutyType.DRIVING.ordinal()]),
                 (int) (times[DutyType.SLEEPER_BERTH.ordinal()]), dutyType
         );
+
+        getDutyTypeManager().setDutyType(lastEventType == null ? DutyType.OFF_DUTY : lastEventType, false);
     }
 
     @Override

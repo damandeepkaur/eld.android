@@ -58,8 +58,9 @@ public final class Auth implements Parcelable {
         return mToken;
     }
 
-    public void setToken(String token) {
+    public Auth setToken(String token) {
         this.mToken = token;
+        return this;
     }
 
     public String getCluster() {
