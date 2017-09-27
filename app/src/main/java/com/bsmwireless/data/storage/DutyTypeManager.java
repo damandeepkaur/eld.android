@@ -50,8 +50,7 @@ public final class DutyTypeManager {
     };
 
     private static List createDataTypeList(DutyType... array) {
-        ArrayList<DutyType> collection = new ArrayList<>(Arrays.asList(array));
-        return Collections.unmodifiableList(collection);
+        return Collections.unmodifiableList(Arrays.asList(array));
     }
 
     public DutyTypeManager(PreferencesManager preferencesManager) {

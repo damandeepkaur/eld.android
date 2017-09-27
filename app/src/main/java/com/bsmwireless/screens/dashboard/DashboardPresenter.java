@@ -20,7 +20,7 @@ public final class DashboardPresenter {
     private DutyTypeManager mDutyTypeManager;
     private ELDEventsInteractor mEventsInteractor;
 
-    private DutyTypeManager.DutyTypeListener mListener = dutyType -> mView.setDutyType(dutyType);
+    private DutyTypeManager.DutyTypeListener mListener = this::onSetDutyType;
 
     @Inject
     public DashboardPresenter(DashboardView view, DutyTypeManager dutyTypeManager, ELDEventsInteractor eventsInteractor) {
@@ -33,7 +33,6 @@ public final class DashboardPresenter {
     }
 
     void onResume() {
-        mView.setDutyType(mDutyTypeManager.getDutyType());
         mDutyTypeManager.addListener(mListener);
     }
 
@@ -64,7 +63,13 @@ public final class DashboardPresenter {
         return DashboardView.Error.VALID_COMMENT;
     }
 
-    boolean isConnected() {
-        return mEventsInteractor.isConnected();
+    private void onSetDutyType(DutyType dutyType) {
+        mView.setDutyType(dutyType);
+
+        if (mEventsInteractor.isConnected()) {
+            mView.showSpecialStatuses();
+        } else {
+            mView.hideSpecialStatuses();
+        }
     }
 }

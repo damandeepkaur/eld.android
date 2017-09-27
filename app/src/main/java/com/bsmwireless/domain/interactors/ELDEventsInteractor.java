@@ -108,19 +108,29 @@ public final class ELDEventsInteractor {
     }
 
     public Observable<long[]> postNewDutyTypeEvent(DutyType dutyType, String comment, long time) {
-        ArrayList<ELDEvent> events = getEvents(dutyType, comment);
-        for (ELDEvent event : events) {
-            event.setEventTime(time);
-            event.setMobileTime(time);
-        }
-
-        return postNewELDEvents(events)
-                .doOnNext(isSuccess -> mDutyTypeManager.setDutyType(dutyType, true));
+        return Observable.fromIterable(getEvents(dutyType, comment))
+                .map(event -> {
+                    event.setEventTime(time);
+                    event.setMobileTime(time);
+                    return event;
+                })
+                .toList()
+                .toObservable()
+                .flatMap(this::postNewELDEvents)
+                .doOnNext(ids -> {
+                    if (ids.length > 0) {
+                        mDutyTypeManager.setDutyType(dutyType, true);
+                    }
+                });
     }
 
     public Observable<long[]> postNewDutyTypeEvent(DutyType dutyType, String comment) {
         return postNewELDEvents(getEvents(dutyType, comment))
-                .doOnNext(isSuccess -> mDutyTypeManager.setDutyType(dutyType, true));
+                .doOnNext(ids -> {
+                    if (ids.length > 0) {
+                        mDutyTypeManager.setDutyType(dutyType, true);
+                    }
+                });
     }
 
     public Observable<Boolean> postLogoutEvent() {
