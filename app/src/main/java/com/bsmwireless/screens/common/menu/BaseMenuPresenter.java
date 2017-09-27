@@ -98,7 +98,7 @@ public abstract class BaseMenuPresenter implements AccountManager.AccountListene
         }
     }
 
-    public boolean isDriverConnected() {
+    public final boolean isDriverConnected() {
         return mEventsInteractor.isConnected();
     }
 
