@@ -1,10 +1,10 @@
 package com.bsmwireless.screens.driverprofile;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.ActionBar;
+import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
@@ -40,9 +40,7 @@ import timber.log.Timber;
 
 import static com.bsmwireless.common.utils.DateUtils.getFullTimeZone;
 
-public class DriverProfileActivity extends BaseMenuActivity implements DriverProfileView, SignatureLayout.OnSaveSignatureListener, AdapterView.OnItemSelectedListener {
-
-    public static final String EXTRA_USER = "user";
+public final class DriverProfileActivity extends BaseMenuActivity implements DriverProfileView, SignatureLayout.OnSaveSignatureListener {
 
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
@@ -104,8 +102,33 @@ public class DriverProfileActivity extends BaseMenuActivity implements DriverPro
     @BindView(R.id.snackbar)
     SnackBarLayout mSnackBarLayout;
 
+    @BindView(R.id.change_password_button)
+    AppCompatButton mChangePassButton;
+
     @Inject
     DriverProfilePresenter mPresenter;
+
+    private AdapterView.OnItemSelectedListener mHomeTerminalSelectionListener =
+    new AdapterView.OnItemSelectedListener() {
+        @Override
+        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            mPresenter.onChooseHomeTerminal(position);
+        }
+
+        @Override
+        public void onNothingSelected(AdapterView<?> parent) {}
+    };
+
+    private AdapterView.OnItemSelectedListener mHOSCycleSelectionListener =
+    new AdapterView.OnItemSelectedListener() {
+        @Override
+        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            mPresenter.onChooseHOSCycle(position);
+        }
+
+        @Override
+        public void onNothingSelected(AdapterView<?> parent) {}
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -118,15 +141,23 @@ public class DriverProfileActivity extends BaseMenuActivity implements DriverPro
 
         initToolbar();
 
+        boolean isOnline = NetworkUtils.isOnlineMode();
+        mCurrentPasswordTextView.setEnabled(isOnline);
+        mConfirmPasswordTextView.setEnabled(isOnline);
+        mNewPasswordTextView.setEnabled(isOnline);
+
+        mCurrentPasswordTextView.setFocusable(isOnline);
+        mConfirmPasswordTextView.setFocusable(isOnline);
+        mNewPasswordTextView.setFocusable(isOnline);
+
+        mChangePassButton.setEnabled(isOnline);
+        if (!isOnline) {
+            mChangePassButton.setTextColor(mChangePassButton.getHintTextColors());
+        }
+
         mPresenter.onNeedUpdateUserInfo();
 
         mSignatureLayout.setOnSaveListener(this);
-    }
-
-    @Override
-    public void onBackPressed() {
-        mPresenter.onSaveUserInfo();
-        super.onBackPressed();
     }
 
     @Override
@@ -159,7 +190,7 @@ public class DriverProfileActivity extends BaseMenuActivity implements DriverPro
 
         mTerminalNames.setAdapter(adapter);
         mTerminalNames.setSelection(selectedTerminal);
-        mTerminalNames.setOnItemSelectedListener(this);
+        mTerminalNames.setOnItemSelectedListener(mHomeTerminalSelectionListener);
     }
 
     @Override
@@ -171,6 +202,15 @@ public class DriverProfileActivity extends BaseMenuActivity implements DriverPro
     @Override
     public void setCarrierInfo(CarrierEntity carrier) {
         mCarrierName.setText(carrier.getName());
+    }
+
+    @Override
+    public void setCycleInfo(List<String> cycles, int selectedCycle) {
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, cycles);
+
+        mHOSCycle.setAdapter(adapter);
+        mHOSCycle.setSelection(selectedCycle);
+        mHOSCycle.setOnItemSelectedListener(mHOSCycleSelectionListener);
     }
 
     @Override
@@ -186,13 +226,6 @@ public class DriverProfileActivity extends BaseMenuActivity implements DriverPro
     @Override
     public void onChangeClicked() {
         showChangeSignSnackBar();
-    }
-
-    @Override
-    public void setResults(User user) {
-        Intent resultIntent = new Intent();
-        resultIntent.putExtra(EXTRA_USER, user);
-        setResult(RESULT_OK, resultIntent);
     }
 
     @Override
@@ -246,15 +279,5 @@ public class DriverProfileActivity extends BaseMenuActivity implements DriverPro
     private void showNotificationSnackBar(String message) {
         mSnackBarLayout.setOnReadyListener(snackBar -> snackBar.reset().setMessage(message).setHideableOnTimeout(SnackBarLayout.DURATION_LONG))
                        .showSnackbar();
-    }
-
-    @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        mPresenter.onChooseHomeTerminal(position);
-    }
-
-    @Override
-    public void onNothingSelected(AdapterView<?> parent) {
-
     }
 }

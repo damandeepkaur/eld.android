@@ -3,6 +3,20 @@ ELD app for Android
 
 # Version history
 
+* **1.0.82** - Fix crash when screen rotated twice with confirm on duty popup on foreground (_EA-407_)
+* **1.0.81** - Fix multiple duty status marked as 'Driving' are added on Driver Logsheet after Driving (_EA-425_)
+* **1.0.80** - Fix not able to add event/change duty status (_EA-422_)
+* **1.0.79** - Fix app returns home screen instead of login screen after selecting close
+* **1.0.78** - Fixed the lock screen in Personal Use and Yard Moves and switching from background to foreground  (_EA-417_, _EA-436_)
+* **1.0.77** - Replace snackbar to floating action button
+* **1.0.76** - Driver’s re-certification of Own Records (_EA-306_)
+* **1.0.75** - Engine Synchronization Compliance Monitoring (_EA-222_)
+* **1.0.74** - Add progress bar for selecting assets and pairing to black box
+* **1.0.73** - Add driver cycles list to the profile (_EA-315_)
+* **1.0.72** - Add Lint inspection (EA-330)
+* **1.0.71** - Fix remember me due to merge conflict
+* **1.0.70** - Malfunction and Data diagnostic indications (_EA-104_, _EA-105_, _EA-106_)
+* **1.0.69** - Lock screen in the driving mode (_EA-82_)
 * **1.0.68** - Update Dashboard, fix comment validation (_EA-387_, _EA-326_)
 * **1.0.67** - Not show 'helper' midnight event in logs screen (_EA-349_)
 * **1.0.66** - Fix seconds value for manually added event (_EA-308_)

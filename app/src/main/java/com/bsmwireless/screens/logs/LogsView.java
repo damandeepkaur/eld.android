@@ -4,6 +4,7 @@ import com.bsmwireless.data.network.RetrofitException;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.LogSheetHeader;
 import com.bsmwireless.screens.logs.dagger.EventLogModel;
+import com.bsmwireless.widgets.logs.LogsTitleView;
 import com.bsmwireless.widgets.logs.calendar.CalendarItem;
 
 import java.util.List;
@@ -52,4 +53,7 @@ public interface LogsView {
         }
     }
 
+    void showTitleButton(LogsTitleView.Type expandedType);
+
+    void hideTitleButton(LogsTitleView.Type expandedType);
 }

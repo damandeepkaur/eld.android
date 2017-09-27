@@ -21,11 +21,23 @@ public interface LogSheetDao {
     void insert(List<LogSheetEntity> logSheetHeaders);
 
     @Insert(onConflict = REPLACE)
-    void insert(LogSheetEntity logSheetHeader);
+    long insert(LogSheetEntity logSheetHeader);
 
-    @Query("SELECT * FROM log_sheet_header WHERE log_day = :logDay LIMIT 1")
-    LogSheetEntity getByLogDaySync(Long logDay);
+    @Query("SELECT * FROM log_sheet_header WHERE log_day = :logDay AND driver_id = :driverId LIMIT 1")
+    LogSheetEntity getByLogDaySync(Long logDay, Integer driverId);
+
+    @Query("SELECT * FROM log_sheet_header WHERE sync = 1 AND driver_id = :driverId")
+    List<LogSheetEntity> getUnSync(Integer driverId);
+
+    @Query("SELECT * FROM log_sheet_header WHERE log_day < :logDay AND driver_id = :driverId ORDER BY log_day DESC LIMIT 1")
+    LogSheetEntity getLatestLogSheet(Long logDay, Integer driverId);
+
+    @Query("SELECT * FROM log_sheet_header WHERE log_day > :startDay AND log_day < :endDay AND driver_id = :driverId")
+    Flowable<List<LogSheetEntity>> getLogSheets(Long startDay, Long endDay, Integer driverId);
 
     @Query("SELECT * FROM log_sheet_header WHERE log_day > :startDay AND log_day < :endDay AND driver_id = :driverId ORDER BY log_day")
     Flowable<List<LogSheetEntity>> getLogSheetsFromStartToEndDay(long startDay, long endDay, int driverId);
+
+    @Query("SELECT * FROM log_sheet_header WHERE log_day > :startDay AND log_day < :endDay AND driver_id = :driverId")
+    List<LogSheetEntity> getLogSheetsSync(Long startDay, Long endDay, Integer driverId);
 }

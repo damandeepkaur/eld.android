@@ -1,6 +1,7 @@
 package com.bsmwireless.data.storage.eldevents;
 
 import com.bsmwireless.models.ELDEvent;
+import com.bsmwireless.models.Malfunction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +18,7 @@ public class ELDEventConverter {
             event.setStatus(entity.getStatus());
             event.setOrigin(entity.getOrigin());
             event.setEventTime(entity.getEventTime());
+            event.setLogSheet(entity.getLogSheet());
             event.setOdometer(entity.getOdometer());
             event.setEngineHours(entity.getEngineHours());
             event.setLat(entity.getLat());
@@ -33,6 +35,7 @@ public class ELDEventConverter {
             event.setDriverId(entity.getDriverId());
             event.setMalfunction(entity.getMalfunction());
             event.setDiagnostic(entity.getDiagnostic());
+            event.setMalCode(Malfunction.createByCode(entity.getMalCode()));
         }
 
         return event;
@@ -54,6 +57,7 @@ public class ELDEventConverter {
             entity.setStatus(event.getStatus());
             entity.setOrigin(event.getOrigin());
             entity.setEventTime(event.getEventTime());
+            entity.setLogSheet(event.getLogSheet());
             entity.setOdometer(event.getOdometer());
             entity.setEngineHours(event.getEngineHours());
             entity.setLat(event.getLat());
@@ -70,6 +74,8 @@ public class ELDEventConverter {
             entity.setDriverId(event.getDriverId());
             entity.setMalfunction(event.getMalfunction());
             entity.setDiagnostic(event.getDiagnostic());
+            Malfunction malCode = event.getMalCode();
+            entity.setMalCode(malCode == null ? Malfunction.UNKNOWN.getCode() : malCode.getCode());
         }
         return entity;
     }

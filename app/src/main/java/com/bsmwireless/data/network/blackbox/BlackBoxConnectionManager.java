@@ -3,12 +3,13 @@ package com.bsmwireless.data.network.blackbox;
 import com.bsmwireless.models.BlackBoxModel;
 
 import io.reactivex.Observable;
+import io.reactivex.Single;
 
 public interface BlackBoxConnectionManager {
 
-    Observable<BlackBoxConnectionManager> connectBlackBox(int boxId);
+    Single<BlackBoxConnectionManager> connectBlackBox(int boxId);
 
-    Observable<BlackBoxConnectionManager> disconnectBlackBox();
+    Single<BlackBoxConnectionManager> disconnectBlackBox();
 
     boolean isConnected();
 

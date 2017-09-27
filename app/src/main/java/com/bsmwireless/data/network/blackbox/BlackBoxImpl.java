@@ -2,7 +2,6 @@ package com.bsmwireless.data.network.blackbox;
 
 import com.bsmwireless.data.network.blackbox.models.BlackBoxResponseModel;
 import com.bsmwireless.data.network.blackbox.utils.BlackBoxParser;
-import com.bsmwireless.data.network.blackbox.utils.ConnectionUtils;
 import com.bsmwireless.models.BlackBoxModel;
 
 import java.io.IOException;
@@ -58,9 +57,9 @@ public final class BlackBoxImpl implements BlackBox {
     @Override
     public void connect(int boxId) throws Exception {
         Timber.d("connect");
-        if (ConnectionUtils.isEmulator()) {
-            return;
-        }
+       // if (ConnectionUtils.isEmulator()) {
+       //     return;
+       // }
         if (!isConnected() && (mDisposable == null || mDisposable.isDisposed())) {
             mBoxId = boxId;
             mDisposable = Observable.interval(RETRY_CONNECT_DELAY, TimeUnit.MILLISECONDS)
@@ -173,6 +172,7 @@ public final class BlackBoxImpl implements BlackBox {
 
     private Subject<BlackBoxModel> getEmitter() {
         if (mEmitter.get().hasComplete() || mEmitter.get().hasThrowable()) {
+            Timber.d("Recreate Emitter");
             recreateEmitter();
         }
         return mEmitter.get();
@@ -236,7 +236,7 @@ public final class BlackBoxImpl implements BlackBox {
     }
 
     private Observable<BlackBoxModel> readStatus() {
-        return Observable.fromCallable(() -> isConnected())
+        return Observable.fromCallable(this::isConnected)
                 .observeOn(Schedulers.io())
                 .filter(isConnected -> isConnected)
                 .map(unused -> getInputStream())

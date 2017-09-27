@@ -5,7 +5,7 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 
 @Entity(tableName = "configurations")
-public class ConfigurationEntity {
+public final class ConfigurationEntity {
 
     @PrimaryKey
     @ColumnInfo(name = "id")

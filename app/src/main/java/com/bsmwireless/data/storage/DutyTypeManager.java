@@ -12,6 +12,8 @@ import com.bsmwireless.models.User;
 import com.bsmwireless.widgets.alerts.DutyType;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static com.bsmwireless.common.utils.DateUtils.MS_IN_HOUR;
@@ -24,13 +26,20 @@ import static com.bsmwireless.widgets.alerts.DutyType.PERSONAL_USE;
 import static com.bsmwireless.widgets.alerts.DutyType.SLEEPER_BERTH;
 import static com.bsmwireless.widgets.alerts.DutyType.YARD_MOVES;
 
-public class DutyTypeManager {
-    public static final DutyType[] DRIVER_DUTY_EXTENDED = {OFF_DUTY, SLEEPER_BERTH, DRIVING, ON_DUTY, PERSONAL_USE, YARD_MOVES};
-    public static final DutyType[] DRIVER_DUTY_EXTENDED_WITH_CLEAR = {ON_DUTY, OFF_DUTY, SLEEPER_BERTH, DRIVING, YARD_MOVES, PERSONAL_USE, CLEAR};
-    public static final DutyType[] DRIVER_DUTY = {OFF_DUTY, SLEEPER_BERTH, DRIVING, ON_DUTY};
+public final class DutyTypeManager {
 
-    public static final DutyType[] CO_DRIVER_DUTY_EXTENDED = {OFF_DUTY, SLEEPER_BERTH, ON_DUTY, PERSONAL_USE, YARD_MOVES};
-    public static final DutyType[] CO_DRIVER_DUTY = {OFF_DUTY, SLEEPER_BERTH, ON_DUTY};
+    //Suppressed, but the problem is fixed by createDataTypeList funcrion which returns unmodifiable colleaction
+    @SuppressWarnings("PublicStaticCollectionField")
+    public static final List<DutyType> DRIVER_DUTY_EXTENDED = createDataTypeList(OFF_DUTY, SLEEPER_BERTH, DRIVING, ON_DUTY, PERSONAL_USE, YARD_MOVES);
+    @SuppressWarnings("PublicStaticCollectionField")
+    public static final List<DutyType> DRIVER_DUTY_EXTENDED_WITH_CLEAR = createDataTypeList(ON_DUTY, OFF_DUTY, SLEEPER_BERTH, DRIVING, YARD_MOVES, PERSONAL_USE, CLEAR);
+    @SuppressWarnings("PublicStaticCollectionField")
+    public static final List<DutyType> DRIVING_DUTY = createDataTypeList(OFF_DUTY, SLEEPER_BERTH, DRIVING, ON_DUTY);
+
+    @SuppressWarnings("PublicStaticCollectionField")
+    public static final List<DutyType> CO_DRIVER_DUTY_EXTENDED = createDataTypeList(OFF_DUTY, SLEEPER_BERTH, ON_DUTY, PERSONAL_USE, YARD_MOVES);
+    @SuppressWarnings("PublicStaticCollectionField")
+    public static final List<DutyType> CO_DRIVER_DUTY = createDataTypeList(OFF_DUTY, SLEEPER_BERTH, ON_DUTY);
 
     private PreferencesManager mPreferencesManager;
 
@@ -47,6 +56,11 @@ public class DutyTypeManager {
             }
         }
     };
+
+    private static List createDataTypeList(DutyType... array) {
+        ArrayList<DutyType> collection = new ArrayList<DutyType>(Arrays.asList(array));
+        return Collections.unmodifiableList(collection);
+    }
 
     public DutyTypeManager(PreferencesManager preferencesManager) {
         mPreferencesManager = preferencesManager;
@@ -162,7 +176,7 @@ public class DutyTypeManager {
             time -= (System.currentTimeMillis() - mStart);
         }
 
-        return time;
+        return Math.max(0, time);
     }
 
     public void addListener(@NonNull DutyTypeListener listener) {

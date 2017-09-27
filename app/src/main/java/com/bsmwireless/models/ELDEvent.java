@@ -10,7 +10,7 @@ import com.google.gson.annotations.SerializedName;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-public class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheckable {
+public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheckable {
     public enum EventType {
         DUTY_STATUS_CHANGING(1),
         INTERMEDIATE_LOG(2),
@@ -96,6 +96,23 @@ public class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheckable {
         }
     }
 
+    public enum MalfunctionCode {
+
+        MALFUNCTION_LOGGED(1),
+        MALFUNCTION_CLEARED(2),
+        DIAGNOSTIC_LOGGED(3),
+        DIAGNOSTIC_CLEARED(4);
+        private int mCode;
+
+        MalfunctionCode(int code) {
+            mCode = code;
+        }
+
+        public int getCode() {
+            return mCode;
+        }
+    }
+
     @SerializedName("id")
     @Expose
     private Integer mId;
@@ -114,6 +131,9 @@ public class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheckable {
     @SerializedName("eventTime")
     @Expose
     private Long mEventTime;
+    @SerializedName("logsheet")
+    @Expose
+    private Long mLogSheet;
     @SerializedName("odometer")
     @Expose
     private Integer mOdometer;
@@ -168,6 +188,9 @@ public class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheckable {
     @SerializedName("diagnostic")
     @Expose
     private Boolean mDiagnostic;
+    @SerializedName("malCode")
+    @Expose
+    private Malfunction mMalCode;
 
     public ELDEvent() {
     }
@@ -192,6 +215,10 @@ public class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheckable {
         notNull = in.readByte() == 1;
         if (notNull) {
             this.mEventTime = in.readLong();
+        }
+        notNull = in.readByte() == 1;
+        if (notNull) {
+            this.mLogSheet = in.readLong();
         }
         notNull = in.readByte() == 1;
         if (notNull) {
@@ -269,6 +296,10 @@ public class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheckable {
         if (notNull) {
             this.mDiagnostic = in.readByte() != 0;
         }
+        notNull = in.readByte() == 1;
+        if (notNull) {
+            mMalCode = Malfunction.createByCode(in.readString());
+        }
     }
 
     public Integer getStatus() {
@@ -311,8 +342,12 @@ public class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheckable {
         mEventTime = eventTime;
     }
 
-    public void setEventCode(Long eventTime) {
-        this.mEventTime = eventTime;
+    public Long getLogSheet() {
+        return mLogSheet;
+    }
+
+    public void setLogSheet(Long logSheet) {
+        mLogSheet = logSheet;
     }
 
     public Integer getOdometer() {
@@ -467,6 +502,14 @@ public class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheckable {
         this.mDiagnostic = diagnostic;
     }
 
+    public Malfunction getMalCode() {
+        return mMalCode;
+    }
+
+    public void setMalCode(Malfunction malCode) {
+        this.mMalCode = malCode;
+    }
+
     @Override
     public Boolean isActive() {
         return mStatus.equals(ELDEvent.StatusCode.ACTIVE.getValue());
@@ -495,6 +538,7 @@ public class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheckable {
                 .append(mEventType, rhs.mEventType)
                 .append(mEventCode, rhs.mEventCode)
                 .append(mEventTime, rhs.mEventTime)
+                .append(mLogSheet, rhs.mLogSheet)
                 .append(mOdometer, rhs.mOdometer)
                 .append(mEngineHours, rhs.mEngineHours)
                 .append(mLat, rhs.mLat)
@@ -514,6 +558,7 @@ public class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheckable {
                 .append(mDriverId, rhs.mDriverId)
                 .append(mMalfunction, rhs.mMalfunction)
                 .append(mDiagnostic, rhs.mDiagnostic)
+                .append(mMalCode, rhs.mMalCode)
                 .isEquals();
     }
 
@@ -525,6 +570,7 @@ public class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheckable {
                 .append(mEventType)
                 .append(mEventCode)
                 .append(mEventTime)
+                .append(mLogSheet)
                 .append(mOdometer)
                 .append(mEngineHours)
                 .append(mLat)
@@ -544,6 +590,7 @@ public class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheckable {
                 .append(mDriverId)
                 .append(mMalfunction)
                 .append(mDiagnostic)
+                .append(mMalCode)
                 .toHashCode();
     }
 
@@ -577,6 +624,11 @@ public class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheckable {
         dest.writeByte(this.mEventTime == null ? (byte) 0 : 1);
         if (this.mEventTime != null) {
             dest.writeLong(this.mEventTime);
+        }
+
+        dest.writeByte(this.mLogSheet == null ? (byte) 0 : 1);
+        if (this.mLogSheet != null) {
+            dest.writeLong(this.mLogSheet);
         }
 
         dest.writeByte(this.mOdometer == null ? (byte) 0 : 1);
@@ -673,6 +725,10 @@ public class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheckable {
         if (this.mDiagnostic != null) {
             dest.writeByte((byte) (mDiagnostic ? 1 : 0));
         }
+        dest.writeByte((byte) (mMalCode == null ? 0 : 1));
+        if (mMalCode != null) {
+            dest.writeString(mMalCode.getCode());
+        }
     }
 
     public static final Creator<ELDEvent> CREATOR = new Creator<ELDEvent>() {
@@ -688,7 +744,7 @@ public class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheckable {
     };
 
     @Override
-    public ELDEvent clone() {
+    public final ELDEvent clone() {
         Parcel parcel = Parcel.obtain();
         parcel.writeValue(this);
         parcel.setDataPosition(0);
@@ -706,6 +762,7 @@ public class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheckable {
         sb.append(", mStatus=").append(mStatus);
         sb.append(", mOrigin=").append(mOrigin);
         sb.append(", mEventTime=").append(mEventTime);
+        sb.append(", mLogSheet=").append(mLogSheet);
         sb.append(", mOdometer=").append(mOdometer);
         sb.append(", mEngineHours=").append(mEngineHours);
         sb.append(", mLat=").append(mLat);
@@ -724,6 +781,7 @@ public class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheckable {
         sb.append(", mDriverId=").append(mDriverId);
         sb.append(", mMalfunction=").append(mMalfunction);
         sb.append(", mDiagnostic=").append(mDiagnostic);
+        sb.append(", mMalCode=").append(mMalCode);
         sb.append('}');
         return sb.toString();
     }

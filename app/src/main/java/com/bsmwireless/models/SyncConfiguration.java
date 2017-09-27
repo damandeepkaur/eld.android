@@ -9,7 +9,7 @@ import com.google.gson.annotations.SerializedName;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-public class SyncConfiguration implements Parcelable {
+public final class SyncConfiguration implements Parcelable {
     public final static Parcelable.Creator<SyncConfiguration> CREATOR = new Creator<SyncConfiguration>() {
 
         @SuppressWarnings({

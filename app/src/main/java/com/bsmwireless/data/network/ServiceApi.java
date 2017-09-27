@@ -1,31 +1,19 @@
 package com.bsmwireless.data.network;
 
 import com.bsmwireless.models.Auth;
-import com.bsmwireless.models.CUDTripInfo;
 import com.bsmwireless.models.DriverHomeTerminal;
-import com.bsmwireless.models.DriverLog;
 import com.bsmwireless.models.DriverProfileModel;
 import com.bsmwireless.models.DriverSignature;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.ELDUpdate;
-import com.bsmwireless.models.EmailReport;
-import com.bsmwireless.models.Event;
-import com.bsmwireless.models.HOSAlert;
 import com.bsmwireless.models.InspectionReport;
-import com.bsmwireless.models.Location;
 import com.bsmwireless.models.LogSheetHeader;
 import com.bsmwireless.models.LoginModel;
-import com.bsmwireless.models.NewRule;
 import com.bsmwireless.models.PasswordModel;
-import com.bsmwireless.models.Registry;
-import com.bsmwireless.models.RegistryInformation;
-import com.bsmwireless.models.Report;
 import com.bsmwireless.models.ResponseMessage;
-import com.bsmwireless.models.Rule;
 import com.bsmwireless.models.RuleSelectionModel;
-import com.bsmwireless.models.User;
 import com.bsmwireless.models.SyncInspectionCategory;
-import com.bsmwireless.models.Trailer;
+import com.bsmwireless.models.User;
 import com.bsmwireless.models.Vehicle;
 
 import java.util.List;
@@ -33,7 +21,6 @@ import java.util.List;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import retrofit2.http.Body;
-import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
@@ -173,7 +160,7 @@ public interface ServiceApi {
      * @return update driver rule response {@link ResponseMessage}.
      */
     @PUT("v1/app/driver/rules")
-    Single<ResponseMessage> updateDriverRule(@Body RuleSelectionModel ruleSelectionModel);
+    Observable<ResponseMessage> updateDriverRule(@Body RuleSelectionModel ruleSelectionModel);
 
     /**
      * Update driver's home terminal selection

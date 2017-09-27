@@ -19,7 +19,7 @@ import app.bsmuniversal.com.R;
 
 import static com.bsmwireless.common.utils.DateUtils.MS_IN_MIN;
 
-public class AutoDutyDialogActivity extends BaseActivity implements AutoDutyDialogView {
+public final class AutoDutyDialogActivity extends BaseActivity implements AutoDutyDialogView {
 
     private static final String TAG = AutoDutyDialogActivity.class.getSimpleName();
 

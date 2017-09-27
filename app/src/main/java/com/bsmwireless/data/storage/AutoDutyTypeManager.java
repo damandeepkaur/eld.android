@@ -18,7 +18,7 @@ import timber.log.Timber;
 
 import static com.bsmwireless.common.utils.DateUtils.MS_IN_MIN;
 
-public class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListener {
+public final class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListener {
     private static final int AUTO_ON_DUTY_DELAY = 5 * MS_IN_MIN;
 
     private BlackBoxInteractor mBlackBoxInteractor;
@@ -72,12 +72,11 @@ public class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListener {
             mBlackBoxDisposable.dispose();
         }
 
-        mBlackBoxDisposable = (mBlackBoxInteractor.getData(boxId)
+        mBlackBoxDisposable = mBlackBoxInteractor.getData(boxId)
                 .subscribeOn(Schedulers.io())
                 .subscribe(
                         blackBoxState -> processBlackBoxState(blackBoxState),
-                        error -> Timber.e("BlackBox error: %s", error)
-        ));
+                        error -> Timber.e("BlackBox error: %s", error));
     }
 
     private void processBlackBoxState(BlackBoxModel blackBoxState) {
@@ -114,7 +113,8 @@ public class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListener {
 
                 mHandler.removeCallbacks(mAutoOnDutyTask);
 
-                if (mDutyTypeManager.getDutyType() != DutyType.PERSONAL_USE && mDutyTypeManager.getDutyType() != DutyType.YARD_MOVES) {
+                DutyType dutyTypeCurr = mDutyTypeManager.getDutyType();
+                if (dutyTypeCurr != DutyType.PERSONAL_USE && dutyTypeCurr != DutyType.YARD_MOVES && dutyTypeCurr != DutyType.DRIVING) {
                     events.add(mEventsInteractor.getEvent(DutyType.DRIVING, null, true));
                 }
 

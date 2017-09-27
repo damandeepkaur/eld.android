@@ -9,7 +9,7 @@ import dagger.Module;
 import dagger.Provides;
 
 @Module
-public class EditEventModule {
+public final class EditEventModule {
     private final EditEventView mHomeView;
 
     public EditEventModule(@NonNull EditEventView view) {

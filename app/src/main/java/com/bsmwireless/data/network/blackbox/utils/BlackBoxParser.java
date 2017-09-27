@@ -106,12 +106,12 @@ public class BlackBoxParser {
             byte[] latLonArr = new byte[4];
             System.arraycopy(data, index, latLonArr, 0, 4);
             int lat = ByteBuffer.wrap(latLonArr).order(java.nio.ByteOrder.LITTLE_ENDIAN).getInt();
-            boxData.setLat(convertDMStoDecimal(lat));
+            boxData.setLat(convertDegMinsToDecimal(lat));
             index += 4;
             //longitude at 34-37
             System.arraycopy(data, index, latLonArr, 0, 4);
             int lon = ByteBuffer.wrap(latLonArr).order(java.nio.ByteOrder.LITTLE_ENDIAN).getInt();
-            boxData.setLon(convertDMStoDecimal(lon));
+            boxData.setLon(convertDegMinsToDecimal(lon));
             index += 4;
             //Heading at 38-39
             boxData.setHeading(ByteBuffer.wrap(new byte[]{data[index++],
@@ -237,6 +237,21 @@ public class BlackBoxParser {
         int ms = dms % 100;
 
         return degrees + minutes / 60. + seconds / 3600. + ms / 360000.;
+    }
+
+    /**
+     * Converts [degrees][mins][decimal-mins] to [degrees].[decimal-degrees]
+     *
+     * @param dm an integer in the form of [degrees][mins][decimal-mins]
+     * @return coordinates in the form of [degrees].[decimal-degrees]
+     */
+    private static double convertDegMinsToDecimal(int dm) {
+        int degrees = dm / 1000000;
+        dm %= 1000000;
+
+        double minutes = ((double)dm) / 10000.; // minutes with decimal-minutes
+
+        return degrees + minutes / 60.;
     }
 
     private static byte[] generateHeader() {

@@ -2,7 +2,7 @@ package com.bsmwireless.data.storage;
 
 import android.content.SharedPreferences;
 
-public class PreferencesManager {
+public final class PreferencesManager {
     private static final String KEY_DRIVER_ACCOUNT_NAME = "driver_account_name";
     private static final String KEY_USER_ACCOUNT_NAME = "user_account_name";
     private static final String KEY_DRIVER_ID = "driver_id";
@@ -14,6 +14,7 @@ public class PreferencesManager {
     private static final String KEY_BOX_GPS_ENABLED = "keep_box_gps_enabled";
     private static final String KEY_FIXED_AMOUNT_ENABLED = "keep_fixed_amount_enabled";
     private static final String KEY_SELECTED_KM_UNITS = "selected_km_units";
+    private static final String KEY_SHOW_SELECT_ASSET_SCREEN_ENABLED = "show_select_asset_screen_enabled";
     //TODO: validate from server
     public static final String KEY_TIME_ON_DUTY = "time_on_duty";
     public static final String KEY_TIME_DRIVING = "time_driving";
@@ -125,7 +126,9 @@ public class PreferencesManager {
     }
 
     public void clearValues() {
+        boolean rememberMeEnabled = isRememberUserEnabled();
         mPreferences.edit().clear().apply();
+        setRememberUserEnabled(rememberMeEnabled);
     }
 
     public void setBoxGPSEnabled(boolean boxGPSEnabled) {
@@ -253,5 +256,15 @@ public class PreferencesManager {
      */
     public boolean isKMOdometerUnitsSelected() {
         return mPreferences.getBoolean(KEY_SELECTED_KM_UNITS, true);
+    }
+
+    public void setShowSelectAssetScreenEnabled(boolean showSelectAssetScreen) {
+        SharedPreferences.Editor editor = mPreferences.edit();
+        editor.putBoolean(KEY_SHOW_SELECT_ASSET_SCREEN_ENABLED, showSelectAssetScreen);
+        editor.apply();
+    }
+
+    public boolean isShowSelectAssetScreenEnabled() {
+        return mPreferences.getBoolean(KEY_SHOW_SELECT_ASSET_SCREEN_ENABLED, false);
     }
 }

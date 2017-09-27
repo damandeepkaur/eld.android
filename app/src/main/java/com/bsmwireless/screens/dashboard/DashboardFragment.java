@@ -40,7 +40,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 
-public class DashboardFragment extends BaseFragment implements DashboardView {
+public final class DashboardFragment extends BaseFragment implements DashboardView {
     private static final int TIMER_DELAY = 1000;
 
     @Inject
@@ -119,19 +119,7 @@ public class DashboardFragment extends BaseFragment implements DashboardView {
         super.onDestroyView();
         mUnbinder.unbind();
         mPresenter.onDestroy();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        mPresenter.onPause();
         stopTimer();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        mPresenter.onResume();
     }
 
     @OnClick(R.id.dashboard_current)

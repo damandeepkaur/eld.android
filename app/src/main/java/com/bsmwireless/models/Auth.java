@@ -5,10 +5,11 @@ import android.os.Parcelable;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-public class Auth implements Parcelable {
+public final class Auth implements Parcelable {
 
     @SerializedName("token")
     @Expose
@@ -57,8 +58,9 @@ public class Auth implements Parcelable {
         return mToken;
     }
 
-    public void setToken(String token) {
+    public Auth setToken(String token) {
         this.mToken = token;
+        return this;
     }
 
     public String getCluster() {

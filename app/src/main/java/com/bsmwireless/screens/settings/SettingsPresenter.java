@@ -3,6 +3,7 @@ package com.bsmwireless.screens.settings;
 import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.data.storage.DutyTypeManager;
+import com.bsmwireless.domain.interactors.ELDEventsInteractor;
 import com.bsmwireless.domain.interactors.SettingsInteractor;
 import com.bsmwireless.domain.interactors.UserInteractor;
 import com.bsmwireless.screens.common.menu.BaseMenuPresenter;
@@ -10,25 +11,24 @@ import com.bsmwireless.screens.common.menu.BaseMenuView;
 
 import javax.inject.Inject;
 
-import io.reactivex.disposables.CompositeDisposable;
 import timber.log.Timber;
 
 @ActivityScope
-public class SettingsPresenter extends BaseMenuPresenter {
+public final class SettingsPresenter extends BaseMenuPresenter {
 
     private SettingsView mView;
     private SettingsInteractor mSettingsInteractor;
 
     @Inject
-    public SettingsPresenter(SettingsView view, SettingsInteractor settingsInteractor,
-                             DutyTypeManager dutyTypeManager, UserInteractor userInteractor,
+    public SettingsPresenter(SettingsView view,
+                             SettingsInteractor settingsInteractor,
+                             DutyTypeManager dutyTypeManager,
+                             UserInteractor userInteractor,
+                             ELDEventsInteractor eldEventsInteractor,
                              AccountManager accountManager) {
+        super(dutyTypeManager, eldEventsInteractor, userInteractor, accountManager);
         mView = view;
         mSettingsInteractor = settingsInteractor;
-        mDutyTypeManager = dutyTypeManager;
-        mUserInteractor = userInteractor;
-        mAccountManager = accountManager;
-        mDisposables = new CompositeDisposable();
 
         Timber.d("CREATED");
     }

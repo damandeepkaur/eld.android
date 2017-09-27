@@ -8,7 +8,7 @@ import javax.inject.Inject;
 
 import io.reactivex.Observable;
 
-public class BlackBoxInteractor {
+public final class BlackBoxInteractor {
 
     private BlackBoxConnectionManager mConnectionManager;
 
@@ -20,7 +20,7 @@ public class BlackBoxInteractor {
     public Observable<BlackBoxModel> getData(int boxId) {
         if (!mConnectionManager.isConnected()) {
             return mConnectionManager.connectBlackBox(boxId)
-                    .flatMap(connectionManager ->  connectionManager.getDataObservable())
+                    .flatMapObservable(BlackBoxConnectionManager::getDataObservable)
                     .doOnError(error -> mConnectionManager.disconnectBlackBox());
         }
 
@@ -34,7 +34,7 @@ public class BlackBoxInteractor {
 
     public <T> Observable<T> shutdown(T item) {
         return mConnectionManager.disconnectBlackBox()
-                .flatMap(blackBoxConnectionManager -> Observable.just(item));
+                .flatMapObservable(blackBoxConnectionManager -> Observable.just(item));
     }
 
     public String getVinNumber() {

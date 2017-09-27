@@ -4,10 +4,11 @@ import com.bsmwireless.models.BlackBoxModel;
 
 import javax.inject.Inject;
 
+import io.reactivex.Completable;
 import io.reactivex.Observable;
-import io.reactivex.schedulers.Schedulers;
+import io.reactivex.Single;
 
-public class BlackBoxConnectionManagerImpl implements BlackBoxConnectionManager {
+public final class BlackBoxConnectionManagerImpl implements BlackBoxConnectionManager {
 
     private BlackBox mBlackBox;
 
@@ -17,17 +18,15 @@ public class BlackBoxConnectionManagerImpl implements BlackBoxConnectionManager 
     }
 
     @Override
-    public Observable<BlackBoxConnectionManager> connectBlackBox(int boxId) {
-        return Observable.just((BlackBoxConnectionManager) this)
-                .observeOn(Schedulers.single())
-                .doOnNext(manager -> manager.getBlackBox().connect(boxId));
+    public Single<BlackBoxConnectionManager> connectBlackBox(int boxId) {
+        return Completable.fromAction(() -> mBlackBox.connect(boxId))
+                .andThen(Single.just(this));
     }
 
     @Override
-    public Observable<BlackBoxConnectionManager> disconnectBlackBox() {
-        return Observable.just((BlackBoxConnectionManager) this)
-                .observeOn(Schedulers.single())
-                .doOnNext(manager -> manager.getBlackBox().disconnect());
+    public Single<BlackBoxConnectionManager> disconnectBlackBox() {
+        return Completable.fromAction(() -> mBlackBox.disconnect())
+                .andThen(Single.just(this));
     }
 
     @Override

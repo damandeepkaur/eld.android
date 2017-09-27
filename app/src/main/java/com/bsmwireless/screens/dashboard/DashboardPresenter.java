@@ -14,7 +14,7 @@ import timber.log.Timber;
 import static com.bsmwireless.common.Constants.COMMENT_VALIDATE_PATTERN;
 
 @ActivityScope
-public class DashboardPresenter {
+public final class DashboardPresenter {
     private DashboardView mView;
 
     private DutyTypeManager mDutyTypeManager;
@@ -29,19 +29,13 @@ public class DashboardPresenter {
         mDutyTypeManager = dutyTypeManager;
         mEventsInteractor = eventsInteractor;
 
+        mDutyTypeManager.addListener(mListener);
+
         Timber.d("CREATED");
     }
 
-    void onResume() {
-        mView.setDutyType(mDutyTypeManager.getDutyType());
-        mDutyTypeManager.addListener(mListener);
-    }
-
-    void onPause() {
-        mDutyTypeManager.removeListener(mListener);
-    }
-
     public void onDestroy() {
+        mDutyTypeManager.removeListener(mListener);
         Timber.d("DESTROYED");
     }
 
@@ -50,11 +44,7 @@ public class DashboardPresenter {
     }
 
     void onDutyClick() {
-        if (mEventsInteractor.isConnected()) {
-            mView.showDutyTypeDialog();
-        } else {
-            mView.showNotInVehicleDialog();
-        }
+        mView.showDutyTypeDialog();
     }
 
     DashboardView.Error validateComment(String comment) {

@@ -3,6 +3,7 @@ package com.bsmwireless.screens.logs;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -34,6 +35,7 @@ import javax.inject.Inject;
 import app.bsmuniversal.com.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import butterknife.Unbinder;
 
 import static android.app.Activity.RESULT_OK;
@@ -43,7 +45,7 @@ import static com.bsmwireless.screens.editevent.EditEventActivity.OLD_ELD_EVENT_
 import static com.bsmwireless.screens.editlogheader.EditLogHeaderActivity.NEW_LOG_HEADER_EXTRA;
 import static com.bsmwireless.screens.editlogheader.EditLogHeaderActivity.OLD_LOG_HEADER_EXTRA;
 
-public class LogsFragment extends BaseFragment implements LogsView {
+public final class LogsFragment extends BaseFragment implements LogsView {
 
     private static final int REQUEST_CODE_EDIT_EVENT = 101;
     private static final int REQUEST_CODE_ADD_EVENT = 102;
@@ -51,8 +53,15 @@ public class LogsFragment extends BaseFragment implements LogsView {
 
     @Inject
     LogsPresenter mPresenter;
+
     @BindView(R.id.recycler_view)
     RecyclerView mRecyclerView;
+
+    @BindView(R.id.add_event)
+    FloatingActionButton mAddEventFloatingActionButton;
+
+    @BindView(R.id.edit_log_header)
+    FloatingActionButton mEditLogHeaderFloatingActionButton;
 
     private LogsAdapter mAdapter;
     private Unbinder mUnbinder;
@@ -72,7 +81,7 @@ public class LogsFragment extends BaseFragment implements LogsView {
     public void setMenuVisibility(boolean menuVisible) {
         super.setMenuVisibility(menuVisible);
         if (menuVisible && mAdapter != null) {
-            showSnackBar();
+            showTitleButton();
         }
     }
 
@@ -86,12 +95,12 @@ public class LogsFragment extends BaseFragment implements LogsView {
         mAdapter = new LogsAdapter(mContext, mPresenter, new OnLogsStateChangeListener() {
             @Override
             public void showTitle(LogsTitleView.Type expandedType) {
-                showSnackBar(expandedType);
+                showTitleButton(expandedType);
             }
 
             @Override
-            public void hideTitle() {
-                mNavigateView.getSnackBar().hideSnackbar();
+            public void hideTitle(LogsTitleView.Type expandedType) {
+                hideTitleButton(expandedType);
             }
 
             @Override
@@ -100,12 +109,22 @@ public class LogsFragment extends BaseFragment implements LogsView {
             }
         });
 
-        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
+        RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new WrapLinearLayoutManager(mContext));
         recyclerView.setAdapter(mAdapter);
 
         mPresenter.onViewCreated();
         return view;
+    }
+
+    @OnClick(R.id.edit_log_header)
+    void editLogHeader() {
+        mPresenter.onEditLogHeaderClicked();
+    }
+
+    @OnClick(R.id.add_event)
+    void addEvents() {
+        mPresenter.onAddEventClicked(mAdapter.getCurrentItem());
     }
 
     @Override
@@ -115,45 +134,17 @@ public class LogsFragment extends BaseFragment implements LogsView {
         mPresenter.onDestroy();
     }
 
-    public void showSnackBar() {
+    public void showTitleButton() {
         LogsTitleView.Type expandedType = mAdapter.getExpandedLogsTitle();
-        if (expandedType != null) showSnackBar(expandedType);
-    }
-
-    public void showSnackBar(LogsTitleView.Type expandedType) {
-        switch (expandedType) {
-            case EVENTS:
-                mNavigateView.getSnackBar()
-                             .setOnReadyListener(snackBar ->
-                                     snackBar.reset()
-                                             .setPositiveLabel(mContext.getString(R.string.add_event), v -> mPresenter.onAddEventClicked(mAdapter.getCurrentItem())))
-                             .showSnackbar();
-                break;
-            case LOG_HEADER:
-                mNavigateView.getSnackBar()
-                             .setOnReadyListener(snackBar ->
-                                     snackBar.reset()
-                                             .setPositiveLabel(mContext.getString(R.string.edit), v -> mPresenter.onEditLogHeaderClicked()))
-                             .showSnackbar();
-                break;
-        }
+        if (expandedType != null) showTitleButton(expandedType);
     }
 
     public void showNotificationSnackBar(String message) {
         mNavigateView.getSnackBar()
-                     .setOnReadyListener(snackBar -> snackBar.reset()
-                             .setMessage(message)
-                             .setHideableOnTimeout(SnackBarLayout.DURATION_LONG)
-                             .setOnCloseListener(new SnackBarLayout.OnCloseListener() {
-                                 @Override
-                                 public void onClose(SnackBarLayout snackBar) {
-                                     showSnackBar();
-                                 }
-
-                                 @Override
-                                 public void onOpen(SnackBarLayout snackBar) {}
-                             }))
-                     .showSnackbar();
+                .setOnReadyListener(snackBar -> snackBar.reset()
+                        .setMessage(message)
+                        .setHideableOnTimeout(SnackBarLayout.DURATION_LONG))
+                .showSnackbar();
     }
 
     public void showSignDialog(CalendarItem calendarItem) {
@@ -242,6 +233,41 @@ public class LogsFragment extends BaseFragment implements LogsView {
     }
 
     @Override
+    public void showTitleButton(LogsTitleView.Type expandedType) {
+        switch (expandedType) {
+            case EVENTS:
+                if (mEditLogHeaderFloatingActionButton.isShown()) {
+                    mEditLogHeaderFloatingActionButton.hide();
+                }
+                mAddEventFloatingActionButton.show();
+                break;
+            case LOG_HEADER:
+                if (mAddEventFloatingActionButton.isShown()) {
+                    mAddEventFloatingActionButton.hide();
+                }
+                mEditLogHeaderFloatingActionButton.show();
+                break;
+            default:
+                break;
+        }
+
+    }
+
+    @Override
+    public void hideTitleButton(LogsTitleView.Type expandedType) {
+        switch (expandedType) {
+            case EVENTS:
+                mAddEventFloatingActionButton.hide();
+                break;
+            case LOG_HEADER:
+                mEditLogHeaderFloatingActionButton.hide();
+                break;
+            default:
+                break;
+        }
+    }
+
+    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
@@ -272,3 +298,4 @@ public class LogsFragment extends BaseFragment implements LogsView {
         }
     }
 }
+

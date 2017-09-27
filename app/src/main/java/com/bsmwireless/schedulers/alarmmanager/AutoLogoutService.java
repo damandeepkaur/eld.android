@@ -7,7 +7,7 @@ import com.bsmwireless.screens.autologout.AutoDutyDialogActivity;
 
 import static com.bsmwireless.screens.autologout.AutoDutyDialogActivity.EXTRA_AUTO_LOGOUT;
 
-public class AutoLogoutService extends IntentService {
+public final class AutoLogoutService extends IntentService {
 
     public static final String TAG = AutoLogoutService.class.getSimpleName();
 

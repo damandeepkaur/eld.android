@@ -5,7 +5,7 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 
 @Entity(tableName = "home_terminals")
-public class HomeTerminalEntity {
+public final class HomeTerminalEntity {
 
     @PrimaryKey
     @ColumnInfo(name = "id")
@@ -16,8 +16,6 @@ public class HomeTerminalEntity {
     private String mTimezone;
     @ColumnInfo(name = "address")
     private String mAddress;
-    @ColumnInfo(name = "user_id")
-    private Integer mUserId;
 
     public Integer getId() {
         return mId;
@@ -49,13 +47,5 @@ public class HomeTerminalEntity {
 
     public void setAddress(String address) {
         mAddress = address;
-    }
-
-    public Integer getUserId() {
-        return mUserId;
-    }
-
-    public void setUserId(Integer userId) {
-        mUserId = userId;
     }
 }
