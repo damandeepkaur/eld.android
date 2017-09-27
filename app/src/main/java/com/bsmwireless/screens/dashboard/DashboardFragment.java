@@ -119,19 +119,7 @@ public final class DashboardFragment extends BaseFragment implements DashboardVi
         super.onDestroyView();
         mUnbinder.unbind();
         mPresenter.onDestroy();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        mPresenter.onPause();
         stopTimer();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        mPresenter.onResume();
     }
 
     @OnClick(R.id.dashboard_current)
