@@ -2,7 +2,10 @@ package com.bsmwireless.common.utils.malfunction;
 
 import com.bsmwireless.BaseTest;
 import com.bsmwireless.data.storage.DutyTypeManager;
+import com.bsmwireless.data.storage.PreferencesManager;
+import com.bsmwireless.domain.interactors.BlackBoxInteractor;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
+import com.bsmwireless.models.BlackBoxModel;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.Malfunction;
 import com.bsmwireless.widgets.alerts.DutyType;
@@ -13,13 +16,16 @@ import org.junit.Test;
 import org.mockito.Mock;
 
 import io.reactivex.Maybe;
+import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.plugins.RxJavaPlugins;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -33,6 +39,10 @@ public class MissingDataJobTest extends BaseTest {
     ELDEventsInteractor mELDEventsInteractor;
     @Mock
     DutyTypeManager mDutyTypeManager;
+    @Mock
+    BlackBoxInteractor mBlackBoxInteractor;
+    @Mock
+    PreferencesManager mPreferencesManager;
 
     MissingDataJob mMissingDataJob;
 
@@ -41,7 +51,10 @@ public class MissingDataJobTest extends BaseTest {
         RxJavaPlugins.setIoSchedulerHandler(scheduler -> Schedulers.trampoline());
         RxJavaPlugins.setComputationSchedulerHandler(scheduler -> Schedulers.trampoline());
 
-        mMissingDataJob = spy(new MissingDataJob(mELDEventsInteractor, mDutyTypeManager));
+        when(mPreferencesManager.getBoxId()).thenReturn(0);
+
+        mMissingDataJob = spy(new MissingDataJob(mELDEventsInteractor, mDutyTypeManager,
+                mBlackBoxInteractor, mPreferencesManager));
     }
 
     @Test
@@ -57,9 +70,14 @@ public class MissingDataJobTest extends BaseTest {
         when(eldEvent.getEventCode()).thenReturn(ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED.getCode());
         when(mELDEventsInteractor.getEvent(any(DutyType.class)))
                 .thenReturn(eldEvent);
+        ELDEvent defaultEvent = new ELDEvent();
+        defaultEvent.setEventCode(ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED.getCode());
+        when(mELDEventsInteractor.getEvent(any(), any(), any())).thenReturn(defaultEvent);
+
+        when(mBlackBoxInteractor.getData(anyInt())).thenReturn(Observable.just(new BlackBoxModel()));
 
         BehaviorSubject<DutyType> subject = BehaviorSubject.create();
-        when(mMissingDataJob.createDutyTypeObservable()).thenReturn(subject);
+        doReturn(subject).when(mMissingDataJob).createDutyTypeObservable();
 
         mMissingDataJob.start();
         subject.onNext(DutyType.ON_DUTY);
@@ -67,7 +85,7 @@ public class MissingDataJobTest extends BaseTest {
         verify(mELDEventsInteractor).postNewELDEvent(any());
         verify(mELDEventsInteractor)
                 .getLatestMalfunctionEvent(Malfunction.MISSING_REQUIRED_DATA_ELEMENTS);
-        verify(mELDEventsInteractor, atLeastOnce()).getEvent(any(DutyType.class));
+        verify(mELDEventsInteractor, atLeastOnce()).getEvent(any(), any(), any());
     }
 
     @Test
@@ -79,12 +97,13 @@ public class MissingDataJobTest extends BaseTest {
         when(mELDEventsInteractor.getLatestMalfunctionEvent(Malfunction.MISSING_REQUIRED_DATA_ELEMENTS))
                 .thenReturn(Maybe.empty());
         when(mELDEventsInteractor.postNewELDEvent(any())).thenReturn(Single.just(1L));
-        ELDEvent eldEvent = mock(ELDEvent.class);
-        when(mELDEventsInteractor.getEvent(any(DutyType.class)))
-                .thenReturn(eldEvent);
+        ELDEvent defaultEvent = new ELDEvent();
+        defaultEvent.setEventCode(ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED.getCode());
+        when(mELDEventsInteractor.getEvent(any(), any(), any())).thenReturn(defaultEvent);
+        when(mBlackBoxInteractor.getData(anyInt())).thenReturn(Observable.just(new BlackBoxModel()));
 
         BehaviorSubject<DutyType> subject = BehaviorSubject.create();
-        when(mMissingDataJob.createDutyTypeObservable()).thenReturn(subject);
+        doReturn(subject).when(mMissingDataJob).createDutyTypeObservable();
 
         mMissingDataJob.start();
         subject.onNext(DutyType.ON_DUTY);
@@ -92,7 +111,7 @@ public class MissingDataJobTest extends BaseTest {
         verify(mELDEventsInteractor, never()).postNewELDEvent(any());
         verify(mELDEventsInteractor)
                 .getLatestMalfunctionEvent(Malfunction.MISSING_REQUIRED_DATA_ELEMENTS);
-        verify(mELDEventsInteractor, atLeastOnce()).getEvent(any(DutyType.class));
+        verify(mELDEventsInteractor, atLeastOnce()).getEvent(any(), any(), any());
     }
 
     @Test
@@ -110,9 +129,14 @@ public class MissingDataJobTest extends BaseTest {
         ELDEvent eldEvent = mock(ELDEvent.class);
         when(mELDEventsInteractor.getEvent(any(DutyType.class)))
                 .thenReturn(eldEvent);
+        ELDEvent defaultEvent = new ELDEvent();
+        defaultEvent.setEventCode(ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED.getCode());
+        when(mELDEventsInteractor.getEvent(any(), any(), any())).thenReturn(defaultEvent);
+
+        when(mBlackBoxInteractor.getData(anyInt())).thenReturn(Observable.just(new BlackBoxModel()));
 
         BehaviorSubject<DutyType> subject = BehaviorSubject.create();
-        when(mMissingDataJob.createDutyTypeObservable()).thenReturn(subject);
+        doReturn(subject).when(mMissingDataJob).createDutyTypeObservable();
 
         mMissingDataJob.start();
         subject.onNext(DutyType.ON_DUTY);
@@ -120,10 +144,8 @@ public class MissingDataJobTest extends BaseTest {
         verify(mELDEventsInteractor).postNewELDEvent(any());
         verify(mELDEventsInteractor)
                 .getLatestMalfunctionEvent(Malfunction.MISSING_REQUIRED_DATA_ELEMENTS);
-        verify(mELDEventsInteractor, atLeastOnce()).getEvent(any(DutyType.class));
+        verify(mELDEventsInteractor, atLeastOnce()).getEvent(any(), any(), any());
     }
-
-
 
     @SuppressWarnings("unchecked")
     @Test
@@ -146,9 +168,12 @@ public class MissingDataJobTest extends BaseTest {
         ELDEvent eldEvent = mock(ELDEvent.class);
         when(mELDEventsInteractor.getEvent(any(DutyType.class)))
                 .thenReturn(eldEvent);
+        ELDEvent defaultEvent = new ELDEvent();
+        defaultEvent.setEventCode(ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED.getCode());
+        when(mELDEventsInteractor.getEvent(any(), any(), any())).thenReturn(defaultEvent);
 
         BehaviorSubject<DutyType> subject = BehaviorSubject.create();
-        when(mMissingDataJob.createDutyTypeObservable()).thenReturn(subject);
+        doReturn(subject).when(mMissingDataJob).createDutyTypeObservable();
 
         mMissingDataJob.start();
         subject.onNext(DutyType.ON_DUTY);
@@ -157,6 +182,6 @@ public class MissingDataJobTest extends BaseTest {
         verify(mELDEventsInteractor, times(2)).postNewELDEvent(any());
         verify(mELDEventsInteractor, atLeastOnce())
                 .getLatestMalfunctionEvent(Malfunction.MISSING_REQUIRED_DATA_ELEMENTS);
-        verify(mELDEventsInteractor, atLeastOnce()).getEvent(any(DutyType.class));
+        verify(mELDEventsInteractor, atLeastOnce()).getEvent(any(), any(), any());
     }
 }

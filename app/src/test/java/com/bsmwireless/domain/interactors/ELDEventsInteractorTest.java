@@ -57,6 +57,8 @@ public class ELDEventsInteractorTest extends BaseTest {
     AccountManager mAccountManager;
     @Mock
     TokenManager mTokenManager;
+    @Mock
+    LogSheetInteractor mLogSheetInteractor;
 
     ELDEventsInteractor mELDEventsInteractor;
 
@@ -76,7 +78,8 @@ public class ELDEventsInteractorTest extends BaseTest {
                 mBlackBoxInteractor,
                 mDutyTypeManager,
                 mAccountManager,
-                mTokenManager);
+                mTokenManager,
+                mLogSheetInteractor);
     }
 
     @Test
