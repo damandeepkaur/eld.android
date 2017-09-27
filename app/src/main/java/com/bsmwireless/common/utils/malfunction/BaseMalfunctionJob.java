@@ -78,7 +78,7 @@ abstract class BaseMalfunctionJob {
                 ELDEvent.MalfunctionCode.MALFUNCTION_CLEARED;
     }
 
-    protected void switchToDefaultMalfunctionCleared(Observer<? super ELDEvent> observer,
+    protected final void switchToDefaultMalfunctionCleared(Observer<? super ELDEvent> observer,
                                                      Malfunction malfunction,
                                                      ELDEvent.MalfunctionCode malfunctionCode,
                                                      BlackBoxModel blackBoxModel) {

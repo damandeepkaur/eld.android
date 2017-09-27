@@ -21,7 +21,7 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
-public class StorageCapacityJob extends BaseMalfunctionJob implements MalfunctionJob {
+public final class StorageCapacityJob extends BaseMalfunctionJob implements MalfunctionJob {
 
     private final AppSettings mAppSettings;
     private final StorageUtil mStorageUtil;
@@ -48,6 +48,11 @@ public class StorageCapacityJob extends BaseMalfunctionJob implements Malfunctio
                         createCodeForMalfunction(result.mELDEvent), result.mBlackBoxModel)))
                 .doOnNext(eldEvent -> Timber.d("Save new Data Recording Compliance event: " + eldEvent))
                 .flatMap(this::saveEvents)
+                .onErrorReturn(throwable -> {
+                    throwable.printStackTrace();
+                    Timber.e(throwable, "Error save the eld event");
+                    return -1L;
+                })
                 .subscribeOn(Schedulers.io())
                 .subscribe();
         add(disposable);

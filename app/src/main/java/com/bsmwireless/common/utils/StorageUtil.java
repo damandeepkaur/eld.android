@@ -7,7 +7,7 @@ import android.os.StatFs;
 
 import javax.inject.Inject;
 
-public class StorageUtil {
+public final class StorageUtil {
 
     private final StatsFsInternal mStatsFsInternal;
 
@@ -35,7 +35,7 @@ public class StorageUtil {
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
-    private static class StatFsApi18 implements StatsFsInternal {
+    private static final class StatFsApi18 implements StatsFsInternal {
 
         private final StatFs mStatFsInternal;
         private final StatFs mStatFsExternal;
@@ -64,7 +64,7 @@ public class StorageUtil {
         }
     }
 
-    private static class StatFsApi14 implements StatsFsInternal {
+    private static final class StatFsApi14 implements StatsFsInternal {
 
         private final StatFs mStatFsInternal;
         private final StatFs mStatFsExternal;
