@@ -306,6 +306,7 @@ public final class ELDEventsInteractor {
         return getEvent(dutyType, null, false);
     }
 
+
     public ELDEvent getEvent(DutyType dutyType, String comment, boolean isAuto) {
         ELDEvent event = getEvent(getBlackBoxState(dutyType == DutyType.PERSONAL_USE), isAuto);
         event.setStatus(ELDEvent.StatusCode.ACTIVE.getValue());
@@ -317,6 +318,26 @@ public final class ELDEventsInteractor {
         }
 
         return event;
+    }
+
+    /**
+     * Makes and fills an event for malfunction
+     *
+     * @param malfunction     malfunction type
+     * @param malfunctionCode malfunction code
+     * @param blackBoxModel   data from blackbox
+     * @return filled event
+     */
+    public ELDEvent getEvent(Malfunction malfunction,
+                             ELDEvent.MalfunctionCode malfunctionCode,
+                             BlackBoxModel blackBoxModel) {
+
+        ELDEvent eldEvent = getEvent(blackBoxModel, true);
+
+        eldEvent.setMalCode(malfunction);
+        eldEvent.setEventCode(malfunctionCode.getCode());
+        eldEvent.setEventType(ELDEvent.EventType.DATA_DIAGNOSTIC.getValue());
+        return eldEvent;
     }
 
     private ELDEvent getEvent(BlackBoxModel blackBoxModel, boolean isAuto) {
