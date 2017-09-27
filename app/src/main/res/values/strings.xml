@@ -384,7 +384,8 @@
 
     <!-- Navigation drawer-->
     <string name="nav_home">Home</string>
-    <string name="nav_inspector_view">Inspector View</string>
+    <string name="nav_inspector_view">Roadside Inspections</string>
+    <string name="nav_transfer_view">Data Transfer</string>
     <string name="nav_help">Help</string>
     <string name="nav_driver_profile">Driver Profile</string>
     <string name="nav_settings">Settings</string>
@@ -646,7 +647,54 @@
     <string name="malfunction_data_transfer">Data Transfer</string>
     <string name="malfunction_other">Other</string>
 
+    <!-- Roadside -->
+    <string name="roadside_title">Roadside</string>
+    <string name="roadside_view">View</string>
+    <string name="roadside_history">History</string>
+    <string name="roadside_date">Date</string>
+    <string name="roadside_starting_time">24-Hour Starting Time</string>
+    <string name="roadside_time_zone">Time Zone</string>
+    <string name="roadside_carrier_name">Carrier Name</string>
+    <string name="roadside_carrier_dot">Carrier DOT</string>
+    <string name="roadside_empty"/>
+    <string name="roadside_midnight">Midnight</string>
+    <string name="roadside_driver_name">Driver Name</string>
+    <string name="roadside_driver_id">Driver ID</string>
+    <string name="roadside_driver_state">Driver License State</string>
+    <string name="roadside_driver_license">Driver License Number</string>
+    <string name="roadside_codriver_name">Co-Driver Name</string>
+    <string name="roadside_codriver_id">Co-Driver ID</string>
+    <string name="roadside_undefined">undefined</string>
+    <string name="roadside_odometer">Current Odometer</string>
+    <string name="roadside_engine">Current Engine Hours</string>
+    <string name="roadside_eld_provider">ELD Provider</string>
+    <string name="roadside_eld_id">ELD ID</string>
+    <string name="roadside_truck_id">Truck Tractor ID</string>
+    <string name="roadside_truck_vin">Truck Tractor VIN</string>
+    <string name="roadside_shipping_id">Shipping ID</string>
+    <string name="roadside_location">Current Location</string>
+    <string name="roadside_unidentified_records">Unidentified Driving Records</string>
+    <string name="roadside_exempt">Exempt Driver Status</string>
+    <string name="roadside_malfunctions">Malfunction Status</string>
+    <string name="roadside_diagnostic">Diagnostic Status</string>
+    <string name="roadside_yes">Yes</string>
+    <string name="roadside_no">No</string>
+    <string name="roadside_not_set"/>
+    <string name="roadside_time">Time</string>
+    <string name="roadside_event">Event</string>
+    <string name="roadside_origin">Origin</string>
+    <string name="roadside_comment">Comment</string>
 
-
+    <!-- Transfer -->
+    <string name="transfer_title">Transfer</string>
+    <string name="transfer_error">Transfer failed</string>
+    <string name="transfer_method">Transfer Method</string>
+    <string name="transfer_email">Email</string>
+    <string name="transfer_web_service">Web Service</string>
+    <string name="transfer_send_logsheets">Send Logsheets</string>
+    <string name="transfer_dialog_title">Confirmation Required</string>
+    <string name="transfer_dialog_message">You are going to send data for current 24 hours and last 7 days. Please confirm your action to proceed with data transfer.</string>
+    <string name="transfer_dialog_positive">Confirm</string>
+    <string name="transfer_dialog_negative">Cancel</string>
 
 </resources>

@@ -7,6 +7,7 @@ import android.arch.persistence.room.Query;
 import java.util.List;
 
 import io.reactivex.Flowable;
+import io.reactivex.Single;
 
 import static android.arch.persistence.room.OnConflictStrategy.REPLACE;
 
@@ -33,6 +34,6 @@ public interface LogSheetDao {
     @Query("SELECT * FROM log_sheet_header WHERE log_day > :startDay AND log_day < :endDay AND driver_id = :driverId")
     Flowable<List<LogSheetEntity>> getLogSheets(Long startDay, Long endDay, Integer driverId);
 
-    @Query("SELECT * FROM log_sheet_header WHERE log_day > :startDay AND log_day < :endDay AND driver_id = :driverId")
-    List<LogSheetEntity> getLogSheetsSync(Long startDay, Long endDay, Integer driverId);
+    @Query("SELECT * FROM log_sheet_header WHERE log_day = :logDay AND driver_id = :driverId LIMIT 1")
+    Single<LogSheetEntity> getLogSheet(long logDay, int driverId);
 }

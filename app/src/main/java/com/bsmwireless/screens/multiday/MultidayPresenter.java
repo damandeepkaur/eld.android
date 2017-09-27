@@ -114,6 +114,8 @@ public final class MultidayPresenter implements AccountManager.AccountListener {
 
             long[] durations = DutyTypeManager.getDutyTypeTimes(new ArrayList<>(dayEvents), startDay, endDay);
 
+            durations = DateUtils.getRoundedDurations(durations, i == dayCount - 1);
+
             item.setTotalOffDuty(durations[DutyType.OFF_DUTY.ordinal()]);
             item.setTotalSleeping(durations[DutyType.SLEEPER_BERTH.ordinal()]);
             item.setTotalDriving(durations[DutyType.DRIVING.ordinal()]);

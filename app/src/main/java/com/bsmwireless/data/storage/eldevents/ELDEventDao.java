@@ -9,6 +9,7 @@ import java.util.List;
 
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
+import io.reactivex.Single;
 
 import static android.arch.persistence.room.OnConflictStrategy.REPLACE;
 
@@ -23,8 +24,11 @@ public interface ELDEventDao {
     @Query("SELECT * FROM events WHERE sync = 2 AND driver_id=:userId ORDER BY event_time")
     List<ELDEventEntity> getNewUnsyncEvents(int userId);
 
-    @Query("SELECT * FROM events WHERE event_time > :startTime AND event_time < :endTime " +
-            "AND driver_id = :driverId ORDER BY event_time")
+    @Query("SELECT * FROM events WHERE event_time > :startTime AND event_time < :endTime and driver_id = :driverId ORDER BY event_time")
+    Single<List<ELDEventEntity>> getEventsFromStartToEndTimeOnce(long startTime, long endTime, int driverId);
+
+    @Query("SELECT * FROM events WHERE event_time > :startTime and event_time < :endTime " +
+            "and driver_id = :driverId ORDER BY event_time")
     List<ELDEventEntity> getEventsFromStartToEndTimeSync(long startTime, long endTime, int driverId);
 
     @Query("SELECT * FROM events WHERE event_time > :startTime AND event_time < :endTime " +
@@ -35,12 +39,19 @@ public interface ELDEventDao {
             "AND (event_type = 1 or event_type = 3) AND status = 1 ORDER BY event_time DESC) AND driver_id = :driverId")
     List<ELDEventEntity> getLatestActiveDutyEventSync(long latestTime, int driverId);
 
+    @Query("SELECT * FROM events WHERE event_time = (SELECT event_time FROM events WHERE event_time < :latestTime AND driver_id = :driverId " +
+            "AND (event_type = 1 or event_type = 3) AND status = 1 ORDER BY event_time DESC) AND driver_id = :driverId")
+    Single<List<ELDEventEntity>> getLatestActiveDutyEventOnce(long latestTime, int driverId);
+
     @Query("SELECT * FROM events WHERE event_time > :startTime AND event_time < :endTime " +
             "AND driver_id = :driverId AND (event_type = 1 or event_type = 3) AND status = 1 ORDER BY event_time")
     List<ELDEventEntity> getActiveEventsFromStartToEndTimeSync(long startTime, long endTime, int driverId);
 
-    @Query("SELECT count(id) FROM events WHERE event_type = :type AND event_code = :code AND mal_code IN (:malCodes)")
-    Flowable<Integer> getMalfunctionEventCount(int type, int code, String[] malCodes);
+    @Query("SELECT count(id) FROM events WHERE event_time > :startTime AND event_time < :endTime AND driver_id = :driverId AND event_type = 7 AND (event_code = 1 OR event_code = 2)")
+    Integer getMalfunctionEventCountSync(int driverId, long startTime, long endTime);
+
+    @Query("SELECT count(id) FROM events WHERE event_time > :startTime AND event_time < :endTime AND driver_id = :driverId AND event_type = 7 AND (event_code = 3 OR event_code = 4)")
+    Integer getDiagnosticEventCountSync(int driverId, long startTime, long endTime);
 
     @Query("SELECT count(id) FROM events WHERE driver_id = :driverId AND event_type = :type and event_code = :code and mal_code IN (:malCodes)")
     Flowable<Integer> getMalfunctionEventCount(int driverId, int type, int code, String[] malCodes);
