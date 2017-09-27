@@ -2,8 +2,6 @@ package com.bsmwireless.domain.interactors;
 
 import com.bsmwireless.common.Constants;
 import com.bsmwireless.data.network.RetrofitException;
-import com.bsmwireless.common.Constants;
-import com.bsmwireless.data.network.RetrofitException;
 import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.network.authenticator.TokenManager;
 import com.bsmwireless.data.storage.AccountManager;
@@ -22,6 +20,7 @@ import com.bsmwireless.widgets.alerts.DutyType;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -47,12 +46,14 @@ public final class ELDEventsInteractor {
     private PreferencesManager mPreferencesManager;
     private AccountManager mAccountManager;
     private TokenManager mTokenManager;
+    private LogSheetInteractor mLogSheetInteractor;
 
     @Inject
     public ELDEventsInteractor(ServiceApi serviceApi, PreferencesManager preferencesManager,
                                AppDatabase appDatabase, UserInteractor userInteractor,
                                BlackBoxInteractor blackBoxInteractor, DutyTypeManager dutyTypeManager,
-                               AccountManager accountManager, TokenManager tokenManager) {
+                               AccountManager accountManager, TokenManager tokenManager,
+                               LogSheetInteractor logSheetInteractor) {
         mServiceApi = serviceApi;
         mPreferencesManager = preferencesManager;
         mUserInteractor = userInteractor;
@@ -63,6 +64,7 @@ public final class ELDEventsInteractor {
         mPreferencesManager = preferencesManager;
         mAccountManager = accountManager;
         mTokenManager = tokenManager;
+        mLogSheetInteractor = logSheetInteractor;
 
         mUserInteractor.getTimezone().subscribe(timezone -> mTimezone = timezone);
     }
@@ -84,17 +86,20 @@ public final class ELDEventsInteractor {
 
     public Observable<long[]> updateELDEvents(List<ELDEvent> events) {
         return Observable.fromCallable(() ->
-                mELDEventDao.insertAll(ELDEventConverter.toEntityArray(events, ELDEventEntity.SyncType.UPDATE_UNSYNC)));
+                mELDEventDao.insertAll(ELDEventConverter.toEntityArray(events, ELDEventEntity.SyncType.UPDATE_UNSYNC)))
+                .doOnNext(longs -> mLogSheetInteractor.resetLogSheetHeaderSigning(events));
     }
 
     public Single<Long> postNewELDEvent(ELDEvent event) {
         return Single.fromCallable(() ->
-                mELDEventDao.insertEvent(ELDEventConverter.toEntity(event, ELDEventEntity.SyncType.NEW_UNSYNC)));
+                mELDEventDao.insertEvent(ELDEventConverter.toEntity(event, ELDEventEntity.SyncType.NEW_UNSYNC)))
+                .doOnSuccess(aLong -> mLogSheetInteractor.resetLogSheetHeaderSigning(Arrays.asList(event)));
     }
 
     public Observable<long[]> postNewELDEvents(List<ELDEvent> events) {
         return Observable.fromCallable(() ->
-                mELDEventDao.insertAll(ELDEventConverter.toEntityArray(events, ELDEventEntity.SyncType.NEW_UNSYNC)));
+                mELDEventDao.insertAll(ELDEventConverter.toEntityArray(events, ELDEventEntity.SyncType.NEW_UNSYNC)))
+                .doOnNext(longs -> mLogSheetInteractor.resetLogSheetHeaderSigning(events));
     }
 
     public void storeUnidentifiedEvents(List<ELDEvent> events) {
@@ -181,17 +186,24 @@ public final class ELDEventsInteractor {
 
     /**
      * Returns the latest malfunction event with malfunction code
+     *
      * @param malfunction malfunction code
      * @return latest malfunction ELD event
      */
-    public Maybe<ELDEvent> getLatestMalfunctionEvent(Malfunction malfunction){
-        return mELDEventDao.getLatestEvent(ELDEvent.EventType.DATA_DIAGNOSTIC.getValue(), malfunction.getCode())
+    public Maybe<ELDEvent> getLatestMalfunctionEvent(Malfunction malfunction) {
+        return mELDEventDao
+                .getLatestEvent(mAccountManager.getCurrentUserId(),
+                        ELDEvent.EventType.DATA_DIAGNOSTIC.getValue(),
+                        malfunction.getCode())
                 .map(ELDEventConverter::toModel);
     }
 
     private Flowable<Integer> getMalfunctionCount(ELDEvent.MalfunctionCode code, String[] codes) {
-        return mELDEventDao.getMalfunctionEventCount(ELDEvent.EventType.DATA_DIAGNOSTIC.getValue(),
-                code.getCode(), codes);
+        return mELDEventDao
+                .getMalfunctionEventCount(mAccountManager.getCurrentUserId(),
+                        ELDEvent.EventType.DATA_DIAGNOSTIC.getValue(),
+                        code.getCode(),
+                        codes);
     }
 
     private ArrayList<ELDEvent> getEvents(DutyType dutyType, String comment) {
@@ -273,6 +285,7 @@ public final class ELDEventsInteractor {
         return getEvent(dutyType, null, false);
     }
 
+
     public ELDEvent getEvent(DutyType dutyType, String comment, boolean isAuto) {
         ELDEvent event = getEvent(getBlackBoxState(dutyType == DutyType.PERSONAL_USE), isAuto);
         event.setStatus(ELDEvent.StatusCode.ACTIVE.getValue());
@@ -284,6 +297,26 @@ public final class ELDEventsInteractor {
         }
 
         return event;
+    }
+
+    /**
+     * Makes and fills an event for malfunction
+     *
+     * @param malfunction     malfunction type
+     * @param malfunctionCode malfunction code
+     * @param blackBoxModel   data from blackbox
+     * @return filled event
+     */
+    public ELDEvent getEvent(Malfunction malfunction,
+                             ELDEvent.MalfunctionCode malfunctionCode,
+                             BlackBoxModel blackBoxModel) {
+
+        ELDEvent eldEvent = getEvent(blackBoxModel, true);
+
+        eldEvent.setMalCode(malfunction);
+        eldEvent.setEventCode(malfunctionCode.getCode());
+        eldEvent.setEventType(ELDEvent.EventType.DATA_DIAGNOSTIC.getValue());
+        return eldEvent;
     }
 
     private ELDEvent getEvent(BlackBoxModel blackBoxModel, boolean isAuto) {

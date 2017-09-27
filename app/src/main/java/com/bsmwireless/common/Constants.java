@@ -26,6 +26,9 @@ public interface Constants {
     long LOCK_SCREEN_IDLE_MONITORING_TIMEOUT_MS = TimeUnit.MINUTES.toMillis(5);
     long LOCK_SCREEN_DISCONNECTION_TIMEOUT_MS = TimeUnit.MINUTES.toMillis(5);
 
+    long DIFF_FOR_TRIGGER_TIMING_MALFUNCTION_MS = TimeUnit.MINUTES.toMillis(10);
+    long CHECK_TIME_INTERVAL = TimeUnit.MINUTES.toMillis(1);
+
     String BASE_URL = "https://develd.bsmtechnologies.com/sdmobile/rest/";
     String DEVICE_TYPE = "Android";
 
@@ -56,11 +59,13 @@ public interface Constants {
             Malfunction.OTHER_COMPLIANCE.getCode()
     };
 
+    @SuppressWarnings("PublicStaticCollectionField")
     Set<Class> NOT_RUNNING_DRIVING_MONITORING_ACTIVITY = Collections
             .unmodifiableSet(new HashSet<>(Arrays.asList(LoginActivity.class,
                     LockScreenActivity.class,
                     SelectAssetActivity.class)));
 
+    @SuppressWarnings("PublicStaticCollectionField")
     Set<Class> NOT_RUNNING_MALFUNCTIONS_MONITORING_ACTIVITY = Collections
             .unmodifiableSet(new HashSet<>(Arrays.asList(LoginActivity.class,
                     SelectAssetActivity.class)));

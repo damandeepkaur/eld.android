@@ -2,10 +2,13 @@ package com.bsmwireless.common.utils.malfunction;
 
 import android.support.annotation.VisibleForTesting;
 
-import com.bsmwireless.common.utils.SettingsManager;
+import com.bsmwireless.common.utils.AppSettings;
 import com.bsmwireless.data.network.NtpClientManager;
 import com.bsmwireless.data.storage.DutyTypeManager;
+import com.bsmwireless.data.storage.PreferencesManager;
+import com.bsmwireless.domain.interactors.BlackBoxInteractor;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
+import com.bsmwireless.models.BlackBoxModel;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.Malfunction;
 
@@ -21,26 +24,32 @@ import timber.log.Timber;
 public final class TimingJob extends BaseMalfunctionJob implements MalfunctionJob {
 
     private final NtpClientManager mNtpClientManager;
-    private final SettingsManager mSettingsManager;
+    private final AppSettings mAppSettings;
 
     @Inject
     public TimingJob(ELDEventsInteractor eldEventsInteractor,
                      DutyTypeManager dutyTypeManager,
                      NtpClientManager ntpClientManager,
-                     SettingsManager settingsManager) {
-        super(eldEventsInteractor, dutyTypeManager);
+                     AppSettings appSettings,
+                     BlackBoxInteractor blackBoxInteractor,
+                     PreferencesManager preferencesManager) {
+        super(eldEventsInteractor, dutyTypeManager, blackBoxInteractor, preferencesManager);
         mNtpClientManager = ntpClientManager;
-        mSettingsManager = settingsManager;
+        mAppSettings = appSettings;
     }
 
     @Override
     public void start() {
         Timber.d("Start timing compliance detection");
         Disposable disposable = getIntervalObservable()
-                .flatMap(unused -> loadLatestTimingEvent())
-                .filter(this::isCurrentTimingEventAndStateDifferent)
-                .map(eldEvent -> createEvent(Malfunction.TIMING_COMPLIANCE,
-                        createCodeForMalfunction(eldEvent)))
+                .doOnNext(unused -> Timber.d("Check the time compliance"))
+                .flatMap(unsed -> getBlackboxData())
+                .flatMap(this::loadLatestTimingEvent)
+                .filter(result -> isCurrentTimingEventAndStateDifferent(result.mELDEvent))
+                .map(result -> createEvent(Malfunction.TIMING_COMPLIANCE,
+                        createCodeForMalfunction(result.mELDEvent),
+                        result.mBlackBoxModel))
+                .doOnNext(eldEvent -> Timber.d("Save new timing compliance event: " + eldEvent))
                 .flatMap(this::saveEvents)
                 .onErrorReturn(throwable -> {
                     Timber.e(throwable, "Error save the eld event");
@@ -58,20 +67,28 @@ public final class TimingJob extends BaseMalfunctionJob implements MalfunctionJo
     }
 
     @VisibleForTesting
-    Observable<Long> getIntervalObservable(){
-        return Observable.interval(1, TimeUnit.MILLISECONDS);
+    Observable<Long> getIntervalObservable() {
+        return Observable.interval(mAppSettings.getIntervalForCheckTime(), TimeUnit.MILLISECONDS);
     }
 
-    private Observable<ELDEvent> loadLatestTimingEvent() {
+    private Observable<Result> loadLatestTimingEvent(BlackBoxModel blackBoxModel) {
         return getELDEventsInteractor()
                 .getLatestMalfunctionEvent(Malfunction.TIMING_COMPLIANCE)
                 .toObservable()
-                .switchIfEmpty(this::switchToDefaultMalfunctionCleared);
+                .switchIfEmpty(observer -> {
+                    // create default event with cleared status
+                    ELDEvent eldEvent = getELDEventsInteractor()
+                            .getEvent(Malfunction.TIMING_COMPLIANCE,
+                                    ELDEvent.MalfunctionCode.MALFUNCTION_CLEARED,
+                                    blackBoxModel);
+                    observer.onNext(eldEvent);
+                })
+                .map(eldEvent -> new Result(eldEvent, blackBoxModel));
     }
 
     private boolean isCurrentTimingEventAndStateDifferent(ELDEvent eldEvent) {
         long realTimeInMillisDiff = mNtpClientManager.getRealTimeInMillisDiff();
-        long timingMalfunctionDiff = mSettingsManager.getTimingMalfunctionDiff();
+        long timingMalfunctionDiff = mAppSettings.getTimingMalfunctionDiff();
         int eventCode = eldEvent.getEventCode();
 
         if (realTimeInMillisDiff > timingMalfunctionDiff) {
@@ -83,4 +100,6 @@ public final class TimingJob extends BaseMalfunctionJob implements MalfunctionJo
 
         return false;
     }
+
+
 }

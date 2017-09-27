@@ -82,7 +82,7 @@ public final class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.
         if (logs != null) {
             clearItems();
             for (LogSheetHeader log : logs) {
-                CalendarItem item = findItemByDate(DateUtils.convertDayNumberToUnixMs(log.getLogDay()));
+                CalendarItem item = findItemByDate(DateUtils.convertLogDayToUnixMs(log.getLogDay()));
                 if (item != null) {
                     item.setAssociatedLog(log);
                 }

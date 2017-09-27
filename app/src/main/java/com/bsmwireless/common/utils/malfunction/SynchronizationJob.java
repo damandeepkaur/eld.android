@@ -1,8 +1,9 @@
 package com.bsmwireless.common.utils.malfunction;
 
-import com.bsmwireless.data.network.blackbox.BlackBoxConnectionManager;
 import com.bsmwireless.data.network.blackbox.models.BlackBoxResponseModel;
 import com.bsmwireless.data.storage.DutyTypeManager;
+import com.bsmwireless.data.storage.PreferencesManager;
+import com.bsmwireless.domain.interactors.BlackBoxInteractor;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
 import com.bsmwireless.models.BlackBoxModel;
 import com.bsmwireless.models.BlackBoxSensorState;
@@ -18,24 +19,29 @@ import timber.log.Timber;
 
 public final class SynchronizationJob extends BaseMalfunctionJob implements MalfunctionJob {
 
-    private final BlackBoxConnectionManager mBoxConnectionManager;
+    private final BlackBoxInteractor mBlackBoxInteractor;
+    private final PreferencesManager mPreferencesManager;
 
     @Inject
-    public SynchronizationJob(ELDEventsInteractor eldEventsInteractor, DutyTypeManager dutyTypeManager, BlackBoxConnectionManager boxConnectionManager) {
-        super(eldEventsInteractor, dutyTypeManager);
-        mBoxConnectionManager = boxConnectionManager;
+    public SynchronizationJob(ELDEventsInteractor eldEventsInteractor,
+                              DutyTypeManager dutyTypeManager,
+                              BlackBoxInteractor blackBoxInteractor, PreferencesManager preferencesManager) {
+        super(eldEventsInteractor, dutyTypeManager, blackBoxInteractor, preferencesManager);
+        mBlackBoxInteractor = blackBoxInteractor;
+        mPreferencesManager = preferencesManager;
     }
 
     @Override
     public void start() {
         Timber.d("Start synchronization compliance detection");
-        Disposable disposable = mBoxConnectionManager.getDataObservable()
+        Disposable disposable = mBlackBoxInteractor.getData(mPreferencesManager.getBoxId())
                 .filter(blackBoxModel -> BlackBoxResponseModel.ResponseType.STATUS_UPDATE
                         == blackBoxModel.getResponseType())
-                .flatMap(blackBoxModel -> loadLatestSynchronizationEvent(), SynchResult::new)
+                .flatMap(this::loadLatestSynchronizationEvent, SynchResult::new)
                 .filter(this::isStateAndEventAreDifferent)
+                // create event with opposite mal code
                 .map(result -> createEvent(Malfunction.ENGINE_SYNCHRONIZATION,
-                        createCodeForDiagnostic(result.mELDEvent)))
+                        createCodeForDiagnostic(result.mELDEvent), result.mBlackBoxModel))
                 .flatMap(this::saveEvents)
                 .onErrorReturn(throwable -> {
                     Timber.e(throwable, "Error handle synchronization event");
@@ -52,15 +58,17 @@ public final class SynchronizationJob extends BaseMalfunctionJob implements Malf
         dispose();
     }
 
-    private Observable<ELDEvent> loadLatestSynchronizationEvent() {
+    private Observable<ELDEvent> loadLatestSynchronizationEvent(BlackBoxModel blackBoxModel) {
         return getELDEventsInteractor()
                 .getLatestMalfunctionEvent(Malfunction.ENGINE_SYNCHRONIZATION)
                 .toObservable()
                 .switchIfEmpty(observer -> {
                     // create default event with cleared status
-                    ELDEvent event = getELDEventsInteractor().getEvent(getDutyTypeManager().getDutyType());
-                    event.setEventCode(ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED.getCode());
-                    observer.onNext(event);
+                    ELDEvent eldEvent = getELDEventsInteractor()
+                            .getEvent(Malfunction.ENGINE_SYNCHRONIZATION,
+                                    ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED,
+                                    blackBoxModel);
+                    observer.onNext(eldEvent);
                 });
     }
 
@@ -75,14 +83,13 @@ public final class SynchronizationJob extends BaseMalfunctionJob implements Malf
      */
     private boolean isStateAndEventAreDifferent(SynchResult synchResult) {
 
-        if (ELDEvent.MalfunctionCode.DIAGNOSTIC_LOGGED.getCode() == synchResult.mELDEvent.getEventCode()) {
-            return synchResult.mBlackBoxModel.getSensorState(BlackBoxSensorState.ECM_CABLE)
-                    && synchResult.mBlackBoxModel.getSensorState(BlackBoxSensorState.ECM_SYNC);
-        } else if (ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED.getCode() == synchResult.mELDEvent.getEventCode()) {
-            return !synchResult.mBlackBoxModel.getSensorState(BlackBoxSensorState.ECM_CABLE)
-                    || !synchResult.mBlackBoxModel.getSensorState(BlackBoxSensorState.ECM_SYNC);
+        boolean isEcmOk = synchResult.mBlackBoxModel.getSensorState(BlackBoxSensorState.ECM_CABLE)
+                && synchResult.mBlackBoxModel.getSensorState(BlackBoxSensorState.ECM_SYNC);
+        if (isEcmOk) {
+            return ELDEvent.MalfunctionCode.DIAGNOSTIC_LOGGED.getCode() == synchResult.mELDEvent.getEventCode();
+        } else {
+            return ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED.getCode() == synchResult.mELDEvent.getEventCode();
         }
-        return true;
     }
 
     private final static class SynchResult {

@@ -13,12 +13,13 @@ import com.bsmwireless.services.malfunction.MalfunctionMonitoringService;
 import com.bsmwireless.services.monitoring.StatusMonitoringService;
 
 import butterknife.Unbinder;
+import timber.log.Timber;
 
 public abstract class BaseActivity extends AppCompatActivity{
     private static final String RETAIN_FRAGMENT = "RETAIN_FRAGMENT";
     protected Unbinder mUnbinder;
-    boolean mIsLockScreenDetectionServiceBound = false;
-    boolean mIsMalfunctionServiceBound = false;
+    boolean mIsLockScreenDetectionServiceBound;
+    boolean mIsMalfunctionServiceBound ;
 
     @SuppressWarnings("DesignForExtension")
     @Override
@@ -58,7 +59,7 @@ public abstract class BaseActivity extends AppCompatActivity{
         super.onDestroy();
     }
 
-    protected RetainFragment getRetainFragment(){
+    protected final RetainFragment getRetainFragment(){
         Fragment fragment = getSupportFragmentManager().findFragmentByTag(RETAIN_FRAGMENT);
         if (fragment == null) {
             fragment = RetainFragment.createFragment();
@@ -87,6 +88,7 @@ public abstract class BaseActivity extends AppCompatActivity{
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
             mIsLockScreenDetectionServiceBound = false;
+            Timber.d("Disconnected");
         }
     };
 
@@ -98,6 +100,7 @@ public abstract class BaseActivity extends AppCompatActivity{
 
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
+            Timber.d("Disconnected");
             mIsMalfunctionServiceBound = false;
         }
     };

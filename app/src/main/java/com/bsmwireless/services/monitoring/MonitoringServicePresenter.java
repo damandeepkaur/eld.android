@@ -7,6 +7,7 @@ import com.bsmwireless.data.network.blackbox.BlackBoxConnectionManager;
 import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.models.BlackBoxModel;
+import com.bsmwireless.services.MonitoringPresenter;
 import com.bsmwireless.widgets.alerts.DutyType;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -21,7 +22,7 @@ import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
 @ActivityScope
-public final class MonitoringServicePresenter {
+public final class MonitoringServicePresenter implements MonitoringPresenter {
 
     final MonitoringServiceView mView;
     private final BlackBoxConnectionManager mBlackBox;
@@ -43,11 +44,13 @@ public final class MonitoringServicePresenter {
         mMonitoringDisposable = Disposables.disposed();
     }
 
+    @Override
     public void stopMonitoring() {
         Timber.d("Stop monitoring");
         mMonitoringDisposable.dispose();
     }
 
+    @Override
     public void startMonitoring() {
         Timber.d("Start monitoring");
 
@@ -71,12 +74,8 @@ public final class MonitoringServicePresenter {
     }
 
     boolean checkConditions(Result result) {
-
-        Timber.d("Moving - " + mChecker.isMoving(result.blackBoxModel));
-
         return mAccountManager.isCurrentUserDriver() &&
-                mChecker.isMoving(result.blackBoxModel) &&
-                (result.dutyType != DutyType.PERSONAL_USE && result.dutyType != DutyType.YARD_MOVES);
+                mChecker.isMoving(result.blackBoxModel);
     }
 
     private static final class DutyManagerObservable extends Observable<DutyType> {
