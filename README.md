@@ -3,6 +3,10 @@ ELD app for Android
 
 # Version history
 
+* **1.0.84** - Fix extra timing in auto-duty (_EA-406_), Fix duration round issue (_EA-336_)
+* **1.0.83** - Timing Compliance Monitoring (_EA-224_)
+* **1.0.82** - Fix crash when screen rotated twice with confirm on duty popup on foreground (_EA-407_)
+* **1.0.81** - Fix multiple duty status marked as 'Driving' are added on Driver Logsheet after Driving (_EA-425_)
 * **1.0.80** - Fix not able to add event/change duty status (_EA-422_)
 * **1.0.79** - Fix app returns home screen instead of login screen after selecting close
 * **1.0.78** - Fixed the lock screen in Personal Use and Yard Moves and switching from background to foreground  (_EA-417_, _EA-436_)
