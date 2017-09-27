@@ -73,7 +73,7 @@ public final class StorageCapacityJob extends BaseMalfunctionJob implements Malf
         return getELDEventsInteractor()
                 .getLatestMalfunctionEvent(Malfunction.DATA_RECORDING_COMPLIANCE)
                 .toObservable()
-                .switchIfEmpty(observer -> switchToDefaultMalfunctionCleared(observer,
+                .switchIfEmpty(observer -> switchToDefaultMalfunction(observer,
                         Malfunction.DATA_RECORDING_COMPLIANCE,
                         ELDEvent.MalfunctionCode.MALFUNCTION_CLEARED,
                         blackBoxModel))

@@ -78,15 +78,28 @@ abstract class BaseMalfunctionJob {
                 ELDEvent.MalfunctionCode.MALFUNCTION_CLEARED;
     }
 
-    protected final void switchToDefaultMalfunctionCleared(Observer<? super ELDEvent> observer,
-                                                     Malfunction malfunction,
-                                                     ELDEvent.MalfunctionCode malfunctionCode,
-                                                     BlackBoxModel blackBoxModel) {
-        ELDEvent eldEvent = getELDEventsInteractor()
-                .getEvent(malfunction, malfunctionCode, blackBoxModel);
+    /**
+     * Creates a default {@link ELDEvent} and put it into observable
+     * @param observer observer
+     * @param malfunction malfunction type for this event
+     * @param malfunctionCode malfunction code for this event
+     * @param blackBoxModel data from blackbox
+     */
+    protected final void switchToDefaultMalfunction(Observer<? super ELDEvent> observer,
+                                                    Malfunction malfunction,
+                                                    ELDEvent.MalfunctionCode malfunctionCode,
+                                                    BlackBoxModel blackBoxModel) {
+        ELDEvent eldEvent = createEvent(malfunction, malfunctionCode, blackBoxModel);
         observer.onNext(eldEvent);
     }
 
+    /**
+     * Creates an {@link ELDEvent}
+     * @param malfunction malfunction type for this event
+     * @param malfunctionCode malfunction code for this event
+     * @param blackBoxModel data from blackbox
+     * @return corret event
+     */
     @NonNull
     protected final ELDEvent createEvent(Malfunction malfunction,
                                          ELDEvent.MalfunctionCode malfunctionCode,
@@ -94,6 +107,10 @@ abstract class BaseMalfunctionJob {
         return mELDEventsInteractor.getEvent(malfunction, malfunctionCode, blackBoxModel);
     }
 
+    /**
+     * Load data from BlackBox
+     * @return
+     */
     protected final Observable<BlackBoxModel> getBlackboxData() {
         return mBlackBoxInteractor
                 .getData(mPreferencesManager.getBoxId())
