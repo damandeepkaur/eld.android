@@ -43,9 +43,9 @@ public class StorageCapacityJob extends BaseMalfunctionJob implements Malfunctio
         Disposable disposable = getIntervalObservable()
                 .flatMap(unused -> getBlackboxData())
                 .flatMap(this::loadLatest)
-                .filter(this::isStateEndEventAreDifferent)
-                .flatMap(unused -> Observable.fromCallable(() ->
-                        getELDEventsInteractor().getEvent(getDutyTypeManager().getDutyType())))
+                .filter(result -> isStateEndEventAreDifferent(result.mELDEvent))
+                .flatMap(result -> Observable.fromCallable(() -> createEvent(Malfunction.DATA_RECORDING_COMPLIANCE,
+                        createCodeForMalfunction(result.mELDEvent), result.mBlackBoxModel)))
                 .doOnNext(eldEvent -> Timber.d("Save new Data Recording Compliance event: " + eldEvent))
                 .flatMap(this::saveEvents)
                 .subscribeOn(Schedulers.io())
@@ -64,14 +64,15 @@ public class StorageCapacityJob extends BaseMalfunctionJob implements Malfunctio
                 TimeUnit.MILLISECONDS);
     }
 
-    Observable<ELDEvent> loadLatest(BlackBoxModel blackBoxModel) {
+    Observable<Result> loadLatest(BlackBoxModel blackBoxModel) {
         return getELDEventsInteractor()
                 .getLatestMalfunctionEvent(Malfunction.DATA_RECORDING_COMPLIANCE)
                 .toObservable()
                 .switchIfEmpty(observer -> switchToDefaultMalfunctionCleared(observer,
                         Malfunction.DATA_RECORDING_COMPLIANCE,
                         ELDEvent.MalfunctionCode.MALFUNCTION_CLEARED,
-                        blackBoxModel));
+                        blackBoxModel))
+                .map(eldEvent -> new Result(eldEvent, blackBoxModel));
     }
 
     private boolean isStateEndEventAreDifferent(ELDEvent eldEvent) {

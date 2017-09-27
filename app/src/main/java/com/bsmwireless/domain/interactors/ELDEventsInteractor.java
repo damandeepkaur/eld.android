@@ -326,6 +326,7 @@ public final class ELDEventsInteractor {
         ELDEvent event = new ELDEvent();
         event.setEventTime(currentTime);
         event.setEngineHours(blackBoxModel.getEngineHours());
+        event.setOdometer(blackBoxModel.getOdometer());
         event.setLat(blackBoxModel.getLat());
         event.setLng(blackBoxModel.getLon());
         event.setLocation("");

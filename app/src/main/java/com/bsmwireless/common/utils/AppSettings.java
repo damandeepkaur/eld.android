@@ -53,7 +53,6 @@ public final class AppSettings {
      * @return threshold in percent
      */
     public double getFreeSpaceThreshold(){
-//        return 0.05;
-        return 0.5;
+        return 0.05;
     }
 }
