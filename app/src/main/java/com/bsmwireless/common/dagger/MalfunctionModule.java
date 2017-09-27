@@ -36,7 +36,6 @@ public final class MalfunctionModule {
                                                  BlackBoxInteractor blackBoxInteractor,
                                                  PreferencesManager preferencesManager) {
         return new SynchronizationJob(eldEventsInteractor, dutyTypeManager, blackBoxInteractor,
-
                 preferencesManager);
     }
 

@@ -44,7 +44,6 @@ public final class SynchronizationJob extends BaseMalfunctionJob implements Malf
                         createCodeForDiagnostic(result.mELDEvent), result.mBlackBoxModel))
                 .flatMap(this::saveEvents)
                 .onErrorReturn(throwable -> {
-                    throwable.printStackTrace();
                     Timber.e(throwable, "Error handle synchronization event");
                     return -1L;
                 })
