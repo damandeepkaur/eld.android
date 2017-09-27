@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.bsmwireless.widgets.logs.calendar.CalendarLayout
+        android:id="@+id/roadside_calendar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:daysCount="@integer/roadside_day_count"/>
+
+    <ScrollView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_below="@id/roadside_calendar">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:orientation="vertical">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/roadside_headers"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layoutManager="android.support.v7.widget.GridLayoutManager"/>
+
+            <com.bsmwireless.widgets.logs.graphview.GraphLayout
+                android:id="@+id/roadside_graph"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/logs_list_item_header_sign_graph_height"
+                android:layout_margin="@dimen/margin_small"/>
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/roadside_events"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layoutManager="android.support.v7.widget.GridLayoutManager"/>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/progress_height"
+        android:layout_below="@id/roadside_calendar"
+        android:background="@drawable/drop_shadow_down"/>
+
+</RelativeLayout>

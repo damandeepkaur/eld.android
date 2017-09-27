@@ -57,8 +57,8 @@ public final class AutoDutyDialogPresenter {
                 ));
     }
 
-    public void onOnDutyClick() {
-        mDisposables.add(mEventsInteractor.postNewDutyTypeEvent(DutyType.ON_DUTY, null)
+    public void onOnDutyClick(long time) {
+        mDisposables.add(mEventsInteractor.postNewDutyTypeEvent(DutyType.ON_DUTY, null, time)
                 .subscribeOn(Schedulers.io())
                 .doOnTerminate(() -> {
                     SchedulerUtils.cancel();

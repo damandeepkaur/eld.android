@@ -15,6 +15,7 @@ import com.bsmwireless.data.storage.eldevents.ELDEventEntity;
 import com.bsmwireless.data.storage.hometerminals.HomeTerminalConverter;
 import com.bsmwireless.data.storage.users.FullUserEntity;
 import com.bsmwireless.data.storage.users.UserConverter;
+import com.bsmwireless.data.storage.users.UserDao;
 import com.bsmwireless.data.storage.users.UserEntity;
 import com.bsmwireless.models.Auth;
 import com.bsmwireless.models.DriverHomeTerminal;
@@ -83,7 +84,7 @@ public final class UserInteractor {
                                 .filter(accountPassword -> !StringUtils.isAnyEmpty(password, accountPassword) && password.equals(accountPassword))
                                 .map(filterIn -> mAppDatabase.userDao().getUserSync(Integer.valueOf(driverId)))
                                 .map(UserConverter::toUser)
-                                .map(user -> user.setAuth(new Auth(Integer.valueOf(driverId))));
+                                .map(user -> user.setAuth(new Auth(Integer.valueOf(driverId)).setToken(mTokenManager.getToken(accountName))));
                     }
                     return Observable.error(throwable);
                 })
@@ -170,7 +171,7 @@ public final class UserInteractor {
             mTokenManager.removeAccount(mAccountManager.getCurrentDriverAccountName());
             mPreferencesManager.clearValues();
         } else {
-            mTokenManager.clearToken(mTokenManager.getToken(mAccountManager.getCurrentDriverAccountName()));
+            mPreferencesManager.setShowHomeScreenEnabled(false);
             mAppDatabase.userDao().setUserCoDrivers(driverId, null);
         }
     }
@@ -199,7 +200,8 @@ public final class UserInteractor {
                     }
                     return Observable.just(new ResponseMessage(""));
                 })
-                .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
+                .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS))
+                .onErrorReturn(this::handleOfflineOperation);
     }
 
     public Observable<Boolean> updateDriverPassword(String oldPassword, String newPassword) {
@@ -209,17 +211,24 @@ public final class UserInteractor {
 
     public Observable<Boolean> updateDriverSignature(String signature) {
         return mServiceApi.updateDriverSignature(getDriverSignature(signature))
-                .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
+                .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS))
+                .onErrorReturn(throwable -> false);
     }
 
-    public Single<Boolean> updateDriverRule(String ruleException, String dutyCycle) {
+    public Observable<Boolean> updateDriverRule(String ruleException, String dutyCycle) {
         return mServiceApi.updateDriverRule(getRuleSelectionModel(ruleException, dutyCycle))
-                .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
+                .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS))
+                .onErrorReturn(throwable -> false);
     }
 
     public Observable<Boolean> updateDriverHomeTerminal(Integer homeTerminalId) {
         return mServiceApi.updateDriverHomeTerminal(getHomeTerminal(homeTerminalId))
-                .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
+                .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS))
+                .onErrorReturn(throwable -> false);
+    }
+
+    private Boolean handleOfflineOperation(Throwable throwable) {
+        return throwable instanceof RetrofitException || throwable instanceof UnknownHostException;
     }
 
     public String getDriverName() {
@@ -272,13 +281,13 @@ public final class UserInteractor {
 
     public Flowable<FullUserEntity> getFullDriver() {
         return mAppDatabase.userDao()
-                   .getFullUser(getDriverId())
-                   .doOnNext(userEntity -> {
-                       userEntity.setHomeTerminalEntities(
-                           mAppDatabase.homeTerminalDao()
-                                       .getHomeTerminalsSync(userEntity.getHomeTerminalIds())
-                       );
-                   });
+                .getFullUser(getDriverId())
+                .doOnNext(userEntity -> {
+                    userEntity.setHomeTerminalEntities(
+                            mAppDatabase.homeTerminalDao()
+                                    .getHomeTerminalsSync(userEntity.getHomeTerminalIds())
+                    );
+                });
     }
 
     public FullUserEntity getFullUserSync() {
@@ -287,6 +296,10 @@ public final class UserInteractor {
                 .homeTerminalDao()
                 .getHomeTerminalsSync(fullUserEntity.getHomeTerminalIds()));
         return fullUserEntity;
+    }
+
+    public FullUserEntity getFullUserSync(int id) {
+        return mAppDatabase.userDao().getFullUserSync(id);
     }
 
     public Flowable<User> getFullUser() {
@@ -315,6 +328,10 @@ public final class UserInteractor {
         return mAppDatabase.userDao().getUserTimezone(getDriverId());
     }
 
+    public Single<String> getTimezoneOnce() {
+        return mAppDatabase.userDao().getUserTimezoneOnce(getDriverId());
+    }
+
     public boolean isRememberMeEnabled() {
         return mPreferencesManager.isRememberUserEnabled();
     }
@@ -331,6 +348,10 @@ public final class UserInteractor {
 
     public UserEntity getUserFromDBSync(int userId) {
         return mAppDatabase.userDao().getUserSync(userId);
+    }
+
+    public List<UserEntity> getUsersFromDBSync(String ids) {
+        return mAppDatabase.userDao().getUsersSync(ListConverter.toIntegerList(ids));
     }
 
     private List<Integer> saveCoDrivers(int driverId, List<Integer> coDriverIds) {
@@ -405,12 +426,16 @@ public final class UserInteractor {
 
     private void saveUserDataInDB(User user, String accountName) {
         int userId = user.getId();
+        UserDao userDao = mAppDatabase.userDao();
+        UserEntity originalUser = userDao.getUserSync(user.getId());
+        if (originalUser != null && originalUser.isOfflineChange()) {
+            return;
+        }
 
-        String lastVehicles = mAppDatabase.userDao().getUserLastVehiclesSync(userId);
-
+        String lastVehicles = userDao.getUserLastVehiclesSync(userId);
         UserEntity userEntity = UserConverter.toEntity(user);
         userEntity.setAccountName(accountName);
-        mAppDatabase.userDao().insertUser(userEntity);
+        userDao.insertUser(userEntity);
 
         if (user.getCarriers() != null) {
             mAppDatabase.carrierDao().deleteByUserId(userId);
@@ -434,8 +459,16 @@ public final class UserInteractor {
         }
 
         if (lastVehicles != null) {
-            mAppDatabase.userDao().setUserLastVehicles(userId, lastVehicles);
+            userDao.setUserLastVehicles(userId, lastVehicles);
         }
+    }
+
+    public boolean isSelectAssetScreenActive() {
+        return mPreferencesManager.isShowSelectAssetScreenEnabled();
+    }
+
+    public void setShowSelectAssetScreenEnabled(boolean showSelectAssetScreen) {
+        mPreferencesManager.setShowSelectAssetScreenEnabled(showSelectAssetScreen);
     }
 }
 

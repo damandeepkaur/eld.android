@@ -14,6 +14,7 @@ public final class PreferencesManager {
     private static final String KEY_BOX_GPS_ENABLED = "keep_box_gps_enabled";
     private static final String KEY_FIXED_AMOUNT_ENABLED = "keep_fixed_amount_enabled";
     private static final String KEY_SELECTED_KM_UNITS = "selected_km_units";
+    private static final String KEY_SHOW_SELECT_ASSET_SCREEN_ENABLED = "show_select_asset_screen_enabled";
     //TODO: validate from server
     public static final String KEY_TIME_ON_DUTY = "time_on_duty";
     public static final String KEY_TIME_DRIVING = "time_driving";
@@ -23,6 +24,7 @@ public final class PreferencesManager {
     private static final String KEY_DUTY_DAY = "duty_day";
 
     public static final int NOT_FOUND_VALUE = -1;
+    public static final int VEHICLE_NOT_FOUND_VALUE = 0;
 
     private SharedPreferences mPreferences;
 
@@ -85,7 +87,7 @@ public final class PreferencesManager {
     }
 
     public int getVehicleId() {
-        return mPreferences.getInt(KEY_SELECTED_VEHICLE_ID, NOT_FOUND_VALUE);
+        return mPreferences.getInt(KEY_SELECTED_VEHICLE_ID, VEHICLE_NOT_FOUND_VALUE);
     }
 
     public void setBoxId(int boxId) {
@@ -209,5 +211,15 @@ public final class PreferencesManager {
      */
     public boolean isKMOdometerUnitsSelected() {
         return mPreferences.getBoolean(KEY_SELECTED_KM_UNITS, true);
+    }
+
+    public void setShowSelectAssetScreenEnabled(boolean showSelectAssetScreen) {
+        SharedPreferences.Editor editor = mPreferences.edit();
+        editor.putBoolean(KEY_SHOW_SELECT_ASSET_SCREEN_ENABLED, showSelectAssetScreen);
+        editor.apply();
+    }
+
+    public boolean isShowSelectAssetScreenEnabled() {
+        return mPreferences.getBoolean(KEY_SHOW_SELECT_ASSET_SCREEN_ENABLED, false);
     }
 }

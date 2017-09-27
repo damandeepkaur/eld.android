@@ -2,6 +2,7 @@ package com.bsmwireless.widgets.logs.calendar;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -16,12 +17,14 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import app.bsmuniversal.com.R;
 
 public final class CalendarLayout extends LinearLayout implements View.OnClickListener {
 
     private static final int DEFAULT_DAYS_COUNT = 30;
+    private static final int ANIMATION_DURATION = 500;
 
     private RecyclerView mRecyclerView;
     private Button mLeftButton;
@@ -32,6 +35,17 @@ public final class CalendarLayout extends LinearLayout implements View.OnClickLi
     private LinearLayoutManager mLayoutManager;
     private OnItemSelectListener mOnItemSelectListener;
     private List<LogSheetHeader> mLogSheetHeaders;
+
+    private AtomicReference<CalendarItem> mSelectedItem = new AtomicReference<>();
+    private Handler mHandler = new Handler();
+    private Runnable mSelectTask = new Runnable() {
+        @Override
+        public void run() {
+            if (mOnItemSelectListener != null) {
+                mOnItemSelectListener.onItemSelected(mSelectedItem.get());
+            }
+        }
+    };
 
     public CalendarLayout(Context context) {
         super(context);
@@ -94,10 +108,11 @@ public final class CalendarLayout extends LinearLayout implements View.OnClickLi
     public void onClick(View v) {
         int position = mRecyclerView.getChildAdapterPosition(v);
         mAdapter.setSelectedItem(position);
-        if (mOnItemSelectListener != null) {
-            CalendarItem item = mAdapter.getItemByPosition(position);
-            mOnItemSelectListener.onItemSelected(item);
-        }
+
+        mSelectedItem.set(mAdapter.getItemByPosition(position));
+
+        mHandler.removeCallbacks(mSelectTask);
+        mHandler.postDelayed(mSelectTask, ANIMATION_DURATION);
     }
 
     private void onLeftClicked() {
@@ -147,5 +162,11 @@ public final class CalendarLayout extends LinearLayout implements View.OnClickLi
 
     public interface OnItemSelectListener {
         void onItemSelected(CalendarItem log);
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        mHandler.removeCallbacks(mSelectTask);
+        super.onDetachedFromWindow();
     }
 }

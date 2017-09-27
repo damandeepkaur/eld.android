@@ -23,5 +23,7 @@ public interface DashboardView {
 
     void setDutyType(DutyType dutyType);
     void showDutyTypeDialog();
-    void showNotInVehicleDialog();
+
+    void showSpecialStatuses();
+    void hideSpecialStatuses();
 }

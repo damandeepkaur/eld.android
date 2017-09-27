@@ -26,6 +26,9 @@ public interface Constants {
     long LOCK_SCREEN_IDLE_MONITORING_TIMEOUT_MS = TimeUnit.MINUTES.toMillis(5);
     long LOCK_SCREEN_DISCONNECTION_TIMEOUT_MS = TimeUnit.MINUTES.toMillis(5);
 
+    long DIFF_FOR_TRIGGER_TIMING_MALFUNCTION_MS = TimeUnit.MINUTES.toMillis(10);
+    long CHECK_TIME_INTERVAL = TimeUnit.MINUTES.toMillis(1);
+
     String BASE_URL = "https://develd.bsmtechnologies.com/sdmobile/rest/";
     String DEVICE_TYPE = "Android";
 

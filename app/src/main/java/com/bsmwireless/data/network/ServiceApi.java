@@ -160,7 +160,7 @@ public interface ServiceApi {
      * @return update driver rule response {@link ResponseMessage}.
      */
     @PUT("v1/app/driver/rules")
-    Single<ResponseMessage> updateDriverRule(@Body RuleSelectionModel ruleSelectionModel);
+    Observable<ResponseMessage> updateDriverRule(@Body RuleSelectionModel ruleSelectionModel);
 
     /**
      * Update driver's home terminal selection
@@ -241,4 +241,7 @@ public interface ServiceApi {
      */
     @GET("v1/app/vehicles/search/{keyword}")
     Observable<List<Vehicle>> searchVehicles(@Path("keyword") String keyword);
+
+    @POST("v1/app/reports/logsheets/{start}/{end}/{option}")
+    Single<ResponseMessage> sendReport(@Path("start") long start, @Path("end") long end, @Path("option") int option, @Body ELDEvent report);
 }
