@@ -140,9 +140,7 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
         }
     }
 
-    @SuppressWarnings("DesignForExtension")
-    @Override
-    public void showReassignEventDialog(ELDEvent event) {
+    public final void showReassignEventDialog(ELDEvent event) {
         if (mSwitchDriverDialog != null) {
             mSwitchDriverDialog.showReassignEventDialog(event);
         }
