@@ -13,6 +13,7 @@ import com.bsmwireless.models.User;
 import com.bsmwireless.widgets.alerts.DutyType;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -244,10 +245,7 @@ public final class SwitchDriverPresenter {
         event.setStatus(ELDEvent.StatusCode.INACTIVE_CHANGED.getValue());
         event.setId(null);
 
-        ArrayList<ELDEvent> events = new ArrayList<ELDEvent>() {{
-            add(event);
-            add(reassignedEvent);
-        }};
+        List<ELDEvent> events = Arrays.asList(event, reassignedEvent);
 
         mReassignEventDisposable.dispose();
         mView.showProgress();

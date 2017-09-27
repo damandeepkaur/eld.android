@@ -126,7 +126,6 @@ public final class SwitchDriverDialog implements SwitchDriverView, DriverDialog 
                 mPresenter.onReassignDialog();
                 break;
             }
-            case SWITCH_DRIVER:
             default: {
                 mPresenter.onSwitchDriverDialog();
                 break;

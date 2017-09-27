@@ -1,6 +1,7 @@
 package com.bsmwireless.screens.switchdriver;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -23,7 +24,7 @@ public class ReassignEventAdapter extends RecyclerView.Adapter<ReassignEventAdap
 
     private int mSelectedPosition = -1;
 
-    private List<SwitchDriverDialog.UserModel> mItems = Collections.emptyList();
+    private List<SwitchDriverDialog.UserModel> mItems;
 
     private Context mContext;
 
@@ -35,7 +36,8 @@ public class ReassignEventAdapter extends RecyclerView.Adapter<ReassignEventAdap
     private static final int DRIVER = 1;
     private static final int CO_DRIVER_HEADER = 2;
 
-    public ReassignEventAdapter(Context context, List<SwitchDriverDialog.UserModel> items, SwitchDriverPresenter presenter) {
+    public ReassignEventAdapter(Context context, @NonNull List<SwitchDriverDialog.UserModel> items,
+                                SwitchDriverPresenter presenter) {
         mContext = context;
         mItems = items;
         mPresenter = presenter;
@@ -68,13 +70,10 @@ public class ReassignEventAdapter extends RecyclerView.Adapter<ReassignEventAdap
                 view = LayoutInflater.from(parent.getContext()).inflate(R.layout.reassign_event_header_layout, parent, false);
                 break;
             }
-            case DRIVER: {
+            default: {
                 view = LayoutInflater.from(parent.getContext()).inflate(R.layout.log_out_co_driver_item, parent, false);
                 break;
             }
-            default:
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.log_out_co_driver_item, parent, false);
-                break;
         }
         return new ReassignViewHolder(view, viewType);
     }
@@ -114,7 +113,7 @@ public class ReassignEventAdapter extends RecyclerView.Adapter<ReassignEventAdap
 
     @Override
     public int getItemCount() {
-        return mItems != null ? mItems.size() + HEADERS_COUNT : 0;
+        return mItems.size() + HEADERS_COUNT;
     }
 
     public void setSelectedPosition(int position) {
@@ -124,7 +123,7 @@ public class ReassignEventAdapter extends RecyclerView.Adapter<ReassignEventAdap
 
     @Nullable
     public SwitchDriverDialog.UserModel getItem(int position) {
-        return mItems != null && (position < mItems.size() + HEADERS_COUNT) && position > 0 ?
+        return (position < mItems.size() + HEADERS_COUNT) && position > 0 ?
                 mItems.get(position < HEADERS_COUNT ? position - 1 : position - HEADERS_COUNT) :
                 null;
     }
