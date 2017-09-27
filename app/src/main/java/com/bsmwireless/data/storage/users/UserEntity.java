@@ -45,6 +45,8 @@ public final class UserEntity {
     private String mCoDriversIds;
     @ColumnInfo(name = "account_name")
     private String mAccountName;
+    @ColumnInfo(name = "offline_change")
+    public Boolean mOfflineChange;
 
     public Integer getId() {
         return mId;
@@ -196,5 +198,17 @@ public final class UserEntity {
 
     public void setAccountName(String accountName) {
         mAccountName = accountName;
+    }
+
+    public Boolean isOfflineChange() {
+        if (mOfflineChange == null) {
+            mOfflineChange = false;
+        }
+        return mOfflineChange;
+    }
+
+    public UserEntity setOfflineChange(boolean isOfflineChange) {
+        mOfflineChange = isOfflineChange;
+        return this;
     }
 }

@@ -160,7 +160,7 @@ public interface ServiceApi {
      * @return update driver rule response {@link ResponseMessage}.
      */
     @PUT("v1/app/driver/rules")
-    Single<ResponseMessage> updateDriverRule(@Body RuleSelectionModel ruleSelectionModel);
+    Observable<ResponseMessage> updateDriverRule(@Body RuleSelectionModel ruleSelectionModel);
 
     /**
      * Update driver's home terminal selection

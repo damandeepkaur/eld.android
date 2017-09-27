@@ -44,6 +44,7 @@ import butterknife.Unbinder;
 import static com.bsmwireless.screens.autologout.AutoDutyDialogActivity.EXTRA_AUTO_DRIVING;
 import static com.bsmwireless.screens.autologout.AutoDutyDialogActivity.EXTRA_AUTO_DRIVING_WITHOUT_CONFIRM;
 import static com.bsmwireless.screens.autologout.AutoDutyDialogActivity.EXTRA_AUTO_ON_DUTY;
+import static com.bsmwireless.screens.autologout.AutoDutyDialogActivity.EXTRA_AUTO_ON_DUTY_TIME;
 
 public final class NavigationActivity extends BaseMenuActivity implements OnNavigationItemSelectedListener, NavigateView, ViewPager.OnPageChangeListener {
 
@@ -283,10 +284,11 @@ public final class NavigationActivity extends BaseMenuActivity implements OnNavi
     }
 
     @Override
-    public void setAutoOnDuty() {
+    public void setAutoOnDuty(long stoppedTime) {
         Intent dialogIntent = new Intent(this, AutoDutyDialogActivity.class);
         dialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         dialogIntent.putExtra(EXTRA_AUTO_ON_DUTY, true);
+        dialogIntent.putExtra(EXTRA_AUTO_ON_DUTY_TIME, stoppedTime);
         startActivity(dialogIntent);
     }
 

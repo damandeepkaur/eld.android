@@ -20,7 +20,7 @@ public final class DashboardPresenter {
     private DutyTypeManager mDutyTypeManager;
     private ELDEventsInteractor mEventsInteractor;
 
-    private DutyTypeManager.DutyTypeListener mListener = dutyType -> mView.setDutyType(dutyType);
+    private DutyTypeManager.DutyTypeListener mListener = this::onSetDutyType;
 
     @Inject
     public DashboardPresenter(DashboardView view, DutyTypeManager dutyTypeManager, ELDEventsInteractor eventsInteractor) {
@@ -29,19 +29,13 @@ public final class DashboardPresenter {
         mDutyTypeManager = dutyTypeManager;
         mEventsInteractor = eventsInteractor;
 
+        mDutyTypeManager.addListener(mListener);
+
         Timber.d("CREATED");
     }
 
-    void onResume() {
-        mView.setDutyType(mDutyTypeManager.getDutyType());
-        mDutyTypeManager.addListener(mListener);
-    }
-
-    void onPause() {
-        mDutyTypeManager.removeListener(mListener);
-    }
-
     public void onDestroy() {
+        mDutyTypeManager.removeListener(mListener);
         Timber.d("DESTROYED");
     }
 
@@ -50,11 +44,7 @@ public final class DashboardPresenter {
     }
 
     void onDutyClick() {
-        if (mEventsInteractor.isConnected()) {
-            mView.showDutyTypeDialog();
-        } else {
-            mView.showNotInVehicleDialog();
-        }
+        mView.showDutyTypeDialog();
     }
 
     DashboardView.Error validateComment(String comment) {
@@ -66,5 +56,15 @@ public final class DashboardPresenter {
             return DashboardView.Error.INVALID_COMMENT;
         }
         return DashboardView.Error.VALID_COMMENT;
+    }
+
+    private void onSetDutyType(DutyType dutyType) {
+        mView.setDutyType(dutyType);
+
+        if (mEventsInteractor.isConnected()) {
+            mView.showSpecialStatuses();
+        } else {
+            mView.hideSpecialStatuses();
+        }
     }
 }

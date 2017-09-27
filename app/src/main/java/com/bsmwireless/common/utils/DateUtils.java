@@ -311,4 +311,33 @@ public class DateUtils {
         return dateFormat.format(date);
     }
 
+    /**
+     *
+     * @param durations calculated durations in ms
+     * @param isToday if calculated day is current (no fix needed)
+     * @return rounded to min durations
+     */
+    public static long[] getRoundedDurations(long[] durations, boolean isToday) {
+        int index = 0;
+        long dif = MS_IN_DAY;
+        for (int i = 0; i < durations.length; i++) {
+            //round duration
+            durations[i] = durations[i] / MS_IN_MIN * MS_IN_MIN;
+
+            //find non-zero duty
+            if (durations[i] > 0) {
+                index = i;
+            }
+
+            //calculate round error
+            dif -= durations[i];
+        }
+
+        if (!isToday) {
+            durations[index] += dif;
+        }
+
+        return durations;
+    }
+
 }

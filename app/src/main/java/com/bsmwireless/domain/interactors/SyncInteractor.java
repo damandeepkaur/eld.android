@@ -10,12 +10,17 @@ import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.data.storage.eldevents.ELDEventConverter;
 import com.bsmwireless.data.storage.eldevents.ELDEventDao;
 import com.bsmwireless.data.storage.eldevents.ELDEventEntity;
+import com.bsmwireless.data.storage.users.UserDao;
+import com.bsmwireless.data.storage.users.UserEntity;
+import com.bsmwireless.models.DriverHomeTerminal;
+import com.bsmwireless.models.DriverSignature;
 import com.bsmwireless.data.storage.logsheets.LogSheetConverter;
 import com.bsmwireless.data.storage.logsheets.LogSheetDao;
 import com.bsmwireless.data.storage.logsheets.LogSheetEntity;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.LogSheetHeader;
 import com.bsmwireless.models.ResponseMessage;
+import com.bsmwireless.models.RuleSelectionModel;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -26,6 +31,7 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.Single;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
@@ -43,9 +49,12 @@ public final class SyncInteractor {
     private ServiceApi mServiceApi;
     private PreferencesManager mPreferencesManager;
     private ELDEventDao mELDEventDao;
+    private UserDao mUserDao;
     private volatile boolean mIsSyncActive;
     private AccountManager mAccountManager;
     private ResponseMessage mErrorResponse;
+
+    private Disposable mDriverProfileDisposable;
     private Disposable mSyncEventsForDayDisposable;
     private LogSheetDao mLogSheetDao;
     private LogSheetInteractor mLogSheetInteractor;
@@ -57,6 +66,7 @@ public final class SyncInteractor {
         mServiceApi = serviceApi;
         mPreferencesManager = preferencesManager;
         mELDEventDao = appDatabase.ELDEventDao();
+        mUserDao = appDatabase.userDao();
         mLogSheetDao = appDatabase.logSheetDao();
         mErrorResponse = new ResponseMessage("error");
         mSyncCompositeDisposable = new CompositeDisposable();
@@ -70,7 +80,46 @@ public final class SyncInteractor {
             syncNewEvents();
             syncUpdatedEvents();
             syncLogSheetHeaders();
+            syncDriverProfile();
         }
+    }
+
+    private void syncDriverProfile() {
+        if (mDriverProfileDisposable != null && !mDriverProfileDisposable.isDisposed()) {
+            mDriverProfileDisposable.dispose();
+        }
+
+        mDriverProfileDisposable = Observable.interval(Constants.SYNC_TIMEOUT_IN_MIN, TimeUnit.MINUTES)
+                .filter(timeout -> NetworkUtils.isOnlineMode())
+                .map(timeout -> mAccountManager.getCurrentUserId())
+                .map(userId -> mUserDao.getUserSync(Integer.valueOf(userId)))
+                .filter(UserEntity::isOfflineChange)
+                .switchMap(userEntity -> {
+                    Observable<Boolean> signatureUpdate = mServiceApi.updateDriverSignature(new DriverSignature()
+                            .setDriverId(userEntity.getId())
+                            .setSignature(userEntity.getSignature()))
+                            .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS))
+                            .onErrorReturn(throwable -> false);
+                    Observable<Boolean> driverRuleUpdate = mServiceApi.updateDriverRule(new RuleSelectionModel()
+                            .setDriverId(userEntity.getId())
+                            .setRuleException(userEntity.getRuleException())
+                            .setDutyCycle(userEntity.getDutyCycle())
+                            .setApplyTime(Calendar.getInstance().getTimeInMillis()))
+                            .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS))
+                            .onErrorReturn(throwable -> false);
+                    Observable<Boolean> homeTerminalUpdate = mServiceApi.updateDriverHomeTerminal(new DriverHomeTerminal()
+                            .setDriverId(userEntity.getId())
+                            .setHomeTermId(userEntity.getHomeTermId()))
+                            .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS))
+                            .onErrorReturn(throwable -> false);
+                    return Observable.zip(signatureUpdate, driverRuleUpdate, (resultFirst, resultSecond) -> resultFirst && resultSecond)
+                            .zipWith(homeTerminalUpdate, (resultFirst, resultSecond) -> resultFirst && resultSecond)
+                            .map(updateSuccess -> userEntity.setOfflineChange(!updateSuccess))
+                            .doOnNext(userEntity1 -> mUserDao.insertUser(userEntity1));
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe();
     }
 
     public void syncEventsForDay(Calendar dayCalendar, String timezone) {
@@ -204,7 +253,7 @@ public final class SyncInteractor {
                 .doOnNext(logSheetHeaders -> createMissingLogSheets(logSheetHeaders, days, timezone))
                 .subscribe();
     }
-	
+
     public void stopSync() {
         if (mIsSyncActive) {
             mSyncCompositeDisposable.dispose();

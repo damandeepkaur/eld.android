@@ -13,7 +13,7 @@ public interface NavigateView extends BaseMenuView {
     void setAssetsNumber(int assetsNum);
     void setResetTime(long time);
 
-    void setAutoOnDuty();
+    void setAutoOnDuty(long stoppedTime);
     void setAutoDriving();
     void setAutoDrivingWithoutConfirm();
 
