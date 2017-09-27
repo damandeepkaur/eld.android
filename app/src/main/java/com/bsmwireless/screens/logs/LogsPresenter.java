@@ -475,21 +475,6 @@ public final class LogsPresenter implements AccountManager.AccountListener {
 
         return mELDEventsInteractor.getDutyEventsFromDB(startDate, endDate)
                 .first(Collections.emptyList())
-//                .map(events -> {
-//
-//                    ArrayList<ELDEvent> output = new ArrayList<>(events.size());
-//
-//                    for (ELDEvent event : events) {
-//
-//                        //adds only active duty changing event except PU and YM
-//                        if (event.getEventType() == ELDEvent.EventType.DUTY_STATUS_CHANGING.getValue()
-//                                && event.getEventCode() == ELDEvent.StatusCode.ACTIVE.getValue()) {
-//                            output.add(event);
-//                        }
-//                    }
-//
-//                    return output;
-//                })
                 .flatMap(events -> Single.fromCallable(() -> {
 
                     final long startValue;
@@ -512,20 +497,26 @@ public final class LogsPresenter implements AccountManager.AccountListener {
                             endValue = odometer != null ? odometer : 0;
                         }
 
-                        long prevValue = 0;
+                        long startDrivingOdometer = 0;
+                        boolean isPreviousDriving = false;
                         for (ELDEvent event : events) {
 
-                            if (DutyType.DRIVING.isSame(event.getEventType(), event.getEventCode())) {
+                            if (!isPreviousDriving
+                                    && DutyType.DRIVING.isSame(event.getEventType(), event.getEventCode())) {
 
                                 // start driving event, save odometer value
-                                prevValue = event.getOdometer() != null ? event.getOdometer() : 0;
-
+                                startDrivingOdometer = event.getOdometer() != null ? event.getOdometer() : 0;
+                                isPreviousDriving = true;
                             } else {
-                                // stop driving event
-                                Integer odometer = event.getOdometer();
-                                int currentOdometer = odometer != null ? odometer : 0;
-                                distance += currentOdometer - prevValue;
-                                prevValue = 0;
+
+                                if (isPreviousDriving) {
+                                    // stop driving event
+                                    Integer odometer = event.getOdometer();
+                                    int currentOdometer = odometer != null ? odometer : 0;
+                                    distance += currentOdometer - startDrivingOdometer;
+                                    startDrivingOdometer = 0;
+                                    isPreviousDriving = false;
+                                }
                             }
                         }
                         // subtract a first odometer value for correctness
