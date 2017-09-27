@@ -22,7 +22,6 @@ import com.bsmwireless.widgets.alerts.DutyType;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -242,7 +241,7 @@ public final class ELDEventsInteractor {
     }
 
     public Single<Boolean> isLocationUpdateEventExists() {
-        // FIXME: 21.09.2017 Need to exclude events for which modified events with updated coordinates are exist
+        // FIXME: 21.09.2017 Need to exclude events for which exist modified events with updated coordinates
         return mELDEventDao
                 .getCountForChangingLocationEvent(mAccountManager.getCurrentUserId(),
                         new String[]{ELDEvent.LatLngFlag.FLAG_E.getCode(), ELDEvent.LatLngFlag.FLAG_X.getCode()})
