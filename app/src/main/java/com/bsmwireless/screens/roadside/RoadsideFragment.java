@@ -23,12 +23,10 @@ import com.bsmwireless.screens.roadside.dagger.RoadsideModule;
 import com.bsmwireless.widgets.logs.calendar.CalendarLayout;
 import com.bsmwireless.widgets.logs.graphview.GraphLayout;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.TimeZone;
 
 import javax.inject.Inject;
@@ -39,8 +37,8 @@ import butterknife.ButterKnife;
 
 public final class RoadsideFragment extends BaseFragment implements RoadsideView {
     private final int COLUMN_COUNT = 7;
-    private final ArrayList<Integer> HEADER_TITLE_INDEXES = new ArrayList<>(Arrays.asList(0, 2, 4, 6));
-    private final ArrayList<Integer> EVENT_TITLE_INDEXES = new ArrayList<>(Collections.singletonList(0));
+    private final List<Integer> HEADER_TITLE_INDEXES = Arrays.asList(0, 2, 4, 6);
+    private final List<Integer> EVENT_TITLE_INDEXES = Collections.singletonList(0);
 
     @BindView(R.id.roadside_events)
     RecyclerView mEventsView;
@@ -113,9 +111,6 @@ public final class RoadsideFragment extends BaseFragment implements RoadsideView
     public List<String> getEventsData(List<ELDEvent> events) {
         List<String> data = new ArrayList<>();
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yy", Locale.US);
-        SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm", Locale.US);
-
         String last = "";
         String current = "";
 
@@ -128,11 +123,10 @@ public final class RoadsideFragment extends BaseFragment implements RoadsideView
         data.add(getString(R.string.roadside_comment));
 
         for (ELDEvent event : events) {
-            dateFormat.setTimeZone(TimeZone.getTimeZone(event.getTimezone()));
-            timeFormat.setTimeZone(TimeZone.getTimeZone(event.getTimezone()));
+            TimeZone timezone = TimeZone.getTimeZone(event.getTimezone());
 
             //write date
-            current = dateFormat.format(event.getEventTime());
+            current = DateUtils.convertTimeToDDMMYY(timezone, event.getEventTime());
             if (!current.equals(last)) {
                 data.add(current);
                 data.add(getString(R.string.roadside_empty));
@@ -146,7 +140,7 @@ public final class RoadsideFragment extends BaseFragment implements RoadsideView
             }
 
             //write event
-            data.add(timeFormat.format(event.getEventTime()));
+            data.add(DateUtils.convertTimeToHHMM(timezone, event.getEventTime()));
             data.add(event.getLocation());
             data.add(String.valueOf(event.getOdometer()));
             data.add(String.valueOf(event.getEngineHours()));
@@ -189,7 +183,6 @@ public final class RoadsideFragment extends BaseFragment implements RoadsideView
 
     private List<String> getCarrierData(TimeZone timeZone, long time, List<Carrier> carriers) {
         List<String> data = new ArrayList<>();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yy", Locale.US);
 
         StringBuilder carrierBuilder = new StringBuilder();
         StringBuilder carrierDotBuilder = new StringBuilder();
@@ -210,7 +203,7 @@ public final class RoadsideFragment extends BaseFragment implements RoadsideView
         data.add(mContext.getString(R.string.roadside_empty));
         data.add(mContext.getString(R.string.roadside_empty));
 
-        data.add(dateFormat.format(time));
+        data.add(DateUtils.convertTimeToDDMMYY(timeZone, time));
         data.add(mContext.getString(R.string.roadside_midnight));
         data.add(DateUtils.getFullTimeZone(timeZone.getID(), time));
         data.add(carrierBuilder.toString());

@@ -87,11 +87,11 @@ public final class RoadsidePresenter {
                                 ELDEvent lastEvent = lastEvents.isEmpty() ? null : lastEvents.get(lastEvents.size() - 1);
                                 Vehicle vehicle = lastEvent == null ? null : mVehiclesInteractor.getVehicle(lastEvent.getVehicleId());
 
-                                ArrayList<Object> result = new ArrayList<>();
-                                result.add(mView.getHeadersData(header, lastEvent, vehicle));
-                                result.add(mView.getEventsData(events));
-                                result.add(preparingLogs(events, startTime, Math.min(endTime, System.currentTimeMillis()), timezone));
-                                result.add(prevDayEvent);
+                                RoadsideResult result = new RoadsideResult();
+                                result.setHeadersData(mView.getHeadersData(header, lastEvent, vehicle));
+                                result.setEventsData(mView.getEventsData(events));
+                                result.setGraphData(preparingLogs(events, startTime, Math.min(endTime, System.currentTimeMillis()), timezone));
+                                result.setPreviousEvent(prevDayEvent);
 
                                 return result;
                             });
@@ -99,10 +99,10 @@ public final class RoadsidePresenter {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                        data -> {
-                            mView.showHeaders((List<String>) data.get(0));
-                            mView.showEvents((List<String>) data.get(1));
-                            mView.showGraph((List<EventLogModel>) data.get(2), (ELDEvent) data.get(3));
+                        result -> {
+                            mView.showHeaders(result.getHeadersData());
+                            mView.showEvents(result.getEventsData());
+                            mView.showGraph(result.getGraphData(), result.getPreviousEvent());
                         },
                         throwable -> Timber.e(throwable)
                 );
@@ -135,7 +135,7 @@ public final class RoadsidePresenter {
                 continue;
             }
 
-            EventLogModel log = new EventLogModel(events.get(i), timezone);
+            EventLogModel log = new EventLogModel(event, timezone);
             log.setDutyType(DutyType.getTypeByCode(log.getEventType(), log.getEventCode()));
 
             if (logs.size() == 0) {
@@ -157,5 +157,44 @@ public final class RoadsidePresenter {
         }
 
         return logs;
+    }
+
+    private static final class RoadsideResult {
+        private List<String> mHeadersData;
+        private List<String> mEventsData;
+        private List<EventLogModel> mGraphData;
+        private ELDEvent mPreviousEvent;
+
+        List<String> getHeadersData() {
+            return mHeadersData;
+        }
+
+        void setHeadersData(List<String> headersData) {
+            mHeadersData = headersData;
+        }
+
+        List<String> getEventsData() {
+            return mEventsData;
+        }
+
+        void setEventsData(List<String> eventsData) {
+            mEventsData = eventsData;
+        }
+
+        List<EventLogModel> getGraphData() {
+            return mGraphData;
+        }
+
+        void setGraphData(List<EventLogModel> graphData) {
+            mGraphData = graphData;
+        }
+
+        ELDEvent getPreviousEvent() {
+            return mPreviousEvent;
+        }
+
+        void setPreviousEvent(ELDEvent previousEvent) {
+            mPreviousEvent = previousEvent;
+        }
     }
 }

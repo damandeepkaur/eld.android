@@ -23,7 +23,7 @@ public final class PreferencesManager {
     private static final String KEY_DUTY_DAY = "duty_day";
 
     public static final int NOT_FOUND_VALUE = -1;
-    public static final int VEHICLE_NOT_FOUND_VALUE = -1;
+    public static final int VEHICLE_NOT_FOUND_VALUE = 0;
 
     private SharedPreferences mPreferences;
 

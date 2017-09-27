@@ -9,7 +9,7 @@
         android:id="@+id/roadside_calendar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:daysCount="8"/>
+        app:daysCount="@integer/roadside_day_count"/>
 
     <ScrollView
         android:layout_width="wrap_content"

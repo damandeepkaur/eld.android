@@ -24,7 +24,7 @@ public interface ELDEventDao {
     @Query("SELECT * FROM events WHERE sync = 2 AND driver_id=:userId ORDER BY event_time")
     List<ELDEventEntity> getNewUnsyncEvents(int userId);
 
-    @Query("SELECT * FROM events WHERE event_time > :startTime AND event_time < :endTime and driver_id = :driverId")
+    @Query("SELECT * FROM events WHERE event_time > :startTime AND event_time < :endTime and driver_id = :driverId ORDER BY event_time")
     Single<List<ELDEventEntity>> getEventsFromStartToEndTimeOnce(long startTime, long endTime, int driverId);
 
     @Query("SELECT * FROM events WHERE event_time > :startTime and event_time < :endTime " +
