@@ -79,6 +79,10 @@ public final class VehiclesInteractor {
                 .map(VehicleConverter::toVehicle);
     }
 
+    public List<Vehicle> getVehiclesByIds(List<Integer> vehicleIds) {
+        return VehicleConverter.toVehicle(mAppDatabase.vehicleDao().getVehiclesSync(vehicleIds));
+    }
+
     public Vehicle getVehicle(Integer vehicleId) {
         return VehicleConverter.toVehicle(mAppDatabase.vehicleDao().getVehicleSync(vehicleId));
     }

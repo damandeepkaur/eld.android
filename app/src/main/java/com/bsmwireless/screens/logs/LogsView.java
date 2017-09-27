@@ -13,9 +13,11 @@ import app.bsmuniversal.com.R;
 
 public interface LogsView {
 
+    CalendarItem getSelectedDay();
+
     void setEventLogs(List<EventLogModel> logs);
 
-    void setPrevDayEvent(ELDEvent prevDayEvent);
+    void updateGraph(GraphModel graphModel);
 
     void setLogHeader(LogHeaderModel logHeader);
 
