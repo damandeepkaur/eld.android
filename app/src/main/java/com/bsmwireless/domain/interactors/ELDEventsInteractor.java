@@ -124,7 +124,6 @@ public final class ELDEventsInteractor {
         return Observable.fromIterable(getEvents(dutyType, comment))
                 .map(event -> {
                     event.setEventTime(time);
-                    event.setMobileTime(time);
                     return event;
                 })
                 .toList()
