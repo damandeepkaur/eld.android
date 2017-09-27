@@ -11,7 +11,6 @@ import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
-import java.util.Collections;
 import java.util.List;
 
 import app.bsmuniversal.com.R;
@@ -44,7 +43,7 @@ public class ReassignEventAdapter extends RecyclerView.Adapter<ReassignEventAdap
     }
 
     @Override
-    public int getItemViewType(int position) {
+    public final int getItemViewType(int position) {
         switch (position) {
             case 0: {
                 return DRIVER_HEADER;
@@ -59,7 +58,7 @@ public class ReassignEventAdapter extends RecyclerView.Adapter<ReassignEventAdap
     }
 
     @Override
-    public ReassignViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public final ReassignViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view;
         switch (viewType) {
             case DRIVER_HEADER: {
@@ -79,7 +78,7 @@ public class ReassignEventAdapter extends RecyclerView.Adapter<ReassignEventAdap
     }
 
     @Override
-    public void onBindViewHolder(ReassignViewHolder holder, int position) {
+    public final void onBindViewHolder(ReassignViewHolder holder, int position) {
         int viewType = holder.mViewType;
         switch (viewType) {
             case DRIVER_HEADER:
@@ -112,27 +111,27 @@ public class ReassignEventAdapter extends RecyclerView.Adapter<ReassignEventAdap
     }
 
     @Override
-    public int getItemCount() {
+    public final int getItemCount() {
         return mItems.size() + HEADERS_COUNT;
     }
 
-    public void setSelectedPosition(int position) {
+    public final void setSelectedPosition(int position) {
         mSelectedPosition = position;
         notifyDataSetChanged();
     }
 
     @Nullable
-    public SwitchDriverDialog.UserModel getItem(int position) {
+    public final SwitchDriverDialog.UserModel getItem(int position) {
         return (position < mItems.size() + HEADERS_COUNT) && position > 0 ?
                 mItems.get(position < HEADERS_COUNT ? position - 1 : position - HEADERS_COUNT) :
                 null;
     }
 
-    public int getSelectedPosition() {
+    public final int getSelectedPosition() {
         return mSelectedPosition;
     }
 
-    public void setOnClickListener(View.OnClickListener listener) {
+    public final void setOnClickListener(View.OnClickListener listener) {
         mListener = listener;
     }
 
