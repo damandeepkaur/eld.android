@@ -7,6 +7,8 @@ import com.bsmwireless.domain.interactors.UserInteractor;
 import com.bsmwireless.widgets.alerts.DutyType;
 import com.bsmwireless.widgets.alerts.OccupancyType;
 
+import java.util.List;
+
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
@@ -187,6 +189,10 @@ public abstract class BaseMenuPresenter implements AccountManager.AccountListene
         } else {
             getView().hideCoDriverView();
         }
+    }
+
+    final List<DutyType> getAvailableDutyTypes() {
+        return mAccountManager.isCurrentUserDriver() && mEventsInteractor.isConnected() ? DutyTypeManager.DRIVER_DUTY : DutyTypeManager.CO_DRIVER_DUTY;
     }
 
     @Override
