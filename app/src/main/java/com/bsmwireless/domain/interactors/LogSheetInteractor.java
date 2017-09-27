@@ -1,14 +1,17 @@
 package com.bsmwireless.domain.interactors;
 
+import com.bsmwireless.common.utils.DateUtils;
 import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.PreferencesManager;
+import com.bsmwireless.data.storage.eldevents.ELDEventConverter;
 import com.bsmwireless.data.storage.hometerminals.HomeTerminalConverter;
 import com.bsmwireless.data.storage.hometerminals.HomeTerminalEntity;
 import com.bsmwireless.data.storage.logsheets.LogSheetConverter;
 import com.bsmwireless.data.storage.logsheets.LogSheetEntity;
 import com.bsmwireless.data.storage.users.UserEntity;
+import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.HomeTerminal;
 import com.bsmwireless.models.LogSheetHeader;
 
@@ -44,6 +47,12 @@ public class LogSheetInteractor {
         return mServiceApi.getLogSheets(startLogDay, endLogDay)
                 .doOnNext(logSheetHeaders -> mAppDatabase.logSheetDao().insert(LogSheetConverter.toEntityList(logSheetHeaders)))
                 .toFlowable(BackpressureStrategy.LATEST);
+    }
+
+    public Flowable<List<LogSheetHeader>> getLogSheetHeadersFromDB(long startDay, long endDay) {
+        int driverId = mAccountManager.getCurrentUserId();
+        return mAppDatabase.logSheetDao().getLogSheetsFromStartToEndDay(startDay, endDay, driverId)
+                .map(LogSheetConverter::toModelList);
     }
 
     public Single<LogSheetHeader> getLogSheet(Long logDay) {

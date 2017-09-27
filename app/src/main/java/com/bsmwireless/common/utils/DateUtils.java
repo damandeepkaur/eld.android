@@ -25,6 +25,7 @@ public class DateUtils {
     public final static int MS_IN_HOUR = MIN_IN_HOUR * MS_IN_MIN;
     public static final long MS_IN_DAY = MS_IN_SEC * SEC_IN_DAY;
     public static final long MS_IN_WEEK = MS_IN_DAY * 7;
+    public static final long MS_IN_MONTH = MS_IN_DAY * 25;
 
     /**
      * @param zone user timezone for example "America/Los_Angeles"

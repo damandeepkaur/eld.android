@@ -46,7 +46,7 @@ public class DashboardPresenter {
     }
 
     long getDutyTypeTime(DutyType dutyType) {
-        return mDutyTypeManager.getDutyTypeTime(dutyType);
+        return mDutyTypeManager.getDutyTypeTimeLeft(dutyType);
     }
 
     void onDutyClick() {

@@ -8,6 +8,7 @@ import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.data.storage.users.UserConverter;
 import com.bsmwireless.data.storage.users.UserEntity;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
+import com.bsmwireless.domain.interactors.LogSheetInteractor;
 import com.bsmwireless.domain.interactors.SyncInteractor;
 import com.bsmwireless.domain.interactors.UserInteractor;
 import com.bsmwireless.domain.interactors.VehiclesInteractor;
@@ -31,11 +32,15 @@ import io.reactivex.disposables.Disposables;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
+import static com.bsmwireless.common.utils.DateUtils.MS_IN_MONTH;
+
 public class NavigationPresenter extends BaseMenuPresenter {
 
     private NavigateView mView;
     private VehiclesInteractor mVehiclesInteractor;
+    private LogSheetInteractor mLogSheetInteractor;
     private Disposable mResetTimeDisposable;
+    private Disposable mResetLeftTimeDisposable;
     private SyncInteractor mSyncInteractor;
     private AutoDutyTypeManager mAutoDutyTypeManager;
 
@@ -57,18 +62,20 @@ public class NavigationPresenter extends BaseMenuPresenter {
     };
 
     @Inject
-    public NavigationPresenter(NavigateView view, UserInteractor userInteractor, VehiclesInteractor vehiclesInteractor, ELDEventsInteractor eventsInteractor,
+    public NavigationPresenter(NavigateView view, UserInteractor userInteractor, VehiclesInteractor vehiclesInteractor, ELDEventsInteractor eventsInteractor, LogSheetInteractor logSheetInteractor,
                                DutyTypeManager dutyTypeManager, AutoDutyTypeManager autoDutyTypeManager, SyncInteractor syncInteractor, AccountManager accountManager) {
         mView = view;
         mUserInteractor = userInteractor;
         mVehiclesInteractor = vehiclesInteractor;
         mEventsInteractor = eventsInteractor;
+        mLogSheetInteractor = logSheetInteractor;
         mDutyTypeManager = dutyTypeManager;
         mAutoDutyTypeManager = autoDutyTypeManager;
         mSyncInteractor = syncInteractor;
         mAccountManager = accountManager;
         mDisposables = new CompositeDisposable();
         mResetTimeDisposable = Disposables.disposed();
+        mResetLeftTimeDisposable = Disposables.disposed();
 
         mAutoDutyTypeManager.setListener(mListener);
     }
@@ -155,6 +162,24 @@ public class NavigationPresenter extends BaseMenuPresenter {
               );
     }
 
+    public void onResetLeftTime() {
+        mResetLeftTimeDisposable.dispose();
+        mResetLeftTimeDisposable = mUserInteractor.getUser()
+                .flatMap(user -> {
+                    long current = System.currentTimeMillis();
+                    long startTime = DateUtils.getStartDayTimeInMs(user.getTimezone(), current) - MS_IN_MONTH;
+                    long endTime = DateUtils.getEndDayTimeInMs(user.getTimezone(), current);
+
+                    return mEventsInteractor.getDutyEventsFromDB(startTime, endTime)
+                            .map(events -> mDutyTypeManager.setDutyTypeTimeLeft(events, user));
+                })
+                .subscribeOn(Schedulers.io())
+                .subscribe(
+                        result -> Timber.i("Reset left time complete: %b", result),
+                        error -> Timber.e("Reset left time error: %s", error)
+                );
+    }
+
     private void resetTime(List<ELDEvent> events, long startOfDay) {
         DutyType dutyType = DutyType.OFF_DUTY;
         DutyType eventDutyType;
@@ -233,6 +258,7 @@ public class NavigationPresenter extends BaseMenuPresenter {
     public void onUserChanged() {
         super.onUserChanged();
         onResetTime();
+        onResetLeftTime();
     }
 
     @Override

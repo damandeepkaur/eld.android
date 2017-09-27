@@ -3,11 +3,18 @@ package com.bsmwireless.data.storage;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 
+import com.bsm.sd.hos.model.LogEvent;
+import com.bsm.sd.hos.model.Result;
+import com.bsm.sd.hos.model.RuleSelectionHst;
+import com.bsmwireless.common.utils.DateUtils;
+import com.bsmwireless.models.ELDEvent;
+import com.bsmwireless.models.User;
 import com.bsmwireless.widgets.alerts.DutyType;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.bsmwireless.common.utils.DateUtils.MS_IN_HOUR;
 import static com.bsmwireless.common.utils.DateUtils.MS_IN_SEC;
 import static com.bsmwireless.widgets.alerts.DutyType.CLEAR;
 import static com.bsmwireless.widgets.alerts.DutyType.DRIVING;
@@ -59,14 +66,21 @@ public class DutyTypeManager {
             case ON_DUTY:
             case YARD_MOVES:
                 mPreferencesManager.setOnDutyTime(mPreferencesManager.getOnDutyTime() + time);
+                mPreferencesManager.setOnDutyTimeLeft(mPreferencesManager.getOnDutyTimeLeft() - time);
                 break;
 
             case DRIVING:
                 mPreferencesManager.setDrivingTime(mPreferencesManager.getDrivingTime() + time);
+                mPreferencesManager.setDrivingTimeLeft(mPreferencesManager.getDrivingTimeLeft() - time);
                 break;
 
             case SLEEPER_BERTH:
                 mPreferencesManager.setSleeperBerthTime(mPreferencesManager.getSleeperBerthTime() + time);
+                break;
+
+            default:
+                //TODO: validate cases
+                mPreferencesManager.setCycleTimeLeft(mPreferencesManager.getCycleTimeLeft() - time);
                 break;
         }
     }
@@ -117,6 +131,35 @@ public class DutyTypeManager {
 
         if (mDutyType == dutyType) {
             time += (System.currentTimeMillis() - mStart);
+        }
+
+        return time;
+    }
+
+    public long getDutyTypeTimeLeft(DutyType dutyType) {
+        long time;
+
+        switch (dutyType) {
+            case ON_DUTY:
+            case YARD_MOVES:
+                time = mPreferencesManager.getOnDutyTimeLeft();
+                break;
+
+            case DRIVING:
+                time = mPreferencesManager.getDrivingTimeLeft();
+                break;
+
+            case SLEEPER_BERTH:
+                time = 8 * MS_IN_HOUR - mPreferencesManager.getSleeperBerthTime();
+                break;
+
+            default:
+                time = mPreferencesManager.getCycleTimeLeft();
+                break;
+        }
+
+        if (mDutyType == dutyType) {
+            time -= (System.currentTimeMillis() - mStart);
         }
 
         return time;
@@ -192,6 +235,26 @@ public class DutyTypeManager {
         }
 
         return new long[]{onDutyTime, offDutyTime, sleeperBerthTime, drivingTime};
+    }
+
+    public boolean setDutyTypeTimeLeft(List<ELDEvent> events, User user) {
+        Result result = null;
+        long start = DateUtils.getStartDayTimeInMs(user.getTimezone(), System.currentTimeMillis());
+
+        List<LogEvent> calculatorEvents = CalculatorConverter.eventListToCalculatorEventList(events);
+        List<RuleSelectionHst> calculatorRules = CalculatorConverter.userToCalculatorRule(user, start);
+
+        if (result == null) {
+            mPreferencesManager.setOnDutyTimeLeft(0);
+            mPreferencesManager.setCycleTimeLeft(0);
+            mPreferencesManager.setDrivingTimeLeft(0);
+        } else {
+            mPreferencesManager.setOnDutyTimeLeft(result.getAvaliableOndutySecs() * 1000);
+            mPreferencesManager.setCycleTimeLeft(result.getCycleAvaliable() * 1000);
+            mPreferencesManager.setDrivingTimeLeft(result.getAvaliableDrivingSecs() * 1000);
+        }
+
+        return result != null;
     }
 
     private void notifyListeners() {

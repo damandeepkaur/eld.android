@@ -19,6 +19,12 @@ public class PreferencesManager {
     public static final String KEY_TIME_DRIVING = "time_driving";
     public static final String KEY_TIME_SLEEPER_BERTH = "time_sleeper_berth";
 
+    //HOS times
+    public static final String KEY_TIME_ON_DUTY_LEFT = "time_on_duty_left";
+    public static final String KEY_TIME_DRIVING_LEFT = "time_driving_left";
+    public static final String KEY_TIME_SLEEPER_BERTH_LEFT = "time_sleeper_berth_left";
+    public static final String KEY_TIME_CYCLE_LEFT = "time_cycle_left";
+
     public static final String KEY_DUTY_TYPE = "duty_type";
     private static final String KEY_DUTY_DAY = "duty_day";
 
@@ -170,6 +176,46 @@ public class PreferencesManager {
 
     public long getSleeperBerthTime() {
         return mPreferences.getLong(KEY_TIME_SLEEPER_BERTH, 0);
+    }
+
+    public void setOnDutyTimeLeft(long time) {
+        SharedPreferences.Editor editor = mPreferences.edit();
+        editor.putLong(KEY_TIME_ON_DUTY_LEFT, time);
+        editor.apply();
+    }
+
+    public long getOnDutyTimeLeft() {
+        return mPreferences.getLong(KEY_TIME_ON_DUTY_LEFT, 0);
+    }
+
+    public void setDrivingTimeLeft(long time) {
+        SharedPreferences.Editor editor = mPreferences.edit();
+        editor.putLong(KEY_TIME_DRIVING_LEFT, time);
+        editor.apply();
+    }
+
+    public long getDrivingTimeLeft() {
+        return mPreferences.getLong(KEY_TIME_DRIVING_LEFT, 0);
+    }
+
+    public void setSleeperBerthTimeLeft(long time) {
+        SharedPreferences.Editor editor = mPreferences.edit();
+        editor.putLong(KEY_TIME_SLEEPER_BERTH_LEFT, time);
+        editor.apply();
+    }
+
+    public long getSleeperBerthTimeLeft() {
+        return mPreferences.getLong(KEY_TIME_SLEEPER_BERTH_LEFT, 0);
+    }
+
+    public void setCycleTimeLeft(long time) {
+        SharedPreferences.Editor editor = mPreferences.edit();
+        editor.putLong(KEY_TIME_CYCLE_LEFT, time);
+        editor.apply();
+    }
+
+    public long getCycleTimeLeft() {
+        return mPreferences.getLong(KEY_TIME_CYCLE_LEFT, 0);
     }
 
     //Should be used via DutyTypeManager only

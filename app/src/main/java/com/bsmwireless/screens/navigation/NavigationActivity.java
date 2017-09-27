@@ -77,6 +77,14 @@ public class NavigationActivity extends BaseMenuActivity implements OnNavigation
     private Handler mHandler = new Handler();
     private Runnable mResetTimeTask = () -> mPresenter.onResetTime();
 
+    private Runnable mResetLeftTimeTask = new Runnable() {
+        @Override
+        public void run() {
+            mPresenter.onResetLeftTime();
+            mPresenter.onResetTime();
+        }
+    };
+
     private View.OnClickListener mOnAssetMenuClickListener;
 
     @Override
@@ -96,6 +104,7 @@ public class NavigationActivity extends BaseMenuActivity implements OnNavigation
 
         mPresenter.onViewCreated();
         mPresenter.onResetTime();
+        mPresenter.onResetLeftTime();
     }
 
     @Override
@@ -243,6 +252,7 @@ public class NavigationActivity extends BaseMenuActivity implements OnNavigation
     @Override
     protected void onDestroy() {
         mHandler.removeCallbacks(mResetTimeTask);
+        mHandler.removeCallbacks(mResetLeftTimeTask);
         mViewPager.removeOnPageChangeListener(this);
         mPresenter.onDestroy();
         mHeaderViewHolder.unbind();
