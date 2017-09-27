@@ -73,8 +73,7 @@ public final class MonitoringServicePresenter implements MonitoringPresenter {
 
     boolean checkConditions(Result result) {
         return mAccountManager.isCurrentUserDriver() &&
-                mChecker.isMoving(result.blackBoxModel) &&
-                (result.dutyType != DutyType.PERSONAL_USE && result.dutyType != DutyType.YARD_MOVES);
+                mChecker.isMoving(result.blackBoxModel);
     }
 
     private final static class Result {

@@ -199,7 +199,7 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
                     break;
 
                 case DRIVING:
-                    isEnabled &= current != DutyType.YARD_MOVES & current != DutyType.PERSONAL_USE & getPresenter().isUserDriver();
+                    isEnabled &= current != DutyType.YARD_MOVES & current != DutyType.PERSONAL_USE & getPresenter().isUserDriver() & getPresenter().isDriverConnected();
                     break;
 
                 case SLEEPER_BERTH:
@@ -207,11 +207,11 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
                     break;
 
                 case PERSONAL_USE:
-                    isEnabled &= current == DutyType.OFF_DUTY;
+                    isEnabled &= current == DutyType.OFF_DUTY & getPresenter().isDriverConnected();
                     break;
 
                 case YARD_MOVES:
-                    isEnabled &= current == DutyType.ON_DUTY;
+                    isEnabled &= current == DutyType.ON_DUTY & getPresenter().isDriverConnected();
                     break;
             }
 

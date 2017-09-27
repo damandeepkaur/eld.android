@@ -1,10 +1,13 @@
 package com.bsmwireless.common.utils.malfunction;
 
 import com.bsmwireless.BaseTest;
-import com.bsmwireless.common.utils.SettingsManager;
+import com.bsmwireless.common.utils.AppSettings;
 import com.bsmwireless.data.network.NtpClientManager;
 import com.bsmwireless.data.storage.DutyTypeManager;
+import com.bsmwireless.data.storage.PreferencesManager;
+import com.bsmwireless.domain.interactors.BlackBoxInteractor;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
+import com.bsmwireless.models.BlackBoxModel;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.Malfunction;
 import com.bsmwireless.widgets.alerts.DutyType;
@@ -25,6 +28,8 @@ import io.reactivex.subjects.Subject;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -39,7 +44,11 @@ public class TimingJobTest extends BaseTest {
     @Mock
     NtpClientManager mNtpClientManager;
     @Mock
-    SettingsManager mSettingsManager;
+    AppSettings mAppSettings;
+    @Mock
+    BlackBoxInteractor mBlackBoxInteractor;
+    @Mock
+    PreferencesManager mPreferencesManager;
 
     TimingJob mTimingJob;
 
@@ -48,27 +57,28 @@ public class TimingJobTest extends BaseTest {
         RxJavaPlugins.setIoSchedulerHandler(scheduler -> Schedulers.trampoline());
         RxJavaPlugins.setComputationSchedulerHandler(scheduler -> Schedulers.trampoline());
 
-        when(mSettingsManager.getIntervalForCheckTime()).thenReturn(0L);
+        when(mPreferencesManager.getBoxId()).thenReturn(0);
+        when(mAppSettings.getIntervalForCheckTime()).thenReturn(0L);
 
         mTimingJob = spy(new TimingJob(mELDEventsInteractor, mDutyTypeManager, mNtpClientManager,
-                mSettingsManager));
+                mAppSettings, mBlackBoxInteractor, mPreferencesManager));
     }
 
     @Test
     public void complianceNotDetectedNoEventsInDb() throws Exception {
 
-
-        ELDEvent eldEvent = spy(ELDEvent.class);
-
-        when(mDutyTypeManager.getDutyType()).thenReturn(DutyType.ON_DUTY);
-
-        when(mELDEventsInteractor.getEvent(any(DutyType.class))).thenReturn(eldEvent);
         when(mELDEventsInteractor.getLatestMalfunctionEvent(Malfunction.TIMING_COMPLIANCE))
                 .thenReturn(Maybe.empty());
 
         final long timeDiffForTriggered = TimeUnit.MILLISECONDS.toMillis(5);
         when(mNtpClientManager.getRealTimeInMillisDiff()).thenReturn(timeDiffForTriggered - 1);
-        when(mSettingsManager.getTimingMalfunctionDiff()).thenReturn(timeDiffForTriggered);
+        when(mAppSettings.getTimingMalfunctionDiff()).thenReturn(timeDiffForTriggered);
+
+        when(mBlackBoxInteractor.getData(anyInt())).thenReturn(Observable.just(new BlackBoxModel()));
+
+        ELDEvent defaultEvent = new ELDEvent();
+        defaultEvent.setEventCode(ELDEvent.MalfunctionCode.MALFUNCTION_CLEARED.getCode());
+        when(mELDEventsInteractor.getEvent(any(), any(), any())).thenReturn(defaultEvent);
 
         doReturn(Observable.just(1L)).when(mTimingJob).getIntervalObservable();
 
@@ -81,18 +91,19 @@ public class TimingJobTest extends BaseTest {
     @Test
     public void complianceDetectedNoEventsInDb() throws Exception {
 
-        ELDEvent eldEvent = spy(ELDEvent.class);
+        BlackBoxModel model = spy(new BlackBoxModel());
+        when(mBlackBoxInteractor.getData(anyInt())).thenReturn(Observable.just(model));
 
-        when(mDutyTypeManager.getDutyType()).thenReturn(DutyType.ON_DUTY);
-
-        when(mELDEventsInteractor.getEvent(any(DutyType.class))).thenReturn(eldEvent);
         when(mELDEventsInteractor.getLatestMalfunctionEvent(Malfunction.TIMING_COMPLIANCE))
                 .thenReturn(Maybe.empty());
         when(mELDEventsInteractor.postNewELDEvent(any())).thenReturn(Single.just(1L));
+        ELDEvent defaultEvent = new ELDEvent();
+        defaultEvent.setEventCode(ELDEvent.MalfunctionCode.MALFUNCTION_CLEARED.getCode());
+        when(mELDEventsInteractor.getEvent(any(), any(), any())).thenReturn(defaultEvent);
 
         final long timeDiffForTriggered = TimeUnit.MILLISECONDS.toMillis(1);
         when(mNtpClientManager.getRealTimeInMillisDiff()).thenReturn(timeDiffForTriggered + 1);
-        when(mSettingsManager.getTimingMalfunctionDiff()).thenReturn(timeDiffForTriggered);
+        when(mAppSettings.getTimingMalfunctionDiff()).thenReturn(timeDiffForTriggered);
 
         doReturn(Observable.just(1L)).when(mTimingJob).getIntervalObservable();
 
@@ -100,6 +111,8 @@ public class TimingJobTest extends BaseTest {
         mTimingJob.stop();
 
         verify(mELDEventsInteractor).postNewELDEvent(any());
+        verify(mELDEventsInteractor).getEvent(Malfunction.TIMING_COMPLIANCE,
+                ELDEvent.MalfunctionCode.MALFUNCTION_LOGGED, model);
     }
 
     @Test
@@ -110,18 +123,17 @@ public class TimingJobTest extends BaseTest {
         when(eldEventFromDb.getEventCode())
                 .thenReturn(ELDEvent.MalfunctionCode.MALFUNCTION_LOGGED.getCode());
 
-        ELDEvent newEldEvent = spy(ELDEvent.class);
-
-        when(mDutyTypeManager.getDutyType()).thenReturn(DutyType.ON_DUTY);
-
-        when(mELDEventsInteractor.getEvent(any(DutyType.class))).thenReturn(newEldEvent);
         when(mELDEventsInteractor.getLatestMalfunctionEvent(Malfunction.TIMING_COMPLIANCE))
                 .thenReturn(Maybe.just(eldEventFromDb));
         when(mELDEventsInteractor.postNewELDEvent(any())).thenReturn(Single.just(1L));
+        ELDEvent defaultEvent = new ELDEvent();
+        defaultEvent.setEventCode(ELDEvent.MalfunctionCode.MALFUNCTION_LOGGED.getCode());
+        when(mELDEventsInteractor.getEvent(any(), any(), any())).thenReturn(defaultEvent);
+        when(mBlackBoxInteractor.getData(anyInt())).thenReturn(Observable.just(new BlackBoxModel()));
 
         final long timeDiffForTriggered = TimeUnit.MILLISECONDS.toMillis(1);
         when(mNtpClientManager.getRealTimeInMillisDiff()).thenReturn(timeDiffForTriggered + 1);
-        when(mSettingsManager.getTimingMalfunctionDiff()).thenReturn(timeDiffForTriggered);
+        when(mAppSettings.getTimingMalfunctionDiff()).thenReturn(timeDiffForTriggered);
 
         doReturn(Observable.just(1L)).when(mTimingJob).getIntervalObservable();
 
@@ -133,24 +145,22 @@ public class TimingJobTest extends BaseTest {
 
     @Test
     public void complianceDetectedEventCleared() throws Exception {
+        BlackBoxModel model = spy(new BlackBoxModel());
+        when(mBlackBoxInteractor.getData(anyInt())).thenReturn(Observable.just(model));
 
         ELDEvent eldEventFromDb = spy(ELDEvent.class);
         when(eldEventFromDb.getMalCode()).thenReturn(Malfunction.TIMING_COMPLIANCE);
         when(eldEventFromDb.getEventCode())
                 .thenReturn(ELDEvent.MalfunctionCode.MALFUNCTION_CLEARED.getCode());
 
-        ELDEvent newEldEvent = spy(ELDEvent.class);
-
-        when(mDutyTypeManager.getDutyType()).thenReturn(DutyType.ON_DUTY);
-
-        when(mELDEventsInteractor.getEvent(any(DutyType.class))).thenReturn(newEldEvent);
         when(mELDEventsInteractor.getLatestMalfunctionEvent(Malfunction.TIMING_COMPLIANCE))
                 .thenReturn(Maybe.just(eldEventFromDb));
         when(mELDEventsInteractor.postNewELDEvent(any())).thenReturn(Single.just(1L));
+        when(mELDEventsInteractor.getEvent(any(), any(), any())).thenReturn(new ELDEvent());
 
         final long timeDiffForTriggered = TimeUnit.MILLISECONDS.toMillis(1);
         when(mNtpClientManager.getRealTimeInMillisDiff()).thenReturn(timeDiffForTriggered + 1);
-        when(mSettingsManager.getTimingMalfunctionDiff()).thenReturn(timeDiffForTriggered);
+        when(mAppSettings.getTimingMalfunctionDiff()).thenReturn(timeDiffForTriggered);
 
         doReturn(Observable.just(1L)).when(mTimingJob).getIntervalObservable();
 
@@ -158,12 +168,18 @@ public class TimingJobTest extends BaseTest {
         mTimingJob.stop();
 
         verify(mELDEventsInteractor).postNewELDEvent(any());
-
+        verify(mELDEventsInteractor).getEvent(Malfunction.TIMING_COMPLIANCE,
+                ELDEvent.MalfunctionCode.MALFUNCTION_LOGGED, model);
     }
 
     @SuppressWarnings("unchecked")
     @Test
     public void complianceAppearedAndDisappeared() throws Exception {
+        BlackBoxModel model = spy(new BlackBoxModel());
+
+        when(mBlackBoxInteractor.getData(anyInt()))
+                .thenReturn(Observable.just(model),
+                        Observable.just(model));
 
         ELDEvent clearedEvent = spy(ELDEvent.class);
         when(clearedEvent.getMalCode()).thenReturn(Malfunction.TIMING_COMPLIANCE);
@@ -180,16 +196,14 @@ public class TimingJobTest extends BaseTest {
         when(mELDEventsInteractor.getLatestMalfunctionEvent(Malfunction.TIMING_COMPLIANCE))
                 .thenReturn(Maybe.just(clearedEvent), Maybe.just(loggedEvent));
         when(mELDEventsInteractor.postNewELDEvent(any())).thenReturn(Single.just(1L));
-
-        when(mDutyTypeManager.getDutyType()).thenReturn(DutyType.ON_DUTY);
+        when(mELDEventsInteractor.getEvent(any(), any(), any())).thenReturn(new ELDEvent());
 
         final long timeDiffForTriggered = TimeUnit.MILLISECONDS.toMillis(5);
         when(mNtpClientManager.getRealTimeInMillisDiff())
                 .thenReturn(timeDiffForTriggered + 1, timeDiffForTriggered - 1);
-        when(mSettingsManager.getTimingMalfunctionDiff()).thenReturn(timeDiffForTriggered);
+        when(mAppSettings.getTimingMalfunctionDiff()).thenReturn(timeDiffForTriggered);
 
         Subject<Long> subject = BehaviorSubject.create();
-
         doReturn(subject).when(mTimingJob).getIntervalObservable();
 
         mTimingJob.start();
@@ -199,5 +213,9 @@ public class TimingJobTest extends BaseTest {
         mTimingJob.stop();
 
         verify(mELDEventsInteractor, times(2)).postNewELDEvent(any());
+        verify(mELDEventsInteractor).getEvent(Malfunction.TIMING_COMPLIANCE,
+                ELDEvent.MalfunctionCode.MALFUNCTION_LOGGED, model);
+        verify(mELDEventsInteractor).getEvent(Malfunction.TIMING_COMPLIANCE,
+                ELDEvent.MalfunctionCode.MALFUNCTION_CLEARED, model);
     }
 }

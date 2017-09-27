@@ -27,6 +27,8 @@ public final class ELDEventEntity {
     private Integer mOrigin;
     @ColumnInfo(name = "event_time")
     private Long mEventTime;
+    @ColumnInfo(name = "log_sheet")
+    private Long mLogSheet;
     @ColumnInfo(name = "odometer")
     private Integer mOdometer;
     @ColumnInfo(name = "engine_hours")
@@ -122,6 +124,14 @@ public final class ELDEventEntity {
 
     public void setEventTime(Long eventTime) {
         mEventTime = eventTime;
+    }
+
+    public Long getLogSheet() {
+        return mLogSheet;
+    }
+
+    public void setLogSheet(Long logSheet) {
+        mLogSheet = logSheet;
     }
 
     public Integer getOdometer() {

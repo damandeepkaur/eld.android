@@ -1,9 +1,10 @@
 package com.bsmwireless.common.utils.malfunction;
 
 import com.bsmwireless.BaseTest;
-import com.bsmwireless.data.network.blackbox.BlackBoxConnectionManager;
 import com.bsmwireless.data.network.blackbox.models.BlackBoxResponseModel;
 import com.bsmwireless.data.storage.DutyTypeManager;
+import com.bsmwireless.data.storage.PreferencesManager;
+import com.bsmwireless.domain.interactors.BlackBoxInteractor;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
 import com.bsmwireless.models.BlackBoxModel;
 import com.bsmwireless.models.BlackBoxSensorState;
@@ -24,6 +25,7 @@ import io.reactivex.subjects.PublishSubject;
 import io.reactivex.subjects.Subject;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -34,11 +36,13 @@ import static org.mockito.Mockito.when;
 public class SynchronizationJobTest extends BaseTest {
 
     @Mock
-    BlackBoxConnectionManager mConnectionManager;
+    BlackBoxInteractor mBlackBoxInteractor;
     @Mock
     ELDEventsInteractor mELDEventsInteractor;
     @Mock
     DutyTypeManager mDutyTypeManager;
+    @Mock
+    PreferencesManager mPreferencesManager;
 
     SynchronizationJob mSynchronizationJob;
 
@@ -46,7 +50,8 @@ public class SynchronizationJobTest extends BaseTest {
     public void setUp() throws Exception {
         RxJavaPlugins.setIoSchedulerHandler(scheduler -> Schedulers.trampoline());
         RxJavaPlugins.setComputationSchedulerHandler(scheduler -> Schedulers.trampoline());
-        mSynchronizationJob = new SynchronizationJob(mELDEventsInteractor, mDutyTypeManager, mConnectionManager);
+        mSynchronizationJob = new SynchronizationJob(mELDEventsInteractor, mDutyTypeManager,
+                mBlackBoxInteractor, mPreferencesManager);
     }
 
     @Test
@@ -57,7 +62,8 @@ public class SynchronizationJobTest extends BaseTest {
         when(blackBoxModel.getSensorState(BlackBoxSensorState.ECM_SYNC)).thenReturn(true);
         when(blackBoxModel.getResponseType()).thenReturn(BlackBoxResponseModel.ResponseType.STATUS_UPDATE);
 
-        when(mConnectionManager.getDataObservable()).thenReturn(Observable.just(blackBoxModel));
+        when(mPreferencesManager.getBoxId()).thenReturn(1);
+        when(mBlackBoxInteractor.getData(anyInt())).thenReturn(Observable.just(blackBoxModel));
 
         ELDEvent eldEvent = mock(ELDEvent.class);
         when(eldEvent.getEventCode()).thenReturn(ELDEvent.MalfunctionCode.DIAGNOSTIC_LOGGED.getCode());
@@ -66,14 +72,16 @@ public class SynchronizationJobTest extends BaseTest {
         when(mELDEventsInteractor.getLatestMalfunctionEvent(Malfunction.ENGINE_SYNCHRONIZATION))
                 .thenReturn(Single.just(eldEvent).toMaybe());
         when(mELDEventsInteractor.postNewELDEvent(any())).thenReturn(Single.just(1L));
-        when(mELDEventsInteractor.getEvent(any(DutyType.class))).thenReturn(eldEvent);
+        when(mELDEventsInteractor.getEvent(any(), any(), any())).thenReturn(eldEvent);
 
         when(mDutyTypeManager.getDutyType()).thenReturn(DutyType.ON_DUTY);
 
         mSynchronizationJob.start();
 
         mSynchronizationJob.stop();
-        verify(mELDEventsInteractor).getEvent(DutyType.ON_DUTY);
+        verify(mELDEventsInteractor).getEvent(Malfunction.ENGINE_SYNCHRONIZATION,
+                ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED,
+                blackBoxModel);
         verify(mELDEventsInteractor).postNewELDEvent(any(ELDEvent.class));
     }
 
@@ -84,7 +92,8 @@ public class SynchronizationJobTest extends BaseTest {
         when(blackBoxModel.getSensorState(BlackBoxSensorState.ECM_CABLE)).thenReturn(false);
         when(blackBoxModel.getSensorState(BlackBoxSensorState.ECM_SYNC)).thenReturn(false);
 
-        when(mConnectionManager.getDataObservable()).thenReturn(Observable.just(blackBoxModel));
+        when(mPreferencesManager.getBoxId()).thenReturn(1);
+        when(mBlackBoxInteractor.getData(anyInt())).thenReturn(Observable.just(blackBoxModel));
 
         ELDEvent eldEvent = mock(ELDEvent.class);
         when(eldEvent.getEventCode()).thenReturn(ELDEvent.MalfunctionCode.DIAGNOSTIC_LOGGED.getCode());
@@ -110,7 +119,8 @@ public class SynchronizationJobTest extends BaseTest {
         when(diagnosticDisappear.getResponseType()).thenReturn(BlackBoxResponseModel.ResponseType.STATUS_UPDATE);
 
         Subject<BlackBoxModel> blackBoxObservable = PublishSubject.create();
-        when(mConnectionManager.getDataObservable()).thenReturn(blackBoxObservable);
+        when(mPreferencesManager.getBoxId()).thenReturn(1);
+        when(mBlackBoxInteractor.getData(anyInt())).thenReturn(blackBoxObservable);
 
         ELDEvent diagnosticLogged = mock(ELDEvent.class);
         when(diagnosticLogged.getEventCode()).thenReturn(ELDEvent.MalfunctionCode.DIAGNOSTIC_LOGGED.getCode());
@@ -118,7 +128,7 @@ public class SynchronizationJobTest extends BaseTest {
         when(diagnosticCleared.getEventCode()).thenReturn(ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED.getCode());
 
         when(mELDEventsInteractor.postNewELDEvent(any())).thenReturn(Single.just(1L));
-        when(mELDEventsInteractor.getEvent(any(DutyType.class))).thenReturn(new ELDEvent());
+        when(mELDEventsInteractor.getEvent(any(), any(), any())).thenReturn(new ELDEvent());
 
         when(mDutyTypeManager.getDutyType()).thenReturn(DutyType.ON_DUTY);
 
@@ -146,20 +156,23 @@ public class SynchronizationJobTest extends BaseTest {
         when(blackBoxModel.getSensorState(BlackBoxSensorState.ECM_SYNC)).thenReturn(false);
         when(blackBoxModel.getResponseType()).thenReturn(BlackBoxResponseModel.ResponseType.STATUS_UPDATE);
 
-        when(mConnectionManager.getDataObservable()).thenReturn(Observable.just(blackBoxModel));
+        when(mPreferencesManager.getBoxId()).thenReturn(1);
+        when(mBlackBoxInteractor.getData(anyInt())).thenReturn(Observable.just(blackBoxModel));
 
         when(mELDEventsInteractor.getLatestMalfunctionEvent(Malfunction.ENGINE_SYNCHRONIZATION))
                 .thenReturn(Maybe.empty());
 
         when(mELDEventsInteractor.postNewELDEvent(any())).thenReturn(Single.just(1L));
-        when(mELDEventsInteractor.getEvent(any(DutyType.class))).thenReturn(new ELDEvent());
+
+        ELDEvent defaultEvent = new ELDEvent();
+        defaultEvent.setEventCode(ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED.getCode());
+        when(mELDEventsInteractor.getEvent(any(), any(), any())).thenReturn(defaultEvent);
 
         when(mDutyTypeManager.getDutyType()).thenReturn(DutyType.ON_DUTY);
 
         mSynchronizationJob.start();
         verify(mELDEventsInteractor).postNewELDEvent(any());
         verify(mELDEventsInteractor).getLatestMalfunctionEvent(Malfunction.ENGINE_SYNCHRONIZATION);
-
     }
 
     @Test
@@ -170,11 +183,12 @@ public class SynchronizationJobTest extends BaseTest {
         when(blackBoxModel.getSensorState(BlackBoxSensorState.ECM_SYNC)).thenReturn(true);
         when(blackBoxModel.getResponseType()).thenReturn(BlackBoxResponseModel.ResponseType.STATUS_UPDATE);
 
-        when(mConnectionManager.getDataObservable()).thenReturn(Observable.just(blackBoxModel));
+        when(mPreferencesManager.getBoxId()).thenReturn(1);
+        when(mBlackBoxInteractor.getData(anyInt())).thenReturn(Observable.just(blackBoxModel));
 
         when(mELDEventsInteractor.getLatestMalfunctionEvent(Malfunction.ENGINE_SYNCHRONIZATION))
                 .thenReturn(Maybe.empty());
-        when(mELDEventsInteractor.getEvent(any(DutyType.class))).thenReturn(new ELDEvent());
+        when(mELDEventsInteractor.getEvent(any(), any(), any())).thenReturn(new ELDEvent());
 
         when(mELDEventsInteractor.postNewELDEvent(any())).thenReturn(Single.just(1L));
         when(mDutyTypeManager.getDutyType()).thenReturn(DutyType.ON_DUTY);

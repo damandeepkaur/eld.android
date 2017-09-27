@@ -19,7 +19,7 @@ import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.Subject;
 import timber.log.Timber;
 
-public abstract class BaseMenuPresenter implements AccountManager.AccountListener{
+public abstract class BaseMenuPresenter implements AccountManager.AccountListener {
     private final DutyTypeManager mDutyTypeManager;
     private final ELDEventsInteractor mEventsInteractor;
     private final UserInteractor mUserInteractor;
@@ -98,12 +98,12 @@ public abstract class BaseMenuPresenter implements AccountManager.AccountListene
         }
     }
 
+    public final boolean isDriverConnected() {
+        return mEventsInteractor.isConnected();
+    }
+
     public final void onChangeDutyClick() {
-        if (mEventsInteractor.isConnected()) {
-            getView().showDutyTypeDialog(mDutyTypeManager.getDutyType());
-        } else {
-            getView().showNotInVehicleDialog();
-        }
+        getView().showDutyTypeDialog(mDutyTypeManager.getDutyType());
     }
 
     @SuppressWarnings("DesignForExtension")
@@ -190,5 +190,6 @@ public abstract class BaseMenuPresenter implements AccountManager.AccountListene
     }
 
     @Override
-    public void onDriverChanged() {}
+    public void onDriverChanged() {
+    }
 }

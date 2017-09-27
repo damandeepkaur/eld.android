@@ -3,6 +3,7 @@ package com.bsmwireless.screens.selectasset;
 import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.data.network.RetrofitException;
 import com.bsmwireless.data.network.blackbox.BlackBoxConnectionException;
+import com.bsmwireless.domain.interactors.ELDEventsInteractor;
 import com.bsmwireless.domain.interactors.UserInteractor;
 import com.bsmwireless.domain.interactors.VehiclesInteractor;
 import com.bsmwireless.models.Vehicle;
@@ -20,18 +21,24 @@ import timber.log.Timber;
 public final class SelectAssetPresenter {
     private SelectAssetView mView;
     private VehiclesInteractor mVehiclesInteractor;
+    private UserInteractor mUserInteractor;
+    private ELDEventsInteractor mEventsInteractor;
     private CompositeDisposable mDisposables;
 
     @Inject
-    public SelectAssetPresenter(SelectAssetView view, VehiclesInteractor vehiclesInteractor, UserInteractor userInteractor) {
+    public SelectAssetPresenter(SelectAssetView view, VehiclesInteractor vehiclesInteractor, UserInteractor userInteractor, ELDEventsInteractor eventsInteractor) {
         mView = view;
         mVehiclesInteractor = vehiclesInteractor;
+        mUserInteractor = userInteractor;
+        mEventsInteractor = eventsInteractor;
         mDisposables = new CompositeDisposable();
 
         Timber.d("CREATED");
     }
 
     public void onViewCreated() {
+        mUserInteractor.setShowSelectAssetScreenEnabled(false);
+
         mDisposables.add(mVehiclesInteractor.cleanSelectedVehicle()
                 .andThen(mVehiclesInteractor.getLastVehicles())
                 .subscribeOn(Schedulers.io())
@@ -49,7 +56,7 @@ public final class SelectAssetPresenter {
     }
 
     public void onSearchTextChanged(String searchText) {
-        if (searchText.isEmpty()){
+        if (searchText.isEmpty()) {
             mView.setEmptyList();
         } else if (searchText.length() < 3) {
             mView.showSearchErrorMessage();
@@ -108,6 +115,8 @@ public final class SelectAssetPresenter {
     }
 
     public void onBackButtonPressed() {
+        mUserInteractor.setShowSelectAssetScreenEnabled(true);
+
         mView.showConfirmationDialog();
     }
 

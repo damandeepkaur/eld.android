@@ -2,7 +2,6 @@ package com.bsmwireless.data.network.blackbox;
 
 import com.bsmwireless.data.network.blackbox.models.BlackBoxResponseModel;
 import com.bsmwireless.data.network.blackbox.utils.BlackBoxParser;
-import com.bsmwireless.data.network.blackbox.utils.ConnectionUtils;
 import com.bsmwireless.models.BlackBoxModel;
 
 import java.io.IOException;
