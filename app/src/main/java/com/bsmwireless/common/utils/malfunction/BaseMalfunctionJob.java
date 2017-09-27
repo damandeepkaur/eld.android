@@ -14,7 +14,6 @@ import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
-import timber.log.Timber;
 
 abstract class BaseMalfunctionJob {
 
@@ -92,12 +91,6 @@ abstract class BaseMalfunctionJob {
                                                     BlackBoxModel blackBoxModel) {
         ELDEvent eldEvent = createEvent(malfunction, malfunctionCode, blackBoxModel);
         observer.onNext(eldEvent);
-    }
-
-    protected void switchToDefaultDiagnosticCleared(Observer<? super ELDEvent> observer){
-        ELDEvent event = getELDEventsInteractor().getEvent(getDutyTypeManager().getDutyType());
-        event.setEventCode(ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED.getCode());
-        observer.onNext(event);
     }
 
     /**

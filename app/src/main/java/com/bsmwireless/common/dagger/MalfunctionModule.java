@@ -24,8 +24,10 @@ public final class MalfunctionModule {
 
     @Provides
     static MissingDataJob missingDataJob(ELDEventsInteractor eldEventsInteractor,
-                                         DutyTypeManager dutyTypeManager){
-        return new MissingDataJob(eldEventsInteractor, dutyTypeManager);
+                                         DutyTypeManager dutyTypeManager,
+                                         BlackBoxInteractor blackBoxInteractor,
+                                         PreferencesManager preferencesManager) {
+        return new MissingDataJob(eldEventsInteractor, dutyTypeManager, blackBoxInteractor, preferencesManager);
     }
 
     @Provides
@@ -63,7 +65,7 @@ public final class MalfunctionModule {
     static List<MalfunctionJob> provideJobs(SynchronizationJob synchronizationJob,
                                             TimingJob timingJob,
                                             StorageCapacityJob storageCapacityJob,
-                                            MissingDataJob missingDataJob){
+                                            MissingDataJob missingDataJob) {
         return Arrays.asList(synchronizationJob, timingJob, storageCapacityJob, missingDataJob);
     }
 }

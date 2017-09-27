@@ -25,7 +25,8 @@ public final class SynchronizationJob extends BaseMalfunctionJob implements Malf
     @Inject
     public SynchronizationJob(ELDEventsInteractor eldEventsInteractor,
                               DutyTypeManager dutyTypeManager,
-                              BlackBoxInteractor blackBoxInteractor, PreferencesManager preferencesManager) {
+                              BlackBoxInteractor blackBoxInteractor,
+                              PreferencesManager preferencesManager) {
         super(eldEventsInteractor, dutyTypeManager, blackBoxInteractor, preferencesManager);
         mBlackBoxInteractor = blackBoxInteractor;
         mPreferencesManager = preferencesManager;

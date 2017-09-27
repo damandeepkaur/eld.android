@@ -17,6 +17,6 @@ public final class DatabaseModule {
     @Singleton
     @Provides
     AppDatabase provideDatabase(Context context) {
-        return Room.databaseBuilder(context.getApplicationContext(), AppDatabase.class, DATABASE_NAME).build();
+        return Room.databaseBuilder(context.getApplicationContext(), AppDatabase.class, DATABASE_NAME).fallbackToDestructiveMigration().build();
     }
 }
