@@ -64,6 +64,12 @@
         <item name="android:textColor">@color/primary_text</item>
     </style>
 
+    <style name="GridItem">
+        <item name="android:textStyle">normal</item>
+        <item name="android:maxWidth">@dimen/grid_width</item>
+        <item name="android:minHeight">@dimen/grid_height</item>
+        <item name="android:padding">@dimen/grid_padding</item>
+    </style>
 
     <style name="DriverProfileTheme.GroupLabel">
         <item name="android:textSize">14sp</item>

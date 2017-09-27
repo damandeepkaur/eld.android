@@ -28,8 +28,10 @@ import com.bsmwireless.screens.driverprofile.DriverProfileActivity;
 import com.bsmwireless.screens.login.LoginActivity;
 import com.bsmwireless.screens.navigation.dagger.DaggerNavigationComponent;
 import com.bsmwireless.screens.navigation.dagger.NavigationModule;
+import com.bsmwireless.screens.roadsidenavigation.RoadsideNavigationActivity;
 import com.bsmwireless.screens.selectasset.SelectAssetActivity;
 import com.bsmwireless.screens.settings.SettingsActivity;
+import com.bsmwireless.screens.transfer.TransferActivity;
 import com.bsmwireless.widgets.snackbar.SnackBarLayout;
 
 import javax.inject.Inject;
@@ -125,7 +127,10 @@ public final class NavigationActivity extends BaseMenuActivity implements OnNavi
                 open((BaseFragment) fragment, false);*/
                 break;
             case R.id.nav_inspector_view:
-                Toast.makeText(this, "Go to inspector screen", Toast.LENGTH_SHORT).show();
+                mDrawerToggle.runWhenIdle(() -> startActivity(new Intent(this, RoadsideNavigationActivity.class)));
+                break;
+            case R.id.nav_transfer_view:
+                mDrawerToggle.runWhenIdle(() -> startActivity(new Intent(this, TransferActivity.class)));
                 break;
             case R.id.nav_help:
                 Toast.makeText(this, "Go to help screen", Toast.LENGTH_SHORT).show();
