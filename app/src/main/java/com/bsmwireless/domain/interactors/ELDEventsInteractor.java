@@ -305,6 +305,7 @@ public final class ELDEventsInteractor {
         ELDEvent event = new ELDEvent();
         event.setEventTime(currentTime);
         event.setEngineHours(blackBoxModel.getEngineHours());
+        event.setOdometer(blackBoxModel.getOdometer());
         event.setLat(blackBoxModel.getLat());
         event.setLng(blackBoxModel.getLon());
         event.setLocation("");
@@ -317,7 +318,6 @@ public final class ELDEventsInteractor {
         event.setVehicleId(mPreferencesManager.getVehicleId());
         event.setMobileTime(currentTime);
         event.setOrigin(isAuto ? ELDEvent.EventOrigin.AUTOMATIC_RECORD.getValue() : ELDEvent.EventOrigin.DRIVER.getValue());
-        event.setOdometer(blackBoxModel.getOdometer());
 
         return event;
     }

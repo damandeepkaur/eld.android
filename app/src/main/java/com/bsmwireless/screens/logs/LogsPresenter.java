@@ -228,82 +228,13 @@ public final class LogsPresenter implements AccountManager.AccountListener {
 
     private void updateLogHeader() {
 
-        loadUserHeaderInfo()
+        Disposable disposable = loadUserHeaderInfo()
                 .zipWith(loadLogHeaderInfo(), this::mapUserAndHeader)
                 .zipWith(loadOdometerValue(), this::mapOdometerValue)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(logHeaderModel -> mView.setLogHeader(logHeaderModel));
-
-//        Single
-//                .fromCallable(() -> {
-//                    LogHeaderModel model = new LogHeaderModel();
-//                    model.setTimezone(mTimeZone);
-//
-//                    if (mUser != null) {
-//                        model.setDriverName(mUser.getFirstName() + " " + mUser.getLastName());
-//                        model.setSelectedExemptions(mUser.getRuleException());
-//
-//                        List<SyncConfiguration> configurations = mUser.getConfigurations();
-//                        if (configurations != null) {
-//                            for (SyncConfiguration configuration : configurations) {
-//                                if (SyncConfiguration.Type.EXCEPT.getName().equals(configuration.getName())) {
-//                                    model.setAllExemptions(configuration.getValue());
-//                                    break;
-//                                }
-//                            }
-//                        } else {
-//                            model.setAllExemptions("");
-//                        }
-//
-//                        //set carrier name
-//                        List<Carrier> carriers = mUser.getCarriers();
-//                        if (carriers != null && !carriers.isEmpty()) {
-//                            StringBuilder sb = new StringBuilder();
-//                            for (Carrier carrier : carriers) {
-//                                sb.append(carrier.getName());
-//                                sb.append(",");
-//                            }
-//                            sb.deleteCharAt(sb.length() - 1);
-//                            model.setCarrierName(sb.toString());
-//                        }
-//                        model.setSelectedExemptions(mUser.getRuleException());
-//                    }
-//
-//                    if (mSelectedLogHeader != null) {
-//                        int vehicleId = mSelectedLogHeader.getVehicleId();
-//                        Vehicle vehicle;
-//                        if (mVehicleIdToNameMap.containsKey(vehicleId)) {
-//                            vehicle = mVehicleIdToNameMap.get(vehicleId);
-//                        } else {
-//                            vehicle = mVehiclesInteractor.getVehicle(vehicleId);
-//                        }
-//                        if (vehicle != null) {
-//                            model.setVehicleName(vehicle.getName());
-//                            model.setVehicleLicense(vehicle.getLicense());
-//                        }
-//                        model.setTrailers(mSelectedLogHeader.getTrailerIds());
-//
-//                        if (mSelectedLogHeader.getHomeTerminal() != null) {
-//                            model.setHomeTerminalAddress(mSelectedLogHeader.getHomeTerminal().getAddress());
-//                            model.setHomeTerminalName(mSelectedLogHeader.getHomeTerminal().getName());
-//                        }
-//
-//                        model.setShippingId(mSelectedLogHeader.getShippingId());
-//                        model.setCoDriversName(getCoDriversName(mSelectedLogHeader));
-//                    }
-//                    //TODO: init by data from black box
-//                    model.setStartOdometer("0");
-//                    model.setEndOdometer("0");
-//                    model.setDistanceDriven("-");
-//
-//                    mLogHeaderModel = model;
-//                    mLogHeaderModel.setLogSheetHeader(mSelectedLogHeader);
-//                    return mLogHeaderModel;
-//                })
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(logHeaderModel -> mView.setLogHeader(logHeaderModel));
+        mDisposables.add(disposable);
     }
 
     public void onSignLogsheetButtonClicked(CalendarItem calendarItem) {
