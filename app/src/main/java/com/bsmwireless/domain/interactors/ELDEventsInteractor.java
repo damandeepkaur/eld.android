@@ -359,6 +359,7 @@ public final class ELDEventsInteractor {
 
         ELDEvent eldEvent = getEvent(blackBoxModel, true);
 
+        eldEvent.setStatus(ELDEvent.StatusCode.ACTIVE.getValue());
         eldEvent.setMalCode(malfunction);
         eldEvent.setEventCode(malfunctionCode.getCode());
         eldEvent.setEventType(ELDEvent.EventType.DATA_DIAGNOSTIC.getValue());
