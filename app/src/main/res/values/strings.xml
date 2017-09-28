@@ -554,7 +554,7 @@
 
     <string name="dashboard_start_ym">Start Yard Moves</string>
     <string name="dashboard_start_pu">Start Personal Use</string>
-    <string name="dashboard_exemption">Exemption List</string>
+    <string name="dashboard_exemption">Exemptions List</string>
 
     <!-- Multiday fragment -->
     <string-array name="multiday_selector">
