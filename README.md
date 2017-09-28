@@ -3,6 +3,7 @@ ELD app for Android
 
 # Version history
 
+* **1.0.88** - Fix events order and duration, fix location precision (_EA-439_, _EA-14_)
 * **1.0.87** - Data Recording Compliance Monitoring (_EA-232_)
 * **1.0.86** - Implement reassign log to co-driver (_EA-182_)
 * **1.0.85** - Add roadside and data transfer (_EA-109_, _EA-84_, _EA-54_)

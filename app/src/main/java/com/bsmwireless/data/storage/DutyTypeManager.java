@@ -86,6 +86,14 @@ public final class DutyTypeManager {
     public void setDutyType(DutyType dutyType, boolean setTime) {
         if (dutyType == null) {
             dutyType = OFF_DUTY;
+        } else if (dutyType == CLEAR) {
+            if (mDutyType == PERSONAL_USE) {
+                dutyType = OFF_DUTY;
+            } else if (mDutyType == YARD_MOVES) {
+                dutyType = ON_DUTY;
+            } else {
+                dutyType = mDutyType;
+            }
         }
 
         long current = System.currentTimeMillis();
