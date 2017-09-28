@@ -70,6 +70,12 @@ public class DriverProfilePresenterTest {
 
     private static final int MAX_SIGNATURE_LENGTH = 50000; // defined here explicitly because number is defined in API
 
+    // Use only fake credentials or will not meet AT&T security requirements
+    private static final String FAKE_P_EMPTY = "";
+    private static final String FAKE_P_1 = "fakeP1";
+    private static final String FAKE_P_2 = "fakeP2";
+    private static final String FAKE_P_3 = "fakeP3";
+
     private final String mTestSignature = "51,377;89,310;89,310;-544,-1";
     private final String mTooLongTestSignature;
 
@@ -244,14 +250,10 @@ public class DriverProfilePresenterTest {
     @Test
     public void testOnChangePasswordClickSuccess() {
         // given
-        String oldPwd = "oldPwd";
-        String newPwd = "newPwd";
-        String confirmPwd = newPwd;
-
         when(mUserInteractor.updateDriverPassword(anyString(), anyString())).thenReturn(Observable.just(true));
 
         // when
-        mDriverProfilePresenter.onChangePasswordClick(oldPwd, newPwd, confirmPwd);
+        mDriverProfilePresenter.onChangePasswordClick(FAKE_P_1, FAKE_P_2, FAKE_P_2);
 
         // then
         verify(mView).showPasswordChanged();
@@ -260,15 +262,10 @@ public class DriverProfilePresenterTest {
     @Test
     public void testOnChangePasswordClickEmptyOld() {
         // given
-        String oldPwd = "";
-        String newPwd = "newPwd";
-        String confirmPwd = newPwd;
-
         when(mUserInteractor.updateDriverPassword(anyString(), anyString())).thenReturn(Observable.just(true));
 
-
         // when
-        mDriverProfilePresenter.onChangePasswordClick(oldPwd, newPwd, confirmPwd);
+        mDriverProfilePresenter.onChangePasswordClick(FAKE_P_EMPTY, FAKE_P_1, FAKE_P_1);
 
         // then
         verify(mView).showError(eq(DriverProfileView.Error.PASSWORD_FIELD_EMPTY));
@@ -277,15 +274,10 @@ public class DriverProfilePresenterTest {
     @Test
     public void testOnChangePasswordClickEmptyNew() {
         // given
-        String oldPwd = "oldPwd";
-        String newPwd = "";
-        String confirmPwd = "confirmPwd";
-
         when(mUserInteractor.updateDriverPassword(anyString(), anyString())).thenReturn(Observable.just(true));
 
-
         // when
-        mDriverProfilePresenter.onChangePasswordClick(oldPwd, newPwd, confirmPwd);
+        mDriverProfilePresenter.onChangePasswordClick(FAKE_P_1, FAKE_P_EMPTY, FAKE_P_2);
 
         // then
         verify(mView).showError(eq(DriverProfileView.Error.PASSWORD_FIELD_EMPTY));
@@ -294,15 +286,10 @@ public class DriverProfilePresenterTest {
     @Test
     public void testOnChangePasswordClickConfirmMismatch() {
         // given
-        String oldPwd = "oldPwd";
-        String newPwd = "newPwd";
-        String confirmPwd = "confirmPwd";
-
         when(mUserInteractor.updateDriverPassword(anyString(), anyString())).thenReturn(Observable.just(true));
 
-
         // when
-        mDriverProfilePresenter.onChangePasswordClick(oldPwd, newPwd, confirmPwd);
+        mDriverProfilePresenter.onChangePasswordClick(FAKE_P_1, FAKE_P_2, FAKE_P_3);
 
         // then
         verify(mView).showError(eq(DriverProfileView.Error.PASSWORD_NOT_MATCH));
@@ -311,15 +298,10 @@ public class DriverProfilePresenterTest {
     @Test
     public void testOnChangePasswordNotUpdated() {
         // given
-        String oldPwd = "oldPwd";
-        String newPwd = "newPwd";
-        String confirmPwd = newPwd;
-
         when(mUserInteractor.updateDriverPassword(anyString(), anyString())).thenReturn(Observable.just(false));
 
-
         // when
-        mDriverProfilePresenter.onChangePasswordClick(oldPwd, newPwd, confirmPwd);
+        mDriverProfilePresenter.onChangePasswordClick(FAKE_P_1, FAKE_P_2, FAKE_P_2);
 
         // then
         verify(mView).showError(eq(DriverProfileView.Error.ERROR_CHANGE_PASSWORD));
@@ -328,14 +310,10 @@ public class DriverProfilePresenterTest {
     @Test
     public void testOnChangePasswordError() {
         // given
-        String oldPwd = "oldPwd";
-        String newPwd = "newPwd";
-        String confirmPwd = newPwd;
-
         when(mUserInteractor.updateDriverPassword(anyString(), anyString())).thenReturn(Observable.error(RetrofitException.networkError(new ConnectException())));
 
         // when
-        mDriverProfilePresenter.onChangePasswordClick(oldPwd, newPwd, confirmPwd);
+        mDriverProfilePresenter.onChangePasswordClick(FAKE_P_1, FAKE_P_2, FAKE_P_2);
 
         // then
         verify(mView).showError(any(RetrofitException.class));
