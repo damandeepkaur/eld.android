@@ -4,18 +4,21 @@ import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.common.utils.observers.DutyManagerObservable;
 import com.bsmwireless.data.storage.DutyTypeManager;
 
+import javax.inject.Inject;
+
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 @ActivityScope
-public class HomePresenter {
+public final class HomePresenter {
 
     private final DutyTypeManager mDutyTypeManager;
     private HomeView mHomeView;
     private final CompositeDisposable mCompositeDisposable;
 
+    @Inject
     public HomePresenter(DutyTypeManager dutyTypeManager) {
         mDutyTypeManager = dutyTypeManager;
         mCompositeDisposable = new CompositeDisposable();

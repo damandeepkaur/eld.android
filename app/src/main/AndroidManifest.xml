@@ -86,6 +86,8 @@
         <activity
             android:name="com.bsmwireless.screens.transfer.TransferActivity"/>
 
+        <activity android:name="com.bsmwireless.screens.dashboard.HoursOfServiceActivity"/>
+
         <service android:name="com.bsmwireless.data.network.authenticator.BsmAuthenticatorService"
             android:exported="false">
             <intent-filter>

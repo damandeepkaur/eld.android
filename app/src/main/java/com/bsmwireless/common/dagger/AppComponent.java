@@ -12,7 +12,9 @@ import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.AutoDutyTypeManager;
 import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.data.storage.PreferencesManager;
+import com.bsmwireless.screens.dashboard.dagger.HoursOfServiceComponent;
 import com.bsmwireless.screens.diagnostic.dagger.DiagnosticComponent;
+import com.bsmwireless.screens.home.HomeComponent;
 import com.bsmwireless.screens.lockscreen.dagger.LockScreenComponent;
 import com.bsmwireless.services.malfunction.dagger.MalfunctionServiceComponent;
 import com.bsmwireless.services.monitoring.dagger.MonitoringServiceComponent;
@@ -66,4 +68,8 @@ public interface AppComponent {
     MalfunctionServiceComponent.Builder malfunctionServiceComponentBuilder();
 
     MonitoringServiceComponent.Builder monitoringServiceBuilder();
+
+    HoursOfServiceComponent.Builder hoursOfServiceBuilder();
+
+    HomeComponent.Builder homeComponentBuilder();
 }
