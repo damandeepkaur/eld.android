@@ -1,16 +1,24 @@
 package com.bsmwireless.screens.home;
 
 import com.bsmwireless.common.dagger.ActivityScope;
+import com.bsmwireless.common.utils.observers.DutyManagerObservable;
 import com.bsmwireless.data.storage.DutyTypeManager;
+
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
 @ActivityScope
 public class HomePresenter {
 
     private final DutyTypeManager mDutyTypeManager;
     private HomeView mHomeView;
+    private final CompositeDisposable mCompositeDisposable;
 
     public HomePresenter(DutyTypeManager dutyTypeManager) {
         mDutyTypeManager = dutyTypeManager;
+        mCompositeDisposable = new CompositeDisposable();
     }
 
     public void onStart(HomeView homeView) {
@@ -43,5 +51,15 @@ public class HomePresenter {
     }
 
     private void startDutyTypeMonitoring(){
+        Disposable disposable = DutyManagerObservable.create(mDutyTypeManager)
+                .retry()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(dutyType -> {
+                    if (mHomeView != null) {
+                        mHomeView.dutyStatusChanged(dutyType);
+                    }
+                });
+        mCompositeDisposable.add(disposable);
     }
 }
