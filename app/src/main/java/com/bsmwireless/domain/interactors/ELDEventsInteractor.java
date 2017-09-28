@@ -278,11 +278,17 @@ public final class ELDEventsInteractor {
                 .map(ELDEventConverter::toModel);
     }
 
+    /**
+     * Check active events with lat lng codes
+     *
+     * @return true if active events are exist
+     */
     public Single<Boolean> isLocationUpdateEventExists() {
-        // FIXME: 21.09.2017 Need to exclude events for which exist modified events with updated coordinates
         return mELDEventDao
-                .getCountForChangingLocationEvent(mAccountManager.getCurrentUserId(),
-                        new String[]{ELDEvent.LatLngFlag.FLAG_E.getCode(), ELDEvent.LatLngFlag.FLAG_X.getCode()})
+                .getChangingLocationEventCount(mAccountManager.getCurrentUserId(),
+                        new String[]{ELDEvent.LatLngFlag.FLAG_E.getCode(),
+                                ELDEvent.LatLngFlag.FLAG_X.getCode()},
+                        ELDEvent.StatusCode.ACTIVE.getValue())
                 .map(count -> count != 0);
     }
 

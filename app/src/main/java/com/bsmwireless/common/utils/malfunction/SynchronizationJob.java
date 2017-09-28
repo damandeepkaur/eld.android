@@ -38,11 +38,13 @@ public final class SynchronizationJob extends BaseMalfunctionJob implements Malf
         Disposable disposable = mBlackBoxInteractor.getData(mPreferencesManager.getBoxId())
                 .filter(blackBoxModel -> BlackBoxResponseModel.ResponseType.STATUS_UPDATE
                         == blackBoxModel.getResponseType())
+                .doOnNext(blackBoxModel -> Timber.d("Get a new blackbox data"))
                 .flatMap(this::loadLatestSynchronizationEvent, SynchResult::new)
                 .filter(this::isStateAndEventAreDifferent)
                 // create event with opposite mal code
                 .map(result -> createEvent(Malfunction.ENGINE_SYNCHRONIZATION,
                         createCodeForDiagnostic(result.mELDEvent), result.mBlackBoxModel))
+                .doOnNext(eldEvent -> Timber.d("Save a new synchronization event: " + eldEvent))
                 .flatMap(this::saveEvents)
                 .onErrorReturn(throwable -> {
                     Timber.e(throwable, "Error handle synchronization event");
