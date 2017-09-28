@@ -5,6 +5,9 @@ import com.bsmwireless.data.storage.configurations.ConfigurationConverter;
 import com.bsmwireless.data.storage.hometerminals.HomeTerminalConverter;
 import com.bsmwireless.models.User;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class UserConverter {
     public static User toUser(UserEntity entity) {
         User user = null;
@@ -71,5 +74,17 @@ public class UserConverter {
         }
 
         return user;
+    }
+
+    public static List<User> toUserList(List<UserEntity> entityList) {
+        ArrayList<User> userList = new ArrayList<>();
+
+        if (entityList != null) {
+            for (UserEntity entity : entityList) {
+                userList.add(toUser(entity));
+            }
+        }
+
+        return userList;
     }
 }

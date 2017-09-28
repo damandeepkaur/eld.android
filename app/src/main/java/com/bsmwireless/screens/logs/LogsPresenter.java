@@ -314,6 +314,10 @@ public final class LogsPresenter implements AccountManager.AccountListener {
     public void onRemovedEventClicked(EventLogModel event) {
     }
 
+    public void onReassignEventClicked(EventLogModel event) {
+        mView.showReassignDialog(event.getEvent());
+    }
+
     public void onAddEventClicked(CalendarItem day) {
         mView.goToAddEventScreen(day);
     }
@@ -401,6 +405,7 @@ public final class LogsPresenter implements AccountManager.AccountListener {
 
     private List<EventLogModel> preparingLogs(List<ELDEvent> events, long startDayTime, long endDayTime) {
         List<EventLogModel> logs = new ArrayList<>();
+        int lastActiveIndex = -1;
 
         if (!events.isEmpty()) {
             //convert to logs model
@@ -432,15 +437,19 @@ public final class LogsPresenter implements AccountManager.AccountListener {
                 if (logs.get(0).getEventTime() < startDayTime) {
                     logs.get(0).setEventTime(startDayTime);
                 }
-                if (i < events.size() - 1) {
-                    duration = events.get(i + 1).getEventTime() - events.get(i).getEventTime();
-                    logs.get(i).setDuration(duration);
+
+                if (logs.get(i).isActive()) {
+                    if (lastActiveIndex >= 0) {
+                        logs.get(lastActiveIndex).setDuration(logs.get(i).getEventTime() - logs.get(lastActiveIndex).getEventTime());
+                    }
+                    lastActiveIndex = i;
                 }
+
             }
 
-            //set duration for last event
-            EventLogModel lastEvent = logs.get(logs.size() - 1);
-            lastEvent.setDuration(endDayTime - lastEvent.getEventTime());
+            if (lastActiveIndex >= 0) {
+                logs.get(lastActiveIndex).setDuration(endDayTime - logs.get(lastActiveIndex).getEventTime());
+            }
         }
         return logs;
     }

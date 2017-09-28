@@ -17,6 +17,7 @@ public final class DatabaseModule {
     @Singleton
     @Provides
     AppDatabase provideDatabase(Context context) {
+        //TODO: replace .fallbackToDestructiveMigration() to migration strategy for production
         return Room.databaseBuilder(context.getApplicationContext(), AppDatabase.class, DATABASE_NAME).fallbackToDestructiveMigration().build();
     }
 }

@@ -12,12 +12,14 @@ import com.bsmwireless.data.storage.eldevents.ELDEventConverter;
 import com.bsmwireless.data.storage.eldevents.ELDEventDao;
 import com.bsmwireless.data.storage.eldevents.ELDEventEntity;
 import com.bsmwireless.data.storage.users.UserDao;
+import com.bsmwireless.models.AppInfo;
 import com.bsmwireless.models.BlackBoxModel;
 import com.bsmwireless.models.BlackBoxSensorState;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.Malfunction;
 import com.bsmwireless.models.ResponseMessage;
 import com.bsmwireless.widgets.alerts.DutyType;
+import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -72,6 +74,12 @@ public final class ELDEventsInteractor {
         mUserInteractor.getTimezone().subscribe(timezone -> mTimezone = timezone);
     }
 
+    public Single<List<ELDEvent>> getEventsFromDBOnce(long startTime, long endTime) {
+        int driverId = mAccountManager.getCurrentUserId();
+        return mELDEventDao.getEventsFromStartToEndTimeOnce(startTime, endTime, driverId)
+                .map(ELDEventConverter::toModelList);
+    }
+
     public Flowable<List<ELDEvent>> getDutyEventsFromDB(long startTime, long endTime) {
         int driverId = mAccountManager.getCurrentUserId();
         return mELDEventDao.getDutyEventsFromStartToEndTime(startTime, endTime, driverId)
@@ -80,6 +88,11 @@ public final class ELDEventsInteractor {
 
     public List<ELDEvent> getLatestActiveDutyEventFromDBSync(long latestTime, int userId) {
         return ELDEventConverter.toModelList(mELDEventDao.getLatestActiveDutyEventSync(latestTime, userId));
+    }
+
+    public Single<List<ELDEvent>> getLatestActiveDutyEventFromDBOnce(long latestTime, int userId) {
+        return mELDEventDao.getLatestActiveDutyEventOnce(latestTime, userId)
+                .map(ELDEventConverter::toModelList);
     }
 
     public List<ELDEvent> getActiveEventsFromDBSync(long startTime, long endTime) {
@@ -110,9 +123,29 @@ public final class ELDEventsInteractor {
         mELDEventDao.insertAll(ELDEventConverter.toEntityArray(events));
     }
 
+    public Observable<long[]> postNewDutyTypeEvent(DutyType dutyType, String comment, long time) {
+        return Observable.fromIterable(getEvents(dutyType, comment))
+                .map(event -> {
+                    event.setEventTime(time);
+                    return event;
+                })
+                .toList()
+                .toObservable()
+                .flatMap(this::postNewELDEvents)
+                .doOnNext(ids -> {
+                    if (ids.length > 0) {
+                        mDutyTypeManager.setDutyType(dutyType, true);
+                    }
+                });
+    }
+
     public Observable<long[]> postNewDutyTypeEvent(DutyType dutyType, String comment) {
         return postNewELDEvents(getEvents(dutyType, comment))
-                .doOnNext(isSuccess -> mDutyTypeManager.setDutyType(dutyType, true));
+                .doOnNext(ids -> {
+                    if (ids.length > 0) {
+                        mDutyTypeManager.setDutyType(dutyType, true);
+                    }
+                });
     }
 
     public Observable<Boolean> postLogoutEvent() {
@@ -147,6 +180,11 @@ public final class ELDEventsInteractor {
                             });
                 })
                 .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
+    }
+
+    public Single<Boolean> sendReport(long start, long end, int option, String comment) {
+        ELDEvent report = getLogSheetEvent(comment);
+        return mServiceApi.sendReport(start, end, option, report).map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
     }
 
     /**
@@ -257,6 +295,14 @@ public final class ELDEventsInteractor {
                         codes);
     }
 
+    public Integer getMalfunctionCountSync(int driverId, long startTime, long endTime) {
+        return mELDEventDao.getMalfunctionEventCountSync(driverId, startTime, endTime);
+    }
+
+    public Integer getDiagnosticCountSync(int driverId, long startTime, long endTime) {
+        return mELDEventDao.getDiagnosticEventCountSync(driverId, startTime, endTime);
+    }
+
     private ArrayList<ELDEvent> getEvents(DutyType dutyType, String comment) {
         ArrayList<ELDEvent> events = new ArrayList<>();
         DutyType current = mDutyTypeManager.getDutyType();
@@ -364,6 +410,7 @@ public final class ELDEventsInteractor {
 
         ELDEvent eldEvent = getEvent(blackBoxModel, true);
 
+        eldEvent.setStatus(ELDEvent.StatusCode.ACTIVE.getValue());
         eldEvent.setMalCode(malfunction);
         eldEvent.setEventCode(malfunctionCode.getCode());
         eldEvent.setEventType(ELDEvent.EventType.DATA_DIAGNOSTIC.getValue());
@@ -391,6 +438,27 @@ public final class ELDEventsInteractor {
         event.setVehicleId(mPreferencesManager.getVehicleId());
         event.setMobileTime(currentTime);
         event.setOrigin(isAuto ? ELDEvent.EventOrigin.AUTOMATIC_RECORD.getValue() : ELDEvent.EventOrigin.DRIVER.getValue());
+
+        return event;
+    }
+
+    public ELDEvent getLogSheetEvent(String comment) {
+        BlackBoxModel blackBoxModel = getBlackBoxState(mDutyTypeManager.getDutyType() == DutyType.PERSONAL_USE);
+        long currentTime = System.currentTimeMillis();
+        int driverId = mAccountManager.getCurrentUserId();
+
+        ELDEvent event = new ELDEvent();
+        event.setDriverId(driverId);
+        event.setVehicleId(mPreferencesManager.getVehicleId());
+        event.setEventTime(currentTime);
+        event.setEngineHours(blackBoxModel.getEngineHours());
+        event.setOdometer(blackBoxModel.getOdometer());
+        event.setLat(blackBoxModel.getLat());
+        event.setLng(blackBoxModel.getLon());
+        event.setTimezone(mTimezone);
+        event.setMobileTime(currentTime);
+        event.setComment(comment);
+        event.setAppInfo(new Gson().toJson(new AppInfo()));
 
         return event;
     }
@@ -424,7 +492,7 @@ public final class ELDEventsInteractor {
     }
 
     private double roundOneDecimal(double d) {
-        return Math.round(d * 10) / 10;
+        return Math.round(d * 10) / 10.;
     }
 
     private int multiplyAndRound(int sec) {

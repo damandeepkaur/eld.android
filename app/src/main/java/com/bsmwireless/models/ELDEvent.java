@@ -4,13 +4,38 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.bsmwireless.data.storage.DutyTypeManager;
+import com.bsmwireless.widgets.alerts.DutyType;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+import static com.bsmwireless.models.ELDEvent.EventType.DUTY_STATUS_CHANGING;
+
 public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheckable {
+    public static String getEvent(int type, int code) {
+        ELDEvent.EventType eventType = ELDEvent.EventType.getEventByType(type);
+
+        switch (eventType) {
+            case DUTY_STATUS_CHANGING:
+            case CHANGE_IN_DRIVER_INDICATION:
+                return DutyType.getTypeByCode(type, code).name();
+
+            case LOGIN_LOGOUT:
+                return ELDEvent.LoginLogoutCode.getLoginLogoutByCode(code).name();
+
+            case ENGINE_POWER_CHANGING:
+                return ELDEvent.EnginePowerCode.getEnginePowerByCode(code).name();
+
+            case DATA_DIAGNOSTIC:
+                return ELDEvent.MalfunctionCode.getMalfunctionByCode(code).name();
+
+            default:
+                return eventType.name();
+        }
+    }
+
     public enum EventType {
         DUTY_STATUS_CHANGING(1),
         INTERMEDIATE_LOG(2),
@@ -28,6 +53,15 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
 
         public int getValue() {
             return mType;
+        }
+
+        public static EventType getEventByType(int type) {
+            for (EventType t : EventType.values()) {
+                if (t.mType == type) {
+                    return t;
+                }
+            }
+            return EventType.INTERMEDIATE_LOG;
         }
     }
 
@@ -62,6 +96,15 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
         EventOrigin(int code) { mOriginCode = code; }
 
         public int getValue() { return mOriginCode; }
+
+        public static EventOrigin getOriginByCode(int code) {
+            for (EventOrigin t : EventOrigin.values()) {
+                if (t.mOriginCode == code) {
+                    return t;
+                }
+            }
+            return EventOrigin.UNIDENTIFIED_DRIVER;
+        }
     }
 
     public enum LoginLogoutCode {
@@ -76,6 +119,15 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
 
         public int getValue() {
             return mCode;
+        }
+
+        public static LoginLogoutCode getLoginLogoutByCode(int code) {
+            for (LoginLogoutCode t : LoginLogoutCode.values()) {
+                if (t.mCode == code) {
+                    return t;
+                }
+            }
+            return LoginLogoutCode.LOGIN;
         }
     }
 
@@ -94,6 +146,15 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
         public int getValue() {
             return mCode;
         }
+
+        public static EnginePowerCode getEnginePowerByCode(int code) {
+            for (EnginePowerCode t : EnginePowerCode.values()) {
+                if (t.mCode == code) {
+                    return t;
+                }
+            }
+            return EnginePowerCode.POWER_UP;
+        }
     }
 
     public enum MalfunctionCode {
@@ -110,6 +171,15 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
 
         public int getCode() {
             return mCode;
+        }
+
+        public static MalfunctionCode getMalfunctionByCode(int code) {
+            for (MalfunctionCode t : MalfunctionCode.values()) {
+                if (t.mCode == code) {
+                    return t;
+                }
+            }
+            return MALFUNCTION_LOGGED;
         }
     }
 
@@ -218,6 +288,9 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
     @SerializedName("malCode")
     @Expose
     private Malfunction mMalCode;
+    @SerializedName("appInfo")
+    @Expose
+    private String mAppInfo;
 
     public ELDEvent() {
     }
@@ -330,6 +403,10 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
         notNull = in.readByte() == 1;
         if (notNull) {
             mMalCode = Malfunction.createByCode(in.readString());
+        }
+        notNull = in.readByte() == 1;
+        if (notNull) {
+            mAppInfo = in.readString();
         }
     }
 
@@ -549,6 +626,14 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
         this.mMalCode = malCode;
     }
 
+    public String getAppInfo() {
+        return mAppInfo;
+    }
+
+    public void setAppInfo(String appInfo) {
+        mAppInfo = appInfo;
+    }
+
     @Override
     public Boolean isActive() {
         return mStatus.equals(ELDEvent.StatusCode.ACTIVE.getValue());
@@ -556,7 +641,7 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
 
     @Override
     public Boolean isDutyEvent() {
-        return mEventType.equals(ELDEvent.EventType.DUTY_STATUS_CHANGING.getValue()) ||
+        return mEventType.equals(DUTY_STATUS_CHANGING.getValue()) ||
                 mEventType.equals(ELDEvent.EventType.CHANGE_IN_DRIVER_INDICATION.getValue());
     }
 
@@ -599,6 +684,7 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
                 .append(mMalfunction, rhs.mMalfunction)
                 .append(mDiagnostic, rhs.mDiagnostic)
                 .append(mMalCode, rhs.mMalCode)
+                .append(mAppInfo, rhs.mAppInfo)
                 .isEquals();
     }
 
@@ -632,6 +718,7 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
                 .append(mMalfunction)
                 .append(mDiagnostic)
                 .append(mMalCode)
+                .append(mAppInfo)
                 .toHashCode();
     }
 
@@ -775,6 +862,11 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
         if (mMalCode != null) {
             dest.writeString(mMalCode.getCode());
         }
+
+        dest.writeByte(this.mAppInfo == null ? (byte) 0 : 1);
+        if (this.mAppInfo != null) {
+            dest.writeString(this.mAppInfo);
+        }
     }
 
     public static final Creator<ELDEvent> CREATOR = new Creator<ELDEvent>() {
@@ -829,6 +921,7 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
         sb.append(", mMalfunction=").append(mMalfunction);
         sb.append(", mDiagnostic=").append(mDiagnostic);
         sb.append(", mMalCode=").append(mMalCode);
+        sb.append(", mAppInfo=").append(mAppInfo);
         sb.append('}');
         return sb.toString();
     }

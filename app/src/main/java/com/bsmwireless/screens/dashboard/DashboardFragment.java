@@ -223,8 +223,13 @@ public final class DashboardFragment extends BaseFragment implements DashboardVi
     }
 
     @Override
-    public void showNotInVehicleDialog() {
-        mNavigateView.showNotInVehicleDialog();
+    public void showSpecialStatuses() {
+        mStatusLayout.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void hideSpecialStatuses() {
+        mStatusLayout.setVisibility(View.GONE);
     }
 
     private void initTimer() {
@@ -254,10 +259,8 @@ public final class DashboardFragment extends BaseFragment implements DashboardVi
             mIndicatorButton.setText(String.format(Locale.US, mContext.getString(R.string.duty_indicator), currentDuty));
             mIndicatorButton.setSupportBackgroundTintList(ColorStateList.valueOf(color));
             mIndicatorView.setVisibility(View.VISIBLE);
-            mStatusLayout.setVisibility(View.GONE);
         } else {
             mIndicatorView.setVisibility(View.GONE);
-            mStatusLayout.setVisibility(View.VISIBLE);
         }
     }
 }
