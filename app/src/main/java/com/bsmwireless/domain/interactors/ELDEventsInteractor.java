@@ -124,7 +124,6 @@ public final class ELDEventsInteractor {
         return Observable.fromIterable(getEvents(dutyType, comment))
                 .map(event -> {
                     event.setEventTime(time);
-                    event.setMobileTime(time);
                     return event;
                 })
                 .toList()
@@ -424,7 +423,7 @@ public final class ELDEventsInteractor {
     }
 
     private double roundOneDecimal(double d) {
-        return Math.round(d * 10) / 10;
+        return Math.round(d * 10) / 10.;
     }
 
     private int multiplyAndRound(int sec) {
