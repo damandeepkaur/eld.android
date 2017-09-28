@@ -263,17 +263,11 @@ public class DateUtils {
      * @param zone   timezone
      * @return long unix time in ms
      */
-    public static long getStartDayTimeInMs(long logday, String zone) {
+    public static long getStartDayTimeInMs(long logday, String zone) throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd", Locale.US);
         TimeZone timeZone = TimeZone.getTimeZone(zone);
         sdf.setTimeZone(timeZone);
-        Date date = null;
-        try {
-            date = sdf.parse(String.valueOf(logday));
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
+        Date  date = sdf.parse(String.valueOf(logday));
         return date.getTime();
     }
 

@@ -99,8 +99,9 @@ public final class ELDEventsInteractor {
     }
 
     public Single<List<ELDEvent>> getDutyEventsForDay(long startDayTime) {
-        return Single.fromCallable(() -> mELDEventDao.getDutyEventsFromStartToEndTimeSync(startDayTime,
-                startDayTime + MS_IN_DAY, mAccountManager.getCurrentUserId()))
+        return mELDEventDao.getDutyEventsFromStartToEndTimeSync(startDayTime,
+                startDayTime + MS_IN_DAY, mAccountManager.getCurrentUserId())
+                .onErrorReturn(throwable -> Collections.emptyList())
                 .map(ELDEventConverter::toModelList);
     }
 
