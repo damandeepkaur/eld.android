@@ -1,7 +1,7 @@
 package com.bsmwireless.domain.interactors;
 
+import com.bsmwireless.common.Constants;
 import com.bsmwireless.common.utils.DateUtils;
-import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.PreferencesManager;
@@ -27,7 +27,7 @@ import io.reactivex.Observable;
 import io.reactivex.Single;
 import timber.log.Timber;
 
-import static com.bsmwireless.common.Constants.SUCCESS;
+import static com.bsmwireless.common.utils.DateUtils.MS_IN_DAY;
 import static com.bsmwireless.data.storage.logsheets.LogSheetEntity.SyncType.UNSYNC;
 
 public final class LogSheetInteractor {
@@ -51,10 +51,18 @@ public final class LogSheetInteractor {
                 .map(LogSheetConverter::toModelList);
     }
 
+
     public Single<LogSheetHeader> getLogSheetHeadersFromDBOnce(long logDay) {
         int driverId = mAccountManager.getCurrentUserId();
         return mAppDatabase.logSheetDao().getLogSheet(logDay, driverId)
                 .map(LogSheetConverter::toModel);
+    }
+
+    public Flowable<List<LogSheetHeader>> getLogSheetHeadersForMonth(String timezone) {
+        long todayLogDay = DateUtils.convertTimeToLogDay(timezone, System.currentTimeMillis());
+        long monthAgoLogDay = DateUtils.convertTimeToLogDay(timezone, System.currentTimeMillis()
+                - MS_IN_DAY * Constants.DEFAULT_CALENDAR_DAYS_COUNT);
+        return getLogSheetHeaders(monthAgoLogDay, todayLogDay);
     }
 
     public Single<LogSheetHeader> getLogSheet(Long logDay) {

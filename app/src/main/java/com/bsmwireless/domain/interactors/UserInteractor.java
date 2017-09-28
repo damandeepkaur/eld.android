@@ -222,6 +222,14 @@ public final class UserInteractor {
                 .onErrorReturn(throwable -> false);
     }
 
+    public Completable updateUserRuleException(String ruleException) {
+        return Completable.fromAction(() -> {
+            UserEntity user = mAppDatabase.userDao().getUserSync(mAccountManager.getCurrentUserId());
+            user.setRuleException(ruleException);
+            mAppDatabase.userDao().insertUser(user);
+        });
+    }
+
     public Single<Boolean> updateDriverHomeTerminal(Integer homeTerminalId) {
         return mServiceApi.updateDriverHomeTerminal(getHomeTerminal(homeTerminalId))
                 .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS))
@@ -283,12 +291,10 @@ public final class UserInteractor {
     public Flowable<FullUserEntity> getFullDriver() {
         return mAppDatabase.userDao()
                 .getFullUser(getDriverId())
-                .doOnNext(userEntity -> {
-                    userEntity.setHomeTerminalEntities(
-                            mAppDatabase.homeTerminalDao()
-                                    .getHomeTerminalsSync(userEntity.getHomeTerminalIds())
-                    );
-                });
+                .doOnNext(userEntity -> userEntity.setHomeTerminalEntities(
+                        mAppDatabase.homeTerminalDao()
+                                .getHomeTerminalsSync(userEntity.getHomeTerminalIds())
+                ));
     }
 
     public FullUserEntity getFullUserSync() {
@@ -303,8 +309,13 @@ public final class UserInteractor {
         return mAppDatabase.userDao().getFullUserSync(id);
     }
 
-    public Flowable<User> getFullUser() {
-        return getFullDriver().map(UserConverter::toFullUser);
+    public Single<User> getFullUser() {
+        return Single.fromCallable(() -> mAppDatabase.userDao().getFullUserSync(mAccountManager.getCurrentUserId()))
+                .doOnSuccess(userEntity -> userEntity.setHomeTerminalEntities(
+                        mAppDatabase.homeTerminalDao()
+                                .getHomeTerminalsSync(userEntity.getHomeTerminalIds())
+                ))
+                .map(UserConverter::toFullUser);
     }
 
     public boolean isLoginActive() {
