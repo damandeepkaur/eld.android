@@ -5,6 +5,8 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatButton;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -16,6 +18,7 @@ import com.bsmwireless.common.App;
 import com.bsmwireless.common.utils.NetworkUtils;
 import com.bsmwireless.data.network.RetrofitException;
 import com.bsmwireless.data.storage.users.UserEntity;
+import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.screens.switchdriver.dagger.DaggerSwitchDriverComponent;
 import com.bsmwireless.screens.switchdriver.dagger.SwitchDriverModule;
 import com.bsmwireless.widgets.alerts.DutyType;
@@ -64,15 +67,25 @@ public final class SwitchDriverDialog implements SwitchDriverView, DriverDialog 
     @Nullable
     @BindView(R.id.progress_bar)
     ProgressBar mProgressBar;
+    @Nullable
+    @BindView(R.id.users_list)
+    RecyclerView mReassignList;
 
     @Nullable
     private LogOutCoDriverAdapter mLogOutCoDriverAdapter;
+
+    @Nullable
+    private ReassignEventAdapter mReassignEventAdapter;
+
+    @Nullable
+    private ELDEvent mELDEvent;
 
     public enum SwitchDriverStatus {
         SWITCH_DRIVER,
         ADD_CO_DRIVER,
         LOG_OUT,
-        DRIVER_SEAT
+        DRIVER_SEAT,
+        REASSIGN_EVENT
     }
 
     public SwitchDriverDialog(Context context) {
@@ -83,6 +96,12 @@ public final class SwitchDriverDialog implements SwitchDriverView, DriverDialog 
     @Override
     public void show() {
         show(mStatus);
+    }
+
+    @Override
+    public void showReassignEventDialog(ELDEvent event) {
+        mELDEvent = event;
+        show(SwitchDriverStatus.REASSIGN_EVENT);
     }
 
     @Override
@@ -103,7 +122,10 @@ public final class SwitchDriverDialog implements SwitchDriverView, DriverDialog 
                 mPresenter.onDriverSeatDialog();
                 break;
             }
-            case SWITCH_DRIVER:
+            case REASSIGN_EVENT: {
+                mPresenter.onReassignDialog();
+                break;
+            }
             default: {
                 mPresenter.onSwitchDriverDialog();
                 break;
@@ -155,13 +177,20 @@ public final class SwitchDriverDialog implements SwitchDriverView, DriverDialog 
     }
 
     @Override
-    public void coDriverLoggedIn() {
-        show(SwitchDriverStatus.SWITCH_DRIVER);
+    public void setUsersForReassignDialog(List<UserModel> users) {
+        if (mReassignList != null) {
+            mReassignEventAdapter = new ReassignEventAdapter(mContext, users, mPresenter);
+            mReassignList.setAdapter(mReassignEventAdapter);
+            mReassignList.setLayoutManager(new LinearLayoutManager(mContext));
+            mReassignEventAdapter.setOnClickListener(view -> {
+                int position = mReassignList.getChildAdapterPosition(view);
+                mReassignEventAdapter.setSelectedPosition(position);
+            });
+        }
     }
 
     @Override
-    public void loginError() {
-        Toast.makeText(mContext, mContext.getString(R.string.switch_driver_login_error), Toast.LENGTH_SHORT).show();
+    public void coDriverLoggedIn() {
         show(SwitchDriverStatus.SWITCH_DRIVER);
     }
 
@@ -171,14 +200,24 @@ public final class SwitchDriverDialog implements SwitchDriverView, DriverDialog 
     }
 
     @Override
-    public void logoutError() {
-        show(SwitchDriverStatus.SWITCH_DRIVER);
+    public void eventReassigned() {
+        Toast.makeText(mContext, mContext.getString(R.string.switch_driver_event_reassigned), Toast.LENGTH_SHORT).show();
+        if (mDialog != null) {
+            mDialog.dismiss();
+        }
     }
 
     @Override
     public void showError(Error error) {
         // TODO show error
         Toast.makeText(mContext, mContext.getString(error.getStringId()), Toast.LENGTH_SHORT).show();
+        switch (error) {
+            case ERROR_LOGIN_CO_DRIVER:
+            case ERROR_LOGOUT_CO_DRIVER: {
+                show(SwitchDriverStatus.SWITCH_DRIVER);
+                break;
+            }
+        }
     }
 
     @Override
@@ -315,6 +354,37 @@ public final class SwitchDriverDialog implements SwitchDriverView, DriverDialog 
 
         driverSeatDialog.setOnShowListener(dialog -> mPresenter.onDriverSeatDialogCreated());
         showDialog(driverSeatDialog);
+    }
+
+    @Override
+    public void createReassignDialog() {
+        View view = View.inflate(mContext, R.layout.reassign_event_layout, null);
+        ButterKnife.bind(this,view);
+
+        AlertDialog reassignDialog = new AlertDialog.Builder(mContext)
+                .setTitle(R.string.switch_driver_reassign_event)
+                .setView(view)
+                .setPositiveButton(R.string.switch_driver_confirm_driver_seat, null)
+                .setNegativeButton(R.string.switch_driver_cancel, (dialog, which) -> dialog.dismiss())
+                .setOnDismissListener(dialog -> mPresenter.onDestroy())
+                .setCancelable(true)
+                .create();
+
+        reassignDialog.setOnShowListener(dialog -> {
+            reassignDialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                                .setOnClickListener(v -> {
+                                    if (mReassignEventAdapter != null && mELDEvent != null) {
+                                        UserModel user = mReassignEventAdapter.getItem(
+                                                mReassignEventAdapter.getSelectedPosition()
+                                        );
+                                        if (user != null) {
+                                            mPresenter.reassignEvent(mELDEvent, user.getUser());
+                                        }
+                                    }
+                                });
+            mPresenter.onReassignEventDialogCreated();
+        });
+        showDialog(reassignDialog);
     }
 
     @Override

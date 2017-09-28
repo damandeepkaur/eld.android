@@ -186,7 +186,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/driver_profile_item_margin"
-            android:text="@string/driver_profile_item_eld_toggle"/>
+            android:text="@string/driver_profile_item_eld_toggle"
+            android:visibility="gone"/>
 
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"

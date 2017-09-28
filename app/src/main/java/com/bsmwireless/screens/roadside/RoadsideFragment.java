@@ -17,6 +17,7 @@ import com.bsmwireless.models.LogSheetHeader;
 import com.bsmwireless.models.User;
 import com.bsmwireless.models.Vehicle;
 import com.bsmwireless.screens.common.BaseFragment;
+import com.bsmwireless.screens.logs.GraphModel;
 import com.bsmwireless.screens.logs.dagger.EventLogModel;
 import com.bsmwireless.screens.roadside.dagger.DaggerRoadsideComponent;
 import com.bsmwireless.screens.roadside.dagger.RoadsideModule;
@@ -102,9 +103,8 @@ public final class RoadsideFragment extends BaseFragment implements RoadsideView
     }
 
     @Override
-    public void showGraph(List<EventLogModel> eventLogs, ELDEvent event) {
-        mGraphLayout.setPrevDayEvent(event);
-        mGraphLayout.setELDEvents(eventLogs);
+    public void showGraph(GraphModel graphModel) {
+        mGraphLayout.updateGraph(graphModel);
         mGraphLayout.invalidate();
     }
 
