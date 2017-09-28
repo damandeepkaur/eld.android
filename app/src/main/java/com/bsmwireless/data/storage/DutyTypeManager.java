@@ -23,15 +23,11 @@ public final class DutyTypeManager {
 
     //Suppressed, but the problem is fixed by createDataTypeList funcrion which returns unmodifiable colleaction
     @SuppressWarnings("PublicStaticCollectionField")
-    public static final List<DutyType> DRIVER_DUTY_EXTENDED = createDataTypeList(OFF_DUTY, SLEEPER_BERTH, DRIVING, ON_DUTY, PERSONAL_USE, YARD_MOVES);
-    @SuppressWarnings("PublicStaticCollectionField")
     public static final List<DutyType> DRIVER_DUTY_EXTENDED_WITH_CLEAR = createDataTypeList(ON_DUTY, OFF_DUTY, SLEEPER_BERTH, DRIVING, YARD_MOVES, PERSONAL_USE, CLEAR);
     @SuppressWarnings("PublicStaticCollectionField")
-    public static final List<DutyType> DRIVER_DUTY = createDataTypeList(OFF_DUTY, SLEEPER_BERTH, DRIVING, ON_DUTY);
+    public static final List<DutyType> DRIVER_DUTY = createDataTypeList(ON_DUTY, OFF_DUTY, SLEEPER_BERTH, DRIVING);
     @SuppressWarnings("PublicStaticCollectionField")
-    public static final List<DutyType> CO_DRIVER_DUTY_EXTENDED = createDataTypeList(OFF_DUTY, SLEEPER_BERTH, ON_DUTY, PERSONAL_USE, YARD_MOVES);
-    @SuppressWarnings("PublicStaticCollectionField")
-    public static final List<DutyType> CO_DRIVER_DUTY = createDataTypeList(OFF_DUTY, SLEEPER_BERTH, ON_DUTY);
+    public static final List<DutyType> CO_DRIVER_DUTY = createDataTypeList(ON_DUTY, OFF_DUTY, SLEEPER_BERTH);
 
     private PreferencesManager mPreferencesManager;
 
@@ -49,7 +45,7 @@ public final class DutyTypeManager {
         }
     };
 
-    private static List createDataTypeList(DutyType... array) {
+    private static List<DutyType> createDataTypeList(DutyType... array) {
         return Collections.unmodifiableList(Arrays.asList(array));
     }
 
@@ -86,6 +82,14 @@ public final class DutyTypeManager {
     public void setDutyType(DutyType dutyType, boolean setTime) {
         if (dutyType == null) {
             dutyType = OFF_DUTY;
+        } else if (dutyType == CLEAR) {
+            if (mDutyType == PERSONAL_USE) {
+                dutyType = OFF_DUTY;
+            } else if (mDutyType == YARD_MOVES) {
+                dutyType = ON_DUTY;
+            } else {
+                dutyType = mDutyType;
+            }
         }
 
         long current = System.currentTimeMillis();

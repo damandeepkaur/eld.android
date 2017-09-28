@@ -35,4 +35,24 @@ public final class AppSettings {
     public long lockScreenDisconnectionTimeout(){
         return Constants.LOCK_SCREEN_DISCONNECTION_TIMEOUT_MS;
     }
+
+    /**
+     * Returns time interval for running a storage capacity check
+     * @return time interval
+     */
+    public long getIntervalForCheckStorageCapacity(){
+        // just the same interval
+        return getIntervalForCheckTime();
+    }
+
+    /**
+     * Return threshold in percent for triggered Data Recording Malfunction
+     * 0.00 is 0%, 1.00 is 100%
+     * For example, the threshold 0.05 means check should be triggered when available space
+     * less than 5%  of total space
+     * @return threshold in percent
+     */
+    public double getFreeSpaceThreshold(){
+        return Constants.DEFAULT_STORAGE_CAPACITY_THRESHOLD;
+    }
 }

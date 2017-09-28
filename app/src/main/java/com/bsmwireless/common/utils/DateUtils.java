@@ -185,7 +185,7 @@ public class DateUtils {
 
     /**
      * @param timeZone user timezone object"
-     * @param time unix time in ms
+     * @param time     unix time in ms
      * @return long with format time like 20170708
      */
     public static long convertTimeToLogDay(TimeZone timeZone, long time) {
@@ -197,7 +197,7 @@ public class DateUtils {
 
     /**
      * @param timeZone user timezone object"
-     * @param time unix time in ms
+     * @param time     unix time in ms
      * @return long with format time like 07-07-09
      */
     public static String convertTimeToDDMMYY(TimeZone timeZone, long time) {
@@ -208,7 +208,7 @@ public class DateUtils {
 
     /**
      * @param timeZone user timezone object"
-     * @param time unix time in ms
+     * @param time     unix time in ms
      * @return long with format time like 11:12
      */
     public static String convertTimeToHHMM(TimeZone timeZone, long time) {
@@ -218,9 +218,8 @@ public class DateUtils {
     }
 
     /**
-     * @param daysAgo days ago
+     * @param daysAgo  days ago
      * @param timezone user timezone
-     *
      * @return long with format time like 20170708
      */
     public static long getLogDayForDaysAgo(int daysAgo, String timezone) {
@@ -256,6 +255,19 @@ public class DateUtils {
         } catch (ParseException e) {
             e.printStackTrace();
         }
+        return date.getTime();
+    }
+
+    /**
+     * @param logday long with format time like 20170708
+     * @param zone   timezone
+     * @return long unix time in ms
+     */
+    public static long getStartDayTimeInMs(long logday, String zone) throws ParseException {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd", Locale.US);
+        TimeZone timeZone = TimeZone.getTimeZone(zone);
+        sdf.setTimeZone(timeZone);
+        Date  date = sdf.parse(String.valueOf(logday));
         return date.getTime();
     }
 
@@ -328,9 +340,8 @@ public class DateUtils {
     }
 
     /**
-     *
      * @param durations calculated durations in ms
-     * @param isToday if calculated day is current (no fix needed)
+     * @param isToday   if calculated day is current (no fix needed)
      * @return rounded to min durations
      */
     public static long[] getRoundedDurations(long[] durations, boolean isToday) {

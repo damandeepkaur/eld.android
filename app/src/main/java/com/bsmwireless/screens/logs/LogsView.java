@@ -13,9 +13,11 @@ import app.bsmuniversal.com.R;
 
 public interface LogsView {
 
+    CalendarItem getSelectedDay();
+
     void setEventLogs(List<EventLogModel> logs);
 
-    void setPrevDayEvent(ELDEvent prevDayEvent);
+    void updateGraph(GraphModel graphModel);
 
     void setLogHeader(LogHeaderModel logHeader);
 
@@ -36,6 +38,8 @@ public interface LogsView {
     void showError(RetrofitException exception);
 
     void showError(Error error);
+
+    void showReassignDialog(ELDEvent event);
 
     enum Error {
         ERROR_ADD_EVENT(R.string.add_event_error),
