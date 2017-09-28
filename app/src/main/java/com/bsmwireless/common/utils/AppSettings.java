@@ -53,6 +53,6 @@ public final class AppSettings {
      * @return threshold in percent
      */
     public double getFreeSpaceThreshold(){
-        return 0.10;
+        return Constants.DEFAULT_STORAGE_CAPACITY_THRESHOLD;
     }
 }
