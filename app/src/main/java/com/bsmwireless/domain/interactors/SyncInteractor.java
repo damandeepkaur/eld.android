@@ -99,31 +99,28 @@ public final class SyncInteractor {
                 .map(timeout -> mAccountManager.getCurrentUserId())
                 .map(userId -> mUserDao.getUserSync(Integer.valueOf(userId)))
                 .filter(UserEntity::isOfflineChange)
-                .switchMap(userEntity -> {
-                    Observable<Boolean> signatureUpdate = mServiceApi.updateDriverSignature(new DriverSignature()
+                .switchMapSingle(userEntity -> {
+                    Single<Boolean> signatureUpdate = mServiceApi.updateDriverSignature(new DriverSignature()
                             .setDriverId(userEntity.getId())
                             .setSignature(userEntity.getSignature()))
                             .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS))
-                            .toObservable()
                             .onErrorReturn(throwable -> false);
-                    Observable<Boolean> driverRuleUpdate = mServiceApi.updateDriverRule(new RuleSelectionModel()
+                    Single<Boolean> driverRuleUpdate = mServiceApi.updateDriverRule(new RuleSelectionModel()
                             .setDriverId(userEntity.getId())
                             .setRuleException(userEntity.getRuleException())
                             .setDutyCycle(userEntity.getDutyCycle())
                             .setApplyTime(Calendar.getInstance().getTimeInMillis()))
                             .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS))
-                            .toObservable()
                             .onErrorReturn(throwable -> false);
-                    Observable<Boolean> homeTerminalUpdate = mServiceApi.updateDriverHomeTerminal(new DriverHomeTerminal()
+                    Single<Boolean> homeTerminalUpdate = mServiceApi.updateDriverHomeTerminal(new DriverHomeTerminal()
                             .setDriverId(userEntity.getId())
                             .setHomeTermId(userEntity.getHomeTermId()))
                             .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS))
-                            .toObservable()
                             .onErrorReturn(throwable -> false);
-                    return Observable.zip(signatureUpdate, driverRuleUpdate, (resultFirst, resultSecond) -> resultFirst && resultSecond)
+                    return Single.zip(signatureUpdate, driverRuleUpdate, (resultFirst, resultSecond) -> resultFirst && resultSecond)
                             .zipWith(homeTerminalUpdate, (resultFirst, resultSecond) -> resultFirst && resultSecond)
                             .map(updateSuccess -> userEntity.setOfflineChange(!updateSuccess))
-                            .doOnNext(userEntity1 -> mUserDao.insertUser(userEntity1));
+                            .doOnSuccess(userEntity1 -> mUserDao.insertUser(userEntity1));
                 })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -144,7 +141,7 @@ public final class SyncInteractor {
                 .map(aLong -> ELDEventConverter.toModelList(mELDEventDao.getUpdateUnsyncEvents()))
                 .map(this::filterInactiveEvents)
                 .filter(List::isEmpty)
-                .flatMap(eldEvents -> mServiceApi.getELDEvents(startTime, endTime).toObservable())
+                .flatMapSingle(eldEvents -> mServiceApi.getELDEvents(startTime, endTime))
                 .subscribe(eldEventsFromServer -> {
                             List<ELDEventEntity> entities = mELDEventDao.getEventsFromStartToEndTimeSync(
                                     startTime, endTime, mAccountManager.getCurrentUserId());
@@ -171,7 +168,7 @@ public final class SyncInteractor {
     }
 
     private void syncNewEvents() {
-        Disposable syncNewEventsDisposable = Observable.interval(Constants.SYNC_TIMEOUT_IN_MIN, TimeUnit.MINUTES)
+        Disposable syncNewEventsDisposable = Single.timer(Constants.SYNC_TIMEOUT_IN_MIN, TimeUnit.MINUTES)
                 .subscribeOn(Schedulers.io())
                 .filter(t -> NetworkUtils.isOnlineMode())
                 .filter(t -> mPreferencesManager.getBoxId() != PreferencesManager.NOT_FOUND_VALUE)
@@ -180,18 +177,16 @@ public final class SyncInteractor {
                 .filter(eldEvents -> !eldEvents.isEmpty())
                 .map(this::filterIncorrectEvents)
                 .filter(eldEvents -> !eldEvents.isEmpty())
-                .flatMap(events -> Observable.fromIterable(parseELDEventsList(events)))
-                .flatMap(events -> mServiceApi.postNewELDEvents(events)
-                        .toObservable()
-                        .onErrorResumeNext(Observable.just(mErrorResponse))
-                        .onExceptionResumeNext(Observable.just(mErrorResponse))
+                .flatMapObservable(events -> Observable.fromIterable(parseELDEventsList(events)))
+                .flatMapSingle(events -> mServiceApi.postNewELDEvents(events)
+                        .onErrorResumeNext(Single.just(mErrorResponse))
+                        .onErrorResumeNext(Single.just(mErrorResponse))
                         .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS) ? events : new ArrayList<ELDEvent>())
                 )
                 .filter(events -> !events.isEmpty())
                 .delay(1, TimeUnit.SECONDS)
-                .flatMap(dbEvents -> mServiceApi.getELDEvents(dbEvents.get(0).getEventTime(), dbEvents.get(dbEvents.size() - 1).getEventTime())
-                        .toObservable()
-                        .doOnNext(serverEvents -> {
+                .flatMapSingle(dbEvents -> mServiceApi.getELDEvents(dbEvents.get(0).getEventTime(), dbEvents.get(dbEvents.size() - 1).getEventTime())
+                        .doOnSuccess(serverEvents -> {
                             ELDEventEntity[] oldEntities = ELDEventConverter.toEntityArray(dbEvents);
                             mELDEventDao.deleteAll(oldEntities);
                             ELDEventEntity[] entities = ELDEventConverter.toEntityArray(serverEvents, SYNC);
@@ -214,16 +209,14 @@ public final class SyncInteractor {
                 .flatMap(dbEvents -> Observable.fromIterable(parseELDEventsList(dbEvents)))
                 .map(this::filterInactiveEvents)
                 .filter(activeDbEvents -> activeDbEvents.size() > 0)
-                .flatMap(dbEvents -> mServiceApi.updateELDEvents(dbEvents)
-                        .toObservable()
-                        .onErrorResumeNext(Observable.just(mErrorResponse))
-                        .onExceptionResumeNext(Observable.just(mErrorResponse))
+                .flatMapSingle(dbEvents -> mServiceApi.updateELDEvents(dbEvents)
+                        .onErrorResumeNext(Single.just(mErrorResponse))
+                        .onErrorResumeNext(Single.just(mErrorResponse))
                         .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS) ? dbEvents : new ArrayList<ELDEvent>())
                 )
                 .filter(events -> !events.isEmpty())
-                .flatMap(dbEvents -> mServiceApi.getELDEvents(dbEvents.get(0).getEventTime(), dbEvents.get(dbEvents.size() - 1).getEventTime())
-                        .toObservable()
-                        .doOnNext(serverEvents -> {
+                .flatMapSingle(dbEvents -> mServiceApi.getELDEvents(dbEvents.get(0).getEventTime(), dbEvents.get(dbEvents.size() - 1).getEventTime())
+                        .doOnSuccess(serverEvents -> {
                             ELDEventEntity[] oldEntities = ELDEventConverter.toEntityArray(dbEvents);
                             mELDEventDao.deleteAll(oldEntities);
                             ELDEventEntity[] entities = ELDEventConverter.toEntityArray(serverEvents);
@@ -260,10 +253,9 @@ public final class SyncInteractor {
 
     public void syncLogSheetHeadersForDaysAgo(int days, String timezone) {
         mServiceApi.getLogSheets(DateUtils.getLogDayForDaysAgo(days, timezone), DateUtils.getLogDayForDaysAgo(0, timezone))
-                .toObservable()
                 .map(LogSheetConverter::toEntityList)
-                .doOnNext(logSheetEntities -> mLogSheetDao.insert(logSheetEntities))
-                .doOnNext(logSheetHeaders -> createMissingLogSheets(logSheetHeaders, days, timezone))
+                .doOnSuccess(logSheetEntities -> mLogSheetDao.insert(logSheetEntities))
+                .doOnSuccess(logSheetHeaders -> createMissingLogSheets(logSheetHeaders, days, timezone))
                 .subscribe();
     }
 
