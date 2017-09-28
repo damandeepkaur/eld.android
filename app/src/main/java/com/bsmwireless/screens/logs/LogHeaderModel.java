@@ -4,10 +4,19 @@ package com.bsmwireless.screens.logs;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.bsmwireless.models.LogSheetHeader;
-
 public final class LogHeaderModel implements Parcelable {
-    private LogSheetHeader mLogSheetHeader;
+    public static final Creator<LogHeaderModel> CREATOR = new Creator<LogHeaderModel>() {
+        @Override
+        public LogHeaderModel createFromParcel(Parcel source) {
+            return new LogHeaderModel(source);
+        }
+
+        @Override
+        public LogHeaderModel[] newArray(int size) {
+            return new LogHeaderModel[size];
+        }
+    };
+    private Long mLogDay;
     private String mTimezone;
     private String mDriverName;
     private String mCoDriversName;
@@ -28,67 +37,30 @@ public final class LogHeaderModel implements Parcelable {
     }
 
     protected LogHeaderModel(Parcel in) {
-        mLogSheetHeader = in.readParcelable(LogSheetHeader.class.getClassLoader());
-        mTimezone = in.readString();
-        mDriverName = in.readString();
-        mCoDriversName = in.readString();
-        mVehicleName = in.readString();
-        mVehicleLicense = in.readString();
-        mStartOdometer = in.readString();
-        mEndOdometer = in.readString();
-        mDistanceDriven = in.readString();
-        mCarrierName = in.readString();
-        mHomeTerminalName = in.readString();
-        mHomeTerminalAddress = in.readString();
-        mTrailers = in.readString();
-        mShippingId = in.readString();
-        mAllExemptions = in.readString();
-        mSelectedExemptions = in.readString();
+        this.mLogDay = (Long) in.readValue(Long.class.getClassLoader());
+        this.mTimezone = in.readString();
+        this.mDriverName = in.readString();
+        this.mCoDriversName = in.readString();
+        this.mVehicleName = in.readString();
+        this.mVehicleLicense = in.readString();
+        this.mStartOdometer = in.readString();
+        this.mEndOdometer = in.readString();
+        this.mDistanceDriven = in.readString();
+        this.mCarrierName = in.readString();
+        this.mHomeTerminalName = in.readString();
+        this.mHomeTerminalAddress = in.readString();
+        this.mTrailers = in.readString();
+        this.mShippingId = in.readString();
+        this.mAllExemptions = in.readString();
+        this.mSelectedExemptions = in.readString();
     }
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeParcelable(mLogSheetHeader, flags);
-        dest.writeString(mTimezone);
-        dest.writeString(mDriverName);
-        dest.writeString(mCoDriversName);
-        dest.writeString(mVehicleName);
-        dest.writeString(mVehicleLicense);
-        dest.writeString(mStartOdometer);
-        dest.writeString(mEndOdometer);
-        dest.writeString(mDistanceDriven);
-        dest.writeString(mCarrierName);
-        dest.writeString(mHomeTerminalName);
-        dest.writeString(mHomeTerminalAddress);
-        dest.writeString(mTrailers);
-        dest.writeString(mShippingId);
-        dest.writeString(mAllExemptions);
-        dest.writeString(mSelectedExemptions);
+    public Long getLogDay() {
+        return mLogDay;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    public static final Creator<LogHeaderModel> CREATOR = new Creator<LogHeaderModel>() {
-        @Override
-        public LogHeaderModel createFromParcel(Parcel in) {
-            return new LogHeaderModel(in);
-        }
-
-        @Override
-        public LogHeaderModel[] newArray(int size) {
-            return new LogHeaderModel[size];
-        }
-    };
-
-    public LogSheetHeader getLogSheetHeader() {
-        return mLogSheetHeader;
-    }
-
-    public void setLogSheetHeader(LogSheetHeader logSheetHeader) {
-        mLogSheetHeader = logSheetHeader;
+    public void setLogDay(Long logDay) {
+        this.mLogDay = logDay;
     }
 
     public String getTimezone() {
@@ -214,7 +186,7 @@ public final class LogHeaderModel implements Parcelable {
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("LogHeaderModel{");
-        sb.append("mLogSheetHeader=").append(mLogSheetHeader);
+        sb.append("mLogDay=").append(mLogDay);
         sb.append(", mTimezone='").append(mTimezone).append('\'');
         sb.append(", mDriverName='").append(mDriverName).append('\'');
         sb.append(", mCoDriversName='").append(mCoDriversName).append('\'');
@@ -232,6 +204,31 @@ public final class LogHeaderModel implements Parcelable {
         sb.append(", mSelectedExemptions='").append(mSelectedExemptions).append('\'');
         sb.append('}');
         return sb.toString();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeValue(this.mLogDay);
+        dest.writeString(this.mTimezone);
+        dest.writeString(this.mDriverName);
+        dest.writeString(this.mCoDriversName);
+        dest.writeString(this.mVehicleName);
+        dest.writeString(this.mVehicleLicense);
+        dest.writeString(this.mStartOdometer);
+        dest.writeString(this.mEndOdometer);
+        dest.writeString(this.mDistanceDriven);
+        dest.writeString(this.mCarrierName);
+        dest.writeString(this.mHomeTerminalName);
+        dest.writeString(this.mHomeTerminalAddress);
+        dest.writeString(this.mTrailers);
+        dest.writeString(this.mShippingId);
+        dest.writeString(this.mAllExemptions);
+        dest.writeString(this.mSelectedExemptions);
     }
 }
 
