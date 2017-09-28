@@ -40,7 +40,6 @@ import javax.inject.Inject;
 
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
-import io.reactivex.Observable;
 import io.reactivex.Single;
 
 import static com.bsmwireless.common.Constants.DEFAULT_CALENDAR_DAYS_COUNT;
@@ -67,7 +66,7 @@ public final class UserInteractor {
         mSyncInteractor = syncInteractor;
     }
 
-    public Observable<Boolean> loginUser(final String name, final String password, final String domain, boolean keepToken, User.DriverType driverType) {
+    public Single<Boolean> loginUser(final String name, final String password, final String domain, boolean keepToken, User.DriverType driverType) {
         LoginModel request = new LoginModel();
         request.setUsername(name);
         request.setPassword(password);
@@ -76,20 +75,20 @@ public final class UserInteractor {
 
         String accountName = mTokenManager.getAccountName(name, domain);
         return mServiceApi.loginUser(request)
-                .toObservable()
-                .doOnNext(user -> saveUserDataInDB(user, accountName))
+                .doOnSuccess(user -> saveUserDataInDB(user, accountName))
                 .onErrorResumeNext(throwable -> {
                     if (throwable instanceof RetrofitException || throwable instanceof UnknownHostException) {
                         String driverId = mTokenManager.getDriver(accountName);
-                        return Observable.fromCallable(() -> mTokenManager.getPassword(accountName))
-                                .filter(accountPassword -> !StringUtils.isAnyEmpty(password, accountPassword) && password.equals(accountPassword))
-                                .map(filterIn -> mAppDatabase.userDao().getUserSync(Integer.valueOf(driverId)))
-                                .map(UserConverter::toUser)
-                                .map(user -> user.setAuth(new Auth(Integer.valueOf(driverId)).setToken(mTokenManager.getToken(accountName))));
+                        String pass = mTokenManager.getPassword(accountName);
+                        if (!StringUtils.isAnyEmpty(password, pass) && password.equals(pass)) {
+                            return Single.fromCallable(() -> mAppDatabase.userDao().getUserSync(Integer.valueOf(driverId)))
+                                    .map(UserConverter::toUser)
+                                    .map(user -> user.setAuth(new Auth(Integer.valueOf(driverId)).setToken(mTokenManager.getToken(accountName))));
+                        }
                     }
-                    return Observable.error(throwable);
+                    return Single.error(throwable);
                 })
-                .doOnNext(user -> {
+                .doOnSuccess(user -> {
                     mTokenManager.setToken(accountName, name, password, domain, user.getAuth());
 
                     //save user data
@@ -102,7 +101,7 @@ public final class UserInteractor {
                     mSyncInteractor.syncEventsForDaysAgo(DEFAULT_CALENDAR_DAYS_COUNT, user.getTimezone());
                     mSyncInteractor.syncLogSheetHeadersForDaysAgo(DEFAULT_CALENDAR_DAYS_COUNT, user.getTimezone());
                 })
-                .switchMap(user -> Observable.just(true));
+                .flatMap(user -> Single.just(true));
     }
 
     public Completable loginCoDriver(final String name, final String password, User.DriverType driverType) {
@@ -117,19 +116,19 @@ public final class UserInteractor {
         String accountName = mTokenManager.getAccountName(name, domain);
 
         return mServiceApi.loginUser(request)
-                .toObservable()
                 .onErrorResumeNext(throwable -> {
                     if (throwable instanceof RetrofitException || throwable instanceof UnknownHostException) {
                         String driverId = mTokenManager.getDriver(accountName);
-                        return Observable.fromCallable(() -> mTokenManager.getPassword(accountName))
-                                .filter(accountPassword -> !StringUtils.isAnyEmpty(password, accountPassword) && password.equals(accountPassword))
-                                .map(filterIn -> mAppDatabase.userDao().getUserSync(Integer.valueOf(driverId)))
-                                .map(UserConverter::toUser)
-                                .map(user -> user.setAuth(new Auth(Integer.valueOf(driverId))));
+                        String pass = mTokenManager.getPassword(accountName);
+                        if (!StringUtils.isAnyEmpty(password, pass) && password.equals(pass)) {
+                            return Single.fromCallable(() -> mAppDatabase.userDao().getUserSync(Integer.valueOf(driverId)))
+                                    .map(UserConverter::toUser)
+                                    .map(user -> user.setAuth(new Auth(Integer.valueOf(driverId)).setToken(mTokenManager.getToken(accountName))));
+                        }
                     }
-                    return Observable.error(throwable);
+                    return Single.error(throwable);
                 })
-                .doOnNext(user -> {
+                .doOnSuccess(user -> {
                     mTokenManager.setToken(accountName, name, password, domain, user.getAuth());
                     saveUserDataInDB(user, accountName);
 
@@ -144,14 +143,14 @@ public final class UserInteractor {
                     long end = DateUtils.getEndDayTimeInMs(user.getTimezone(), current);
                     String token = user.getAuth().getToken();
                     int userId = user.getId();
-                    return mServiceApi.getELDEvents(start, end, token, String.valueOf(userId)).toObservable();
+                    return mServiceApi.getELDEvents(start, end, token, String.valueOf(userId));
                 })
                 .onErrorResumeNext(throwable -> {
                     throwable.printStackTrace();
                     if (throwable instanceof RetrofitException || throwable instanceof UnknownHostException) {
-                        return Observable.just(new ArrayList<>());
+                        return Single.just(new ArrayList<>());
                     }
-                    return Observable.error(throwable);
+                    return Single.error(throwable);
                 })
                 .flatMapCompletable(events -> Completable.fromAction(() -> {
                     ELDEventEntity[] entities = ELDEventConverter.toEntityList(events).toArray(new ELDEventEntity[events.size()]);
