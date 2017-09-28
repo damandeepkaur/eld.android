@@ -3,6 +3,7 @@ ELD app for Android
 
 # Version history
 
+* **1.0.87** - Data Recording Compliance Monitoring (_EA-232_)
 * **1.0.86** - Implement reassign log to co-driver (_EA-182_)
 * **1.0.85** - Add roadside and data transfer (_EA-109_, _EA-84_, _EA-54_)
 * **1.0.84** - Fix extra timing in auto-duty (_EA-406_), Fix duration round issue (_EA-336_)
