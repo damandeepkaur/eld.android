@@ -77,12 +77,12 @@ public final class SyncInteractor {
         if (mIsSyncActive) {
             return;
         }
+        mIsSyncActive = true;
         if (mSyncCompositeDisposable == null || mSyncCompositeDisposable.isDisposed()) {
             mSyncCompositeDisposable = new CompositeDisposable();
         } else {
             mSyncCompositeDisposable.clear();
         }
-        mIsSyncActive = true;
         syncNewEvents();
         syncUpdatedEvents();
         syncLogSheetHeaders();
@@ -268,6 +268,7 @@ public final class SyncInteractor {
         }
         mSyncCompositeDisposable.clear();
         mSyncCompositeDisposable.dispose();
+        mIsSyncActive = false;
     }
 
     //TODO: remove after cleanup all incorrect events on server part
