@@ -3,6 +3,7 @@ package com.bsmwireless.data.storage;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 
+import com.bsm.sd.hos.Calculator;
 import com.bsm.sd.hos.model.LogEvent;
 import com.bsm.sd.hos.model.Result;
 import com.bsm.sd.hos.model.RuleSelectionHst;
@@ -11,10 +12,13 @@ import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.User;
 import com.bsmwireless.widgets.alerts.DutyType;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import timber.log.Timber;
 
 import static com.bsmwireless.common.utils.DateUtils.MS_IN_HOUR;
 import static com.bsmwireless.common.utils.DateUtils.MS_IN_SEC;
@@ -257,6 +261,12 @@ public final class DutyTypeManager {
 
         List<LogEvent> calculatorEvents = CalculatorConverter.eventListToCalculatorEventList(events);
         List<RuleSelectionHst> calculatorRules = CalculatorConverter.userToCalculatorRule(user, start);
+
+        try {
+            result = Calculator.getInstance(null).calculate(calculatorEvents, calculatorRules, new Timestamp(start), new Timestamp(System.currentTimeMillis()));
+        } catch (Exception e) {
+            Timber.e(e);
+        }
 
         if (result == null) {
             mPreferencesManager.setOnDutyTimeLeft(0);
