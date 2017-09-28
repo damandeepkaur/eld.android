@@ -223,8 +223,13 @@ public final class DashboardFragment extends BaseFragment implements DashboardVi
     }
 
     @Override
-    public void showNotInVehicleDialog() {
-        mNavigateView.showNotInVehicleDialog();
+    public void showSpecialStatuses() {
+        mStatusLayout.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void hideSpecialStatuses() {
+        mStatusLayout.setVisibility(View.GONE);
     }
 
     private void initTimer() {

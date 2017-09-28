@@ -10,8 +10,8 @@ android {
         applicationId "app.bsmuniversal.com"
         minSdkVersion 15
         targetSdkVersion 26
-        versionCode 84
-        versionName "1.0.83"
+        versionCode 87
+        versionName "1.0.86"
 
         javaCompileOptions {
             annotationProcessorOptions {

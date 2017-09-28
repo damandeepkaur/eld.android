@@ -241,4 +241,7 @@ public interface ServiceApi {
      */
     @GET("v1/app/vehicles/search/{keyword}")
     Observable<List<Vehicle>> searchVehicles(@Path("keyword") String keyword);
+
+    @POST("v1/app/reports/logsheets/{start}/{end}/{option}")
+    Single<ResponseMessage> sendReport(@Path("start") long start, @Path("end") long end, @Path("option") int option, @Body ELDEvent report);
 }

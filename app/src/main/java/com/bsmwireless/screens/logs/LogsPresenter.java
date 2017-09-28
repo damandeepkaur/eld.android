@@ -314,6 +314,10 @@ public final class LogsPresenter implements AccountManager.AccountListener {
     public void onRemovedEventClicked(EventLogModel event) {
     }
 
+    public void onReassignEventClicked(EventLogModel event) {
+        mView.showReassignDialog(event.getEvent());
+    }
+
     public void onAddEventClicked(CalendarItem day) {
         mView.goToAddEventScreen(day);
     }

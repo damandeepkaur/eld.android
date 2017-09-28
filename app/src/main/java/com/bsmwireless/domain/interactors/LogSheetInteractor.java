@@ -1,6 +1,7 @@
 package com.bsmwireless.domain.interactors;
 
 import com.bsmwireless.common.utils.DateUtils;
+import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.PreferencesManager;
@@ -26,6 +27,7 @@ import io.reactivex.Observable;
 import io.reactivex.Single;
 import timber.log.Timber;
 
+import static com.bsmwireless.common.Constants.SUCCESS;
 import static com.bsmwireless.data.storage.logsheets.LogSheetEntity.SyncType.UNSYNC;
 
 public final class LogSheetInteractor {
@@ -36,8 +38,8 @@ public final class LogSheetInteractor {
     private AccountManager mAccountManager;
 
     @Inject
-    public LogSheetInteractor(PreferencesManager preferencesManager, AppDatabase appDatabase,
-                              AccountManager accountManager) {
+    public LogSheetInteractor(PreferencesManager preferencesManager,
+                              AppDatabase appDatabase, AccountManager accountManager) {
         mPreferencesManager = preferencesManager;
         mAppDatabase = appDatabase;
         mLogSheetDao = appDatabase.logSheetDao();
@@ -47,6 +49,12 @@ public final class LogSheetInteractor {
     public Flowable<List<LogSheetHeader>> getLogSheetHeaders(Long startLogDay, Long endLogDay) {
         return mLogSheetDao.getLogSheets(startLogDay, endLogDay, mAccountManager.getCurrentUserId())
                 .map(LogSheetConverter::toModelList);
+    }
+
+    public Single<LogSheetHeader> getLogSheetHeadersFromDBOnce(long logDay) {
+        int driverId = mAccountManager.getCurrentUserId();
+        return mAppDatabase.logSheetDao().getLogSheet(logDay, driverId)
+                .map(LogSheetConverter::toModel);
     }
 
     public Single<LogSheetHeader> getLogSheet(Long logDay) {
@@ -161,4 +169,6 @@ public final class LogSheetInteractor {
         logSheetHeader.setStartOfDay(0L);
         return logSheetHeader;
     }
+
+
 }

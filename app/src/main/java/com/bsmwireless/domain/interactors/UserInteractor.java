@@ -41,6 +41,7 @@ import javax.inject.Inject;
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 
 import static com.bsmwireless.common.Constants.DEFAULT_CALENDAR_DAYS_COUNT;
 import static com.bsmwireless.common.Constants.SUCCESS;
@@ -297,6 +298,10 @@ public final class UserInteractor {
         return fullUserEntity;
     }
 
+    public FullUserEntity getFullUserSync(int id) {
+        return mAppDatabase.userDao().getFullUserSync(id);
+    }
+
     public Flowable<User> getFullUser() {
         return getFullDriver().map(UserConverter::toFullUser);
     }
@@ -323,6 +328,10 @@ public final class UserInteractor {
         return mAppDatabase.userDao().getUserTimezone(getDriverId());
     }
 
+    public Single<String> getTimezoneOnce() {
+        return mAppDatabase.userDao().getUserTimezoneOnce(getDriverId());
+    }
+
     public boolean isRememberMeEnabled() {
         return mPreferencesManager.isRememberUserEnabled();
     }
@@ -339,6 +348,10 @@ public final class UserInteractor {
 
     public UserEntity getUserFromDBSync(int userId) {
         return mAppDatabase.userDao().getUserSync(userId);
+    }
+
+    public List<UserEntity> getUsersFromDBSync(String ids) {
+        return mAppDatabase.userDao().getUsersSync(ListConverter.toIntegerList(ids));
     }
 
     private List<Integer> saveCoDrivers(int driverId, List<Integer> coDriverIds) {
