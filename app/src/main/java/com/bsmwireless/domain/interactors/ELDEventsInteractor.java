@@ -155,6 +155,7 @@ public final class ELDEventsInteractor {
                     }
                     return new ResponseMessage(throwable.getMessage());
                 })
+                .toObservable()
                 .map(responseMessage -> SUCCESS.equals(responseMessage.getMessage()))
                 .switchMap(isSuccess -> mBlackBoxInteractor.shutdown(isSuccess));
     }
@@ -167,8 +168,8 @@ public final class ELDEventsInteractor {
                             getEvent(ELDEvent.LoginLogoutCode.LOGOUT),
                             token,
                             String.valueOf(userEntity.getId())
-
                     )
+                            .toObservable()
                             .onErrorReturn(throwable -> {
                                 if (throwable instanceof RetrofitException ||
                                         throwable instanceof IOException) {

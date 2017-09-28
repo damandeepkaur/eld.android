@@ -76,6 +76,7 @@ public final class UserInteractor {
 
         String accountName = mTokenManager.getAccountName(name, domain);
         return mServiceApi.loginUser(request)
+                .toObservable()
                 .doOnNext(user -> saveUserDataInDB(user, accountName))
                 .onErrorResumeNext(throwable -> {
                     if (throwable instanceof RetrofitException || throwable instanceof UnknownHostException) {
@@ -116,6 +117,7 @@ public final class UserInteractor {
         String accountName = mTokenManager.getAccountName(name, domain);
 
         return mServiceApi.loginUser(request)
+                .toObservable()
                 .onErrorResumeNext(throwable -> {
                     if (throwable instanceof RetrofitException || throwable instanceof UnknownHostException) {
                         String driverId = mTokenManager.getDriver(accountName);
@@ -142,7 +144,7 @@ public final class UserInteractor {
                     long end = DateUtils.getEndDayTimeInMs(user.getTimezone(), current);
                     String token = user.getAuth().getToken();
                     int userId = user.getId();
-                    return mServiceApi.getELDEvents(start, end, token, String.valueOf(userId));
+                    return mServiceApi.getELDEvents(start, end, token, String.valueOf(userId)).toObservable();
                 })
                 .onErrorResumeNext(throwable -> {
                     throwable.printStackTrace();
@@ -191,37 +193,37 @@ public final class UserInteractor {
         }
     }
 
-    public Observable<Boolean> syncDriverProfile(UserEntity userEntity) {
-        return Observable.fromCallable(() -> mAppDatabase.userDao().insertUser(userEntity))
+    public Single<Boolean> syncDriverProfile(UserEntity userEntity) {
+        return Single.fromCallable(() -> mAppDatabase.userDao().insertUser(userEntity))
                 .map(userId -> userId > 0)
                 .flatMap(userInserted -> {
                     if (userInserted) {
                         return mServiceApi.updateDriverProfile(new DriverProfileModel(userEntity));
                     }
-                    return Observable.just(new ResponseMessage(""));
+                    return Single.just(new ResponseMessage(""));
                 })
                 .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS))
                 .onErrorReturn(this::handleOfflineOperation);
     }
 
-    public Observable<Boolean> updateDriverPassword(String oldPassword, String newPassword) {
+    public Single<Boolean> updateDriverPassword(String oldPassword, String newPassword) {
         return mServiceApi.updateDriverPassword(getPasswordModel(oldPassword, newPassword))
                 .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
     }
 
-    public Observable<Boolean> updateDriverSignature(String signature) {
+    public Single<Boolean> updateDriverSignature(String signature) {
         return mServiceApi.updateDriverSignature(getDriverSignature(signature))
                 .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS))
                 .onErrorReturn(throwable -> false);
     }
 
-    public Observable<Boolean> updateDriverRule(String ruleException, String dutyCycle) {
+    public Single<Boolean> updateDriverRule(String ruleException, String dutyCycle) {
         return mServiceApi.updateDriverRule(getRuleSelectionModel(ruleException, dutyCycle))
                 .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS))
                 .onErrorReturn(throwable -> false);
     }
 
-    public Observable<Boolean> updateDriverHomeTerminal(Integer homeTerminalId) {
+    public Single<Boolean> updateDriverHomeTerminal(Integer homeTerminalId) {
         return mServiceApi.updateDriverHomeTerminal(getHomeTerminal(homeTerminalId))
                 .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS))
                 .onErrorReturn(throwable -> false);

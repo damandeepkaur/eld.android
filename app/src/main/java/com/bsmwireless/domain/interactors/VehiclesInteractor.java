@@ -17,6 +17,7 @@ import javax.inject.Inject;
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 
 public final class VehiclesInteractor {
     private static final int NOT_IN_VEHICLE_ID = -1;
@@ -43,7 +44,7 @@ public final class VehiclesInteractor {
         mELDEventsInteractor = eventsInteractor;
     }
 
-    public Observable<List<Vehicle>> searchVehicles(String searchText) {
+    public Single<List<Vehicle>> searchVehicles(String searchText) {
         return mServiceApi.searchVehicles(searchText);
     }
 
@@ -110,7 +111,7 @@ public final class VehiclesInteractor {
                     event.setEngineHours(blackBox.getEngineHours());
                     event.setComment(mBlackBoxInteractor.getVinNumber());
 
-                    return mServiceApi.pairVehicle(event);
+                    return mServiceApi.pairVehicle(event).toObservable();
                 })
                 .doOnNext(events -> {
                     saveLastVehicle(id, vehicle.getId());

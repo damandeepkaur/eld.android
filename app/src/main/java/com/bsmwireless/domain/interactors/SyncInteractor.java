@@ -69,19 +69,24 @@ public final class SyncInteractor {
         mUserDao = appDatabase.userDao();
         mLogSheetDao = appDatabase.logSheetDao();
         mErrorResponse = new ResponseMessage("error");
-        mSyncCompositeDisposable = new CompositeDisposable();
         mAccountManager = accountManager;
         mLogSheetInteractor = logSheetInteractor;
     }
 
     public void startSync() {
-        if (!mIsSyncActive) {
-            mIsSyncActive = true;
-            syncNewEvents();
-            syncUpdatedEvents();
-            syncLogSheetHeaders();
-            syncDriverProfile();
+        if (mIsSyncActive) {
+            return;
         }
+        if (mSyncCompositeDisposable == null || mSyncCompositeDisposable.isDisposed()) {
+            mSyncCompositeDisposable = new CompositeDisposable();
+        } else {
+            mSyncCompositeDisposable.clear();
+        }
+        mIsSyncActive = true;
+        syncNewEvents();
+        syncUpdatedEvents();
+        syncLogSheetHeaders();
+        syncDriverProfile();
     }
 
     private void syncDriverProfile() {
@@ -99,6 +104,7 @@ public final class SyncInteractor {
                             .setDriverId(userEntity.getId())
                             .setSignature(userEntity.getSignature()))
                             .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS))
+                            .toObservable()
                             .onErrorReturn(throwable -> false);
                     Observable<Boolean> driverRuleUpdate = mServiceApi.updateDriverRule(new RuleSelectionModel()
                             .setDriverId(userEntity.getId())
@@ -106,11 +112,13 @@ public final class SyncInteractor {
                             .setDutyCycle(userEntity.getDutyCycle())
                             .setApplyTime(Calendar.getInstance().getTimeInMillis()))
                             .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS))
+                            .toObservable()
                             .onErrorReturn(throwable -> false);
                     Observable<Boolean> homeTerminalUpdate = mServiceApi.updateDriverHomeTerminal(new DriverHomeTerminal()
                             .setDriverId(userEntity.getId())
                             .setHomeTermId(userEntity.getHomeTermId()))
                             .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS))
+                            .toObservable()
                             .onErrorReturn(throwable -> false);
                     return Observable.zip(signatureUpdate, driverRuleUpdate, (resultFirst, resultSecond) -> resultFirst && resultSecond)
                             .zipWith(homeTerminalUpdate, (resultFirst, resultSecond) -> resultFirst && resultSecond)
@@ -126,7 +134,9 @@ public final class SyncInteractor {
         long startTime = DateUtils.getStartDate(timezone, dayCalendar);
         long endTime = startTime + MS_IN_DAY;
 
-        if (mSyncEventsForDayDisposable != null) mSyncEventsForDayDisposable.dispose();
+        if (mSyncEventsForDayDisposable != null && !mSyncEventsForDayDisposable.isDisposed()) {
+            mSyncEventsForDayDisposable.dispose();
+        }
         mSyncEventsForDayDisposable = Observable.interval(Constants.SYNC_TIMEOUT_IN_MIN, TimeUnit.MINUTES)
                 .subscribeOn(Schedulers.io())
                 .filter(t -> NetworkUtils.isOnlineMode())
@@ -134,7 +144,7 @@ public final class SyncInteractor {
                 .map(aLong -> ELDEventConverter.toModelList(mELDEventDao.getUpdateUnsyncEvents()))
                 .map(this::filterInactiveEvents)
                 .filter(List::isEmpty)
-                .flatMap(eldEvents -> mServiceApi.getELDEvents(startTime, endTime))
+                .flatMap(eldEvents -> mServiceApi.getELDEvents(startTime, endTime).toObservable())
                 .subscribe(eldEventsFromServer -> {
                             List<ELDEventEntity> entities = mELDEventDao.getEventsFromStartToEndTimeSync(
                                     startTime, endTime, mAccountManager.getCurrentUserId());
@@ -161,7 +171,7 @@ public final class SyncInteractor {
     }
 
     private void syncNewEvents() {
-        mSyncCompositeDisposable.add(Observable.interval(Constants.SYNC_TIMEOUT_IN_MIN, TimeUnit.MINUTES)
+        Disposable syncNewEventsDisposable = Observable.interval(Constants.SYNC_TIMEOUT_IN_MIN, TimeUnit.MINUTES)
                 .subscribeOn(Schedulers.io())
                 .filter(t -> NetworkUtils.isOnlineMode())
                 .filter(t -> mPreferencesManager.getBoxId() != PreferencesManager.NOT_FOUND_VALUE)
@@ -172,6 +182,7 @@ public final class SyncInteractor {
                 .filter(eldEvents -> !eldEvents.isEmpty())
                 .flatMap(events -> Observable.fromIterable(parseELDEventsList(events)))
                 .flatMap(events -> mServiceApi.postNewELDEvents(events)
+                        .toObservable()
                         .onErrorResumeNext(Observable.just(mErrorResponse))
                         .onExceptionResumeNext(Observable.just(mErrorResponse))
                         .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS) ? events : new ArrayList<ELDEvent>())
@@ -179,6 +190,7 @@ public final class SyncInteractor {
                 .filter(events -> !events.isEmpty())
                 .delay(1, TimeUnit.SECONDS)
                 .flatMap(dbEvents -> mServiceApi.getELDEvents(dbEvents.get(0).getEventTime(), dbEvents.get(dbEvents.size() - 1).getEventTime())
+                        .toObservable()
                         .doOnNext(serverEvents -> {
                             ELDEventEntity[] oldEntities = ELDEventConverter.toEntityArray(dbEvents);
                             mELDEventDao.deleteAll(oldEntities);
@@ -186,12 +198,12 @@ public final class SyncInteractor {
                             mELDEventDao.insertAll(entities);
                         }))
                 .subscribe(events -> Timber.d("Sync added events:" + events),
-                        Timber::e)
-        );
+                        Timber::e);
+        mSyncCompositeDisposable.add(syncNewEventsDisposable);
     }
 
     private void syncUpdatedEvents() {
-        mSyncCompositeDisposable.add(Observable.interval(Constants.SYNC_TIMEOUT_IN_MIN, TimeUnit.MINUTES)
+        Disposable syncUpdatedEventDisposable = Observable.interval(Constants.SYNC_TIMEOUT_IN_MIN, TimeUnit.MINUTES)
                 .subscribeOn(Schedulers.io())
                 .filter(t -> NetworkUtils.isOnlineMode())
                 .filter(t -> mPreferencesManager.getBoxId() != PreferencesManager.NOT_FOUND_VALUE)
@@ -203,12 +215,14 @@ public final class SyncInteractor {
                 .map(this::filterInactiveEvents)
                 .filter(activeDbEvents -> activeDbEvents.size() > 0)
                 .flatMap(dbEvents -> mServiceApi.updateELDEvents(dbEvents)
+                        .toObservable()
                         .onErrorResumeNext(Observable.just(mErrorResponse))
                         .onExceptionResumeNext(Observable.just(mErrorResponse))
                         .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS) ? dbEvents : new ArrayList<ELDEvent>())
                 )
                 .filter(events -> !events.isEmpty())
                 .flatMap(dbEvents -> mServiceApi.getELDEvents(dbEvents.get(0).getEventTime(), dbEvents.get(dbEvents.size() - 1).getEventTime())
+                        .toObservable()
                         .doOnNext(serverEvents -> {
                             ELDEventEntity[] oldEntities = ELDEventConverter.toEntityArray(dbEvents);
                             mELDEventDao.deleteAll(oldEntities);
@@ -217,35 +231,36 @@ public final class SyncInteractor {
                         })
                         .map(serverEvents -> dbEvents))
                 .subscribe(dbEvents -> Timber.d("Sync updated events:" + dbEvents),
-                        Timber::e)
-        );
+                        Timber::e);
+        mSyncCompositeDisposable.add(syncUpdatedEventDisposable);
     }
 
     public void syncLogSheetHeaders() {
-        mSyncCompositeDisposable.add(
-                Observable.interval(Constants.SYNC_TIMEOUT_IN_MIN, TimeUnit.MINUTES)
-                        .subscribeOn(Schedulers.io())
-                        .filter(t -> NetworkUtils.isOnlineMode())
-                        .filter(t -> mPreferencesManager.getBoxId() != PreferencesManager.NOT_FOUND_VALUE)
-                        .map(t -> mAccountManager.getCurrentUserId())
-                        .map(userId -> mLogSheetDao.getUnSync(userId))
-                        .filter(logSheetEntities -> !logSheetEntities.isEmpty())
-                        .map(LogSheetConverter::toModelList)
-                        .flatMap(Observable::fromIterable)
-                        .flatMap(logSheetHeader -> mServiceApi.updateLogSheetHeader(logSheetHeader)
-                                .onErrorResumeNext(throwable -> Single.just(mErrorResponse))
-                                .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS))
-                                .map(isSuccess -> (isSuccess) ? LogSheetEntity.SyncType.SYNC : LogSheetEntity.SyncType.UNSYNC)
-                                .flatMapObservable(syncType -> Observable.just(LogSheetConverter.toEntity(logSheetHeader, syncType)))
-                        )
-                        .filter(logSheetEntity -> logSheetEntity.getSync() == LogSheetEntity.SyncType.SYNC.ordinal())
-                        .doOnNext(logSheetEntity -> mLogSheetDao.insert(logSheetEntity))
-                        .subscribe(logSheetEntity -> Timber.d("Sync LogSheetHeader: " + LogSheetConverter.toModel(logSheetEntity)),
-                                Timber::e));
+        Disposable syncHeadersDisposable = Observable.interval(Constants.SYNC_TIMEOUT_IN_MIN, TimeUnit.MINUTES)
+                .subscribeOn(Schedulers.io())
+                .filter(t -> NetworkUtils.isOnlineMode())
+                .filter(t -> mPreferencesManager.getBoxId() != PreferencesManager.NOT_FOUND_VALUE)
+                .map(t -> mAccountManager.getCurrentUserId())
+                .map(userId -> mLogSheetDao.getUnSync(userId))
+                .filter(logSheetEntities -> !logSheetEntities.isEmpty())
+                .map(LogSheetConverter::toModelList)
+                .flatMap(Observable::fromIterable)
+                .flatMap(logSheetHeader -> mServiceApi.updateLogSheetHeader(logSheetHeader)
+                        .onErrorResumeNext(throwable -> Single.just(mErrorResponse))
+                        .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS))
+                        .map(isSuccess -> (isSuccess) ? LogSheetEntity.SyncType.SYNC : LogSheetEntity.SyncType.UNSYNC)
+                        .flatMapObservable(syncType -> Observable.just(LogSheetConverter.toEntity(logSheetHeader, syncType)))
+                )
+                .filter(logSheetEntity -> logSheetEntity.getSync() == LogSheetEntity.SyncType.SYNC.ordinal())
+                .doOnNext(logSheetEntity -> mLogSheetDao.insert(logSheetEntity))
+                .subscribe(logSheetEntity -> Timber.d("Sync LogSheetHeader: " + LogSheetConverter.toModel(logSheetEntity)),
+                        Timber::e);
+        mSyncCompositeDisposable.add(syncHeadersDisposable);
     }
 
     public void syncLogSheetHeadersForDaysAgo(int days, String timezone) {
         mServiceApi.getLogSheets(DateUtils.getLogDayForDaysAgo(days, timezone), DateUtils.getLogDayForDaysAgo(0, timezone))
+                .toObservable()
                 .map(LogSheetConverter::toEntityList)
                 .doOnNext(logSheetEntities -> mLogSheetDao.insert(logSheetEntities))
                 .doOnNext(logSheetHeaders -> createMissingLogSheets(logSheetHeaders, days, timezone))
@@ -253,9 +268,14 @@ public final class SyncInteractor {
     }
 
     public void stopSync() {
-        if (mIsSyncActive) {
-            mSyncCompositeDisposable.dispose();
+        if (!mIsSyncActive) {
+            return;
         }
+        if (mSyncCompositeDisposable == null || mSyncCompositeDisposable.isDisposed()) {
+            return;
+        }
+        mSyncCompositeDisposable.clear();
+        mSyncCompositeDisposable.dispose();
     }
 
     //TODO: remove after cleanup all incorrect events on server part
