@@ -131,8 +131,7 @@ public final class SyncInteractor {
                 .subscribeOn(Schedulers.io())
                 .filter(t -> NetworkUtils.isOnlineMode())
                 .take(3)
-                .map(aLong -> mAccountManager.getCurrentUserId())
-                .map(userId -> ELDEventConverter.toModelList(mELDEventDao.getUpdateUnsyncEvents(userId)))
+                .map(aLong -> ELDEventConverter.toModelList(mELDEventDao.getUpdateUnsyncEvents()))
                 .map(this::filterInactiveEvents)
                 .filter(List::isEmpty)
                 .flatMap(eldEvents -> mServiceApi.getELDEvents(startTime, endTime))
@@ -196,8 +195,7 @@ public final class SyncInteractor {
                 .subscribeOn(Schedulers.io())
                 .filter(t -> NetworkUtils.isOnlineMode())
                 .filter(t -> mPreferencesManager.getBoxId() != PreferencesManager.NOT_FOUND_VALUE)
-                .map(t -> mAccountManager.getCurrentUserId())
-                .map(userId -> ELDEventConverter.toModelList(mELDEventDao.getUpdateUnsyncEvents(userId)))
+                .map(t -> ELDEventConverter.toModelList(mELDEventDao.getUpdateUnsyncEvents()))
                 .filter(dbEvents -> !dbEvents.isEmpty())
                 .map(this::filterIncorrectEvents)
                 .filter(dbEvents -> !dbEvents.isEmpty())
@@ -276,7 +274,7 @@ public final class SyncInteractor {
         ListIterator<ELDEvent> iterator = list.listIterator();
         while (iterator.hasNext()) {
             ELDEvent event = iterator.next();
-            if (event.getStatus() != ELDEvent.StatusCode.ACTIVE.getValue()) {
+            if (event.getStatus() == ELDEvent.StatusCode.INACTIVE_CHANGED.getValue()) {
                 iterator.remove();
             }
         }
