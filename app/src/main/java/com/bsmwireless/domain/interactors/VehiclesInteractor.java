@@ -103,7 +103,7 @@ public final class VehiclesInteractor {
 
         return mBlackBoxInteractor.getData(vehicle.getBoxId())
                 .doOnNext(blackBox -> saveVehicle(vehicle))
-                .flatMap(blackBox -> {
+                .flatMapSingle(blackBox -> {
                     event.setTimezone(mUserInteractor.getTimezoneSync(id));
                     event.setOdometer(blackBox.getOdometer());
                     event.setLat(blackBox.getLat());
@@ -111,7 +111,7 @@ public final class VehiclesInteractor {
                     event.setEngineHours(blackBox.getEngineHours());
                     event.setComment(mBlackBoxInteractor.getVinNumber());
 
-                    return mServiceApi.pairVehicle(event).toObservable();
+                    return mServiceApi.pairVehicle(event);
                 })
                 .doOnNext(events -> {
                     saveLastVehicle(id, vehicle.getId());

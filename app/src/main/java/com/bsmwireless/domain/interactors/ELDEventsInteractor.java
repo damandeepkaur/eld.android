@@ -145,7 +145,7 @@ public final class ELDEventsInteractor {
                 });
     }
 
-    public Observable<Boolean> postLogoutEvent() {
+    public Single<Boolean> postLogoutEvent() {
         return mServiceApi.logout(getEvent(ELDEvent.LoginLogoutCode.LOGOUT))
                 .onErrorReturn(throwable -> {
                     if (throwable instanceof RetrofitException ||
@@ -154,13 +154,12 @@ public final class ELDEventsInteractor {
                     }
                     return new ResponseMessage(throwable.getMessage());
                 })
-                .toObservable()
                 .map(responseMessage -> SUCCESS.equals(responseMessage.getMessage()))
-                .switchMap(isSuccess -> mBlackBoxInteractor.shutdown(isSuccess));
+                .flatMap(isSuccess -> mBlackBoxInteractor.shutdown(isSuccess).singleOrError());
     }
 
-    public Observable<Boolean> postLogoutEvent(int userId) {
-        return Observable.fromCallable(() -> mUserDao.getUserSync(userId))
+    public Single<Boolean> postLogoutEvent(int userId) {
+        return Single.fromCallable(() -> mUserDao.getUserSync(userId))
                 .flatMap(userEntity -> {
                     String token = mTokenManager.getToken(userEntity.getAccountName());
                     return mServiceApi.logout(
@@ -168,7 +167,6 @@ public final class ELDEventsInteractor {
                             token,
                             String.valueOf(userEntity.getId())
                     )
-                            .toObservable()
                             .onErrorReturn(throwable -> {
                                 if (throwable instanceof RetrofitException ||
                                         throwable instanceof IOException) {
