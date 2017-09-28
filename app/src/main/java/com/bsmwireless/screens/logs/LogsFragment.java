@@ -171,7 +171,7 @@ public final class LogsFragment extends BaseFragment implements LogsView {
     }
 
     @Override
-    public void updateGraph(GraphModel graphModel){
+    public void updateGraph(GraphModel graphModel) {
         mAdapter.updateGraph(graphModel);
     }
 
@@ -261,6 +261,9 @@ public final class LogsFragment extends BaseFragment implements LogsView {
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
+        if (mAdapter != null) {
+            mPresenter.updateDataForDay(mAdapter.getCurrentItem().getLogDay());
+        }
     }
 
     @Override

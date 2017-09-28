@@ -7,7 +7,6 @@ import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
 import com.bsmwireless.domain.interactors.LogSheetInteractor;
-import com.bsmwireless.domain.interactors.SyncInteractor;
 import com.bsmwireless.domain.interactors.UserInteractor;
 import com.bsmwireless.domain.interactors.VehiclesInteractor;
 import com.bsmwireless.models.Carrier;
@@ -51,12 +50,13 @@ public final class LogsPresenter implements AccountManager.AccountListener {
     private Map<Integer, Vehicle> mVehicleIdToNameMap = new HashMap<>();
     private Map<Long, LogSheetHeader> mLogSheetHeadersMap = new HashMap<>();
     private DutyTypeManager.DutyTypeListener mListener = dutyType -> mView.dutyUpdated();
-    private CompositeDisposable mDisposables = new CompositeDisposable();
+    private CompositeDisposable mDisposables;
+    private CompositeDisposable mUpdateDayDataDisposables;
 
     @Inject
     public LogsPresenter(LogsView view, ELDEventsInteractor eventsInteractor, LogSheetInteractor logSheetInteractor,
                          VehiclesInteractor vehiclesInteractor, UserInteractor userInteractor, DutyTypeManager dutyTypeManager,
-                         AccountManager accountManager, SyncInteractor syncInteractor) {
+                         AccountManager accountManager) {
         mView = view;
         mELDEventsInteractor = eventsInteractor;
         mLogSheetInteractor = logSheetInteractor;
@@ -69,9 +69,10 @@ public final class LogsPresenter implements AccountManager.AccountListener {
     }
 
     public void onViewCreated() {
+        mDisposables = new CompositeDisposable();
+        mUpdateDayDataDisposables = new CompositeDisposable();
         mDisposables.add(mUserInteractor.getTimezone()
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(timezone -> {
                     long logDay = DateUtils.convertTimeToLogDay(timezone, System.currentTimeMillis());
                     updateDataForDay(logDay);
@@ -81,6 +82,7 @@ public final class LogsPresenter implements AccountManager.AccountListener {
     }
 
     private void updateCalendarData() {
+        mDisposables.clear();
         mDisposables.add(mUserInteractor.getTimezone()
                 .flatMap(timezone ->
                         mLogSheetInteractor.getLogSheetHeadersForMonth(timezone))
@@ -100,10 +102,8 @@ public final class LogsPresenter implements AccountManager.AccountListener {
     }
 
     public void updateDataForDay(long logDay) {
-        if (!mDisposables.isDisposed()) {
-            mDisposables.clear();
-        }
-        mDisposables.add(mUserInteractor.getTimezone()
+        mUpdateDayDataDisposables.clear();
+        mUpdateDayDataDisposables.add(mUserInteractor.getTimezone()
                 .subscribeOn(Schedulers.io())
                 .subscribe(timezone -> {
                     long startDayTime = DateUtils.getStartDayTimeInMs(logDay, timezone);
@@ -116,7 +116,7 @@ public final class LogsPresenter implements AccountManager.AccountListener {
     private void setGraphData(long startDayTime, String timezone) {
         GraphModel graphModel = new GraphModel();
         graphModel.setStartDayTime(startDayTime);
-        mDisposables.add(mELDEventsInteractor.getActiveDutyEventsForDay(startDayTime)
+        mUpdateDayDataDisposables.add(mELDEventsInteractor.getActiveDutyEventsForDay(startDayTime)
                 .subscribeOn(Schedulers.io())
                 .map(eldEvents -> convertToEventLogModels(eldEvents, startDayTime, timezone))
                 .doOnSuccess(eventLogModels -> graphModel.setEventLogModels(eventLogModels))
@@ -127,7 +127,7 @@ public final class LogsPresenter implements AccountManager.AccountListener {
     }
 
     private void setEventListData(long startDayTime, String timezone) {
-        mDisposables.add(mELDEventsInteractor.getDutyEventsForDay(startDayTime)
+        mUpdateDayDataDisposables.add(mELDEventsInteractor.getDutyEventsForDay(startDayTime)
                 .subscribeOn(Schedulers.io())
                 .map(eldEvents -> convertToEventLogModels(eldEvents, startDayTime, timezone))
                 .doOnSuccess(this::setVehicleNames)
@@ -137,7 +137,7 @@ public final class LogsPresenter implements AccountManager.AccountListener {
 
     private void setLogHeaderData(long logDay) {
         LogHeaderModel model = new LogHeaderModel();
-        mDisposables.add(mUserInteractor.getFullUser()
+        mUpdateDayDataDisposables.add(mUserInteractor.getFullUser()
                 .subscribeOn(Schedulers.io())
                 .doOnSuccess(user -> updateLogHeaderModelByUser(model, user))
                 .flatMap(user -> mLogSheetInteractor.getLogSheet(logDay))
@@ -265,6 +265,7 @@ public final class LogsPresenter implements AccountManager.AccountListener {
     }
 
     public void onEventAdded(List<ELDEvent> newEvents) {
+        mDisposables.clear();
         mDisposables.add(mELDEventsInteractor.postNewELDEvents(newEvents)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -279,6 +280,7 @@ public final class LogsPresenter implements AccountManager.AccountListener {
     }
 
     public void onEventChanged(List<ELDEvent> updatedEvents) {
+        mDisposables.clear();
         mDisposables.add(mELDEventsInteractor.updateELDEvents(updatedEvents)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -289,11 +291,11 @@ public final class LogsPresenter implements AccountManager.AccountListener {
                         throwable -> {
                             Timber.e(throwable.getMessage());
                             mView.showError(LogsView.Error.ERROR_UPDATE_EVENT);
-
                         }));
     }
 
     public void onLogHeaderChanged(LogHeaderModel logHeaderModel) {
+        mDisposables.clear();
         mDisposables.add(mLogSheetInteractor.getLogSheet(logHeaderModel.getLogDay())
                 .map(logSheetHeader -> updateLogSheetHeader(logSheetHeader, logHeaderModel))
                 .flatMap(logSheetHeader -> mLogSheetInteractor.updateLogSheetHeader(logSheetHeader))
@@ -332,7 +334,7 @@ public final class LogsPresenter implements AccountManager.AccountListener {
     public void onDestroy() {
         mAccountManager.removeListener(this);
         mDutyTypeManager.removeListener(mListener);
-        mDisposables.clear();
+        mUpdateDayDataDisposables.dispose();
         mDisposables.dispose();
         Timber.d("DESTROYED");
     }
