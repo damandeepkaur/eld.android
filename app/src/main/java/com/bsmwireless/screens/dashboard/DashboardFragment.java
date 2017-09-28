@@ -259,10 +259,8 @@ public final class DashboardFragment extends BaseFragment implements DashboardVi
             mIndicatorButton.setText(String.format(Locale.US, mContext.getString(R.string.duty_indicator), currentDuty));
             mIndicatorButton.setSupportBackgroundTintList(ColorStateList.valueOf(color));
             mIndicatorView.setVisibility(View.VISIBLE);
-            mStatusLayout.setVisibility(View.GONE);
         } else {
             mIndicatorView.setVisibility(View.GONE);
-            mStatusLayout.setVisibility(View.VISIBLE);
         }
     }
 }

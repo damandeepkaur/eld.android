@@ -18,8 +18,8 @@ public interface ELDEventDao {
     @Query("SELECT * FROM events")
     List<ELDEventEntity> getAll();
 
-    @Query("SELECT * FROM events WHERE sync = 1 AND driver_id=:userId ORDER BY event_time")
-    List<ELDEventEntity> getUpdateUnsyncEvents(int userId);
+    @Query("SELECT * FROM events WHERE sync = 1 ORDER BY event_time")
+    List<ELDEventEntity> getUpdateUnsyncEvents();
 
     @Query("SELECT * FROM events WHERE sync = 2 AND driver_id=:userId ORDER BY event_time")
     List<ELDEventEntity> getNewUnsyncEvents(int userId);
@@ -32,7 +32,7 @@ public interface ELDEventDao {
     List<ELDEventEntity> getEventsFromStartToEndTimeSync(long startTime, long endTime, int driverId);
 
     @Query("SELECT * FROM events WHERE event_time > :startTime AND event_time < :endTime " +
-            "AND driver_id = :driverId AND (event_type = 1 or event_type = 3) ORDER BY event_time")
+            "AND driver_id = :driverId AND (event_type = 1 or event_type = 3) ORDER BY event_time, mobile_time, status DESC")
     Flowable<List<ELDEventEntity>> getDutyEventsFromStartToEndTime(long startTime, long endTime, int driverId);
 
     @Query("SELECT * FROM events WHERE event_time > :startTime AND event_time < :endTime " +

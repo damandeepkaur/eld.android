@@ -39,6 +39,8 @@ public interface LogsView {
 
     void showError(Error error);
 
+    void showReassignDialog(ELDEvent event);
+
     enum Error {
         ERROR_ADD_EVENT(R.string.add_event_error),
         ERROR_UPDATE_EVENT(R.string.update_event_error),

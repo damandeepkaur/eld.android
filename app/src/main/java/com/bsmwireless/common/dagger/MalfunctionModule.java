@@ -1,7 +1,9 @@
 package com.bsmwireless.common.dagger;
 
+import com.bsmwireless.common.utils.StorageUtil;
 import com.bsmwireless.common.utils.AppSettings;
 import com.bsmwireless.common.utils.malfunction.MalfunctionJob;
+import com.bsmwireless.common.utils.malfunction.StorageCapacityJob;
 import com.bsmwireless.common.utils.malfunction.SynchronizationJob;
 import com.bsmwireless.common.utils.malfunction.TimingJob;
 import com.bsmwireless.data.network.NtpClientManager;
@@ -40,8 +42,20 @@ public final class MalfunctionModule {
     }
 
     @Provides
+    static StorageCapacityJob storageCapacityJob(ELDEventsInteractor eldEventsInteractor,
+                                                 DutyTypeManager dutyTypeManager,
+                                                 AppSettings settingsManager,
+                                                 StorageUtil storageUtil,
+                                                 BlackBoxInteractor blackBoxInteractor,
+                                                 PreferencesManager preferencesManager) {
+        return new StorageCapacityJob(eldEventsInteractor, dutyTypeManager, blackBoxInteractor,
+                preferencesManager, settingsManager, storageUtil);
+    }
+
+    @Provides
     static List<MalfunctionJob> provideJobs(SynchronizationJob synchronizationJob,
-                                            TimingJob timingJob) {
-        return Arrays.asList(synchronizationJob, timingJob);
+                                            TimingJob timingJob,
+                                            StorageCapacityJob storageCapacityJob) {
+        return Arrays.asList(synchronizationJob, timingJob, storageCapacityJob);
     }
 }

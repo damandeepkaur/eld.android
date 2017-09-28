@@ -278,6 +278,11 @@ public final class LogsFragment extends BaseFragment implements LogsView {
     }
 
     @Override
+    public void showReassignDialog(ELDEvent event) {
+        mNavigateView.showReassignDialog(event);
+    }
+
+    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {

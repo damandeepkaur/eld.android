@@ -21,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bsmwireless.common.App;
+import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.screens.autologout.AutoDutyDialogActivity;
 import com.bsmwireless.screens.common.menu.BaseMenuActivity;
 import com.bsmwireless.screens.common.menu.BaseMenuPresenter;
@@ -242,6 +243,11 @@ public final class NavigationActivity extends BaseMenuActivity implements OnNavi
     @Override
     public SnackBarLayout getSnackBar() {
         return mSnackBarLayout;
+    }
+
+    @Override
+    public void showReassignDialog(ELDEvent event) {
+        showReassignEventDialog(event);
     }
 
     @Override

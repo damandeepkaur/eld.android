@@ -11,6 +11,7 @@ import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.Malfunction;
 
 import io.reactivex.Observable;
+import io.reactivex.Observer;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 
@@ -23,7 +24,9 @@ abstract class BaseMalfunctionJob {
     private final PreferencesManager mPreferencesManager;
 
     BaseMalfunctionJob(ELDEventsInteractor eldEventsInteractor,
-                       DutyTypeManager dutyTypeManager, BlackBoxInteractor blackBoxInteractor, PreferencesManager preferencesManager) {
+                       DutyTypeManager dutyTypeManager,
+                       BlackBoxInteractor blackBoxInteractor,
+                       PreferencesManager preferencesManager) {
         mELDEventsInteractor = eldEventsInteractor;
         mDutyTypeManager = dutyTypeManager;
         mBlackBoxInteractor = blackBoxInteractor;
@@ -35,7 +38,7 @@ abstract class BaseMalfunctionJob {
         mCompositeDisposable.add(disposable);
     }
 
-    protected final void dispose(){
+    protected final void dispose() {
         mCompositeDisposable.dispose();
     }
 
@@ -43,16 +46,17 @@ abstract class BaseMalfunctionJob {
         return mELDEventsInteractor.postNewELDEvent(eldEvent).toObservable();
     }
 
-    protected final ELDEventsInteractor getELDEventsInteractor(){
+    protected final ELDEventsInteractor getELDEventsInteractor() {
         return mELDEventsInteractor;
     }
 
-    protected final DutyTypeManager getDutyTypeManager(){
+    protected final DutyTypeManager getDutyTypeManager() {
         return mDutyTypeManager;
     }
 
     /**
      * Creates event with an opposite malfunction code
+     *
      * @param eldEvent
      * @return
      */
@@ -64,6 +68,7 @@ abstract class BaseMalfunctionJob {
 
     /**
      * Creates event with an opposite malfunction code
+     *
      * @param eldEvent
      * @return
      */
@@ -73,6 +78,28 @@ abstract class BaseMalfunctionJob {
                 ELDEvent.MalfunctionCode.MALFUNCTION_CLEARED;
     }
 
+    /**
+     * Creates a default {@link ELDEvent} and put it into observable
+     * @param observer observer
+     * @param malfunction malfunction type for this event
+     * @param malfunctionCode malfunction code for this event
+     * @param blackBoxModel data from blackbox
+     */
+    protected final void switchToDefaultMalfunction(Observer<? super ELDEvent> observer,
+                                                    Malfunction malfunction,
+                                                    ELDEvent.MalfunctionCode malfunctionCode,
+                                                    BlackBoxModel blackBoxModel) {
+        ELDEvent eldEvent = createEvent(malfunction, malfunctionCode, blackBoxModel);
+        observer.onNext(eldEvent);
+    }
+
+    /**
+     * Creates an {@link ELDEvent}
+     * @param malfunction malfunction type for this event
+     * @param malfunctionCode malfunction code for this event
+     * @param blackBoxModel data from blackbox
+     * @return corret event
+     */
     @NonNull
     protected final ELDEvent createEvent(Malfunction malfunction,
                                          ELDEvent.MalfunctionCode malfunctionCode,
@@ -80,7 +107,11 @@ abstract class BaseMalfunctionJob {
         return mELDEventsInteractor.getEvent(malfunction, malfunctionCode, blackBoxModel);
     }
 
-    protected final Observable<BlackBoxModel> getBlackboxData(){
+    /**
+     * Load data from BlackBox
+     * @return
+     */
+    protected final Observable<BlackBoxModel> getBlackboxData() {
         return mBlackBoxInteractor
                 .getData(mPreferencesManager.getBoxId())
                 .onErrorReturn(throwable -> new BlackBoxModel())

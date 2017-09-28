@@ -257,6 +257,10 @@ public final class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHold
         if (!event.isActive()) {
             popup.getMenu().findItem(R.id.menu_edit).setEnabled(false);
         }
+        if (!DutyType.getTypeByCode(event.getEventType(), event.getEventCode())
+                     .equals(DutyType.DRIVING) || !event.isActive()) {
+            popup.getMenu().findItem(R.id.menu_assign).setEnabled(false);
+        }
 
         popup.setOnMenuItemClickListener(menuItem -> {
             switch (menuItem.getItemId()) {
@@ -265,6 +269,9 @@ public final class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHold
                     return true;
                 case R.id.menu_remove:
                     mPresenter.onRemovedEventClicked(event);
+                    return true;
+                case R.id.menu_assign:
+                    mPresenter.onReassignEventClicked(event);
                     return true;
             }
             return false;
