@@ -701,5 +701,13 @@
     <string name="transfer_dialog_message">You are going to send data for current 24 hours and last 7 days. Please confirm your action to proceed with data transfer.</string>
     <string name="transfer_dialog_positive">Confirm</string>
     <string name="transfer_dialog_negative">Cancel</string>
+    
+    <!--Home screen-->
+    <string name="home_screen_current_status">Current status:</string>
+    <string name="home_screen_hours_of_service">Hours of service</string>
+    <string name="home_screen_pre_trip">pre-trip</string>
+    <string name="home_screen_post_trip">post-trip</string>
+    <string name="home_screen_inspections">Inspections</string>
+
 
 </resources>

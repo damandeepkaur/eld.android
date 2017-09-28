@@ -260,6 +260,10 @@
     </style>
     <!-- END OLD STYLES -->
 
+    <style name="AppTheme.Divider">
+        <item name="android:background">@color/divider_color</item>
+    </style>
+
 
     <!-- Text Appearance-->
     <style name="AppTheme.TextAppearance.Caption" parent="TextAppearance.AppCompat.Caption">
@@ -277,6 +281,9 @@
     <style name="AppTheme.TextAppearance.Description" parent="TextAppearance.AppCompat.Body1">
         <item name="android:textColor">@color/black_54</item>
         <item name="android:textStyle">normal</item>
+    </style>
+
+    <style name="AppTheme.TextAppearance.Headline" parent="TextAppearance.AppCompat.Headline">
     </style>
 
     <!-- Progress Bar Appearance-->

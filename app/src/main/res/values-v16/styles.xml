@@ -13,4 +13,9 @@
         <item name="android:textStyle">normal</item>
         <item name="android:textColor">@color/black_38</item>
     </style>
+
+    <style name="AppTheme.TextAppearance.Headline" parent="TextAppearance.AppCompat.Headline">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textStyle">normal</item>
+    </style>
 </resources>
