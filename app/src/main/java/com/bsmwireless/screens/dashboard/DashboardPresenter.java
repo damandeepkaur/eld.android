@@ -61,7 +61,7 @@ public final class DashboardPresenter {
     private void onSetDutyType(DutyType dutyType) {
         mView.setDutyType(dutyType);
 
-        if (mEventsInteractor.isConnected()) {
+        if (mEventsInteractor.isConnected() && dutyType != DutyType.PERSONAL_USE && dutyType != DutyType.YARD_MOVES) {
             mView.showSpecialStatuses();
         } else {
             mView.hideSpecialStatuses();

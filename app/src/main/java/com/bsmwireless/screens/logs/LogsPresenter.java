@@ -140,7 +140,6 @@ public final class LogsPresenter implements AccountManager.AccountListener {
 
         mSyncInteractor.syncEventsForDay(calendar, mTimeZone);
 
-        mGetEventsFromDBDisposable.dispose();
         mGetEventsFromDBDisposable = mELDEventsInteractor.getDutyEventsFromDB(startDayTime, endDayTime)
                 .map(selectedDayEvents -> {
                     List<ELDEvent> prevDayLatestEvents = mELDEventsInteractor.getLatestActiveDutyEventFromDBSync(startDayTime, mUserInteractor.getUserId());

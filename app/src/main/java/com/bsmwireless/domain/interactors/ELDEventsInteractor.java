@@ -422,7 +422,7 @@ public final class ELDEventsInteractor {
     }
 
     private double roundOneDecimal(double d) {
-        return Math.round(d * 10) / 10;
+        return Math.round(d * 10) / 10.;
     }
 
     private int multiplyAndRound(int sec) {
