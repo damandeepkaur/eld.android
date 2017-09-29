@@ -165,10 +165,7 @@ public final class UserInteractor {
                     }
                     return Single.error(throwable);
                 })
-                .flatMapCompletable(events -> Completable.fromAction(() -> {
-                    ELDEventEntity[] entities = ELDEventConverter.toEntityList(events).toArray(new ELDEventEntity[events.size()]);
-                    mAppDatabase.ELDEventDao().insertAll(entities);
-                }));
+                .flatMapCompletable(events -> Completable.fromAction(() -> mSyncInteractor.replaceRecords(events)));
     }
 
     public void deleteDriver() {
