@@ -26,11 +26,15 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import app.bsmuniversal.com.RxSchedulerRule;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
+import io.reactivex.Single;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.functions.Predicate;
 import io.reactivex.observers.TestObserver;
 import io.reactivex.subscribers.TestSubscriber;
 
@@ -50,6 +54,7 @@ import static org.mockito.Mockito.when;
 public class ELDEventsInteractorTest {
 
     private final String mfakeTimezone = "fake timezone";
+    private final long MS_IN_DAY = 24*60*60*1000;
 
 
     @ClassRule
@@ -103,6 +108,49 @@ public class ELDEventsInteractorTest {
     }
 
     @Test
+    public void testGetEventsFromDBOnceSuccess() {
+        // given
+        long startTime = 1234567890;
+        long endTime = 1235555555;
+
+        List<ELDEventEntity> eldEvents = new ArrayList<>();
+
+        TestObserver<List<ELDEvent>> testObserver = TestObserver.create();
+        when(mAccountManager.getCurrentUserId()).thenReturn(111111);
+        when(mEldEventDao.getEventsFromStartToEndTimeOnce(anyLong(), anyLong(), anyInt()))
+                .thenReturn(Single.just(eldEvents));
+
+        // when
+        mEldEventsInteractor.getEventsFromDBOnce(startTime, endTime).subscribe(testObserver);
+
+        // then
+        verify(mAccountManager).getCurrentUserId();
+        verify(mEldEventDao).getEventsFromStartToEndTimeOnce(eq(startTime), eq(endTime), anyInt());
+    }
+
+    @Test
+    public void testGetEventsFromDBOnceError() {
+        // given
+        long startTime = 1234567890;
+        long endTime = 1235555555;
+
+        List<ELDEventEntity> eldEvents = new ArrayList<>();
+
+        Throwable error = new RuntimeException("db broken");
+
+        TestObserver<List<ELDEvent>> testObserver = TestObserver.create();
+        when(mAccountManager.getCurrentUserId()).thenReturn(111111);
+        when(mEldEventDao.getEventsFromStartToEndTimeOnce(anyLong(), anyLong(), anyInt()))
+                .thenReturn(Single.error(error));
+
+        // when
+        mEldEventsInteractor.getEventsFromDBOnce(startTime, endTime).subscribe(testObserver);
+
+        // then
+        testObserver.assertError(error); // error is propagated
+    }
+
+    @Test
     public void testGetDutyEventsFromDbSuccess() {
         // given
         long startTime = 1234567890;
@@ -144,24 +192,6 @@ public class ELDEventsInteractorTest {
     }
 
     @Test
-    public void testGetLatestActiveDutyEventFromDb() {
-        // given
-        long latestTime = 1503963474;
-        int userId = 1234;
-
-        List<ELDEventEntity> eldEventEntities = new ArrayList<>();
-
-        when(mEldEventDao.getLatestActiveDutyEventSync(anyLong(), anyInt()))
-                .thenReturn(eldEventEntities);
-
-        // when
-        mEldEventsInteractor.getLatestActiveDutyEventFromDBSync(latestTime, userId);
-
-        // then
-        verify(mEldEventDao).getLatestActiveDutyEventSync(eq(latestTime), anyInt());
-    }
-
-    @Test
     public void testGetLatestActiveDutyEventFromDbSync() {
         // given
         long latestTime = 1515151515;
@@ -177,6 +207,47 @@ public class ELDEventsInteractorTest {
 
         // then
         verify(mEldEventDao).getLatestActiveDutyEventSync(eq(latestTime), anyInt());
+    }
+
+    @Test
+    public void testGetLatestActiveDutyEventFromDBOnce() {
+        // given
+        long latestTime = 1515151515;
+        int userId = 1234;
+
+        List<ELDEventEntity> eldEventEntities = new ArrayList<>();
+        when(mEldEventDao.getLatestActiveDutyEventOnce(anyLong(), anyInt()))
+                .thenReturn(Single.just(eldEventEntities));
+
+        TestObserver<List<ELDEvent>> testObserver = TestObserver.create();
+
+        // when
+        mEldEventsInteractor.getLatestActiveDutyEventFromDBOnce(latestTime, userId)
+                .subscribe(testObserver);
+
+        // then
+        verify(mEldEventDao).getLatestActiveDutyEventOnce(eq(latestTime), eq(userId));
+    }
+
+    @Test
+    public void testGetLatestActiveDutyEventFromDBError() {
+        // given
+        long latestTime = 1515151515;
+        int userId = 1234;
+
+        Throwable error = new RuntimeException("db broken");
+        when(mEldEventDao.getLatestActiveDutyEventOnce(anyLong(), anyInt()))
+                .thenReturn(Single.error(error));
+
+        TestObserver<List<ELDEvent>> testObserver = TestObserver.create();
+
+        // when
+        mEldEventsInteractor.getLatestActiveDutyEventFromDBOnce(latestTime, userId)
+                .subscribe(testObserver);
+
+        // then
+        verify(mEldEventDao).getLatestActiveDutyEventOnce(eq(latestTime), eq(userId));
+        testObserver.assertError(error); // error propagated
     }
 
     @Test
@@ -196,6 +267,56 @@ public class ELDEventsInteractorTest {
         // then
         verify(mEldEventDao).getActiveEventsFromStartToEndTimeSync(eq(startTime), eq(endTime), anyInt());
     }
+
+    @Test
+    public void testGetDutyEventsForDay() {
+        // given
+        long startDayTime = 10000000L;
+
+        List<ELDEventEntity> eldEventEntities = new ArrayList<>();
+
+        when(mEldEventDao.getDutyEventsFromStartToEndTimeSync(anyLong(), anyLong(), anyInt()))
+                .thenReturn(Single.just(eldEventEntities));
+
+        when(mAccountManager.getCurrentUserId()).thenReturn(1337);
+
+        TestObserver<List<ELDEvent>> testObserver = TestObserver.create();
+
+        // when
+        mEldEventsInteractor.getDutyEventsForDay(startDayTime).subscribe(testObserver);
+
+        // then
+        verify(mEldEventDao).getDutyEventsFromStartToEndTimeSync(eq(startDayTime),
+                eq(startDayTime + MS_IN_DAY), anyInt());
+    }
+
+    @Test
+    public void testGetDutyEventsForDayError() {
+        // given
+        long startDayTime = 10000000L;
+
+        Throwable error = new RuntimeException("error from dao");
+
+        when(mEldEventDao.getDutyEventsFromStartToEndTimeSync(anyLong(), anyLong(), anyInt()))
+                .thenReturn(Single.error(error));
+
+        when(mAccountManager.getCurrentUserId()).thenReturn(1337);
+
+        TestObserver<List<ELDEvent>> testObserver = TestObserver.create();
+
+        // when
+        mEldEventsInteractor.getDutyEventsForDay(startDayTime).subscribe(testObserver);
+
+        // then
+        testObserver.assertValue(new Predicate<List<ELDEvent>>() {
+            @Override
+            public boolean test(@NonNull List<ELDEvent> eldEvents) throws Exception {
+                return eldEvents.size() == 0; // empty list is returned upon error, error is not propagated
+            }
+        });
+    }
+
+    // TODO: getLatestActiveDutyEventFromDB
 
     @Test
     public void testUpdateEldEvents() {
