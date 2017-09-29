@@ -3,6 +3,7 @@ ELD app for Android
 
 # Version history
 
+* **1.0.89** - Home screen (_EA-211_)
 * **1.0.88** - Fix events order and duration, fix location precision (_EA-439_, _EA-14_)
 * **1.0.87** - Data Recording Compliance Monitoring (_EA-232_)
 * **1.0.86** - Implement reassign log to co-driver (_EA-182_)
