@@ -10,8 +10,6 @@ import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.data.storage.carriers.CarrierConverter;
 import com.bsmwireless.data.storage.configurations.ConfigurationConverter;
-import com.bsmwireless.data.storage.eldevents.ELDEventConverter;
-import com.bsmwireless.data.storage.eldevents.ELDEventEntity;
 import com.bsmwireless.data.storage.hometerminals.HomeTerminalConverter;
 import com.bsmwireless.data.storage.users.FullUserEntity;
 import com.bsmwireless.data.storage.users.UserConverter;

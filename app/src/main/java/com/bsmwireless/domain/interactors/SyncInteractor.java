@@ -156,13 +156,8 @@ public final class SyncInteractor {
                         .onErrorResumeNext(Single.just(mErrorResponse))
                         .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS) ? events : new ArrayList<ELDEvent>())
                 )
-                .filter(events -> {
-                    if (!events.isEmpty()) {
-                        setSync(events);
-                        return true;
-                    }
-                    return false;
-                })
+                .filter(events -> !events.isEmpty())
+                .map(this::setSync)
                 .delay(1, TimeUnit.SECONDS)
                 .flatMapSingle(dbEvents -> mServiceApi.getELDEvents(dbEvents.get(0).getEventTime(), dbEvents.get(dbEvents.size() - 1).getEventTime())
                         .map(this::filterIncorrectEvents)
@@ -184,13 +179,8 @@ public final class SyncInteractor {
                         .onErrorResumeNext(Single.just(mErrorResponse))
                         .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS) ? dbEvents : new ArrayList<ELDEvent>())
                 )
-                .filter(events -> {
-                    if (!events.isEmpty()) {
-                        setSync(events);
-                        return true;
-                    }
-                    return false;
-                })
+                .filter(events -> !events.isEmpty())
+                .map(this::setSync)
                 .flatMapSingle(dbEvents -> mServiceApi.getELDEvents(dbEvents.get(0).getEventTime(), dbEvents.get(dbEvents.size() - 1).getEventTime())
                         .map(this::filterIncorrectEvents)
                         .doOnSuccess(this::replaceRecords)
@@ -200,12 +190,13 @@ public final class SyncInteractor {
         mSyncCompositeDisposable.add(syncUpdatedEventDisposable);
     }
 
-    private void setSync(List<ELDEvent> events) {
+    private List<ELDEvent> setSync(List<ELDEvent> events) {
         List<ELDEventEntity> entities = ELDEventConverter.toEntityList(events);
         for (ELDEventEntity entity : entities) {
             entity.setSync(SYNC.ordinal());
         }
         mELDEventDao.insertAll(entities.toArray(new ELDEventEntity[entities.size()]));
+        return events;
     }
 
     public void replaceRecords(List<ELDEvent> events) {
