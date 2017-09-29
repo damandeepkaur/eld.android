@@ -195,7 +195,7 @@ public final class NavigationActivity extends BaseMenuActivity implements
 
     @Override
     public void setBoxId(int boxId) {
-        String boxString = (boxId > 0) ? getResources().getString(R.string.box) + " " + boxId
+        String boxString = (boxId > 0) ? getResources().getString(R.string.box, boxId)
                 : getResources().getString(R.string.select_asset_not_in_vehicle);
         mHeaderViewHolder.boxId.setText(boxString);
     }

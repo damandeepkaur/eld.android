@@ -131,6 +131,10 @@
         </item>
     </style>
 
+    <style name="AppTheme.Divider">
+        <item name="android:background">@color/divider_color</item>
+    </style>
+
     <!-- START OLD STYLES -->
     <style name="Theme.Splash" parent="MyTheme.Base">
         <item name="android:windowBackground">@drawable/background</item>
@@ -260,11 +264,6 @@
     </style>
     <!-- END OLD STYLES -->
 
-    <style name="AppTheme.Divider">
-        <item name="android:background">@color/divider_color</item>
-    </style>
-
-
     <!-- Text Appearance-->
     <style name="AppTheme.TextAppearance.Caption" parent="TextAppearance.AppCompat.Caption">
         <item name="android:textStyle">normal</item>
@@ -285,6 +284,15 @@
 
     <style name="AppTheme.TextAppearance.Headline" parent="TextAppearance.AppCompat.Headline">
     </style>
+
+    <style name="AppTheme.TextAppearance.Toolbar.Title" parent="AppTheme.TextAppearance.Description">
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="AppTheme.TextAppearance.Toolbar.Subtitle" parent="AppTheme.TextAppearance.Toolbar.Base.Subtitle">
+        <item name="android:textColor">?attr/colorAccent</item>
+    </style>
+
 
     <!-- Progress Bar Appearance-->
     <style name="AppTheme.IndeterminateAppearance.ProgressBar" parent="Theme.AppCompat.Light">

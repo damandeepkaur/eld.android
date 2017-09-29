@@ -11,4 +11,6 @@ public interface HoursOfServiceView extends BaseMenuView {
 
     void setResetTime(long time);
 
+    void setTitle(long boxId, String driverName);
+
 }

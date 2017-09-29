@@ -392,7 +392,7 @@
     <string name="nav_logout">Log Out</string>
     <string name="driver">Driver</string>
     <string name="asset">Asset</string>
-    <string name="box">Box</string>
+    <string name="box">Box %1$d</string>
     <plurals name="co_drivers">
         <item quantity="one">%1$d co-driver</item>
         <item quantity="other">%1$d co-drivers</item>
@@ -710,5 +710,8 @@
     <string name="home_screen_post_trip">post-trip</string>
     <string name="home_screen_inspections">Inspections</string>
 
+    <!-- Hours of Service-->
+    <string name="hos_box_name">@string/box</string>
+    <string name="hos_not_in_vehicle">@string/select_asset_not_in_vehicle</string>
 
 </resources>

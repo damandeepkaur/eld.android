@@ -8,6 +8,8 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
+import android.support.v7.widget.Toolbar;
 
 import com.bsmwireless.common.App;
 import com.bsmwireless.models.ELDEvent;
@@ -22,7 +24,10 @@ import app.bsmuniversal.com.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class HoursOfServiceActivity extends BaseMenuActivity implements ViewPager.OnPageChangeListener, HoursOfServiceView {
+public final class HoursOfServiceActivity extends BaseMenuActivity implements ViewPager.OnPageChangeListener, HoursOfServiceView {
+
+    @BindView(R.id.toolbar)
+    Toolbar mToolbar;
 
     @BindView(R.id.navigation_tab_layout)
     TabLayout mTabLayout;
@@ -36,10 +41,8 @@ public class HoursOfServiceActivity extends BaseMenuActivity implements ViewPage
     @Inject
     HoursOfServicePresenter mPresenter;
 
-    private NavigationAdapter mPagerAdapter;
     private Runnable mResetTimeTask = () -> mPresenter.onResetTime();
     private Handler mHandler = new Handler();
-
 
     public static Intent createIntent(Context context) {
         return new Intent(context, HoursOfServiceActivity.class);
@@ -57,8 +60,8 @@ public class HoursOfServiceActivity extends BaseMenuActivity implements ViewPage
                 .inject(this);
 
 
-        mPagerAdapter = new NavigationAdapter(getApplicationContext(), getSupportFragmentManager());
-        mViewPager.setAdapter(mPagerAdapter);
+        NavigationAdapter pagerAdapter = new NavigationAdapter(getApplicationContext(), getSupportFragmentManager());
+        mViewPager.setAdapter(pagerAdapter);
         mViewPager.setOffscreenPageLimit(2);
         mViewPager.addOnPageChangeListener(this);
 
@@ -67,6 +70,18 @@ public class HoursOfServiceActivity extends BaseMenuActivity implements ViewPage
 
         mSnackBarLayout.setHideableOnTouch(false);
 
+        mToolbar.setTitleTextAppearance(this, R.style.AppTheme_TextAppearance_Toolbar_Title);
+        mToolbar.setSubtitleTextAppearance(this, R.style.AppTheme_TextAppearance_Toolbar_Subtitle);
+
+        setSupportActionBar(mToolbar);
+
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setHomeAsUpIndicator(R.drawable.ic_arrow_back_green_24dp);
+        }
+
+        mPresenter.loadTitle();
         mPresenter.onResetTime();
     }
 
@@ -105,6 +120,15 @@ public class HoursOfServiceActivity extends BaseMenuActivity implements ViewPage
         } else {
             mHandler.postAtTime(mResetTimeTask, time);
         }
+    }
+
+    @Override
+    public void setTitle(long boxId, String driverName) {
+        mToolbar.setTitle(driverName);
+
+        mToolbar.setSubtitle(boxId > 0
+                ? getString(R.string.box, boxId)
+                : getString(R.string.hos_not_in_vehicle));
     }
 
     @Override

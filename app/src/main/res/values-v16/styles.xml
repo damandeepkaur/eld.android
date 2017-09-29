@@ -18,4 +18,8 @@
         <item name="android:fontFamily">sans-serif</item>
         <item name="android:textStyle">normal</item>
     </style>
+
+    <style name="AppTheme.TextAppearance.Toolbar.Base.Subtitle" parent="TextAppearance.AppCompat.Title">
+        <item name="android:fontFamily">sans-serif-condensed</item>
+    </style>
 </resources>
