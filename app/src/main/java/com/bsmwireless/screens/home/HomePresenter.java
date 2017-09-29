@@ -31,7 +31,7 @@ public final class HomePresenter {
 
     public void onStop() {
         mHomeView = null;
-        mCompositeDisposable.dispose();
+        mCompositeDisposable.clear();
     }
 
     public void onHoursOfService() {

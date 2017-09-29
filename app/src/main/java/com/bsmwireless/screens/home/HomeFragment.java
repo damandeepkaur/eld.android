@@ -61,6 +61,7 @@ public final class HomeFragment extends BaseFragment implements HomeView {
     public void dutyStatusChanged(DutyType dutyType) {
         mCurrentStatus.setText(dutyType.getName());
         mCurrentStatus.setTextColor(ContextCompat.getColor(getContext(), dutyType.getColor()));
+        mCurrentStatus.setCompoundDrawablesWithIntrinsicBounds(0, 0, dutyType.getIcon(), 0);
     }
 
     @Override

@@ -82,7 +82,7 @@ public final class NavigationActivity extends BaseMenuActivity implements
         ButterKnife.bind(this);
 
         initNavigation();
-        open(HomeFragment.newInstance(), true);
+        open(HomeFragment.newInstance(), false);
 
         mPresenter.onViewCreated();
     }
