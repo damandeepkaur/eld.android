@@ -15,10 +15,6 @@ import timber.log.Timber;
 import static com.bsmwireless.data.network.authenticator.BsmAuthenticator.ACCOUNT_NAME;
 import static com.bsmwireless.data.network.authenticator.BsmAuthenticator.ACCOUNT_TYPE;
 
-/**
- * Created by osminin on 20.09.2017.
- */
-
 public final class TokenExpirationService extends IntentService {
     @Inject
     TokenManager mTokenManager;

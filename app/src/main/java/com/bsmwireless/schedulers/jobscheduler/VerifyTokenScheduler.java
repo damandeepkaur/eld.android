@@ -16,10 +16,6 @@ import timber.log.Timber;
 import static com.bsmwireless.data.network.authenticator.BsmAuthenticator.ACCOUNT_NAME;
 import static com.bsmwireless.data.network.authenticator.BsmAuthenticator.ACCOUNT_TYPE;
 
-/**
- * Created by osminin on 15.09.2017.
- */
-
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
 public final class VerifyTokenScheduler extends JobService {
     @Inject
