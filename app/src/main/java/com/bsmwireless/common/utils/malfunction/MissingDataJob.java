@@ -50,7 +50,6 @@ public final class MissingDataJob extends BaseMalfunctionJob implements Malfunct
                         result.mBlackBoxModel))
                 .flatMap(this::saveEvents)
                 .onErrorReturn(throwable -> {
-                    throwable.printStackTrace();
                     Timber.e(throwable, "Error save the eld event");
                     return -1L;
                 })
