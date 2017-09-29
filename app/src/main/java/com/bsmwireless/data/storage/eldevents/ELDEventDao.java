@@ -84,4 +84,6 @@ public interface ELDEventDao {
     @Insert(onConflict = REPLACE)
     long[] insertAll(ELDEventEntity... events);
 
+    @Query("DELETE FROM events WHERE id IN (SELECT id FROM events WHERE driver_id = :driverId AND sync = 0 AND event_time >= :eventTimeStart AND event_time < :eventTimeEnd AND mobile_time = :mobileTime AND event_code = :eventCode AND event_type = :eventType AND status = :status LIMIT 1)")
+    int delete(long driverId, long eventTimeStart, long eventTimeEnd, long mobileTime, int eventCode, int eventType, int status);
 }

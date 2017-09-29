@@ -10,8 +10,6 @@ import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.data.storage.carriers.CarrierConverter;
 import com.bsmwireless.data.storage.configurations.ConfigurationConverter;
-import com.bsmwireless.data.storage.eldevents.ELDEventConverter;
-import com.bsmwireless.data.storage.eldevents.ELDEventEntity;
 import com.bsmwireless.data.storage.hometerminals.HomeTerminalConverter;
 import com.bsmwireless.data.storage.users.FullUserEntity;
 import com.bsmwireless.data.storage.users.UserConverter;
@@ -165,10 +163,7 @@ public final class UserInteractor {
                     }
                     return Single.error(throwable);
                 })
-                .flatMapCompletable(events -> Completable.fromAction(() -> {
-                    ELDEventEntity[] entities = ELDEventConverter.toEntityList(events).toArray(new ELDEventEntity[events.size()]);
-                    mAppDatabase.ELDEventDao().insertAll(entities);
-                }));
+                .flatMapCompletable(events -> Completable.fromAction(() -> mSyncInteractor.replaceRecords(events)));
     }
 
     public void deleteDriver() {
