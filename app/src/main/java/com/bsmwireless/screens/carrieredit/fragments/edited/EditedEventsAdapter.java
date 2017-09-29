@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.LinearSmoothScroller;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +13,7 @@ import android.widget.TextView;
 
 import com.bsmwireless.common.utils.DateUtils;
 import com.bsmwireless.models.LogSheetHeader;
+import com.bsmwireless.screens.logs.GraphModel;
 import com.bsmwireless.screens.logs.LogHeaderModel;
 import com.bsmwireless.screens.logs.LogsAdapter;
 import com.bsmwireless.screens.logs.dagger.EventLogModel;
@@ -52,23 +54,34 @@ public class EditedEventsAdapter extends RecyclerView.Adapter<EditedEventsAdapte
     private LogsTitleView mEventsTitleView;
     private LogsTitleView mLogHeaderTitleView;
     private Context mContext;
-    private RecyclerView.SmoothScroller mSmoothScroller;
-    private RecyclerView mRecyclerView;
+    private final RecyclerView.SmoothScroller mSmoothScroller;
+    private final RecyclerView mRecyclerView;
     private List<EventLogModel> mEventLogs = Collections.emptyList();
     private String mNoAddressLabel;
     private AdapterColors mAdapterColors;
     private HashMap<Integer, Integer> mColors = new HashMap<>();
     private LogHeaderModel mLogHeader = new LogHeaderModel();
     private View.OnClickListener mOnMenuClickListener;
+    private GraphModel mGraphModel;
+    private final EditedEventsPresenter mPresenter;
 
-    public EditedEventsAdapter(Context context) {
+    public EditedEventsAdapter(Context context, RecyclerView recyclerView, EditedEventsPresenter presenter) {
         mContext = context;
+        mRecyclerView = recyclerView;
+        mPresenter = presenter;
         mAdapterColors = new AdapterColors(mContext);
         mNoAddressLabel = mContext.getResources().getString(R.string.no_address_available);
         mLayoutInflater = LayoutInflater.from(mContext);
 
         mOnMenuClickListener = view -> {
             EventLogModel log = (EventLogModel) view.getTag();
+        };
+
+        mSmoothScroller = new LinearSmoothScroller(mContext) {
+            @Override
+            protected int getVerticalSnapPreference() {
+                return LinearSmoothScroller.SNAP_TO_START;
+            }
         };
 
         for (DutyType type : DutyType.values()) {
@@ -82,19 +95,22 @@ public class EditedEventsAdapter extends RecyclerView.Adapter<EditedEventsAdapte
         notifyDataSetChanged();
     }
 
+    public void setLogHeader(LogHeaderModel logHeaderModel) {
+        mLogHeader = logHeaderModel;
+        notifyDataSetChanged();
+    }
+
     @Override
     public LogsHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view;
         switch (viewType) {
             case VIEW_TYPE_HEADER:
                 view = mLayoutInflater.inflate(R.layout.edited_events_list_item_header, parent, false);
-
                 mCalendarLayout = view.findViewById(R.id.calendar);
                 mCalendarLayout.setLogs(mLogHeaders);
                 mCalendarLayout.setOnItemSelectedListener(calendarItem -> {
-
+                    mPresenter.onCalendarDaySelected(calendarItem);
                 });
-
                 mGraphLayout = view.findViewById(R.id.graphic);
                 //mGraphLayout.setELDEvents(mEventLogs);
 
@@ -151,6 +167,21 @@ public class EditedEventsAdapter extends RecyclerView.Adapter<EditedEventsAdapte
         } else {
             return VIEW_TYPE_LOG_HEADER_ITEM;
         }
+    }
+
+    public void updateGraph(GraphModel graphModel) {
+        mGraphModel = graphModel;
+        if (mGraphLayout != null) {
+            mGraphLayout.updateGraph(graphModel);
+        }
+    }
+
+    public void setLogSheetHeaders(List<LogSheetHeader> logHeaders) {
+        mLogHeaders = logHeaders;
+        if (mCalendarLayout != null) {
+            mCalendarLayout.setLogs(logHeaders);
+        }
+        notifyDataSetChanged();
     }
 
     private void onTitleItemClicked(LogsTitleView titleView) {

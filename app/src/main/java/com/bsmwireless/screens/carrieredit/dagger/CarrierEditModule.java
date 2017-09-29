@@ -5,6 +5,7 @@ import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
 import com.bsmwireless.domain.interactors.LogSheetInteractor;
 import com.bsmwireless.domain.interactors.UserInteractor;
+import com.bsmwireless.domain.interactors.VehiclesInteractor;
 import com.bsmwireless.screens.carrieredit.CarrierEditPresenter;
 import com.bsmwireless.screens.carrieredit.fragments.edited.EditedEventsFragment;
 import com.bsmwireless.screens.carrieredit.fragments.edited.EditedEventsPresenter;
@@ -29,8 +30,9 @@ public final class CarrierEditModule {
     EditedEventsPresenter provideEditedEventsPresenter(ELDEventsInteractor eldEventsInteractor,
                                                        LogSheetInteractor logSheetInteractor,
                                                        UserInteractor userInteractor,
-                                                       ServiceApi serviceApi) {
-        return new EditedEventsPresenter(eldEventsInteractor, logSheetInteractor, userInteractor, serviceApi);
+                                                       ServiceApi serviceApi,
+                                                       VehiclesInteractor vehiclesInteractor) {
+        return new EditedEventsPresenter(eldEventsInteractor, logSheetInteractor, userInteractor, vehiclesInteractor, serviceApi);
     }
 
     @Provides

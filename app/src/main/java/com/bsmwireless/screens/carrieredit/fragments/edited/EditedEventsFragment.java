@@ -7,15 +7,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.bsmwireless.screens.carrieredit.CarrierEditActivity;
+import com.bsmwireless.models.LogSheetHeader;
 import com.bsmwireless.screens.carrieredit.CarrierEditView;
 import com.bsmwireless.screens.common.BaseFragment;
-import com.bsmwireless.screens.logs.LogsAdapter;
-import com.bsmwireless.screens.logs.LogsPresenter;
+import com.bsmwireless.screens.logs.GraphModel;
+import com.bsmwireless.screens.logs.LogHeaderModel;
 import com.bsmwireless.screens.logs.dagger.EventLogModel;
-import com.bsmwireless.widgets.logs.LogsTitleView;
 import com.bsmwireless.widgets.logs.WrapLinearLayoutManager;
-import com.bsmwireless.widgets.logs.calendar.CalendarItem;
 
 import java.util.List;
 
@@ -53,16 +51,30 @@ public final class EditedEventsFragment extends BaseFragment implements EditedEv
         super.onActivityCreated(savedInstanceState);
         ((CarrierEditView) getActivity()).getComponent().inject(this);
         mPresenter.setView(this);
-        mAdapter = new EditedEventsAdapter(mContext);
+        mAdapter = new EditedEventsAdapter(mContext, mRecyclerView, mPresenter);
 
         mRecyclerView.setLayoutManager(new WrapLinearLayoutManager(mContext));
         mRecyclerView.setAdapter(mAdapter);
-        mPresenter.fetchEldEvents();
     }
 
     @Override
     public void setEvents(List<EventLogModel> events) {
         Timber.v("setEvents: ");
         mAdapter.setEvents(events);
+    }
+
+    @Override
+    public void setLogSheetHeaders(List<LogSheetHeader> logs) {
+        mAdapter.setLogSheetHeaders(logs);
+    }
+
+    @Override
+    public void updateGraph(GraphModel graphModel) {
+        mAdapter.updateGraph(graphModel);
+    }
+
+    @Override
+    public void setLogHeader(LogHeaderModel logHeader) {
+        mAdapter.setLogHeader(logHeader);
     }
 }
