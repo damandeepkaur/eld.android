@@ -17,8 +17,6 @@ import java.util.List;
 import javax.inject.Inject;
 
 import app.bsmuniversal.com.R;
-import io.reactivex.Observable;
-import io.reactivex.Single;
 
 
 public final class DiagnosticDialog extends DialogFragment implements DiagnosticView{

@@ -73,7 +73,7 @@ public final class DashboardFragment extends BaseFragment implements DashboardVi
     private Drawable mIndicatorDrawable;
 
     private Unbinder mUnbinder;
-    private HoursOfServiceView mNavigateView;
+    private HoursOfServiceView mHoursOfServiceView;
 
     private DutyType mDutyType = DutyType.OFF_DUTY;
 
@@ -92,9 +92,9 @@ public final class DashboardFragment extends BaseFragment implements DashboardVi
     public void onAttach(Context context) {
         super.onAttach(context);
         if (context instanceof HoursOfServiceView) {
-            mNavigateView = (HoursOfServiceView) context;
+            mHoursOfServiceView = (HoursOfServiceView) context;
         } else {
-            throw new RuntimeException(context.toString() + " must implement NavigateView");
+            throw new RuntimeException(context.toString() + " must implement HoursOfServiceView");
         }
     }
 
@@ -129,7 +129,7 @@ public final class DashboardFragment extends BaseFragment implements DashboardVi
 
     @OnClick(R.id.dashboard_indicator)
     public void onClearClick() {
-        mNavigateView.changeDutyType(mDutyType == DutyType.PERSONAL_USE ? DutyType.OFF_DUTY : DutyType.ON_DUTY, null);
+        mHoursOfServiceView.changeDutyType(mDutyType == DutyType.PERSONAL_USE ? DutyType.OFF_DUTY : DutyType.ON_DUTY, null);
     }
 
     @OnClick(R.id.dashboard_pu_status)
@@ -195,7 +195,7 @@ public final class DashboardFragment extends BaseFragment implements DashboardVi
             } else if (error == Error.INVALID_COMMENT) {
                 inputLayout.setError(mContext.getString(R.string.edit_event_comment_error));
             } else {
-                mNavigateView.changeDutyType(dutyType, comment);
+                mHoursOfServiceView.changeDutyType(dutyType, comment);
                 mAlertDialog.dismiss();
             }
         });
@@ -219,7 +219,7 @@ public final class DashboardFragment extends BaseFragment implements DashboardVi
 
     @Override
     public void showDutyTypeDialog() {
-        mNavigateView.showDutyTypeDialog(mDutyType);
+        mHoursOfServiceView.showDutyTypeDialog(mDutyType);
     }
 
     @Override

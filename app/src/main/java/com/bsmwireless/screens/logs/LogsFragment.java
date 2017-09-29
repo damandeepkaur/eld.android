@@ -65,15 +65,15 @@ public final class LogsFragment extends BaseFragment implements LogsView {
 
     private LogsAdapter mAdapter;
     private Unbinder mUnbinder;
-    private HoursOfServiceView mNavigateView;
+    private HoursOfServiceView mHoursOfServiceView;
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         if (context instanceof HoursOfServiceView) {
-            mNavigateView = (HoursOfServiceView) context;
+            mHoursOfServiceView = (HoursOfServiceView) context;
         } else {
-            throw new RuntimeException(context.toString() + " must implement NavigateView");
+            throw new RuntimeException(context.toString() + " must implement HoursOfServiceView");
         }
     }
 
@@ -140,7 +140,7 @@ public final class LogsFragment extends BaseFragment implements LogsView {
     }
 
     public void showNotificationSnackBar(String message) {
-        mNavigateView.getSnackBar()
+        mHoursOfServiceView.getSnackBar()
                 .setOnReadyListener(snackBar -> snackBar.reset()
                         .setMessage(message)
                         .setHideableOnTimeout(SnackBarLayout.DURATION_LONG))
@@ -211,7 +211,7 @@ public final class LogsFragment extends BaseFragment implements LogsView {
         showNotificationSnackBar(getString(R.string.event_added));
         CalendarItem item = mAdapter.getCurrentItem();
         mPresenter.updateDataForDay(item.getLogDay());
-        mNavigateView.setResetTime(0);
+        mHoursOfServiceView.setResetTime(0);
     }
 
     @Override
@@ -219,7 +219,7 @@ public final class LogsFragment extends BaseFragment implements LogsView {
         showNotificationSnackBar(getString(R.string.event_updated));
         CalendarItem item = mAdapter.getCurrentItem();
         mPresenter.updateDataForDay(item.getLogDay());
-        mNavigateView.setResetTime(0);
+        mHoursOfServiceView.setResetTime(0);
     }
 
     @Override
@@ -282,7 +282,7 @@ public final class LogsFragment extends BaseFragment implements LogsView {
 
     @Override
     public void showReassignDialog(ELDEvent event) {
-        mNavigateView.showReassignDialog(event);
+        mHoursOfServiceView.showReassignDialog(event);
     }
 
     @Override

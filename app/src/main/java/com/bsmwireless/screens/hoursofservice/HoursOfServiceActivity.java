@@ -52,7 +52,7 @@ public final class HoursOfServiceActivity extends BaseMenuActivity implements Vi
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_hours_of_service);
-        ButterKnife.bind(this);
+        mUnbinder = ButterKnife.bind(this);
 
         App.getComponent().hoursOfServiceBuilder()
                 .view(this)
