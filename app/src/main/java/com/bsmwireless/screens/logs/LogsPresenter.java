@@ -1,6 +1,8 @@
 package com.bsmwireless.screens.logs;
 
 
+import android.util.SparseArray;
+
 import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.common.utils.DateUtils;
 import com.bsmwireless.common.utils.ListConverter;
@@ -503,44 +505,68 @@ public final class LogsPresenter implements AccountManager.AccountListener {
                         distance = 0;
                     } else {
 
-                        Integer firstOdometerValue = events.get(0).getOdometer();
-                        startValue = firstOdometerValue != null ? firstOdometerValue : 0;
-                        int size = events.size();
-                        if (size == 1) {
+                        startValue = events.get(0).getOdometer();
+                        if (events.size() == 1) {
                             endValue = startValue;
                         } else {
-                            Integer odometer = events.get(size - 1).getOdometer();
-                            endValue = odometer != null ? odometer : 0;
+                            endValue = events.get(events.size() - 1).getOdometer();
                         }
 
-                        long startDrivingOdometer = 0;
-                        boolean isPreviousDriving = false;
+                        SparseArray<List<ELDEvent>> eventsByBoxId = new SparseArray<>(3);
                         for (ELDEvent event : events) {
 
-                            if (!isPreviousDriving
-                                    && DutyType.DRIVING.isSame(event.getEventType(), event.getEventCode())) {
-
-                                // start driving event, save odometer value
-                                startDrivingOdometer = event.getOdometer() != null ? event.getOdometer() : 0;
-                                isPreviousDriving = true;
-                            } else {
-
-                                if (isPreviousDriving) {
-                                    // stop driving event
-                                    Integer odometer = event.getOdometer();
-                                    int currentOdometer = odometer != null ? odometer : 0;
-                                    distance += currentOdometer - startDrivingOdometer;
-                                    startDrivingOdometer = 0;
-                                    isPreviousDriving = false;
-                                }
+                            List<ELDEvent> eldEvents = eventsByBoxId.get(event.getBoxId());
+                            if (eldEvents == null) {
+                                Timber.d("New box id" + event.getBoxId());
+                                eldEvents = new ArrayList<>();
+                                eventsByBoxId.put(event.getBoxId(), eldEvents);
                             }
+                            eldEvents.add(event);
                         }
-                        // subtract a first odometer value for correctness
-                        distance -= startValue;
+
+                        for (int i = 0; i < eventsByBoxId.size(); i++) {
+                            List<ELDEvent> eldEvents = eventsByBoxId.get(eventsByBoxId.keyAt(i));
+                            distance += calculateOdometer(eldEvents);
+                        }
                     }
 
                     return new OdometerResult(startValue, endValue, distance);
                 }));
+    }
+
+    private long calculateOdometer(List<ELDEvent> events) {
+
+        long startValue;
+        long distance = 0;
+
+        Integer firstOdometerValue = events.get(0).getOdometer();
+        startValue = firstOdometerValue != null ? firstOdometerValue : 0;
+
+        long startDrivingOdometer = 0;
+        boolean isPreviousDriving = false;
+        for (ELDEvent event : events) {
+
+            if (!isPreviousDriving
+                    && DutyType.DRIVING.isSame(event.getEventType(), event.getEventCode())) {
+
+                // start driving event, save odometer value
+                startDrivingOdometer = event.getOdometer() != null ? event.getOdometer() : 0;
+                isPreviousDriving = true;
+            } else {
+
+                if (isPreviousDriving) {
+                    // stop driving event
+                    Integer odometer = event.getOdometer();
+                    int currentOdometer = odometer != null ? odometer : 0;
+                    distance += currentOdometer - startDrivingOdometer;
+                    startDrivingOdometer = 0;
+                    isPreviousDriving = false;
+                }
+            }
+        }
+        // subtract a first odometer value for correctness
+        distance -= startValue;
+        return distance;
     }
 
     private LogHeaderModel mapUserAndHeader(UserHeaderInfo userHeaderInfo,
