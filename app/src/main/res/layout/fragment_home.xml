@@ -57,6 +57,7 @@
                     android:id="@+id/homeScreen_hours_of_service"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/default_margin"
                     android:background="?attr/selectableItemBackground"
                     android:clickable="true"
                     android:focusable="true"
@@ -65,15 +66,19 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginEnd="@dimen/default_margin"
+                        android:layout_marginRight="@dimen/default_margin"
                         android:background="?attr/selectableItemBackground"
                         android:clickable="true"
-                        android:drawableEnd="@drawable/ic_button_arrow"
-                        android:drawablePadding="@dimen/default_margin"
-                        android:drawableRight="@drawable/ic_button_arrow"
                         android:focusable="true"
-                        android:padding="@dimen/default_margin"
                         android:text="@string/home_screen_hours_of_service"
                         android:textAppearance="@style/AppTheme.TextAppearance.Headline"/>
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom"
+                        android:src="@drawable/ic_button_arrow"/>
 
                 </LinearLayout>
 
@@ -125,26 +130,34 @@
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/divider_height"/>
 
-                <FrameLayout
+                <LinearLayout
                     android:id="@+id/home_screen_inspections"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/default_margin"
                     android:background="?attr/selectableItemBackground"
-                    android:clickable="true">
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:orientation="horizontal">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:drawableEnd="@drawable/ic_button_arrow"
-                        android:drawablePadding="@dimen/default_margin"
-                        android:drawableRight="@drawable/ic_button_arrow"
-                        android:gravity="center_vertical"
-                        android:padding="@dimen/default_margin"
+                        android:layout_marginEnd="@dimen/default_margin"
+                        android:layout_marginRight="@dimen/default_margin"
+                        android:background="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true"
                         android:text="@string/home_screen_inspections"
                         android:textAppearance="@style/AppTheme.TextAppearance.Headline"/>
 
-                </FrameLayout>
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom"
+                        android:src="@drawable/ic_button_arrow"/>
 
+                </LinearLayout>
 
             </LinearLayout>
 
