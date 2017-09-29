@@ -3,6 +3,8 @@ package com.bsmwireless.screens.carrieredit.dagger;
 import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
+import com.bsmwireless.domain.interactors.LogSheetInteractor;
+import com.bsmwireless.domain.interactors.UserInteractor;
 import com.bsmwireless.screens.carrieredit.CarrierEditPresenter;
 import com.bsmwireless.screens.carrieredit.fragments.edited.EditedEventsFragment;
 import com.bsmwireless.screens.carrieredit.fragments.edited.EditedEventsPresenter;
@@ -24,8 +26,11 @@ public final class CarrierEditModule {
     }
 
     @Provides
-    EditedEventsPresenter provideEditedEventsPresenter() {
-        return new EditedEventsPresenter();
+    EditedEventsPresenter provideEditedEventsPresenter(ELDEventsInteractor eldEventsInteractor,
+                                                       LogSheetInteractor logSheetInteractor,
+                                                       UserInteractor userInteractor,
+                                                       ServiceApi serviceApi) {
+        return new EditedEventsPresenter(eldEventsInteractor, logSheetInteractor, userInteractor, serviceApi);
     }
 
     @Provides
