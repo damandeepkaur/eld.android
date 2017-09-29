@@ -87,9 +87,9 @@ public final class HoursOfServiceActivity extends BaseMenuActivity implements Vi
 
     @Override
     protected void onDestroy() {
+        mViewPager.removeOnPageChangeListener(this);
         super.onDestroy();
         mHandler.removeCallbacks(mResetTimeTask);
-        mViewPager.removeOnPageChangeListener(this);
     }
 
     @Override

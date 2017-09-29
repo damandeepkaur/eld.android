@@ -70,45 +70,43 @@ public final class NavigationPresenter extends BaseMenuPresenter {
 
     public void onLogoutItemSelected() {
         Disposable disposable = getEventsInteractor().postLogoutEvent()
-                .doOnNext(isSuccess -> getUserInteractor().deleteDriver())
-                                               .subscribeOn(Schedulers.io())
-                                               .observeOn(AndroidSchedulers.mainThread())
-                                               .subscribe(
-                                                       status -> {
-                                                           Timber.i("LoginUser status = %b", status);
-                                                           if (status) {
-                                                               SchedulerUtils.cancel();
-                                                               mView.goToLoginScreen();
-                                                           } else {
-                                                               mView.showErrorMessage("Logout failed");
-                                                           }
-                                                       },
-                                                       error -> {
-                                                           Timber.e("LoginUser error: %s", error);
-                                                           mView.showErrorMessage("Exception:" + error.toString());
-                                                       }
-                                               );
+                .doOnSuccess(isSuccess -> getUserInteractor().deleteDriver())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        status -> {
+                            Timber.i("LoginUser status = %b", status);
+                            if (status) {
+                                SchedulerUtils.cancel();
+                                mView.goToLoginScreen();
+                            } else {
+                                mView.showErrorMessage("Logout failed");
+                            }
+                        },
+                        error -> {
+                            Timber.e("LoginUser error: %s", error);
+                            mView.showErrorMessage("Exception:" + error.toString());
+                        }
+                );
         add(disposable);
     }
 
     public void onViewCreated() {
         add(getUserInteractor().getFullDriverName()
-                                        .subscribeOn(Schedulers.io())
-                                        .observeOn(AndroidSchedulers.mainThread())
-                                        .subscribe(name -> mView.setDriverName(name)));
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(name -> mView.setDriverName(name)));
 
         mView.setBoxId(mVehiclesInteractor.getBoxId());
         mView.setAssetsNumber(mVehiclesInteractor.getAssetsNumber());
 
         add(getUserInteractor().getCoDriversNumber()
-                                        .subscribeOn(Schedulers.io())
-                                        .observeOn(AndroidSchedulers.mainThread())
-                                        .subscribe(count -> mView.setCoDriversNumber(count)));
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(count -> mView.setCoDriversNumber(count)));
         mAutoDutyTypeManager.validateBlackBoxState();
         mSyncInteractor.startSync();
     }
-
-
 
     @Override
     protected BaseMenuView getView() {
@@ -119,9 +117,9 @@ public final class NavigationPresenter extends BaseMenuPresenter {
     public void onDriverChanged() {
         super.onDriverChanged();
         Disposable disposable = Single.fromCallable(() -> getUserInteractor().getFullDriverNameSync())
-                                      .subscribeOn(Schedulers.io())
-                                      .observeOn(AndroidSchedulers.mainThread())
-                                      .subscribe(name -> mView.setDriverName(name));
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(name -> mView.setDriverName(name));
         add(disposable);
     }
 }
