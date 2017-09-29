@@ -31,7 +31,7 @@ public final class BlackBoxImpl implements BlackBox {
     private static final int RETRY_CONNECT_DELAY = 3000;
     private static final int RETRY_COUNT = 5;
     public static final int BUFFER_SIZE = 64;
-    public static final int UPDATE_RATE_MILLIS = 10000;
+    public static final int UPDATE_RATE_MILLIS = 60000;
     public static final int UPDATE_RATE_RATIO = 10;
     public static final int TIMEOUT_RATIO = 10;
 
