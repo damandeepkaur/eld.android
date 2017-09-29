@@ -146,13 +146,13 @@ public final class SyncInteractor {
     }
 
     private void syncNewEvents() {
-        Disposable syncNewEventsDisposable = Single.timer(Constants.SYNC_TIMEOUT_IN_MIN, TimeUnit.MINUTES)
+        Disposable syncNewEventsDisposable = Observable.interval(Constants.SYNC_TIMEOUT_IN_MIN, TimeUnit.MINUTES)
                 .subscribeOn(Schedulers.io())
                 .filter(t -> NetworkUtils.isOnlineMode())
                 .map(t -> mAccountManager.getCurrentUserId())
                 .map(userId -> ELDEventConverter.toModelList(mELDEventDao.getNewUnsyncEvents(userId)))
                 .filter(eldEvents -> !eldEvents.isEmpty())
-                .flatMapObservable(events -> Observable.fromIterable(parseELDEventsList(events)))
+                .flatMap(events -> Observable.fromIterable(parseELDEventsList(events)))
                 .flatMapSingle(events -> mServiceApi.postNewELDEvents(events)
                         .onErrorResumeNext(Single.just(mErrorResponse))
                         .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS) ? events : new ArrayList<ELDEvent>())
