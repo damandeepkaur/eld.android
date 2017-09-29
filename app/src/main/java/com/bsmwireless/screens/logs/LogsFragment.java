@@ -224,7 +224,8 @@ public final class LogsFragment extends BaseFragment implements LogsView {
 
     @Override
     public void dutyUpdated() {
-        //update from db
+        CalendarItem item = mAdapter.getCurrentItem();
+        mPresenter.updateDataForDay(item.getLogDay());
     }
 
     @Override
@@ -262,7 +263,10 @@ public final class LogsFragment extends BaseFragment implements LogsView {
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
         if (mAdapter != null) {
-            mPresenter.updateDataForDay(mAdapter.getCurrentItem().getLogDay());
+            CalendarItem calendarItem = mAdapter.getCurrentItem();
+            if (calendarItem != null) {
+                mPresenter.updateDataForDay(mAdapter.getCurrentItem().getLogDay());
+            }
         }
     }
 

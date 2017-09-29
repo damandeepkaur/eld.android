@@ -10,13 +10,13 @@ import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.data.storage.eldevents.ELDEventConverter;
 import com.bsmwireless.data.storage.eldevents.ELDEventDao;
 import com.bsmwireless.data.storage.eldevents.ELDEventEntity;
+import com.bsmwireless.data.storage.logsheets.LogSheetConverter;
+import com.bsmwireless.data.storage.logsheets.LogSheetDao;
+import com.bsmwireless.data.storage.logsheets.LogSheetEntity;
 import com.bsmwireless.data.storage.users.UserDao;
 import com.bsmwireless.data.storage.users.UserEntity;
 import com.bsmwireless.models.DriverHomeTerminal;
 import com.bsmwireless.models.DriverSignature;
-import com.bsmwireless.data.storage.logsheets.LogSheetConverter;
-import com.bsmwireless.data.storage.logsheets.LogSheetDao;
-import com.bsmwireless.data.storage.logsheets.LogSheetEntity;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.LogSheetHeader;
 import com.bsmwireless.models.ResponseMessage;
@@ -31,14 +31,15 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.Single;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
 import static com.bsmwireless.common.Constants.SUCCESS;
+import static com.bsmwireless.common.Constants.SYNC_ALL_EVENTS_IN_MIN;
 import static com.bsmwireless.common.utils.DateUtils.MS_IN_DAY;
 import static com.bsmwireless.data.storage.eldevents.ELDEventEntity.SyncType.SYNC;
 import static com.bsmwireless.data.storage.logsheets.LogSheetEntity.SyncType.UNSYNC;
@@ -55,7 +56,7 @@ public final class SyncInteractor {
     private ResponseMessage mErrorResponse;
 
     private Disposable mDriverProfileDisposable;
-    private Disposable mSyncEventsForDayDisposable;
+    private Disposable mSyncEventsDisposable;
     private LogSheetDao mLogSheetDao;
     private LogSheetInteractor mLogSheetInteractor;
 
@@ -81,6 +82,7 @@ public final class SyncInteractor {
             syncUpdatedEvents();
             syncLogSheetHeaders();
             syncDriverProfile();
+            getEventsFromServer();
         }
     }
 
@@ -122,29 +124,13 @@ public final class SyncInteractor {
                 .subscribe();
     }
 
-    public void syncEventsForDay(Calendar dayCalendar, String timezone) {
-        long startTime = DateUtils.getStartDate(timezone, dayCalendar);
-        long endTime = startTime + MS_IN_DAY;
-
-        if (mSyncEventsForDayDisposable != null) mSyncEventsForDayDisposable.dispose();
-        mSyncEventsForDayDisposable = Observable.interval(Constants.SYNC_TIMEOUT_IN_MIN, TimeUnit.MINUTES)
+    public void getEventsFromServer() {
+        mSyncCompositeDisposable.add(Observable.interval(SYNC_ALL_EVENTS_IN_MIN, TimeUnit.MINUTES)
                 .subscribeOn(Schedulers.io())
                 .filter(t -> NetworkUtils.isOnlineMode())
-                .take(3)
-                .map(aLong -> ELDEventConverter.toModelList(mELDEventDao.getUpdateUnsyncEvents()))
-                .map(this::filterInactiveEvents)
-                .filter(List::isEmpty)
-                .flatMap(eldEvents -> mServiceApi.getELDEvents(startTime, endTime))
-                .subscribe(eldEventsFromServer -> {
-                            List<ELDEventEntity> entities = mELDEventDao.getEventsFromStartToEndTimeSync(
-                                    startTime, endTime, mAccountManager.getCurrentUserId());
-                            List<ELDEvent> eventsFromDB = ELDEventConverter.toModelList(entities);
-                            if (!eldEventsFromServer.equals(eventsFromDB)) {
-                                ELDEventEntity[] entitiesArray = ELDEventConverter.toEntityArray(eldEventsFromServer);
-                                mELDEventDao.insertAll(entitiesArray);
-                            }
-                        },
-                        Timber::e);
+                .map(t -> mUserDao.getUserTimezoneSync(mAccountManager.getCurrentUserId()))
+                .subscribe(timezone -> syncEventsForDaysAgo(Constants.DEFAULT_CALENDAR_DAYS_COUNT, timezone)
+                ));
     }
 
     public void syncEventsForDaysAgo(int days, String timezone) {
@@ -152,7 +138,8 @@ public final class SyncInteractor {
         long start = DateUtils.getStartDayTimeInMs(timezone, current - days * MS_IN_DAY);
         long end = DateUtils.getEndDayTimeInMs(timezone, current);
         if (NetworkUtils.isOnlineMode()) {
-            mServiceApi.getELDEvents(start, end)
+            if (mSyncEventsDisposable != null) mSyncEventsDisposable.dispose();
+            mSyncEventsDisposable = mServiceApi.getELDEvents(start, end)
                     .subscribeOn(Schedulers.io())
                     .map(eldEvents -> ELDEventConverter.toEntityArray(eldEvents, SYNC))
                     .subscribe(eldEventEntities -> mELDEventDao.insertAll(eldEventEntities),
