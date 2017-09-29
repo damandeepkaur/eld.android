@@ -23,7 +23,6 @@ import com.bsmwireless.widgets.alerts.DutyType;
 import com.bsmwireless.widgets.logs.calendar.CalendarItem;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -32,8 +31,10 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
@@ -143,14 +144,17 @@ public final class LogsPresenter implements AccountManager.AccountListener {
     }
 
     private void setLogHeaderData(long logDay) {
-        LogHeaderModel model = new LogHeaderModel();
-        mUpdateDayDataDisposables.add(mUserInteractor.getFullUser()
+
+        Disposable disposable = mUserInteractor.getTimezoneOnce()
+                .flatMap(timezone -> Single
+                        .zip(loadUserHeaderInfo(timezone),
+                                loadLogHeaderInfo(logDay),
+                                loadOdometerValue(timezone),
+                                this::mapUserAndHeader))
                 .subscribeOn(Schedulers.io())
-                .doOnSuccess(user -> updateLogHeaderModelByUser(model, user))
-                .flatMap(user -> mLogSheetInteractor.getLogSheet(logDay))
-                .doOnSuccess(logSheetHeader -> updateLogHeaderModelByLogSheet(model, logSheetHeader))
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(eventLogModels -> mView.setLogHeader(model)));
+                .subscribe(logHeaderModel -> mView.setLogHeader(logHeaderModel));
+        mUpdateDayDataDisposables.add(disposable);
     }
 
     private void updateLogHeaderModelByUser(LogHeaderModel logHeaderModel, User user) {
@@ -398,89 +402,91 @@ public final class LogsPresenter implements AccountManager.AccountListener {
         return logs;
     }
 
-    private Single<UserHeaderInfo> loadUserHeaderInfo() {
+    private Single<UserHeaderInfo> loadUserHeaderInfo(String timeZone) {
 
-        return Single.fromCallable(() -> {
+        return mUserInteractor.getFullUser()
+                .map(user -> {
+                    if (user == null) return new UserHeaderInfo();
 
-            if (mUser == null) return new UserHeaderInfo();
+                    String driverName = String.format("%1$s %2$s", user.getFirstName(), user.getLastName());
+                    String selectedExemptions = user.getRuleException();
 
-            String driverName = String.format("%1$s %2$s", mUser.getFirstName(), mUser.getLastName());
-            String selectedExemptions = mUser.getRuleException();
-
-            String allExemptions = null;
-            List<SyncConfiguration> configurations = mUser.getConfigurations();
-            if (configurations != null) {
-                for (SyncConfiguration configuration : configurations) {
-                    if (SyncConfiguration.Type.EXCEPT.getName().equals(configuration.getName())) {
-                        allExemptions = configuration.getValue();
-                        break;
+                    String allExemptions = null;
+                    List<SyncConfiguration> configurations = user.getConfigurations();
+                    if (configurations != null) {
+                        for (SyncConfiguration configuration : configurations) {
+                            if (SyncConfiguration.Type.EXCEPT.getName().equals(configuration.getName())) {
+                                allExemptions = configuration.getValue();
+                                break;
+                            }
+                        }
                     }
-                }
-            }
 
-            //set carrier name
-            String carriername;
-            List<Carrier> carriers = mUser.getCarriers();
-            if (carriers != null && !carriers.isEmpty()) {
-                StringBuilder sb = new StringBuilder();
-                for (Carrier carrier : carriers) {
-                    sb.append(carrier.getName());
-                    sb.append(",");
-                }
-                carriername = sb.substring(0, sb.length() - 1);
-            } else {
-                carriername = "";
-            }
+                    //set carrier name
+                    String carriername;
+                    List<Carrier> carriers = user.getCarriers();
+                    if (carriers != null && !carriers.isEmpty()) {
+                        StringBuilder sb = new StringBuilder();
+                        for (Carrier carrier : carriers) {
+                            sb.append(carrier.getName());
+                            sb.append(",");
+                        }
+                        carriername = sb.substring(0, sb.length() - 1);
+                    } else {
+                        carriername = "";
+                    }
 
-            return new UserHeaderInfo(mTimeZone, driverName, selectedExemptions,
-                    allExemptions != null ? allExemptions : "", carriername);
-        });
+                    return new UserHeaderInfo(timeZone, driverName, selectedExemptions,
+                            allExemptions != null ? allExemptions : "", carriername);
+                });
     }
 
-    private Single<SelectedLogHeaderInfo> loadLogHeaderInfo() {
-        return Single.fromCallable(() -> {
-            if (mSelectedLogHeader == null) return new SelectedLogHeaderInfo();
+    private Single<SelectedLogHeaderInfo> loadLogHeaderInfo(long logDay) {
 
-            int vehicleId = mSelectedLogHeader.getVehicleId();
-            Vehicle vehicle;
-            if (mVehicleIdToNameMap.containsKey(vehicleId)) {
-                vehicle = mVehicleIdToNameMap.get(vehicleId);
-            } else {
-                vehicle = mVehiclesInteractor.getVehicle(vehicleId);
-            }
-            String vehicleName;
-            String vehicleLicense;
-            if (vehicle != null) {
-                vehicleName = vehicle.getName();
-                vehicleLicense = vehicle.getLicense();
-            } else {
-                vehicleName = "";
-                vehicleLicense = "";
-            }
+        return mLogSheetInteractor.getLogSheet(logDay)
+                .map(selectedLogHeader -> {
+                    if (selectedLogHeader == null) return new SelectedLogHeaderInfo();
 
-            String vehicleTrailers = mSelectedLogHeader.getCoDriverIds();
+                    int vehicleId = selectedLogHeader.getVehicleId();
+                    Vehicle vehicle;
+                    if (mVehicleIdToNameMap.containsKey(vehicleId)) {
+                        vehicle = mVehicleIdToNameMap.get(vehicleId);
+                    } else {
+                        vehicle = mVehiclesInteractor.getVehicle(vehicleId);
+                    }
+                    String vehicleName;
+                    String vehicleLicense;
+                    if (vehicle != null) {
+                        vehicleName = vehicle.getName();
+                        vehicleLicense = vehicle.getLicense();
+                    } else {
+                        vehicleName = "";
+                        vehicleLicense = "";
+                    }
 
-            String homeTerminalAddress;
-            String homeTerminalName;
-            if (mSelectedLogHeader.getHomeTerminal() != null) {
-                homeTerminalAddress = mSelectedLogHeader.getHomeTerminal().getAddress();
-                homeTerminalName = mSelectedLogHeader.getHomeTerminal().getName();
-            } else {
-                homeTerminalAddress = "";
-                homeTerminalName = "";
-            }
+                    String vehicleTrailers = selectedLogHeader.getCoDriverIds();
 
-            String shippingId = mSelectedLogHeader.getShippingId();
-            String coDriversname = getCoDriversName(mSelectedLogHeader);
+                    String homeTerminalAddress;
+                    String homeTerminalName;
+                    if (selectedLogHeader.getHomeTerminal() != null) {
+                        homeTerminalAddress = selectedLogHeader.getHomeTerminal().getAddress();
+                        homeTerminalName = selectedLogHeader.getHomeTerminal().getName();
+                    } else {
+                        homeTerminalAddress = "";
+                        homeTerminalName = "";
+                    }
 
-            return new SelectedLogHeaderInfo(vehicleName, vehicleLicense, vehicleTrailers,
-                    homeTerminalAddress, homeTerminalName, shippingId, coDriversname);
-        });
+                    String shippingId = selectedLogHeader.getShippingId();
+                    String coDriversname = getCoDriversName(selectedLogHeader);
+
+                    return new SelectedLogHeaderInfo(vehicleName, vehicleLicense, vehicleTrailers,
+                            homeTerminalAddress, homeTerminalName, shippingId, coDriversname);
+                });
     }
 
-    private Single<OdometerResult> loadOdometerValue() {
+    private Single<OdometerResult> loadOdometerValue(String mTimeZone) {
 
-        final long startDate = DateUtils.getStartDate(mTimeZone, mSelectedDayCalendar);
+        final long startDate = DateUtils.getStartDate(mTimeZone, mView.getSelectedDay().getCalendar());
         final long endDate = startDate + MS_IN_DAY;
 
         return mELDEventsInteractor.getDutyEventsFromDB(startDate, endDate)
@@ -538,7 +544,8 @@ public final class LogsPresenter implements AccountManager.AccountListener {
     }
 
     private LogHeaderModel mapUserAndHeader(UserHeaderInfo userHeaderInfo,
-                                            SelectedLogHeaderInfo selectedLogHeaderInfo) {
+                                            SelectedLogHeaderInfo selectedLogHeaderInfo,
+                                            OdometerResult odometerResult) {
 
         LogHeaderModel model = new LogHeaderModel();
         model.setTimezone(userHeaderInfo.mTimezone);
@@ -554,17 +561,12 @@ public final class LogsPresenter implements AccountManager.AccountListener {
         model.setHomeTerminalName(selectedLogHeaderInfo.mHomeTerminalName);
         model.setShippingId(selectedLogHeaderInfo.mShippingId);
         model.setCoDriversName(selectedLogHeaderInfo.mCoDriversName);
-        return model;
-    }
-
-    private LogHeaderModel mapOdometerValue(LogHeaderModel model, OdometerResult odometerResult) {
 
         model.setStartOdometer(String.valueOf(odometerResult.startValue));
         model.setEndOdometer(String.valueOf(odometerResult.endValue));
         model.setDistanceDriven(String.valueOf(odometerResult.distance));
         return model;
     }
-
 
     private String getCoDriversName(LogSheetHeader header) {
 
