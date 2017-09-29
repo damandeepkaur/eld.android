@@ -3,6 +3,8 @@ ELD app for Android
 
 # Version history
 
+* **1.0.90** - Co-driver is unable to access logsheet events (_EA-440_, _EA-435_)
+* **1.0.89** - Update UI (_EA-449_)
 * **1.0.88** - Fix events order and duration, fix location precision (_EA-439_, _EA-14_)
 * **1.0.87** - Data Recording Compliance Monitoring (_EA-232_)
 * **1.0.86** - Implement reassign log to co-driver (_EA-182_)
