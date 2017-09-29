@@ -1,5 +1,7 @@
 package com.bsmwireless.domain.interactors;
 
+import android.arch.persistence.room.RoomDatabase;
+
 import com.bsmwireless.common.Constants;
 import com.bsmwireless.common.utils.DateUtils;
 import com.bsmwireless.common.utils.NetworkUtils;
@@ -54,6 +56,7 @@ public final class SyncInteractor {
     private AccountManager mAccountManager;
     private ResponseMessage mErrorResponse;
 
+    private RoomDatabase mRoomDatabase;
     private Disposable mDriverProfileDisposable;
     private Disposable mSyncEventsForDayDisposable;
     private LogSheetDao mLogSheetDao;
@@ -65,6 +68,7 @@ public final class SyncInteractor {
                           AccountManager accountManager, LogSheetInteractor logSheetInteractor) {
         mServiceApi = serviceApi;
         mPreferencesManager = preferencesManager;
+        mRoomDatabase = appDatabase;
         mELDEventDao = appDatabase.ELDEventDao();
         mUserDao = appDatabase.userDao();
         mLogSheetDao = appDatabase.logSheetDao();
@@ -188,9 +192,11 @@ public final class SyncInteractor {
                 .flatMapSingle(dbEvents -> mServiceApi.getELDEvents(dbEvents.get(0).getEventTime(), dbEvents.get(dbEvents.size() - 1).getEventTime())
                         .doOnSuccess(serverEvents -> {
                             ELDEventEntity[] oldEntities = ELDEventConverter.toEntityArray(dbEvents);
-                            mELDEventDao.deleteAll(oldEntities);
                             ELDEventEntity[] entities = ELDEventConverter.toEntityArray(serverEvents, SYNC);
-                            mELDEventDao.insertAll(entities);
+                            mRoomDatabase.runInTransaction(() -> {
+                                mELDEventDao.deleteAll(oldEntities);
+                                mELDEventDao.insertAll(entities);
+                            });
                         }))
                 .subscribe(events -> Timber.d("Sync added events:" + events),
                         Timber::e);
@@ -218,9 +224,11 @@ public final class SyncInteractor {
                 .flatMapSingle(dbEvents -> mServiceApi.getELDEvents(dbEvents.get(0).getEventTime(), dbEvents.get(dbEvents.size() - 1).getEventTime())
                         .doOnSuccess(serverEvents -> {
                             ELDEventEntity[] oldEntities = ELDEventConverter.toEntityArray(dbEvents);
-                            mELDEventDao.deleteAll(oldEntities);
                             ELDEventEntity[] entities = ELDEventConverter.toEntityArray(serverEvents);
-                            mELDEventDao.insertAll(entities);
+                            mRoomDatabase.runInTransaction(() -> {
+                                mELDEventDao.deleteAll(oldEntities);
+                                mELDEventDao.insertAll(entities);
+                            });
                         })
                         .map(serverEvents -> dbEvents))
                 .subscribe(dbEvents -> Timber.d("Sync updated events:" + dbEvents),

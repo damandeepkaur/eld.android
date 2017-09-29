@@ -75,7 +75,7 @@ public final class UserInteractor {
 
         String accountName = mTokenManager.getAccountName(name, domain);
         return mServiceApi.loginUser(request)
-                .doOnSuccess(user -> saveUserDataInDB(user, accountName))
+                .doOnSuccess(user -> mAppDatabase.runInTransaction(() -> saveUserDataInDB(user, accountName)))
                 .onErrorResumeNext(throwable -> {
                     if (throwable instanceof RetrofitException || throwable instanceof UnknownHostException) {
                         String driverId = mTokenManager.getDriver(accountName);
@@ -130,7 +130,7 @@ public final class UserInteractor {
                 })
                 .doOnSuccess(user -> {
                     mTokenManager.setToken(accountName, name, password, domain, user.getAuth());
-                    saveUserDataInDB(user, accountName);
+                    mAppDatabase.runInTransaction(() -> saveUserDataInDB(user, accountName));
 
                     List<Integer> coDriverIds = saveCoDrivers(getDriverId(), Arrays.asList(user.getId()));
                     coDriverIds.add(getDriverId());
