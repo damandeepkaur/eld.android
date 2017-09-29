@@ -6,7 +6,7 @@ import com.bsmwireless.screens.logs.dagger.EventLogModel;
 import java.util.Collections;
 import java.util.List;
 
-public class GraphModel {
+public final class GraphModel {
     private long mStartDayTime;
     private ELDEvent prevDayEvent;
     private List<EventLogModel> mEventLogModels = Collections.emptyList();
