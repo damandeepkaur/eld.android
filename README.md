@@ -3,7 +3,8 @@ ELD app for Android
 
 # Version history
 
-* **1.0.91** - Home screen (_EA-211_)
+* **1.0.92** - Home screen (_EA-211_)
+* **1.0.91** - Change blackbox update rate from 10 sec to 1 minute (_EA-446_)
 * **1.0.90** - Co-driver is unable to access logsheet events (_EA-440_, _EA-435_)
 * **1.0.89** - Update UI (_EA-449_)
 * **1.0.88** - Fix events order and duration, fix location precision (_EA-439_, _EA-14_)
