@@ -85,6 +85,12 @@
         <activity
             android:name="com.bsmwireless.screens.lockscreen.LockScreenActivity"/>
 
+        <activity
+            android:name="com.bsmwireless.screens.roadsidenavigation.RoadsideNavigationActivity"/>
+
+        <activity
+            android:name="com.bsmwireless.screens.transfer.TransferActivity"/>
+
         <service android:name="com.bsmwireless.data.network.authenticator.BsmAuthenticatorService"
             android:exported="false">
             <intent-filter>

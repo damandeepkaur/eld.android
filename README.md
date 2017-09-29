@@ -3,6 +3,17 @@ ELD app for Android
 
 # Version history
 
+* **1.0.90** - Co-driver is unable to access logsheet events (_EA-440_, _EA-435_)
+* **1.0.89** - Update UI (_EA-449_)
+* **1.0.88** - Fix events order and duration, fix location precision (_EA-439_, _EA-14_)
+* **1.0.87** - Data Recording Compliance Monitoring (_EA-232_)
+* **1.0.86** - Implement reassign log to co-driver (_EA-182_)
+* **1.0.85** - Add roadside and data transfer (_EA-109_, _EA-84_, _EA-54_)
+* **1.0.84** - Fix extra timing in auto-duty (_EA-406_), Fix duration round issue (_EA-336_)
+* **1.0.83** - Timing Compliance Monitoring (_EA-224_)
+* **1.0.82** - Fix crash when screen rotated twice with confirm on duty popup on foreground (_EA-407_)
+* **1.0.81** - Fix multiple duty status marked as 'Driving' are added on Driver Logsheet after Driving (_EA-425_)
+* **1.0.80** - Fix not able to add event/change duty status (_EA-422_)
 * **1.0.79** - Fix app returns home screen instead of login screen after selecting close
 * **1.0.78** - Fixed the lock screen in Personal Use and Yard Moves and switching from background to foreground  (_EA-417_, _EA-436_)
 * **1.0.77** - Replace snackbar to floating action button

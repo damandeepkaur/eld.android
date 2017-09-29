@@ -9,15 +9,13 @@ import java.util.List;
 public final class DrawableLog {
     private DutyType mType;
     private long mTime;
-    private long mDuration;
 
     public DrawableLog() {
     }
 
-    public DrawableLog(DutyType type, long time, long duration) {
+    public DrawableLog(DutyType type, long time) {
         mType = type;
         mTime = time;
-        mDuration = duration;
     }
 
     public static List<DrawableLog> convertToDrawableLog(List<EventLogModel> events) {
@@ -30,9 +28,9 @@ public final class DrawableLog {
                 if (DutyType.CLEAR.equals(dutyType) || DutyType.CLEAR_PU.equals(dutyType)
                         || DutyType.CLEAR_YM.equals(dutyType)) {
                     DutyType type = event.getDutyType();
-                    log = new DrawableLog(type, event.getEventTime(), event.getDuration());
+                    log = new DrawableLog(type, event.getEventTime());
                 } else {
-                    log = new DrawableLog(dutyType, event.getEventTime(), event.getDuration());
+                    log = new DrawableLog(dutyType, event.getEventTime());
                 }
                 result.add(log);
             }
@@ -58,9 +56,5 @@ public final class DrawableLog {
 
     public boolean isSpecialStatus() {
         return mType.equals(DutyType.PERSONAL_USE) || mType.equals(DutyType.YARD_MOVES);
-    }
-
-    public long getDuration() {
-        return mDuration;
     }
 }

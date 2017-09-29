@@ -11,7 +11,7 @@
         <item
             android:id="@+id/nav_inspector_view"
             android:checked="false"
-            android:icon="@drawable/ic_description_black_24dp"
+            android:icon="@drawable/ic_send"
             android:title="@string/nav_inspector_view"/>
 
         <item
@@ -19,6 +19,12 @@
             android:checked="false"
             android:icon="@drawable/ic_description_black_24dp"
             android:title="@string/nav_carrier_edit_view"/>
+
+        <item
+            android:id="@+id/nav_transfer_view"
+            android:checked="false"
+            android:icon="@drawable/ic_description_black_24dp"
+            android:title="@string/nav_transfer_view"/>
     </group>
 
 

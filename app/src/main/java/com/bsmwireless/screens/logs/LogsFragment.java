@@ -118,7 +118,7 @@ public final class LogsFragment extends BaseFragment implements LogsView {
 
     @OnClick(R.id.edit_log_header)
     void editLogHeader() {
-        mPresenter.onEditLogHeaderClicked();
+        mPresenter.onEditLogHeaderClicked(mAdapter.getLogHeaderModel());
     }
 
     @OnClick(R.id.add_event)
@@ -160,13 +160,18 @@ public final class LogsFragment extends BaseFragment implements LogsView {
     }
 
     @Override
+    public CalendarItem getSelectedDay() {
+        return mAdapter.getCurrentItem();
+    }
+
+    @Override
     public void setEventLogs(List<EventLogModel> eventLogs) {
         mAdapter.setEventLogs(eventLogs);
     }
 
     @Override
-    public void setPrevDayEvent(ELDEvent event) {
-        mAdapter.setPrevDayEvent(event);
+    public void updateGraph(GraphModel graphModel) {
+        mAdapter.updateGraph(graphModel);
     }
 
     @Override
@@ -204,7 +209,7 @@ public final class LogsFragment extends BaseFragment implements LogsView {
     public void eventAdded() {
         showNotificationSnackBar(getString(R.string.event_added));
         CalendarItem item = mAdapter.getCurrentItem();
-        mPresenter.setEventsForDay(item.getCalendar());
+        mPresenter.updateDataForDay(item.getLogDay());
         mNavigateView.setResetTime(0);
     }
 
@@ -212,7 +217,7 @@ public final class LogsFragment extends BaseFragment implements LogsView {
     public void eventUpdated() {
         showNotificationSnackBar(getString(R.string.event_updated));
         CalendarItem item = mAdapter.getCurrentItem();
-        mPresenter.setEventsForDay(item.getCalendar());
+        mPresenter.updateDataForDay(item.getLogDay());
         mNavigateView.setResetTime(0);
     }
 
@@ -253,6 +258,14 @@ public final class LogsFragment extends BaseFragment implements LogsView {
     }
 
     @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (mAdapter != null) {
+            mPresenter.updateDataForDay(mAdapter.getCurrentItem().getLogDay());
+        }
+    }
+
+    @Override
     public void hideTitleButton(LogsTitleView.Type expandedType) {
         switch (expandedType) {
             case EVENTS:
@@ -264,6 +277,11 @@ public final class LogsFragment extends BaseFragment implements LogsView {
             default:
                 break;
         }
+    }
+
+    @Override
+    public void showReassignDialog(ELDEvent event) {
+        mNavigateView.showReassignDialog(event);
     }
 
     @Override

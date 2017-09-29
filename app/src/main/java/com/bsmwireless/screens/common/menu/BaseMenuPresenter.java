@@ -7,6 +7,8 @@ import com.bsmwireless.domain.interactors.UserInteractor;
 import com.bsmwireless.widgets.alerts.DutyType;
 import com.bsmwireless.widgets.alerts.OccupancyType;
 
+import java.util.List;
+
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
@@ -19,7 +21,7 @@ import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.Subject;
 import timber.log.Timber;
 
-public abstract class BaseMenuPresenter implements AccountManager.AccountListener{
+public abstract class BaseMenuPresenter implements AccountManager.AccountListener {
     private final DutyTypeManager mDutyTypeManager;
     private final ELDEventsInteractor mEventsInteractor;
     private final UserInteractor mUserInteractor;
@@ -98,12 +100,12 @@ public abstract class BaseMenuPresenter implements AccountManager.AccountListene
         }
     }
 
+    public final boolean isDriverConnected() {
+        return mEventsInteractor.isConnected();
+    }
+
     public final void onChangeDutyClick() {
-        if (mEventsInteractor.isConnected()) {
-            getView().showDutyTypeDialog(mDutyTypeManager.getDutyType());
-        } else {
-            getView().showNotInVehicleDialog();
-        }
+        getView().showDutyTypeDialog(mDutyTypeManager.getDutyType());
     }
 
     @SuppressWarnings("DesignForExtension")
@@ -189,6 +191,11 @@ public abstract class BaseMenuPresenter implements AccountManager.AccountListene
         }
     }
 
+    final List<DutyType> getAvailableDutyTypes() {
+        return mAccountManager.isCurrentUserDriver() && mEventsInteractor.isConnected() ? DutyTypeManager.DRIVER_DUTY : DutyTypeManager.CO_DRIVER_DUTY;
+    }
+
     @Override
-    public void onDriverChanged() {}
+    public void onDriverChanged() {
+    }
 }

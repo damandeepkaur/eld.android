@@ -21,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bsmwireless.common.App;
+import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.screens.autologout.AutoDutyDialogActivity;
 import com.bsmwireless.screens.carrieredit.CarrierEditActivity;
 import com.bsmwireless.screens.carrieredit.CarrierEditView;
@@ -30,8 +31,10 @@ import com.bsmwireless.screens.driverprofile.DriverProfileActivity;
 import com.bsmwireless.screens.login.LoginActivity;
 import com.bsmwireless.screens.navigation.dagger.DaggerNavigationComponent;
 import com.bsmwireless.screens.navigation.dagger.NavigationModule;
+import com.bsmwireless.screens.roadsidenavigation.RoadsideNavigationActivity;
 import com.bsmwireless.screens.selectasset.SelectAssetActivity;
 import com.bsmwireless.screens.settings.SettingsActivity;
+import com.bsmwireless.screens.transfer.TransferActivity;
 import com.bsmwireless.widgets.snackbar.SnackBarLayout;
 
 import javax.inject.Inject;
@@ -44,6 +47,7 @@ import butterknife.Unbinder;
 import static com.bsmwireless.screens.autologout.AutoDutyDialogActivity.EXTRA_AUTO_DRIVING;
 import static com.bsmwireless.screens.autologout.AutoDutyDialogActivity.EXTRA_AUTO_DRIVING_WITHOUT_CONFIRM;
 import static com.bsmwireless.screens.autologout.AutoDutyDialogActivity.EXTRA_AUTO_ON_DUTY;
+import static com.bsmwireless.screens.autologout.AutoDutyDialogActivity.EXTRA_AUTO_ON_DUTY_TIME;
 
 public final class NavigationActivity extends BaseMenuActivity implements OnNavigationItemSelectedListener, NavigateView, ViewPager.OnPageChangeListener {
 
@@ -126,7 +130,10 @@ public final class NavigationActivity extends BaseMenuActivity implements OnNavi
                 open((BaseFragment) fragment, false);*/
                 break;
             case R.id.nav_inspector_view:
-                Toast.makeText(this, "Go to inspector screen", Toast.LENGTH_SHORT).show();
+                mDrawerToggle.runWhenIdle(() -> startActivity(new Intent(this, RoadsideNavigationActivity.class)));
+                break;
+            case R.id.nav_transfer_view:
+                mDrawerToggle.runWhenIdle(() -> startActivity(new Intent(this, TransferActivity.class)));
                 break;
             case R.id.nav_help:
                 Toast.makeText(this, "Go to help screen", Toast.LENGTH_SHORT).show();
@@ -252,6 +259,11 @@ public final class NavigationActivity extends BaseMenuActivity implements OnNavi
     }
 
     @Override
+    public void showReassignDialog(ELDEvent event) {
+        showReassignEventDialog(event);
+    }
+
+    @Override
     protected void onDestroy() {
         mHandler.removeCallbacks(mResetTimeTask);
         mViewPager.removeOnPageChangeListener(this);
@@ -291,10 +303,11 @@ public final class NavigationActivity extends BaseMenuActivity implements OnNavi
     }
 
     @Override
-    public void setAutoOnDuty() {
+    public void setAutoOnDuty(long stoppedTime) {
         Intent dialogIntent = new Intent(this, AutoDutyDialogActivity.class);
         dialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         dialogIntent.putExtra(EXTRA_AUTO_ON_DUTY, true);
+        dialogIntent.putExtra(EXTRA_AUTO_ON_DUTY_TIME, stoppedTime);
         startActivity(dialogIntent);
     }
 

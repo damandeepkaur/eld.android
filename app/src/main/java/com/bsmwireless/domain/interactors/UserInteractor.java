@@ -41,6 +41,7 @@ import javax.inject.Inject;
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 
 import static com.bsmwireless.common.Constants.DEFAULT_CALENDAR_DAYS_COUNT;
 import static com.bsmwireless.common.Constants.SUCCESS;
@@ -220,6 +221,14 @@ public final class UserInteractor {
                 .onErrorReturn(throwable -> false);
     }
 
+    public Completable updateUserRuleException(String ruleException) {
+        return Completable.fromAction(() -> {
+            UserEntity user = mAppDatabase.userDao().getUserSync(mAccountManager.getCurrentUserId());
+            user.setRuleException(ruleException);
+            mAppDatabase.userDao().insertUser(user);
+        });
+    }
+
     public Observable<Boolean> updateDriverHomeTerminal(Integer homeTerminalId) {
         return mServiceApi.updateDriverHomeTerminal(getHomeTerminal(homeTerminalId))
                 .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS))
@@ -281,12 +290,10 @@ public final class UserInteractor {
     public Flowable<FullUserEntity> getFullDriver() {
         return mAppDatabase.userDao()
                 .getFullUser(getDriverId())
-                .doOnNext(userEntity -> {
-                    userEntity.setHomeTerminalEntities(
-                            mAppDatabase.homeTerminalDao()
-                                    .getHomeTerminalsSync(userEntity.getHomeTerminalIds())
-                    );
-                });
+                .doOnNext(userEntity -> userEntity.setHomeTerminalEntities(
+                        mAppDatabase.homeTerminalDao()
+                                .getHomeTerminalsSync(userEntity.getHomeTerminalIds())
+                ));
     }
 
     public FullUserEntity getFullUserSync() {
@@ -297,8 +304,17 @@ public final class UserInteractor {
         return fullUserEntity;
     }
 
-    public Flowable<User> getFullUser() {
-        return getFullDriver().map(UserConverter::toFullUser);
+    public FullUserEntity getFullUserSync(int id) {
+        return mAppDatabase.userDao().getFullUserSync(id);
+    }
+
+    public Single<User> getFullUser() {
+        return Single.fromCallable(() -> mAppDatabase.userDao().getFullUserSync(mAccountManager.getCurrentUserId()))
+                .doOnSuccess(userEntity -> userEntity.setHomeTerminalEntities(
+                        mAppDatabase.homeTerminalDao()
+                                .getHomeTerminalsSync(userEntity.getHomeTerminalIds())
+                ))
+                .map(UserConverter::toFullUser);
     }
 
     public boolean isLoginActive() {
@@ -323,6 +339,10 @@ public final class UserInteractor {
         return mAppDatabase.userDao().getUserTimezone(getDriverId());
     }
 
+    public Single<String> getTimezoneOnce() {
+        return mAppDatabase.userDao().getUserTimezoneOnce(getDriverId());
+    }
+
     public boolean isRememberMeEnabled() {
         return mPreferencesManager.isRememberUserEnabled();
     }
@@ -339,6 +359,10 @@ public final class UserInteractor {
 
     public UserEntity getUserFromDBSync(int userId) {
         return mAppDatabase.userDao().getUserSync(userId);
+    }
+
+    public List<UserEntity> getUsersFromDBSync(String ids) {
+        return mAppDatabase.userDao().getUsersSync(ListConverter.toIntegerList(ids));
     }
 
     private List<Integer> saveCoDrivers(int driverId, List<Integer> coDriverIds) {

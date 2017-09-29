@@ -96,7 +96,7 @@ public class EditedEventsAdapter extends RecyclerView.Adapter<EditedEventsAdapte
                 });
 
                 mGraphLayout = view.findViewById(R.id.graphic);
-                mGraphLayout.setELDEvents(mEventLogs);
+                //mGraphLayout.setELDEvents(mEventLogs);
 
                 break;
             case VIEW_TYPE_EVENTS_TITLE:
