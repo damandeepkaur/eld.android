@@ -34,6 +34,7 @@ import io.reactivex.Observable;
 import io.reactivex.Single;
 
 import static com.bsmwireless.common.Constants.SUCCESS;
+import static com.bsmwireless.common.utils.DateUtils.MS_IN_DAY;
 import static com.bsmwireless.common.utils.DateUtils.SEC_IN_HOUR;
 
 public final class ELDEventsInteractor {
@@ -95,6 +96,29 @@ public final class ELDEventsInteractor {
     public List<ELDEvent> getActiveEventsFromDBSync(long startTime, long endTime) {
         int driverId = mAccountManager.getCurrentUserId();
         return ELDEventConverter.toModelList(mELDEventDao.getActiveEventsFromStartToEndTimeSync(startTime, endTime, driverId));
+    }
+
+    public Single<List<ELDEvent>> getDutyEventsForDay(long startDayTime) {
+        return mELDEventDao.getDutyEventsFromStartToEndTimeSync(startDayTime,
+                startDayTime + MS_IN_DAY, mAccountManager.getCurrentUserId())
+                .onErrorReturn(throwable -> Collections.emptyList())
+                .map(ELDEventConverter::toModelList);
+    }
+
+    public Single<List<ELDEvent>> getActiveDutyEventsForDay(long startDayTime) {
+        return Single.fromCallable(() -> mELDEventDao.getActiveEventsFromStartToEndTimeSync(startDayTime,
+                startDayTime + MS_IN_DAY, mAccountManager.getCurrentUserId()))
+                .map(ELDEventConverter::toModelList);
+    }
+
+    public ELDEvent getLatestActiveDutyEventFromDB(long startDayTime) {
+        List<ELDEventEntity> entities = mELDEventDao.getLatestActiveDutyEventSync(startDayTime,
+                mAccountManager.getCurrentUserId());
+        ELDEvent event = null;
+        if (!entities.isEmpty()) {
+            event = ELDEventConverter.toModel(entities.get(entities.size() - 1));
+        }
+        return event;
     }
 
     public Observable<long[]> updateELDEvents(List<ELDEvent> events) {
