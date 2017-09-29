@@ -21,6 +21,7 @@ import com.bsmwireless.models.Auth;
 import com.bsmwireless.models.DriverHomeTerminal;
 import com.bsmwireless.models.DriverProfileModel;
 import com.bsmwireless.models.DriverSignature;
+import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.HomeTerminal;
 import com.bsmwireless.models.LoginModel;
 import com.bsmwireless.models.PasswordModel;
@@ -35,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
+import java.util.ListIterator;
 
 import javax.inject.Inject;
 
@@ -143,7 +145,18 @@ public final class UserInteractor {
                     long end = DateUtils.getEndDayTimeInMs(user.getTimezone(), current);
                     String token = user.getAuth().getToken();
                     int userId = user.getId();
-                    return mServiceApi.getELDEvents(start, end, token, String.valueOf(userId));
+                    return mServiceApi.getELDEvents(start, end, token, String.valueOf(userId))
+                            .map(eldEvents -> {
+                                //Filter out incorrect events
+                                ListIterator<ELDEvent> iterator = eldEvents.listIterator();
+                                while (iterator.hasNext()) {
+                                    ELDEvent event = iterator.next();
+                                    if (event.getEventCode() <= 0 || event.getEventType() <= 0) {
+                                        iterator.remove();
+                                    }
+                                }
+                                return eldEvents;
+                            });
                 })
                 .onErrorResumeNext(throwable -> {
                     throwable.printStackTrace();
