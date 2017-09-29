@@ -79,8 +79,6 @@ public final class MultidayPresenter implements AccountManager.AccountListener {
         calendar.setTimeInMillis(endDayTime - (dayCount - 1) * MS_IN_DAY);
         long startDayTime = DateUtils.getStartDate(mTimeZone, calendar);
 
-        mSyncInteractor.syncEventsForDay(calendar, mTimeZone);
-
         mGetEventDisposable.dispose();
         mGetEventDisposable = Observable.fromCallable(() -> getMultidayItems(dayCount, startDayTime))
                 .subscribeOn(Schedulers.io())

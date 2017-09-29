@@ -10,6 +10,7 @@ import com.bsmwireless.domain.interactors.VehiclesInteractor;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.User;
 import com.bsmwireless.models.Vehicle;
+import com.bsmwireless.screens.logs.GraphModel;
 import com.bsmwireless.screens.logs.dagger.EventLogModel;
 import com.bsmwireless.widgets.alerts.DutyType;
 
@@ -90,7 +91,12 @@ public final class RoadsidePresenter {
                                 RoadsideResult result = new RoadsideResult();
                                 result.setHeadersData(mView.getHeadersData(header, lastEvent, vehicle));
                                 result.setEventsData(mView.getEventsData(events));
-                                result.setGraphData(preparingLogs(events, startTime, Math.min(endTime, System.currentTimeMillis()), timezone));
+                                GraphModel graphModel = new GraphModel();
+                                graphModel.setPrevDayEvent(prevDayEvent);
+                                graphModel.setStartDayTime(startTime);
+                                graphModel.setEventLogModels(preparingLogs(events, startTime,
+                                        Math.min(endTime, System.currentTimeMillis()), timezone));
+                                result.setGraphData(graphModel);
                                 result.setPreviousEvent(prevDayEvent);
 
                                 return result;
@@ -102,7 +108,7 @@ public final class RoadsidePresenter {
                         result -> {
                             mView.showHeaders(result.getHeadersData());
                             mView.showEvents(result.getEventsData());
-                            mView.showGraph(result.getGraphData(), result.getPreviousEvent());
+                            mView.showGraph(result.getGraphData());
                         },
                         throwable -> Timber.e(throwable)
                 );
@@ -162,7 +168,7 @@ public final class RoadsidePresenter {
     private static final class RoadsideResult {
         private List<String> mHeadersData;
         private List<String> mEventsData;
-        private List<EventLogModel> mGraphData;
+        private GraphModel mGraphData;
         private ELDEvent mPreviousEvent;
 
         List<String> getHeadersData() {
@@ -181,11 +187,11 @@ public final class RoadsidePresenter {
             mEventsData = eventsData;
         }
 
-        List<EventLogModel> getGraphData() {
+        GraphModel getGraphData() {
             return mGraphData;
         }
 
-        void setGraphData(List<EventLogModel> graphData) {
+        void setGraphData(GraphModel graphData) {
             mGraphData = graphData;
         }
 

@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.screens.common.BaseActivity;
 import com.bsmwireless.screens.diagnostic.DiagnosticDialog;
 import com.bsmwireless.screens.diagnostic.MalfunctionDialog;
@@ -135,6 +136,12 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
     public void showSwitchDriverDialog() {
         if (mSwitchDriverDialog != null) {
             mSwitchDriverDialog.show();
+        }
+    }
+
+    public final void showReassignEventDialog(ELDEvent event) {
+        if (mSwitchDriverDialog != null) {
+            mSwitchDriverDialog.showReassignEventDialog(event);
         }
     }
 
