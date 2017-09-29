@@ -29,7 +29,7 @@ public final class HomePresenter {
         startDutyTypeMonitoring();
     }
 
-    public void onStop(){
+    public void onStop() {
         mHomeView = null;
     }
 
@@ -53,7 +53,7 @@ public final class HomePresenter {
 
     }
 
-    private void startDutyTypeMonitoring(){
+    private void startDutyTypeMonitoring() {
         Disposable disposable = DutyManagerObservable.create(mDutyTypeManager)
                 .retry()
                 .subscribeOn(Schedulers.io())

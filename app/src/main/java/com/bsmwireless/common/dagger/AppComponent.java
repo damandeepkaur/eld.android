@@ -12,7 +12,7 @@ import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.AutoDutyTypeManager;
 import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.data.storage.PreferencesManager;
-import com.bsmwireless.screens.dashboard.dagger.HoursOfServiceComponent;
+import com.bsmwireless.screens.hoursofservice.HoursOfServiceComponent;
 import com.bsmwireless.screens.diagnostic.dagger.DiagnosticComponent;
 import com.bsmwireless.screens.home.HomeComponent;
 import com.bsmwireless.screens.lockscreen.dagger.LockScreenComponent;

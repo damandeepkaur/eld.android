@@ -18,11 +18,11 @@ import com.bsmwireless.models.LogSheetHeader;
 import com.bsmwireless.screens.common.BaseFragment;
 import com.bsmwireless.screens.editevent.EditEventActivity;
 import com.bsmwireless.screens.editlogheader.EditLogHeaderActivity;
+import com.bsmwireless.screens.hoursofservice.HoursOfServiceView;
 import com.bsmwireless.screens.logs.LogsAdapter.OnLogsStateChangeListener;
 import com.bsmwireless.screens.logs.dagger.DaggerLogsComponent;
 import com.bsmwireless.screens.logs.dagger.EventLogModel;
 import com.bsmwireless.screens.logs.dagger.LogsModule;
-import com.bsmwireless.screens.navigation.NavigateView;
 import com.bsmwireless.widgets.logs.LogsTitleView;
 import com.bsmwireless.widgets.logs.WrapLinearLayoutManager;
 import com.bsmwireless.widgets.logs.calendar.CalendarItem;
@@ -65,13 +65,13 @@ public final class LogsFragment extends BaseFragment implements LogsView {
 
     private LogsAdapter mAdapter;
     private Unbinder mUnbinder;
-    private NavigateView mNavigateView;
+    private HoursOfServiceView mNavigateView;
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof NavigateView) {
-            mNavigateView = (NavigateView) context;
+        if (context instanceof HoursOfServiceView) {
+            mNavigateView = (HoursOfServiceView) context;
         } else {
             throw new RuntimeException(context.toString() + " must implement NavigateView");
         }

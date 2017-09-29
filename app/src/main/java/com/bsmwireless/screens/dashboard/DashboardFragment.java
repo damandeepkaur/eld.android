@@ -26,7 +26,7 @@ import com.bsmwireless.common.utils.ViewUtils;
 import com.bsmwireless.screens.common.BaseFragment;
 import com.bsmwireless.screens.dashboard.dagger.DaggerDashboardComponent;
 import com.bsmwireless.screens.dashboard.dagger.DashboardModule;
-import com.bsmwireless.screens.navigation.NavigateView;
+import com.bsmwireless.screens.hoursofservice.HoursOfServiceView;
 import com.bsmwireless.widgets.alerts.DutyType;
 import com.bsmwireless.widgets.dashboard.DutyView;
 
@@ -73,7 +73,7 @@ public final class DashboardFragment extends BaseFragment implements DashboardVi
     private Drawable mIndicatorDrawable;
 
     private Unbinder mUnbinder;
-    private NavigateView mNavigateView;
+    private HoursOfServiceView mNavigateView;
 
     private DutyType mDutyType = DutyType.OFF_DUTY;
 
@@ -91,8 +91,8 @@ public final class DashboardFragment extends BaseFragment implements DashboardVi
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof NavigateView) {
-            mNavigateView = (NavigateView) context;
+        if (context instanceof HoursOfServiceView) {
+            mNavigateView = (HoursOfServiceView) context;
         } else {
             throw new RuntimeException(context.toString() + " must implement NavigateView");
         }

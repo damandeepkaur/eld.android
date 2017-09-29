@@ -10,7 +10,7 @@ import android.widget.TextView;
 
 import com.bsmwireless.common.App;
 import com.bsmwireless.screens.common.BaseFragment;
-import com.bsmwireless.screens.dashboard.HoursOfServiceActivity;
+import com.bsmwireless.screens.hoursofservice.HoursOfServiceActivity;
 import com.bsmwireless.widgets.alerts.DutyType;
 
 import javax.inject.Inject;
@@ -20,7 +20,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public final class HomeFragment extends BaseFragment implements HomeView{
+public final class HomeFragment extends BaseFragment implements HomeView {
 
     @BindView(R.id.home_screen_current_status)
     TextView mCurrentStatus;
@@ -28,7 +28,7 @@ public final class HomeFragment extends BaseFragment implements HomeView{
     @Inject
     HomePresenter mHomePresenter;
 
-    public static HomeFragment newInstance(){
+    public static HomeFragment newInstance() {
         return new HomeFragment();
     }
 
@@ -69,22 +69,22 @@ public final class HomeFragment extends BaseFragment implements HomeView{
     }
 
     @OnClick(R.id.home_screen_pre_trip)
-    void onPreTripClick(){
+    void onPreTripClick() {
         mHomePresenter.onPreTrip();
     }
 
     @OnClick(R.id.home_screen_post_trip)
-    void onPostTripClick(){
+    void onPostTripClick() {
         mHomePresenter.onPostTrip();
     }
 
     @OnClick(R.id.home_screen_inspections)
-    void onInspectionsClick(){
+    void onInspectionsClick() {
         mHomePresenter.onInspections();
     }
 
     @OnClick(R.id.homeScreen_hours_of_service)
-    void onHoursOfServiceClick(){
+    void onHoursOfServiceClick() {
         mHomePresenter.onHoursOfService();
     }
 }

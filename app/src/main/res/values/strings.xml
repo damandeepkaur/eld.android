@@ -703,6 +703,7 @@
     <string name="transfer_dialog_negative">Cancel</string>
     
     <!--Home screen-->
+    <string name="home_screen_label">Home</string>
     <string name="home_screen_current_status">Current status:</string>
     <string name="home_screen_hours_of_service">Hours of service</string>
     <string name="home_screen_pre_trip">pre-trip</string>

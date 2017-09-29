@@ -42,7 +42,8 @@
         <activity
             android:name="com.bsmwireless.screens.navigation.NavigationActivity"
             android:theme="@style/AppTheme"
-            android:windowSoftInputMode="stateHidden|adjustResize">
+            android:windowSoftInputMode="stateHidden|adjustResize"
+            >
         </activity>
         <activity
             android:name="com.bsmwireless.screens.help.HelpActivity"
@@ -86,9 +87,10 @@
         <activity
             android:name="com.bsmwireless.screens.transfer.TransferActivity"/>
 
-        <activity android:name="com.bsmwireless.screens.dashboard.HoursOfServiceActivity"/>
+        <activity android:name="com.bsmwireless.screens.hoursofservice.HoursOfServiceActivity"/>
 
-        <service android:name="com.bsmwireless.data.network.authenticator.BsmAuthenticatorService"
+        <service
+            android:name="com.bsmwireless.data.network.authenticator.BsmAuthenticatorService"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator"/>

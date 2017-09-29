@@ -8,7 +8,7 @@ import dagger.Subcomponent;
 @Subcomponent
 public interface HomeComponent {
 
-    void inject(HomeFragment homeFragment);
+    void inject(HomeFragment homeActivity);
 
     @Subcomponent.Builder
     interface Builder {
