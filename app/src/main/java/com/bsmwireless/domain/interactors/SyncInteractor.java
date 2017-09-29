@@ -131,33 +131,6 @@ public final class SyncInteractor {
                 .subscribe();
     }
 
-    public void syncEventsForDay(Calendar dayCalendar, String timezone) {
-        long startTime = DateUtils.getStartDate(timezone, dayCalendar);
-        long endTime = startTime + MS_IN_DAY;
-
-        if (mSyncEventsForDayDisposable != null && !mSyncEventsForDayDisposable.isDisposed()) {
-            mSyncEventsForDayDisposable.dispose();
-        }
-        mSyncEventsForDayDisposable = Observable.interval(Constants.SYNC_TIMEOUT_IN_MIN, TimeUnit.MINUTES)
-                .subscribeOn(Schedulers.io())
-                .filter(t -> NetworkUtils.isOnlineMode())
-                .take(3)
-                .map(aLong -> ELDEventConverter.toModelList(mELDEventDao.getUpdateUnsyncEvents()))
-                .map(this::filterInactiveEvents)
-                .filter(List::isEmpty)
-                .flatMapSingle(eldEvents -> mServiceApi.getELDEvents(startTime, endTime))
-                .subscribe(eldEventsFromServer -> {
-                            List<ELDEventEntity> entities = mELDEventDao.getEventsFromStartToEndTimeSync(
-                                    startTime, endTime, mAccountManager.getCurrentUserId());
-                            List<ELDEvent> eventsFromDB = ELDEventConverter.toModelList(entities);
-                            if (!eldEventsFromServer.equals(eventsFromDB)) {
-                                ELDEventEntity[] entitiesArray = ELDEventConverter.toEntityArray(eldEventsFromServer);
-                                mELDEventDao.insertAll(entitiesArray);
-                            }
-                        },
-                        Timber::e);
-    }
-
     public void syncEventsForDaysAgo(int days, String timezone) {
         long current = System.currentTimeMillis();
         long start = DateUtils.getStartDayTimeInMs(timezone, current - days * MS_IN_DAY);
@@ -165,6 +138,7 @@ public final class SyncInteractor {
         if (NetworkUtils.isOnlineMode()) {
             mServiceApi.getELDEvents(start, end)
                     .subscribeOn(Schedulers.io())
+                    .map(this::filterIncorrectEvents)
                     .map(eldEvents -> ELDEventConverter.toEntityArray(eldEvents, SYNC))
                     .subscribe(eldEventEntities -> mELDEventDao.insertAll(eldEventEntities),
                             Timber::e);
@@ -175,21 +149,18 @@ public final class SyncInteractor {
         Disposable syncNewEventsDisposable = Single.timer(Constants.SYNC_TIMEOUT_IN_MIN, TimeUnit.MINUTES)
                 .subscribeOn(Schedulers.io())
                 .filter(t -> NetworkUtils.isOnlineMode())
-                .filter(t -> mPreferencesManager.getBoxId() != PreferencesManager.NOT_FOUND_VALUE)
                 .map(t -> mAccountManager.getCurrentUserId())
                 .map(userId -> ELDEventConverter.toModelList(mELDEventDao.getNewUnsyncEvents(userId)))
                 .filter(eldEvents -> !eldEvents.isEmpty())
-                .map(this::filterIncorrectEvents)
-                .filter(eldEvents -> !eldEvents.isEmpty())
                 .flatMapObservable(events -> Observable.fromIterable(parseELDEventsList(events)))
                 .flatMapSingle(events -> mServiceApi.postNewELDEvents(events)
-                        .onErrorResumeNext(Single.just(mErrorResponse))
                         .onErrorResumeNext(Single.just(mErrorResponse))
                         .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS) ? events : new ArrayList<ELDEvent>())
                 )
                 .filter(events -> !events.isEmpty())
                 .delay(1, TimeUnit.SECONDS)
                 .flatMapSingle(dbEvents -> mServiceApi.getELDEvents(dbEvents.get(0).getEventTime(), dbEvents.get(dbEvents.size() - 1).getEventTime())
+                        .map(this::filterIncorrectEvents)
                         .doOnSuccess(serverEvents -> {
                             ELDEventEntity[] oldEntities = ELDEventConverter.toEntityArray(dbEvents);
                             ELDEventEntity[] entities = ELDEventConverter.toEntityArray(serverEvents, SYNC);
@@ -207,21 +178,17 @@ public final class SyncInteractor {
         Disposable syncUpdatedEventDisposable = Observable.interval(Constants.SYNC_TIMEOUT_IN_MIN, TimeUnit.MINUTES)
                 .subscribeOn(Schedulers.io())
                 .filter(t -> NetworkUtils.isOnlineMode())
-                .filter(t -> mPreferencesManager.getBoxId() != PreferencesManager.NOT_FOUND_VALUE)
                 .map(t -> ELDEventConverter.toModelList(mELDEventDao.getUpdateUnsyncEvents()))
                 .filter(dbEvents -> !dbEvents.isEmpty())
-                .map(this::filterIncorrectEvents)
-                .filter(dbEvents -> !dbEvents.isEmpty())
                 .flatMap(dbEvents -> Observable.fromIterable(parseELDEventsList(dbEvents)))
-                .map(this::filterInactiveEvents)
                 .filter(activeDbEvents -> activeDbEvents.size() > 0)
-                .flatMapSingle(dbEvents -> mServiceApi.updateELDEvents(dbEvents)
-                        .onErrorResumeNext(Single.just(mErrorResponse))
+                .flatMapSingle(dbEvents -> mServiceApi.updateELDEvents(filterInactiveEvents(dbEvents))
                         .onErrorResumeNext(Single.just(mErrorResponse))
                         .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS) ? dbEvents : new ArrayList<ELDEvent>())
                 )
                 .filter(events -> !events.isEmpty())
                 .flatMapSingle(dbEvents -> mServiceApi.getELDEvents(dbEvents.get(0).getEventTime(), dbEvents.get(dbEvents.size() - 1).getEventTime())
+                        .map(this::filterIncorrectEvents)
                         .doOnSuccess(serverEvents -> {
                             ELDEventEntity[] oldEntities = ELDEventConverter.toEntityArray(dbEvents);
                             ELDEventEntity[] entities = ELDEventConverter.toEntityArray(serverEvents);
@@ -240,7 +207,6 @@ public final class SyncInteractor {
         Disposable syncHeadersDisposable = Observable.interval(Constants.SYNC_TIMEOUT_IN_MIN, TimeUnit.MINUTES)
                 .subscribeOn(Schedulers.io())
                 .filter(t -> NetworkUtils.isOnlineMode())
-                .filter(t -> mPreferencesManager.getBoxId() != PreferencesManager.NOT_FOUND_VALUE)
                 .map(t -> mAccountManager.getCurrentUserId())
                 .map(userId -> mLogSheetDao.getUnSync(userId))
                 .filter(logSheetEntities -> !logSheetEntities.isEmpty())
@@ -279,12 +245,11 @@ public final class SyncInteractor {
         mIsSyncActive = false;
     }
 
-    //TODO: remove after cleanup all incorrect events on server part
     private List<ELDEvent> filterIncorrectEvents(List<ELDEvent> list) {
         ListIterator<ELDEvent> iterator = list.listIterator();
         while (iterator.hasNext()) {
             ELDEvent event = iterator.next();
-            if (event.getBoxId() <= 0 || event.getVehicleId() <= 0) {
+            if (event.getEventCode() <= 0 || event.getEventType() <= 0) {
                 iterator.remove();
             }
         }
