@@ -3,12 +3,9 @@ package com.bsmwireless.screens.carrieredit;
 import android.support.v4.app.FragmentManager;
 
 import com.bsmwireless.screens.carrieredit.dagger.CarrierEditComponent;
+import com.bsmwireless.screens.common.menu.BaseMenuView;
 
-/**
- * Created by osminin on 21.09.2017.
- */
-
-public interface CarrierEditView {
+public interface CarrierEditView extends BaseMenuView{
 
     CarrierEditComponent getComponent();
 

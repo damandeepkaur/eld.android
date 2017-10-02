@@ -11,7 +11,8 @@ import com.bsmwireless.common.App;
 import com.bsmwireless.screens.carrieredit.dagger.CarrierEditComponent;
 import com.bsmwireless.screens.carrieredit.dagger.CarrierEditModule;
 import com.bsmwireless.screens.carrieredit.dagger.DaggerCarrierEditComponent;
-import com.bsmwireless.screens.common.BaseActivity;
+import com.bsmwireless.screens.common.menu.BaseMenuActivity;
+import com.bsmwireless.screens.common.menu.BaseMenuPresenter;
 
 import javax.inject.Inject;
 
@@ -19,11 +20,7 @@ import app.bsmuniversal.com.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-/**
- * Created by osminin on 21.09.2017.
- */
-
-public final class CarrierEditActivity extends BaseActivity implements CarrierEditView {
+public final class CarrierEditActivity extends BaseMenuActivity implements CarrierEditView {
 
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
@@ -47,6 +44,8 @@ public final class CarrierEditActivity extends BaseActivity implements CarrierEd
                 .appComponent(App.getComponent())
                 .carrierEditModule(new CarrierEditModule())
                 .build();
+        mComponent.inject(this);
+        mPresenter.bind(this);
         setSupportActionBar(mToolbar);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -60,5 +59,15 @@ public final class CarrierEditActivity extends BaseActivity implements CarrierEd
 
     public CarrierEditComponent getComponent() {
         return mComponent;
+    }
+
+    @Override
+    protected BaseMenuPresenter getPresenter() {
+        return (BaseMenuPresenter) mPresenter;
+    }
+
+    @Override
+    public void onPointerCaptureChanged(boolean hasCapture) {
+
     }
 }

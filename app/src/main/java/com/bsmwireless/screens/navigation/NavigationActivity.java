@@ -24,7 +24,6 @@ import com.bsmwireless.common.App;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.screens.autologout.AutoDutyDialogActivity;
 import com.bsmwireless.screens.carrieredit.CarrierEditActivity;
-import com.bsmwireless.screens.carrieredit.CarrierEditView;
 import com.bsmwireless.screens.common.menu.BaseMenuActivity;
 import com.bsmwireless.screens.common.menu.BaseMenuPresenter;
 import com.bsmwireless.screens.driverprofile.DriverProfileActivity;

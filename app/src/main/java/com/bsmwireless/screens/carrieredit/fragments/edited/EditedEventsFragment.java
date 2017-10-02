@@ -24,10 +24,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import timber.log.Timber;
 
-/**
- * Created by osminin on 22.09.2017.
- */
-
 public final class EditedEventsFragment extends BaseFragment implements EditedEventsView {
 
     @BindView(R.id.recycler_view)

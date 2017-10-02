@@ -15,7 +15,6 @@ import com.bsmwireless.common.utils.DateUtils;
 import com.bsmwireless.models.LogSheetHeader;
 import com.bsmwireless.screens.logs.GraphModel;
 import com.bsmwireless.screens.logs.LogHeaderModel;
-import com.bsmwireless.screens.logs.LogsAdapter;
 import com.bsmwireless.screens.logs.dagger.EventLogModel;
 import com.bsmwireless.widgets.alerts.DutyType;
 import com.bsmwireless.widgets.logs.LogsTitleView;
@@ -36,16 +35,15 @@ import static android.view.View.VISIBLE;
 import static com.bsmwireless.widgets.logs.LogsTitleView.Type.EVENTS;
 import static com.bsmwireless.widgets.logs.LogsTitleView.Type.LOG_HEADER;
 
-/**
- * Created by osminin on 28.09.2017.
- */
-
 public class EditedEventsAdapter extends RecyclerView.Adapter<EditedEventsAdapter.LogsHolder> {
     private static final int VIEW_TYPE_HEADER = 0;
     private static final int VIEW_TYPE_EVENTS_TITLE = 1;
     private static final int VIEW_TYPE_EVENTS_ITEM = 2;
     private static final int VIEW_TYPE_LOG_HEADER_TITLE = 3;
     private static final int VIEW_TYPE_LOG_HEADER_ITEM = 4;
+
+    //header + logs + trip info titles
+    private final int MIN_LIST_SIZE = 3;
 
     private CalendarLayout mCalendarLayout;
     private LayoutInflater mLayoutInflater;
@@ -92,6 +90,12 @@ public class EditedEventsAdapter extends RecyclerView.Adapter<EditedEventsAdapte
     public void setEvents(List<EventLogModel> events) {
         Timber.v("setEvents: ");
         mEventLogs = events;
+        TextView eventsTitle = ButterKnife.findById(mEventsTitleView, R.id.list_item_title);
+        int resId = 0;
+        if (!mEventLogs.isEmpty()) {
+            resId = R.drawable.red_dot;
+        }
+        eventsTitle.setCompoundDrawablesWithIntrinsicBounds(0, 0, resId, 0);
         notifyDataSetChanged();
     }
 
@@ -150,7 +154,9 @@ public class EditedEventsAdapter extends RecyclerView.Adapter<EditedEventsAdapte
 
     @Override
     public int getItemCount() {
-        return mEventLogs.size();
+        int eventsSize = (mEventsTitleView == null || mEventsTitleView.isCollapsed()) ? 0 : mEventLogs.size();
+        int tripInfoSize = ((mLogHeaderTitleView == null) || mLogHeaderTitleView.isCollapsed()) ? 0 : 1;
+        return MIN_LIST_SIZE + eventsSize + tripInfoSize;
     }
 
     @Override

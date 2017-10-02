@@ -1,8 +1,6 @@
 package com.bsmwireless.screens.carrieredit;
 
-/**
- * Created by osminin on 22.09.2017.
- */
+public interface CarrierEditPresenter {
 
-public final class CarrierEditPresenter {
+    void bind(CarrierEditView view);
 }

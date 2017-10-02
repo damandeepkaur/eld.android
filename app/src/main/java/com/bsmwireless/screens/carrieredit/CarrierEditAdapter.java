@@ -10,10 +10,6 @@ import javax.inject.Inject;
 
 import app.bsmuniversal.com.R;
 
-/**
- * Created by osminin on 22.09.2017.
- */
-
 public final class CarrierEditAdapter extends FragmentStatePagerAdapter {
     private static final int PAGE_COUNT = 2;
 

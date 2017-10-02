@@ -9,10 +9,6 @@ import com.bsmwireless.screens.carrieredit.fragments.unassigned.UnassignedEvents
 
 import dagger.Component;
 
-/**
- * Created by osminin on 22.09.2017.
- */
-
 @ActivityScope
 @Component(dependencies = AppComponent.class, modules = CarrierEditModule.class)
 public interface CarrierEditComponent {
