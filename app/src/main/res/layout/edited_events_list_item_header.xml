@@ -9,24 +9,63 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+        <RelativeLayout
+            android:id="@+id/top_header_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#64000000">
+
+            <ImageView
+                android:id="@+id/edited_events_exclamation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/margin_medium"
+                android:layout_marginLeft="@dimen/margin_extra_large"
+                android:layout_marginRight="@dimen/margin_extra_large"
+                android:layout_marginTop="@dimen/margin_medium"
+                android:src="@drawable/ic_error_black_24dp"/>
+
+            <TextView
+                android:id="@+id/edited_events_top_header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/separator"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:layout_toRightOf="@+id/edited_events_exclamation"
+                android:gravity="center_vertical|left"
+                android:lines="2"
+                android:text="@string/logsheet_edited"
+                android:textSize="@dimen/text_size_small"/>
+
+            <View
+                android:id="@+id/separator"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_below="@+id/edited_events_exclamation"
+                android:background="?android:attr/listDivider"/>
+        </RelativeLayout>
+
         <Button
             android:id="@+id/edited_events_approve"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@android:color/transparent"
-            android:layout_margin="@dimen/margin_small"
             android:layout_alignParentRight="true"
-            android:textColor="@color/nasty_green"
-            android:text="@string/edited_events_approve"/>
+            android:layout_below="@+id/top_header_container"
+            android:layout_margin="@dimen/margin_small"
+            android:background="@android:color/transparent"
+            android:text="@string/edited_events_approve"
+            android:textColor="@color/nasty_green"/>
 
         <Button
             android:id="@+id/edited_events_disapprove"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/top_header_container"
             android:layout_margin="@dimen/margin_small"
             android:layout_toLeftOf="@+id/edited_events_approve"
-            android:text="@string/edited_events_disapprove"
             android:background="@android:color/transparent"
+            android:text="@string/edited_events_disapprove"
             android:textColor="@color/coral"/>
     </RelativeLayout>
 
