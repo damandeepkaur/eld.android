@@ -55,10 +55,22 @@ public final class CarrierEditActivity extends BaseMenuActivity implements Carri
         mPagerAdapter = new CarrierEditAdapter(this);
         mViewPager.setAdapter(mPagerAdapter);
         mTabLayout.setupWithViewPager(mViewPager);
+        mPresenter.requestDriverName();
+        mPresenter.requestVehicleId();
     }
 
     public CarrierEditComponent getComponent() {
         return mComponent;
+    }
+
+    @Override
+    public void setDriverName(String driverName) {
+        getSupportActionBar().setSubtitle(driverName);
+    }
+
+    @Override
+    public void setVehicleName(String vehicleName) {
+        getSupportActionBar().setTitle(vehicleName);
     }
 
     @Override

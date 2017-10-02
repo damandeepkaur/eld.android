@@ -12,4 +12,8 @@ public interface CarrierEditView extends BaseMenuView{
     FragmentManager getSupportFragmentManager();
 
     String getString(int resId);
+
+    void setDriverName(String driverName);
+
+    void setVehicleName(String vehicleName);
 }

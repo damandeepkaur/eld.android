@@ -4,6 +4,7 @@ import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.data.storage.DutyTypeManager;
+import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
 import com.bsmwireless.domain.interactors.LogSheetInteractor;
 import com.bsmwireless.domain.interactors.UserInteractor;
@@ -29,8 +30,8 @@ public final class CarrierEditModule {
     @Provides
     CarrierEditPresenter provideCarrierEditPresenter(DutyTypeManager dutyTypeManager,
                                                      ELDEventsInteractor eventsInteractor, UserInteractor userInteractor,
-                                                     AccountManager accountManager) {
-        return new CarrierEditPresenterImpl(dutyTypeManager, eventsInteractor, userInteractor, accountManager);
+                                                     AccountManager accountManager, PreferencesManager preferencesManager, VehiclesInteractor vehiclesInteractor) {
+        return new CarrierEditPresenterImpl(dutyTypeManager, eventsInteractor, userInteractor, accountManager, preferencesManager, vehiclesInteractor);
     }
 
     @Provides
