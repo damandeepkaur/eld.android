@@ -253,28 +253,30 @@ public final class LogsPresenter implements AccountManager.AccountListener {
 
     public void onRemovedEventClicked(EventLogModel event) {
         mDisposables.clear();
-        mDisposables.add(mELDEventsInteractor.getLatestActiveDutyEventFromDBOnce(event.getEventTime(), mAccountManager.getCurrentUserId())
-                            .subscribeOn(Schedulers.io())
-                            .map(events -> events.get(events.size() - 1))
-                            .map(latestEvent -> {
-                                ELDEvent updatedEvent = event.getEvent();
-                                ELDEvent originEvent = updatedEvent.clone();
-                                updatedEvent.setEventCode(latestEvent.getEventCode());
-                                updatedEvent.setEventType(latestEvent.getEventType());
-                                originEvent.setStatus(ELDEvent.StatusCode.INACTIVE_CHANGED.getValue());
-                                originEvent.setId(null);
-                                return Arrays.asList(updatedEvent, originEvent);
-                            })
-                            .flatMapObservable(events -> mELDEventsInteractor.updateELDEvents(events))
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe(longs -> {
-                                mView.eventRemoved();
-                                updateCalendarData();
-                            },
-                            throwable -> {
-                                Timber.e(throwable.getMessage());
-                                mView.showError(LogsView.Error.ERROR_REMOVE_EVENT);
-                            }));
+        mDisposables.add(mELDEventsInteractor
+                .getLatestActiveDutyEventFromDBOnce(event.getEventTime(), mAccountManager
+                        .getCurrentUserId())
+                .subscribeOn(Schedulers.io())
+                .map(events -> events.get(events.size() - 1))
+                .map(latestEvent -> {
+                    ELDEvent updatedEvent = event.getEvent();
+                    ELDEvent originEvent = updatedEvent.clone();
+                    updatedEvent.setEventCode(latestEvent.getEventCode());
+                    updatedEvent.setEventType(latestEvent.getEventType());
+                    originEvent.setStatus(ELDEvent.StatusCode.INACTIVE_CHANGED.getValue());
+                    originEvent.setId(null);
+                    return Arrays.asList(updatedEvent, originEvent);
+                })
+                .flatMapObservable(events -> mELDEventsInteractor.updateELDEvents(events))
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(longs -> {
+                            mView.eventRemoved();
+                            updateCalendarData();
+                        },
+                        throwable -> {
+                            Timber.e(throwable.getMessage());
+                            mView.showError(LogsView.Error.ERROR_REMOVE_EVENT);
+                        }));
     }
 
     public void onReassignEventClicked(EventLogModel event) {
