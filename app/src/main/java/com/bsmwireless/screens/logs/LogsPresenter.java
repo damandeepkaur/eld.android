@@ -456,6 +456,9 @@ public final class LogsPresenter implements AccountManager.AccountListener {
     private Single<OdometerResult> loadOdometerValue(String mTimeZone) {
 
         final long startDate = DateUtils.getStartDate(mTimeZone, mView.getSelectedDay().getCalendar());
+
+        // Day may stared from event in previous day, that's why loads event for previous day
+
         return mELDEventsInteractor
                 .getActiveDutyEventsForDay(startDate)
                 .zipWith(mELDEventsInteractor
@@ -511,6 +514,15 @@ public final class LogsPresenter implements AccountManager.AccountListener {
     }
 
 
+    /**
+     * Creates events list.
+     * Takes events for current(selected) day and events for previous day.
+     * Result will be all events from current day plus a last event for previous day
+     *
+     * @param current       events for current day
+     * @param prevDayEvents events for previous day
+     * @return events for current day with event for previous day
+     */
     private List<ELDEvent> mapLatestAndCurrentEvents(List<ELDEvent> current, List<ELDEvent> prevDayEvents) {
 
         List<ELDEvent> eldEvents = new ArrayList<>(current.size() + (prevDayEvents.isEmpty() ? 0 : 1));
