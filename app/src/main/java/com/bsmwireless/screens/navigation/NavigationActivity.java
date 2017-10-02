@@ -1,15 +1,13 @@
 package com.bsmwireless.screens.navigation;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.NavigationView.OnNavigationItemSelectedListener;
-import android.support.design.widget.TabLayout;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.ViewPager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -22,15 +20,18 @@ import android.widget.Toast;
 
 import com.bsmwireless.common.App;
 import com.bsmwireless.screens.autologout.AutoDutyDialogActivity;
+import com.bsmwireless.screens.common.BaseFragment;
 import com.bsmwireless.screens.common.menu.BaseMenuActivity;
 import com.bsmwireless.screens.common.menu.BaseMenuPresenter;
 import com.bsmwireless.screens.driverprofile.DriverProfileActivity;
+import com.bsmwireless.screens.home.HomeFragment;
 import com.bsmwireless.screens.login.LoginActivity;
 import com.bsmwireless.screens.navigation.dagger.DaggerNavigationComponent;
 import com.bsmwireless.screens.navigation.dagger.NavigationModule;
+import com.bsmwireless.screens.roadsidenavigation.RoadsideNavigationActivity;
 import com.bsmwireless.screens.selectasset.SelectAssetActivity;
 import com.bsmwireless.screens.settings.SettingsActivity;
-import com.bsmwireless.widgets.snackbar.SnackBarLayout;
+import com.bsmwireless.screens.transfer.TransferActivity;
 
 import javax.inject.Inject;
 
@@ -42,8 +43,10 @@ import butterknife.Unbinder;
 import static com.bsmwireless.screens.autologout.AutoDutyDialogActivity.EXTRA_AUTO_DRIVING;
 import static com.bsmwireless.screens.autologout.AutoDutyDialogActivity.EXTRA_AUTO_DRIVING_WITHOUT_CONFIRM;
 import static com.bsmwireless.screens.autologout.AutoDutyDialogActivity.EXTRA_AUTO_ON_DUTY;
+import static com.bsmwireless.screens.autologout.AutoDutyDialogActivity.EXTRA_AUTO_ON_DUTY_TIME;
 
-public final class NavigationActivity extends BaseMenuActivity implements OnNavigationItemSelectedListener, NavigateView, ViewPager.OnPageChangeListener {
+public final class NavigationActivity extends BaseMenuActivity implements
+        OnNavigationItemSelectedListener, NavigateView {
 
     private static final int REQUEST_CODE_UPDATE_USER = 101;
 
@@ -56,26 +59,17 @@ public final class NavigationActivity extends BaseMenuActivity implements OnNavi
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
 
-    @BindView(R.id.navigation_tab_layout)
-    TabLayout mTabLayout;
-
-    @BindView(R.id.navigation_view_pager)
-    ViewPager mViewPager;
-
-    @BindView(R.id.navigation_snackbar)
-    SnackBarLayout mSnackBarLayout;
-
     @Inject
     NavigationPresenter mPresenter;
 
-    private NavigationAdapter mPagerAdapter;
     private SmoothActionBarDrawerToggle mDrawerToggle;
     private HeaderViewHolder mHeaderViewHolder;
 
-    private Handler mHandler = new Handler();
-    private Runnable mResetTimeTask = () -> mPresenter.onResetTime();
-
     private View.OnClickListener mOnAssetMenuClickListener;
+
+    public static Intent createIntent(Context context) {
+        return new Intent(context, NavigationActivity.class);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,15 +79,12 @@ public final class NavigationActivity extends BaseMenuActivity implements OnNavi
                 .navigationModule(new NavigationModule(this)).build().inject(this);
 
         setContentView(R.layout.activity_navigation);
-        mUnbinder = ButterKnife.bind(this);
-
-        //TODO: waiting for UI
-        //open(new HomeFragment(), false);
+        ButterKnife.bind(this);
 
         initNavigation();
+        open(HomeFragment.newInstance(), false);
 
         mPresenter.onViewCreated();
-        mPresenter.onResetTime();
     }
 
     @Override
@@ -112,19 +103,12 @@ public final class NavigationActivity extends BaseMenuActivity implements OnNavi
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.nav_home:
-                mViewPager.setCurrentItem(0, true);
-
-                //TODO: waiting for UI
-                /*Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.navigation_content);
-                if (fragment == null) {
-                    fragment = new HomeFragment();
-                } else if (fragment instanceof HomeFragment) {
-                    break;
-                }
-                open((BaseFragment) fragment, false);*/
                 break;
             case R.id.nav_inspector_view:
-                Toast.makeText(this, "Go to inspector screen", Toast.LENGTH_SHORT).show();
+                mDrawerToggle.runWhenIdle(() -> startActivity(new Intent(this, RoadsideNavigationActivity.class)));
+                break;
+            case R.id.nav_transfer_view:
+                mDrawerToggle.runWhenIdle(() -> startActivity(new Intent(this, TransferActivity.class)));
                 break;
             case R.id.nav_help:
                 Toast.makeText(this, "Go to help screen", Toast.LENGTH_SHORT).show();
@@ -165,28 +149,17 @@ public final class NavigationActivity extends BaseMenuActivity implements OnNavi
         View header = mNavigationView.getHeaderView(0);
         mOnAssetMenuClickListener = v -> goToSelectAssetScreen();
         mHeaderViewHolder = new HeaderViewHolder(header, mOnAssetMenuClickListener);
-
-        mPagerAdapter = new NavigationAdapter(getApplicationContext(), getSupportFragmentManager());
-        mViewPager.setAdapter(mPagerAdapter);
-        mViewPager.setOffscreenPageLimit(2);
-        mViewPager.addOnPageChangeListener(this);
-
-        mTabLayout.setupWithViewPager(mViewPager);
-        mTabLayout.setTabTextColors(ContextCompat.getColor(this, R.color.accent_transparent), ContextCompat.getColor(this, R.color.accent));
-
-        mSnackBarLayout.setHideableOnTouch(false);
     }
 
-    //TODO: waiting for UI
-    /*public void open(BaseFragment fragment, boolean useBackStack) {
+    public void open(BaseFragment fragment, boolean useBackStack) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
         if (useBackStack) {
             transaction.addToBackStack(null);
         }
 
-        transaction.replace(R.id.navigation_content, fragment).commit();
-    }*/
+        transaction.replace(R.id.fragmentContainer, fragment).commit();
+    }
 
     @Override
     public void goToLoginScreen() {
@@ -222,7 +195,7 @@ public final class NavigationActivity extends BaseMenuActivity implements OnNavi
 
     @Override
     public void setBoxId(int boxId) {
-        String boxString = (boxId > 0) ? getResources().getString(R.string.box) + " " + boxId
+        String boxString = (boxId > 0) ? getResources().getString(R.string.box, boxId)
                 : getResources().getString(R.string.select_asset_not_in_vehicle);
         mHeaderViewHolder.boxId.setText(boxString);
     }
@@ -234,14 +207,7 @@ public final class NavigationActivity extends BaseMenuActivity implements OnNavi
     }
 
     @Override
-    public SnackBarLayout getSnackBar() {
-        return mSnackBarLayout;
-    }
-
-    @Override
     protected void onDestroy() {
-        mHandler.removeCallbacks(mResetTimeTask);
-        mViewPager.removeOnPageChangeListener(this);
         mPresenter.onDestroy();
         mHeaderViewHolder.unbind();
         super.onDestroy();
@@ -253,35 +219,11 @@ public final class NavigationActivity extends BaseMenuActivity implements OnNavi
     }
 
     @Override
-    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-    }
-
-    @Override
-    public void onPageSelected(int position) {
-        mSnackBarLayout.reset().hideSnackbar();
-    }
-
-    @Override
-    public void onPageScrollStateChanged(int state) {
-
-    }
-
-    @Override
-    public void setResetTime(long time) {
-        mHandler.removeCallbacks(mResetTimeTask);
-        if (time == 0) {
-            mHandler.post(mResetTimeTask);
-        } else {
-            mHandler.postAtTime(mResetTimeTask, time);
-        }
-    }
-
-    @Override
-    public void setAutoOnDuty() {
+    public void setAutoOnDuty(long stoppedTime) {
         Intent dialogIntent = new Intent(this, AutoDutyDialogActivity.class);
         dialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         dialogIntent.putExtra(EXTRA_AUTO_ON_DUTY, true);
+        dialogIntent.putExtra(EXTRA_AUTO_ON_DUTY_TIME, stoppedTime);
         startActivity(dialogIntent);
     }
 

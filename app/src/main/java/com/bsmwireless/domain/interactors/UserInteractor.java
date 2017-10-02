@@ -11,8 +11,6 @@ import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.data.storage.carriers.CarrierConverter;
 import com.bsmwireless.data.storage.configurations.ConfigurationConverter;
-import com.bsmwireless.data.storage.eldevents.ELDEventConverter;
-import com.bsmwireless.data.storage.eldevents.ELDEventEntity;
 import com.bsmwireless.data.storage.hometerminals.HomeTerminalConverter;
 import com.bsmwireless.data.storage.users.FullUserEntity;
 import com.bsmwireless.data.storage.users.UserConverter;
@@ -22,6 +20,7 @@ import com.bsmwireless.models.Auth;
 import com.bsmwireless.models.DriverHomeTerminal;
 import com.bsmwireless.models.DriverProfileModel;
 import com.bsmwireless.models.DriverSignature;
+import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.HomeTerminal;
 import com.bsmwireless.models.LoginModel;
 import com.bsmwireless.models.PasswordModel;
@@ -36,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
+import java.util.ListIterator;
 
 import javax.inject.Inject;
 
@@ -44,6 +44,7 @@ import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import retrofit2.HttpException;
+import io.reactivex.Single;
 
 import static com.bsmwireless.common.Constants.DEFAULT_CALENDAR_DAYS_COUNT;
 import static com.bsmwireless.common.Constants.SUCCESS;
@@ -69,7 +70,7 @@ public final class UserInteractor {
         mSyncInteractor = syncInteractor;
     }
 
-    public Observable<Boolean> loginUser(final String name, final String password, final String domain, boolean keepToken, User.DriverType driverType) {
+    public Single<Boolean> loginUser(final String name, final String password, final String domain, boolean keepToken, User.DriverType driverType) {
         LoginModel request = new LoginModel();
         request.setUsername(name);
         request.setPassword(password);
@@ -78,24 +79,25 @@ public final class UserInteractor {
 
         String accountName = mTokenManager.getAccountName(name, domain);
         return mServiceApi.loginUser(request)
-                .doOnNext(user -> saveUserDataInDB(user, accountName))
+                .doOnSuccess(user -> mAppDatabase.runInTransaction(() -> saveUserDataInDB(user, accountName)))
                 .onErrorResumeNext(throwable -> {
                     if (throwable instanceof RetrofitException || throwable instanceof UnknownHostException) {
                         String driverId = mTokenManager.getDriver(accountName);
-                        return Observable.fromCallable(() -> mTokenManager.getPassword(accountName))
-                                .filter(accountPassword -> !StringUtils.isAnyEmpty(password, accountPassword) && password.equals(accountPassword))
-                                .map(filterIn -> mAppDatabase.userDao().getUserSync(Integer.valueOf(driverId)))
-                                .map(UserConverter::toUser)
-                                .map(user -> user.setAuth(new Auth(Integer.valueOf(driverId)).setToken(mTokenManager.getToken(accountName))));
+                        String pass = mTokenManager.getPassword(accountName);
+                        if (!StringUtils.isAnyEmpty(password, pass) && password.equals(pass)) {
+                            return Single.fromCallable(() -> mAppDatabase.userDao().getUserSync(Integer.valueOf(driverId)))
+                                    .map(UserConverter::toUser)
+                                    .map(user -> user.setAuth(new Auth(Integer.valueOf(driverId)).setToken(mTokenManager.getToken(accountName))));
+                        }
                     }
 
                     if (throwable instanceof HttpException) {
-                        return Observable.error(RetrofitException.httpError(((HttpException) throwable).response()));
+                        return Single.error(RetrofitException.httpError(((HttpException) throwable).response()));
                     }
 
-                    return Observable.error(throwable);
+                    return Single.error(throwable);
                 })
-                .doOnNext(user -> {
+                .doOnSuccess(user -> {
                     mTokenManager.setToken(accountName, name, password, domain, user.getAuth());
 
                     //save user data
@@ -108,7 +110,7 @@ public final class UserInteractor {
                     mSyncInteractor.syncEventsForDaysAgo(DEFAULT_CALENDAR_DAYS_COUNT, user.getTimezone());
                     mSyncInteractor.syncLogSheetHeadersForDaysAgo(DEFAULT_CALENDAR_DAYS_COUNT, user.getTimezone());
                 })
-                .switchMap(user -> Observable.just(true));
+                .flatMap(user -> Single.just(true));
     }
 
     public Completable loginCoDriver(final String name, final String password, User.DriverType driverType) {
@@ -126,17 +128,18 @@ public final class UserInteractor {
                 .onErrorResumeNext(throwable -> {
                     if (throwable instanceof RetrofitException || throwable instanceof UnknownHostException) {
                         String driverId = mTokenManager.getDriver(accountName);
-                        return Observable.fromCallable(() -> mTokenManager.getPassword(accountName))
-                                .filter(accountPassword -> !StringUtils.isAnyEmpty(password, accountPassword) && password.equals(accountPassword))
-                                .map(filterIn -> mAppDatabase.userDao().getUserSync(Integer.valueOf(driverId)))
-                                .map(UserConverter::toUser)
-                                .map(user -> user.setAuth(new Auth(Integer.valueOf(driverId))));
+                        String pass = mTokenManager.getPassword(accountName);
+                        if (!StringUtils.isAnyEmpty(password, pass) && password.equals(pass)) {
+                            return Single.fromCallable(() -> mAppDatabase.userDao().getUserSync(Integer.valueOf(driverId)))
+                                    .map(UserConverter::toUser)
+                                    .map(user -> user.setAuth(new Auth(Integer.valueOf(driverId)).setToken(mTokenManager.getToken(accountName))));
+                        }
                     }
-                    return Observable.error(throwable);
+                    return Single.error(throwable);
                 })
-                .doOnNext(user -> {
+                .doOnSuccess(user -> {
                     mTokenManager.setToken(accountName, name, password, domain, user.getAuth());
-                    saveUserDataInDB(user, accountName);
+                    mAppDatabase.runInTransaction(() -> saveUserDataInDB(user, accountName));
 
                     List<Integer> coDriverIds = saveCoDrivers(getDriverId(), Arrays.asList(user.getId()));
                     coDriverIds.add(getDriverId());
@@ -149,19 +152,27 @@ public final class UserInteractor {
                     long end = DateUtils.getEndDayTimeInMs(user.getTimezone(), current);
                     String token = user.getAuth().getToken();
                     int userId = user.getId();
-                    return mServiceApi.getELDEvents(start, end, token, String.valueOf(userId));
+                    return mServiceApi.getELDEvents(start, end, token, String.valueOf(userId))
+                            .map(eldEvents -> {
+                                //Filter out incorrect events
+                                ListIterator<ELDEvent> iterator = eldEvents.listIterator();
+                                while (iterator.hasNext()) {
+                                    ELDEvent event = iterator.next();
+                                    if (event.getEventCode() <= 0 || event.getEventType() <= 0) {
+                                        iterator.remove();
+                                    }
+                                }
+                                return eldEvents;
+                            });
                 })
                 .onErrorResumeNext(throwable -> {
                     throwable.printStackTrace();
                     if (throwable instanceof RetrofitException || throwable instanceof UnknownHostException) {
-                        return Observable.just(new ArrayList<>());
+                        return Single.just(new ArrayList<>());
                     }
-                    return Observable.error(throwable);
+                    return Single.error(throwable);
                 })
-                .flatMapCompletable(events -> Completable.fromAction(() -> {
-                    ELDEventEntity[] entities = ELDEventConverter.toEntityList(events).toArray(new ELDEventEntity[events.size()]);
-                    mAppDatabase.ELDEventDao().insertAll(entities);
-                }));
+                .flatMapCompletable(events -> Completable.fromAction(() -> mSyncInteractor.replaceRecords(events)));
     }
 
     public void deleteDriver() {
@@ -198,37 +209,45 @@ public final class UserInteractor {
         }
     }
 
-    public Observable<Boolean> syncDriverProfile(UserEntity userEntity) {
-        return Observable.fromCallable(() -> mAppDatabase.userDao().insertUser(userEntity))
+    public Single<Boolean> syncDriverProfile(UserEntity userEntity) {
+        return Single.fromCallable(() -> mAppDatabase.userDao().insertUser(userEntity))
                 .map(userId -> userId > 0)
                 .flatMap(userInserted -> {
                     if (userInserted) {
                         return mServiceApi.updateDriverProfile(new DriverProfileModel(userEntity));
                     }
-                    return Observable.just(new ResponseMessage(""));
+                    return Single.just(new ResponseMessage(""));
                 })
                 .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS))
                 .onErrorReturn(this::handleOfflineOperation);
     }
 
-    public Observable<Boolean> updateDriverPassword(String oldPassword, String newPassword) {
+    public Single<Boolean> updateDriverPassword(String oldPassword, String newPassword) {
         return mServiceApi.updateDriverPassword(getPasswordModel(oldPassword, newPassword))
                 .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
     }
 
-    public Observable<Boolean> updateDriverSignature(String signature) {
+    public Single<Boolean> updateDriverSignature(String signature) {
         return mServiceApi.updateDriverSignature(getDriverSignature(signature))
                 .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS))
                 .onErrorReturn(throwable -> false);
     }
 
-    public Observable<Boolean> updateDriverRule(String ruleException, String dutyCycle) {
+    public Single<Boolean> updateDriverRule(String ruleException, String dutyCycle) {
         return mServiceApi.updateDriverRule(getRuleSelectionModel(ruleException, dutyCycle))
                 .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS))
                 .onErrorReturn(throwable -> false);
     }
 
-    public Observable<Boolean> updateDriverHomeTerminal(Integer homeTerminalId) {
+    public Completable updateUserRuleException(String ruleException) {
+        return Completable.fromAction(() -> {
+            UserEntity user = mAppDatabase.userDao().getUserSync(mAccountManager.getCurrentUserId());
+            user.setRuleException(ruleException);
+            mAppDatabase.userDao().insertUser(user);
+        });
+    }
+
+    public Single<Boolean> updateDriverHomeTerminal(Integer homeTerminalId) {
         return mServiceApi.updateDriverHomeTerminal(getHomeTerminal(homeTerminalId))
                 .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS))
                 .onErrorReturn(throwable -> false);
@@ -289,12 +308,10 @@ public final class UserInteractor {
     public Flowable<FullUserEntity> getFullDriver() {
         return mAppDatabase.userDao()
                 .getFullUser(getDriverId())
-                .doOnNext(userEntity -> {
-                    userEntity.setHomeTerminalEntities(
-                            mAppDatabase.homeTerminalDao()
-                                    .getHomeTerminalsSync(userEntity.getHomeTerminalIds())
-                    );
-                });
+                .doOnNext(userEntity -> userEntity.setHomeTerminalEntities(
+                        mAppDatabase.homeTerminalDao()
+                                .getHomeTerminalsSync(userEntity.getHomeTerminalIds())
+                ));
     }
 
     public FullUserEntity getFullUserSync() {
@@ -305,8 +322,17 @@ public final class UserInteractor {
         return fullUserEntity;
     }
 
-    public Flowable<User> getFullUser() {
-        return getFullDriver().map(UserConverter::toFullUser);
+    public FullUserEntity getFullUserSync(int id) {
+        return mAppDatabase.userDao().getFullUserSync(id);
+    }
+
+    public Single<User> getFullUser() {
+        return Single.fromCallable(() -> mAppDatabase.userDao().getFullUserSync(mAccountManager.getCurrentUserId()))
+                .doOnSuccess(userEntity -> userEntity.setHomeTerminalEntities(
+                        mAppDatabase.homeTerminalDao()
+                                .getHomeTerminalsSync(userEntity.getHomeTerminalIds())
+                ))
+                .map(UserConverter::toFullUser);
     }
 
     public boolean isLoginActive() {
@@ -331,6 +357,10 @@ public final class UserInteractor {
         return mAppDatabase.userDao().getUserTimezone(getDriverId());
     }
 
+    public Single<String> getTimezoneOnce() {
+        return mAppDatabase.userDao().getUserTimezoneOnce(getDriverId());
+    }
+
     public boolean isRememberMeEnabled() {
         return mPreferencesManager.isRememberUserEnabled();
     }
@@ -347,6 +377,10 @@ public final class UserInteractor {
 
     public UserEntity getUserFromDBSync(int userId) {
         return mAppDatabase.userDao().getUserSync(userId);
+    }
+
+    public List<UserEntity> getUsersFromDBSync(String ids) {
+        return mAppDatabase.userDao().getUsersSync(ListConverter.toIntegerList(ids));
     }
 
     private List<Integer> saveCoDrivers(int driverId, List<Integer> coDriverIds) {

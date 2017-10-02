@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 
 import com.bsmwireless.common.dagger.ActivityScope;
+import com.bsmwireless.common.utils.AppSettings;
 import com.bsmwireless.common.utils.BlackBoxStateChecker;
 import com.bsmwireless.data.network.blackbox.BlackBoxConnectionException;
 import com.bsmwireless.data.network.blackbox.models.BlackBoxResponseModel;
@@ -22,7 +23,6 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 
 import io.reactivex.Completable;
 import io.reactivex.Observable;
@@ -43,9 +43,8 @@ public final class LockScreenPresenter {
     private final PreferencesManager mPreferencesManager;
     final BlackBoxStateChecker mChecker;
     private final ELDEventsInteractor mEventsInteractor;
-    private final long mBlackBoxTimeoutMillis;
-    private final long mIdlingTimeoutMillis;
-    private final AccountManager mAccountManager;
+    private final AppSettings mAppSettings;
+    final AccountManager mAccountManager;
     private final AtomicReference<Completable> mReconnectionReference;
     private Disposable mIdlingTDisposable;
     private volatile BlackBoxResponseModel.ResponseType mCurrentResponseType;
@@ -57,15 +56,14 @@ public final class LockScreenPresenter {
             PreferencesManager preferencesManager,
             BlackBoxStateChecker checker,
             ELDEventsInteractor eventsInteractor,
-            @Named("disconnectTimeout") long blackBoxTimeoutMillis,
-            @Named("idleTimeout") long idlingTimeout, AccountManager accountManager) {
+            AppSettings appSettings,
+            AccountManager accountManager) {
         mDutyManager = dutyManager;
         mBlackBoxInteractor = connectionManager;
         mPreferencesManager = preferencesManager;
         mChecker = checker;
         mEventsInteractor = eventsInteractor;
-        mBlackBoxTimeoutMillis = blackBoxTimeoutMillis;
-        mIdlingTimeoutMillis = idlingTimeout;
+        mAppSettings = appSettings;
         mAccountManager = accountManager;
         mCompositeDisposable = new CompositeDisposable();
         mReconnectionReference = new AtomicReference<>();
@@ -198,7 +196,7 @@ public final class LockScreenPresenter {
         }
 
         mIdlingTDisposable = Completable
-                .timer(mIdlingTimeoutMillis, TimeUnit.MILLISECONDS)
+                .timer(mAppSettings.lockScreenIdlingTimeout(), TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(mView::closeLockScreen);
@@ -236,7 +234,7 @@ public final class LockScreenPresenter {
             reconnectCompletable = mBlackBoxInteractor.getData(boxId)
                     .firstOrError()
                     .toCompletable()
-                    .timeout(mBlackBoxTimeoutMillis, TimeUnit.MILLISECONDS)
+                    .timeout(mAppSettings.lockScreenDisconnectionTimeout(), TimeUnit.MILLISECONDS)
                     .onErrorResumeNext(throwable -> {
                         Timber.d("start reconnection again");
                         if (throwable instanceof TimeoutException) {

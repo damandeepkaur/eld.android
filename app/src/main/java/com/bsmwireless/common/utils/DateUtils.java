@@ -185,7 +185,7 @@ public class DateUtils {
 
     /**
      * @param timeZone user timezone object"
-     * @param time unix time in ms
+     * @param time     unix time in ms
      * @return long with format time like 20170708
      */
     public static long convertTimeToLogDay(TimeZone timeZone, long time) {
@@ -196,9 +196,30 @@ public class DateUtils {
     }
 
     /**
-     * @param daysAgo days ago
+     * @param timeZone user timezone object"
+     * @param time     unix time in ms
+     * @return long with format time like 07-07-09
+     */
+    public static String convertTimeToDDMMYY(TimeZone timeZone, long time) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yy", Locale.US);
+        dateFormat.setTimeZone(timeZone);
+        return dateFormat.format(time);
+    }
+
+    /**
+     * @param timeZone user timezone object"
+     * @param time     unix time in ms
+     * @return long with format time like 11:12
+     */
+    public static String convertTimeToHHMM(TimeZone timeZone, long time) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm", Locale.US);
+        dateFormat.setTimeZone(timeZone);
+        return dateFormat.format(time);
+    }
+
+    /**
+     * @param daysAgo  days ago
      * @param timezone user timezone
-     *
      * @return long with format time like 20170708
      */
     public static long getLogDayForDaysAgo(int daysAgo, String timezone) {
@@ -218,6 +239,35 @@ public class DateUtils {
         } catch (ParseException e) {
             e.printStackTrace();
         }
+        return date.getTime();
+    }
+
+    /**
+     * @param logDay long with format time like 20170708
+     * @return long unix time in ms
+     */
+    public static long convertLogDayToUnixMs(long logDay, TimeZone timeZone) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd", Locale.US);
+        sdf.setTimeZone(timeZone);
+        Date date = null;
+        try {
+            date = sdf.parse(String.valueOf(logDay));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return date.getTime();
+    }
+
+    /**
+     * @param logday long with format time like 20170708
+     * @param zone   timezone
+     * @return long unix time in ms
+     */
+    public static long getStartDayTimeInMs(long logday, String zone) throws ParseException {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd", Locale.US);
+        TimeZone timeZone = TimeZone.getTimeZone(zone);
+        sdf.setTimeZone(timeZone);
+        Date  date = sdf.parse(String.valueOf(logday));
         return date.getTime();
     }
 
@@ -287,6 +337,34 @@ public class DateUtils {
         SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm MMM dd, yyyy", Locale.US);
         dateFormat.setTimeZone(TimeZone.getTimeZone(timezone));
         return dateFormat.format(date);
+    }
+
+    /**
+     * @param durations calculated durations in ms
+     * @param isToday   if calculated day is current (no fix needed)
+     * @return rounded to min durations
+     */
+    public static long[] getRoundedDurations(long[] durations, boolean isToday) {
+        int index = 0;
+        long dif = MS_IN_DAY;
+        for (int i = 0; i < durations.length; i++) {
+            //round duration
+            durations[i] = durations[i] / MS_IN_MIN * MS_IN_MIN;
+
+            //find non-zero duty
+            if (durations[i] > 0) {
+                index = i;
+            }
+
+            //calculate round error
+            dif -= durations[i];
+        }
+
+        if (!isToday) {
+            durations[index] += dif;
+        }
+
+        return durations;
     }
 
 }

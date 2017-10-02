@@ -26,7 +26,7 @@ import com.bsmwireless.common.utils.ViewUtils;
 import com.bsmwireless.screens.common.BaseFragment;
 import com.bsmwireless.screens.dashboard.dagger.DaggerDashboardComponent;
 import com.bsmwireless.screens.dashboard.dagger.DashboardModule;
-import com.bsmwireless.screens.navigation.NavigateView;
+import com.bsmwireless.screens.hoursofservice.HoursOfServiceView;
 import com.bsmwireless.widgets.alerts.DutyType;
 import com.bsmwireless.widgets.dashboard.DutyView;
 
@@ -73,7 +73,7 @@ public final class DashboardFragment extends BaseFragment implements DashboardVi
     private Drawable mIndicatorDrawable;
 
     private Unbinder mUnbinder;
-    private NavigateView mNavigateView;
+    private HoursOfServiceView mHoursOfServiceView;
 
     private DutyType mDutyType = DutyType.OFF_DUTY;
 
@@ -91,10 +91,10 @@ public final class DashboardFragment extends BaseFragment implements DashboardVi
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof NavigateView) {
-            mNavigateView = (NavigateView) context;
+        if (context instanceof HoursOfServiceView) {
+            mHoursOfServiceView = (HoursOfServiceView) context;
         } else {
-            throw new RuntimeException(context.toString() + " must implement NavigateView");
+            throw new RuntimeException(context.toString() + " must implement HoursOfServiceView");
         }
     }
 
@@ -129,7 +129,7 @@ public final class DashboardFragment extends BaseFragment implements DashboardVi
 
     @OnClick(R.id.dashboard_indicator)
     public void onClearClick() {
-        mNavigateView.changeDutyType(mDutyType == DutyType.PERSONAL_USE ? DutyType.OFF_DUTY : DutyType.ON_DUTY, null);
+        mHoursOfServiceView.changeDutyType(mDutyType == DutyType.PERSONAL_USE ? DutyType.OFF_DUTY : DutyType.ON_DUTY, null);
     }
 
     @OnClick(R.id.dashboard_pu_status)
@@ -195,7 +195,7 @@ public final class DashboardFragment extends BaseFragment implements DashboardVi
             } else if (error == Error.INVALID_COMMENT) {
                 inputLayout.setError(mContext.getString(R.string.edit_event_comment_error));
             } else {
-                mNavigateView.changeDutyType(dutyType, comment);
+                mHoursOfServiceView.changeDutyType(dutyType, comment);
                 mAlertDialog.dismiss();
             }
         });
@@ -219,12 +219,17 @@ public final class DashboardFragment extends BaseFragment implements DashboardVi
 
     @Override
     public void showDutyTypeDialog() {
-        mNavigateView.showDutyTypeDialog(mDutyType);
+        mHoursOfServiceView.showDutyTypeDialog(mDutyType);
     }
 
     @Override
-    public void showNotInVehicleDialog() {
-        mNavigateView.showNotInVehicleDialog();
+    public void showSpecialStatuses() {
+        mStatusLayout.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void hideSpecialStatuses() {
+        mStatusLayout.setVisibility(View.GONE);
     }
 
     private void initTimer() {
@@ -254,10 +259,8 @@ public final class DashboardFragment extends BaseFragment implements DashboardVi
             mIndicatorButton.setText(String.format(Locale.US, mContext.getString(R.string.duty_indicator), currentDuty));
             mIndicatorButton.setSupportBackgroundTintList(ColorStateList.valueOf(color));
             mIndicatorView.setVisibility(View.VISIBLE);
-            mStatusLayout.setVisibility(View.GONE);
         } else {
             mIndicatorView.setVisibility(View.GONE);
-            mStatusLayout.setVisibility(View.VISIBLE);
         }
     }
 }

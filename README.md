@@ -3,7 +3,19 @@ ELD app for Android
 
 # Version history
 
-* **1.0.83** - Fix no error message when trying to Login with incorrect credentials
+* **1.0.95** - Fix no error message when trying to Login with incorrect credentials
+* **1.0.94** - Fix events sync (_EA-446_)
+* **1.0.93** - Fix multiple issues with duplicated or missed events, multiple crash-fix activities (_EA-415_, _EA-432_, _EA-408_)
+* **1.0.92** - Home screen (_EA-211_)
+* **1.0.91** - Change blackbox update rate from 10 sec to 1 minute (_EA-446_)
+* **1.0.90** - Co-driver is unable to access logsheet events (_EA-440_, _EA-435_)
+* **1.0.89** - Update UI (_EA-449_)
+* **1.0.88** - Fix events order and duration, fix location precision (_EA-439_, _EA-14_)
+* **1.0.87** - Data Recording Compliance Monitoring (_EA-232_)
+* **1.0.86** - Implement reassign log to co-driver (_EA-182_)
+* **1.0.85** - Add roadside and data transfer (_EA-109_, _EA-84_, _EA-54_)
+* **1.0.84** - Fix extra timing in auto-duty (_EA-406_), Fix duration round issue (_EA-336_)
+* **1.0.83** - Timing Compliance Monitoring (_EA-224_)
 * **1.0.82** - Fix crash when screen rotated twice with confirm on duty popup on foreground (_EA-407_)
 * **1.0.81** - Fix multiple duty status marked as 'Driving' are added on Driver Logsheet after Driving (_EA-425_)
 * **1.0.80** - Fix not able to add event/change duty status (_EA-422_)

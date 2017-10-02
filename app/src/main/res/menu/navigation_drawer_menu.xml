@@ -11,8 +11,13 @@
         <item
             android:id="@+id/nav_inspector_view"
             android:checked="false"
-            android:icon="@drawable/ic_description_black_24dp"
+            android:icon="@drawable/ic_send"
             android:title="@string/nav_inspector_view"/>
+        <item
+            android:id="@+id/nav_transfer_view"
+            android:checked="false"
+            android:icon="@drawable/ic_description_black_24dp"
+            android:title="@string/nav_transfer_view"/>
     </group>
 
 
@@ -30,7 +35,8 @@
         <item
             android:id="@+id/nav_settings"
             android:icon="@drawable/ic_settings_black_24dp"
-            android:title="@string/nav_settings"/>
+            android:title="@string/nav_settings"
+            android:visible="false"/>
         <item
             android:id="@+id/nav_logout"
             android:icon="@drawable/ic_exit_to_app_black_24dp"

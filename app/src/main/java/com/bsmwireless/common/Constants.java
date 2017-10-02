@@ -21,10 +21,16 @@ public interface Constants {
     int DEFAULT_CALENDAR_DAYS_COUNT = 30;
     int MAX_CODRIVERS = 2;
     int SYNC_TIMEOUT_IN_MIN = 1;
+    int SYNC_ALL_EVENTS_IN_MIN = 60;
     int SYNC_NTP_RETRY_COUNT = 3;
 
     long LOCK_SCREEN_IDLE_MONITORING_TIMEOUT_MS = TimeUnit.MINUTES.toMillis(5);
     long LOCK_SCREEN_DISCONNECTION_TIMEOUT_MS = TimeUnit.MINUTES.toMillis(5);
+
+    long DIFF_FOR_TRIGGER_TIMING_MALFUNCTION_MS = TimeUnit.MINUTES.toMillis(10);
+    long CHECK_TIME_INTERVAL = TimeUnit.MINUTES.toMillis(1);
+
+    double DEFAULT_STORAGE_CAPACITY_THRESHOLD = 0.10;
 
     String BASE_URL = "https://develd.bsmtechnologies.com/sdmobile/rest/";
     String DEVICE_TYPE = "Android";

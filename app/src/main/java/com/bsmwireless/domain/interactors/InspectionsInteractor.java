@@ -9,7 +9,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import io.reactivex.Observable;
+import io.reactivex.Single;
 
 public final class InspectionsInteractor {
 
@@ -22,28 +22,28 @@ public final class InspectionsInteractor {
         mPreferencesManager = preferencesManager;
     }
 
-    public Observable<List<SyncInspectionCategory>> getInspectionItemsByCategoryIds(String categoryIds) {
+    public Single<List<SyncInspectionCategory>> getInspectionItemsByCategoryIds(String categoryIds) {
         int boxId = mPreferencesManager.getBoxId();
         if (boxId == PreferencesManager.NOT_FOUND_VALUE) {
-            return Observable.error(new Throwable("Not in vehicle"));
+            return Single.error(new Throwable("Not in vehicle"));
         } else {
             return mServiceApi.getInspectionItemsByCategoryIds(categoryIds);
         }
     }
 
-    public Observable<List<SyncInspectionCategory>> getInspectionItemsByLastUpdate(long lastUpdate) {
+    public Single<List<SyncInspectionCategory>> getInspectionItemsByLastUpdate(long lastUpdate) {
         int boxId = mPreferencesManager.getBoxId();
         if (boxId == PreferencesManager.NOT_FOUND_VALUE) {
-            return Observable.error(new Throwable("Not in vehicle"));
+            return Single.error(new Throwable("Not in vehicle"));
         } else {
             return mServiceApi.getInspectionItemsByLastUpdate(lastUpdate);
         }
     }
 
-    public Observable<InspectionReport> syncInspectionReport(long lastUpdate, int isTrailer, long beginDate) {
+    public Single<InspectionReport> syncInspectionReport(long lastUpdate, int isTrailer, long beginDate) {
         int boxId = mPreferencesManager.getBoxId();
         if (boxId == PreferencesManager.NOT_FOUND_VALUE) {
-            return Observable.error(new Throwable("Not in vehicle"));
+            return Single.error(new Throwable("Not in vehicle"));
         } else {
             return mServiceApi.syncInspectionReport(lastUpdate, isTrailer, beginDate);
         }

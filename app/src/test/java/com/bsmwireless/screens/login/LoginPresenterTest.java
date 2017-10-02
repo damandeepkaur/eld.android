@@ -13,7 +13,7 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import app.bsmuniversal.com.RxSchedulerRule;
-import io.reactivex.Observable;
+import io.reactivex.Single;
 
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
@@ -81,7 +81,7 @@ public class LoginPresenterTest {
         when(mView.getPassword()).thenReturn(PASSWORD);
         when(mView.getDomain()).thenReturn(DOMAIN);
         when(mUserInteractor.loginUser(anyString(), anyString(), anyString(), anyBoolean(),
-                eq(User.DriverType.DRIVER))).thenReturn(Observable.just(false));
+                eq(User.DriverType.DRIVER))).thenReturn(Single.just(false));
 
         //when
         mLoginPresenter.onLoginButtonClicked(false);
@@ -97,7 +97,7 @@ public class LoginPresenterTest {
         when(mView.getPassword()).thenReturn(PASSWORD);
         when(mView.getDomain()).thenReturn(DOMAIN);
         when(mUserInteractor.loginUser(anyString(), anyString(), anyString(), anyBoolean(),
-                eq(User.DriverType.DRIVER))).thenReturn(Observable.just(true));
+                eq(User.DriverType.DRIVER))).thenReturn(Single.just(true));
 
         //when
         mLoginPresenter.onLoginButtonClicked(false);

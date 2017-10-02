@@ -2,6 +2,8 @@ package com.bsmwireless.common.dagger;
 
 import android.content.Context;
 
+import com.bsmwireless.common.utils.StorageUtil;
+
 import javax.inject.Singleton;
 
 import dagger.Module;
@@ -19,5 +21,10 @@ public final class ContextModule {
     @Provides
     Context provideContext() {
         return mContext;
+    }
+
+    @Provides
+    static StorageUtil storageUtil(){
+        return new StorageUtil();
     }
 }
