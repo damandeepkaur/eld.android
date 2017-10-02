@@ -3,6 +3,7 @@ ELD app for Android
 
 # Version history
 
+* **1.0.99** - Special driving spanning overnight is not handled properly by duty line and event label (_EA-426_)
 * **1.0.98** - Add option to remove event to Logs Screen (_EA-463_)
 * **1.0.97** - Fix missing manually created records (_EA-460_, _EA-427_)
 * **1.0.96** - Fix NPE on HoursOfService screen (_EA-461_)
