@@ -43,13 +43,14 @@ public class BlackBoxParser {
             if (responseModel.getResponseType() == BlackBoxResponseModel.ResponseType.ACK && responseModel.getLength() == 31) {
 
                 // search for VIN end
-                int vinBytesToParse = -1;
-                for (int i = VIN_INDEX_START; i <= VIN_INDEX_END + 1; ++i) { // overshoot end idx by one in case no 0/null encountered
-                    vinBytesToParse ++;
+                int vinBytesToParse = 0;
+                for (int i = VIN_INDEX_START; i <= VIN_INDEX_END; ++i) {
 
-                    if(i > VIN_INDEX_END || data[i] == 0) { // stop on first 0 or invalid index
+                    if(data[i] == 0) { // stop on first 0
                         break;
                     }
+
+                    vinBytesToParse ++;
                 }
 
                 String vinNumber = "";
