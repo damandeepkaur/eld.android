@@ -25,7 +25,6 @@ import com.bsmwireless.widgets.logs.calendar.CalendarItem;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -50,7 +49,8 @@ import static com.bsmwireless.widgets.alerts.DutyType.CLEAR_YM;
 public final class LogsPresenter implements AccountManager.AccountListener {
 
     private static final String DRIVERS_NAME_DIVIDER = ", ";
-    private static final String DISTANCE_DELIMETER = "/";
+    private static final String DISTANCE_DELIMITER = "/";
+    private static final String CARRIER_DELIMITER = ",";
 
     private LogsView mView;
     private ELDEventsInteractor mELDEventsInteractor;
@@ -398,10 +398,9 @@ public final class LogsPresenter implements AccountManager.AccountListener {
                     if (carriers != null && !carriers.isEmpty()) {
                         StringBuilder sb = new StringBuilder();
                         for (Carrier carrier : carriers) {
-                            sb.append(carrier.getName());
-                            sb.append(",");
+                            sb.append(carrier.getName()).append(CARRIER_DELIMITER);
                         }
-                        carriername = sb.substring(0, sb.length() - 1);
+                        carriername = sb.substring(0, sb.length() - CARRIER_DELIMITER.length());
                     } else {
                         carriername = "";
                     }
@@ -434,7 +433,7 @@ public final class LogsPresenter implements AccountManager.AccountListener {
                         vehicleLicense = "";
                     }
 
-                    String vehicleTrailers = selectedLogHeader.getCoDriverIds();
+                    String vehicleTrailers = selectedLogHeader.getTrailerIds();
 
                     String homeTerminalAddress;
                     String homeTerminalName;
@@ -447,20 +446,22 @@ public final class LogsPresenter implements AccountManager.AccountListener {
                     }
 
                     String shippingId = selectedLogHeader.getShippingId();
-                    String coDriversname = getCoDriversName(selectedLogHeader);
+                    String coDriversName = getCoDriversName(selectedLogHeader);
 
                     return new SelectedLogHeaderInfo(vehicleName, vehicleLicense, vehicleTrailers,
-                            homeTerminalAddress, homeTerminalName, shippingId, coDriversname);
+                            homeTerminalAddress, homeTerminalName, shippingId, coDriversName);
                 });
     }
 
     private Single<OdometerResult> loadOdometerValue(String mTimeZone) {
 
         final long startDate = DateUtils.getStartDate(mTimeZone, mView.getSelectedDay().getCalendar());
-        final long endDate = startDate + MS_IN_DAY;
-
-        return mELDEventsInteractor.getDutyEventsFromDB(startDate, endDate)
-                .first(Collections.emptyList())
+        return mELDEventsInteractor
+                .getActiveDutyEventsForDay(startDate)
+                .zipWith(mELDEventsInteractor
+                                .getLatestActiveDutyEventFromDBOnce(startDate,
+                                        mAccountManager.getCurrentUserId()),
+                        this::mapLatestAndCurrentEvents)
                 .flatMap(events -> Single.fromCallable(() -> {
 
                     StringBuilder startValueBuilder = new StringBuilder();
@@ -491,27 +492,33 @@ public final class LogsPresenter implements AccountManager.AccountListener {
                             }
 
                             startValueBuilder.append(eventsForBox.get(0).getOdometer())
-                                    .append(DISTANCE_DELIMETER);
+                                    .append(DISTANCE_DELIMITER);
 
-                            long endOdometer;
-                            if (eventsForBox.size() == 1) {
-                                endOdometer = eventsForBox.get(0).getOdometer();
-                            } else {
-                                endOdometer = eventsForBox.get(eventsForBox.size() - 1).getOdometer();
-                            }
-
-                            endValueBuilder.append(endOdometer).append(DISTANCE_DELIMETER);
+                            Integer endOdometer = eventsForBox.get(eventsForBox.size() - 1).getOdometer();
+                            endValueBuilder.append(endOdometer == null ? 0 : endOdometer)
+                                    .append(DISTANCE_DELIMITER);
                             distance += calculateOdometer(eventsForBox);
                         }
 
-                        truncateBuilder(startValueBuilder, DISTANCE_DELIMETER.length());
-                        truncateBuilder(endValueBuilder, DISTANCE_DELIMETER.length());
+                        truncateBuilder(startValueBuilder, DISTANCE_DELIMITER.length());
+                        truncateBuilder(endValueBuilder, DISTANCE_DELIMITER.length());
                     }
 
                     return new OdometerResult(startValueBuilder.toString(),
                             endValueBuilder.toString(),
                             distance);
                 }));
+    }
+
+
+    private List<ELDEvent> mapLatestAndCurrentEvents(List<ELDEvent> current, List<ELDEvent> prevDayEvents) {
+
+        List<ELDEvent> eldEvents = new ArrayList<>(current.size() + (prevDayEvents.isEmpty() ? 0 : 1));
+        if (!prevDayEvents.isEmpty()) {
+            eldEvents.add(prevDayEvents.get(prevDayEvents.size() - 1));
+        }
+        eldEvents.addAll(current);
+        return eldEvents;
     }
 
     private void truncateBuilder(StringBuilder stringBuilder, int length) {
@@ -528,13 +535,13 @@ public final class LogsPresenter implements AccountManager.AccountListener {
         boolean isPreviousDriving = false;
         for (ELDEvent event : events) {
 
-            if (!isPreviousDriving
-                    && DutyType.DRIVING.isSame(event.getEventType(), event.getEventCode())) {
-
-                // start driving event, save odometer value
-                startDrivingOdometer = event.getOdometer() != null ? event.getOdometer() : 0;
-
-                isPreviousDriving = true;
+            if (DutyType.DRIVING.isSame(event.getEventType(), event.getEventCode())) {
+                // If few driving events meets successively takes only first
+                if (!isPreviousDriving) {
+                    // start driving event, save odometer value
+                    startDrivingOdometer = event.getOdometer() != null ? event.getOdometer() : 0;
+                    isPreviousDriving = true;
+                }
             } else {
 
                 if (isPreviousDriving) {
