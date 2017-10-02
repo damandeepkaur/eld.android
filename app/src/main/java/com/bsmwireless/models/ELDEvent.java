@@ -91,11 +91,11 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
         NON_DRIVER(3),              // ELD 7.22 Table 7: "Edit requested by an Authenticated User other than the Driver"
         UNIDENTIFIED_DRIVER(4);     // ELD 7.22 Table 7: "Assumed from Unidentified Driver profile"
 
-        private int mOriginCode;
+        private Integer mOriginCode;
 
         EventOrigin(int code) { mOriginCode = code; }
 
-        public int getValue() { return mOriginCode; }
+        public Integer getValue() { return mOriginCode; }
 
         public static EventOrigin getOriginByCode(int code) {
             for (EventOrigin t : EventOrigin.values()) {

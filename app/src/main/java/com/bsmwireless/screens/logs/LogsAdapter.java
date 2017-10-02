@@ -262,7 +262,7 @@ public final class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHold
                 .equals(DutyType.DRIVING) || !event.isActive()) {
             popup.getMenu().findItem(R.id.menu_assign).setEnabled(false);
         }
-        if (!event.getEvent().getOrigin().equals(ELDEvent.EventOrigin.DRIVER.getValue())) {
+        if (!ELDEvent.EventOrigin.DRIVER.getValue().equals(event.getEvent().getOrigin())) {
             popup.getMenu().findItem(R.id.menu_remove).setEnabled(false);
         }
 
