@@ -86,18 +86,15 @@ public abstract class BaseMenuPresenter implements AccountManager.AccountListene
     }
 
     final void onDutyChanged(DutyType dutyType, String comment) {
-        // don't set the same type
-        if (dutyType != mDutyTypeManager.getDutyType()) {
-            mDisposables.add(mEventsInteractor.postNewDutyTypeEvent(dutyType, comment)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeOn(Schedulers.io())
-                    .subscribe(
-                            responseMessage -> {
-                            },
-                            error -> Timber.e(error.getMessage())
-                    )
-            );
-        }
+        mDisposables.add(mEventsInteractor.postNewDutyTypeEvent(dutyType, comment)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(
+                        responseMessage -> {
+                        },
+                        error -> Timber.e(error.getMessage())
+                )
+        );
     }
 
     public final boolean isDriverConnected() {
