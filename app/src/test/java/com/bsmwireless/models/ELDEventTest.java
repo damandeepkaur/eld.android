@@ -30,10 +30,10 @@ public class ELDEventTest {
     /** Tests EventOrigin against ELD 7.22 */
     @Test
     public void testEldEventOrigin() {
-        assertEquals(1, ELDEvent.EventOrigin.AUTOMATIC_RECORD.getValue());
-        assertEquals(2, ELDEvent.EventOrigin.DRIVER.getValue());
-        assertEquals(3, ELDEvent.EventOrigin.NON_DRIVER.getValue());
-        assertEquals(4, ELDEvent.EventOrigin.UNIDENTIFIED_DRIVER.getValue());
+        assertEquals(1, ELDEvent.EventOrigin.AUTOMATIC_RECORD.getValue().intValue());
+        assertEquals(2, ELDEvent.EventOrigin.DRIVER.getValue().intValue());
+        assertEquals(3, ELDEvent.EventOrigin.NON_DRIVER.getValue().intValue());
+        assertEquals(4, ELDEvent.EventOrigin.UNIDENTIFIED_DRIVER.getValue().intValue());
     }
 
     /** Tests StatusCode against ELD 7.23 */

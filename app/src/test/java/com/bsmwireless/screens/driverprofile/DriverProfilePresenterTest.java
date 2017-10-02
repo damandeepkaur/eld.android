@@ -29,7 +29,7 @@ import java.util.List;
 
 import app.bsmuniversal.com.RxSchedulerRule;
 import io.reactivex.Flowable;
-import io.reactivex.Observable;
+import io.reactivex.Single;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
@@ -196,7 +196,7 @@ public class DriverProfilePresenterTest {
     public void testOnSaveSignatureClickedValidUserShortSigSuccess() {
         // given
         setUserToNotNull();
-        when(mUserInteractor.updateDriverSignature(anyString())).thenReturn(Observable.just(true));
+        when(mUserInteractor.updateDriverSignature(anyString())).thenReturn(Single.just(true));
 
         // when
         mDriverProfilePresenter.onSaveSignatureClicked(mTestSignature);
@@ -210,7 +210,7 @@ public class DriverProfilePresenterTest {
     public void testOnSaveSignatureClickedApiFailed() {
         // given
         setUserToNotNull();
-        when(mUserInteractor.updateDriverSignature(anyString())).thenReturn(Observable.just(false));
+        when(mUserInteractor.updateDriverSignature(anyString())).thenReturn(Single.just(false));
 
         // when
         mDriverProfilePresenter.onSaveSignatureClicked(mTestSignature);
@@ -224,7 +224,7 @@ public class DriverProfilePresenterTest {
         // given
         setUserToNotNull();
 
-        when(mUserInteractor.updateDriverSignature(anyString())).thenReturn(Observable.error(RetrofitException.networkError(new ConnectException())));
+        when(mUserInteractor.updateDriverSignature(anyString())).thenReturn(Single.error(RetrofitException.networkError(new ConnectException())));
 
         // when
         mDriverProfilePresenter.onSaveSignatureClicked(mTestSignature);
@@ -237,7 +237,7 @@ public class DriverProfilePresenterTest {
     public void testOnSaveSignatureClickedValidUserLongSig() {
         // given
         setUserToNotNull(); // sets to mFakeUserEntity
-        when(mUserInteractor.updateDriverSignature(anyString())).thenReturn(Observable.just(true)); // API success
+        when(mUserInteractor.updateDriverSignature(anyString())).thenReturn(Single.just(true)); // API success
 
         // when
         mDriverProfilePresenter.onSaveSignatureClicked(mTooLongTestSignature);
@@ -250,7 +250,7 @@ public class DriverProfilePresenterTest {
     @Test
     public void testOnChangePasswordClickSuccess() {
         // given
-        when(mUserInteractor.updateDriverPassword(anyString(), anyString())).thenReturn(Observable.just(true));
+        when(mUserInteractor.updateDriverPassword(anyString(), anyString())).thenReturn(Single.just(true));
 
         // when
         mDriverProfilePresenter.onChangePasswordClick(FAKE_P_1, FAKE_P_2, FAKE_P_2);
@@ -262,7 +262,8 @@ public class DriverProfilePresenterTest {
     @Test
     public void testOnChangePasswordClickEmptyOld() {
         // given
-        when(mUserInteractor.updateDriverPassword(anyString(), anyString())).thenReturn(Observable.just(true));
+        when(mUserInteractor.updateDriverPassword(anyString(), anyString())).thenReturn(Single.just(true));
+
 
         // when
         mDriverProfilePresenter.onChangePasswordClick(FAKE_P_EMPTY, FAKE_P_1, FAKE_P_1);
@@ -274,7 +275,8 @@ public class DriverProfilePresenterTest {
     @Test
     public void testOnChangePasswordClickEmptyNew() {
         // given
-        when(mUserInteractor.updateDriverPassword(anyString(), anyString())).thenReturn(Observable.just(true));
+        when(mUserInteractor.updateDriverPassword(anyString(), anyString())).thenReturn(Single.just(true));
+
 
         // when
         mDriverProfilePresenter.onChangePasswordClick(FAKE_P_1, FAKE_P_EMPTY, FAKE_P_2);
@@ -286,7 +288,8 @@ public class DriverProfilePresenterTest {
     @Test
     public void testOnChangePasswordClickConfirmMismatch() {
         // given
-        when(mUserInteractor.updateDriverPassword(anyString(), anyString())).thenReturn(Observable.just(true));
+        when(mUserInteractor.updateDriverPassword(anyString(), anyString())).thenReturn(Single.just(true));
+
 
         // when
         mDriverProfilePresenter.onChangePasswordClick(FAKE_P_1, FAKE_P_2, FAKE_P_3);
@@ -298,7 +301,8 @@ public class DriverProfilePresenterTest {
     @Test
     public void testOnChangePasswordNotUpdated() {
         // given
-        when(mUserInteractor.updateDriverPassword(anyString(), anyString())).thenReturn(Observable.just(false));
+        when(mUserInteractor.updateDriverPassword(anyString(), anyString())).thenReturn(Single.just(false));
+
 
         // when
         mDriverProfilePresenter.onChangePasswordClick(FAKE_P_1, FAKE_P_2, FAKE_P_2);
@@ -310,7 +314,7 @@ public class DriverProfilePresenterTest {
     @Test
     public void testOnChangePasswordError() {
         // given
-        when(mUserInteractor.updateDriverPassword(anyString(), anyString())).thenReturn(Observable.error(RetrofitException.networkError(new ConnectException())));
+        when(mUserInteractor.updateDriverPassword(anyString(), anyString())).thenReturn(Single.error(RetrofitException.networkError(new ConnectException())));
 
         // when
         mDriverProfilePresenter.onChangePasswordClick(FAKE_P_1, FAKE_P_2, FAKE_P_2);

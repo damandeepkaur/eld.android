@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import app.bsmuniversal.com.RxSchedulerRule;
-import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.observers.TestObserver;
 
 import static org.mockito.Matchers.any;
@@ -61,7 +61,7 @@ public class InspectionsInteractorTest {
         List<SyncInspectionCategory> listSyncInspectionCategory = new ArrayList<>();
 
         when(mPreferencesManager.getBoxId()).thenReturn(123450); // != PreferencesManager.NOT_FOUND_VALUE
-        when(mServiceApi.getInspectionItemsByCategoryIds(anyString())).thenReturn(Observable.just(listSyncInspectionCategory));
+        when(mServiceApi.getInspectionItemsByCategoryIds(anyString())).thenReturn(Single.just(listSyncInspectionCategory));
 
         TestObserver<List<SyncInspectionCategory>> testObserver = TestObserver.create();
 
@@ -96,7 +96,7 @@ public class InspectionsInteractorTest {
         Exception fakeApiException = new RuntimeException("the API said no.");
 
         when(mPreferencesManager.getBoxId()).thenReturn(123450); // != PreferencesManager.NOT_FOUND_VALUE
-        when(mServiceApi.getInspectionItemsByCategoryIds(anyString())).thenReturn(Observable.error(fakeApiException));
+        when(mServiceApi.getInspectionItemsByCategoryIds(anyString())).thenReturn(Single.error(fakeApiException));
 
         TestObserver<List<SyncInspectionCategory>> testObserver = TestObserver.create();
 
@@ -115,7 +115,7 @@ public class InspectionsInteractorTest {
         List<SyncInspectionCategory> listSyncInspectionCategory = new ArrayList<>();
 
         when(mPreferencesManager.getBoxId()).thenReturn(1111);
-        when(mServiceApi.getInspectionItemsByLastUpdate(anyLong())).thenReturn(Observable.just(listSyncInspectionCategory));
+        when(mServiceApi.getInspectionItemsByLastUpdate(anyLong())).thenReturn(Single.just(listSyncInspectionCategory));
 
         TestObserver<List<SyncInspectionCategory>> testObserver = TestObserver.create();
 
@@ -152,7 +152,7 @@ public class InspectionsInteractorTest {
         Exception fakeApiException = new RuntimeException("404 API not found");
 
         when(mPreferencesManager.getBoxId()).thenReturn(12312123);
-        when(mServiceApi.getInspectionItemsByLastUpdate(any(Long.class))).thenReturn(Observable.error(fakeApiException));
+        when(mServiceApi.getInspectionItemsByLastUpdate(any(Long.class))).thenReturn(Single.error(fakeApiException));
 
         TestObserver<List<SyncInspectionCategory>> testObserver = TestObserver.create();
 
@@ -172,7 +172,7 @@ public class InspectionsInteractorTest {
         final long beginDate = 1234567890L;
 
         when(mPreferencesManager.getBoxId()).thenReturn(1234);
-        when(mServiceApi.syncInspectionReport(anyLong(), anyInt(), anyLong())).thenReturn(Observable.just(new InspectionReport()));
+        when(mServiceApi.syncInspectionReport(anyLong(), anyInt(), anyLong())).thenReturn(Single.just(new InspectionReport()));
 
         TestObserver<InspectionReport> testObserver = TestObserver.create();
 
@@ -211,7 +211,7 @@ public class InspectionsInteractorTest {
         Exception fakeApiException = new RuntimeException("500 from server");
 
         when(mPreferencesManager.getBoxId()).thenReturn(2010);
-        when(mServiceApi.syncInspectionReport(anyLong(), anyInt(), anyLong())).thenReturn(Observable.error(fakeApiException));
+        when(mServiceApi.syncInspectionReport(anyLong(), anyInt(), anyLong())).thenReturn(Single.error(fakeApiException));
 
         TestObserver<InspectionReport> testObserver = TestObserver.create();
 

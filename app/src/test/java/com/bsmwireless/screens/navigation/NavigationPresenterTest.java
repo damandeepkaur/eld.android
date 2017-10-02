@@ -18,7 +18,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import app.bsmuniversal.com.RxSchedulerRule;
 import io.reactivex.Flowable;
-import io.reactivex.Observable;
+import io.reactivex.Single;
 
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -77,7 +77,7 @@ public class NavigationPresenterTest {
     @Test
     public void testOnLogoutInteractorCall() {
         // given
-        when(mEventsInteractor.postLogoutEvent()).thenReturn(Observable.just(true));
+        when(mEventsInteractor.postLogoutEvent()).thenReturn(Single.just(true));
 
         // when
         mNavigationPresenter.onLogoutItemSelected();
@@ -93,7 +93,7 @@ public class NavigationPresenterTest {
     @Test
     public void testOnLogoutFailed() {
         // given
-        when(mEventsInteractor.postLogoutEvent()).thenReturn(Observable.just(false));
+        when(mEventsInteractor.postLogoutEvent()).thenReturn(Single.just(false));
 
         // when
         mNavigationPresenter.onLogoutItemSelected();
@@ -111,7 +111,7 @@ public class NavigationPresenterTest {
     @Test
     public void testOnLogoutError() {
         // given
-        when(mEventsInteractor.postLogoutEvent()).thenReturn(Observable.error(new RuntimeException("it broke.")));
+        when(mEventsInteractor.postLogoutEvent()).thenReturn(Single.error(new RuntimeException("it broke.")));
 
         // when
         mNavigationPresenter.onLogoutItemSelected();

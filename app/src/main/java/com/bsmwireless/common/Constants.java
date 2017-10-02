@@ -21,6 +21,7 @@ public interface Constants {
     int DEFAULT_CALENDAR_DAYS_COUNT = 30;
     int MAX_CODRIVERS = 2;
     int SYNC_TIMEOUT_IN_MIN = 1;
+    int SYNC_ALL_EVENTS_IN_MIN = 60;
     int SYNC_NTP_RETRY_COUNT = 3;
 
     long LOCK_SCREEN_IDLE_MONITORING_TIMEOUT_MS = TimeUnit.MINUTES.toMillis(5);

@@ -48,37 +48,9 @@ public class DateUtils {
         Calendar calendarWithTimezone = Calendar.getInstance(timeZone);
         calendarWithTimezone.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH),
                 calendar.get(Calendar.DAY_OF_MONTH), 0, 0, 0);
+        calendarWithTimezone.set(Calendar.MILLISECOND, 0);
         long timeInMs = calendarWithTimezone.getTimeInMillis();
         return timeInMs - timeInMs % 1000;
-    }
-
-    /**
-     * @param zone  user timezone for example "America/Los_Angeles"
-     * @param day   day in month
-     * @param month month (0 is for Jan)
-     * @param year  year
-     * @return start date in ms
-     */
-    public static long getStartDate(String zone, int day, int month, int year) {
-        TimeZone timeZone = TimeZone.getTimeZone(zone);
-        Calendar calendar = Calendar.getInstance(timeZone);
-        calendar.set(year, month, day, 0, 0, 0);
-
-        return calendar.getTimeInMillis();
-    }
-
-    /**
-     * @param zone  user timezone for example "America/Los_Angeles"
-     * @param day   day in month
-     * @param month month (0 is for Jan)
-     * @param year  year
-     * @return end date in ms
-     */
-    public static long getEndDate(String zone, int day, int month, int year) {
-        TimeZone timeZone = TimeZone.getTimeZone(zone);
-        Calendar calendar = Calendar.getInstance(timeZone);
-        calendar.set(year, month, day, 23, 59, 59);
-        return calendar.getTimeInMillis();
     }
 
     /**
@@ -89,6 +61,7 @@ public class DateUtils {
         Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(zone));
         calendar.setTimeInMillis(time);
         calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DATE), 0, 0, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
         return calendar.getTimeInMillis();
     }
 
@@ -100,6 +73,7 @@ public class DateUtils {
         Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(zone));
         calendar.setTimeInMillis(time);
         calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DATE), 23, 59, 59);
+        calendar.set(Calendar.MILLISECOND, 999);
         return calendar.getTimeInMillis();
     }
 

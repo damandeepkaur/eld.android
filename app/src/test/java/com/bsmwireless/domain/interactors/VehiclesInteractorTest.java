@@ -28,6 +28,7 @@ import java.util.List;
 import app.bsmuniversal.com.RxSchedulerRule;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.observers.TestObserver;
 import io.reactivex.subscribers.TestSubscriber;
 
@@ -93,7 +94,7 @@ public class VehiclesInteractorTest {
         // given
         List<Vehicle> vehicles = new ArrayList<>();
         String searchText = "anything";
-        when(mServiceApi.searchVehicles(anyString())).thenReturn(Observable.just(vehicles));
+        when(mServiceApi.searchVehicles(anyString())).thenReturn(Single.just(vehicles));
 
         // when
         mVehiclesInteractor.searchVehicles(searchText);
@@ -239,7 +240,7 @@ public class VehiclesInteractorTest {
 
         when(mBlackBoxInteractor.getData(anyInt())).thenReturn(Observable.just(fakeData));
         when(mUserInteractor.getTimezoneSync(any(Integer.class))).thenReturn("fake timezone");
-        when(mServiceApi.pairVehicle(any(ELDEvent.class))).thenReturn(Observable.just(events));
+        when(mServiceApi.pairVehicle(any(ELDEvent.class))).thenReturn(Single.just(events));
 
         when(mAppDatabase.vehicleDao()).thenReturn(mVehicleDao); // for saveVehicle
         when(mAppDatabase.userDao()).thenReturn(mUserDao);
