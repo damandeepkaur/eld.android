@@ -33,6 +33,8 @@ public interface LogsView {
 
     void eventUpdated();
 
+    void eventRemoved();
+
     void dutyUpdated();
 
     void showError(RetrofitException exception);
@@ -44,6 +46,7 @@ public interface LogsView {
     enum Error {
         ERROR_ADD_EVENT(R.string.add_event_error),
         ERROR_UPDATE_EVENT(R.string.update_event_error),
+        ERROR_REMOVE_EVENT(R.string.remove_event_error),
         ERROR_NOT_IN_VEHICLE(R.string.not_in_vehicle_error);
 
         private int mStringId;
