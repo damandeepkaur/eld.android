@@ -3,6 +3,7 @@ ELD app for Android
 
 # Version history
 
+* **1.0.95** - Fix NPE on HoursOfService screen (_EA-461_)
 * **1.0.94** - Fix events sync (_EA-446_)
 * **1.0.93** - Fix multiple issues with duplicated or missed events, multiple crash-fix activities (_EA-415_, _EA-432_, _EA-408_)
 * **1.0.92** - Home screen (_EA-211_)

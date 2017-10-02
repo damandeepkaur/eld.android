@@ -87,6 +87,7 @@ public final class HoursOfServiceActivity extends BaseMenuActivity implements Vi
 
     @Override
     protected void onDestroy() {
+        mPresenter.onDestroy();
         mViewPager.removeOnPageChangeListener(this);
         super.onDestroy();
         mHandler.removeCallbacks(mResetTimeTask);
@@ -124,6 +125,10 @@ public final class HoursOfServiceActivity extends BaseMenuActivity implements Vi
 
     @Override
     public void setTitle(long boxId, String driverName) {
+        if (mToolbar == null) {
+            return;
+        }
+
         mToolbar.setTitle(driverName);
 
         mToolbar.setSubtitle(boxId > 0
