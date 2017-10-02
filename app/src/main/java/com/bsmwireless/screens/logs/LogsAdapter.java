@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.bsmwireless.common.utils.DateUtils;
+import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.LogSheetHeader;
 import com.bsmwireless.screens.logs.dagger.EventLogModel;
 import com.bsmwireless.widgets.alerts.DutyType;
@@ -258,8 +259,11 @@ public final class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHold
             popup.getMenu().findItem(R.id.menu_edit).setEnabled(false);
         }
         if (!DutyType.getTypeByCode(event.getEventType(), event.getEventCode())
-                     .equals(DutyType.DRIVING) || !event.isActive()) {
+                .equals(DutyType.DRIVING) || !event.isActive()) {
             popup.getMenu().findItem(R.id.menu_assign).setEnabled(false);
+        }
+        if (!ELDEvent.EventOrigin.DRIVER.getValue().equals(event.getEvent().getOrigin())) {
+            popup.getMenu().findItem(R.id.menu_remove).setEnabled(false);
         }
 
         popup.setOnMenuItemClickListener(menuItem -> {
@@ -281,7 +285,7 @@ public final class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHold
     }
 
     public CalendarItem getCurrentItem() {
-        return mCalendarLayout.getCurrentItem();
+        return (mCalendarLayout != null) ? mCalendarLayout.getCurrentItem() : null;
     }
 
     public LogHeaderModel getLogHeaderModel() {

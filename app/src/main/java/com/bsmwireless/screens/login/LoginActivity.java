@@ -148,7 +148,7 @@ public final class LoginActivity extends BaseActivity implements LoginView {
 
     @Override
     public void goToNavigationScreen() {
-        startActivity(new Intent(this, NavigationActivity.class));
+        startActivity(NavigationActivity.createIntent(this));
         finish();
     }
 

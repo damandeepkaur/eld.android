@@ -39,10 +39,10 @@ public final class AutoDutyDialogPresenter {
 
     public void onAutoLogoutClick() {
         mDisposables.add(mEventsInteractor.postLogoutEvent()
-                .doOnNext(isSuccess -> mUserInteractor.deleteDriver())
+                .doOnSuccess(isSuccess -> mUserInteractor.deleteDriver())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnTerminate(() -> {
+                .doOnDispose(() -> {
                     SchedulerUtils.cancel();
                     mView.onActionDone();
                 })
