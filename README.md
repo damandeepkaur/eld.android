@@ -3,7 +3,13 @@ ELD app for Android
 
 # Version history
 
-* **1.0.91** - Positioning Compliance Monitoring (_EA-367_)
+* **1.0.97** - Positioning Compliance Monitoring (_EA-367_)
+* **1.0.96** - Fix NPE on HoursOfService screen (_EA-461_)
+* **1.0.95** - Fix no error message when trying to Login with incorrect credentials
+* **1.0.94** - Fix events sync (_EA-446_)
+* **1.0.93** - Fix multiple issues with duplicated or missed events, multiple crash-fix activities (_EA-415_, _EA-432_, _EA-408_)
+* **1.0.92** - Home screen (_EA-211_)
+* **1.0.91** - Change blackbox update rate from 10 sec to 1 minute (_EA-446_)
 * **1.0.90** - Co-driver is unable to access logsheet events (_EA-440_, _EA-435_)
 * **1.0.89** - Update UI (_EA-449_)
 * **1.0.88** - Fix events order and duration, fix location precision (_EA-439_, _EA-14_)

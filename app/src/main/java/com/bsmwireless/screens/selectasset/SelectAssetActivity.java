@@ -253,7 +253,7 @@ public final class SelectAssetActivity extends BaseActivity implements SelectAss
 
     @Override
     public void goToHomeScreen() {
-        startActivity(new Intent(this, NavigationActivity.class));
+        startActivity(NavigationActivity.createIntent(this));
         finish();
     }
 

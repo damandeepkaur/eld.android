@@ -392,7 +392,7 @@
     <string name="nav_logout">Log Out</string>
     <string name="driver">Driver</string>
     <string name="asset">Asset</string>
-    <string name="box">Box</string>
+    <string name="box">Box %1$d</string>
     <plurals name="co_drivers">
         <item quantity="one">%1$d co-driver</item>
         <item quantity="other">%1$d co-drivers</item>
@@ -701,5 +701,17 @@
     <string name="transfer_dialog_message">You are going to send data for current 24 hours and last 7 days. Please confirm your action to proceed with data transfer.</string>
     <string name="transfer_dialog_positive">Confirm</string>
     <string name="transfer_dialog_negative">Cancel</string>
+    
+    <!--Home screen-->
+    <string name="home_screen_label">Home</string>
+    <string name="home_screen_current_status">Current status:</string>
+    <string name="home_screen_hours_of_service">Hours of service</string>
+    <string name="home_screen_pre_trip">pre-trip</string>
+    <string name="home_screen_post_trip">post-trip</string>
+    <string name="home_screen_inspections">Inspections</string>
+
+    <!-- Hours of Service-->
+    <string name="hos_box_name">@string/box</string>
+    <string name="hos_not_in_vehicle">@string/select_asset_not_in_vehicle</string>
 
 </resources>

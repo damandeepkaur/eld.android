@@ -177,6 +177,10 @@ public abstract class BaseMenuPresenter implements AccountManager.AccountListene
         return mDutyTypeManager;
     }
 
+    protected final AccountManager getAccountManager(){
+        return mAccountManager;
+    }
+
     @SuppressWarnings("DesignForExtension")
     @Override
     public void onUserChanged() {
