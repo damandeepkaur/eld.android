@@ -165,7 +165,8 @@ public final class ELDEventsInteractor {
     }
 
     public Observable<long[]> postNewDutyTypeEvent(DutyType dutyType, String comment) {
-        return postNewELDEvents(getEvents(dutyType, comment))
+        return Single.fromCallable(() -> getEvents(dutyType, comment))
+                .flatMapObservable(this::postNewELDEvents)
                 .doOnNext(ids -> {
                     if (ids.length > 0) {
                         mDutyTypeManager.setDutyType(dutyType, true);
