@@ -14,6 +14,7 @@ import com.bsmwireless.data.storage.eldevents.ELDEventEntity;
 import com.bsmwireless.data.storage.users.UserDao;
 import com.bsmwireless.models.AppInfo;
 import com.bsmwireless.models.BlackBoxModel;
+import com.bsmwireless.models.BlackBoxSensorState;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.Malfunction;
 import com.bsmwireless.models.ResponseMessage;
@@ -24,7 +25,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -32,6 +35,7 @@ import io.reactivex.Flowable;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Single;
+import timber.log.Timber;
 
 import static com.bsmwireless.common.Constants.SUCCESS;
 import static com.bsmwireless.common.utils.DateUtils.MS_IN_DAY;
@@ -161,7 +165,8 @@ public final class ELDEventsInteractor {
     }
 
     public Observable<long[]> postNewDutyTypeEvent(DutyType dutyType, String comment) {
-        return postNewELDEvents(getEvents(dutyType, comment))
+        return Single.fromCallable(() -> getEvents(dutyType, comment))
+                .flatMapObservable(this::postNewELDEvents)
                 .doOnNext(ids -> {
                     if (ids.length > 0) {
                         mDutyTypeManager.setDutyType(dutyType, true);
@@ -212,8 +217,8 @@ public final class ELDEventsInteractor {
      *
      * @return
      */
-    public Flowable<List<ELDEvent>> getDiagnosticEvents() {
-        return Flowable.just(Collections.emptyList());
+    public Single<List<ELDEvent>> getDiagnosticEvents() {
+        return loadLoggedMalfunctionsByParams(Constants.DIAGNOSTIC_CODES);
     }
 
     /**
@@ -221,8 +226,42 @@ public final class ELDEventsInteractor {
      *
      * @return
      */
-    public Flowable<List<ELDEvent>> getMalfunctionEvents() {
-        return Flowable.just(Collections.emptyList());
+    public Single<List<ELDEvent>> getMalfunctionEvents() {
+        return loadLoggedMalfunctionsByParams(Constants.MALFUNCTION_CODES);
+    }
+
+    private Single<List<ELDEvent>> loadLoggedMalfunctionsByParams(String[] malcodes) {
+        return mELDEventDao
+                .loadMalfunctions(mAccountManager.getCurrentUserId(),
+                        ELDEvent.EventType.DATA_DIAGNOSTIC.getValue(),
+                        malcodes,
+                        ELDEvent.StatusCode.ACTIVE.getValue())
+                .flatMap(this::removeClearedEvents)
+                .map(ELDEventConverter::toModelList);
+    }
+
+    /**
+     * Removes cleared events from list. Input list must be sortered by event time from early to late
+     *
+     * @param eldEventEntities
+     * @return
+     */
+    private Single<List<ELDEventEntity>> removeClearedEvents(List<ELDEventEntity> eldEventEntities) {
+        return Single.fromCallable(() -> {
+
+            Map<String, ELDEventEntity> items = new LinkedHashMap<>();
+            for (ELDEventEntity entity : eldEventEntities) {
+                if (entity.getEventCode() == ELDEvent.MalfunctionCode.DIAGNOSTIC_LOGGED.getCode() ||
+                        entity.getEventCode() == ELDEvent.MalfunctionCode.MALFUNCTION_LOGGED.getCode()) {
+                    items.put(entity.getMalCode(), entity);
+                } else if (entity.getEventCode() == ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED.getCode() ||
+                        entity.getEventCode() == ELDEvent.MalfunctionCode.MALFUNCTION_CLEARED.getCode()) {
+                    items.remove(entity.getMalCode());
+                }
+            }
+
+            return new ArrayList<>(items.values());
+        });
     }
 
     public Flowable<Boolean> hasMalfunctionEvents() {
@@ -232,7 +271,10 @@ public final class ELDEventsInteractor {
                                 Constants.MALFUNCTION_CODES),
                         getMalfunctionCount(ELDEvent.MalfunctionCode.MALFUNCTION_CLEARED,
                                 Constants.MALFUNCTION_CODES),
-                        (loggedCount, clearedCount) -> loggedCount > clearedCount);
+                        (loggedCount, clearedCount) -> {
+                            Timber.d("Count malfunction events: logged %1$d, cleared %2$d", loggedCount, clearedCount);
+                            return loggedCount > clearedCount;
+                        });
     }
 
     public Flowable<Boolean> hasDiagnosticEvents() {
@@ -242,7 +284,10 @@ public final class ELDEventsInteractor {
                                 Constants.DIAGNOSTIC_CODES),
                         getMalfunctionCount(ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED,
                                 Constants.DIAGNOSTIC_CODES),
-                        (loggedCount, clearedCount) -> loggedCount > clearedCount);
+                        (loggedCount, clearedCount) -> {
+                            Timber.d("Count diagnostic events: logged %1$d, cleared %2$d", loggedCount, clearedCount);
+                            return loggedCount > clearedCount;
+                        });
     }
 
     /**
@@ -255,9 +300,25 @@ public final class ELDEventsInteractor {
         return mELDEventDao
                 .getLatestEvent(mAccountManager.getCurrentUserId(),
                         ELDEvent.EventType.DATA_DIAGNOSTIC.getValue(),
-                        malfunction.getCode())
+                        malfunction.getCode(),
+                        ELDEvent.StatusCode.ACTIVE.getValue())
                 .map(ELDEventConverter::toModel);
     }
+
+    /**
+     * Check active events with lat lng codes
+     *
+     * @return true if active events are exist
+     */
+    public Single<Boolean> isLocationUpdateEventExists() {
+        return mELDEventDao
+                .getChangingLocationEventCount(mAccountManager.getCurrentUserId(),
+                        new String[]{ELDEvent.LatLngFlag.FLAG_E.getCode(),
+                                ELDEvent.LatLngFlag.FLAG_X.getCode()},
+                        ELDEvent.StatusCode.ACTIVE.getValue())
+                .map(count -> count != 0);
+    }
+
 
     private Flowable<Integer> getMalfunctionCount(ELDEvent.MalfunctionCode code, String[] codes) {
         return mELDEventDao
@@ -399,6 +460,7 @@ public final class ELDEventsInteractor {
         event.setOdometer(blackBoxModel.getOdometer());
         event.setLat(blackBoxModel.getLat());
         event.setLng(blackBoxModel.getLon());
+        event.setLatLngFlag(getLatLngFlag(blackBoxModel));
         event.setLocation("");
         event.setDistance(0);
         event.setMalfunction(false);
@@ -432,6 +494,26 @@ public final class ELDEventsInteractor {
         event.setAppInfo(new Gson().toJson(new AppInfo()));
 
         return event;
+    }
+
+    private ELDEvent.LatLngFlag getLatLngFlag(BlackBoxModel blackBoxModel) {
+        ELDEventEntity latestEvent = mELDEventDao.getLatestEventSync(
+                mAccountManager.getCurrentUserId(),
+                ELDEvent.EventType.DATA_DIAGNOSTIC.getValue(),
+                Malfunction.POSITIONING_COMPLIANCE.getCode(),
+                ELDEvent.StatusCode.ACTIVE.getValue());
+
+        ELDEvent.LatLngFlag latLngFlag;
+
+        if (latestEvent != null &&
+                latestEvent.getEventType() == ELDEvent.MalfunctionCode.DIAGNOSTIC_LOGGED.getCode()) {
+            latLngFlag = ELDEvent.LatLngFlag.FLAG_E;
+        } else if (!blackBoxModel.getSensorState(BlackBoxSensorState.GPS)) {
+            latLngFlag = ELDEvent.LatLngFlag.FLAG_X;
+        } else {
+            latLngFlag = ELDEvent.LatLngFlag.FLAG_NONE;
+        }
+        return latLngFlag;
     }
 
     private BlackBoxModel getBlackBoxState(boolean isInPersonalUse) {
