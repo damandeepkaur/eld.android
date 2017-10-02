@@ -113,11 +113,6 @@ public final class EditEventPresenter extends BaseMenuPresenter {
         newEvent.setEventTime(eventTime);
         newEvent.setComment(comment);
 
-        // Need set mobile time for new event or take it from mELDEvent
-        if (mELDEvent == null) {
-            newEvent.setMobileTime(eventTime);
-        }
-
         events.add(newEvent);
 
         mView.changeEvent(events);

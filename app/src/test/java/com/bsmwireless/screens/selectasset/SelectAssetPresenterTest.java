@@ -1,5 +1,6 @@
 package com.bsmwireless.screens.selectasset;
 
+import com.bsmwireless.domain.interactors.ELDEventsInteractor;
 import com.bsmwireless.domain.interactors.UserInteractor;
 import com.bsmwireless.domain.interactors.VehiclesInteractor;
 import com.bsmwireless.models.Vehicle;
@@ -19,6 +20,7 @@ import app.bsmuniversal.com.RxSchedulerRule;
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
@@ -44,6 +46,9 @@ public class SelectAssetPresenterTest {
 
     @Mock
     UserInteractor mUserInteractor;
+
+    @Mock
+    ELDEventsInteractor mEventsInteractor;
 
     private SelectAssetPresenter mSelectAssetPresenter;
 
@@ -74,7 +79,7 @@ public class SelectAssetPresenterTest {
     @Before
     public void before() throws Exception {
         MockitoAnnotations.initMocks(this);
-        mSelectAssetPresenter = new SelectAssetPresenter(mView, mVehiclesInteractor, mUserInteractor);
+        mSelectAssetPresenter = new SelectAssetPresenter(mView, mVehiclesInteractor, mUserInteractor, mEventsInteractor);
 
         mVehicles = buildVehicleList();
     }
@@ -153,7 +158,7 @@ public class SelectAssetPresenterTest {
     public void testOnSearchTextChangedSuccess() {
         // given
         String searchText = "abc";
-        when(mVehiclesInteractor.searchVehicles(eq("abc"))).thenReturn(Observable.just(mVehicles));
+        when(mVehiclesInteractor.searchVehicles(eq("abc"))).thenReturn(Single.just(mVehicles));
 
         // when
         mSelectAssetPresenter.onSearchTextChanged(searchText);
@@ -170,7 +175,7 @@ public class SelectAssetPresenterTest {
         // given
         String searchText = "expect no results";
         final List<Vehicle> emptyList = new ArrayList<>();
-        when(mVehiclesInteractor.searchVehicles(anyString())).thenReturn(Observable.just(emptyList));
+        when(mVehiclesInteractor.searchVehicles(anyString())).thenReturn(Single.just(emptyList));
 
         // when
         mSelectAssetPresenter.onSearchTextChanged(searchText);
