@@ -10,8 +10,8 @@ android {
         applicationId "app.bsmuniversal.com"
         minSdkVersion 15
         targetSdkVersion 26
-        versionCode 99
-        versionName "1.0.98"
+        versionCode 100
+        versionName "1.0.99"
 
         javaCompileOptions {
             annotationProcessorOptions {
@@ -57,6 +57,9 @@ android {
     lintOptions {
         disable 'MissingTranslation', 'ExtraTranslation'
         abortOnError false
+    }
+    testOptions {
+        unitTests.returnDefaultValues = true
     }
 }
 

@@ -7,9 +7,11 @@ import com.bsmwireless.data.network.HttpClientManager;
 import com.bsmwireless.data.network.NtpClientManager;
 import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.network.authenticator.TokenManager;
+import com.bsmwireless.data.network.converters.LatLngFlagConverter;
 import com.bsmwireless.data.network.converters.MalfunctionConverter;
 import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.data.storage.PreferencesManager;
+import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.Malfunction;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -41,6 +43,7 @@ public final class NetworkModule {
     @Singleton
     Gson provideGson() {
         return new GsonBuilder()
+                .registerTypeAdapter(ELDEvent.LatLngFlag.class, new LatLngFlagConverter())
                 .registerTypeAdapter(Malfunction.class, new MalfunctionConverter())
                 .create();
     }

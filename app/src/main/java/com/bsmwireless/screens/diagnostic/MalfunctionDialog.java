@@ -47,7 +47,6 @@ public final class MalfunctionDialog extends DialogFragment implements Diagnosti
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        mPresenter.onCreated();
         return new AlertDialog.Builder(getContext())
                 .setTitle(R.string.malfunction_events_title)
                 .setView(mRecyclerView)
@@ -55,9 +54,15 @@ public final class MalfunctionDialog extends DialogFragment implements Diagnosti
     }
 
     @Override
-    public void onDestroyView() {
+    public void onStart() {
+        super.onStart();
+        mPresenter.onCreated();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
         mPresenter.onDestroyed();
-        super.onDestroyView();
     }
 
     @Override
