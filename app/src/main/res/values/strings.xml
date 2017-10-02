@@ -484,9 +484,11 @@
     <string name="event_type_personal_use_end_title">Off Duty (End of Personal Use)</string>
     <string name="event_type_yard_moves_end_title">On Duty (End of Yard Moves)</string>
     <string name="update_event_error">Update event error</string>
+    <string name="remove_event_error">Remove event error</string>
     <string name="add_event_error">Add event error</string>
     <string name="event_added">Event added</string>
     <string name="event_updated">Event updated</string>
+    <string name="event_removed">Event removed</string>
     <string name="not_in_vehicle_error">Forbidden for not in vehicle state</string>
     <!--Logs Log Header-->
     <string name="log_header_time_zone">Time Zone</string>

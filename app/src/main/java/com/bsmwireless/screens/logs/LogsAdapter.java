@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.bsmwireless.common.utils.DateUtils;
+import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.LogSheetHeader;
 import com.bsmwireless.screens.logs.dagger.EventLogModel;
 import com.bsmwireless.widgets.alerts.DutyType;
@@ -260,6 +261,9 @@ public final class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHold
         if (!DutyType.getTypeByCode(event.getEventType(), event.getEventCode())
                 .equals(DutyType.DRIVING) || !event.isActive()) {
             popup.getMenu().findItem(R.id.menu_assign).setEnabled(false);
+        }
+        if (!event.getEvent().getOrigin().equals(ELDEvent.EventOrigin.DRIVER.getValue())) {
+            popup.getMenu().findItem(R.id.menu_remove).setEnabled(false);
         }
 
         popup.setOnMenuItemClickListener(menuItem -> {

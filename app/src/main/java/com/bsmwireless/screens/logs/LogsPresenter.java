@@ -21,6 +21,7 @@ import com.bsmwireless.widgets.alerts.DutyType;
 import com.bsmwireless.widgets.logs.calendar.CalendarItem;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -233,7 +234,8 @@ public final class LogsPresenter implements AccountManager.AccountListener {
     }
 
     public void onSignLogsheetButtonClicked(CalendarItem calendarItem) {
-        mLogSheetInteractor.signLogSheet(calendarItem.getLogDay())
+        mDisposables.clear();
+        mDisposables.add(mLogSheetInteractor.signLogSheet(calendarItem.getLogDay())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
@@ -242,7 +244,7 @@ public final class LogsPresenter implements AccountManager.AccountListener {
                             mView.setLogSheetHeaders(new ArrayList<>(mLogSheetHeadersMap.values()));
                         },
                         Timber::e
-                );
+                ));
     }
 
     public void onEditEventClicked(EventLogModel event) {
@@ -250,6 +252,29 @@ public final class LogsPresenter implements AccountManager.AccountListener {
     }
 
     public void onRemovedEventClicked(EventLogModel event) {
+        mDisposables.clear();
+        mDisposables.add(mELDEventsInteractor.getLatestActiveDutyEventFromDBOnce(event.getEventTime(), mAccountManager.getCurrentUserId())
+                            .subscribeOn(Schedulers.io())
+                            .map(events -> events.get(events.size() - 1))
+                            .map(latestEvent -> {
+                                ELDEvent updatedEvent = event.getEvent();
+                                ELDEvent originEvent = updatedEvent.clone();
+                                updatedEvent.setEventCode(latestEvent.getEventCode());
+                                updatedEvent.setEventType(latestEvent.getEventType());
+                                originEvent.setStatus(ELDEvent.StatusCode.INACTIVE_CHANGED.getValue());
+                                originEvent.setId(null);
+                                return Arrays.asList(updatedEvent, originEvent);
+                            })
+                            .flatMapObservable(events -> mELDEventsInteractor.updateELDEvents(events))
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(longs -> {
+                                mView.eventRemoved();
+                                updateCalendarData();
+                            },
+                            throwable -> {
+                                Timber.e(throwable.getMessage());
+                                mView.showError(LogsView.Error.ERROR_REMOVE_EVENT);
+                            }));
     }
 
     public void onReassignEventClicked(EventLogModel event) {
