@@ -3,6 +3,7 @@ ELD app for Android
 
 # Version history
 
+* **1.0.97** - Add option to remove event to Logs Screen (_EA-463_)
 * **1.0.96** - Fix NPE on HoursOfService screen (_EA-461_)
 * **1.0.95** - Fix no error message when trying to Login with incorrect credentials
 * **1.0.94** - Fix events sync (_EA-446_)
