@@ -233,7 +233,8 @@ public final class ELDEventsInteractor {
         return mELDEventDao
                 .loadMalfunctions(mAccountManager.getCurrentUserId(),
                         ELDEvent.EventType.DATA_DIAGNOSTIC.getValue(),
-                        malcodes)
+                        malcodes,
+                        ELDEvent.StatusCode.ACTIVE.getValue())
                 .flatMap(this::removeClearedEvents)
                 .map(ELDEventConverter::toModelList);
     }
@@ -298,7 +299,8 @@ public final class ELDEventsInteractor {
         return mELDEventDao
                 .getLatestEvent(mAccountManager.getCurrentUserId(),
                         ELDEvent.EventType.DATA_DIAGNOSTIC.getValue(),
-                        malfunction.getCode())
+                        malfunction.getCode(),
+                        ELDEvent.StatusCode.ACTIVE.getValue())
                 .map(ELDEventConverter::toModel);
     }
 
@@ -495,8 +497,10 @@ public final class ELDEventsInteractor {
 
     private ELDEvent.LatLngFlag getLatLngFlag(BlackBoxModel blackBoxModel) {
         ELDEventEntity latestEvent = mELDEventDao.getLatestEventSync(
+                mAccountManager.getCurrentUserId(),
                 ELDEvent.EventType.DATA_DIAGNOSTIC.getValue(),
-                Malfunction.POSITIONING_COMPLIANCE.getCode());
+                Malfunction.POSITIONING_COMPLIANCE.getCode(),
+                ELDEvent.StatusCode.ACTIVE.getValue());
 
         ELDEvent.LatLngFlag latLngFlag;
 

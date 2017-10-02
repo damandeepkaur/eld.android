@@ -92,8 +92,14 @@ public class ELDEventsInteractorTest extends BaseTest {
         when(eldEventEntity.getEventType())
                 .thenReturn(ELDEvent.MalfunctionCode.DIAGNOSTIC_LOGGED.getCode());
 
-        when(mELDEventDao.getLatestEventSync(ELDEvent.EventType.DATA_DIAGNOSTIC.getValue(),
-                Malfunction.POSITIONING_COMPLIANCE.getCode()))
+        final int currentUserId = 1;
+        when(mAccountManager.getCurrentUserId()).thenReturn(currentUserId);
+        when(mELDEventDao
+                .getLatestEventSync(
+                        currentUserId,
+                        ELDEvent.EventType.DATA_DIAGNOSTIC.getValue(),
+                        Malfunction.POSITIONING_COMPLIANCE.getCode(),
+                        ELDEvent.StatusCode.ACTIVE.getValue()))
                 .thenReturn(eldEventEntity);
 
         ELDEvent event = mELDEventsInteractor.getEvent(DutyType.ON_DUTY);
@@ -112,8 +118,14 @@ public class ELDEventsInteractorTest extends BaseTest {
         when(eldEventEntity.getEventType())
                 .thenReturn(ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED.getCode());
 
-        when(mELDEventDao.getLatestEventSync(ELDEvent.EventType.DATA_DIAGNOSTIC.getValue(),
-                Malfunction.POSITIONING_COMPLIANCE.getCode()))
+        final int currentUserId = 1;
+        when(mAccountManager.getCurrentUserId()).thenReturn(currentUserId);
+        when(mELDEventDao
+                .getLatestEventSync(
+                        currentUserId,
+                        ELDEvent.EventType.DATA_DIAGNOSTIC.getValue(),
+                        Malfunction.POSITIONING_COMPLIANCE.getCode(),
+                        ELDEvent.StatusCode.ACTIVE.getValue()))
                 .thenReturn(eldEventEntity);
 
         ELDEvent event = mELDEventsInteractor.getEvent(DutyType.ON_DUTY);
@@ -128,8 +140,14 @@ public class ELDEventsInteractorTest extends BaseTest {
 
         when(mBlackBoxInteractor.getLastData()).thenReturn(blackBoxModel);
 
-        when(mELDEventDao.getLatestEventSync(ELDEvent.EventType.DATA_DIAGNOSTIC.getValue(),
-                Malfunction.POSITIONING_COMPLIANCE.getCode()))
+        final int currentUserId = 1;
+        when(mAccountManager.getCurrentUserId()).thenReturn(currentUserId);
+        when(mELDEventDao
+                .getLatestEventSync(
+                        currentUserId,
+                        ELDEvent.EventType.DATA_DIAGNOSTIC.getValue(),
+                        Malfunction.POSITIONING_COMPLIANCE.getCode(),
+                        ELDEvent.StatusCode.ACTIVE.getValue()))
                 .thenReturn(null);
 
         ELDEvent event = mELDEventsInteractor.getEvent(DutyType.ON_DUTY);
@@ -146,8 +164,14 @@ public class ELDEventsInteractorTest extends BaseTest {
 
         when(mBlackBoxInteractor.getLastData()).thenReturn(blackBoxModel);
 
-        when(mELDEventDao.getLatestEventSync(ELDEvent.EventType.DATA_DIAGNOSTIC.getValue(),
-                Malfunction.POSITIONING_COMPLIANCE.getCode()))
+        final int currentUserId = 1;
+        when(mAccountManager.getCurrentUserId()).thenReturn(currentUserId);
+        when(mELDEventDao
+                .getLatestEventSync(
+                        currentUserId,
+                        ELDEvent.EventType.DATA_DIAGNOSTIC.getValue(),
+                        Malfunction.POSITIONING_COMPLIANCE.getCode(),
+                        ELDEvent.StatusCode.ACTIVE.getValue()))
                 .thenReturn(null);
 
         ELDEvent event = mELDEventsInteractor.getEvent(DutyType.ON_DUTY);
@@ -229,7 +253,7 @@ public class ELDEventsInteractorTest extends BaseTest {
                 powerDiagnosticCleared, engineSynchCleared, secondPowerDiagnosticLogged,
                 dataTransferLogged, unidentifiedLogged, unidentifiedCleared, dataTransferCleared);
 
-        when(mELDEventDao.loadMalfunctions(anyInt(), anyInt(), any(String[].class)))
+        when(mELDEventDao.loadMalfunctions(anyInt(), anyInt(), any(String[].class), anyInt()))
                 .thenReturn(Single.just(entities));
 
         mELDEventsInteractor.getDiagnosticEvents()
@@ -244,6 +268,7 @@ public class ELDEventsInteractorTest extends BaseTest {
                 });
         verify(mELDEventDao).loadMalfunctions(currentUserId,
                 ELDEvent.EventType.DATA_DIAGNOSTIC.getValue(),
-                Constants.DIAGNOSTIC_CODES);
+                Constants.DIAGNOSTIC_CODES,
+                ELDEvent.StatusCode.ACTIVE.getValue());
     }
 }
