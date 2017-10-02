@@ -90,7 +90,6 @@ public class MonitoringServicePresenterTest extends BaseTest {
     }
 
     @Test
-    @Ignore("Handler not mocked")
     public void testStartMonitoringTwice() throws Exception {
 
 //        dutyTypeManager.setDutyType(DutyType.ON_DUTY, false);
@@ -132,7 +131,6 @@ public class MonitoringServicePresenterTest extends BaseTest {
     }
 
     @Test
-    @Ignore("Handler not mocked")
     public void testStopMonitoring() throws Exception {
         final BlackBoxModel blackBoxModelFirst = mock(BlackBoxModel.class);
         when(blackBoxModelFirst.getResponseType()).thenReturn(BlackBoxResponseModel.ResponseType.IGNITION_ON);

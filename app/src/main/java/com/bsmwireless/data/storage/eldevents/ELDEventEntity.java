@@ -67,6 +67,8 @@ public final class ELDEventEntity {
     private Boolean mDiagnostic;
     @ColumnInfo(name = "mal_code")
     private String mMalCode;
+    @ColumnInfo(name = "latlng_code")
+    private String mLatLngCode;
 
     public Integer getId() {
         return mId;
@@ -282,5 +284,13 @@ public final class ELDEventEntity {
 
     public void setMalCode(String malCode) {
         this.mMalCode = malCode;
+    }
+
+    public String getLatLngCode() {
+        return mLatLngCode;
+    }
+
+    public void setLatLngCode(String latLngCode) {
+        mLatLngCode = latLngCode;
     }
 }

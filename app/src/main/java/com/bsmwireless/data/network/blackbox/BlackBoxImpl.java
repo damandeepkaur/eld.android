@@ -26,24 +26,22 @@ import static com.bsmwireless.data.network.blackbox.utils.BlackBoxParser.HEADER_
 import static com.bsmwireless.data.network.blackbox.utils.BlackBoxParser.START_INDEX;
 
 public final class BlackBoxImpl implements BlackBox {
+    public static final int BUFFER_SIZE = 64;
+    public static final int UPDATE_RATE_MILLIS = 60000;
+    public static final int UPDATE_RATE_RATIO = 10;
     private static final String WIFI_GATEWAY_IP = "192.168.1.1";
     private static final int WIFI_REMOTE_PORT = 2880;
     private static final int RETRY_CONNECT_DELAY = 3000;
     private static final int RETRY_COUNT = 5;
-    public static final int BUFFER_SIZE = 64;
-    public static final int UPDATE_RATE_MILLIS = 10000;
-    public static final int UPDATE_RATE_RATIO = 10;
-    public static final int TIMEOUT_RATIO = 10;
-
+    private final AtomicReference<BlackBoxModel> mBlackBoxModel;
+    private final AtomicReference<BehaviorSubject<BlackBoxModel>> mEmitter;
+    private final ReentrantReadWriteLock.ReadLock mReadSocketLock;
+    private final ReentrantReadWriteLock.WriteLock mWriteLock;
     private Socket mSocket;
     private byte mSequenceID = 1;
     private int mBoxId;
     private String mVinNumber;
     private Disposable mDisposable;
-    private final AtomicReference<BlackBoxModel> mBlackBoxModel;
-    private final AtomicReference<BehaviorSubject<BlackBoxModel>> mEmitter;
-    private final ReentrantReadWriteLock.ReadLock mReadSocketLock;
-    private final ReentrantReadWriteLock.WriteLock mWriteLock;
 
     public BlackBoxImpl() {
         mBlackBoxModel = new AtomicReference<>(new BlackBoxModel());
@@ -57,9 +55,9 @@ public final class BlackBoxImpl implements BlackBox {
     @Override
     public void connect(int boxId) throws Exception {
         Timber.d("connect");
-       // if (ConnectionUtils.isEmulator()) {
-       //     return;
-       // }
+        // if (ConnectionUtils.isEmulator()) {
+        //     return;
+        // }
         if (!isConnected() && (mDisposable == null || mDisposable.isDisposed())) {
             mBoxId = boxId;
             mDisposable = Observable.interval(RETRY_CONNECT_DELAY, TimeUnit.MILLISECONDS)
@@ -130,7 +128,7 @@ public final class BlackBoxImpl implements BlackBox {
         mSocket = new Socket();
         try {
             mSocket.connect(new InetSocketAddress(WIFI_GATEWAY_IP, WIFI_REMOTE_PORT),
-                    UPDATE_RATE_MILLIS * TIMEOUT_RATIO);
+                    UPDATE_RATE_MILLIS);
         } catch (IOException e) {
             if (getEmitter().hasObservers()) {
                 throw new BlackBoxConnectionException(UNKNOWN_ERROR);
@@ -162,7 +160,7 @@ public final class BlackBoxImpl implements BlackBox {
         return Observable.interval(UPDATE_RATE_MILLIS / UPDATE_RATE_RATIO, TimeUnit.MILLISECONDS)
                 .switchMap(unused -> readStatus())
                 .distinctUntilChanged()
-                .timeout(UPDATE_RATE_MILLIS * TIMEOUT_RATIO,
+                .timeout(UPDATE_RATE_MILLIS,
                         TimeUnit.MILLISECONDS,
                         Observable.error(new BlackBoxConnectionException(UNKNOWN_ERROR)))
                 .doOnNext(model -> {

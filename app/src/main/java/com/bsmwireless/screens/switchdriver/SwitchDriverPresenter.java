@@ -12,7 +12,6 @@ import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.User;
 import com.bsmwireless.widgets.alerts.DutyType;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -20,7 +19,6 @@ import java.util.List;
 import javax.inject.Inject;
 
 import io.reactivex.Completable;
-import io.reactivex.Flowable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -180,10 +178,10 @@ public final class SwitchDriverPresenter {
         mView.showProgress();
         mLogoutDisposable.dispose();
         mLogoutDisposable = mELDEventsInteractor.postLogoutEvent(user.getId())
-                .doOnEach(isSuccess -> mUserInteractor.deleteCoDriver(user))
+                .doOnSuccess(isSuccess -> mUserInteractor.deleteCoDriver(user))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnEach(booleanNotification -> mView.hideProgress())
+                .doOnSuccess(booleanNotification -> mView.hideProgress())
                 .subscribe(status -> mView.coDriverLoggedOut(), throwable -> {
                     Timber.e(throwable);
                     if (throwable instanceof RetrofitException) {

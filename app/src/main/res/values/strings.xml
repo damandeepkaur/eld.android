@@ -393,7 +393,7 @@
     <string name="nav_logout">Log Out</string>
     <string name="driver">Driver</string>
     <string name="asset">Asset</string>
-    <string name="box">Box</string>
+    <string name="box">Box %1$d</string>
     <plurals name="co_drivers">
         <item quantity="one">%1$d co-driver</item>
         <item quantity="other">%1$d co-drivers</item>
@@ -486,9 +486,11 @@
     <string name="event_type_personal_use_end_title">Off Duty (End of Personal Use)</string>
     <string name="event_type_yard_moves_end_title">On Duty (End of Yard Moves)</string>
     <string name="update_event_error">Update event error</string>
+    <string name="remove_event_error">Remove event error</string>
     <string name="add_event_error">Add event error</string>
     <string name="event_added">Event added</string>
     <string name="event_updated">Event updated</string>
+    <string name="event_removed">Event removed</string>
     <string name="not_in_vehicle_error">Forbidden for not in vehicle state</string>
     <!--Logs Log Header-->
     <string name="log_header_time_zone">Time Zone</string>
@@ -709,6 +711,16 @@
     <string name="transfer_dialog_message">You are going to send data for current 24 hours and last 7 days. Please confirm your action to proceed with data transfer.</string>
     <string name="transfer_dialog_positive">Confirm</string>
     <string name="transfer_dialog_negative">Cancel</string>
->>>>>>> 1f3944cce444d14c597f013b61281b10b9314a84
 
+    <!--Home screen-->
+    <string name="home_screen_label">Home</string>
+    <string name="home_screen_current_status">Current status:</string>
+    <string name="home_screen_hours_of_service">Hours of service</string>
+    <string name="home_screen_pre_trip">pre-trip</string>
+    <string name="home_screen_post_trip">post-trip</string>
+    <string name="home_screen_inspections">Inspections</string>
+
+    <!-- Hours of Service-->
+    <string name="hos_box_name">@string/box</string>
+    <string name="hos_not_in_vehicle">@string/select_asset_not_in_vehicle</string>
 </resources>

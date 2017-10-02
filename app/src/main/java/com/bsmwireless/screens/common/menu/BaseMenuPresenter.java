@@ -86,18 +86,16 @@ public abstract class BaseMenuPresenter implements AccountManager.AccountListene
     }
 
     final void onDutyChanged(DutyType dutyType, String comment) {
-        // don't set the same type
-        if (dutyType != mDutyTypeManager.getDutyType()) {
-            mDisposables.add(mEventsInteractor.postNewDutyTypeEvent(dutyType, comment)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeOn(Schedulers.io())
-                    .subscribe(
-                            responseMessage -> {
-                            },
-                            error -> Timber.e(error.getMessage())
-                    )
-            );
-        }
+        Disposable disposable = mEventsInteractor
+                .postNewDutyTypeEvent(dutyType, comment)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(
+                        responseMessage -> {
+                        },
+                        error -> Timber.e(error.getMessage())
+                );
+        mDisposables.add(disposable);
     }
 
     public final boolean isDriverConnected() {
@@ -175,6 +173,10 @@ public abstract class BaseMenuPresenter implements AccountManager.AccountListene
 
     protected final DutyTypeManager getDutyTypeManager() {
         return mDutyTypeManager;
+    }
+
+    protected final AccountManager getAccountManager(){
+        return mAccountManager;
     }
 
     @SuppressWarnings("DesignForExtension")
