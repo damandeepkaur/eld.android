@@ -1,5 +1,6 @@
 package com.bsmwireless.domain.interactors;
 
+
 import com.bsmwireless.common.utils.DateUtils;
 import com.bsmwireless.common.utils.ListConverter;
 import com.bsmwireless.data.network.RetrofitException;
@@ -41,6 +42,7 @@ import javax.inject.Inject;
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
+import retrofit2.HttpException;
 
 import static com.bsmwireless.common.Constants.DEFAULT_CALENDAR_DAYS_COUNT;
 import static com.bsmwireless.common.Constants.SUCCESS;
@@ -86,6 +88,11 @@ public final class UserInteractor {
                                     .map(user -> user.setAuth(new Auth(Integer.valueOf(driverId)).setToken(mTokenManager.getToken(accountName))));
                         }
                     }
+
+                    if (throwable instanceof HttpException) {
+                        return Single.error(RetrofitException.httpError(((HttpException) throwable).response()));
+                    }
+
                     return Single.error(throwable);
                 })
                 .doOnSuccess(user -> {
