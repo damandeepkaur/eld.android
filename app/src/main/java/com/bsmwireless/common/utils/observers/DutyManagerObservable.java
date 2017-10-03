@@ -15,17 +15,17 @@ public final class DutyManagerObservable extends Observable<DutyType> {
         return new DutyManagerObservable(dutyTypeManager);
     }
 
-    private final DutyTypeManager manager;
+    private final DutyTypeManager mDutyTypeManager;
 
     private DutyManagerObservable(DutyTypeManager dutyTypeManager) {
-        this.manager = dutyTypeManager;
+        this.mDutyTypeManager = dutyTypeManager;
     }
 
     @Override
     protected void subscribeActual(Observer<? super DutyType> observer) {
-        DutyManagerListener listener = new DutyManagerListener(manager, observer);
+        DutyManagerListener listener = new DutyManagerListener(mDutyTypeManager, observer);
         observer.onSubscribe(listener);
-        manager.addListener(listener);
+        mDutyTypeManager.addListener(listener);
     }
 
     private final static class DutyManagerListener implements DutyTypeManager.DutyTypeListener, Disposable {

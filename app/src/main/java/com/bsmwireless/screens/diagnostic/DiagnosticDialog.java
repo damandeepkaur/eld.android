@@ -48,7 +48,6 @@ public final class DiagnosticDialog extends DialogFragment implements Diagnostic
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        mPresenter.onCreated();
         return new AlertDialog.Builder(getContext())
                 .setTitle(R.string.diagnostic_events_title)
                 .setView(mRecyclerView)
@@ -56,9 +55,15 @@ public final class DiagnosticDialog extends DialogFragment implements Diagnostic
     }
 
     @Override
-    public void onDestroyView() {
+    public void onStart() {
+        super.onStart();
+        mPresenter.onCreated();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
         mPresenter.onDestroyed();
-        super.onDestroyView();
     }
 
     @Override

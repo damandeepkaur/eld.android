@@ -11,7 +11,6 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import io.reactivex.Flowable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -51,7 +50,7 @@ public final class DiagnosticPresenter {
 
     public void onCreated() {
         mLoadingEventsDisposable.dispose();
-        mLoadingEventsDisposable = Flowable
+        mLoadingEventsDisposable = Single
                 .defer(() -> {
                     switch (mEventType) {
                         case DIAGNOSTIC:
@@ -59,10 +58,10 @@ public final class DiagnosticPresenter {
                         case MALFUNCTION:
                             return mEldEventsInteractor.getMalfunctionEvents();
                         default:
-                            return Flowable.error(new Exception("Unknown event type: " + mEventType));
+                            return Single.error(new Exception("Unknown event type: " + mEventType));
                     }
                 })
-                .zipWith(getUser().toFlowable(), Result::new)
+                .zipWith(getUser(), Result::new)
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(result -> {

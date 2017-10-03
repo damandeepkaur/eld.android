@@ -25,7 +25,8 @@ public final class SynchronizationJob extends BaseMalfunctionJob implements Malf
     @Inject
     public SynchronizationJob(ELDEventsInteractor eldEventsInteractor,
                               DutyTypeManager dutyTypeManager,
-                              BlackBoxInteractor blackBoxInteractor, PreferencesManager preferencesManager) {
+                              BlackBoxInteractor blackBoxInteractor,
+                              PreferencesManager preferencesManager) {
         super(eldEventsInteractor, dutyTypeManager, blackBoxInteractor, preferencesManager);
         mBlackBoxInteractor = blackBoxInteractor;
         mPreferencesManager = preferencesManager;
@@ -37,11 +38,13 @@ public final class SynchronizationJob extends BaseMalfunctionJob implements Malf
         Disposable disposable = mBlackBoxInteractor.getData(mPreferencesManager.getBoxId())
                 .filter(blackBoxModel -> BlackBoxResponseModel.ResponseType.STATUS_UPDATE
                         == blackBoxModel.getResponseType())
+                .doOnNext(blackBoxModel -> Timber.d("Get a new blackbox data"))
                 .flatMap(this::loadLatestSynchronizationEvent, SynchResult::new)
                 .filter(this::isStateAndEventAreDifferent)
                 // create event with opposite mal code
                 .map(result -> createEvent(Malfunction.ENGINE_SYNCHRONIZATION,
                         createCodeForDiagnostic(result.mELDEvent), result.mBlackBoxModel))
+                .doOnNext(eldEvent -> Timber.d("Save a new synchronization event: " + eldEvent))
                 .flatMap(this::saveEvents)
                 .onErrorReturn(throwable -> {
                     Timber.e(throwable, "Error handle synchronization event");
@@ -85,10 +88,13 @@ public final class SynchronizationJob extends BaseMalfunctionJob implements Malf
 
         boolean isEcmOk = synchResult.mBlackBoxModel.getSensorState(BlackBoxSensorState.ECM_CABLE)
                 && synchResult.mBlackBoxModel.getSensorState(BlackBoxSensorState.ECM_SYNC);
+
         if (isEcmOk) {
-            return ELDEvent.MalfunctionCode.DIAGNOSTIC_LOGGED.getCode() == synchResult.mELDEvent.getEventCode();
+            return ELDEvent.MalfunctionCode.DIAGNOSTIC_LOGGED.getCode()
+                    == synchResult.mELDEvent.getEventCode();
         } else {
-            return ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED.getCode() == synchResult.mELDEvent.getEventCode();
+            return ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED.getCode()
+                    == synchResult.mELDEvent.getEventCode();
         }
     }
 

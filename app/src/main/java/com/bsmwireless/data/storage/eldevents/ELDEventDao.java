@@ -58,12 +58,49 @@ public interface ELDEventDao {
 
     /**
      * Returns the latest event from a database
-     * @param type event type
-     * @param malCode malfunction code. For non-malfunction event should be empty
+     *
+     * @param type     event type
+     * @param malCode  malfunction code. For non-malfunction event should be empty
+     * @param driverId driver id
+     * @param status   status code
      * @return latest ELD event
      */
-    @Query("SELECT * FROM events WHERE driver_id = :driverId AND event_type = :type AND mal_code = :malCode ORDER BY event_time DESC LIMIT 1")
-    Maybe<ELDEventEntity> getLatestEvent(int driverId, int type, String malCode);
+    @Query("SELECT * FROM events WHERE driver_id = :driverId AND event_type = :type AND mal_code = :malCode AND status = :status ORDER BY event_time DESC LIMIT 1")
+    Maybe<ELDEventEntity> getLatestEvent(int driverId, int type, String malCode, int status);
+
+    /**
+     * Returns the latest event from a database
+     *
+     * @param type     event type
+     * @param malCode  malfunction code. For non-malfunction event should be empty
+     * @param driverId driver id
+     * @param status   status code
+     * @return latest ELD event
+     */
+    @Query("SELECT * FROM events WHERE driver_id = :driverId AND event_type = :type AND mal_code = :malCode AND status = :status ORDER BY event_time DESC LIMIT 1")
+    ELDEventEntity getLatestEventSync(int driverId, int type, String malCode, int status);
+
+    /**
+     * Loads a count for events with specified lat lng code and status
+     *
+     * @param driverId   driver id for which will be load a count
+     * @param latLngCode range of lat lng codes
+     * @param status event status
+     * @return count of events
+     */
+    @Query("SELECT count(id) FROM events WHERE driver_id = :driverId AND latlng_code IN (:latLngCode) AND status = :status")
+    Single<Integer> getChangingLocationEventCount(int driverId, String[] latLngCode, int status);
+
+    /**
+     * Loads all malfunctions by parameters
+     *
+     * @param driverId driver id
+     * @param type     event type
+     * @param malCodes malcode ranges
+     * @return
+     */
+    @Query("SELECT * FROM events WHERE driver_id = :driverId AND event_type = :type AND status = :status AND mal_code IN (:malCodes) ORDER BY event_time")
+    Single<List<ELDEventEntity>> loadMalfunctions(int driverId, int type, String[] malCodes, int status);
 
     @Query("SELECT * FROM events WHERE log_sheet = :logDay AND event_type = 4 AND driver_id = :driverId ORDER BY event_code DESC")
     List<ELDEventEntity> getCertificationEventsSync(long logDay, int driverId);
