@@ -51,7 +51,7 @@ public class DateUtils {
         calendarWithTimezone.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH),
                 calendar.get(Calendar.DAY_OF_MONTH), 0, 0, 0);
         calendarWithTimezone.set(Calendar.MILLISECOND, 0);
-        long timeInMs = calendarWithTimezone.getTimeInMillis();
+        long timeInMs = DateUtils.currentTimeMillis();
         return timeInMs - timeInMs % 1000;
     }
 
@@ -64,7 +64,8 @@ public class DateUtils {
         calendar.setTimeInMillis(time);
         calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DATE), 0, 0, 0);
         calendar.set(Calendar.MILLISECOND, 0);
-        return calendar.getTimeInMillis();
+        long currentTime = currentTimeMillis();
+        return currentTime;
     }
 
     /**
@@ -76,7 +77,8 @@ public class DateUtils {
         calendar.setTimeInMillis(time);
         calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DATE), 23, 59, 59);
         calendar.set(Calendar.MILLISECOND, 999);
-        return calendar.getTimeInMillis();
+        long currentTime = currentTimeMillis();
+        return currentTime;
     }
 
     /**
@@ -282,7 +284,8 @@ public class DateUtils {
             calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
             calendar.set(Calendar.MINUTE, minute);
             calendar.set(Calendar.SECOND, seconds);
-            return calendar.getTimeInMillis();
+            long currentTime = currentTimeMillis();
+            return currentTime;
         } catch (ParseException e) {
             e.printStackTrace();
         }

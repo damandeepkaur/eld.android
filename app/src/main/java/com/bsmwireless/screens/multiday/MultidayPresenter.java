@@ -75,7 +75,7 @@ public final class MultidayPresenter implements AccountManager.AccountListener {
     public void getItems(int dayCount) {
         Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(mTimeZone));
 
-        long endDayTime = calendar.getTimeInMillis();
+        long endDayTime = DateUtils.currentTimeMillis();
         calendar.setTimeInMillis(endDayTime - (dayCount - 1) * MS_IN_DAY);
         long startDayTime = DateUtils.getStartDate(mTimeZone, calendar);
 
