@@ -44,7 +44,7 @@ public interface ELDEventDao {
     Single<List<ELDEventEntity>> getLatestActiveDutyEventOnce(long latestTime, int driverId);
 
     @Query("SELECT * FROM events WHERE event_time >= :startTime AND event_time < :endTime " +
-            "AND driver_id = :driverId AND (event_type = 1 or event_type = 3) AND status = 1 ORDER BY event_time")
+            "AND driver_id = :driverId AND (event_type = 1 or event_type = 3) AND status = 1 ORDER BY event_time, mobile_time, status DESC")
     List<ELDEventEntity> getActiveEventsFromStartToEndTimeSync(long startTime, long endTime, int driverId);
 
     @Query("SELECT count(id) FROM events WHERE event_time >= :startTime AND event_time < :endTime AND driver_id = :driverId AND event_type = 7 AND (event_code = 1 OR event_code = 2)")
