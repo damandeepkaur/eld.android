@@ -97,6 +97,11 @@ public final class ELDEventsInteractor {
                 .map(ELDEventConverter::toModelList);
     }
 
+    public Flowable<ELDEvent> getLatestActiveDutyEventFromDBMultiple(long userId) {
+        return mELDEventDao.getLatestActiveDutyEvent(userId)
+                .map(ELDEventConverter::toModel);
+    }
+
     public List<ELDEvent> getActiveEventsFromDBSync(long startTime, long endTime) {
         int driverId = mAccountManager.getCurrentUserId();
         return ELDEventConverter.toModelList(mELDEventDao.getActiveEventsFromStartToEndTimeSync(startTime, endTime, driverId));

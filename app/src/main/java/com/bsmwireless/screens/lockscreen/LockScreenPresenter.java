@@ -75,16 +75,14 @@ public final class LockScreenPresenter {
 
         mView = view;
 
-        DutyType currentDutyType = mDutyManager.getDutyType();
-        mView.setTimeForDutyType(currentDutyType, getTimeForDutyType(currentDutyType));
-        mView.setTimeForDutyType(DutyType.SLEEPER_BERTH, getTimeForDutyType(
-                currentDutyType == DutyType.SLEEPER_BERTH ? DutyType.DRIVING : DutyType.SLEEPER_BERTH));
-        mView.setTimeForDutyType(DutyType.ON_DUTY, getTimeForDutyType(
-                currentDutyType == DutyType.ON_DUTY || currentDutyType == DutyType.YARD_MOVES
-                        ? DutyType.DRIVING : DutyType.ON_DUTY));
-        mView.setTimeForDutyType(DutyType.OFF_DUTY, getTimeForDutyType(
-                currentDutyType == DutyType.OFF_DUTY || currentDutyType == DutyType.PERSONAL_USE
-                        ? DutyType.DRIVING : DutyType.OFF_DUTY));
+        Disposable disposable = mEventsInteractor
+                .getLatestActiveDutyEventFromDBMultiple(mAccountManager.getCurrentDriverId())
+                .map(eldEvent -> DutyType.getTypeByCode(eldEvent.getEventType(), eldEvent.getEventCode()))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::setDutyType,
+                        throwable -> Timber.e(throwable, "Error getting eld event from database"));
+        mCompositeDisposable.add(disposable);
 
         startTimer();
         startMonitoring();
@@ -120,6 +118,19 @@ public final class LockScreenPresenter {
                     }
                 });
         mCompositeDisposable.add(disposable);
+    }
+
+    void setDutyType(DutyType currentDutyType) {
+        Timber.d("Current duty type is - " + currentDutyType);
+        mView.setTimeForDutyType(currentDutyType, getTimeForDutyType(currentDutyType));
+        mView.setTimeForDutyType(DutyType.SLEEPER_BERTH, getTimeForDutyType(
+                currentDutyType == DutyType.SLEEPER_BERTH ? DutyType.DRIVING : DutyType.SLEEPER_BERTH));
+        mView.setTimeForDutyType(DutyType.ON_DUTY, getTimeForDutyType(
+                currentDutyType == DutyType.ON_DUTY || currentDutyType == DutyType.YARD_MOVES
+                        ? DutyType.DRIVING : DutyType.ON_DUTY));
+        mView.setTimeForDutyType(DutyType.OFF_DUTY, getTimeForDutyType(
+                currentDutyType == DutyType.OFF_DUTY || currentDutyType == DutyType.PERSONAL_USE
+                        ? DutyType.DRIVING : DutyType.OFF_DUTY));
     }
 
     private long getTimeForDutyType(DutyType dutyType) {

@@ -166,6 +166,7 @@ public final class LockScreenActivity extends BaseActivity implements LockScreen
 
     private void showPromtDialog(PromtDialog dialog) {
         dialog.setPromtDialogListener(mPromtDialogListener);
+        dialog.setCancelable(false);
         dialog.show(getSupportFragmentManager(), PROMT_DIALOG);
     }
 
