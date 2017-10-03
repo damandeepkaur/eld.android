@@ -1,19 +1,15 @@
 package com.bsmwireless.screens.logs;
 
 
-import android.util.SparseArray;
-
 import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.common.utils.DateUtils;
-import com.bsmwireless.common.utils.ListConverter;
+import com.bsmwireless.common.utils.LogHeaderUtils;
 import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.data.storage.DutyTypeManager;
-import com.bsmwireless.data.storage.users.UserEntity;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
 import com.bsmwireless.domain.interactors.LogSheetInteractor;
 import com.bsmwireless.domain.interactors.UserInteractor;
 import com.bsmwireless.domain.interactors.VehiclesInteractor;
-import com.bsmwireless.models.Carrier;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.HomeTerminal;
 import com.bsmwireless.models.LogSheetHeader;
@@ -48,9 +44,6 @@ import static com.bsmwireless.widgets.alerts.DutyType.CLEAR_YM;
 @ActivityScope
 public final class LogsPresenter implements AccountManager.AccountListener {
 
-    private static final String DRIVERS_NAME_DIVIDER = ", ";
-    private static final String DISTANCE_DELIMITER = "/";
-    private static final String CARRIER_DELIMITER = ",";
 
     private LogsView mView;
     private ELDEventsInteractor mELDEventsInteractor;
@@ -59,6 +52,7 @@ public final class LogsPresenter implements AccountManager.AccountListener {
     private UserInteractor mUserInteractor;
     private DutyTypeManager mDutyTypeManager;
     private AccountManager mAccountManager;
+    private LogHeaderUtils mLogHeaderUtils;
     private Map<Integer, Vehicle> mVehicleIdToNameMap = new HashMap<>();
     private Map<Long, LogSheetHeader> mLogSheetHeadersMap = new HashMap<>();
     private DutyTypeManager.DutyTypeListener mListener = dutyType -> mView.dutyUpdated();
@@ -68,9 +62,12 @@ public final class LogsPresenter implements AccountManager.AccountListener {
     private Disposable mUpdateEventsDisposable;
 
     @Inject
-    public LogsPresenter(LogsView view, ELDEventsInteractor eventsInteractor, LogSheetInteractor logSheetInteractor,
-                         VehiclesInteractor vehiclesInteractor, UserInteractor userInteractor, DutyTypeManager dutyTypeManager,
-                         AccountManager accountManager) {
+    public LogsPresenter(LogsView view, ELDEventsInteractor eventsInteractor,
+                         LogSheetInteractor logSheetInteractor,
+                         VehiclesInteractor vehiclesInteractor,
+                         UserInteractor userInteractor,
+                         DutyTypeManager dutyTypeManager,
+                         AccountManager accountManager, LogHeaderUtils logHeaderUtils) {
         mView = view;
         mELDEventsInteractor = eventsInteractor;
         mLogSheetInteractor = logSheetInteractor;
@@ -78,6 +75,7 @@ public final class LogsPresenter implements AccountManager.AccountListener {
         mUserInteractor = userInteractor;
         mDutyTypeManager = dutyTypeManager;
         mAccountManager = accountManager;
+        mLogHeaderUtils = logHeaderUtils;
         Timber.d("CREATED");
         mDutyTypeManager.addListener(mListener);
     }
@@ -378,35 +376,14 @@ public final class LogsPresenter implements AccountManager.AccountListener {
                 .map(user -> {
                     if (user == null) return new UserHeaderInfo();
 
-                    String driverName = String.format("%1$s %2$s", user.getFirstName(), user.getLastName());
+                    String driverName = mLogHeaderUtils.makeDrivername(user);
                     String selectedExemptions = user.getRuleException();
-
-                    String allExemptions = null;
-                    List<SyncConfiguration> configurations = user.getConfigurations();
-                    if (configurations != null) {
-                        for (SyncConfiguration configuration : configurations) {
-                            if (SyncConfiguration.Type.EXCEPT.getName().equals(configuration.getName())) {
-                                allExemptions = configuration.getValue();
-                                break;
-                            }
-                        }
-                    }
-
-                    //set carrier name
-                    String carriername;
-                    List<Carrier> carriers = user.getCarriers();
-                    if (carriers != null && !carriers.isEmpty()) {
-                        StringBuilder sb = new StringBuilder();
-                        for (Carrier carrier : carriers) {
-                            sb.append(carrier.getName()).append(CARRIER_DELIMITER);
-                        }
-                        carriername = sb.substring(0, sb.length() - CARRIER_DELIMITER.length());
-                    } else {
-                        carriername = "";
-                    }
+                    String allExemptions = mLogHeaderUtils.getAllExemptions(user,
+                            SyncConfiguration.Type.EXCEPT);
+                    String carrierName = mLogHeaderUtils.makeCarrierName(user);
 
                     return new UserHeaderInfo(timeZone, driverName, selectedExemptions,
-                            allExemptions != null ? allExemptions : "", carriername);
+                            allExemptions, carrierName);
                 });
     }
 
@@ -446,73 +423,27 @@ public final class LogsPresenter implements AccountManager.AccountListener {
                     }
 
                     String shippingId = selectedLogHeader.getShippingId();
-                    String coDriversName = getCoDriversName(selectedLogHeader);
+                    String coDriversName = mLogHeaderUtils.getCoDriversName(selectedLogHeader);
 
                     return new SelectedLogHeaderInfo(vehicleName, vehicleLicense, vehicleTrailers,
                             homeTerminalAddress, homeTerminalName, shippingId, coDriversName);
                 });
     }
 
-    private Single<OdometerResult> loadOdometerValue(String mTimeZone) {
+    private Single<LogHeaderUtils.OdometerResult> loadOdometerValue(String mTimeZone) {
 
         final long startDate = DateUtils.getStartDate(mTimeZone, mView.getSelectedDay().getCalendar());
 
         // Day may stared from event in previous day, that's why loads event for previous day
-
         return mELDEventsInteractor
                 .getActiveDutyEventsForDay(startDate)
                 .zipWith(mELDEventsInteractor
                                 .getLatestActiveDutyEventFromDBOnce(startDate,
                                         mAccountManager.getCurrentUserId()),
                         this::mapLatestAndCurrentEvents)
-                .flatMap(events -> Single.fromCallable(() -> {
-
-                    StringBuilder startValueBuilder = new StringBuilder();
-                    StringBuilder endValueBuilder = new StringBuilder();
-                    long distance = 0;
-
-                    if (events.isEmpty()) {
-                        startValueBuilder.append("0");
-                        endValueBuilder.append("0");
-                    } else {
-
-                        SparseArray<List<ELDEvent>> eventsByBoxId = new SparseArray<>(3);
-                        for (ELDEvent event : events) {
-
-                            List<ELDEvent> eldEvents = eventsByBoxId.get(event.getBoxId());
-                            if (eldEvents == null) {
-                                eldEvents = new ArrayList<>();
-                                eventsByBoxId.put(event.getBoxId(), eldEvents);
-                            }
-                            eldEvents.add(event);
-                        }
-
-                        for (int i = 0; i < eventsByBoxId.size(); i++) {
-                            List<ELDEvent> eventsForBox = eventsByBoxId.get(eventsByBoxId.keyAt(i));
-
-                            if (eventsForBox.isEmpty()) {
-                                continue;
-                            }
-
-                            startValueBuilder.append(eventsForBox.get(0).getOdometer())
-                                    .append(DISTANCE_DELIMITER);
-
-                            Integer endOdometer = eventsForBox.get(eventsForBox.size() - 1).getOdometer();
-                            endValueBuilder.append(endOdometer == null ? 0 : endOdometer)
-                                    .append(DISTANCE_DELIMITER);
-                            distance += calculateOdometer(eventsForBox);
-                        }
-
-                        truncateBuilder(startValueBuilder, DISTANCE_DELIMITER.length());
-                        truncateBuilder(endValueBuilder, DISTANCE_DELIMITER.length());
-                    }
-
-                    return new OdometerResult(startValueBuilder.toString(),
-                            endValueBuilder.toString(),
-                            distance);
-                }));
+                .flatMap(events -> Single.fromCallable(() ->
+                        mLogHeaderUtils.calculateOdometersValue(events)));
     }
-
 
     /**
      * Creates events list.
@@ -533,46 +464,9 @@ public final class LogsPresenter implements AccountManager.AccountListener {
         return eldEvents;
     }
 
-    private void truncateBuilder(StringBuilder stringBuilder, int length) {
-        stringBuilder.delete(
-                stringBuilder.length() - length,
-                stringBuilder.length());
-    }
-
-    private long calculateOdometer(List<ELDEvent> events) {
-
-        long distance = 0;
-
-        long startDrivingOdometer = 0;
-        boolean isPreviousDriving = false;
-        for (ELDEvent event : events) {
-
-            if (DutyType.DRIVING.isSame(event.getEventType(), event.getEventCode())) {
-                // If few driving events meets successively takes only first
-                if (!isPreviousDriving) {
-                    // start driving event, save odometer value
-                    startDrivingOdometer = event.getOdometer() != null ? event.getOdometer() : 0;
-                    isPreviousDriving = true;
-                }
-            } else {
-
-                if (isPreviousDriving) {
-                    // stop driving event
-                    Integer odometer = event.getOdometer();
-                    int currentOdometer = odometer != null ? odometer : 0;
-                    distance += currentOdometer - startDrivingOdometer;
-                    startDrivingOdometer = 0;
-                    isPreviousDriving = false;
-                }
-            }
-        }
-
-        return distance;
-    }
-
     private LogHeaderModel mapUserAndHeader(UserHeaderInfo userHeaderInfo,
                                             SelectedLogHeaderInfo selectedLogHeaderInfo,
-                                            OdometerResult odometerResult) {
+                                            LogHeaderUtils.OdometerResult odometerResult) {
 
         LogHeaderModel model = new LogHeaderModel();
         model.setTimezone(userHeaderInfo.mTimezone);
@@ -593,31 +487,6 @@ public final class LogsPresenter implements AccountManager.AccountListener {
         model.setEndOdometer(odometerResult.endValue);
         model.setDistanceDriven(String.valueOf(odometerResult.distance));
         return model;
-    }
-
-    private String getCoDriversName(LogSheetHeader header) {
-
-        if (header == null) return "";
-
-        String codriverStringIds = header.getCoDriverIds();
-        List<Integer> coDriversIds = ListConverter.toIntegerList(codriverStringIds);
-
-        if (coDriversIds.isEmpty()) return "";
-
-        List<UserEntity> names = mUserInteractor.getCoDriversName(coDriversIds);
-
-        if (names.isEmpty()) {
-            // no users in the database with these ids, workaround - show co-drivers ids
-            return codriverStringIds;
-        }
-
-        StringBuilder coDriversNames = new StringBuilder();
-        for (UserEntity userEntity : names) {
-            coDriversNames
-                    .append(userEntity.getFirstName()).append(" ").append(userEntity.getLastName())
-                    .append(DRIVERS_NAME_DIVIDER);
-        }
-        return coDriversNames.substring(0, coDriversNames.length() - DRIVERS_NAME_DIVIDER.length());
     }
 
     @Override
@@ -693,18 +562,6 @@ public final class LogsPresenter implements AccountManager.AccountListener {
             this.mHomeTerminalName = "";
             this.mShippingId = "";
             this.mCoDriversName = "";
-        }
-    }
-
-    private static final class OdometerResult {
-        private final String startValue;
-        private final String endValue;
-        private final long distance;
-
-        private OdometerResult(String startValue, String endValue, long distance) {
-            this.startValue = startValue;
-            this.endValue = endValue;
-            this.distance = distance;
         }
     }
 }
