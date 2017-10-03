@@ -3,6 +3,7 @@ package com.bsmwireless.screens.dashboard;
 import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
+import com.bsmwireless.domain.interactors.UserInteractor;
 import com.bsmwireless.widgets.alerts.DutyType;
 
 import java.util.regex.Matcher;
@@ -19,15 +20,17 @@ public final class DashboardPresenter {
 
     private DutyTypeManager mDutyTypeManager;
     private ELDEventsInteractor mEventsInteractor;
+    private UserInteractor mUserInteractor;
 
     private DutyTypeManager.DutyTypeListener mListener = this::onSetDutyType;
 
     @Inject
-    public DashboardPresenter(DashboardView view, DutyTypeManager dutyTypeManager, ELDEventsInteractor eventsInteractor) {
+    public DashboardPresenter(DashboardView view, DutyTypeManager dutyTypeManager, ELDEventsInteractor eventsInteractor, UserInteractor userInteractor) {
         mView = view;
 
         mDutyTypeManager = dutyTypeManager;
         mEventsInteractor = eventsInteractor;
+        mUserInteractor = userInteractor;
 
         mDutyTypeManager.addListener(mListener);
 
@@ -61,7 +64,7 @@ public final class DashboardPresenter {
     private void onSetDutyType(DutyType dutyType) {
         mView.setDutyType(dutyType);
 
-        if (mEventsInteractor.isConnected() && dutyType != DutyType.PERSONAL_USE && dutyType != DutyType.YARD_MOVES) {
+        if (mEventsInteractor.isConnected() && dutyType != DutyType.PERSONAL_USE && dutyType != DutyType.YARD_MOVES && mUserInteractor.isUserDriver()) {
             mView.showSpecialStatuses();
         } else {
             mView.hideSpecialStatuses();
