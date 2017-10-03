@@ -253,7 +253,7 @@ public final class SelectAssetActivity extends BaseActivity implements SelectAss
 
     @Override
     public void goToHomeScreen() {
-        startActivity(new Intent(this, NavigationActivity.class));
+        startActivity(NavigationActivity.createIntent(this));
         finish();
     }
 
@@ -283,6 +283,7 @@ public final class SelectAssetActivity extends BaseActivity implements SelectAss
         mAlertDialog = new AlertDialog.Builder(this)
                 .setCancelable(true)
                 .setTitle(R.string.select_asset_dialog_title)
+                .setCancelable(false)
                 .setMessage(R.string.select_asset_information_no_selected_assets)
                 .setPositiveButton(R.string.select_asset_continue, (dialog, which) -> {
                 })

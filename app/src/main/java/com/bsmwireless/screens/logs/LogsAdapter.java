@@ -52,6 +52,7 @@ public final class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHold
     private View mSigned;
     private List<EventLogModel> mEventLogs = Collections.emptyList();
     private LogHeaderModel mLogHeader = new LogHeaderModel();
+    private GraphModel mGraphModel = new GraphModel();
     private List<LogSheetHeader> mLogHeaders = Collections.emptyList();
     private View.OnClickListener mOnMenuClickListener;
     private RecyclerView.SmoothScroller mSmoothScroller;
@@ -95,15 +96,13 @@ public final class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHold
 
     public void setEventLogs(List<EventLogModel> eventLogs) {
         mEventLogs = eventLogs;
-        if (mGraphLayout != null) {
-            mGraphLayout.setELDEvents(eventLogs);
-        }
         notifyDataSetChanged();
     }
 
-    public void setPrevDayEvent(ELDEvent event) {
+    public void updateGraph(GraphModel graphModel) {
+        mGraphModel = graphModel;
         if (mGraphLayout != null) {
-            mGraphLayout.setPrevDayEvent(event);
+            mGraphLayout.updateGraph(graphModel);
         }
     }
 
@@ -154,7 +153,7 @@ public final class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHold
                         mCalendarLayout.getCurrentItem()));
 
                 mGraphLayout = view.findViewById(R.id.graphic);
-                mGraphLayout.setELDEvents(mEventLogs);
+                mGraphLayout.updateGraph(mGraphModel);
 
                 break;
             case VIEW_TYPE_EVENTS_TITLE:
@@ -207,7 +206,7 @@ public final class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHold
             }
         } else {
             titleView.collapse();
-            mOnLogsStateChangeListener.hideTitle();
+            mOnLogsStateChangeListener.hideTitle(titleView.getType());
         }
 
         notifyDataSetChanged();
@@ -259,6 +258,13 @@ public final class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHold
         if (!event.isActive()) {
             popup.getMenu().findItem(R.id.menu_edit).setEnabled(false);
         }
+        if (!DutyType.getTypeByCode(event.getEventType(), event.getEventCode())
+                .equals(DutyType.DRIVING) || !event.isActive()) {
+            popup.getMenu().findItem(R.id.menu_assign).setEnabled(false);
+        }
+        if (!ELDEvent.EventOrigin.DRIVER.getValue().equals(event.getEvent().getOrigin())) {
+            popup.getMenu().findItem(R.id.menu_remove).setEnabled(false);
+        }
 
         popup.setOnMenuItemClickListener(menuItem -> {
             switch (menuItem.getItemId()) {
@@ -268,6 +274,9 @@ public final class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHold
                 case R.id.menu_remove:
                     mPresenter.onRemovedEventClicked(event);
                     return true;
+                case R.id.menu_assign:
+                    mPresenter.onReassignEventClicked(event);
+                    return true;
             }
             return false;
         });
@@ -276,7 +285,11 @@ public final class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHold
     }
 
     public CalendarItem getCurrentItem() {
-        return mCalendarLayout.getCurrentItem();
+        return (mCalendarLayout != null) ? mCalendarLayout.getCurrentItem() : null;
+    }
+
+    public LogHeaderModel getLogHeaderModel() {
+        return mLogHeader;
     }
 
     private void bindEventView(LogsHolder holder,
@@ -320,7 +333,7 @@ public final class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHold
     public interface OnLogsStateChangeListener {
         void showTitle(LogsTitleView.Type type);
 
-        void hideTitle();
+        void hideTitle(LogsTitleView.Type type);
 
         void onSignButtonClicked(CalendarItem calendarItem);
     }

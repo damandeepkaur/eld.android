@@ -3,6 +3,7 @@ package com.bsmwireless.screens.logs;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -17,11 +18,11 @@ import com.bsmwireless.models.LogSheetHeader;
 import com.bsmwireless.screens.common.BaseFragment;
 import com.bsmwireless.screens.editevent.EditEventActivity;
 import com.bsmwireless.screens.editlogheader.EditLogHeaderActivity;
+import com.bsmwireless.screens.hoursofservice.HoursOfServiceView;
 import com.bsmwireless.screens.logs.LogsAdapter.OnLogsStateChangeListener;
 import com.bsmwireless.screens.logs.dagger.DaggerLogsComponent;
 import com.bsmwireless.screens.logs.dagger.EventLogModel;
 import com.bsmwireless.screens.logs.dagger.LogsModule;
-import com.bsmwireless.screens.navigation.NavigateView;
 import com.bsmwireless.widgets.logs.LogsTitleView;
 import com.bsmwireless.widgets.logs.WrapLinearLayoutManager;
 import com.bsmwireless.widgets.logs.calendar.CalendarItem;
@@ -34,6 +35,7 @@ import javax.inject.Inject;
 import app.bsmuniversal.com.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import butterknife.Unbinder;
 
 import static android.app.Activity.RESULT_OK;
@@ -51,20 +53,27 @@ public final class LogsFragment extends BaseFragment implements LogsView {
 
     @Inject
     LogsPresenter mPresenter;
+
     @BindView(R.id.recycler_view)
     RecyclerView mRecyclerView;
 
+    @BindView(R.id.add_event)
+    FloatingActionButton mAddEventFloatingActionButton;
+
+    @BindView(R.id.edit_log_header)
+    FloatingActionButton mEditLogHeaderFloatingActionButton;
+
     private LogsAdapter mAdapter;
     private Unbinder mUnbinder;
-    private NavigateView mNavigateView;
+    private HoursOfServiceView mHoursOfServiceView;
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof NavigateView) {
-            mNavigateView = (NavigateView) context;
+        if (context instanceof HoursOfServiceView) {
+            mHoursOfServiceView = (HoursOfServiceView) context;
         } else {
-            throw new RuntimeException(context.toString() + " must implement NavigateView");
+            throw new RuntimeException(context.toString() + " must implement HoursOfServiceView");
         }
     }
 
@@ -72,7 +81,7 @@ public final class LogsFragment extends BaseFragment implements LogsView {
     public void setMenuVisibility(boolean menuVisible) {
         super.setMenuVisibility(menuVisible);
         if (menuVisible && mAdapter != null) {
-            showSnackBar();
+            showTitleButton();
         }
     }
 
@@ -86,12 +95,12 @@ public final class LogsFragment extends BaseFragment implements LogsView {
         mAdapter = new LogsAdapter(mContext, mPresenter, new OnLogsStateChangeListener() {
             @Override
             public void showTitle(LogsTitleView.Type expandedType) {
-                showSnackBar(expandedType);
+                showTitleButton(expandedType);
             }
 
             @Override
-            public void hideTitle() {
-                mNavigateView.getSnackBar().hideSnackbar();
+            public void hideTitle(LogsTitleView.Type expandedType) {
+                hideTitleButton(expandedType);
             }
 
             @Override
@@ -108,6 +117,16 @@ public final class LogsFragment extends BaseFragment implements LogsView {
         return view;
     }
 
+    @OnClick(R.id.edit_log_header)
+    void editLogHeader() {
+        mPresenter.onEditLogHeaderClicked(mAdapter.getLogHeaderModel());
+    }
+
+    @OnClick(R.id.add_event)
+    void addEvents() {
+        mPresenter.onAddEventClicked(mAdapter.getCurrentItem());
+    }
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
@@ -115,45 +134,17 @@ public final class LogsFragment extends BaseFragment implements LogsView {
         mPresenter.onDestroy();
     }
 
-    public void showSnackBar() {
+    public void showTitleButton() {
         LogsTitleView.Type expandedType = mAdapter.getExpandedLogsTitle();
-        if (expandedType != null) showSnackBar(expandedType);
-    }
-
-    public void showSnackBar(LogsTitleView.Type expandedType) {
-        switch (expandedType) {
-            case EVENTS:
-                mNavigateView.getSnackBar()
-                             .setOnReadyListener(snackBar ->
-                                     snackBar.reset()
-                                             .setPositiveLabel(mContext.getString(R.string.add_event), v -> mPresenter.onAddEventClicked(mAdapter.getCurrentItem())))
-                             .showSnackbar();
-                break;
-            case LOG_HEADER:
-                mNavigateView.getSnackBar()
-                             .setOnReadyListener(snackBar ->
-                                     snackBar.reset()
-                                             .setPositiveLabel(mContext.getString(R.string.edit), v -> mPresenter.onEditLogHeaderClicked()))
-                             .showSnackbar();
-                break;
-        }
+        if (expandedType != null) showTitleButton(expandedType);
     }
 
     public void showNotificationSnackBar(String message) {
-        mNavigateView.getSnackBar()
-                     .setOnReadyListener(snackBar -> snackBar.reset()
-                             .setMessage(message)
-                             .setHideableOnTimeout(SnackBarLayout.DURATION_LONG)
-                             .setOnCloseListener(new SnackBarLayout.OnCloseListener() {
-                                 @Override
-                                 public void onClose(SnackBarLayout snackBar) {
-                                     showSnackBar();
-                                 }
-
-                                 @Override
-                                 public void onOpen(SnackBarLayout snackBar) {}
-                             }))
-                     .showSnackbar();
+        mHoursOfServiceView.getSnackBar()
+                .setOnReadyListener(snackBar -> snackBar.reset()
+                        .setMessage(message)
+                        .setHideableOnTimeout(SnackBarLayout.DURATION_LONG))
+                .showSnackbar();
     }
 
     public void showSignDialog(CalendarItem calendarItem) {
@@ -170,13 +161,18 @@ public final class LogsFragment extends BaseFragment implements LogsView {
     }
 
     @Override
+    public CalendarItem getSelectedDay() {
+        return mAdapter.getCurrentItem();
+    }
+
+    @Override
     public void setEventLogs(List<EventLogModel> eventLogs) {
         mAdapter.setEventLogs(eventLogs);
     }
 
     @Override
-    public void setPrevDayEvent(ELDEvent event) {
-        mAdapter.setPrevDayEvent(event);
+    public void updateGraph(GraphModel graphModel) {
+        mAdapter.updateGraph(graphModel);
     }
 
     @Override
@@ -214,21 +210,30 @@ public final class LogsFragment extends BaseFragment implements LogsView {
     public void eventAdded() {
         showNotificationSnackBar(getString(R.string.event_added));
         CalendarItem item = mAdapter.getCurrentItem();
-        mPresenter.setEventsForDay(item.getCalendar());
-        mNavigateView.setResetTime(0);
+        mPresenter.updateDataForDay(item.getLogDay());
+        mHoursOfServiceView.setResetTime(0);
     }
 
     @Override
     public void eventUpdated() {
         showNotificationSnackBar(getString(R.string.event_updated));
         CalendarItem item = mAdapter.getCurrentItem();
-        mPresenter.setEventsForDay(item.getCalendar());
-        mNavigateView.setResetTime(0);
+        mPresenter.updateDataForDay(item.getLogDay());
+        mHoursOfServiceView.setResetTime(0);
+    }
+
+    @Override
+    public void eventRemoved() {
+        showNotificationSnackBar(getString(R.string.event_removed));
+        CalendarItem item = mAdapter.getCurrentItem();
+        mPresenter.updateDataForDay(item.getLogDay());
+        mHoursOfServiceView.setResetTime(0);
     }
 
     @Override
     public void dutyUpdated() {
-        //update from db
+        CalendarItem item = mAdapter.getCurrentItem();
+        mPresenter.updateDataForDay(item.getLogDay());
     }
 
     @Override
@@ -239,6 +244,57 @@ public final class LogsFragment extends BaseFragment implements LogsView {
     @Override
     public void showError(Error error) {
         showNotificationSnackBar(getString(error.getStringId()));
+    }
+
+    @Override
+    public void showTitleButton(LogsTitleView.Type expandedType) {
+        switch (expandedType) {
+            case EVENTS:
+                if (mEditLogHeaderFloatingActionButton.isShown()) {
+                    mEditLogHeaderFloatingActionButton.hide();
+                }
+                mAddEventFloatingActionButton.show();
+                break;
+            case LOG_HEADER:
+                if (mAddEventFloatingActionButton.isShown()) {
+                    mAddEventFloatingActionButton.hide();
+                }
+                mEditLogHeaderFloatingActionButton.show();
+                break;
+            default:
+                break;
+        }
+
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (mAdapter != null) {
+            CalendarItem calendarItem = mAdapter.getCurrentItem();
+            if (calendarItem != null) {
+                mPresenter.updateDataForDay(mAdapter.getCurrentItem().getLogDay());
+            }
+        }
+    }
+
+    @Override
+    public void hideTitleButton(LogsTitleView.Type expandedType) {
+        switch (expandedType) {
+            case EVENTS:
+                mAddEventFloatingActionButton.hide();
+                break;
+            case LOG_HEADER:
+                mEditLogHeaderFloatingActionButton.hide();
+                break;
+            default:
+                break;
+        }
+    }
+
+    @Override
+    public void showReassignDialog(ELDEvent event) {
+        mHoursOfServiceView.showReassignDialog(event);
     }
 
     @Override
@@ -272,3 +328,4 @@ public final class LogsFragment extends BaseFragment implements LogsView {
         }
     }
 }
+

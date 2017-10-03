@@ -4,6 +4,7 @@ import com.bsmwireless.data.network.RetrofitException;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.LogSheetHeader;
 import com.bsmwireless.screens.logs.dagger.EventLogModel;
+import com.bsmwireless.widgets.logs.LogsTitleView;
 import com.bsmwireless.widgets.logs.calendar.CalendarItem;
 
 import java.util.List;
@@ -12,9 +13,11 @@ import app.bsmuniversal.com.R;
 
 public interface LogsView {
 
+    CalendarItem getSelectedDay();
+
     void setEventLogs(List<EventLogModel> logs);
 
-    void setPrevDayEvent(ELDEvent prevDayEvent);
+    void updateGraph(GraphModel graphModel);
 
     void setLogHeader(LogHeaderModel logHeader);
 
@@ -30,15 +33,20 @@ public interface LogsView {
 
     void eventUpdated();
 
+    void eventRemoved();
+
     void dutyUpdated();
 
     void showError(RetrofitException exception);
 
     void showError(Error error);
 
+    void showReassignDialog(ELDEvent event);
+
     enum Error {
         ERROR_ADD_EVENT(R.string.add_event_error),
         ERROR_UPDATE_EVENT(R.string.update_event_error),
+        ERROR_REMOVE_EVENT(R.string.remove_event_error),
         ERROR_NOT_IN_VEHICLE(R.string.not_in_vehicle_error);
 
         private int mStringId;
@@ -52,4 +60,7 @@ public interface LogsView {
         }
     }
 
+    void showTitleButton(LogsTitleView.Type expandedType);
+
+    void hideTitleButton(LogsTitleView.Type expandedType);
 }

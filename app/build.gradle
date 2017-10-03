@@ -10,9 +10,14 @@ android {
         applicationId "app.bsmuniversal.com"
         minSdkVersion 15
         targetSdkVersion 26
+<<<<<<< HEAD
         versionCode 77
         versionName "1.0.76"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+=======
+        versionCode 100
+        versionName "1.0.99"
+>>>>>>> develop
 
         javaCompileOptions {
             annotationProcessorOptions {
@@ -58,6 +63,9 @@ android {
     lintOptions {
         disable 'MissingTranslation', 'ExtraTranslation'
         abortOnError false
+    }
+    testOptions {
+        unitTests.returnDefaultValues = true
     }
 }
 
