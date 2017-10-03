@@ -54,7 +54,10 @@ public final class CarrierEditPresenterImpl extends BaseMenuPresenter implements
             mDriverDisposable = mUserInteractor.getDriver()
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(driver -> mView.setDriverName(driver.getFirstName() + " " + driver.getLastName()),
+                    .subscribe(driver -> {
+                                mView.setDriverName(driver.getFirstName() + " " + driver.getLastName());
+                                mView.setDriverId(driver.getId());
+                            },
                             Timber::e,
                             () -> mDriverDisposable = null);
         }

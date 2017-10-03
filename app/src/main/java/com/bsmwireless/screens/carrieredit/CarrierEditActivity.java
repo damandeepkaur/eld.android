@@ -46,6 +46,8 @@ public final class CarrierEditActivity extends BaseMenuActivity implements Carri
                 .build();
         mComponent.inject(this);
         mPresenter.bind(this);
+        mToolbar.setTitleTextAppearance(this, R.style.AppTheme_TextAppearance_Toolbar_Title);
+        mToolbar.setSubtitleTextAppearance(this, R.style.AppTheme_TextAppearance_Toolbar_Subtitle);
         setSupportActionBar(mToolbar);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -65,12 +67,18 @@ public final class CarrierEditActivity extends BaseMenuActivity implements Carri
 
     @Override
     public void setDriverName(String driverName) {
-        getSupportActionBar().setSubtitle(driverName);
+        getSupportActionBar().setTitle(driverName);
     }
 
     @Override
     public void setVehicleName(String vehicleName) {
-        getSupportActionBar().setTitle(vehicleName);
+        getSupportActionBar().setSubtitle(vehicleName);
+        mPagerAdapter.setVehicleName(vehicleName);
+    }
+
+    @Override
+    public void setDriverId(int driverId) {
+        mPagerAdapter.setDriverId(driverId);
     }
 
     @Override

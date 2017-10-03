@@ -19,6 +19,7 @@ import com.bsmwireless.widgets.alerts.DutyType;
 import com.bsmwireless.widgets.logs.calendar.CalendarItem;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +29,9 @@ import javax.inject.Inject;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+import timber.log.Timber;
 
 import static com.bsmwireless.common.utils.DateUtils.MS_IN_DAY;
 import static com.bsmwireless.widgets.alerts.DutyType.CLEAR_PU;
@@ -42,6 +45,8 @@ public final class EditedEventsPresenterImpl implements EditedEventsPresenter {
     private final VehiclesInteractor mVehiclesInteractor;
     private final ServiceApi mServiceApi;
     private final CompositeDisposable mDisposable;
+    private Disposable mUpdateEventsDisposable;
+    private Disposable mSendUpdatedDisposable;
     private EditedEventsView mView;
     private String mTimeZone;
     private User mUser;
@@ -95,7 +100,7 @@ public final class EditedEventsPresenterImpl implements EditedEventsPresenter {
                 .toList()
                 .map(eldEvents -> convertToEventLogModels(eldEvents, startDayTime, timezone))
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(eventLogModels -> mView.setEvents(eventLogModels)));
+                .subscribe(eventLogModels -> mView.setEvents(eventLogModels), Timber::e));
     }
 
     public void onCalendarDaySelected(CalendarItem calendarItem) {
@@ -103,15 +108,51 @@ public final class EditedEventsPresenterImpl implements EditedEventsPresenter {
     }
 
     public void updateDataForDay(long logDay) {
-        mDisposable.clear();
-        mDisposable.add(mUserInteractor.getTimezone()
+        if (mUpdateEventsDisposable == null || mUpdateEventsDisposable.isDisposed()) {
+            mUpdateEventsDisposable = mUserInteractor.getTimezone()
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(timezone -> {
+                        long startDayTime = DateUtils.getStartDayTimeInMs(logDay, timezone);
+                        setGraphData(startDayTime, timezone);
+                        setEventListData(startDayTime, timezone);
+                        setLogHeaderData(logDay);
+                        mUpdateEventsDisposable.dispose();
+                    }, Timber::e);
+        }
+    }
+
+    @Override
+    public void approveEdits(List<EventLogModel> events, long logDay) {
+        sendUpdatedEvents(events, logDay, ELDEvent.StatusCode.ACTIVE);
+    }
+
+    @Override
+    public void disapproveEdits(List<EventLogModel> events, long logDay) {
+        sendUpdatedEvents(events, logDay, ELDEvent.StatusCode.INACTIVE_CHANGE_REJECTED);
+    }
+
+    private void sendUpdatedEvents(List<EventLogModel> events, long logDay, ELDEvent.StatusCode code) {
+        if (mSendUpdatedDisposable == null || mSendUpdatedDisposable.isDisposed()) {
+            final List<ELDEvent> cachedEvents = new ArrayList<>();
+            mSendUpdatedDisposable = Observable.fromIterable(events)
+                    .subscribeOn(Schedulers.io())
+                    .map(logModel -> logModel.getEvent().setStatus(code.getValue()))
+                    .toList()
+                    .doOnSuccess(eldEvents -> cachedEvents.addAll(eldEvents))
+                    .flatMap(eldEvents -> mServiceApi.updateELDEvents(eldEvents))
+                    .doOnSuccess(resp -> updateDbEldEvents(cachedEvents, logDay))
+                    .subscribe(responseMessage -> {
+                        mSendUpdatedDisposable.dispose();
+                    }, Timber::e);
+        }
+    }
+
+    private void updateDbEldEvents(List<ELDEvent> events, long logDay) {
+        mDisposable.add(mELDEventsInteractor.updateELDEvents(events)
                 .subscribeOn(Schedulers.io())
-                .subscribe(timezone -> {
-                    long startDayTime = DateUtils.getStartDayTimeInMs(logDay, timezone);
-                    setGraphData(startDayTime, timezone);
-                    setEventListData(startDayTime, timezone);
-                    setLogHeaderData(logDay);
-                }));
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(resp -> updateDataForDay(logDay), Timber::e));
     }
 
     private void setLogHeaderData(long logDay) {
@@ -122,7 +163,7 @@ public final class EditedEventsPresenterImpl implements EditedEventsPresenter {
                 .flatMap(user -> mLogSheetInteractor.getLogSheet(logDay))
                 .doOnSuccess(logSheetHeader -> updateLogHeaderModelByLogSheet(model, logSheetHeader))
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(eventLogModels -> mView.setLogHeader(model)));
+                .subscribe(eventLogModels -> mView.setLogHeader(model), Timber::e));
     }
 
     private void setGraphData(long startDayTime, String timezone) {
@@ -135,7 +176,7 @@ public final class EditedEventsPresenterImpl implements EditedEventsPresenter {
                 .doOnSuccess(eventLogModels -> graphModel.setPrevDayEvent(
                         mELDEventsInteractor.getLatestActiveDutyEventFromDB(startDayTime)))
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(eldEvents -> mView.updateGraph(graphModel)));
+                .subscribe(eldEvents -> mView.updateGraph(graphModel), Timber::e));
     }
 
     private void updateLogHeaderModelByUser(LogHeaderModel logHeaderModel, User user) {

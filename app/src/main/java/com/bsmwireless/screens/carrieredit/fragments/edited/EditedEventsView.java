@@ -9,7 +9,10 @@ import java.util.List;
 
 public interface EditedEventsView {
     void setEvents(List<EventLogModel> events);
+
     void setLogSheetHeaders(List<LogSheetHeader> logs);
+
     void updateGraph(GraphModel graphModel);
+
     void setLogHeader(LogHeaderModel logHeader);
 }

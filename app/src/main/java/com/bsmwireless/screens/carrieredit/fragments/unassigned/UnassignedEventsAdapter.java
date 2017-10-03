@@ -1,9 +1,11 @@
 package com.bsmwireless.screens.carrieredit.fragments.unassigned;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +27,8 @@ import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
 public class UnassignedEventsAdapter extends RecyclerView.Adapter<UnassignedEventsAdapter.EventsHolder> {
+    private static final int HEADER = 0;
+    private static final int ITEM = 1;
 
     private List<EventLogModel> mEvents;
     private Context mContext;
@@ -32,6 +36,8 @@ public class UnassignedEventsAdapter extends RecyclerView.Adapter<UnassignedEven
     private HashMap<Integer, Integer> mColors = new HashMap<>();
     private String mNoAddressLabel;
     private UnassignedEventsPresenter mPresenter;
+    private String mVehicleName;
+    private int mDriverId;
 
     public UnassignedEventsAdapter(Context context, UnassignedEventsPresenter presenter) {
         Timber.v("UnassignedEventsAdapter: ");
@@ -57,21 +63,54 @@ public class UnassignedEventsAdapter extends RecyclerView.Adapter<UnassignedEven
         notifyItemRangeChanged(position - 1, mEvents.size());
     }
 
+    public void setVehicleName(String vehicleName) {
+        mVehicleName = vehicleName;
+        notifyItemChanged(HEADER);
+    }
+
+    public void setDriverId(int driverId) {
+        mDriverId = driverId;
+    }
+
     @Override
     public EventsHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(mContext).inflate(R.layout.unassigned_event_item, parent, false);
-        return new EventsHolder(view);
+        View view = null;
+        switch (viewType) {
+            case HEADER:
+                view = LayoutInflater.from(mContext).inflate(R.layout.unassigned_events_header, parent, false);
+                break;
+            case ITEM:
+                view = LayoutInflater.from(mContext).inflate(R.layout.unassigned_event_item, parent, false);
+                break;
+        }
+        return new EventsHolder(view, viewType);
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return position == 0 ? HEADER : ITEM;
     }
 
     @Override
     public void onBindViewHolder(EventsHolder holder, int position) {
-        EventLogModel event = mEvents.get(position);
-        bindEventView(holder, event, position);
+        int viewType = holder.getViewType();
+        if (viewType == HEADER) {
+            if (!TextUtils.isEmpty(mVehicleName) && mEvents.size() > 0) {
+                holder.mUnassignedTopHeader.setText(String.format("%s %s %d %s",
+                        mVehicleName,
+                        mContext.getString(R.string.has),
+                        mEvents.size(),
+                        mContext.getString(R.string.unassigned_driving)));
+            }
+        } else {
+            EventLogModel event = mEvents.get(position);
+            bindEventView(holder, event, position);
+        }
     }
 
     @Override
     public int getItemCount() {
-        return mEvents == null ? 0 : mEvents.size();
+        return mEvents == null ? 0 : mEvents.size() + 1;
     }
 
     private void bindEventView(EventsHolder holder,
@@ -86,7 +125,7 @@ public class UnassignedEventsAdapter extends RecyclerView.Adapter<UnassignedEven
         holder.mEventVehicleName.setText(vehicleName);
         holder.mAddress.setText(address);
 
-        holder.mAccept.setOnClickListener(v -> mPresenter.acceptEvent(model, position));
+        holder.mAccept.setOnClickListener(v -> mPresenter.acceptEvent(model, mDriverId, position));
         holder.mReject.setOnClickListener(v -> mPresenter.rejectEvent(model, position));
 
         DutyType currentDuty = model.getDutyType();
@@ -113,7 +152,6 @@ public class UnassignedEventsAdapter extends RecyclerView.Adapter<UnassignedEven
     }
 
     static final class EventsHolder extends RecyclerView.ViewHolder {
-        //event
         @Nullable
         @BindView(R.id.event_changed)
         TextView mEventChanged;
@@ -132,14 +170,27 @@ public class UnassignedEventsAdapter extends RecyclerView.Adapter<UnassignedEven
         @Nullable
         @BindView(R.id.address)
         TextView mAddress;
+        @Nullable
         @BindView(R.id.event_accept)
         View mAccept;
+        @Nullable
         @BindView(R.id.event_reject)
         View mReject;
 
-        public EventsHolder(View itemView) {
+        @Nullable
+        @BindView(R.id.unassigned_events_top_header)
+        TextView mUnassignedTopHeader;
+
+        private int mViewType;
+
+        public EventsHolder(View itemView, int viewType) {
             super(itemView);
+            mViewType = viewType;
             ButterKnife.bind(this, itemView);
+        }
+
+        int getViewType() {
+            return mViewType;
         }
     }
 

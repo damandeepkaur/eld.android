@@ -8,7 +8,7 @@ public interface UnassignedEventsPresenter {
 
     void fetchEldEvents();
 
-    void acceptEvent(EventLogModel event, int position);
+    void acceptEvent(EventLogModel event, int driverId, int position);
 
     void rejectEvent(EventLogModel event, int position);
 

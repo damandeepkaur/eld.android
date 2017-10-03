@@ -15,6 +15,7 @@ import javax.inject.Inject;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
@@ -27,6 +28,7 @@ public final class UnassignedEventsPresenterImpl implements UnassignedEventsPres
     private final ELDEventsInteractor mELDEventsInteractor;
     private final ServiceApi mServiceApi;
     private final CompositeDisposable mDisposable;
+    private Disposable mUpdateEventDisposable;
     private UnassignedEventsView mView;
 
     @Inject
@@ -51,22 +53,34 @@ public final class UnassignedEventsPresenterImpl implements UnassignedEventsPres
                 .subscribe(res -> mView.setEvents(res), Timber::e));
     }
 
-    public void acceptEvent(EventLogModel event, int position) {
-        //TODO: set driver id to event
-        List<ELDEvent> eldEvents = new ArrayList<>();
-        eldEvents.add(event.getEvent());
-        mDisposable.add(mServiceApi.updateELDEvents(eldEvents)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(responseMessage -> {
-                    mView.removeEvent(position);
-                    //TODO: update in db
-                }, Timber::e));
+    public void acceptEvent(EventLogModel event, int driverId, int position) {
+        if (mUpdateEventDisposable == null || mUpdateEventDisposable.isDisposed()) {
+            List<ELDEvent> eldEvents = new ArrayList<>();
+            event.getEvent().setDriverId(driverId);
+            eldEvents.add(event.getEvent());
+            mUpdateEventDisposable = mServiceApi.updateELDEvents(eldEvents)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(responseMessage -> {
+                        updateDb(eldEvents, position);
+                        mUpdateEventDisposable.dispose();
+                    }, throwable -> {
+                            Timber.e(throwable);
+                            mDisposable.dispose();
+                    });
+        }
     }
 
     public void rejectEvent(EventLogModel event, int position) {
-        //TODO:
+        //TODO: remove from db?
         mView.removeEvent(position);
+    }
+
+    private void updateDb(List<ELDEvent> eldEvents, int position) {
+        mDisposable.add(mELDEventsInteractor.updateELDEvents(eldEvents)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(resp -> mView.removeEvent(position), Timber::e));
     }
 
     public void dispose() {

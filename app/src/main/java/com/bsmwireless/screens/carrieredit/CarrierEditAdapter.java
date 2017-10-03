@@ -26,6 +26,14 @@ public final class CarrierEditAdapter extends FragmentStatePagerAdapter {
         mView.getComponent().inject(this);
     }
 
+    public void setVehicleName(String vehicleName) {
+        mUnassignedEventsView.setVehicleName(vehicleName);
+    }
+
+    public void setDriverId(int driverId) {
+
+    }
+
     @Override
     public Fragment getItem(int position) {
         Fragment currentFragment = null;

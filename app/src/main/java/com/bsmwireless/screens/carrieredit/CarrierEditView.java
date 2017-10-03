@@ -16,4 +16,6 @@ public interface CarrierEditView extends BaseMenuView{
     void setDriverName(String driverName);
 
     void setVehicleName(String vehicleName);
+
+    void setDriverId(int driverId);
 }

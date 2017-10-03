@@ -661,7 +661,9 @@
     <string name="edited_events">Edited</string>
     <string name="edited_events_disapprove">Disapprove edits</string>
     <string name="edited_events_approve">approve edits</string>
-    <string name="logsheet_edited">3 of your logsheets were edited by the\ncarrier. Please review and re-sign them.</string>
+    <string name="logsheet_edited"> of your logsheets were edited by the\ncarrier. Please review and re-sign them.</string>
+    <string name="has">has</string>
+    <string name="unassigned_driving">unassigned driving events. Please review and assign them.</string>
 
     <!-- Roadside -->
     <string name="roadside_title">Roadside</string>

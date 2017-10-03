@@ -68,4 +68,14 @@ public final class UnassignedEventsFragment extends BaseFragment implements Unas
     public void removeEvent(int position) {
         mAdapter.removeEvent(position);
     }
+
+    @Override
+    public void setVehicleName(String vehicleName) {
+        mAdapter.setVehicleName(vehicleName);
+    }
+
+    @Override
+    public void setDriverId(int driverId) {
+
+    }
 }

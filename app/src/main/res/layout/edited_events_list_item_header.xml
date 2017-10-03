@@ -7,13 +7,14 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:animateLayoutChanges="true">
 
         <RelativeLayout
             android:id="@+id/top_header_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#64000000">
+            android:background="#59000000">
 
             <ImageView
                 android:id="@+id/edited_events_exclamation"
@@ -63,6 +64,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/top_header_container"
             android:layout_margin="@dimen/margin_small"
+            android:paddingRight="@dimen/margin_small"
             android:layout_toLeftOf="@+id/edited_events_approve"
             android:background="@android:color/transparent"
             android:text="@string/edited_events_disapprove"

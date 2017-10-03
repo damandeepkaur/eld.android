@@ -414,8 +414,9 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
         return mStatus;
     }
 
-    public void setStatus(Integer status) {
+    public ELDEvent setStatus(Integer status) {
         this.mStatus = status;
+        return this;
     }
 
     public Integer getOrigin() {

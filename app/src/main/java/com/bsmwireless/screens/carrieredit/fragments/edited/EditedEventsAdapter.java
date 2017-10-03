@@ -61,6 +61,7 @@ public class EditedEventsAdapter extends RecyclerView.Adapter<EditedEventsAdapte
     private LogHeaderModel mLogHeader = new LogHeaderModel();
     private View.OnClickListener mOnMenuClickListener;
     private GraphModel mGraphModel;
+    private View mEditedEventsTopHeader;
     private final EditedEventsPresenter mPresenter;
 
     public EditedEventsAdapter(Context context, RecyclerView recyclerView, EditedEventsPresenter presenter) {
@@ -117,7 +118,7 @@ public class EditedEventsAdapter extends RecyclerView.Adapter<EditedEventsAdapte
                 });
                 mGraphLayout = view.findViewById(R.id.graphic);
                 //mGraphLayout.setELDEvents(mEventLogs);
-
+                mEditedEventsTopHeader = ButterKnife.findById(view, R.id.top_header_container);
                 break;
             case VIEW_TYPE_EVENTS_TITLE:
                 mEventsTitleView = new LogsTitleView(mContext);
@@ -149,6 +150,20 @@ public class EditedEventsAdapter extends RecyclerView.Adapter<EditedEventsAdapte
             bindEventView(holder, event);
         } else if (viewType == VIEW_TYPE_LOG_HEADER_ITEM) {
             holder.bindLogHeaderView(mLogHeader);
+        } else if (viewType == VIEW_TYPE_HEADER) {
+            TextView editedEventsCount = ButterKnife.findById(mEditedEventsTopHeader, R.id.edited_events_top_header);
+            if (mEventLogs.size() > 0) {
+                mEditedEventsTopHeader.setVisibility(VISIBLE);
+                editedEventsCount.setText(Integer.toString(mEventLogs.size())
+                        .concat(" ")
+                        .concat(mContext.getString(R.string.logsheet_edited)));
+            } else {
+                mEditedEventsTopHeader.setVisibility(GONE);
+            }
+            holder.mApprove.setOnClickListener(v -> mPresenter.approveEdits(mEventLogs,
+                    mCalendarLayout.getCurrentItem().getLogDay()));
+            holder.mDisapprove.setOnClickListener(v -> mPresenter.disapproveEdits(mEventLogs,
+                    mCalendarLayout.getCurrentItem().getLogDay()));
         }
     }
 
@@ -193,7 +208,6 @@ public class EditedEventsAdapter extends RecyclerView.Adapter<EditedEventsAdapte
     private void onTitleItemClicked(LogsTitleView titleView) {
         if (titleView.isCollapsed()) {
             titleView.expand();
-            //mOnLogsStateChangeListener.showTitle(titleView.getType());
             if (titleView.getType() == EVENTS) {
                 mLogHeaderTitleView.collapse();
             } else {
@@ -201,7 +215,6 @@ public class EditedEventsAdapter extends RecyclerView.Adapter<EditedEventsAdapte
             }
         } else {
             titleView.collapse();
-            //mOnLogsStateChangeListener.hideTitle(titleView.getType());
         }
 
         notifyDataSetChanged();
@@ -318,6 +331,14 @@ public class EditedEventsAdapter extends RecyclerView.Adapter<EditedEventsAdapte
         @Nullable
         @BindView(R.id.driving_exemptions)
         TextInputEditText mDrivingExemptions;
+
+        @Nullable
+        @BindView(R.id.edited_events_disapprove)
+        View mDisapprove;
+
+        @Nullable
+        @BindView(R.id.edited_events_approve)
+        View mApprove;
 
         private int mViewType;
 
