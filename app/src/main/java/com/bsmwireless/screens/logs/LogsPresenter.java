@@ -376,7 +376,7 @@ public final class LogsPresenter implements AccountManager.AccountListener {
                 .map(user -> {
                     if (user == null) return new UserHeaderInfo();
 
-                    String driverName = mLogHeaderUtils.makeDrivername(user);
+                    String driverName = mLogHeaderUtils.makeDriverName(user);
                     String selectedExemptions = user.getRuleException();
                     String allExemptions = mLogHeaderUtils.getAllExemptions(user,
                             SyncConfiguration.Type.EXCEPT);

@@ -30,7 +30,7 @@ public final class LogHeaderUtils {
     }
 
     @NonNull
-    public String makeDrivername(@NonNull User user) {
+    public String makeDriverName(@NonNull User user) {
         return String.format("%1$s %2$s", user.getFirstName(), user.getLastName());
     }
 
