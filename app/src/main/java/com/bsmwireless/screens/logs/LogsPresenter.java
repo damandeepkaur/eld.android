@@ -425,7 +425,7 @@ public final class LogsPresenter implements AccountManager.AccountListener {
                     String shippingId = selectedLogHeader.getShippingId();
                     String coDriversName = mLogHeaderUtils.getCoDriversName(selectedLogHeader);
 
-                    return new SelectedLogHeaderInfo(vehicleName, vehicleLicense, vehicleTrailers,
+                    return new SelectedLogHeaderInfo(logDay, vehicleName, vehicleLicense, vehicleTrailers,
                             homeTerminalAddress, homeTerminalName, shippingId, coDriversName);
                 });
     }
@@ -469,6 +469,7 @@ public final class LogsPresenter implements AccountManager.AccountListener {
                                             LogHeaderUtils.OdometerResult odometerResult) {
 
         LogHeaderModel model = new LogHeaderModel();
+        model.setLogDay(selectedLogHeaderInfo.logDay);
         model.setTimezone(userHeaderInfo.mTimezone);
         model.setDriverName(userHeaderInfo.mDriverName);
         model.setSelectedExemptions(userHeaderInfo.mSelectedExemption);
@@ -530,6 +531,7 @@ public final class LogsPresenter implements AccountManager.AccountListener {
     }
 
     private static final class SelectedLogHeaderInfo {
+        final long logDay;
         final String mVehicleName;
         final String mVehicleLicense;
         final String mTrailers;
@@ -538,13 +540,15 @@ public final class LogsPresenter implements AccountManager.AccountListener {
         final String mShippingId;
         final String mCoDriversName;
 
-        private SelectedLogHeaderInfo(String vehicleName,
+        private SelectedLogHeaderInfo(long logDay,
+                                      String vehicleName,
                                       String vehicleLicense,
                                       String trailers,
                                       String homeTerminalAddress,
                                       String homeTerminalName,
                                       String shippingId,
                                       String coDriversName) {
+            this.logDay = logDay;
             this.mVehicleName = vehicleName;
             this.mVehicleLicense = vehicleLicense;
             this.mTrailers = trailers;
@@ -555,6 +559,7 @@ public final class LogsPresenter implements AccountManager.AccountListener {
         }
 
         public SelectedLogHeaderInfo() {
+            this.logDay = 0;
             this.mVehicleName = "";
             this.mVehicleLicense = "";
             this.mTrailers = "";
