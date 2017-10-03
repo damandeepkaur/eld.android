@@ -14,6 +14,7 @@ import com.bsmwireless.screens.logs.GraphModel;
 import com.bsmwireless.screens.logs.LogHeaderModel;
 import com.bsmwireless.screens.logs.dagger.EventLogModel;
 import com.bsmwireless.widgets.logs.WrapLinearLayoutManager;
+import com.bsmwireless.widgets.logs.calendar.CalendarItem;
 
 import java.util.List;
 
@@ -72,5 +73,10 @@ public final class EditedEventsFragment extends BaseFragment implements EditedEv
     @Override
     public void setLogHeader(LogHeaderModel logHeader) {
         mAdapter.setLogHeader(logHeader);
+    }
+
+    @Override
+    public void updateCalendarItems(List<CalendarItem> calendarItems) {
+        mAdapter.updateCalendarItems(calendarItems);
     }
 }

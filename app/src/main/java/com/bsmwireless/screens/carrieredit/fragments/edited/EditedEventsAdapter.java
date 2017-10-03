@@ -18,6 +18,7 @@ import com.bsmwireless.screens.logs.LogHeaderModel;
 import com.bsmwireless.screens.logs.dagger.EventLogModel;
 import com.bsmwireless.widgets.alerts.DutyType;
 import com.bsmwireless.widgets.logs.LogsTitleView;
+import com.bsmwireless.widgets.logs.calendar.CalendarItem;
 import com.bsmwireless.widgets.logs.calendar.CalendarLayout;
 import com.bsmwireless.widgets.logs.graphview.GraphLayout;
 
@@ -105,6 +106,10 @@ public class EditedEventsAdapter extends RecyclerView.Adapter<EditedEventsAdapte
         notifyDataSetChanged();
     }
 
+    public void updateCalendarItems(List<CalendarItem> calendarItems) {
+        mCalendarLayout.setAllItems(calendarItems);
+    }
+
     @Override
     public LogsHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view;
@@ -116,6 +121,7 @@ public class EditedEventsAdapter extends RecyclerView.Adapter<EditedEventsAdapte
                 mCalendarLayout.setOnItemSelectedListener(calendarItem -> {
                     mPresenter.onCalendarDaySelected(calendarItem);
                 });
+                mPresenter.markCalendarItems(mCalendarLayout.getAllItems());
                 mGraphLayout = view.findViewById(R.id.graphic);
                 //mGraphLayout.setELDEvents(mEventLogs);
                 mEditedEventsTopHeader = ButterKnife.findById(view, R.id.top_header_container);

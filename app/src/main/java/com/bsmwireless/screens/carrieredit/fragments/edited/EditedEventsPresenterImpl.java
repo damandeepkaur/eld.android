@@ -1,5 +1,8 @@
 package com.bsmwireless.screens.carrieredit.fragments.edited;
 
+import android.content.Context;
+import android.support.v4.content.ContextCompat;
+
 import com.bsmwireless.common.utils.DateUtils;
 import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
@@ -19,13 +22,13 @@ import com.bsmwireless.widgets.alerts.DutyType;
 import com.bsmwireless.widgets.logs.calendar.CalendarItem;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
 
+import app.bsmuniversal.com.R;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -52,16 +55,18 @@ public final class EditedEventsPresenterImpl implements EditedEventsPresenter {
     private User mUser;
     private Map<Long, LogSheetHeader> mLogSheetHeadersMap = new HashMap<>();
     private Map<Integer, Vehicle> mVehicleIdToNameMap = new HashMap<>();
+    private Context mContext;
 
     @Inject
     public EditedEventsPresenterImpl(ELDEventsInteractor eldEventsInteractor,
                                      LogSheetInteractor logSheetInteractor, UserInteractor userInteractor,
-                                     VehiclesInteractor vehiclesInteractor, ServiceApi serviceApi) {
+                                     VehiclesInteractor vehiclesInteractor, ServiceApi serviceApi, Context context) {
         mELDEventsInteractor = eldEventsInteractor;
         mLogSheetInteractor = logSheetInteractor;
         mUserInteractor = userInteractor;
         mVehiclesInteractor = vehiclesInteractor;
         mServiceApi = serviceApi;
+        mContext = context;
         mDisposable = new CompositeDisposable();
     }
 
@@ -113,6 +118,7 @@ public final class EditedEventsPresenterImpl implements EditedEventsPresenter {
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(timezone -> {
+                        mTimeZone = timezone;
                         long startDayTime = DateUtils.getStartDayTimeInMs(logDay, timezone);
                         setGraphData(startDayTime, timezone);
                         setEventListData(startDayTime, timezone);
@@ -130,6 +136,29 @@ public final class EditedEventsPresenterImpl implements EditedEventsPresenter {
     @Override
     public void disapproveEdits(List<EventLogModel> events, long logDay) {
         sendUpdatedEvents(events, logDay, ELDEvent.StatusCode.INACTIVE_CHANGE_REJECTED);
+    }
+
+    @Override
+    public void markCalendarItems(List<CalendarItem> list) {
+        mDisposable.add(mELDEventsInteractor.getUnidentifiedEvents()
+                .subscribeOn(Schedulers.io())
+                .map(eldEvents -> {
+                    for (int i = 0; i < list.size(); ++i) {
+                        CalendarItem calendarItem = list.get(i);
+                        for (ELDEvent eldEvent : eldEvents) {
+                            long startTime = DateUtils.getStartDayTimeInMs(calendarItem.getLogDay(), mTimeZone);
+                            if (eldEvent.getEventTime() > startTime &&
+                                    eldEvent.getEventTime() <= startTime + MS_IN_DAY) {
+                                calendarItem.setExternalColor(ContextCompat.getColor(mContext, R.color.coral));
+                                list.set(i, calendarItem);
+                                break;
+                            }
+                        }
+                    }
+                    return list;
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(list1 -> mView.updateCalendarItems(list1), Timber::e));
     }
 
     private void sendUpdatedEvents(List<EventLogModel> events, long logDay, ELDEvent.StatusCode code) {

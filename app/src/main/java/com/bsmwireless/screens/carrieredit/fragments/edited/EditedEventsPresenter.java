@@ -16,4 +16,6 @@ public interface EditedEventsPresenter {
     void approveEdits(List<EventLogModel> events, long logDay);
 
     void disapproveEdits(List<EventLogModel> events, long logDay);
+
+    void markCalendarItems(List<CalendarItem> list);
 }

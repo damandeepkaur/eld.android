@@ -141,6 +141,14 @@ public final class CalendarLayout extends LinearLayout implements View.OnClickLi
         mOnItemSelectListener = listener;
     }
 
+    public List<CalendarItem> getAllItems() {
+        return mAdapter.getItems();
+    }
+
+    public void setAllItems(List<CalendarItem> items) {
+        mAdapter.setItems(items);
+    }
+
     private List<CalendarItem> getItems() {
         Calendar calendar = Calendar.getInstance();
         List<CalendarItem> logs = new ArrayList<>();

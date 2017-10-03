@@ -62,7 +62,10 @@ public final class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.
 
         LogSheetHeader associatedLog = item.getAssociatedLogSheet();
 
-        if (associatedLog != null && Boolean.TRUE.equals(associatedLog.getSigned())) {
+        if (item.getExternalColor() != 0) {
+            holder.mDayOfMonthTV.setTextColor(item.getExternalColor());
+            holder.mDayOfMonthTV.setTypeface(null, Typeface.BOLD);
+        } else if (associatedLog != null && Boolean.TRUE.equals(associatedLog.getSigned())) {
             holder.mDayOfMonthTV.setTextColor(mNastyGreenColor);
             holder.mDayOfMonthTV.setTypeface(null, Typeface.BOLD);
         } else {
@@ -89,6 +92,15 @@ public final class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.
             }
             notifyDataSetChanged();
         }
+    }
+
+    public List<CalendarItem> getItems() {
+        return mItems;
+    }
+
+    public void setItems(List<CalendarItem> items) {
+        mItems = items;
+        notifyDataSetChanged();
     }
 
     public CalendarItem getItemByPosition(int position) {
