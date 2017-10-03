@@ -251,6 +251,10 @@ public final class UserInteractor {
                 .onErrorReturn(throwable -> false);
     }
 
+    public List<UserEntity> getCoDriversName(List<Integer> codriversIds) {
+        return mAppDatabase.userDao().getDriversSync(codriversIds);
+    }
+
     private Boolean handleOfflineOperation(Throwable throwable) {
         return throwable instanceof RetrofitException || throwable instanceof UnknownHostException;
     }
