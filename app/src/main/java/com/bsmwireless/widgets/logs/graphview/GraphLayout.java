@@ -132,7 +132,7 @@ public final class GraphLayout extends LinearLayout {
         List<DrawableLog> result = DrawableLog.convertToDrawableLog(events);
 
         if (mPrevDayEvent != null) {
-            DutyType type = DutyType.getTypeByCode(ELDEvent.EventType.DUTY_STATUS_CHANGING.getValue(),
+            DutyType type = DutyType.getTypeByCode(mPrevDayEvent.getEventType(),
                     mPrevDayEvent.getEventCode());
             DrawableLog log = new DrawableLog(type, startDayTime);
             result.add(0, log);
