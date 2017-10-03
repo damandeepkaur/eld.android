@@ -28,6 +28,7 @@ import java.util.List;
 
 import app.bsmuniversal.com.RxSchedulerRule;
 import io.reactivex.Flowable;
+import io.reactivex.Single;
 import io.reactivex.observers.TestObserver;
 import io.reactivex.subscribers.TestSubscriber;
 
@@ -100,6 +101,23 @@ public class LogSheetInteractorTest {
 
         // then
         verify(mLogSheetDao).getLogSheets(eq(startLogDay), eq(endLogDay), anyInt());
+    }
+
+    @Test
+    public void testGetLogSheetHeadersFromDBOnce() {
+        // given
+        final Long startLogDay = 1503014401L; // validity of date doesn't matter for these tests
+        TestObserver<LogSheetHeader> testObserver = TestObserver.create();
+        when(mAccountManager.getCurrentUserId()).thenReturn(1234);
+        when(mAppDatabase.logSheetDao()).thenReturn(mLogSheetDao);
+        when(mLogSheetDao.getLogSheet(anyLong(), anyInt())).thenReturn(Single.just(new LogSheetEntity()));
+
+        // when
+        mLogSheetInteractor.getLogSheetHeadersFromDBOnce(startLogDay).subscribe(testObserver);
+
+        // then
+        verify(mAccountManager).getCurrentUserId();
+        verify(mLogSheetDao).getLogSheet(eq(startLogDay), anyInt());
     }
 
     @Test

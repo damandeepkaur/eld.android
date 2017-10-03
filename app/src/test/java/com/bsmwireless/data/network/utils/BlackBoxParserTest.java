@@ -61,6 +61,53 @@ public class BlackBoxParserTest {
     }
 
     @Test
+    public void testParseSubscriptionVin() {
+        // given
+        String vin1 = "JH4KB16225C021129";
+        String vin2 = "SAJDA41C252JM4368";
+
+        String vinLength0 = "";
+        String vinLength1 = "1";
+        String vinLength23 = "12345678901234567890123";
+        String vinLength24 = "123456789012345678901234";
+
+
+        try {
+            // when
+            BlackBoxResponseModel response1 = BlackBoxParser.parseSubscription(generateSubscriptionAccepted(vin1));
+            BlackBoxResponseModel response2 = BlackBoxParser.parseSubscription(generateSubscriptionAccepted(vin2));
+
+            BlackBoxResponseModel responseLength0 = BlackBoxParser.parseSubscription(generateSubscriptionAccepted(vinLength0));
+            BlackBoxResponseModel responseLength1 = BlackBoxParser.parseSubscription(generateSubscriptionAccepted(vinLength1));
+            BlackBoxResponseModel responseLength23 = BlackBoxParser.parseSubscription(generateSubscriptionAccepted(vinLength23));
+            BlackBoxResponseModel responseLength24 = BlackBoxParser.parseSubscription(generateSubscriptionAccepted(vinLength24));
+
+            // then
+            assertEquals(vin1, response1.getVinNumber());
+            assertEquals(vin2, response2.getVinNumber());
+            assertEquals(BlackBoxResponseModel.ResponseType.ACK, response1.getResponseType());
+            assertEquals(BlackBoxResponseModel.ResponseType.ACK, response2.getResponseType());
+            assertEquals(31, response1.getLength());
+            assertEquals(31, response2.getLength());
+
+            assertEquals(vinLength0, responseLength0.getVinNumber());
+            assertEquals(vinLength1, responseLength1.getVinNumber());
+            assertEquals(vinLength23, responseLength23.getVinNumber());
+            assertEquals(vinLength24, responseLength24.getVinNumber());
+
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            fail(e.getMessage());
+        }
+    }
+
+    // TODO: parseSubscription() - exception
+
+
+    // TODO: parseVehicleStatus()
+    // TODO: generateSubscriptionRequest() (with VIN)
+
+    @Test
     public void testParseSubscriptionAckNoVin() {
         // given
 
@@ -84,11 +131,11 @@ public class BlackBoxParserTest {
 
             // then
             assertEquals(BlackBoxResponseModel.ResponseType.ACK, responseAck1.getResponseType());
-            assertThat(responseAck1, not(equalTo(BlackBoxResponseModel.ResponseType.NACK)));
-            assertThat(BlackBoxResponseModel.ResponseType.ACK, not(equalTo(BlackBoxResponseModel.ResponseType.NACK)));
+            assertThat(responseAck1.getResponseType(), not(equalTo(BlackBoxResponseModel.ResponseType.NACK)));
             assertEquals(31, responseAck1.getLength());
             assertTrue(BlackBoxResponseModel.ResponseType.ACK  == responseAck1.getResponseType());
             assertFalse(BlackBoxResponseModel.ResponseType.NACK == responseAck1.getResponseType());
+            assertEquals("", responseAck1.getVinNumber());
 
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
@@ -96,6 +143,8 @@ public class BlackBoxParserTest {
         }
     }
 
+    // TODO: generateImmediateStatusRequest()
+    // TODO: parseHeader
 
     @Test
     public void testVinToBytes() {
@@ -117,10 +166,12 @@ public class BlackBoxParserTest {
      * @return a 24-byte array representing a VIN in the box protocol
      */
     private byte[] vinToBytes(String vin) {
-        byte[] vinBytes = new byte[24];
+        byte[] vinBytes = new byte[MAX_VIN_LENGTH];
         for(int i=0; i<vinBytes.length; i++) {
             vinBytes[i] = 0;
         }
+
+        if(vin.length() == 0) return vinBytes;
 
         String vinString = "";
 
@@ -186,6 +237,11 @@ public class BlackBoxParserTest {
     /**
      * Produces a compact hex string for a box command.
      *
+     * Resulting string is a series of hex digits, with each byte being represented by
+     * two hex digits.
+     *
+     * e.g. "53414c5654324247314348363534343931" (length = 17 bytes)
+     *
      * @param boxCommand
      * @return
      */
@@ -228,6 +284,30 @@ public class BlackBoxParserTest {
             sum ^= bytes[i];
         }
         return sum;
+    }
+
+    /**
+     *
+     * @param vin a VIN, will be truncated if length > MAX_VIN_LENGTH
+     * @return
+     */
+    private byte[] generateSubscriptionAccepted(String vin) {
+
+        String vinHex = boxToCompactHexString(vinToBytes(vin)); // vinToBytes() truncates to MAX_VIN_LENGTH digits
+
+        String dataAck1 = HEX_HEADER
+                + "00"          // B8: checksum (fake for now, calculated later)
+                + "1f00"        // B9-B10: length
+                + "61"          // B11: command 'a'
+                + "02"          // B12: packet ID (any is ok)
+                + vinHex;       // B13-B36: VIN (all 0x00 if unavailable)
+
+        byte[] result = new BigInteger(dataAck1,16).toByteArray();
+
+        byte checksum = checksum(result, 9);
+        result[8] = checksum;
+
+        return result;
     }
 
 

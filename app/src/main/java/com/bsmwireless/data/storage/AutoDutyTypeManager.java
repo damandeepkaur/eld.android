@@ -66,7 +66,7 @@ public final class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListen
 
     public void validateBlackBoxState() {
         int boxId = mPreferencesManager.getBoxId();
-        if (boxId != 0) {
+        if (boxId != PreferencesManager.NOT_FOUND_VALUE) {
             validateBlackBoxState(boxId);
         }
     }
