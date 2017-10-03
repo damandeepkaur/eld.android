@@ -95,7 +95,7 @@ public final class RoadsidePresenter {
                                 graphModel.setPrevDayEvent(prevDayEvent);
                                 graphModel.setStartDayTime(startTime);
                                 graphModel.setEventLogModels(preparingLogs(events, startTime,
-                                        Math.min(endTime, System.currentTimeMillis()), timezone));
+                                        Math.min(endTime, DateUtils.currentTimeMillis()), timezone));
                                 result.setGraphData(graphModel);
                                 result.setPreviousEvent(prevDayEvent);
 

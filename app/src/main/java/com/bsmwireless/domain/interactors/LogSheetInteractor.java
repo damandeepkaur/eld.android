@@ -59,8 +59,8 @@ public final class LogSheetInteractor {
     }
 
     public Flowable<List<LogSheetHeader>> getLogSheetHeadersForMonth(String timezone) {
-        long todayLogDay = DateUtils.convertTimeToLogDay(timezone, System.currentTimeMillis());
-        long monthAgoLogDay = DateUtils.convertTimeToLogDay(timezone, System.currentTimeMillis()
+        long todayLogDay = DateUtils.convertTimeToLogDay(timezone, DateUtils.currentTimeMillis());
+        long monthAgoLogDay = DateUtils.convertTimeToLogDay(timezone, DateUtils.currentTimeMillis()
                 - MS_IN_DAY * Constants.DEFAULT_CALENDAR_DAYS_COUNT);
         return getLogSheetHeaders(monthAgoLogDay, todayLogDay);
     }
@@ -115,11 +115,11 @@ public final class LogSheetInteractor {
         event.setDriverId(logSheetHeader.getDriverId());
         event.setVehicleId(logSheetHeader.getVehicleId());
         event.setEventTime(certDay);
-        event.setMobileTime(Calendar.getInstance().getTimeInMillis());
+        event.setMobileTime(DateUtils.currentTimeMillis());
         String timezone = logSheetHeader.getHomeTerminal().getTimezone();
         event.setTimezone(timezone);
         event.setBoxId(logSheetHeader.getBoxId());
-        event.setMobileTime(Calendar.getInstance().getTimeInMillis());
+        event.setMobileTime(DateUtils.currentTimeMillis());
         return event;
     }
 

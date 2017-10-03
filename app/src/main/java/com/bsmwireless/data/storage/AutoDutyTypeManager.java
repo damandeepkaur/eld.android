@@ -3,6 +3,7 @@ package com.bsmwireless.data.storage;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 
+import com.bsmwireless.common.utils.DateUtils;
 import com.bsmwireless.common.utils.SchedulerUtils;
 import com.bsmwireless.domain.interactors.BlackBoxInteractor;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
@@ -39,7 +40,7 @@ public final class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListen
         public void run() {
             if (mListener != null) {
                 mListener.onAutoOnDuty(mStoppedTime);
-                mStoppedTime = System.currentTimeMillis();
+                mStoppedTime = DateUtils.currentTimeMillis();
                 mHandler.postDelayed(this, AUTO_ON_DUTY_DELAY);
             }
         }
@@ -134,7 +135,7 @@ public final class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListen
                 mHandler.removeCallbacks(mAutoOnDutyTask);
 
                 if (mDutyTypeManager.getDutyType() == DutyType.DRIVING) {
-                    mStoppedTime = System.currentTimeMillis();
+                    mStoppedTime = DateUtils.currentTimeMillis();
                     mHandler.postDelayed(mAutoOnDutyTask, AUTO_ON_DUTY_DELAY);
                 } else {
                     SchedulerUtils.schedule();
@@ -170,7 +171,7 @@ public final class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListen
 
             if (dutyType == DutyType.DRIVING && mBlackBoxInteractor.getLastData().getSpeed() == 0) {
                 mHandler.removeCallbacks(mAutoDrivingTask);
-                mStoppedTime = System.currentTimeMillis();
+                mStoppedTime = DateUtils.currentTimeMillis();
                 mHandler.postDelayed(mAutoOnDutyTask, AUTO_ON_DUTY_DELAY);
             }
         }

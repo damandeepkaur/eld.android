@@ -91,11 +91,11 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
         NON_DRIVER(3),              // ELD 7.22 Table 7: "Edit requested by an Authenticated User other than the Driver"
         UNIDENTIFIED_DRIVER(4);     // ELD 7.22 Table 7: "Assumed from Unidentified Driver profile"
 
-        private int mOriginCode;
+        private Integer mOriginCode;
 
         EventOrigin(int code) { mOriginCode = code; }
 
-        public int getValue() { return mOriginCode; }
+        public Integer getValue() { return mOriginCode; }
 
         public static EventOrigin getOriginByCode(int code) {
             for (EventOrigin t : EventOrigin.values()) {
@@ -183,6 +183,30 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
         }
     }
 
+    public enum LatLngFlag {
+        FLAG_NONE(""),
+        FLAG_X("X"),
+        FLAG_M("M"),
+        FLAG_E("E");
+
+        private final String mCode;
+
+        LatLngFlag(String code) {
+            mCode = code;
+        }
+
+        public String getCode() {
+            return mCode;
+        }
+
+        public static LatLngFlag createByCode(String code) {
+            for (LatLngFlag flag : values()) {
+                if (flag.mCode.equalsIgnoreCase(code)) return flag;
+            }
+            return FLAG_NONE;
+        }
+    }
+
     @SerializedName("id")
     @Expose
     private Integer mId;
@@ -216,6 +240,9 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
     @SerializedName("lng")
     @Expose
     private Double mLng;
+    @SerializedName("latLnFlag")
+    @Expose
+    private LatLngFlag mLatLngFlag;
     @SerializedName("distance")
     @Expose
     private Integer mDistance;
@@ -308,6 +335,10 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
         notNull = in.readByte() == 1;
         if (notNull) {
             this.mLng = in.readDouble();
+        }
+        notNull = in.readByte() == 1;
+        if (notNull) {
+            this.mLatLngFlag = LatLngFlag.createByCode(in.readString());
         }
         notNull = in.readByte() == 1;
         if (notNull) {
@@ -455,8 +486,16 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
         return mLng;
     }
 
+    public LatLngFlag getLatLngFlag() {
+        return mLatLngFlag;
+    }
+
     public void setLng(Double lng) {
         this.mLng = lng;
+    }
+
+    public void setLatLngFlag(LatLngFlag latLngFlag) {
+        mLatLngFlag = latLngFlag;
     }
 
     public Integer getDistance() {
@@ -628,6 +667,7 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
                 .append(mEngineHours, rhs.mEngineHours)
                 .append(mLat, rhs.mLat)
                 .append(mLng, rhs.mLng)
+                .append(mLatLngFlag, rhs.mLatLngFlag)
                 .append(mDistance, rhs.mDistance)
                 .append(mComment, rhs.mComment)
                 .append(mLocation, rhs.mLocation)
@@ -661,6 +701,7 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
                 .append(mEngineHours)
                 .append(mLat)
                 .append(mLng)
+                .append(mLatLngFlag)
                 .append(mDistance)
                 .append(mComment)
                 .append(mLocation)
@@ -736,6 +777,11 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
         dest.writeByte(this.mLng == null ? (byte) 0 : 1);
         if (this.mLng != null) {
             dest.writeDouble(this.mLng);
+        }
+
+        dest.writeByte(this.mLatLngFlag == null ? (byte) 0 : 1);
+        if (this.mLatLngFlag != null) {
+            dest.writeString(this.mLatLngFlag.mCode);
         }
 
         dest.writeByte(this.mDistance == null ? (byte) 0 : 1);
@@ -859,6 +905,7 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
         sb.append(", mEngineHours=").append(mEngineHours);
         sb.append(", mLat=").append(mLat);
         sb.append(", mLng=").append(mLng);
+        sb.append(", mLatLngFlag").append(mLatLngFlag);
         sb.append(", mDistance=").append(mDistance);
         sb.append(", mComment='").append(mComment).append('\'');
         sb.append(", mLocation='").append(mLocation).append('\'');

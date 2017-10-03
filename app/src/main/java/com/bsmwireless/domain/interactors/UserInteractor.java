@@ -437,7 +437,7 @@ public final class UserInteractor {
         ruleSelectionModel.setDriverId(getUserId());
         ruleSelectionModel.setRuleException(ruleException);
         ruleSelectionModel.setDutyCycle(dutyCycle);
-        ruleSelectionModel.setApplyTime(Calendar.getInstance().getTimeInMillis());
+        ruleSelectionModel.setApplyTime(DateUtils.currentTimeMillis());
 
         return ruleSelectionModel;
     }

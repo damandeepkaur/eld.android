@@ -9,6 +9,7 @@ import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.view.View;
 
+import com.bsmwireless.common.utils.DateUtils;
 import com.bsmwireless.common.utils.ViewUtils;
 import com.bsmwireless.widgets.alerts.DutyType;
 
@@ -251,8 +252,8 @@ public final class ELDGraphView extends View {
             mHorizontalLinesPaint.setPathEffect(null);
         }
 
-        long currentTime = Calendar.getInstance().getTimeInMillis();
-        if (mStartDayUnixTimeInMs + MS_IN_DAY < Calendar.getInstance().getTimeInMillis()) {
+        long currentTime = DateUtils.currentTimeMillis();
+        if (mStartDayUnixTimeInMs + MS_IN_DAY < DateUtils.currentTimeMillis()) {
             x2 = mGraphWidth + mGraphLeft;
         } else {
             long timeStamp = (currentTime - log.getEventTime()) / MS_IN_MIN;

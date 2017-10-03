@@ -15,7 +15,7 @@ public final class MalfunctionServiceModule {
 
     @Provides
     @ActivityScope
-    static MonitoringPresenter presenter(List<MalfunctionJob> malfunctionJobs){
-        return new MalfunctionServicePresenter(malfunctionJobs);
+    static MonitoringPresenter presenter(List<MalfunctionJob> jobs) {
+        return new MalfunctionServicePresenter(jobs);
     }
 }

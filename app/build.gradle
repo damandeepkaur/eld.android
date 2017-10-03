@@ -10,8 +10,8 @@ android {
         applicationId "app.bsmuniversal.com"
         minSdkVersion 15
         targetSdkVersion 26
-        versionCode 97
-        versionName "1.0.96"
+        versionCode 102
+        versionName "1.0.101"
 
         javaCompileOptions {
             annotationProcessorOptions {
@@ -36,12 +36,12 @@ android {
             buildConfigField "boolean", "USE_LOG", "false"
             signingConfig signingConfigs.release
 
-            testCoverageEnabled = true
+            testCoverageEnabled = false
         }
         debug {
             buildConfigField "boolean", "USE_LOG", "true"
 
-            testCoverageEnabled = true
+            testCoverageEnabled = false
         }
     }
 
@@ -57,6 +57,9 @@ android {
     lintOptions {
         disable 'MissingTranslation', 'ExtraTranslation'
         abortOnError false
+    }
+    testOptions {
+        unitTests.returnDefaultValues = true
     }
 }
 
@@ -176,4 +179,4 @@ dependencies {
 }
 
 
-apply from: "jacoco.gradle"
+//apply from: "jacoco.gradle"
