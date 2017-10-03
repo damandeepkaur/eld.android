@@ -29,11 +29,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import javax.inject.Inject;
 
 import io.reactivex.Flowable;
-import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -306,7 +307,7 @@ public final class ELDEventsInteractor {
      * @param malfunction malfunction code
      * @return latest malfunction ELD event
      */
-    public Maybe<ELDEvent> getLatestMalfunctionEvent(Malfunction malfunction) {
+    public Flowable<ELDEvent> getLatestMalfunctionEvent(Malfunction malfunction) {
         return mELDEventDao
                 .getLatestEvent(mAccountManager.getCurrentUserId(),
                         ELDEvent.EventType.DATA_DIAGNOSTIC.getValue(),
@@ -472,7 +473,7 @@ public final class ELDEventsInteractor {
         event.setLng(blackBoxModel.getLon());
         try {
             event.setLatLngFlag(getLatLngFlag(blackBoxModel));
-        } catch (InterruptedException | ExecutionException e) {
+        } catch (InterruptedException | ExecutionException | TimeoutException e) {
             event.setLatLngFlag(ELDEvent.LatLngFlag.FLAG_NONE);
         }
         event.setLocation("");
@@ -510,7 +511,7 @@ public final class ELDEventsInteractor {
         return event;
     }
 
-    private ELDEvent.LatLngFlag getLatLngFlag(BlackBoxModel blackBoxModel) throws ExecutionException, InterruptedException {
+    private ELDEvent.LatLngFlag getLatLngFlag(BlackBoxModel blackBoxModel) throws ExecutionException, InterruptedException, TimeoutException {
         if (mLatestEldEvent == null) {
             mLatestEldEvent = mELDEventDao.getLatestEvent(
                     mAccountManager.getCurrentUserId(),
@@ -518,9 +519,8 @@ public final class ELDEventsInteractor {
                     Malfunction.POSITIONING_COMPLIANCE.getCode(),
                     ELDEvent.StatusCode.ACTIVE.getValue())
                     .subscribeOn(Schedulers.io())
-                    .toFlowable()
                     .toFuture()
-                    .get();
+                    .get(100, TimeUnit.MILLISECONDS);
         }
 
         ELDEvent.LatLngFlag latLngFlag;
