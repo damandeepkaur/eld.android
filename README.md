@@ -3,6 +3,7 @@ ELD app for Android
 
 # Version history
 
+* **1.0.101** - Calculation a driving distance, co-driver info (_EA-405_, _EA-442_, _EA-420_, _EA-437_)
 * **1.0.100** - Special driving spanning overnight is not handled properly by duty line and event label (_EA-426_)
 * **1.0.99** - Positioning Compliance Monitoring (_EA-367_)
 * **1.0.98** - Add option to remove event to Logs Screen (_EA-463_)
