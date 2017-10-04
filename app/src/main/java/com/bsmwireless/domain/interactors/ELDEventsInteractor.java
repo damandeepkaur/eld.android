@@ -140,11 +140,9 @@ public final class ELDEventsInteractor {
     public Observable<long[]> updateELDEvents(List<ELDEvent> events) {
         ELDEventEntity entities[] = new ELDEventEntity[events.size()];
 
-        //if event is not posted yet, we should not send update request for it
         for (int i = 0; i < entities.length; i++) {
             ELDEvent event = events.get(i);
-            entities[i] = ELDEventConverter.toEntity(event, event.getSync() == ELDEventEntity.SyncType.NEW_UNSYNC.ordinal() ?
-                    ELDEventEntity.SyncType.NEW_UNSYNC : ELDEventEntity.SyncType.UPDATE_UNSYNC);
+            entities[i] = ELDEventConverter.toEntity(event, event.getStatus() == ELDEvent.StatusCode.ACTIVE.getValue() ? ELDEventEntity.SyncType.UPDATE_UNSYNC : ELDEventEntity.SyncType.getType(event.getSync()));
         }
 
         return Observable.fromCallable(() ->

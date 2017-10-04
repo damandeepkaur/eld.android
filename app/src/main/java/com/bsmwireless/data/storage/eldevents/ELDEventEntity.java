@@ -9,7 +9,16 @@ public final class ELDEventEntity {
     public enum SyncType {
         SYNC,
         UPDATE_UNSYNC,
-        NEW_UNSYNC
+        NEW_UNSYNC;
+
+        public static SyncType getType(int code) {
+            for (SyncType type : values()) {
+                if (code == type.ordinal()) {
+                    return type;
+                }
+            }
+            return SYNC;
+        }
     }
 
     @PrimaryKey
