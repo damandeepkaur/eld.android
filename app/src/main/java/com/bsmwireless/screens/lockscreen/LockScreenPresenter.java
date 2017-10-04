@@ -26,6 +26,7 @@ import javax.inject.Inject;
 
 import io.reactivex.Completable;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
@@ -46,6 +47,7 @@ public final class LockScreenPresenter {
     private final AppSettings mAppSettings;
     final AccountManager mAccountManager;
     private final AtomicReference<Completable> mReconnectionReference;
+    private final AtomicReference<Completable> mStoppedReference;
     private Disposable mIdlingTDisposable;
     private volatile BlackBoxResponseModel.ResponseType mCurrentResponseType;
 
@@ -67,6 +69,8 @@ public final class LockScreenPresenter {
         mAccountManager = accountManager;
         mCompositeDisposable = new CompositeDisposable();
         mReconnectionReference = new AtomicReference<>();
+        mIdlingTDisposable = Disposables.disposed();
+        mStoppedReference = new AtomicReference<>();
         mIdlingTDisposable = Disposables.disposed();
         mCurrentResponseType = BlackBoxResponseModel.ResponseType.NONE;
     }
@@ -110,7 +114,10 @@ public final class LockScreenPresenter {
             return;
         }
 
-        Disposable disposable = createPostNewEventCompletable(mEventsInteractor.getEvent(dutyType))
+        Disposable disposable = Single
+                .fromCallable(() -> mEventsInteractor.getEvent(dutyType))
+                .flatMapCompletable(this::createPostNewEventCompletable)
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(() -> {
                     if (mView != null) {
@@ -154,10 +161,15 @@ public final class LockScreenPresenter {
      * Start the monitoring statuses task.
      */
     void startMonitoring() {
-        if (mView != null) {
-            mView.removeAnyPopup();
+        // try to restore tasks which triggered by timeout
+        if (mCurrentResponseType == BlackBoxResponseModel.ResponseType.STOPPED) {
+            handleStopped();
+        } else if (mStoppedReference.get() != null) {
+            handleDisconnection();
         }
-        mBlackBoxInteractor.getData(mPreferencesManager.getBoxId())
+
+        Disposable disposable = mBlackBoxInteractor
+                .getData(mPreferencesManager.getBoxId())
                 .skip(1) // first element already handled, skip it
                 .distinctUntilChanged(BlackBoxModel::getResponseType)
                 .doOnNext(blackBoxModel -> mCurrentResponseType = blackBoxModel.getResponseType())
@@ -186,16 +198,21 @@ public final class LockScreenPresenter {
                         handleDisconnection();
                     }
                 });
+        mCompositeDisposable.add(disposable);
     }
 
     void handleIgnitionOff() {
+        // cancel the idling timer first
         mIdlingTDisposable.dispose();
-        Disposable disposable = createPostNewEventCompletable(mEventsInteractor.getEvent(DutyType.ON_DUTY))
-                .subscribe(() -> {
-                    if (mView != null) {
-                        mView.showIgnitionOffDetectedDialog();
-                    }
-                });
+        Disposable disposable =
+                Single.fromCallable(() -> mEventsInteractor.getEvent(DutyType.ON_DUTY))
+                        .flatMapCompletable(this::createPostNewEventCompletable)
+                        .subscribeOn(Schedulers.io())
+                        .subscribe(() -> {
+                            if (mView != null) {
+                                mView.showIgnitionOffDetectedDialog();
+                            }
+                        });
         mCompositeDisposable.add(disposable);
     }
 
@@ -206,16 +223,31 @@ public final class LockScreenPresenter {
             return;
         }
 
-        mIdlingTDisposable = Completable
-                .timer(mAppSettings.lockScreenIdlingTimeout(), TimeUnit.MILLISECONDS)
+        Completable idleReference = mStoppedReference.get();
+        if (idleReference == null) {
+            idleReference = Completable
+                    .timer(mAppSettings.lockScreenIdlingTimeout(), TimeUnit.MILLISECONDS)
+                    .cache();
+
+            if (!mStoppedReference.compareAndSet(null, idleReference)) {
+                idleReference = mStoppedReference.get();
+            }
+        }
+
+        mIdlingTDisposable = idleReference
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
+                .doFinally(() -> mReconnectionReference.set(null))
                 .subscribe(mView::closeLockScreen);
+        mCompositeDisposable.add(mIdlingTDisposable);
     }
 
     void handleMoving() {
-        ELDEvent eldEvent = mEventsInteractor.getEvent(mDutyManager.getDutyType());
-        Disposable disposable = createPostNewEventCompletable(eldEvent)
+        Disposable disposable = Single
+                .fromCallable(() -> mEventsInteractor.getEvent(mDutyManager.getDutyType()))
+                .flatMapCompletable(this::createPostNewEventCompletable)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(() -> {
                     if (mView != null) {
                         mView.removeAnyPopup();
@@ -227,8 +259,10 @@ public final class LockScreenPresenter {
 
     void handleDisconnection() {
         mIdlingTDisposable.dispose();
-        ELDEvent event = mEventsInteractor.getEvent(DutyType.ON_DUTY);
-        startReconnection(event);
+        Disposable disposable = Single.fromCallable(() -> mEventsInteractor.getEvent(DutyType.ON_DUTY))
+                .subscribeOn(Schedulers.io())
+                .subscribe(this::startReconnection, Timber::e);
+        mCompositeDisposable.add(disposable);
     }
 
     /**
@@ -270,7 +304,12 @@ public final class LockScreenPresenter {
                 .andThen(createPostNewEventCompletable(eldEvent))
                 .observeOn(AndroidSchedulers.mainThread())
                 .doFinally(() -> mReconnectionReference.set(null))
-                .subscribe(this::startMonitoring, throwable -> mView.closeLockScreen());
+                .subscribe(() -> {
+                    if (mView != null) {
+                        mView.removeAnyPopup();
+                    }
+                    startMonitoring();
+                }, throwable -> mView.closeLockScreen());
         mCompositeDisposable.add(disposable);
     }
 
@@ -286,9 +325,7 @@ public final class LockScreenPresenter {
                 .onErrorComplete(throwable -> {
                     Timber.e(throwable, "Post new duty event error");
                     return true;
-                })
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
+                });
     }
 
     private final AccountManager.AccountListener accountListener = new AccountManager.AccountListener() {
