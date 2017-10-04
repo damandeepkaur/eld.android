@@ -3,13 +3,10 @@ package com.bsmwireless.screens.navigation;
 import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.data.storage.AutoDutyTypeManager;
 import com.bsmwireless.data.storage.DutyTypeManager;
-import com.bsmwireless.data.storage.users.UserConverter;
-import com.bsmwireless.data.storage.users.UserEntity;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
 import com.bsmwireless.domain.interactors.SyncInteractor;
 import com.bsmwireless.domain.interactors.UserInteractor;
 import com.bsmwireless.domain.interactors.VehiclesInteractor;
-import com.bsmwireless.models.User;
 
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -21,9 +18,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import app.bsmuniversal.com.RxSchedulerRule;
 import io.reactivex.Flowable;
-import io.reactivex.Observable;
+import io.reactivex.Single;
 
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
@@ -81,7 +77,7 @@ public class NavigationPresenterTest {
     @Test
     public void testOnLogoutInteractorCall() {
         // given
-        when(mEventsInteractor.postLogoutEvent()).thenReturn(Observable.just(true));
+        when(mEventsInteractor.postLogoutEvent()).thenReturn(Single.just(true));
 
         // when
         mNavigationPresenter.onLogoutItemSelected();
@@ -97,7 +93,7 @@ public class NavigationPresenterTest {
     @Test
     public void testOnLogoutFailed() {
         // given
-        when(mEventsInteractor.postLogoutEvent()).thenReturn(Observable.just(false));
+        when(mEventsInteractor.postLogoutEvent()).thenReturn(Single.just(false));
 
         // when
         mNavigationPresenter.onLogoutItemSelected();
@@ -115,7 +111,7 @@ public class NavigationPresenterTest {
     @Test
     public void testOnLogoutError() {
         // given
-        when(mEventsInteractor.postLogoutEvent()).thenReturn(Observable.error(new RuntimeException("it broke.")));
+        when(mEventsInteractor.postLogoutEvent()).thenReturn(Single.error(new RuntimeException("it broke.")));
 
         // when
         mNavigationPresenter.onLogoutItemSelected();

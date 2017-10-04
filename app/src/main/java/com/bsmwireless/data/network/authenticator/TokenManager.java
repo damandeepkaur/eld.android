@@ -170,8 +170,9 @@ public final class TokenManager {
                 mServiceApi.refreshToken()
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
+                        .toObservable()
                         .flatMap(auth -> Observable.fromCallable(() -> refreshToken(accountType, name, auth)))
-                        .subscribe();
+                        .subscribe(flag -> Timber.d("Token refreshed: " + flag), Timber::e);
                 retVal = true;
             } else if (mAccountManager.getCurrentUserAccountName().equals(accountType)) {
                 Timber.d("onTokenExpired: logout");

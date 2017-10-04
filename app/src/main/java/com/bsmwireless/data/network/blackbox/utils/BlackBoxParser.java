@@ -41,13 +41,21 @@ public class BlackBoxParser {
             // on ACK - parse for the VIN , available from the subscription ack message
             // is length 31 excluding the header
             if (responseModel.getResponseType() == BlackBoxResponseModel.ResponseType.ACK && responseModel.getLength() == 31) {
-                int sum = 0;
-                for (int i = VIN_INDEX_START; i < VIN_INDEX_END; ++i) {
-                    sum |= data[i];
+
+                // search for VIN end
+                int vinBytesToParse = 0;
+                for (int i = VIN_INDEX_START; i <= VIN_INDEX_END; ++i) {
+
+                    if(data[i] == 0) { // stop on first 0
+                        break;
+                    }
+
+                    vinBytesToParse ++;
                 }
+
                 String vinNumber = "";
-                if (sum > 0) {
-                    vinNumber = new String(data, index, VIN_INDEX_END - VIN_INDEX_START, "ASCII");
+                if (vinBytesToParse > 0) {
+                    vinNumber = new String(data, index, vinBytesToParse, "ASCII");
                 }
                 responseModel.setVinNumber(vinNumber);
                 Timber.i("VIN number from the box " + responseModel.getVinNumber());

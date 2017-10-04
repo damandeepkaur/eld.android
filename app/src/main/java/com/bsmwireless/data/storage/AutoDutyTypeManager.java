@@ -30,12 +30,16 @@ public final class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListen
 
     private AutoDutyTypeListener mListener = null;
 
+    private volatile DutyType mDutyType;
+    private volatile long mStoppedTime;
+
     private Handler mHandler = new Handler();
     private Runnable mAutoOnDutyTask = new Runnable() {
         @Override
         public void run() {
             if (mListener != null) {
-                mListener.onAutoOnDuty();
+                mListener.onAutoOnDuty(mStoppedTime);
+                mStoppedTime = System.currentTimeMillis();
                 mHandler.postDelayed(this, AUTO_ON_DUTY_DELAY);
             }
         }
@@ -62,7 +66,7 @@ public final class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListen
 
     public void validateBlackBoxState() {
         int boxId = mPreferencesManager.getBoxId();
-        if (boxId != 0) {
+        if (boxId != PreferencesManager.NOT_FOUND_VALUE) {
             validateBlackBoxState(boxId);
         }
     }
@@ -72,12 +76,11 @@ public final class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListen
             mBlackBoxDisposable.dispose();
         }
 
-        mBlackBoxDisposable = (mBlackBoxInteractor.getData(boxId)
+        mBlackBoxDisposable = mBlackBoxInteractor.getData(boxId)
                 .subscribeOn(Schedulers.io())
                 .subscribe(
                         blackBoxState -> processBlackBoxState(blackBoxState),
-                        error -> Timber.e("BlackBox error: %s", error)
-        ));
+                        error -> Timber.e("BlackBox error: %s", error));
     }
 
     private void processBlackBoxState(BlackBoxModel blackBoxState) {
@@ -114,7 +117,8 @@ public final class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListen
 
                 mHandler.removeCallbacks(mAutoOnDutyTask);
 
-                if (mDutyTypeManager.getDutyType() != DutyType.PERSONAL_USE && mDutyTypeManager.getDutyType() != DutyType.YARD_MOVES) {
+                DutyType dutyTypeCurr = mDutyTypeManager.getDutyType();
+                if (dutyTypeCurr != DutyType.PERSONAL_USE && dutyTypeCurr != DutyType.YARD_MOVES && dutyTypeCurr != DutyType.DRIVING) {
                     events.add(mEventsInteractor.getEvent(DutyType.DRIVING, null, true));
                 }
 
@@ -130,6 +134,7 @@ public final class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListen
                 mHandler.removeCallbacks(mAutoOnDutyTask);
 
                 if (mDutyTypeManager.getDutyType() == DutyType.DRIVING) {
+                    mStoppedTime = System.currentTimeMillis();
                     mHandler.postDelayed(mAutoOnDutyTask, AUTO_ON_DUTY_DELAY);
                 } else {
                     SchedulerUtils.schedule();
@@ -140,7 +145,6 @@ public final class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListen
                 break;
         }
 
-        //TODO: change to putting in data base
         if (!events.isEmpty()) {
             mEventsInteractor.postNewELDEvents(events).subscribeOn(Schedulers.io()).subscribe();
         }
@@ -159,16 +163,21 @@ public final class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListen
 
     @Override
     public void onDutyTypeChanged(DutyType dutyType) {
-        mHandler.removeCallbacks(mAutoOnDutyTask);
+        if (mDutyType != dutyType) {
+            mDutyType = dutyType;
 
-        if (dutyType == DutyType.DRIVING && mBlackBoxInteractor.getLastData().getSpeed() == 0) {
-            mHandler.removeCallbacks(mAutoDrivingTask);
-            mHandler.postDelayed(mAutoOnDutyTask, AUTO_ON_DUTY_DELAY);
+            mHandler.removeCallbacks(mAutoOnDutyTask);
+
+            if (dutyType == DutyType.DRIVING && mBlackBoxInteractor.getLastData().getSpeed() == 0) {
+                mHandler.removeCallbacks(mAutoDrivingTask);
+                mStoppedTime = System.currentTimeMillis();
+                mHandler.postDelayed(mAutoOnDutyTask, AUTO_ON_DUTY_DELAY);
+            }
         }
     }
 
     public interface AutoDutyTypeListener {
-        void onAutoOnDuty();
+        void onAutoOnDuty(long stoppedTime);
         void onAutoDriving();
         void onAutoDrivingWithoutConfirm();
     }

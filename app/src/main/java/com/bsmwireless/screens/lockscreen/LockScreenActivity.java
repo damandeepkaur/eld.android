@@ -51,9 +51,8 @@ public final class LockScreenActivity extends BaseActivity implements LockScreen
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        doBindToService(false);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Window w = getWindow(); // in Activity's onCreate() for instance
+            Window w = getWindow(); // in Activity's startMonitoring() for instance
             w.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         }
 
@@ -87,6 +86,8 @@ public final class LockScreenActivity extends BaseActivity implements LockScreen
 
         DutyView dutyView;
         switch (dutyType) {
+            case YARD_MOVES:
+            case PERSONAL_USE:
             case DRIVING:
                 dutyView = mCurrentDutyView;
                 break;

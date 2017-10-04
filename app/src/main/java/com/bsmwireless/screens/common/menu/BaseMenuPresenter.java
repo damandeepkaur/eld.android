@@ -7,6 +7,8 @@ import com.bsmwireless.domain.interactors.UserInteractor;
 import com.bsmwireless.widgets.alerts.DutyType;
 import com.bsmwireless.widgets.alerts.OccupancyType;
 
+import java.util.List;
+
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
@@ -19,7 +21,7 @@ import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.Subject;
 import timber.log.Timber;
 
-public abstract class BaseMenuPresenter implements AccountManager.AccountListener{
+public abstract class BaseMenuPresenter implements AccountManager.AccountListener {
     private final DutyTypeManager mDutyTypeManager;
     private final ELDEventsInteractor mEventsInteractor;
     private final UserInteractor mUserInteractor;
@@ -84,26 +86,24 @@ public abstract class BaseMenuPresenter implements AccountManager.AccountListene
     }
 
     final void onDutyChanged(DutyType dutyType, String comment) {
-        // don't set the same type
-        if (dutyType != mDutyTypeManager.getDutyType()) {
-            mDisposables.add(mEventsInteractor.postNewDutyTypeEvent(dutyType, comment)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeOn(Schedulers.io())
-                    .subscribe(
-                            responseMessage -> {
-                            },
-                            error -> Timber.e(error.getMessage())
-                    )
-            );
-        }
+        Disposable disposable = mEventsInteractor
+                .postNewDutyTypeEvent(dutyType, comment)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(
+                        responseMessage -> {
+                        },
+                        error -> Timber.e(error.getMessage())
+                );
+        mDisposables.add(disposable);
+    }
+
+    public final boolean isDriverConnected() {
+        return mEventsInteractor.isConnected();
     }
 
     public final void onChangeDutyClick() {
-        if (mEventsInteractor.isConnected()) {
-            getView().showDutyTypeDialog(mDutyTypeManager.getDutyType());
-        } else {
-            getView().showNotInVehicleDialog();
-        }
+        getView().showDutyTypeDialog(mDutyTypeManager.getDutyType());
     }
 
     @SuppressWarnings("DesignForExtension")
@@ -175,6 +175,10 @@ public abstract class BaseMenuPresenter implements AccountManager.AccountListene
         return mDutyTypeManager;
     }
 
+    protected final AccountManager getAccountManager(){
+        return mAccountManager;
+    }
+
     @SuppressWarnings("DesignForExtension")
     @Override
     public void onUserChanged() {
@@ -189,6 +193,11 @@ public abstract class BaseMenuPresenter implements AccountManager.AccountListene
         }
     }
 
+    final List<DutyType> getAvailableDutyTypes() {
+        return mAccountManager.isCurrentUserDriver() && mEventsInteractor.isConnected() ? DutyTypeManager.DRIVER_DUTY : DutyTypeManager.CO_DRIVER_DUTY;
+    }
+
     @Override
-    public void onDriverChanged() {}
+    public void onDriverChanged() {
+    }
 }

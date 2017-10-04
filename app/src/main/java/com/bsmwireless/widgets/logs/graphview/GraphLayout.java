@@ -8,7 +8,7 @@ import android.widget.LinearLayout;
 import com.bsmwireless.common.utils.DateUtils;
 import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.models.ELDEvent;
-import com.bsmwireless.screens.logs.HOSTimesModel;
+import com.bsmwireless.screens.logs.GraphModel;
 import com.bsmwireless.screens.logs.dagger.EventLogModel;
 import com.bsmwireless.widgets.alerts.DutyType;
 import com.bsmwireless.widgets.common.FontTextView;
@@ -56,27 +56,18 @@ public final class GraphLayout extends LinearLayout {
         init(context);
     }
 
-    public void setELDEvents(List<EventLogModel> logs) {
+    public void updateGraph(GraphModel graphModel) {
         if (mELDGraphView != null) {
-            if (!logs.isEmpty() && (mPrevDayEvent == null)) {
-                mStartDayUnixTimeInMs = DateUtils.getStartDayTimeInMs(logs.get(0).getDriverTimezone(),
-                        logs.get(0).getEventTime());
-            }
+            mPrevDayEvent = graphModel.getPrevDayEvent();
+            mStartDayUnixTimeInMs = graphModel.getStartDayTime();
+            List<EventLogModel> logs = graphModel.getEventLogModels();
             updateHOSTimes(logs, mStartDayUnixTimeInMs);
             List<DrawableLog> drawableLog = prepareEvents(logs, mStartDayUnixTimeInMs);
             mELDGraphView.setLogs(drawableLog, mStartDayUnixTimeInMs);
         }
     }
 
-    public void setPrevDayEvent(ELDEvent event) {
-        if (mELDGraphView != null) {
-            mPrevDayEvent = event;
-            mStartDayUnixTimeInMs = event.getEventTime();
-        }
-    }
-
     private void updateHOSTimes(final List<EventLogModel> events, final long startDayTime) {
-        HOSTimesModel hosTimesModel = new HOSTimesModel();
         long currentTime = Calendar.getInstance().getTimeInMillis();
         long endDayTime = startDayTime + MS_IN_DAY;
 
@@ -88,18 +79,12 @@ public final class GraphLayout extends LinearLayout {
         long[] times = DutyTypeManager.getDutyTypeTimes(checkableEvents, startDayTime,
                 Math.min(endDayTime, currentTime));
 
-        hosTimesModel.setSleeperBerthTime(DateUtils.convertTotalTimeInMsToStringTime(times[DutyType.SLEEPER_BERTH.ordinal()]));
-        hosTimesModel.setDrivingTime(DateUtils.convertTotalTimeInMsToStringTime(times[DutyType.DRIVING.ordinal()]));
-        hosTimesModel.setOffDutyTime(DateUtils.convertTotalTimeInMsToStringTime(times[DutyType.OFF_DUTY.ordinal()]));
-        hosTimesModel.setOnDutyTime(DateUtils.convertTotalTimeInMsToStringTime(times[DutyType.ON_DUTY.ordinal()]));
-        setHOSTimer(hosTimesModel);
-    }
+        times = DateUtils.getRoundedDurations(times, endDayTime >= currentTime);
 
-    public void setHOSTimer(HOSTimesModel hosTimes) {
-        setHOSTimerSleeperBerth(hosTimes.getSleeperBerthTime());
-        setHOSTimerDriving(hosTimes.getDrivingTime());
-        setHOSTimerOffDuty(hosTimes.getOffDutyTime());
-        setHOSTimerOnDuty(hosTimes.getOnDutyTime());
+        setHOSTimerSleeperBerth(DateUtils.convertTotalTimeInMsToStringTime(times[DutyType.SLEEPER_BERTH.ordinal()]));
+        setHOSTimerDriving(DateUtils.convertTotalTimeInMsToStringTime(times[DutyType.DRIVING.ordinal()]));
+        setHOSTimerOffDuty(DateUtils.convertTotalTimeInMsToStringTime(times[DutyType.OFF_DUTY.ordinal()]));
+        setHOSTimerOnDuty(DateUtils.convertTotalTimeInMsToStringTime(times[DutyType.ON_DUTY.ordinal()]));
     }
 
     public void setHOSTimerOnDuty(String time) {
@@ -147,9 +132,9 @@ public final class GraphLayout extends LinearLayout {
         List<DrawableLog> result = DrawableLog.convertToDrawableLog(events);
 
         if (mPrevDayEvent != null) {
-            long duration = result.isEmpty() ? MS_IN_DAY : result.get(0).getEventTime() - startDayTime;
-            DutyType type = DutyType.getTypeByCode(ELDEvent.EventType.DUTY_STATUS_CHANGING.getValue(), mPrevDayEvent.getEventCode());
-            DrawableLog log = new DrawableLog(type, startDayTime, duration);
+            DutyType type = DutyType.getTypeByCode(mPrevDayEvent.getEventType(),
+                    mPrevDayEvent.getEventCode());
+            DrawableLog log = new DrawableLog(type, startDayTime);
             result.add(0, log);
         }
         return result;

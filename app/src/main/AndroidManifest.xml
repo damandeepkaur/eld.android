@@ -80,7 +80,16 @@
         <activity
             android:name="com.bsmwireless.screens.lockscreen.LockScreenActivity"/>
 
-        <service android:name="com.bsmwireless.data.network.authenticator.BsmAuthenticatorService"
+        <activity
+            android:name="com.bsmwireless.screens.roadsidenavigation.RoadsideNavigationActivity"/>
+
+        <activity
+            android:name="com.bsmwireless.screens.transfer.TransferActivity"/>
+
+        <activity android:name="com.bsmwireless.screens.hoursofservice.HoursOfServiceActivity"/>
+
+        <service
+            android:name="com.bsmwireless.data.network.authenticator.BsmAuthenticatorService"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator"/>
@@ -113,6 +122,8 @@
             android:permission="android.permission.BIND_JOB_SERVICE"/>
 
         <service android:name="com.bsmwireless.schedulers.alarmmanager.SyncNtpService"/>
+
+        <service android:name="com.bsmwireless.services.malfunction.MalfunctionMonitoringService"/>
 
         <receiver android:name="com.bsmwireless.schedulers.alarmmanager.SyncNtpAlarmReceiver"/>
 

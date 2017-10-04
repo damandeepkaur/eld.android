@@ -18,6 +18,9 @@ public interface VehicleDao {
     @Query("SELECT * FROM vehicles WHERE vehicles.id IN (:ids)")
     Flowable<List<VehicleEntity>> getVehicles(List<Integer> ids);
 
+    @Query("SELECT * FROM vehicles WHERE vehicles.id IN (:ids)")
+    List<VehicleEntity> getVehiclesSync(List<Integer> ids);
+
     @Query("SELECT * FROM vehicles WHERE id = :id LIMIT 1")
     VehicleEntity getVehicleSync(int id);
 

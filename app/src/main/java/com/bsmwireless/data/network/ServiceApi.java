@@ -18,7 +18,6 @@ import com.bsmwireless.models.Vehicle;
 
 import java.util.List;
 
-import io.reactivex.Observable;
 import io.reactivex.Single;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
@@ -36,7 +35,7 @@ public interface ServiceApi {
      * @return User Response {@link User}.
      */
     @POST("v1/login/driver")
-    Observable<User> loginUser(@Body LoginModel request);
+    Single<User> loginUser(@Body LoginModel request);
 
     /**
      * Request to update current token
@@ -44,7 +43,7 @@ public interface ServiceApi {
      * @return Auth data {@link Auth}
      */
     @POST("v1/app/newtoken")
-    Observable<Auth> refreshToken();
+    Single<Auth> refreshToken();
 
     /**
      * User logout
@@ -55,7 +54,7 @@ public interface ServiceApi {
      * @return Logout response {@link ResponseMessage}
      */
     @POST("v1/app/logout")
-    Observable<ResponseMessage> logout(@Body ELDEvent logoutEvent, @Header("X-Token") String token, @Header("X-Driver") String driver);
+    Single<ResponseMessage> logout(@Body ELDEvent logoutEvent, @Header("X-Token") String token, @Header("X-Driver") String driver);
 
     /**
      * User logout
@@ -64,7 +63,7 @@ public interface ServiceApi {
      * @return Logout response {@link ResponseMessage}
      */
     @POST("v1/app/logout")
-    Observable<ResponseMessage> logout(@Body ELDEvent logoutEvent);
+    Single<ResponseMessage> logout(@Body ELDEvent logoutEvent);
 
     /**
      * Send ELD event;
@@ -74,7 +73,7 @@ public interface ServiceApi {
      * @return update driver status response {@link ResponseMessage}.
      */
     @POST("v1/app/driver/certify")
-    Observable<ResponseMessage> postNewELDEvent(@Body ELDEvent event);
+    Single<ResponseMessage> postNewELDEvent(@Body ELDEvent event);
 
     /**
      * Send ELD events;
@@ -84,7 +83,7 @@ public interface ServiceApi {
      * @return update driver status response {@link ResponseMessage}.
      */
     @POST("v1/app/driver/dutyevents")
-    Observable<ResponseMessage> postNewELDEvents(@Body List<ELDEvent> statusList);
+    Single<ResponseMessage> postNewELDEvents(@Body List<ELDEvent> statusList);
 
     /**
      * Update ELD Event which already sent to server
@@ -93,7 +92,7 @@ public interface ServiceApi {
      * @return update events response {@link ResponseMessage}.
      */
     @POST("v1/app/driver/updateevents")
-    Observable<ResponseMessage> updateELDEvents(@Body List<ELDEvent> events);
+    Single<ResponseMessage> updateELDEvents(@Body List<ELDEvent> events);
 
     /**
      * Fetch processed driver records.
@@ -103,7 +102,7 @@ public interface ServiceApi {
      * @return List of unidentified or changed event records {@link ELDEvent}.
      */
     @GET("v1/sync/records/search/{start}/{end}")
-    Observable<List<ELDEvent>> getELDEvents(@Path("start") Long startTime, @Path("end") Long endTime);
+    Single<List<ELDEvent>> getELDEvents(@Path("start") Long startTime, @Path("end") Long endTime);
 
     /**
      * Fetch processed driver records.
@@ -115,7 +114,7 @@ public interface ServiceApi {
      * @return List of unidentified or changed event records {@link ELDEvent}.
      */
     @GET("v1/sync/records/search/{start}/{end}")
-    Observable<List<ELDEvent>> getELDEvents(@Path("start") Long startTime, @Path("end") Long endTime, @Header("X-Token") String token, @Header("X-Driver") String driver);
+    Single<List<ELDEvent>> getELDEvents(@Path("start") Long startTime, @Path("end") Long endTime, @Header("X-Token") String token, @Header("X-Driver") String driver);
 
     /**
      * Update unidentified records or change record request.
@@ -124,7 +123,7 @@ public interface ServiceApi {
      * @return Response {@link ResponseMessage}.
      */
     @PUT("v1/sync/records/update")
-    Observable<ResponseMessage> updateRescords(@Body List<ELDUpdate> events);
+    Single<ResponseMessage> updateRescords(@Body List<ELDUpdate> events);
 
     /**
      * Update user profile.
@@ -133,7 +132,7 @@ public interface ServiceApi {
      * @return update driver information response {@link ResponseMessage}.
      */
     @PUT("v1/app/driver/profile")
-    Observable<ResponseMessage> updateDriverProfile(@Body DriverProfileModel driverProfile);
+    Single<ResponseMessage> updateDriverProfile(@Body DriverProfileModel driverProfile);
 
     /**
      * Update driver password
@@ -142,7 +141,7 @@ public interface ServiceApi {
      * @return update driver password response {@link ResponseMessage}.
      */
     @PUT("v1/app/driver/pswd")
-    Observable<ResponseMessage> updateDriverPassword(@Body PasswordModel passwordModel);
+    Single<ResponseMessage> updateDriverPassword(@Body PasswordModel passwordModel);
 
     /**
      * Update driver signature
@@ -151,7 +150,7 @@ public interface ServiceApi {
      * @return update driver signature response {@link ResponseMessage}.
      */
     @PUT("v1/app/driver/signature")
-    Observable<ResponseMessage> updateDriverSignature(@Body DriverSignature signature);
+    Single<ResponseMessage> updateDriverSignature(@Body DriverSignature signature);
 
     /**
      * Update driver's HOS rule selection
@@ -169,7 +168,7 @@ public interface ServiceApi {
      * @return update driver home terminal response {@link ResponseMessage}.
      */
     @PUT("v1/app/driver/home")
-    Observable<ResponseMessage> updateDriverHomeTerminal(@Body DriverHomeTerminal driverHomeTerminal);
+    Single<ResponseMessage> updateDriverHomeTerminal(@Body DriverHomeTerminal driverHomeTerminal);
 
     /**
      * Inspection Categories from category Ids
@@ -178,7 +177,7 @@ public interface ServiceApi {
      * @return Sync Inspection Items Response {@link SyncInspectionCategory}.
      */
     @GET("v1/sync/inspection_items/search/{categoryIds}")
-    Observable<List<SyncInspectionCategory>> getInspectionItemsByCategoryIds(@Path("categoryIds") String categoryIds);
+    Single<List<SyncInspectionCategory>> getInspectionItemsByCategoryIds(@Path("categoryIds") String categoryIds);
 
     /**
      * Inspection Categories for the box. It is used after driver selects a vehicle, which maps to a box
@@ -187,7 +186,7 @@ public interface ServiceApi {
      * @return Sync Inspection Items Response {@link SyncInspectionCategory}.
      */
     @GET("v1/sync/inspection_items/{lastupdate}")
-    Observable<List<SyncInspectionCategory>> getInspectionItemsByLastUpdate(@Path("lastupdate") long lastUpdate);
+    Single<List<SyncInspectionCategory>> getInspectionItemsByLastUpdate(@Path("lastupdate") long lastUpdate);
 
     /**
      * Sync Inspection Report.
@@ -198,7 +197,7 @@ public interface ServiceApi {
      * @return Inspection Report Response {@link InspectionReport}
      */
     @GET("v1/sync/inspections/report/{lastUpdate}/{isTrailer}/{beginDate}")
-    Observable<InspectionReport> syncInspectionReport(@Path("lastUpdate") Long lastUpdate,
+    Single<InspectionReport> syncInspectionReport(@Path("lastUpdate") Long lastUpdate,
                                                       @Path("isTrailer") int isTrailer,
                                                       @Path("beginDate") Long beginDate);
 
@@ -210,7 +209,7 @@ public interface ServiceApi {
      * @return LogSheet Response {@link LogSheetHeader}
      */
     @GET("v1/sync/logsheet/headers/{start}/{end}")
-    Observable<List<LogSheetHeader>> getLogSheets(@Path("start") Long startLogDay,
+    Single<List<LogSheetHeader>> getLogSheets(@Path("start") Long startLogDay,
                                                   @Path("end") Long endLogDay);
 
     /**
@@ -231,7 +230,7 @@ public interface ServiceApi {
      * @return Pair Vehicle Response {@link ELDEvent}
      */
     @POST("v1/login/pair")
-    Observable<List<ELDEvent>> pairVehicle(@Body ELDEvent status);
+    Single<List<ELDEvent>> pairVehicle(@Body ELDEvent status);
 
     /**
      * Search Vehicle.
@@ -240,5 +239,8 @@ public interface ServiceApi {
      * @return Vehicle Attributes Response {@link Vehicle}.
      */
     @GET("v1/app/vehicles/search/{keyword}")
-    Observable<List<Vehicle>> searchVehicles(@Path("keyword") String keyword);
+    Single<List<Vehicle>> searchVehicles(@Path("keyword") String keyword);
+
+    @POST("v1/app/reports/logsheets/{start}/{end}/{option}")
+    Single<ResponseMessage> sendReport(@Path("start") long start, @Path("end") long end, @Path("option") int option, @Body ELDEvent report);
 }

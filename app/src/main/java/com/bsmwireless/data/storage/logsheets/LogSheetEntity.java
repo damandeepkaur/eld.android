@@ -8,10 +8,18 @@ import android.arch.persistence.room.PrimaryKey;
 import com.bsmwireless.data.storage.hometerminals.HomeTerminalEntity;
 
 @Entity(tableName = "log_sheet_header")
+
 public final class LogSheetEntity {
+    public enum SyncType {
+        SYNC,
+        UNSYNC
+    }
+
     @PrimaryKey
     @ColumnInfo(name = "log_day")
     private Long mLogDay;
+    @ColumnInfo(name = "sync")
+    private Integer mSync;
     @ColumnInfo(name = "driver_id")
     private Integer mDriverId;
     @ColumnInfo(name = "vehicle_id")
@@ -43,6 +51,14 @@ public final class LogSheetEntity {
 
     public void setLogDay(Long logDay) {
         mLogDay = logDay;
+    }
+
+    public Integer getSync() {
+        return mSync;
+    }
+
+    public void setSync(Integer sync) {
+        mSync = sync;
     }
 
     public Integer getDriverId() {

@@ -58,7 +58,6 @@ public final class LoginActivity extends BaseActivity implements LoginView {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        doBindToService(false);
         DaggerLoginComponent.builder().appComponent(App.getComponent()).loginModule(new LoginModule(this)).build().inject(this);
 
         setContentView(R.layout.activity_login);
@@ -149,7 +148,7 @@ public final class LoginActivity extends BaseActivity implements LoginView {
 
     @Override
     public void goToNavigationScreen() {
-        startActivity(new Intent(this, NavigationActivity.class));
+        startActivity(NavigationActivity.createIntent(this));
         finish();
     }
 

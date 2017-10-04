@@ -12,23 +12,37 @@ import com.bsmwireless.data.storage.eldevents.ELDEventConverter;
 import com.bsmwireless.data.storage.eldevents.ELDEventDao;
 import com.bsmwireless.data.storage.eldevents.ELDEventEntity;
 import com.bsmwireless.data.storage.users.UserDao;
+import com.bsmwireless.models.AppInfo;
 import com.bsmwireless.models.BlackBoxModel;
+import com.bsmwireless.models.BlackBoxSensorState;
 import com.bsmwireless.models.ELDEvent;
+import com.bsmwireless.models.Malfunction;
 import com.bsmwireless.models.ResponseMessage;
 import com.bsmwireless.widgets.alerts.DutyType;
+import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import javax.inject.Inject;
 
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
+import timber.log.Timber;
 
 import static com.bsmwireless.common.Constants.SUCCESS;
+import static com.bsmwireless.common.utils.DateUtils.MS_IN_DAY;
 import static com.bsmwireless.common.utils.DateUtils.SEC_IN_HOUR;
 
 public final class ELDEventsInteractor {
@@ -43,12 +57,15 @@ public final class ELDEventsInteractor {
     private PreferencesManager mPreferencesManager;
     private AccountManager mAccountManager;
     private TokenManager mTokenManager;
+    private LogSheetInteractor mLogSheetInteractor;
+    private ELDEventEntity mLatestEldEvent;
 
     @Inject
     public ELDEventsInteractor(ServiceApi serviceApi, PreferencesManager preferencesManager,
                                AppDatabase appDatabase, UserInteractor userInteractor,
                                BlackBoxInteractor blackBoxInteractor, DutyTypeManager dutyTypeManager,
-                               AccountManager accountManager, TokenManager tokenManager) {
+                               AccountManager accountManager, TokenManager tokenManager,
+                               LogSheetInteractor logSheetInteractor) {
         mServiceApi = serviceApi;
         mPreferencesManager = preferencesManager;
         mUserInteractor = userInteractor;
@@ -59,8 +76,21 @@ public final class ELDEventsInteractor {
         mPreferencesManager = preferencesManager;
         mAccountManager = accountManager;
         mTokenManager = tokenManager;
+        mLogSheetInteractor = logSheetInteractor;
 
         mUserInteractor.getTimezone().subscribe(timezone -> mTimezone = timezone);
+
+        mELDEventDao.getLatestEvent(mAccountManager.getCurrentUserId(), ELDEvent.EventType.DATA_DIAGNOSTIC.getValue(),
+                Malfunction.POSITIONING_COMPLIANCE.getCode(), ELDEvent.StatusCode.ACTIVE.getValue())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(eldEventEntity -> mLatestEldEvent = eldEventEntity);
+    }
+
+    public Single<List<ELDEvent>> getEventsFromDBOnce(long startTime, long endTime) {
+        int driverId = mAccountManager.getCurrentUserId();
+        return mELDEventDao.getEventsFromStartToEndTimeOnce(startTime, endTime, driverId)
+                .map(ELDEventConverter::toModelList);
     }
 
     public Flowable<List<ELDEvent>> getDutyEventsFromDB(long startTime, long endTime) {
@@ -73,24 +103,55 @@ public final class ELDEventsInteractor {
         return ELDEventConverter.toModelList(mELDEventDao.getLatestActiveDutyEventSync(latestTime, userId));
     }
 
+    public Single<List<ELDEvent>> getLatestActiveDutyEventFromDBOnce(long latestTime, int userId) {
+        return mELDEventDao.getLatestActiveDutyEventOnce(latestTime, userId)
+                .map(ELDEventConverter::toModelList);
+    }
+
     public List<ELDEvent> getActiveEventsFromDBSync(long startTime, long endTime) {
         int driverId = mAccountManager.getCurrentUserId();
         return ELDEventConverter.toModelList(mELDEventDao.getActiveEventsFromStartToEndTimeSync(startTime, endTime, driverId));
     }
 
+    public Single<List<ELDEvent>> getDutyEventsForDay(long startDayTime) {
+        return mELDEventDao.getDutyEventsFromStartToEndTimeSync(startDayTime,
+                startDayTime + MS_IN_DAY, mAccountManager.getCurrentUserId())
+                .onErrorReturn(throwable -> Collections.emptyList())
+                .map(ELDEventConverter::toModelList);
+    }
+
+    public Single<List<ELDEvent>> getActiveDutyEventsForDay(long startDayTime) {
+        return Single.fromCallable(() -> mELDEventDao.getActiveEventsFromStartToEndTimeSync(startDayTime,
+                startDayTime + MS_IN_DAY, mAccountManager.getCurrentUserId()))
+                .map(ELDEventConverter::toModelList);
+    }
+
+    public ELDEvent getLatestActiveDutyEventFromDB(long startDayTime) {
+        List<ELDEventEntity> entities = mELDEventDao.getLatestActiveDutyEventSync(startDayTime,
+                mAccountManager.getCurrentUserId());
+        ELDEvent event = null;
+        if (!entities.isEmpty()) {
+            event = ELDEventConverter.toModel(entities.get(entities.size() - 1));
+        }
+        return event;
+    }
+
     public Observable<long[]> updateELDEvents(List<ELDEvent> events) {
         return Observable.fromCallable(() ->
-                mELDEventDao.insertAll(ELDEventConverter.toEntityArray(events, ELDEventEntity.SyncType.UPDATE_UNSYNC)));
+                mELDEventDao.insertAll(ELDEventConverter.toEntityArray(events, ELDEventEntity.SyncType.UPDATE_UNSYNC)))
+                .doOnNext(longs -> mLogSheetInteractor.resetLogSheetHeaderSigning(events));
     }
 
     public Single<Long> postNewELDEvent(ELDEvent event) {
         return Single.fromCallable(() ->
-                mELDEventDao.insertEvent(ELDEventConverter.toEntity(event, ELDEventEntity.SyncType.NEW_UNSYNC)));
+                mELDEventDao.insertEvent(ELDEventConverter.toEntity(event, ELDEventEntity.SyncType.NEW_UNSYNC)))
+                .doOnSuccess(aLong -> mLogSheetInteractor.resetLogSheetHeaderSigning(Arrays.asList(event)));
     }
 
     public Observable<long[]> postNewELDEvents(List<ELDEvent> events) {
         return Observable.fromCallable(() ->
-                mELDEventDao.insertAll(ELDEventConverter.toEntityArray(events, ELDEventEntity.SyncType.NEW_UNSYNC)));
+                mELDEventDao.insertAll(ELDEventConverter.toEntityArray(events, ELDEventEntity.SyncType.NEW_UNSYNC)))
+                .doOnNext(longs -> mLogSheetInteractor.resetLogSheetHeaderSigning(events));
     }
 
     public void storeUnidentifiedEvents(List<ELDEvent> events) {
@@ -98,12 +159,33 @@ public final class ELDEventsInteractor {
         mELDEventDao.insertAll(ELDEventConverter.toEntityArray(events));
     }
 
-    public Observable<long[]> postNewDutyTypeEvent(DutyType dutyType, String comment) {
-        return postNewELDEvents(getEvents(dutyType, comment))
-                .doOnNext(isSuccess -> mDutyTypeManager.setDutyType(dutyType, true));
+    public Observable<long[]> postNewDutyTypeEvent(DutyType dutyType, String comment, long time) {
+        return Observable.fromIterable(getEvents(dutyType, comment))
+                .map(event -> {
+                    event.setEventTime(time);
+                    return event;
+                })
+                .toList()
+                .toObservable()
+                .flatMap(this::postNewELDEvents)
+                .doOnNext(ids -> {
+                    if (ids.length > 0) {
+                        mDutyTypeManager.setDutyType(dutyType, true);
+                    }
+                });
     }
 
-    public Observable<Boolean> postLogoutEvent() {
+    public Observable<long[]> postNewDutyTypeEvent(DutyType dutyType, String comment) {
+        return Single.fromCallable(() -> getEvents(dutyType, comment))
+                .flatMapObservable(this::postNewELDEvents)
+                .doOnNext(ids -> {
+                    if (ids.length > 0) {
+                        mDutyTypeManager.setDutyType(dutyType, true);
+                    }
+                });
+    }
+
+    public Single<Boolean> postLogoutEvent() {
         return mServiceApi.logout(getEvent(ELDEvent.LoginLogoutCode.LOGOUT))
                 .onErrorReturn(throwable -> {
                     if (throwable instanceof RetrofitException ||
@@ -113,18 +195,17 @@ public final class ELDEventsInteractor {
                     return new ResponseMessage(throwable.getMessage());
                 })
                 .map(responseMessage -> SUCCESS.equals(responseMessage.getMessage()))
-                .switchMap(isSuccess -> mBlackBoxInteractor.shutdown(isSuccess));
+                .flatMap(isSuccess -> mBlackBoxInteractor.shutdown(isSuccess).singleOrError());
     }
 
-    public Observable<Boolean> postLogoutEvent(int userId) {
-        return Observable.fromCallable(() -> mUserDao.getUserSync(userId))
+    public Single<Boolean> postLogoutEvent(int userId) {
+        return Single.fromCallable(() -> mUserDao.getUserSync(userId))
                 .flatMap(userEntity -> {
                     String token = mTokenManager.getToken(userEntity.getAccountName());
                     return mServiceApi.logout(
                             getEvent(ELDEvent.LoginLogoutCode.LOGOUT),
                             token,
                             String.valueOf(userEntity.getId())
-
                     )
                             .onErrorReturn(throwable -> {
                                 if (throwable instanceof RetrofitException ||
@@ -137,13 +218,18 @@ public final class ELDEventsInteractor {
                 .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
     }
 
+    public Single<Boolean> sendReport(long start, long end, int option, String comment) {
+        ELDEvent report = getLogSheetEvent(comment);
+        return mServiceApi.sendReport(start, end, option, report).map(responseMessage -> responseMessage.getMessage().equals(SUCCESS));
+    }
+
     /**
      * Load all active diagnostic events
      *
      * @return
      */
-    public Flowable<List<ELDEvent>> getDiagnosticEvents() {
-        return Flowable.just(Collections.emptyList());
+    public Single<List<ELDEvent>> getDiagnosticEvents() {
+        return loadLoggedMalfunctionsByParams(Constants.DIAGNOSTIC_CODES);
     }
 
     /**
@@ -151,8 +237,42 @@ public final class ELDEventsInteractor {
      *
      * @return
      */
-    public Flowable<List<ELDEvent>> getMalfunctionEvents() {
-        return Flowable.just(Collections.emptyList());
+    public Single<List<ELDEvent>> getMalfunctionEvents() {
+        return loadLoggedMalfunctionsByParams(Constants.MALFUNCTION_CODES);
+    }
+
+    private Single<List<ELDEvent>> loadLoggedMalfunctionsByParams(String[] malcodes) {
+        return mELDEventDao
+                .loadMalfunctions(mAccountManager.getCurrentUserId(),
+                        ELDEvent.EventType.DATA_DIAGNOSTIC.getValue(),
+                        malcodes,
+                        ELDEvent.StatusCode.ACTIVE.getValue())
+                .flatMap(this::removeClearedEvents)
+                .map(ELDEventConverter::toModelList);
+    }
+
+    /**
+     * Removes cleared events from list. Input list must be sortered by event time from early to late
+     *
+     * @param eldEventEntities
+     * @return
+     */
+    private Single<List<ELDEventEntity>> removeClearedEvents(List<ELDEventEntity> eldEventEntities) {
+        return Single.fromCallable(() -> {
+
+            Map<String, ELDEventEntity> items = new LinkedHashMap<>();
+            for (ELDEventEntity entity : eldEventEntities) {
+                if (entity.getEventCode() == ELDEvent.MalfunctionCode.DIAGNOSTIC_LOGGED.getCode() ||
+                        entity.getEventCode() == ELDEvent.MalfunctionCode.MALFUNCTION_LOGGED.getCode()) {
+                    items.put(entity.getMalCode(), entity);
+                } else if (entity.getEventCode() == ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED.getCode() ||
+                        entity.getEventCode() == ELDEvent.MalfunctionCode.MALFUNCTION_CLEARED.getCode()) {
+                    items.remove(entity.getMalCode());
+                }
+            }
+
+            return new ArrayList<>(items.values());
+        });
     }
 
     public Flowable<Boolean> hasMalfunctionEvents() {
@@ -162,7 +282,10 @@ public final class ELDEventsInteractor {
                                 Constants.MALFUNCTION_CODES),
                         getMalfunctionCount(ELDEvent.MalfunctionCode.MALFUNCTION_CLEARED,
                                 Constants.MALFUNCTION_CODES),
-                        (loggedCount, clearedCount) -> loggedCount.compareTo(clearedCount) != 0);
+                        (loggedCount, clearedCount) -> {
+                            Timber.d("Count malfunction events: logged %1$d, cleared %2$d", loggedCount, clearedCount);
+                            return loggedCount > clearedCount;
+                        });
     }
 
     public Flowable<Boolean> hasDiagnosticEvents() {
@@ -172,12 +295,56 @@ public final class ELDEventsInteractor {
                                 Constants.DIAGNOSTIC_CODES),
                         getMalfunctionCount(ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED,
                                 Constants.DIAGNOSTIC_CODES),
-                        (loggedCount, clearedCount) -> loggedCount.compareTo(clearedCount) != 0);
+                        (loggedCount, clearedCount) -> {
+                            Timber.d("Count diagnostic events: logged %1$d, cleared %2$d", loggedCount, clearedCount);
+                            return loggedCount > clearedCount;
+                        });
     }
 
+    /**
+     * Returns the latest malfunction event with malfunction code
+     *
+     * @param malfunction malfunction code
+     * @return latest malfunction ELD event
+     */
+    public Flowable<ELDEvent> getLatestMalfunctionEvent(Malfunction malfunction) {
+        return mELDEventDao
+                .getLatestEvent(mAccountManager.getCurrentUserId(),
+                        ELDEvent.EventType.DATA_DIAGNOSTIC.getValue(),
+                        malfunction.getCode(),
+                        ELDEvent.StatusCode.ACTIVE.getValue())
+                .map(ELDEventConverter::toModel);
+    }
+
+    /**
+     * Check active events with lat lng codes
+     *
+     * @return true if active events are exist
+     */
+    public Single<Boolean> isLocationUpdateEventExists() {
+        return mELDEventDao
+                .getChangingLocationEventCount(mAccountManager.getCurrentUserId(),
+                        new String[]{ELDEvent.LatLngFlag.FLAG_E.getCode(),
+                                ELDEvent.LatLngFlag.FLAG_X.getCode()},
+                        ELDEvent.StatusCode.ACTIVE.getValue())
+                .map(count -> count != 0);
+    }
+
+
     private Flowable<Integer> getMalfunctionCount(ELDEvent.MalfunctionCode code, String[] codes) {
-        return mELDEventDao.getMalfunctionEventCount(ELDEvent.EventType.DATA_DIAGNOSTIC.getValue(),
-                code.getCode(), codes);
+        return mELDEventDao
+                .getMalfunctionEventCount(mAccountManager.getCurrentUserId(),
+                        ELDEvent.EventType.DATA_DIAGNOSTIC.getValue(),
+                        code.getCode(),
+                        codes);
+    }
+
+    public Integer getMalfunctionCountSync(int driverId, long startTime, long endTime) {
+        return mELDEventDao.getMalfunctionEventCountSync(driverId, startTime, endTime);
+    }
+
+    public Integer getDiagnosticCountSync(int driverId, long startTime, long endTime) {
+        return mELDEventDao.getDiagnosticEventCountSync(driverId, startTime, endTime);
     }
 
     private ArrayList<ELDEvent> getEvents(DutyType dutyType, String comment) {
@@ -259,6 +426,7 @@ public final class ELDEventsInteractor {
         return getEvent(dutyType, null, false);
     }
 
+
     public ELDEvent getEvent(DutyType dutyType, String comment, boolean isAuto) {
         ELDEvent event = getEvent(getBlackBoxState(dutyType == DutyType.PERSONAL_USE), isAuto);
         event.setStatus(ELDEvent.StatusCode.ACTIVE.getValue());
@@ -272,6 +440,27 @@ public final class ELDEventsInteractor {
         return event;
     }
 
+    /**
+     * Makes and fills an event for malfunction
+     *
+     * @param malfunction     malfunction type
+     * @param malfunctionCode malfunction code
+     * @param blackBoxModel   data from blackbox
+     * @return filled event
+     */
+    public ELDEvent getEvent(Malfunction malfunction,
+                             ELDEvent.MalfunctionCode malfunctionCode,
+                             BlackBoxModel blackBoxModel) {
+
+        ELDEvent eldEvent = getEvent(blackBoxModel, true);
+
+        eldEvent.setStatus(ELDEvent.StatusCode.ACTIVE.getValue());
+        eldEvent.setMalCode(malfunction);
+        eldEvent.setEventCode(malfunctionCode.getCode());
+        eldEvent.setEventType(ELDEvent.EventType.DATA_DIAGNOSTIC.getValue());
+        return eldEvent;
+    }
+
     private ELDEvent getEvent(BlackBoxModel blackBoxModel, boolean isAuto) {
         long currentTime = System.currentTimeMillis();
         int driverId = mAccountManager.getCurrentUserId();
@@ -279,8 +468,14 @@ public final class ELDEventsInteractor {
         ELDEvent event = new ELDEvent();
         event.setEventTime(currentTime);
         event.setEngineHours(blackBoxModel.getEngineHours());
+        event.setOdometer(blackBoxModel.getOdometer());
         event.setLat(blackBoxModel.getLat());
         event.setLng(blackBoxModel.getLon());
+        try {
+            event.setLatLngFlag(getLatLngFlag(blackBoxModel));
+        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            event.setLatLngFlag(ELDEvent.LatLngFlag.FLAG_NONE);
+        }
         event.setLocation("");
         event.setDistance(0);
         event.setMalfunction(false);
@@ -295,6 +490,52 @@ public final class ELDEventsInteractor {
         return event;
     }
 
+    public ELDEvent getLogSheetEvent(String comment) {
+        BlackBoxModel blackBoxModel = getBlackBoxState(mDutyTypeManager.getDutyType() == DutyType.PERSONAL_USE);
+        long currentTime = System.currentTimeMillis();
+        int driverId = mAccountManager.getCurrentUserId();
+
+        ELDEvent event = new ELDEvent();
+        event.setDriverId(driverId);
+        event.setVehicleId(mPreferencesManager.getVehicleId());
+        event.setEventTime(currentTime);
+        event.setEngineHours(blackBoxModel.getEngineHours());
+        event.setOdometer(blackBoxModel.getOdometer());
+        event.setLat(blackBoxModel.getLat());
+        event.setLng(blackBoxModel.getLon());
+        event.setTimezone(mTimezone);
+        event.setMobileTime(currentTime);
+        event.setComment(comment);
+        event.setAppInfo(new Gson().toJson(new AppInfo()));
+
+        return event;
+    }
+
+    private ELDEvent.LatLngFlag getLatLngFlag(BlackBoxModel blackBoxModel) throws ExecutionException, InterruptedException, TimeoutException {
+        if (mLatestEldEvent == null) {
+            mLatestEldEvent = mELDEventDao.getLatestEvent(
+                    mAccountManager.getCurrentUserId(),
+                    ELDEvent.EventType.DATA_DIAGNOSTIC.getValue(),
+                    Malfunction.POSITIONING_COMPLIANCE.getCode(),
+                    ELDEvent.StatusCode.ACTIVE.getValue())
+                    .subscribeOn(Schedulers.io())
+                    .toFuture()
+                    .get(100, TimeUnit.MILLISECONDS);
+        }
+
+        ELDEvent.LatLngFlag latLngFlag;
+
+        if (mLatestEldEvent != null &&
+                mLatestEldEvent.getEventType() == ELDEvent.MalfunctionCode.DIAGNOSTIC_LOGGED.getCode()) {
+            latLngFlag = ELDEvent.LatLngFlag.FLAG_E;
+        } else if (!blackBoxModel.getSensorState(BlackBoxSensorState.GPS)) {
+            latLngFlag = ELDEvent.LatLngFlag.FLAG_X;
+        } else {
+            latLngFlag = ELDEvent.LatLngFlag.FLAG_NONE;
+        }
+        return latLngFlag;
+    }
+
     private BlackBoxModel getBlackBoxState(boolean isInPersonalUse) {
         BlackBoxModel blackBoxState = mBlackBoxInteractor.getLastData();
         if (isInPersonalUse) {
@@ -306,7 +547,7 @@ public final class ELDEventsInteractor {
     }
 
     private double roundOneDecimal(double d) {
-        return Math.round(d * 10) / 10;
+        return Math.round(d * 10) / 10.;
     }
 
     private int multiplyAndRound(int sec) {

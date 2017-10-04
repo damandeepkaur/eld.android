@@ -8,7 +8,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.bsmwireless.data.storage.DutyTypeManager;
+import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.screens.common.BaseActivity;
 import com.bsmwireless.screens.diagnostic.DiagnosticDialog;
 import com.bsmwireless.screens.diagnostic.MalfunctionDialog;
@@ -28,7 +28,7 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
     private MenuItem mELDItem;
     private MenuItem mDutyItem;
     private MenuItem mOccupancyItem;
-    private MenuItem mMalfunctionItem;
+    private MenuItem mDiagnosticItem;
 
     protected AlertDialog mDutyDialog;
 
@@ -59,10 +59,10 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_alert, menu);
 
-        mELDItem = menu.findItem(R.id.action_diagnostic);
+        mELDItem = menu.findItem(R.id.action_malfunction);
         mDutyItem = menu.findItem(R.id.action_duty);
         mOccupancyItem = menu.findItem(R.id.action_occupancy);
-        mMalfunctionItem = menu.findItem(R.id.action_malfunction);
+        mDiagnosticItem = menu.findItem(R.id.action_diagnostic);
 
         mSwitchDriverDialog = new SwitchDriverDialog(this);
 
@@ -83,10 +83,9 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
             case R.id.action_occupancy:
                 showSwitchDriverDialog();
                 break;
-            case android.R.id.home: {
+            case android.R.id.home:
                 onHomePress();
                 break;
-            }
             case R.id.action_malfunction:
                 getPresenter().onMalfunctionEventsClick();
                 break;
@@ -139,6 +138,12 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
         }
     }
 
+    public final void showReassignEventDialog(ELDEvent event) {
+        if (mSwitchDriverDialog != null) {
+            mSwitchDriverDialog.showReassignEventDialog(event);
+        }
+    }
+
     @SuppressWarnings("DesignForExtension")
     @Override
     public void showMalfunctionDialog() {
@@ -153,18 +158,18 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
     @Override
     public final void changeMalfunctionStatus(boolean hasMalfunctionEvents) {
 
-        if (mMalfunctionItem == null) {
-            return;
-        }
-        mMalfunctionItem.setIcon(hasMalfunctionEvents ? R.drawable.ic_ico_dd_red : R.drawable.ic_ico_dd_green);
-    }
-
-    @Override
-    public final void changeDiagnosticStatus(boolean hasMalfunctionEvents) {
         if (mELDItem == null) {
             return;
         }
         mELDItem.setIcon(hasMalfunctionEvents ? R.drawable.ic_eld_red : R.drawable.ic_eld_green);
+    }
+
+    @Override
+    public final void changeDiagnosticStatus(boolean hasMalfunctionEvents) {
+        if (mDiagnosticItem == null) {
+            return;
+        }
+        mDiagnosticItem.setIcon(hasMalfunctionEvents ? R.drawable.ic_ico_dd_red : R.drawable.ic_ico_dd_green);
     }
 
     @Override
@@ -184,39 +189,11 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
             mDutyDialog.dismiss();
         }
 
-        //TODO: set correct types
-        List<DutyType> dutyTypes = DutyTypeManager.DRIVER_DUTY_EXTENDED;
+        List<DutyType> dutyTypes = getPresenter().getAvailableDutyTypes();
 
         ArrayList<BaseMenuAdapter.DutyItem> dutyItems = new ArrayList<>();
         for (DutyType dutyType : dutyTypes) {
-            boolean isEnabled = current != dutyType;
-            switch (dutyType) {
-                case ON_DUTY:
-                    isEnabled &= current != DutyType.PERSONAL_USE;
-                    break;
-
-                case OFF_DUTY:
-                    isEnabled &= current != DutyType.YARD_MOVES;
-                    break;
-
-                case DRIVING:
-                    isEnabled &= current != DutyType.YARD_MOVES & current != DutyType.PERSONAL_USE & getPresenter().isUserDriver();
-                    break;
-
-                case SLEEPER_BERTH:
-                    isEnabled &= current != DutyType.YARD_MOVES & current != DutyType.PERSONAL_USE;
-                    break;
-
-                case PERSONAL_USE:
-                    isEnabled &= current == DutyType.OFF_DUTY;
-                    break;
-
-                case YARD_MOVES:
-                    isEnabled &= current == DutyType.ON_DUTY;
-                    break;
-            }
-
-            dutyItems.add(new BaseMenuAdapter.DutyItem(dutyType, isEnabled));
+            dutyItems.add(new BaseMenuAdapter.DutyItem(dutyType, true));
         }
 
         ArrayAdapter<BaseMenuAdapter.DutyItem> arrayAdapter = new BaseMenuAdapter(this, dutyItems);

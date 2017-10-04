@@ -384,14 +384,15 @@
 
     <!-- Navigation drawer-->
     <string name="nav_home">Home</string>
-    <string name="nav_inspector_view">Inspector View</string>
+    <string name="nav_inspector_view">Roadside Inspections</string>
+    <string name="nav_transfer_view">Data Transfer</string>
     <string name="nav_help">Help</string>
     <string name="nav_driver_profile">Driver Profile</string>
     <string name="nav_settings">Settings</string>
     <string name="nav_logout">Log Out</string>
     <string name="driver">Driver</string>
     <string name="asset">Asset</string>
-    <string name="box">Box</string>
+    <string name="box">Box %1$d</string>
     <plurals name="co_drivers">
         <item quantity="one">%1$d co-driver</item>
         <item quantity="other">%1$d co-drivers</item>
@@ -448,10 +449,11 @@
     <string name="odometer">Odometer(%1$s)</string>
     <string name="add_event">Add event</string>
     <string name="edit">Edit</string>
+    <string name="assign">Assign</string>
     <string name="remove">Remove</string>
     <string name="km">km</string>
     <string name="ml">ml</string>
-    <string name="sign_logsheet">sign logsheet</string>
+    <string name="sign_logsheet">sign</string>
     <string name="signed">signed</string>
     <string name="no_address_available">No address available</string>
     <string name="hours">hrs</string>
@@ -482,9 +484,11 @@
     <string name="event_type_personal_use_end_title">Off Duty (End of Personal Use)</string>
     <string name="event_type_yard_moves_end_title">On Duty (End of Yard Moves)</string>
     <string name="update_event_error">Update event error</string>
+    <string name="remove_event_error">Remove event error</string>
     <string name="add_event_error">Add event error</string>
     <string name="event_added">Event added</string>
     <string name="event_updated">Event updated</string>
+    <string name="event_removed">Event removed</string>
     <string name="not_in_vehicle_error">Forbidden for not in vehicle state</string>
     <!--Logs Log Header-->
     <string name="log_header_time_zone">Time Zone</string>
@@ -553,7 +557,7 @@
 
     <string name="dashboard_start_ym">Start Yard Moves</string>
     <string name="dashboard_start_pu">Start Personal Use</string>
-    <string name="dashboard_exemption">Exemption List</string>
+    <string name="dashboard_exemption">Exemptions List</string>
 
     <!-- Multiday fragment -->
     <string-array name="multiday_selector">
@@ -622,13 +626,17 @@
     <string name="switch_driver_log_out">Log out</string>
     <string name="switch_driver_add_co_driver">Add co-driver</string>
     <string name="switch_driver_driver_seat">Driver\'s seat</string>
+    <string name="switch_driver_reassign_event">Assign event to</string>
     <string name="switch_driver_co_drivers">Co-drivers</string>
     <string name="switch_driver_co_driver_log_out">Driver Log out</string>
     <string name="switch_driver_confirm_driver_seat">Confirm</string>
     <string name="switch_driver_invalid_credentials">Invalid credentials</string>
     <string name="switch_driver_error_login_codriver">Co-driver was not logged in</string>
+    <string name="switch_driver_error_logout_codriver">Co-driver log out error</string>
+    <string name="switch_driver_error_reassign_event">Event was not reassigned</string>
     <string name="switch_driver_login_error">Login error</string>
     <string name="switch_driver_co_driver_view">You are in co-driver view</string>
+    <string name="switch_driver_event_reassigned">Event was reassigned</string>
 
     <!-- Diagnostic events -->
     <string name="diagnostic_events_title">Data diagnostics events</string>
@@ -647,7 +655,66 @@
     <string name="malfunction_data_transfer">Data Transfer</string>
     <string name="malfunction_other">Other</string>
 
+    <!-- Roadside -->
+    <string name="roadside_title">Roadside</string>
+    <string name="roadside_view">View</string>
+    <string name="roadside_history">History</string>
+    <string name="roadside_date">Date</string>
+    <string name="roadside_starting_time">24-Hour Starting Time</string>
+    <string name="roadside_time_zone">Time Zone</string>
+    <string name="roadside_carrier_name">Carrier Name</string>
+    <string name="roadside_carrier_dot">Carrier DOT</string>
+    <string name="roadside_empty"/>
+    <string name="roadside_midnight">Midnight</string>
+    <string name="roadside_driver_name">Driver Name</string>
+    <string name="roadside_driver_id">Driver ID</string>
+    <string name="roadside_driver_state">Driver License State</string>
+    <string name="roadside_driver_license">Driver License Number</string>
+    <string name="roadside_codriver_name">Co-Driver Name</string>
+    <string name="roadside_codriver_id">Co-Driver ID</string>
+    <string name="roadside_undefined">undefined</string>
+    <string name="roadside_odometer">Current Odometer</string>
+    <string name="roadside_engine">Current Engine Hours</string>
+    <string name="roadside_eld_provider">ELD Provider</string>
+    <string name="roadside_eld_id">ELD ID</string>
+    <string name="roadside_truck_id">Truck Tractor ID</string>
+    <string name="roadside_truck_vin">Truck Tractor VIN</string>
+    <string name="roadside_shipping_id">Shipping ID</string>
+    <string name="roadside_location">Current Location</string>
+    <string name="roadside_unidentified_records">Unidentified Driving Records</string>
+    <string name="roadside_exempt">Exempt Driver Status</string>
+    <string name="roadside_malfunctions">Malfunction Status</string>
+    <string name="roadside_diagnostic">Diagnostic Status</string>
+    <string name="roadside_yes">Yes</string>
+    <string name="roadside_no">No</string>
+    <string name="roadside_not_set"/>
+    <string name="roadside_time">Time</string>
+    <string name="roadside_event">Event</string>
+    <string name="roadside_origin">Origin</string>
+    <string name="roadside_comment">Comment</string>
 
+    <!-- Transfer -->
+    <string name="transfer_title">Transfer</string>
+    <string name="transfer_error">Transfer failed</string>
+    <string name="transfer_method">Transfer Method</string>
+    <string name="transfer_email">Email</string>
+    <string name="transfer_web_service">Web Service</string>
+    <string name="transfer_send_logsheets">Send Logsheets</string>
+    <string name="transfer_dialog_title">Confirmation Required</string>
+    <string name="transfer_dialog_message">You are going to send data for current 24 hours and last 7 days. Please confirm your action to proceed with data transfer.</string>
+    <string name="transfer_dialog_positive">Confirm</string>
+    <string name="transfer_dialog_negative">Cancel</string>
+    
+    <!--Home screen-->
+    <string name="home_screen_label">Home</string>
+    <string name="home_screen_current_status">Current status:</string>
+    <string name="home_screen_hours_of_service">Hours of service</string>
+    <string name="home_screen_pre_trip">pre-trip</string>
+    <string name="home_screen_post_trip">post-trip</string>
+    <string name="home_screen_inspections">Inspections</string>
 
+    <!-- Hours of Service-->
+    <string name="hos_box_name">@string/box</string>
+    <string name="hos_not_in_vehicle">@string/select_asset_not_in_vehicle</string>
 
 </resources>

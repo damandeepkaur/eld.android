@@ -7,6 +7,7 @@ import android.arch.persistence.room.Query;
 import java.util.List;
 
 import io.reactivex.Flowable;
+import io.reactivex.Single;
 
 import static android.arch.persistence.room.OnConflictStrategy.REPLACE;
 
@@ -19,8 +20,14 @@ public interface UserDao {
     @Query("SELECT * FROM users WHERE users.id IN (:ids)")
     Flowable<List<UserEntity>> getDrivers(List<Integer> ids);
 
+    @Query("SELECT * FROM users WHERE users.id IN (:ids)")
+    List<UserEntity> getDriversSync(List<Integer> ids);
+
     @Query("SELECT * FROM users WHERE id = :id LIMIT 1")
     UserEntity getUserSync(int id);
+
+    @Query("SELECT * FROM users WHERE id IN (:id)")
+    List<UserEntity> getUsersSync(List<Integer> id);
 
     @Query("SELECT * FROM users WHERE id = :id LIMIT 1")
     Flowable<FullUserEntity> getFullUser(int id);
@@ -39,6 +46,9 @@ public interface UserDao {
 
     @Query("SELECT timezone FROM users WHERE id = :id LIMIT 1")
     Flowable<String> getUserTimezone(int id);
+
+    @Query("SELECT timezone FROM users WHERE id = :id LIMIT 1")
+    Single<String> getUserTimezoneOnce(int id);
 
     @Query("DELETE FROM users WHERE id = :id")
     int deleteUser(int id);

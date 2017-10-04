@@ -3,6 +3,7 @@ package com.bsmwireless.screens.dashboard;
 import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
+import com.bsmwireless.domain.interactors.UserInteractor;
 import com.bsmwireless.widgets.alerts.DutyType;
 
 import java.util.regex.Matcher;
@@ -19,29 +20,25 @@ public final class DashboardPresenter {
 
     private DutyTypeManager mDutyTypeManager;
     private ELDEventsInteractor mEventsInteractor;
+    private UserInteractor mUserInteractor;
 
-    private DutyTypeManager.DutyTypeListener mListener = dutyType -> mView.setDutyType(dutyType);
+    private DutyTypeManager.DutyTypeListener mListener = this::onSetDutyType;
 
     @Inject
-    public DashboardPresenter(DashboardView view, DutyTypeManager dutyTypeManager, ELDEventsInteractor eventsInteractor) {
+    public DashboardPresenter(DashboardView view, DutyTypeManager dutyTypeManager, ELDEventsInteractor eventsInteractor, UserInteractor userInteractor) {
         mView = view;
 
         mDutyTypeManager = dutyTypeManager;
         mEventsInteractor = eventsInteractor;
+        mUserInteractor = userInteractor;
+
+        mDutyTypeManager.addListener(mListener);
 
         Timber.d("CREATED");
     }
 
-    void onResume() {
-        mView.setDutyType(mDutyTypeManager.getDutyType());
-        mDutyTypeManager.addListener(mListener);
-    }
-
-    void onPause() {
-        mDutyTypeManager.removeListener(mListener);
-    }
-
     public void onDestroy() {
+        mDutyTypeManager.removeListener(mListener);
         Timber.d("DESTROYED");
     }
 
@@ -50,11 +47,7 @@ public final class DashboardPresenter {
     }
 
     void onDutyClick() {
-        if (mEventsInteractor.isConnected()) {
-            mView.showDutyTypeDialog();
-        } else {
-            mView.showNotInVehicleDialog();
-        }
+        mView.showDutyTypeDialog();
     }
 
     DashboardView.Error validateComment(String comment) {
@@ -66,5 +59,15 @@ public final class DashboardPresenter {
             return DashboardView.Error.INVALID_COMMENT;
         }
         return DashboardView.Error.VALID_COMMENT;
+    }
+
+    private void onSetDutyType(DutyType dutyType) {
+        mView.setDutyType(dutyType);
+
+        if (mEventsInteractor.isConnected() && dutyType != DutyType.PERSONAL_USE && dutyType != DutyType.YARD_MOVES && mUserInteractor.isUserDriver()) {
+            mView.showSpecialStatuses();
+        } else {
+            mView.hideSpecialStatuses();
+        }
     }
 }

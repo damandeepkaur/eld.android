@@ -26,6 +26,7 @@ public final class AutoDutyDialogActivity extends BaseActivity implements AutoDu
     public static final String EXTRA_AUTO_LOGOUT = "auto_logout";
     public static final String EXTRA_TOKEN_EXPIRED = "token_expired";
     public static final String EXTRA_AUTO_ON_DUTY = "auto_on_duty";
+    public static final String EXTRA_AUTO_ON_DUTY_TIME = "auto_on_duty_time";
     public static final String EXTRA_AUTO_DRIVING = "auto_driving";
     public static final String EXTRA_AUTO_DRIVING_WITHOUT_CONFIRM = "auto_driving_without_confirm";
 
@@ -38,7 +39,7 @@ public final class AutoDutyDialogActivity extends BaseActivity implements AutoDu
 
     private Runnable mAutoLogoutTask = () -> mPresenter.onAutoLogoutClick();
 
-    private Runnable mAutoOnDutyTask = () -> mPresenter.onOnDutyClick();
+    private Runnable mAutoOnDutyTask;
 
     private boolean mIsAutoDrivingDialogShown = false;
 
@@ -67,7 +68,8 @@ public final class AutoDutyDialogActivity extends BaseActivity implements AutoDu
                 showAutoDrivingDialog();
 
             } else if (intent.hasExtra(EXTRA_AUTO_ON_DUTY)) {
-                showAutoOnDutyDialog();
+                long time = intent.getLongExtra(EXTRA_AUTO_ON_DUTY_TIME, System.currentTimeMillis());
+                showAutoOnDutyDialog(time);
 
             } else if (intent.hasExtra(EXTRA_AUTO_DRIVING_WITHOUT_CONFIRM) && mIsAutoDrivingDialogShown) {
                 mPresenter.onDrivingClick();
@@ -136,7 +138,7 @@ public final class AutoDutyDialogActivity extends BaseActivity implements AutoDu
         mIsAutoDrivingDialogShown = true;
     }
 
-    private void showAutoOnDutyDialog() {
+    private void showAutoOnDutyDialog(long time) {
         if (mAlertDialog != null) {
             mAlertDialog.dismiss();
         }
@@ -146,10 +148,12 @@ public final class AutoDutyDialogActivity extends BaseActivity implements AutoDu
                 .setMessage(R.string.on_duty_dialog_message)
                 .setCancelable(false)
                 .setPositiveButton(R.string.on_duty_accept, (dialog, which) -> onActionDone())
-                .setNegativeButton(R.string.on_duty_cancel, (dialog, which) -> mPresenter.onOnDutyClick())
+                .setNegativeButton(R.string.on_duty_cancel, (dialog, which) -> mPresenter.onOnDutyClick(time))
                 .show();
 
         mHandler.removeCallbacks(mAutoOnDutyTask);
+
+        mAutoOnDutyTask = () -> mPresenter.onOnDutyClick(time);
         mHandler.postDelayed(mAutoOnDutyTask, MS_IN_MIN);
     }
 

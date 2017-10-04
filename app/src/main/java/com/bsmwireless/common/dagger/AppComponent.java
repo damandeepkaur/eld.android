@@ -14,8 +14,11 @@ import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.schedulers.alarmmanager.TokenExpirationService;
 import com.bsmwireless.schedulers.jobscheduler.VerifyTokenScheduler;
+import com.bsmwireless.screens.hoursofservice.HoursOfServiceComponent;
 import com.bsmwireless.screens.diagnostic.dagger.DiagnosticComponent;
+import com.bsmwireless.screens.home.HomeComponent;
 import com.bsmwireless.screens.lockscreen.dagger.LockScreenComponent;
+import com.bsmwireless.services.malfunction.dagger.MalfunctionServiceComponent;
 import com.bsmwireless.services.monitoring.dagger.MonitoringServiceComponent;
 import com.bsmwireless.widgets.common.FontTextView;
 
@@ -24,7 +27,17 @@ import javax.inject.Singleton;
 import dagger.Component;
 
 @Singleton
-@Component(modules = {ContextModule.class, NetworkModule.class, DatabaseModule.class, TokenModule.class, PreferencesModule.class, CacheModule.class, BlackBoxModule.class, DutyModule.class, AutoDutyModule.class, AccountModule.class})
+@Component(modules = {ContextModule.class,
+        NetworkModule.class,
+        DatabaseModule.class,
+        TokenModule.class,
+        PreferencesModule.class,
+        CacheModule.class,
+        BlackBoxModule.class,
+        DutyModule.class,
+        AutoDutyModule.class,
+        AccountModule.class,
+        MalfunctionModule.class})
 public interface AppComponent {
     Context context();
 
@@ -60,5 +73,11 @@ public interface AppComponent {
 
     DiagnosticComponent.Builder diagnosticBuilder();
 
+    MalfunctionServiceComponent.Builder malfunctionServiceComponentBuilder();
+
     MonitoringServiceComponent.Builder monitoringServiceBuilder();
+
+    HoursOfServiceComponent.Builder hoursOfServiceBuilder();
+
+    HomeComponent.Builder homeComponentBuilder();
 }
