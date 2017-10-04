@@ -16,7 +16,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 
-import io.reactivex.Maybe;
+import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.plugins.RxJavaPlugins;
@@ -70,7 +70,7 @@ public class SynchronizationJobTest extends BaseTest {
         when(eldEvent.getMalCode()).thenReturn(Malfunction.ENGINE_SYNCHRONIZATION);
 
         when(mELDEventsInteractor.getLatestMalfunctionEvent(Malfunction.ENGINE_SYNCHRONIZATION))
-                .thenReturn(Single.just(eldEvent).toMaybe());
+                .thenReturn(Single.just(eldEvent).toFlowable());
         when(mELDEventsInteractor.postNewELDEvent(any())).thenReturn(Single.just(1L));
         when(mELDEventsInteractor.getEvent(any(), any(), any())).thenReturn(eldEvent);
 
@@ -98,7 +98,7 @@ public class SynchronizationJobTest extends BaseTest {
         ELDEvent eldEvent = mock(ELDEvent.class);
         when(eldEvent.getEventCode()).thenReturn(ELDEvent.MalfunctionCode.DIAGNOSTIC_LOGGED.getCode());
         when(mELDEventsInteractor.getLatestMalfunctionEvent(Malfunction.ENGINE_SYNCHRONIZATION))
-                .thenReturn(Maybe.just(eldEvent));
+                .thenReturn(Flowable.just(eldEvent));
         when(mELDEventsInteractor.postNewELDEvent(any())).thenReturn(Single.just(1L));
 
         mSynchronizationJob.start();
@@ -135,11 +135,11 @@ public class SynchronizationJobTest extends BaseTest {
         mSynchronizationJob.start();
 
         when(mELDEventsInteractor.getLatestMalfunctionEvent(Malfunction.ENGINE_SYNCHRONIZATION))
-                .thenReturn(Maybe.just(diagnosticCleared));
+                .thenReturn(Flowable.just(diagnosticCleared));
         blackBoxObservable.onNext(diagnosticAppear);
 
         when(mELDEventsInteractor.getLatestMalfunctionEvent(Malfunction.ENGINE_SYNCHRONIZATION))
-                .thenReturn(Maybe.just(diagnosticLogged));
+                .thenReturn(Flowable.just(diagnosticLogged));
         blackBoxObservable.onNext(diagnosticDisappear);
 
         blackBoxObservable.onComplete();
@@ -160,7 +160,7 @@ public class SynchronizationJobTest extends BaseTest {
         when(mBlackBoxInteractor.getData(anyInt())).thenReturn(Observable.just(blackBoxModel));
 
         when(mELDEventsInteractor.getLatestMalfunctionEvent(Malfunction.ENGINE_SYNCHRONIZATION))
-                .thenReturn(Maybe.empty());
+                .thenReturn(Flowable.empty());
 
         when(mELDEventsInteractor.postNewELDEvent(any())).thenReturn(Single.just(1L));
 
@@ -187,7 +187,7 @@ public class SynchronizationJobTest extends BaseTest {
         when(mBlackBoxInteractor.getData(anyInt())).thenReturn(Observable.just(blackBoxModel));
 
         when(mELDEventsInteractor.getLatestMalfunctionEvent(Malfunction.ENGINE_SYNCHRONIZATION))
-                .thenReturn(Maybe.empty());
+                .thenReturn(Flowable.empty());
         when(mELDEventsInteractor.getEvent(any(), any(), any())).thenReturn(new ELDEvent());
 
         when(mELDEventsInteractor.postNewELDEvent(any())).thenReturn(Single.just(1L));

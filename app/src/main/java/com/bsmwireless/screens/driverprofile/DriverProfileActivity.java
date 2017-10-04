@@ -15,6 +15,7 @@ import android.widget.ScrollView;
 
 import com.bsmwireless.common.App;
 import com.bsmwireless.common.utils.NetworkUtils;
+import com.bsmwireless.common.utils.ViewUtils;
 import com.bsmwireless.data.network.RetrofitException;
 import com.bsmwireless.data.storage.carriers.CarrierEntity;
 import com.bsmwireless.data.storage.hometerminals.HomeTerminalEntity;
@@ -241,6 +242,8 @@ public final class DriverProfileActivity extends BaseMenuActivity implements Dri
 
     @OnClick(R.id.change_password_button)
     void onChangePasswordClick() {
+        ViewUtils.hideSoftKeyboard(this);
+
         mPresenter.onChangePasswordClick(mCurrentPasswordTextView.getText().toString(),
                                          mNewPasswordTextView.getText().toString(),
                                          mConfirmPasswordTextView.getText().toString());
