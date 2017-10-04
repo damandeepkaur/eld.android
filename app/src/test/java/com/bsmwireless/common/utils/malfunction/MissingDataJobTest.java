@@ -15,7 +15,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
 
-import io.reactivex.Maybe;
+import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.plugins.RxJavaPlugins;
@@ -64,7 +64,7 @@ public class MissingDataJobTest extends BaseTest {
 
         when(mELDEventsInteractor.isLocationUpdateEventExists()).thenReturn(Single.just(true));
         when(mELDEventsInteractor.getLatestMalfunctionEvent(Malfunction.MISSING_REQUIRED_DATA_ELEMENTS))
-                .thenReturn(Maybe.empty());
+                .thenReturn(Flowable.empty());
         when(mELDEventsInteractor.postNewELDEvent(any())).thenReturn(Single.just(1L));
         ELDEvent eldEvent = mock(ELDEvent.class);
         when(eldEvent.getEventCode()).thenReturn(ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED.getCode());
@@ -95,7 +95,7 @@ public class MissingDataJobTest extends BaseTest {
 
         when(mELDEventsInteractor.isLocationUpdateEventExists()).thenReturn(Single.just(false));
         when(mELDEventsInteractor.getLatestMalfunctionEvent(Malfunction.MISSING_REQUIRED_DATA_ELEMENTS))
-                .thenReturn(Maybe.empty());
+                .thenReturn(Flowable.empty());
         when(mELDEventsInteractor.postNewELDEvent(any())).thenReturn(Single.just(1L));
         ELDEvent defaultEvent = new ELDEvent();
         defaultEvent.setEventCode(ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED.getCode());
@@ -124,7 +124,7 @@ public class MissingDataJobTest extends BaseTest {
         when(currentEvent.getEventCode())
                 .thenReturn(ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED.getCode());
         when(mELDEventsInteractor.getLatestMalfunctionEvent(Malfunction.MISSING_REQUIRED_DATA_ELEMENTS))
-                .thenReturn(Maybe.just(currentEvent));
+                .thenReturn(Flowable.just(currentEvent));
         when(mELDEventsInteractor.postNewELDEvent(any())).thenReturn(Single.just(1L));
         ELDEvent eldEvent = mock(ELDEvent.class);
         when(mELDEventsInteractor.getEvent(any(DutyType.class)))
@@ -163,7 +163,7 @@ public class MissingDataJobTest extends BaseTest {
         when(logged.getEventCode())
                 .thenReturn(ELDEvent.MalfunctionCode.DIAGNOSTIC_LOGGED.getCode());
         when(mELDEventsInteractor.getLatestMalfunctionEvent(Malfunction.MISSING_REQUIRED_DATA_ELEMENTS))
-                .thenReturn(Maybe.just(cleared), Maybe.just(logged));
+                .thenReturn(Flowable.just(cleared), Flowable.just(logged));
         when(mELDEventsInteractor.postNewELDEvent(any())).thenReturn(Single.just(1L));
         ELDEvent eldEvent = mock(ELDEvent.class);
         when(mELDEventsInteractor.getEvent(any(DutyType.class)))

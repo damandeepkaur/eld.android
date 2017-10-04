@@ -18,7 +18,7 @@ import org.mockito.Mock;
 
 import java.util.concurrent.TimeUnit;
 
-import io.reactivex.Maybe;
+import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.plugins.RxJavaPlugins;
@@ -27,7 +27,6 @@ import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.Subject;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
@@ -68,7 +67,7 @@ public class TimingJobTest extends BaseTest {
     public void complianceNotDetectedNoEventsInDb() throws Exception {
 
         when(mELDEventsInteractor.getLatestMalfunctionEvent(Malfunction.TIMING_COMPLIANCE))
-                .thenReturn(Maybe.empty());
+                .thenReturn(Flowable.empty());
 
         final long timeDiffForTriggered = TimeUnit.MILLISECONDS.toMillis(5);
         when(mNtpClientManager.getRealTimeInMillisDiff()).thenReturn(timeDiffForTriggered - 1);
@@ -95,7 +94,7 @@ public class TimingJobTest extends BaseTest {
         when(mBlackBoxInteractor.getData(anyInt())).thenReturn(Observable.just(model));
 
         when(mELDEventsInteractor.getLatestMalfunctionEvent(Malfunction.TIMING_COMPLIANCE))
-                .thenReturn(Maybe.empty());
+                .thenReturn(Flowable.empty());
         when(mELDEventsInteractor.postNewELDEvent(any())).thenReturn(Single.just(1L));
         ELDEvent defaultEvent = new ELDEvent();
         defaultEvent.setEventCode(ELDEvent.MalfunctionCode.MALFUNCTION_CLEARED.getCode());
@@ -124,7 +123,7 @@ public class TimingJobTest extends BaseTest {
                 .thenReturn(ELDEvent.MalfunctionCode.MALFUNCTION_LOGGED.getCode());
 
         when(mELDEventsInteractor.getLatestMalfunctionEvent(Malfunction.TIMING_COMPLIANCE))
-                .thenReturn(Maybe.just(eldEventFromDb));
+                .thenReturn(Flowable.just(eldEventFromDb));
         when(mELDEventsInteractor.postNewELDEvent(any())).thenReturn(Single.just(1L));
         ELDEvent defaultEvent = new ELDEvent();
         defaultEvent.setEventCode(ELDEvent.MalfunctionCode.MALFUNCTION_LOGGED.getCode());
@@ -154,7 +153,7 @@ public class TimingJobTest extends BaseTest {
                 .thenReturn(ELDEvent.MalfunctionCode.MALFUNCTION_CLEARED.getCode());
 
         when(mELDEventsInteractor.getLatestMalfunctionEvent(Malfunction.TIMING_COMPLIANCE))
-                .thenReturn(Maybe.just(eldEventFromDb));
+                .thenReturn(Flowable.just(eldEventFromDb));
         when(mELDEventsInteractor.postNewELDEvent(any())).thenReturn(Single.just(1L));
         when(mELDEventsInteractor.getEvent(any(), any(), any())).thenReturn(new ELDEvent());
 
@@ -194,7 +193,7 @@ public class TimingJobTest extends BaseTest {
         ELDEvent newEldEvent = spy(ELDEvent.class);
         when(mELDEventsInteractor.getEvent(any(DutyType.class))).thenReturn(newEldEvent);
         when(mELDEventsInteractor.getLatestMalfunctionEvent(Malfunction.TIMING_COMPLIANCE))
-                .thenReturn(Maybe.just(clearedEvent), Maybe.just(loggedEvent));
+                .thenReturn(Flowable.just(clearedEvent), Flowable.just(loggedEvent));
         when(mELDEventsInteractor.postNewELDEvent(any())).thenReturn(Single.just(1L));
         when(mELDEventsInteractor.getEvent(any(), any(), any())).thenReturn(new ELDEvent());
 
