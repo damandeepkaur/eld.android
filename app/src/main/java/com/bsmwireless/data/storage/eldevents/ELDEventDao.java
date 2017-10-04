@@ -8,7 +8,6 @@ import android.arch.persistence.room.Query;
 import java.util.List;
 
 import io.reactivex.Flowable;
-import io.reactivex.Maybe;
 import io.reactivex.Single;
 
 import static android.arch.persistence.room.OnConflictStrategy.REPLACE;
@@ -67,7 +66,7 @@ public interface ELDEventDao {
      * @return latest ELD event
      */
     @Query("SELECT * FROM events WHERE driver_id = :driverId AND event_type = :type AND mal_code = :malCode AND status = :status ORDER BY event_time DESC LIMIT 1")
-    Maybe<ELDEventEntity> getLatestEvent(int driverId, int type, String malCode, int status);
+    Flowable<ELDEventEntity> getLatestEvent(int driverId, int type, String malCode, int status);
 
     /**
      * Returns the latest event from a database

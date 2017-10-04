@@ -4,18 +4,17 @@ package com.bsmwireless.screens.logs;
 import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.common.utils.DateUtils;
 import com.bsmwireless.common.utils.DutyUtils;
+import com.bsmwireless.common.utils.LogHeaderUtils;
 import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
 import com.bsmwireless.domain.interactors.LogSheetInteractor;
 import com.bsmwireless.domain.interactors.UserInteractor;
 import com.bsmwireless.domain.interactors.VehiclesInteractor;
-import com.bsmwireless.models.Carrier;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.HomeTerminal;
 import com.bsmwireless.models.LogSheetHeader;
 import com.bsmwireless.models.SyncConfiguration;
-import com.bsmwireless.models.User;
 import com.bsmwireless.models.Vehicle;
 import com.bsmwireless.screens.logs.dagger.EventLogModel;
 import com.bsmwireless.widgets.alerts.DutyType;
@@ -30,6 +29,7 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
@@ -44,6 +44,8 @@ import static com.bsmwireless.widgets.alerts.DutyType.CLEAR_YM;
 
 @ActivityScope
 public final class LogsPresenter implements AccountManager.AccountListener {
+
+
     private LogsView mView;
     private ELDEventsInteractor mELDEventsInteractor;
     private LogSheetInteractor mLogSheetInteractor;
@@ -51,6 +53,7 @@ public final class LogsPresenter implements AccountManager.AccountListener {
     private UserInteractor mUserInteractor;
     private DutyTypeManager mDutyTypeManager;
     private AccountManager mAccountManager;
+    private LogHeaderUtils mLogHeaderUtils;
     private Map<Integer, Vehicle> mVehicleIdToNameMap = new HashMap<>();
     private Map<Long, LogSheetHeader> mLogSheetHeadersMap = new HashMap<>();
     private DutyTypeManager.DutyTypeListener mListener = dutyType -> mView.dutyUpdated();
@@ -60,9 +63,12 @@ public final class LogsPresenter implements AccountManager.AccountListener {
     private Disposable mUpdateEventsDisposable;
 
     @Inject
-    public LogsPresenter(LogsView view, ELDEventsInteractor eventsInteractor, LogSheetInteractor logSheetInteractor,
-                         VehiclesInteractor vehiclesInteractor, UserInteractor userInteractor, DutyTypeManager dutyTypeManager,
-                         AccountManager accountManager) {
+    public LogsPresenter(LogsView view, ELDEventsInteractor eventsInteractor,
+                         LogSheetInteractor logSheetInteractor,
+                         VehiclesInteractor vehiclesInteractor,
+                         UserInteractor userInteractor,
+                         DutyTypeManager dutyTypeManager,
+                         AccountManager accountManager, LogHeaderUtils logHeaderUtils) {
         mView = view;
         mELDEventsInteractor = eventsInteractor;
         mLogSheetInteractor = logSheetInteractor;
@@ -70,6 +76,7 @@ public final class LogsPresenter implements AccountManager.AccountListener {
         mUserInteractor = userInteractor;
         mDutyTypeManager = dutyTypeManager;
         mAccountManager = accountManager;
+        mLogHeaderUtils = logHeaderUtils;
         Timber.d("CREATED");
         mDutyTypeManager.addListener(mListener);
     }
@@ -126,7 +133,7 @@ public final class LogsPresenter implements AccountManager.AccountListener {
         mUpdateDayDataDisposables.add(mELDEventsInteractor.getActiveDutyEventsForDay(startDayTime)
                 .subscribeOn(Schedulers.io())
                 .map(eldEvents -> convertToEventLogModels(eldEvents, startDayTime, timezone))
-                .doOnSuccess(eventLogModels -> graphModel.setEventLogModels(eventLogModels))
+                .doOnSuccess(graphModel::setEventLogModels)
                 .doOnSuccess(eventLogModels -> graphModel.setPrevDayEvent(
                         mELDEventsInteractor.getLatestActiveDutyEventFromDB(startDayTime)))
                 .observeOn(AndroidSchedulers.mainThread())
@@ -143,78 +150,17 @@ public final class LogsPresenter implements AccountManager.AccountListener {
     }
 
     private void setLogHeaderData(long logDay) {
-        LogHeaderModel model = new LogHeaderModel();
-        mUpdateDayDataDisposables.add(mUserInteractor.getFullUser()
+
+        Disposable disposable = mUserInteractor.getTimezoneOnce()
+                .flatMap(timezone -> Single
+                        .zip(loadUserHeaderInfo(timezone),
+                                loadLogHeaderInfo(logDay),
+                                loadOdometerValue(timezone),
+                                this::mapUserAndHeader))
                 .subscribeOn(Schedulers.io())
-                .doOnSuccess(user -> updateLogHeaderModelByUser(model, user))
-                .flatMap(user -> mLogSheetInteractor.getLogSheet(logDay))
-                .doOnSuccess(logSheetHeader -> updateLogHeaderModelByLogSheet(model, logSheetHeader))
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(eventLogModels -> mView.setLogHeader(model)));
-    }
-
-    private void updateLogHeaderModelByUser(LogHeaderModel logHeaderModel, User user) {
-        logHeaderModel.setTimezone(user.getTimezone());
-        logHeaderModel.setDriverName(user.getFirstName() + " " + user.getLastName());
-        logHeaderModel.setSelectedExemptions(user.getRuleException() != null ? user.getRuleException() : "");
-
-        List<SyncConfiguration> configurations = user.getConfigurations();
-        if (configurations != null) {
-            for (SyncConfiguration configuration : configurations) {
-                if (SyncConfiguration.Type.EXCEPT.getName().equals(configuration.getName())) {
-                    logHeaderModel.setAllExemptions(configuration.getValue());
-                    break;
-                }
-            }
-        } else {
-            logHeaderModel.setAllExemptions("");
-        }
-
-        //set carrier name
-        List<Carrier> carriers = user.getCarriers();
-        if (carriers != null && !carriers.isEmpty()) {
-            StringBuilder sb = new StringBuilder();
-            for (Carrier carrier : carriers) {
-                sb.append(carrier.getName());
-                sb.append(",");
-            }
-            sb.deleteCharAt(sb.length() - 1);
-            logHeaderModel.setCarrierName(sb.toString());
-        }
-        logHeaderModel.setSelectedExemptions(user.getRuleException());
-    }
-
-    private void updateLogHeaderModelByLogSheet(LogHeaderModel logHeaderModel, LogSheetHeader logSheetHeader) {
-        logHeaderModel.setLogDay(logSheetHeader.getLogDay());
-        int vehicleId = logSheetHeader.getVehicleId();
-        Vehicle vehicle;
-        if (mVehicleIdToNameMap.containsKey(vehicleId)) {
-            vehicle = mVehicleIdToNameMap.get(vehicleId);
-        } else {
-            vehicle = mVehiclesInteractor.getVehicle(vehicleId);
-        }
-        if (vehicle != null) {
-            logHeaderModel.setVehicleName(vehicle.getName());
-            logHeaderModel.setVehicleLicense(vehicle.getLicense());
-        }
-        logHeaderModel.setTrailers(logSheetHeader.getTrailerIds());
-
-        if (logSheetHeader.getHomeTerminal() != null) {
-            logHeaderModel.setHomeTerminalAddress(logSheetHeader.getHomeTerminal().getAddress());
-            logHeaderModel.setHomeTerminalName(logSheetHeader.getHomeTerminal().getName());
-        }
-
-        logHeaderModel.setShippingId(logSheetHeader.getShippingId());
-
-        String codriverIds = logSheetHeader.getCoDriverIds();
-
-        //TODO: get codriver names by ids
-        logHeaderModel.setCoDriversName(codriverIds);
-
-        //TODO: init by data from black box
-        logHeaderModel.setStartOdometer("0");
-        logHeaderModel.setEndOdometer("0");
-        logHeaderModel.setDistanceDriven("-");
+                .subscribe(logHeaderModel -> mView.setLogHeader(logHeaderModel));
+        mUpdateDayDataDisposables.add(disposable);
     }
 
     private List<EventLogModel> setVehicleNames(List<EventLogModel> eventLogModels) {
@@ -425,6 +371,126 @@ public final class LogsPresenter implements AccountManager.AccountListener {
         return logs;
     }
 
+    private Single<UserHeaderInfo> loadUserHeaderInfo(String timeZone) {
+
+        return mUserInteractor.getFullUser()
+                .map(user -> {
+                    if (user == null) return new UserHeaderInfo();
+
+                    String driverName = mLogHeaderUtils.makeDriverName(user);
+                    String selectedExemptions = user.getRuleException();
+                    String allExemptions = mLogHeaderUtils.getAllExemptions(user,
+                            SyncConfiguration.Type.EXCEPT);
+                    String carrierName = mLogHeaderUtils.makeCarrierName(user);
+
+                    return new UserHeaderInfo(timeZone, driverName, selectedExemptions,
+                            allExemptions, carrierName);
+                });
+    }
+
+    private Single<SelectedLogHeaderInfo> loadLogHeaderInfo(long logDay) {
+
+        return mLogSheetInteractor.getLogSheet(logDay)
+                .map(selectedLogHeader -> {
+                    if (selectedLogHeader == null) return new SelectedLogHeaderInfo();
+
+                    int vehicleId = selectedLogHeader.getVehicleId();
+                    Vehicle vehicle;
+                    if (mVehicleIdToNameMap.containsKey(vehicleId)) {
+                        vehicle = mVehicleIdToNameMap.get(vehicleId);
+                    } else {
+                        vehicle = mVehiclesInteractor.getVehicle(vehicleId);
+                    }
+                    String vehicleName;
+                    String vehicleLicense;
+                    if (vehicle != null) {
+                        vehicleName = vehicle.getName();
+                        vehicleLicense = vehicle.getLicense();
+                    } else {
+                        vehicleName = "";
+                        vehicleLicense = "";
+                    }
+
+                    String vehicleTrailers = selectedLogHeader.getTrailerIds();
+
+                    String homeTerminalAddress;
+                    String homeTerminalName;
+                    if (selectedLogHeader.getHomeTerminal() != null) {
+                        homeTerminalAddress = selectedLogHeader.getHomeTerminal().getAddress();
+                        homeTerminalName = selectedLogHeader.getHomeTerminal().getName();
+                    } else {
+                        homeTerminalAddress = "";
+                        homeTerminalName = "";
+                    }
+
+                    String shippingId = selectedLogHeader.getShippingId();
+                    String coDriversName = mLogHeaderUtils.getCoDriversName(selectedLogHeader);
+
+                    return new SelectedLogHeaderInfo(logDay, vehicleName, vehicleLicense, vehicleTrailers,
+                            homeTerminalAddress, homeTerminalName, shippingId, coDriversName);
+                });
+    }
+
+    private Single<LogHeaderUtils.OdometerResult> loadOdometerValue(String mTimeZone) {
+
+        final long startDate = DateUtils.getStartDate(mTimeZone, mView.getSelectedDay().getCalendar());
+
+        // Day may stared from event in previous day, that's why loads event for previous day
+        return mELDEventsInteractor
+                .getActiveDutyEventsForDay(startDate)
+                .zipWith(mELDEventsInteractor
+                                .getLatestActiveDutyEventFromDBOnce(startDate,
+                                        mAccountManager.getCurrentUserId()),
+                        this::mapLatestAndCurrentEvents)
+                .flatMap(events -> Single.fromCallable(() ->
+                        mLogHeaderUtils.calculateOdometersValue(events)));
+    }
+
+    /**
+     * Creates events list.
+     * Takes events for current(selected) day and events for previous day.
+     * Result will be all events from current day plus a last event for previous day
+     *
+     * @param current       events for current day
+     * @param prevDayEvents events for previous day
+     * @return events for current day with event for previous day
+     */
+    private List<ELDEvent> mapLatestAndCurrentEvents(List<ELDEvent> current, List<ELDEvent> prevDayEvents) {
+
+        List<ELDEvent> eldEvents = new ArrayList<>(current.size() + (prevDayEvents.isEmpty() ? 0 : 1));
+        if (!prevDayEvents.isEmpty()) {
+            eldEvents.add(prevDayEvents.get(prevDayEvents.size() - 1));
+        }
+        eldEvents.addAll(current);
+        return eldEvents;
+    }
+
+    private LogHeaderModel mapUserAndHeader(UserHeaderInfo userHeaderInfo,
+                                            SelectedLogHeaderInfo selectedLogHeaderInfo,
+                                            LogHeaderUtils.OdometerResult odometerResult) {
+
+        LogHeaderModel model = new LogHeaderModel();
+        model.setLogDay(selectedLogHeaderInfo.logDay);
+        model.setTimezone(userHeaderInfo.mTimezone);
+        model.setDriverName(userHeaderInfo.mDriverName);
+        model.setSelectedExemptions(userHeaderInfo.mSelectedExemption);
+        model.setAllExemptions(userHeaderInfo.mAllExemptions);
+        model.setCarrierName(userHeaderInfo.mCarrierName);
+
+        model.setVehicleName(selectedLogHeaderInfo.mVehicleName);
+        model.setVehicleLicense(selectedLogHeaderInfo.mVehicleLicense);
+        model.setTrailers(selectedLogHeaderInfo.mTrailers);
+        model.setHomeTerminalAddress(selectedLogHeaderInfo.mHomeTerminalAddress);
+        model.setHomeTerminalName(selectedLogHeaderInfo.mHomeTerminalName);
+        model.setShippingId(selectedLogHeaderInfo.mShippingId);
+        model.setCoDriversName(selectedLogHeaderInfo.mCoDriversName);
+
+        model.setStartOdometer(odometerResult.startValue);
+        model.setEndOdometer(odometerResult.endValue);
+        model.setDistanceDriven(String.valueOf(odometerResult.distance));
+        return model;
+    }
+
     @Override
     public void onUserChanged() {
         mUpdateEventsDisposable.dispose();
@@ -435,5 +501,73 @@ public final class LogsPresenter implements AccountManager.AccountListener {
 
     @Override
     public void onDriverChanged() {
+    }
+
+    private static final class UserHeaderInfo {
+        final String mTimezone;
+        final String mDriverName;
+        final String mSelectedExemption;
+        final String mAllExemptions;
+        final String mCarrierName;
+
+        private UserHeaderInfo(String timezone,
+                               String driverName,
+                               String selectedExemption,
+                               String allExemptions,
+                               String carrierName) {
+            this.mTimezone = timezone;
+            this.mDriverName = driverName;
+            this.mSelectedExemption = selectedExemption;
+            this.mAllExemptions = allExemptions;
+            this.mCarrierName = carrierName;
+        }
+
+        public UserHeaderInfo() {
+            mTimezone = "";
+            mDriverName = "";
+            mSelectedExemption = "";
+            mAllExemptions = "";
+            mCarrierName = "";
+        }
+    }
+
+    private static final class SelectedLogHeaderInfo {
+        final long logDay;
+        final String mVehicleName;
+        final String mVehicleLicense;
+        final String mTrailers;
+        final String mHomeTerminalAddress;
+        final String mHomeTerminalName;
+        final String mShippingId;
+        final String mCoDriversName;
+
+        private SelectedLogHeaderInfo(long logDay,
+                                      String vehicleName,
+                                      String vehicleLicense,
+                                      String trailers,
+                                      String homeTerminalAddress,
+                                      String homeTerminalName,
+                                      String shippingId,
+                                      String coDriversName) {
+            this.logDay = logDay;
+            this.mVehicleName = vehicleName;
+            this.mVehicleLicense = vehicleLicense;
+            this.mTrailers = trailers;
+            this.mHomeTerminalAddress = homeTerminalAddress;
+            this.mHomeTerminalName = homeTerminalName;
+            this.mShippingId = shippingId;
+            this.mCoDriversName = coDriversName;
+        }
+
+        public SelectedLogHeaderInfo() {
+            this.logDay = 0;
+            this.mVehicleName = "";
+            this.mVehicleLicense = "";
+            this.mTrailers = "";
+            this.mHomeTerminalAddress = "";
+            this.mHomeTerminalName = "";
+            this.mShippingId = "";
+            this.mCoDriversName = "";
+        }
     }
 }

@@ -28,13 +28,17 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import javax.inject.Inject;
 
 import io.reactivex.Flowable;
-import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Single;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
 import static com.bsmwireless.common.Constants.SUCCESS;
@@ -54,6 +58,7 @@ public final class ELDEventsInteractor {
     private AccountManager mAccountManager;
     private TokenManager mTokenManager;
     private LogSheetInteractor mLogSheetInteractor;
+    private ELDEventEntity mLatestEldEvent;
 
     @Inject
     public ELDEventsInteractor(ServiceApi serviceApi, PreferencesManager preferencesManager,
@@ -74,6 +79,12 @@ public final class ELDEventsInteractor {
         mLogSheetInteractor = logSheetInteractor;
 
         mUserInteractor.getTimezone().subscribe(timezone -> mTimezone = timezone);
+
+        mELDEventDao.getLatestEvent(mAccountManager.getCurrentUserId(), ELDEvent.EventType.DATA_DIAGNOSTIC.getValue(),
+                Malfunction.POSITIONING_COMPLIANCE.getCode(), ELDEvent.StatusCode.ACTIVE.getValue())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(eldEventEntity -> mLatestEldEvent = eldEventEntity);
     }
 
     public Single<List<ELDEvent>> getEventsFromDBOnce(long startTime, long endTime) {
@@ -296,7 +307,7 @@ public final class ELDEventsInteractor {
      * @param malfunction malfunction code
      * @return latest malfunction ELD event
      */
-    public Maybe<ELDEvent> getLatestMalfunctionEvent(Malfunction malfunction) {
+    public Flowable<ELDEvent> getLatestMalfunctionEvent(Malfunction malfunction) {
         return mELDEventDao
                 .getLatestEvent(mAccountManager.getCurrentUserId(),
                         ELDEvent.EventType.DATA_DIAGNOSTIC.getValue(),
@@ -460,7 +471,11 @@ public final class ELDEventsInteractor {
         event.setOdometer(blackBoxModel.getOdometer());
         event.setLat(blackBoxModel.getLat());
         event.setLng(blackBoxModel.getLon());
-        event.setLatLngFlag(getLatLngFlag(blackBoxModel));
+        try {
+            event.setLatLngFlag(getLatLngFlag(blackBoxModel));
+        } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            event.setLatLngFlag(ELDEvent.LatLngFlag.FLAG_NONE);
+        }
         event.setLocation("");
         event.setDistance(0);
         event.setMalfunction(false);
@@ -496,17 +511,22 @@ public final class ELDEventsInteractor {
         return event;
     }
 
-    private ELDEvent.LatLngFlag getLatLngFlag(BlackBoxModel blackBoxModel) {
-        ELDEventEntity latestEvent = mELDEventDao.getLatestEventSync(
-                mAccountManager.getCurrentUserId(),
-                ELDEvent.EventType.DATA_DIAGNOSTIC.getValue(),
-                Malfunction.POSITIONING_COMPLIANCE.getCode(),
-                ELDEvent.StatusCode.ACTIVE.getValue());
+    private ELDEvent.LatLngFlag getLatLngFlag(BlackBoxModel blackBoxModel) throws ExecutionException, InterruptedException, TimeoutException {
+        if (mLatestEldEvent == null) {
+            mLatestEldEvent = mELDEventDao.getLatestEvent(
+                    mAccountManager.getCurrentUserId(),
+                    ELDEvent.EventType.DATA_DIAGNOSTIC.getValue(),
+                    Malfunction.POSITIONING_COMPLIANCE.getCode(),
+                    ELDEvent.StatusCode.ACTIVE.getValue())
+                    .subscribeOn(Schedulers.io())
+                    .toFuture()
+                    .get(100, TimeUnit.MILLISECONDS);
+        }
 
         ELDEvent.LatLngFlag latLngFlag;
 
-        if (latestEvent != null &&
-                latestEvent.getEventType() == ELDEvent.MalfunctionCode.DIAGNOSTIC_LOGGED.getCode()) {
+        if (mLatestEldEvent != null &&
+                mLatestEldEvent.getEventType() == ELDEvent.MalfunctionCode.DIAGNOSTIC_LOGGED.getCode()) {
             latLngFlag = ELDEvent.LatLngFlag.FLAG_E;
         } else if (!blackBoxModel.getSensorState(BlackBoxSensorState.GPS)) {
             latLngFlag = ELDEvent.LatLngFlag.FLAG_X;

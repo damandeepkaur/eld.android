@@ -16,4 +16,6 @@ public interface Type {
 
     int getOriginalCode();
 
+    boolean isSame(int type, int code);
+
 }

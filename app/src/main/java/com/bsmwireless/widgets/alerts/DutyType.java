@@ -75,4 +75,14 @@ public enum DutyType implements Type {
         return mOriginalCode;
     }
 
+    /**
+     * Check type and code is the same as type and code for duty status
+     * @param type event type
+     * @param code event code
+     * @return
+     */
+    @Override
+    public boolean isSame(int type, int code) {
+        return mType == type && mCode == code;
+    }
 }

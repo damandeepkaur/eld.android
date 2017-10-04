@@ -94,4 +94,9 @@ public enum NonDutyType implements Type {
         return DutyType.OFF_DUTY.getOriginalCode();
     }
 
+    @Override
+    public boolean isSame(int type, int code) {
+        return mType == type && mCode == code;
+    }
+
 }
