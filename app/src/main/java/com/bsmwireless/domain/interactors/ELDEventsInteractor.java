@@ -96,6 +96,10 @@ public final class ELDEventsInteractor {
         return Observable.fromCallable(() -> ELDEventConverter.toModelList(mELDEventDao.getUnidentifiedEvents()));
     }
 
+    public Observable<List<ELDEvent>> getUnassignedEvents() {
+        return Observable.fromCallable(() -> ELDEventConverter.toModelList(mELDEventDao.getUnassignedEvents()));
+    }
+
     public Single<List<ELDEvent>> getLatestActiveDutyEventFromDBOnce(long latestTime, int userId) {
         return mELDEventDao.getLatestActiveDutyEventOnce(latestTime, userId)
                 .map(ELDEventConverter::toModelList);

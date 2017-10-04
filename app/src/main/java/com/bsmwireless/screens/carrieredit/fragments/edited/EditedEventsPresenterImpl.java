@@ -36,7 +36,6 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
-import static android.R.id.list;
 import static com.bsmwireless.common.utils.DateUtils.MS_IN_DAY;
 import static com.bsmwireless.widgets.alerts.DutyType.CLEAR_PU;
 import static com.bsmwireless.widgets.alerts.DutyType.CLEAR_YM;
@@ -146,8 +145,11 @@ public final class EditedEventsPresenterImpl implements EditedEventsPresenter {
 
     @Override
     public void markCalendarItems(List<CalendarItem> list) {
-        mDisposable.add(mELDEventsInteractor.getUnidentifiedEvents()
+        mDisposable.add(mUserInteractor.getTimezone()
                 .subscribeOn(Schedulers.io())
+                .doOnNext(timezone -> mTimeZone = timezone)
+                .toObservable()
+                .switchMap(s -> mELDEventsInteractor.getUnidentifiedEvents())
                 .map(eldEvents -> {
                     for (int i = 0; i < list.size(); ++i) {
                         CalendarItem calendarItem = list.get(i);

@@ -71,6 +71,7 @@ public final class UnassignedEventsFragment extends BaseFragment implements Unas
 
     @Override
     public void setVehicleName(String vehicleName) {
+        mRecyclerView.setVisibility(View.VISIBLE);
         mAdapter.setVehicleName(vehicleName);
     }
 

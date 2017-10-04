@@ -33,6 +33,9 @@ public interface ELDEventDao {
     @Query("SELECT * FROM events WHERE status = 3")
     List<ELDEventEntity> getUnidentifiedEvents();
 
+    @Query("SELECT * FROM events WHERE driver_id = -1")
+    List<ELDEventEntity> getUnassignedEvents();
+
     @Query("SELECT * FROM events WHERE event_time >= :startTime AND event_time < :endTime and driver_id = :driverId ORDER BY event_time")
     Single<List<ELDEventEntity>> getEventsFromStartToEndTimeOnce(long startTime, long endTime, int driverId);
 

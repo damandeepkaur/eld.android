@@ -46,7 +46,7 @@ public final class UnassignedEventsPresenterImpl implements UnassignedEventsPres
 
     public void fetchEldEvents() {
         Timber.v("fetchEldEvents: ");
-        mDisposable.add(mELDEventsInteractor.getUnidentifiedEvents()
+        mDisposable.add(mELDEventsInteractor.getUnassignedEvents()
                 .subscribeOn(Schedulers.io())
                 .map(this::preparingLogs)
                 .observeOn(AndroidSchedulers.mainThread())

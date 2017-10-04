@@ -24,7 +24,6 @@
         android:layout_toRightOf="@+id/unassigned_events_exclamation"
         android:gravity="center_vertical|left"
         android:lines="2"
-        android:text="@string/logsheet_edited"
         android:textSize="@dimen/text_size_small"/>
 
     <View

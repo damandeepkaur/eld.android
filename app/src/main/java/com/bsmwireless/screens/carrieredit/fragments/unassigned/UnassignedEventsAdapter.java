@@ -103,7 +103,7 @@ public class UnassignedEventsAdapter extends RecyclerView.Adapter<UnassignedEven
                         mContext.getString(R.string.unassigned_driving)));
             }
         } else {
-            EventLogModel event = mEvents.get(position);
+            EventLogModel event = mEvents.get(position - 1);
             bindEventView(holder, event, position);
         }
     }
