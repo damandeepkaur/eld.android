@@ -3,6 +3,7 @@ package com.bsmwireless.screens.logs;
 
 import com.bsmwireless.common.dagger.ActivityScope;
 import com.bsmwireless.common.utils.DateUtils;
+import com.bsmwireless.common.utils.DutyUtils;
 import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
@@ -133,7 +134,7 @@ public final class LogsPresenter implements AccountManager.AccountListener {
     }
 
     private void setEventListData(long startDayTime, String timezone) {
-        mUpdateDayDataDisposables.add(mELDEventsInteractor.getDutyEventsForDay(startDayTime)
+        mUpdateDayDataDisposables.add(mELDEventsInteractor.getEventsForDayOnce(startDayTime)
                 .subscribeOn(Schedulers.io())
                 .map(eldEvents -> convertToEventLogModels(eldEvents, startDayTime, timezone))
                 .doOnSuccess(this::setVehicleNames)
@@ -385,23 +386,23 @@ public final class LogsPresenter implements AccountManager.AccountListener {
                 EventLogModel log = new EventLogModel(event, timezone);
                 if (event.getEventType() == ELDEvent.EventType.CHANGE_IN_DRIVER_INDICATION.getValue()
                         && event.getEventCode() == DutyType.CLEAR.getCode()) {
-                    log.setDutyType(DutyType.CLEAR);
+                    log.setType(DutyType.CLEAR);
                     //get code of indication ON event for indication OFF event
                     for (int j = i - 1; j >= 0; j--) {
                         ELDEvent dutyEvent = events.get(j);
 
                         if (dutyEvent.getEventType() == ELDEvent.EventType.CHANGE_IN_DRIVER_INDICATION.getValue()) {
                             if (dutyEvent.getEventCode() == DutyType.PERSONAL_USE.getCode()) {
-                                log.setDutyType(CLEAR_PU);
+                                log.setType(CLEAR_PU);
                                 break;
                             } else if (dutyEvent.getEventCode() == DutyType.YARD_MOVES.getCode()) {
-                                log.setDutyType(CLEAR_YM);
+                                log.setType(CLEAR_YM);
                                 break;
                             }
                         }
                     }
                 } else {
-                    log.setDutyType(DutyType.getTypeByCode(log.getEventType(), log.getEventCode()));
+                    log.setType(DutyUtils.getTypeByCode(log.getEventType(), log.getEventCode()));
                 }
                 logs.add(log);
                 if (logs.get(0).getEventTime() < startDayTime) {

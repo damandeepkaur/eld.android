@@ -119,7 +119,7 @@ public final class HoursOfServicePresenter extends BaseMenuPresenter {
             event = events.get(i);
 
             if (event.isDutyEvent() && event.isActive()) {
-                eventDutyType = DutyType.getTypeByCode(event.getEventType(), event.getEventCode());
+                eventDutyType = DutyType.getDutyTypeByCode(event.getEventType(), event.getEventCode());
 
                 if (lastEventType == null) {
                     lastEventType = eventDutyType;

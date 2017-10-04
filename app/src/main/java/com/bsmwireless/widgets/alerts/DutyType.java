@@ -2,7 +2,7 @@ package com.bsmwireless.widgets.alerts;
 
 import app.bsmuniversal.com.R;
 
-public enum DutyType {
+public enum DutyType implements Type {
     ON_DUTY(1, 4, R.string.event_type_on_duty, R.string.event_type_on_duty,R.color.onduty_light, R.drawable.ic_duty_status_on, 4),
     OFF_DUTY(1, 1, R.string.event_type_off_duty, R.string.event_type_off_duty,R.color.offduty_light, R.drawable.ic_duty_status_of, 1),
     SLEEPER_BERTH(1, 2, R.string.event_type_sleeping, R.string.event_type_sleeping,R.color.sleepingberth_light, R.drawable.ic_duty_status_sb, 2),
@@ -31,40 +31,48 @@ public enum DutyType {
         mOriginalCode = originalCode;
     }
 
-    public static DutyType getTypeByCode(int type, int code) {
+    public static DutyType getDutyTypeByCode(int type, int code) {
         for (DutyType t : DutyType.values()) {
             if (t.mCode == code && t.mType == type) {
                 return t;
             }
         }
-        return DutyType.OFF_DUTY;
+        return OFF_DUTY;
     }
 
+    @Override
     public int getCode() {
         return mCode;
     }
 
+    @Override
     public int getName() {
         return mName;
     }
 
+    @Override
     public int getTitle() {
         return mTitle;
     }
 
+    @Override
     public int getColor() {
         return mColor;
     }
 
+    @Override
     public int getIcon() {
         return mIcon;
     }
 
+    @Override
     public int getType() {
         return mType;
     }
 
+    @Override
     public int getOriginalCode() {
         return mOriginalCode;
     }
+
 }

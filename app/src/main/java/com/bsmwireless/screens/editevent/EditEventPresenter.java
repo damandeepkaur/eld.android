@@ -121,7 +121,7 @@ public final class EditEventPresenter extends BaseMenuPresenter {
     public void setEvent(ELDEvent event) {
         mELDEvent = event;
         if (mELDEvent != null) {
-            DutyType type = DutyType.getTypeByCode(event.getEventType(), event.getEventCode());
+            DutyType type = DutyType.getDutyTypeByCode(event.getEventType(), event.getEventCode());
             mView.setStatus(type);
 
             Long time = mELDEvent.getEventTime();

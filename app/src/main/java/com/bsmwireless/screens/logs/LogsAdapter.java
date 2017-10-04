@@ -17,6 +17,7 @@ import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.LogSheetHeader;
 import com.bsmwireless.screens.logs.dagger.EventLogModel;
 import com.bsmwireless.widgets.alerts.DutyType;
+import com.bsmwireless.widgets.alerts.Type;
 import com.bsmwireless.widgets.logs.LogsTitleView;
 import com.bsmwireless.widgets.logs.calendar.CalendarItem;
 import com.bsmwireless.widgets.logs.calendar.CalendarLayout;
@@ -255,14 +256,15 @@ public final class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHold
         PopupMenu popup = new PopupMenu(mContext, anchorView);
         popup.getMenuInflater().inflate(R.menu.menu_eld_event, popup.getMenu());
 
-        if (!event.isActive()) {
+        if (!event.isActive() || !event.isDutyEvent()) {
             popup.getMenu().findItem(R.id.menu_edit).setEnabled(false);
         }
-        if (!DutyType.getTypeByCode(event.getEventType(), event.getEventCode())
-                .equals(DutyType.DRIVING) || !event.isActive()) {
+        if (!event.isActive() || !event.isDutyEvent() ||
+                !DutyType.getDutyTypeByCode(event.getEventType(), event.getEventCode()).equals(DutyType.DRIVING)) {
             popup.getMenu().findItem(R.id.menu_assign).setEnabled(false);
         }
-        if (!ELDEvent.EventOrigin.DRIVER.getValue().equals(event.getEvent().getOrigin())) {
+        if (!event.isActive() || !event.isDutyEvent() ||
+                !ELDEvent.EventOrigin.DRIVER.getValue().equals(event.getEvent().getOrigin())) {
             popup.getMenu().findItem(R.id.menu_remove).setEnabled(false);
         }
 
@@ -307,7 +309,7 @@ public final class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHold
         holder.mMenuButton.setTag(log);
         holder.mMenuButton.setOnClickListener(mOnMenuClickListener);
 
-        DutyType currentDuty = log.getDutyType();
+        Type currentDuty = log.getType();
 
         holder.mEventStatus.setTextColor(mColors.get(currentDuty.getColor()));
         holder.mEventStatus.setText(currentDuty.getTitle());
