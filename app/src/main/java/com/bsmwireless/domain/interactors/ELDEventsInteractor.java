@@ -142,7 +142,8 @@ public final class ELDEventsInteractor {
 
         for (int i = 0; i < entities.length; i++) {
             ELDEvent event = events.get(i);
-            entities[i] = ELDEventConverter.toEntity(event, event.getStatus() == ELDEvent.StatusCode.ACTIVE.getValue() ? ELDEventEntity.SyncType.UPDATE_UNSYNC : ELDEventEntity.SyncType.getType(event.getSync()));
+            entities[i] = ELDEventConverter.toEntity(event, event.getStatus() == ELDEvent.StatusCode.ACTIVE.getValue() ?
+                    ELDEventEntity.SyncType.UPDATE_UNSYNC : ELDEventEntity.SyncType.values()[event.getSync()]);
         }
 
         return Observable.fromCallable(() ->

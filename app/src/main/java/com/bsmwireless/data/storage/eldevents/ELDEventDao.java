@@ -17,21 +17,21 @@ public interface ELDEventDao {
     @Query("SELECT * FROM events")
     List<ELDEventEntity> getAll();
 
-    @Query("SELECT * FROM events WHERE sync = 1 AND mobile_time NOT IN (SELECT mobile_time FROM events WHERE sync = 2) ORDER BY id")
+    @Query("SELECT * FROM events WHERE sync = 2 AND mobile_time NOT IN (SELECT mobile_time FROM events WHERE sync = 1) ORDER BY id")
     List<ELDEventEntity> getUpdateUnsyncEvents();
 
-    @Query("SELECT * FROM events WHERE sync = 2 AND driver_id=:userId ORDER BY id")
+    @Query("SELECT * FROM events WHERE sync = 1 AND driver_id=:userId ORDER BY id")
     List<ELDEventEntity> getNewUnsyncEvents(int userId);
 
     @Query("SELECT * FROM events WHERE event_time >= :startTime AND event_time < :endTime and driver_id = :driverId ORDER BY event_time")
     Single<List<ELDEventEntity>> getEventsFromStartToEndTimeOnce(long startTime, long endTime, int driverId);
 
     @Query("SELECT * FROM events WHERE event_time >= :startTime AND event_time < :endTime " +
-            "AND driver_id = :driverId AND (event_type = 1 or event_type = 3) ORDER BY event_time, mobile_time, status DESC")
+            "AND driver_id = :driverId AND (event_type = 1 or event_type = 3) ORDER BY event_time, mobile_time, status DESC, sync")
     Flowable<List<ELDEventEntity>> getDutyEventsFromStartToEndTime(long startTime, long endTime, int driverId);
 
     @Query("SELECT * FROM events WHERE event_time >= :startTime AND event_time < :endTime " +
-            "AND driver_id = :driverId AND (event_type = 1 or event_type = 3) ORDER BY event_time, mobile_time, status DESC")
+            "AND driver_id = :driverId AND (event_type = 1 or event_type = 3) ORDER BY event_time, mobile_time, status DESC, sync")
     Single<List<ELDEventEntity>> getDutyEventsFromStartToEndTimeSync(long startTime, long endTime, int driverId);
 
     @Query("SELECT * FROM events WHERE event_time < :latestTime AND driver_id = :driverId " +
@@ -116,6 +116,6 @@ public interface ELDEventDao {
     @Insert(onConflict = REPLACE)
     long[] insertAll(ELDEventEntity... events);
 
-    @Query("DELETE FROM events WHERE id IN (SELECT id FROM events WHERE driver_id = :driverId AND sync = 0 AND event_time >= :eventTimeStart AND event_time < :eventTimeEnd AND mobile_time = :mobileTime AND event_code = :eventCode AND event_type = :eventType AND status = :status LIMIT 1)")
-    int delete(long driverId, long eventTimeStart, long eventTimeEnd, long mobileTime, int eventCode, int eventType, int status);
+    @Query("DELETE FROM events WHERE id IN (SELECT id FROM events WHERE driver_id = :driverId AND sync = 0 AND event_time >= :eventTimeStart AND event_time < :eventTimeEnd AND mobile_time = :mobileTime AND event_code = :eventCode AND event_type = :eventType ORDER BY status DESC LIMIT 1)")
+    int delete(long driverId, long eventTimeStart, long eventTimeEnd, long mobileTime, int eventCode, int eventType);
 }

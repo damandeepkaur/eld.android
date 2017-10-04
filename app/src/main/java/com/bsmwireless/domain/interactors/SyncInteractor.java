@@ -26,6 +26,7 @@ import com.bsmwireless.models.RuleSelectionModel;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.concurrent.TimeUnit;
@@ -205,7 +206,7 @@ public final class SyncInteractor {
     public void replaceRecords(List<ELDEvent> events) {
         for (ELDEvent event : events) {
             mRoomDatabase.runInTransaction(() -> {
-                mELDEventDao.delete(event.getDriverId(), event.getEventTime(), event.getEventTime() + MS_IN_SEC, event.getMobileTime(), event.getEventCode(), event.getEventType(), event.getStatus());
+                mELDEventDao.delete(event.getDriverId(), event.getEventTime(), event.getEventTime() + MS_IN_SEC, event.getMobileTime(), event.getEventCode(), event.getEventType());
                 mELDEventDao.insertEvent(ELDEventConverter.toEntity(event));
             });
         }
@@ -272,7 +273,7 @@ public final class SyncInteractor {
      * @return filtered list
      */
     private List<ELDEvent> filterDoubleEvents(List<ELDEvent> list) {
-        List<Long> uniqueTimes = new ArrayList<>();
+        HashSet<Long> uniqueTimes = new HashSet<>();
         ListIterator<ELDEvent> iterator = list.listIterator();
         while (iterator.hasNext()) {
             Long time = iterator.next().getMobileTime();
