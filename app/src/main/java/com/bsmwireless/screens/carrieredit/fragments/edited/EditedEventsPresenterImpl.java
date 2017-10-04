@@ -36,6 +36,7 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
+import static android.R.id.list;
 import static com.bsmwireless.common.utils.DateUtils.MS_IN_DAY;
 import static com.bsmwireless.widgets.alerts.DutyType.CLEAR_PU;
 import static com.bsmwireless.widgets.alerts.DutyType.CLEAR_YM;
@@ -131,12 +132,16 @@ public final class EditedEventsPresenterImpl implements EditedEventsPresenter {
 
     @Override
     public void approveEdits(List<EventLogModel> events, long logDay) {
-        sendUpdatedEvents(events, logDay, ELDEvent.StatusCode.ACTIVE);
+        if (events != null && !events.isEmpty()) {
+            sendUpdatedEvents(events, logDay, ELDEvent.StatusCode.ACTIVE);
+        }
     }
 
     @Override
     public void disapproveEdits(List<EventLogModel> events, long logDay) {
-        sendUpdatedEvents(events, logDay, ELDEvent.StatusCode.INACTIVE_CHANGE_REJECTED);
+        if (events != null && !events.isEmpty()) {
+            sendUpdatedEvents(events, logDay, ELDEvent.StatusCode.INACTIVE_CHANGE_REJECTED);
+        }
     }
 
     @Override

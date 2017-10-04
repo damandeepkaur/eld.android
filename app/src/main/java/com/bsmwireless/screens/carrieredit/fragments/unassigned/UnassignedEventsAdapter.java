@@ -110,7 +110,7 @@ public class UnassignedEventsAdapter extends RecyclerView.Adapter<UnassignedEven
 
     @Override
     public int getItemCount() {
-        return mEvents == null ? 0 : mEvents.size() + 1;
+        return mEvents == null || mEvents.isEmpty() ? 0 : mEvents.size() + 1;
     }
 
     private void bindEventView(EventsHolder holder,

@@ -30,8 +30,7 @@ public interface ELDEventDao {
     @Query("SELECT * FROM events WHERE id = :id")
     Flowable<ELDEventEntity> getEventById(int id);
 
-    //TODO: WHERE status = 3
-    @Query("SELECT * FROM events ")
+    @Query("SELECT * FROM events WHERE status = 3")
     List<ELDEventEntity> getUnidentifiedEvents();
 
     @Query("SELECT * FROM events WHERE event_time >= :startTime AND event_time < :endTime and driver_id = :driverId ORDER BY event_time")
