@@ -36,6 +36,7 @@ public class ELDEventConverter {
             event.setMalfunction(entity.getMalfunction());
             event.setDiagnostic(entity.getDiagnostic());
             event.setMalCode(Malfunction.createByCode(entity.getMalCode()));
+            event.setSync(entity.getSync());
         }
 
         return event;

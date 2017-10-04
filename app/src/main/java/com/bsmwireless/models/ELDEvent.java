@@ -292,6 +292,8 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
     @Expose
     private String mAppInfo;
 
+    private transient int mSync;
+
     public ELDEvent() {
     }
 
@@ -408,6 +410,7 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
         if (notNull) {
             mAppInfo = in.readString();
         }
+        mSync = in.readInt();
     }
 
     public Integer getStatus() {
@@ -634,6 +637,14 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
         mAppInfo = appInfo;
     }
 
+    public int getSync() {
+        return mSync;
+    }
+
+    public void setSync(int sync) {
+        mSync = sync;
+    }
+
     @Override
     public Boolean isActive() {
         return mStatus.equals(ELDEvent.StatusCode.ACTIVE.getValue());
@@ -685,6 +696,7 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
                 .append(mDiagnostic, rhs.mDiagnostic)
                 .append(mMalCode, rhs.mMalCode)
                 .append(mAppInfo, rhs.mAppInfo)
+                .append(mSync, rhs.mSync)
                 .isEquals();
     }
 
@@ -719,6 +731,7 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
                 .append(mDiagnostic)
                 .append(mMalCode)
                 .append(mAppInfo)
+                .append(mSync)
                 .toHashCode();
     }
 
@@ -867,6 +880,8 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
         if (this.mAppInfo != null) {
             dest.writeString(this.mAppInfo);
         }
+
+        dest.writeInt(mSync);
     }
 
     public static final Creator<ELDEvent> CREATOR = new Creator<ELDEvent>() {
@@ -922,6 +937,7 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
         sb.append(", mDiagnostic=").append(mDiagnostic);
         sb.append(", mMalCode=").append(mMalCode);
         sb.append(", mAppInfo=").append(mAppInfo);
+        sb.append(", mSync=").append(mSync);
         sb.append('}');
         return sb.toString();
     }

@@ -175,6 +175,7 @@ public final class SyncInteractor {
                 .filter(t -> NetworkUtils.isOnlineMode())
                 .map(t -> ELDEventConverter.toModelList(mELDEventDao.getUpdateUnsyncEvents()))
                 .filter(dbEvents -> !dbEvents.isEmpty())
+                .map(this::filterDoubleEvents)
                 .flatMap(dbEvents -> Observable.fromIterable(parseELDEventsList(dbEvents)))
                 .filter(activeDbEvents -> activeDbEvents.size() > 0)
                 .flatMapSingle(dbEvents -> mServiceApi.updateELDEvents(filterInactiveEvents(dbEvents))
@@ -259,6 +260,26 @@ public final class SyncInteractor {
             ELDEvent event = iterator.next();
             if (event.getEventCode() < 0 || event.getEventType() < 0) {
                 iterator.remove();
+            }
+        }
+        return list;
+    }
+
+    /**
+     * If user updates single event several times we should send separate request to each
+     * update to prevent loosing data
+     * @param list all updated events
+     * @return filtered list
+     */
+    private List<ELDEvent> filterDoubleEvents(List<ELDEvent> list) {
+        List<Long> uniqueTimes = new ArrayList<>();
+        ListIterator<ELDEvent> iterator = list.listIterator();
+        while (iterator.hasNext()) {
+            Long time = iterator.next().getMobileTime();
+            if (uniqueTimes.contains(time)) {
+                iterator.remove();
+            } else {
+                uniqueTimes.add(time);
             }
         }
         return list;
