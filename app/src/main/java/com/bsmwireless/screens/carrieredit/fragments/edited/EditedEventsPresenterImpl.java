@@ -75,10 +75,11 @@ public final class EditedEventsPresenterImpl implements EditedEventsPresenter {
         mDisposable.add(mUserInteractor.getTimezone()
                 .subscribeOn(Schedulers.io())
                 .subscribe(timezone -> {
+                    mTimeZone = timezone;
                     long logDay = DateUtils.convertTimeToLogDay(timezone, System.currentTimeMillis());
                     updateDataForDay(logDay);
+                    updateCalendarData();
                 }));
-        updateCalendarData();
     }
 
     private void updateCalendarData() {

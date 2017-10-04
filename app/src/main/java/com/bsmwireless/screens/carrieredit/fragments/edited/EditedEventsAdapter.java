@@ -133,7 +133,7 @@ public class EditedEventsAdapter extends RecyclerView.Adapter<EditedEventsAdapte
                 view = mEventsTitleView;
                 break;
             case VIEW_TYPE_EVENTS_ITEM:
-                view = mLayoutInflater.inflate(R.layout.logs_list_item_eld_event, parent, false);
+                view = mLayoutInflater.inflate(R.layout.edited_list_item_eld_event, parent, false);
                 break;
             case VIEW_TYPE_LOG_HEADER_TITLE:
                 mLogHeaderTitleView = new LogsTitleView(mContext);
@@ -244,9 +244,6 @@ public class EditedEventsAdapter extends RecyclerView.Adapter<EditedEventsAdapte
         holder.mEventVehicleName.setText(vehicleName);
         holder.mAddress.setText(address);
 
-        holder.mMenuButton.setTag(log);
-        holder.mMenuButton.setOnClickListener(mOnMenuClickListener);
-
         DutyType currentDuty = log.getDutyType();
 
         holder.mEventStatus.setTextColor(mColors.get(currentDuty.getColor()));
@@ -290,9 +287,6 @@ public class EditedEventsAdapter extends RecyclerView.Adapter<EditedEventsAdapte
         @Nullable
         @BindView(R.id.address)
         TextView mAddress;
-        @Nullable
-        @BindView(R.id.menu_button)
-        View mMenuButton;
 
         //log header
         @Nullable
