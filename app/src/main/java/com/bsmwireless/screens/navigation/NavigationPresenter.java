@@ -106,6 +106,7 @@ public final class NavigationPresenter extends BaseMenuPresenter {
                 .subscribe(count -> mView.setCoDriversNumber(count)));
         mAutoDutyTypeManager.validateBlackBoxState();
         mSyncInteractor.startSync();
+        checkForUnassignedEvents();
     }
 
     @Override
@@ -121,5 +122,16 @@ public final class NavigationPresenter extends BaseMenuPresenter {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(name -> mView.setDriverName(name));
         add(disposable);
+    }
+
+    private void checkForUnassignedEvents() {
+        add(mEventsInteractor.getUnidentifiedEvents()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(res -> {
+                    if (!res.isEmpty()) {
+                        mView.showUnassignedDialog();
+                    }
+                }, Timber::e));
     }
 }

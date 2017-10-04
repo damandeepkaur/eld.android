@@ -18,4 +18,6 @@ public interface EditedEventsPresenter {
     void disapproveEdits(List<EventLogModel> events, long logDay);
 
     void markCalendarItems(List<CalendarItem> list);
+
+    void destroy();
 }

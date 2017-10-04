@@ -23,7 +23,7 @@ import timber.log.Timber;
 
 public abstract class BaseMenuPresenter implements AccountManager.AccountListener {
     private final DutyTypeManager mDutyTypeManager;
-    private final ELDEventsInteractor mEventsInteractor;
+    protected final ELDEventsInteractor mEventsInteractor;
     protected final UserInteractor mUserInteractor;
     private final AccountManager mAccountManager;
     private CompositeDisposable mDisposables;

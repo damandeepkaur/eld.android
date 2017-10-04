@@ -664,6 +664,10 @@
     <string name="logsheet_edited"> of your logsheets were edited by the\ncarrier. Please review and re-sign them.</string>
     <string name="has">has</string>
     <string name="unassigned_driving">unassigned driving events. Please review and assign them.</string>
+    <string name="carrier_edit_warning">Please review unidentified driver records or carrier edited logs</string>
+    <string name="carrier_edit_dialog_title">Warning</string>
+    <string name="carrier_edit_dialog_message">Please review unidentified driver records or carrier edited logs</string>
+    <string name="carrier_edit_dialog_ok">switch to carrier edit</string>
 
     <!-- Roadside -->
     <string name="roadside_title">Roadside</string>

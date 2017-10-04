@@ -167,6 +167,19 @@ public final class EditedEventsPresenterImpl implements EditedEventsPresenter {
                 .subscribe(list1 -> mView.updateCalendarItems(list1), Timber::e));
     }
 
+    @Override
+    public void destroy() {
+        if (mDisposable != null && !mDisposable.isDisposed()) {
+            mDisposable.dispose();
+        }
+        if (mSendUpdatedDisposable != null && !mSendUpdatedDisposable.isDisposed()) {
+            mSendUpdatedDisposable.dispose();
+        }
+        if (mUpdateEventsDisposable != null && !mUpdateEventsDisposable.isDisposed()) {
+            mUpdateEventsDisposable.dispose();
+        }
+    }
+
     private void sendUpdatedEvents(List<EventLogModel> events, long logDay, ELDEvent.StatusCode code) {
         if (mSendUpdatedDisposable == null || mSendUpdatedDisposable.isDisposed()) {
             final List<ELDEvent> cachedEvents = new ArrayList<>();

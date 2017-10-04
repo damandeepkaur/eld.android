@@ -68,7 +68,21 @@ public final class CarrierEditPresenterImpl extends BaseMenuPresenter implements
         mVehicleDisposable = Observable.fromCallable(() -> mVehiclesInteractor.getVehicle(mPreferencesManager.getVehicleId()))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(vehicle -> mView.setVehicleName(vehicle.getName()));
+                .subscribe(vehicle -> mView.setVehicleName(vehicle.getName()), Timber::e);
 
+    }
+
+    @Override
+    public void destroy() {
+        mView = null;
+        if (mDisposable != null && !mDisposable.isDisposed()) {
+            mDisposable.dispose();
+        }
+        if (mDriverDisposable != null && !mDriverDisposable.isDisposed()) {
+            mDriverDisposable.dispose();
+        }
+        if (mVehicleDisposable != null && !mVehicleDisposable.isDisposed()) {
+            mVehicleDisposable.dispose();
+        }
     }
 }

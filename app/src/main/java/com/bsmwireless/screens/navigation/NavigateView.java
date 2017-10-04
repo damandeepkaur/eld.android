@@ -15,5 +15,5 @@ public interface NavigateView extends BaseMenuView {
     void setAutoOnDuty(long stoppedTime);
     void setAutoDriving();
     void setAutoDrivingWithoutConfirm();
-
+    void showUnassignedDialog();
 }

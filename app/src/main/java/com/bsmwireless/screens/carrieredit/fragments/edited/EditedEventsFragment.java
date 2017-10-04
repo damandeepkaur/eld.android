@@ -79,4 +79,10 @@ public final class EditedEventsFragment extends BaseFragment implements EditedEv
     public void updateCalendarItems(List<CalendarItem> calendarItems) {
         mAdapter.updateCalendarItems(calendarItems);
     }
+
+    @Override
+    public void onDestroy() {
+        mPresenter.destroy();
+        super.onDestroy();
+    }
 }

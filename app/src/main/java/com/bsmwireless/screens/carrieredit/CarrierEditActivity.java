@@ -61,6 +61,12 @@ public final class CarrierEditActivity extends BaseMenuActivity implements Carri
         mPresenter.requestVehicleId();
     }
 
+    @Override
+    protected void onDestroy() {
+        mPresenter.destroy();
+        super.onDestroy();
+    }
+
     public CarrierEditComponent getComponent() {
         return mComponent;
     }

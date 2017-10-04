@@ -88,6 +88,9 @@ public final class UnassignedEventsPresenterImpl implements UnassignedEventsPres
         if (mDisposable != null && !mDisposable.isDisposed()) {
             mDisposable.dispose();
         }
+        if (mUpdateEventDisposable != null && !mUpdateEventDisposable.isDisposed()) {
+            mUpdateEventDisposable.dispose();
+        }
     }
 
     private List<EventLogModel> preparingLogs(List<ELDEvent> events) {

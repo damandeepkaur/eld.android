@@ -7,4 +7,6 @@ public interface CarrierEditPresenter {
     void requestDriverName();
 
     void requestVehicleId();
+
+    void destroy();
 }
