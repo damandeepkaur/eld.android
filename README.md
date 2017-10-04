@@ -3,6 +3,7 @@ ELD app for Android
 
 # Version history
 
+* **1.0.105** - Update date and time
 * **1.0.104** - Hide keyboard to show snackbar error (_EA-327_)
 * **1.0.103** - Fix different crashes caused by sync requests for database in UI thread (_EA-465_, _EA-464_, _EA-422_)
 * **1.0.102** - Hide special statuses for co-drivers (_EA-469_)

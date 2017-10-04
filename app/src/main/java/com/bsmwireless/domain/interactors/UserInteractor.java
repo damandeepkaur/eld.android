@@ -145,7 +145,7 @@ public final class UserInteractor {
                 })
                 .flatMap(user -> {
                     // get last 7 days events
-                    long current = System.currentTimeMillis();
+                    long current = DateUtils.currentTimeMillis();
                     long start = DateUtils.getStartDayTimeInMs(user.getTimezone(), current - MS_IN_WEEK);
                     long end = DateUtils.getEndDayTimeInMs(user.getTimezone(), current);
                     String token = user.getAuth().getToken();
@@ -441,7 +441,7 @@ public final class UserInteractor {
         ruleSelectionModel.setDriverId(getUserId());
         ruleSelectionModel.setRuleException(ruleException);
         ruleSelectionModel.setDutyCycle(dutyCycle);
-        ruleSelectionModel.setApplyTime(Calendar.getInstance().getTimeInMillis());
+        ruleSelectionModel.setApplyTime(DateUtils.currentTimeMillis());
 
         return ruleSelectionModel;
     }

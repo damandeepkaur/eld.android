@@ -68,7 +68,7 @@ public final class GraphLayout extends LinearLayout {
     }
 
     private void updateHOSTimes(final List<EventLogModel> events, final long startDayTime) {
-        long currentTime = Calendar.getInstance().getTimeInMillis();
+        long currentTime = DateUtils.currentTimeMillis();
         long endDayTime = startDayTime + MS_IN_DAY;
 
         List<DutyTypeManager.DutyTypeCheckable> checkableEvents = new ArrayList<>(events);
