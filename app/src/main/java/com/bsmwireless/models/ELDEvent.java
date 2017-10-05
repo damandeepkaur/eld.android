@@ -20,7 +20,7 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
         switch (eventType) {
             case DUTY_STATUS_CHANGING:
             case CHANGE_IN_DRIVER_INDICATION:
-                return DutyType.getTypeByCode(type, code).name();
+                return DutyType.getDutyTypeByCode(type, code).name();
 
             case LOGIN_LOGOUT:
                 return ELDEvent.LoginLogoutCode.getLoginLogoutByCode(code).name();

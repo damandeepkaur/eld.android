@@ -142,7 +142,7 @@ public final class RoadsidePresenter {
             }
 
             EventLogModel log = new EventLogModel(event, timezone);
-            log.setDutyType(DutyType.getTypeByCode(log.getEventType(), log.getEventCode()));
+            log.setType(DutyType.getDutyTypeByCode(log.getEventType(), log.getEventCode()));
 
             if (logs.size() == 0) {
                 if ((log.getEventTime() < startDayTime)) {
