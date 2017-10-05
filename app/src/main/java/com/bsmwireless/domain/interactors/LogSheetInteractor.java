@@ -106,6 +106,9 @@ public final class LogSheetInteractor {
 
     private ELDEvent createCertificationEvent(LogSheetHeader logSheetHeader, int code) {
         long certDay = DateUtils.convertLogDayToUnixMs(logSheetHeader.getLogDay());
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(DateUtils.currentTimeMillis());
+
         ELDEvent event = new ELDEvent();
         event.setStatus(ELDEvent.StatusCode.ACTIVE.getValue());
         event.setOrigin(ELDEvent.EventOrigin.DRIVER.getValue());
@@ -115,11 +118,11 @@ public final class LogSheetInteractor {
         event.setDriverId(logSheetHeader.getDriverId());
         event.setVehicleId(logSheetHeader.getVehicleId());
         event.setEventTime(certDay);
-        event.setMobileTime(DateUtils.currentTimeMillis());
+        event.setMobileTime(calendar.getTimeInMillis());
         String timezone = logSheetHeader.getHomeTerminal().getTimezone();
         event.setTimezone(timezone);
         event.setBoxId(logSheetHeader.getBoxId());
-        event.setMobileTime(DateUtils.currentTimeMillis());
+        event.setMobileTime(calendar.getTimeInMillis());
         return event;
     }
 

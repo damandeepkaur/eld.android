@@ -78,7 +78,7 @@ public final class EditEventPresenter extends BaseMenuPresenter {
             mCalendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
             mCalendar.set(Calendar.MINUTE, minute);
             mCalendar.set(Calendar.SECOND, 0);
-            mView.setStartTime(DateUtils.convertTimeToAMPMString(DateUtils.currentTimeMillis(), mTimezone));
+            mView.setStartTime(DateUtils.convertTimeToAMPMString(mCalendar.getTimeInMillis(), mTimezone));
         }, hours, minutes);
     }
 

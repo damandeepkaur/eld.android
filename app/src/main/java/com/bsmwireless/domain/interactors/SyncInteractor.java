@@ -98,6 +98,8 @@ public final class SyncInteractor {
         if (mDriverProfileDisposable != null && !mDriverProfileDisposable.isDisposed()) {
             mDriverProfileDisposable.dispose();
         }
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(DateUtils.currentTimeMillis());
 
         mDriverProfileDisposable = Observable.interval(Constants.SYNC_TIMEOUT_IN_MIN, TimeUnit.MINUTES)
                 .filter(timeout -> NetworkUtils.isOnlineMode())
@@ -114,7 +116,7 @@ public final class SyncInteractor {
                             .setDriverId(userEntity.getId())
                             .setRuleException(userEntity.getRuleException())
                             .setDutyCycle(userEntity.getDutyCycle())
-                            .setApplyTime(DateUtils.currentTimeMillis()))
+                            .setApplyTime(calendar.getTimeInMillis()))
                             .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS))
                             .onErrorReturn(throwable -> false);
                     Single<Boolean> homeTerminalUpdate = mServiceApi.updateDriverHomeTerminal(new DriverHomeTerminal()
