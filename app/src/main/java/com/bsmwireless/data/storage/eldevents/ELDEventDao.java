@@ -8,7 +8,6 @@ import android.arch.persistence.room.Query;
 import java.util.List;
 
 import io.reactivex.Flowable;
-import io.reactivex.Maybe;
 import io.reactivex.Single;
 
 import static android.arch.persistence.room.OnConflictStrategy.REPLACE;
@@ -24,19 +23,14 @@ public interface ELDEventDao {
     @Query("SELECT * FROM events WHERE sync = 2 AND driver_id=:userId ORDER BY event_time")
     List<ELDEventEntity> getNewUnsyncEvents(int userId);
 
-    @Query("SELECT * FROM events WHERE event_time > :startTime AND event_time < :endTime")
-    List<ELDEventEntity> getEventsForInterval(long startTime, long endTime);
-
-    @Query("SELECT * FROM events WHERE id = :id")
-    Flowable<ELDEventEntity> getEventById(int id);
-
     @Query("SELECT * FROM events WHERE status = 3")
     List<ELDEventEntity> getUnidentifiedEvents();
 
     @Query("SELECT * FROM events WHERE driver_id = -1")
     List<ELDEventEntity> getUnassignedEvents();
 
-    @Query("SELECT * FROM events WHERE event_time >= :startTime AND event_time < :endTime and driver_id = :driverId ORDER BY event_time")
+    @Query("SELECT * FROM events WHERE event_time >= :startTime AND event_time < :endTime AND " +
+            "driver_id = :driverId ORDER BY event_time, mobile_time, status DESC")
     Single<List<ELDEventEntity>> getEventsFromStartToEndTimeOnce(long startTime, long endTime, int driverId);
 
     @Query("SELECT * FROM events WHERE event_time >= :startTime AND event_time < :endTime " +
@@ -78,7 +72,7 @@ public interface ELDEventDao {
      * @return latest ELD event
      */
     @Query("SELECT * FROM events WHERE driver_id = :driverId AND event_type = :type AND mal_code = :malCode AND status = :status ORDER BY event_time DESC LIMIT 1")
-    Maybe<ELDEventEntity> getLatestEvent(int driverId, int type, String malCode, int status);
+    Flowable<ELDEventEntity> getLatestEvent(int driverId, int type, String malCode, int status);
 
     /**
      * Returns the latest event from a database

@@ -14,6 +14,7 @@ import android.widget.TextView;
 import com.bsmwireless.common.utils.DateUtils;
 import com.bsmwireless.screens.logs.dagger.EventLogModel;
 import com.bsmwireless.widgets.alerts.DutyType;
+import com.bsmwireless.widgets.alerts.Type;
 
 import java.util.HashMap;
 import java.util.List;
@@ -57,7 +58,7 @@ public class UnassignedEventsAdapter extends RecyclerView.Adapter<UnassignedEven
     }
 
     public void removeEvent(int position) {
-        Timber.v("removeEvent: ");
+        Timber.v("removeEvent: %d", position);
         mEvents.remove(position);
         notifyItemRemoved(position);
         notifyItemRangeChanged(position - 1, mEvents.size());
@@ -130,7 +131,7 @@ public class UnassignedEventsAdapter extends RecyclerView.Adapter<UnassignedEven
         holder.mAccept.setOnClickListener(v -> mPresenter.acceptEvent(model, mDriverId, position));
         holder.mReject.setOnClickListener(v -> mPresenter.rejectEvent(model, position));
 
-        DutyType currentDuty = model.getDutyType();
+        Type currentDuty = model.getType();
 
         holder.mEventStatus.setTextColor(mColors.get(currentDuty.getColor()));
         holder.mEventStatus.setText(currentDuty.getTitle());

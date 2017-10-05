@@ -3,6 +3,10 @@ ELD app for Android
 
 # Version history
 
+* **1.1.0** - Showing events for all types (_EA-271_)
+* **1.0.105** - Update date and time
+* **1.0.104** - Hide keyboard to show snackbar error (_EA-327_)
+* **1.0.103** - Fix different crashes caused by sync requests for database in UI thread (_EA-465_, _EA-464_, _EA-422_)
 * **1.0.102** - Hide special statuses for co-drivers (_EA-469_)
 * **1.0.101** - Calculation a driving distance, co-driver info (_EA-405_, _EA-442_, _EA-420_, _EA-437_)
 * **1.0.100** - Special driving spanning overnight is not handled properly by duty line and event label (_EA-426_)

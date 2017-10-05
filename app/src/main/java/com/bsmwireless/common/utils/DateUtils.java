@@ -3,6 +3,8 @@ package com.bsmwireless.common.utils;
 import android.content.Context;
 
 import com.bsmwireless.common.App;
+import com.bsmwireless.common.dagger.AppComponent;
+import com.bsmwireless.data.network.NtpClientManager;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -49,7 +51,7 @@ public class DateUtils {
         calendarWithTimezone.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH),
                 calendar.get(Calendar.DAY_OF_MONTH), 0, 0, 0);
         calendarWithTimezone.set(Calendar.MILLISECOND, 0);
-        long timeInMs = calendarWithTimezone.getTimeInMillis();
+        long timeInMs = currentTimeMillis();
         return timeInMs - timeInMs % 1000;
     }
 
@@ -62,7 +64,8 @@ public class DateUtils {
         calendar.setTimeInMillis(time);
         calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DATE), 0, 0, 0);
         calendar.set(Calendar.MILLISECOND, 0);
-        return calendar.getTimeInMillis();
+        long currentTime = currentTimeMillis();
+        return currentTime;
     }
 
     /**
@@ -74,7 +77,8 @@ public class DateUtils {
         calendar.setTimeInMillis(time);
         calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DATE), 23, 59, 59);
         calendar.set(Calendar.MILLISECOND, 999);
-        return calendar.getTimeInMillis();
+        long currentTime = currentTimeMillis();
+        return currentTime;
     }
 
     /**
@@ -197,7 +201,7 @@ public class DateUtils {
      * @return long with format time like 20170708
      */
     public static long getLogDayForDaysAgo(int daysAgo, String timezone) {
-        return DateUtils.convertTimeToLogDay(timezone, System.currentTimeMillis()
+        return DateUtils.convertTimeToLogDay(timezone, DateUtils.currentTimeMillis()
                 - MS_IN_DAY * daysAgo);
     }
 
@@ -280,7 +284,8 @@ public class DateUtils {
             calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
             calendar.set(Calendar.MINUTE, minute);
             calendar.set(Calendar.SECOND, seconds);
-            return calendar.getTimeInMillis();
+            long currentTime = currentTimeMillis();
+            return currentTime;
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -301,10 +306,15 @@ public class DateUtils {
     /**
      * @return real time which is sync with the ntp server
      */
-    public static Long currentTimeMillis() {
-        long realTimeInMilisecondsDiff = App.getComponent().ntpClientManager().getRealTimeInMillisDiff();
-        long realTimeInMiliseconds = System.currentTimeMillis() + realTimeInMilisecondsDiff;
-        return realTimeInMiliseconds;
+    public static long currentTimeMillis() {
+        AppComponent appComponent = App.getComponent();
+        if (appComponent == null) {
+            return System.currentTimeMillis();
+        }
+
+        NtpClientManager ntpClientManager = appComponent.ntpClientManager();
+        long realTimeInMillisecondsDiff = ntpClientManager.getRealTimeInMillisDiff();
+        return System.currentTimeMillis() + realTimeInMillisecondsDiff;
     }
 
     public static String convertToFullTime(String timezone, Date date) {

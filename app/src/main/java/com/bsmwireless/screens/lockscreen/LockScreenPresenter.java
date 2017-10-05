@@ -269,7 +269,7 @@ public final class LockScreenPresenter {
                 .doOnComplete(() -> {
                     Integer eventType = eldEventInfo.getEventType();
                     Integer eventCode = eldEventInfo.getEventCode();
-                    DutyType dutyType = DutyType.getTypeByCode(eventType, eventCode);
+                    DutyType dutyType = DutyType.getDutyTypeByCode(eventType, eventCode);
                     resetTime(dutyType);
                 })
                 .onErrorComplete(throwable -> {

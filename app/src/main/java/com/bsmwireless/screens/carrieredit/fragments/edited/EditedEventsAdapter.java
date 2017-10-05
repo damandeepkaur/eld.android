@@ -17,6 +17,7 @@ import com.bsmwireless.screens.logs.GraphModel;
 import com.bsmwireless.screens.logs.LogHeaderModel;
 import com.bsmwireless.screens.logs.dagger.EventLogModel;
 import com.bsmwireless.widgets.alerts.DutyType;
+import com.bsmwireless.widgets.alerts.Type;
 import com.bsmwireless.widgets.logs.LogsTitleView;
 import com.bsmwireless.widgets.logs.calendar.CalendarItem;
 import com.bsmwireless.widgets.logs.calendar.CalendarLayout;
@@ -249,7 +250,7 @@ public class EditedEventsAdapter extends RecyclerView.Adapter<EditedEventsAdapte
         holder.mEventVehicleName.setText(vehicleName);
         holder.mAddress.setText(address);
 
-        DutyType currentDuty = log.getDutyType();
+        Type currentDuty = log.getType();
 
         holder.mEventStatus.setTextColor(mColors.get(currentDuty.getColor()));
         holder.mEventStatus.setText(currentDuty.getTitle());

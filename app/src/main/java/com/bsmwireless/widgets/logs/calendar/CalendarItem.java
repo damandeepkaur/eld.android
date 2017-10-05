@@ -34,7 +34,7 @@ public final class CalendarItem {
 
         mDay = String.valueOf(mCalendar.get(Calendar.DAY_OF_MONTH));
         mDayOfWeek = mDayFormat.format(mCalendar.getTime()).substring(0, 3).toUpperCase();
-        mLogDay = DateUtils.convertTimeToLogDay(mCalendar.getTimeZone(), mCalendar.getTimeInMillis());
+        mLogDay = DateUtils.convertTimeToLogDay(mCalendar.getTimeZone(), DateUtils.currentTimeMillis());
     }
 
     public String getDay() {

@@ -41,7 +41,6 @@ import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
 import static com.bsmwireless.common.Constants.SUCCESS;
-import static com.bsmwireless.common.Constants.SYNC_ALL_EVENTS_IN_MIN;
 import static com.bsmwireless.common.utils.DateUtils.MS_IN_DAY;
 import static com.bsmwireless.common.utils.DateUtils.MS_IN_SEC;
 import static com.bsmwireless.data.storage.eldevents.ELDEventEntity.SyncType.SYNC;
@@ -115,7 +114,7 @@ public final class SyncInteractor {
                             .setDriverId(userEntity.getId())
                             .setRuleException(userEntity.getRuleException())
                             .setDutyCycle(userEntity.getDutyCycle())
-                            .setApplyTime(Calendar.getInstance().getTimeInMillis()))
+                            .setApplyTime(DateUtils.currentTimeMillis()))
                             .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS))
                             .onErrorReturn(throwable -> false);
                     Single<Boolean> homeTerminalUpdate = mServiceApi.updateDriverHomeTerminal(new DriverHomeTerminal()
@@ -134,7 +133,7 @@ public final class SyncInteractor {
     }
 
     public void syncEventsForDaysAgo(int days, String timezone) {
-        long current = System.currentTimeMillis();
+        long current = DateUtils.currentTimeMillis();
         long start = DateUtils.getStartDayTimeInMs(timezone, current - days * MS_IN_DAY);
         long end = DateUtils.getEndDayTimeInMs(timezone, current);
         if (NetworkUtils.isOnlineMode()) {
@@ -238,6 +237,7 @@ public final class SyncInteractor {
                 .map(LogSheetConverter::toEntityList)
                 .doOnSuccess(logSheetEntities -> mLogSheetDao.insert(logSheetEntities))
                 .doOnSuccess(logSheetHeaders -> createMissingLogSheets(logSheetHeaders, days, timezone))
+                .onErrorReturn(throwable -> new ArrayList<>())
                 .subscribe();
     }
 
