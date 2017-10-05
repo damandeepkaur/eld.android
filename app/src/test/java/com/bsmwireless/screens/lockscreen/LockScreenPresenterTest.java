@@ -1,9 +1,7 @@
 package com.bsmwireless.screens.lockscreen;
 
-import com.bsmwireless.common.utils.BlackBoxSimpleChecker;
 import com.bsmwireless.common.utils.AppSettings;
-import com.bsmwireless.data.network.blackbox.BlackBox;
-import com.bsmwireless.data.network.blackbox.BlackBoxConnectionManagerImpl;
+import com.bsmwireless.common.utils.BlackBoxSimpleChecker;
 import com.bsmwireless.data.network.blackbox.models.BlackBoxResponseModel;
 import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.data.storage.DutyTypeManager;
@@ -11,6 +9,7 @@ import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.domain.interactors.BlackBoxInteractor;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
 import com.bsmwireless.models.BlackBoxModel;
+import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.widgets.alerts.DutyType;
 
 import org.junit.Before;
@@ -28,6 +27,7 @@ import io.reactivex.subjects.BehaviorSubject;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -59,7 +59,7 @@ public class LockScreenPresenterTest {
 
         when(mAppSettings.lockScreenDisconnectionTimeout()).thenReturn(1L);
         when(mAppSettings.lockScreenIdlingTimeout()).thenReturn(1L);
-
+        when(mAppSettings.ignitionOffDialogTimeout()).thenReturn(1L);
 
         mPresenter = spy(new LockScreenPresenter(
                 mDutyTypeManager,
@@ -81,7 +81,8 @@ public class LockScreenPresenterTest {
     public void testStatuses() throws Exception {
         doNothing().when(mPresenter).startTimer();
 
-        when(mDutyTypeManager.getDutyType()).thenReturn(DutyType.DRIVING);
+        BehaviorSubject<DutyType> subject = BehaviorSubject.create();
+        doReturn(subject).when(mPresenter).createChangingDutyTypeObservable();
 
         when(mDutyTypeManager.getDutyTypeTime(DutyType.DRIVING)).thenReturn(1L);
         when(mDutyTypeManager.getDutyTypeTime(DutyType.SLEEPER_BERTH)).thenReturn(2L);
@@ -91,6 +92,9 @@ public class LockScreenPresenterTest {
         when(mBlackBoxInteractor.getData(anyInt())).thenReturn(Observable.empty());
 
         mPresenter.onStart(mLockScreenView);
+        subject.onNext(DutyType.DRIVING);
+        subject.onComplete();
+
         verify(mLockScreenView).setTimeForDutyType(DutyType.DRIVING, 1L);
         verify(mLockScreenView).setTimeForDutyType(DutyType.SLEEPER_BERTH, 2L);
         verify(mLockScreenView).setTimeForDutyType(DutyType.ON_DUTY, 3L);
@@ -111,15 +115,6 @@ public class LockScreenPresenterTest {
         mPresenter.onStart(mLockScreenView);
         mPresenter.switchCoDriver();
         verify(mLockScreenView).openCoDriverDialog();
-    }
-
-    @Test
-    public void startMonitoring() throws Exception {
-        when(mBlackBoxInteractor.getData(anyInt())).thenReturn(Observable.empty());
-        doNothing().when(mPresenter).startTimer();
-
-        mPresenter.onStart(mLockScreenView);
-        verify(mLockScreenView).removeAnyPopup();
     }
 
     @Test
@@ -155,15 +150,16 @@ public class LockScreenPresenterTest {
 
         when(mELDEventsInteractor.postNewELDEvent(any())).thenReturn(Single.just(1L));
         doNothing().when(mPresenter).startTimer();
+        when(mELDEventsInteractor.getEvent(any(DutyType.class))).thenReturn(new ELDEvent());
 
         mPresenter.onStart(mLockScreenView);
-        verify(mLockScreenView).removeAnyPopup();
         subject.onNext(ignitionOffMock);
         subject.onNext(ignitionOffMock);
 
-
+        verify(mELDEventsInteractor).getEvent(DutyType.ON_DUTY);
         verify(mELDEventsInteractor).postNewELDEvent(any());
         verify(mLockScreenView).showIgnitionOffDetectedDialog();
+        verify(mLockScreenView).closeLockScreen();
 
     }
 }
