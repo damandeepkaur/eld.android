@@ -250,20 +250,11 @@ public final class EditedEventsPresenterImpl implements EditedEventsPresenter {
         Timber.v("updateLogHeaderModelByUser: ");
         logHeaderModel.setTimezone(user.getTimezone());
         logHeaderModel.setDriverName(user.getFirstName() + " " + user.getLastName());
-        logHeaderModel.setSelectedExemptions(mLogHeaderUtils.getAllExemptions(user,
-                SyncConfiguration.Type.EXCEPT));
+        logHeaderModel.setSelectedExemptions(user.getRuleException());
 
-        List<SyncConfiguration> configurations = user.getConfigurations();
-        if (configurations != null) {
-            for (SyncConfiguration configuration : configurations) {
-                if (SyncConfiguration.Type.EXCEPT.getName().equals(configuration.getName())) {
-                    logHeaderModel.setAllExemptions(configuration.getValue());
-                    break;
-                }
-            }
-        } else {
-            logHeaderModel.setAllExemptions("");
-        }
+        String allExemptions = mLogHeaderUtils.getAllExemptions(user,
+                SyncConfiguration.Type.EXCEPT);
+        logHeaderModel.setAllExemptions(allExemptions);
 
         //set carrier name
         String carrierName = mLogHeaderUtils.makeCarrierName(user);
