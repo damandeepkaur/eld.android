@@ -197,8 +197,11 @@ public final class DriverProfileActivity extends BaseMenuActivity implements Dri
 
     @Override
     public void setHomeTerminalInfo(HomeTerminalEntity homeTerminal) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(DateUtils.currentTimeMillis());
+
         mTerminalAddress.setText(homeTerminal.getAddress());
-        mHomeTerminalTimeZone.setText(getFullTimeZone(homeTerminal.getTimezone(), DateUtils.currentTimeMillis()));
+        mHomeTerminalTimeZone.setText(getFullTimeZone(homeTerminal.getTimezone(), calendar.getTimeInMillis()));
     }
 
     @Override

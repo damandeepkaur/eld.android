@@ -252,8 +252,10 @@ public final class ELDGraphView extends View {
             mHorizontalLinesPaint.setPathEffect(null);
         }
 
-        long currentTime = DateUtils.currentTimeMillis();
-        if (mStartDayUnixTimeInMs + MS_IN_DAY < DateUtils.currentTimeMillis()) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(DateUtils.currentTimeMillis());
+        long currentTime = calendar.getTimeInMillis();
+        if (mStartDayUnixTimeInMs + MS_IN_DAY < calendar.getTimeInMillis()) {
             x2 = mGraphWidth + mGraphLeft;
         } else {
             long timeStamp = (currentTime - log.getEventTime()) / MS_IN_MIN;

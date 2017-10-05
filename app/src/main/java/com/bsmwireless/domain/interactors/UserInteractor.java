@@ -437,11 +437,13 @@ public final class UserInteractor {
 
     private RuleSelectionModel getRuleSelectionModel(String ruleException, String dutyCycle) {
         RuleSelectionModel ruleSelectionModel = new RuleSelectionModel();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(DateUtils.currentTimeMillis());
 
         ruleSelectionModel.setDriverId(getUserId());
         ruleSelectionModel.setRuleException(ruleException);
         ruleSelectionModel.setDutyCycle(dutyCycle);
-        ruleSelectionModel.setApplyTime(DateUtils.currentTimeMillis());
+        ruleSelectionModel.setApplyTime(calendar.getTimeInMillis());
 
         return ruleSelectionModel;
     }
