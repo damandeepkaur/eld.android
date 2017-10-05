@@ -281,7 +281,7 @@ public final class SwitchDriverPresenter {
             List<ELDEvent> events = mELDEventsInteractor.getLatestActiveDutyEventFromDBSync(DateUtils.currentTimeMillis(), user.getUser().getId());
             if (events != null && !events.isEmpty()) {
                 ELDEvent event = events.get(events.size() - 1);
-                user.setDutyType(DutyType.getTypeByCode(event.getEventType(), event.getEventCode()));
+                user.setDutyType(DutyType.getDutyTypeByCode(event.getEventType(), event.getEventCode()));
             }
         }
         return userEntities;

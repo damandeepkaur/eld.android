@@ -175,7 +175,7 @@ public final class DutyTypeManager {
             event = events.get(i);
 
             if (event.isDutyEvent() && event.isActive()) {
-                currentDutyType = DutyType.getTypeByCode(event.getEventType(), event.getEventCode());
+                currentDutyType = DutyType.getDutyTypeByCode(event.getEventType(), event.getEventCode());
 
                 if (currentDutyType == CLEAR) {
                     continue;
