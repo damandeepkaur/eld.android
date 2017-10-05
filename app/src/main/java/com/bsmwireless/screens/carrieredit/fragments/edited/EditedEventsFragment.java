@@ -87,6 +87,11 @@ public final class EditedEventsFragment extends BaseFragment implements EditedEv
     }
 
     @Override
+    public CalendarItem getSelectedDay() {
+        return mAdapter.getCurrentItem();
+    }
+
+    @Override
     public void onDestroy() {
         mPresenter.destroy();
         super.onDestroy();

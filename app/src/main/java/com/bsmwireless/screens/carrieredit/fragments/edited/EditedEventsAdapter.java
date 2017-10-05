@@ -114,6 +114,10 @@ public class EditedEventsAdapter extends RecyclerView.Adapter<EditedEventsAdapte
         mCalendarLayout.setAllItems(calendarItems);
     }
 
+    public CalendarItem getCurrentItem() {
+        return (mCalendarLayout != null) ? mCalendarLayout.getCurrentItem() : null;
+    }
+
     @Override
     public LogsHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view;

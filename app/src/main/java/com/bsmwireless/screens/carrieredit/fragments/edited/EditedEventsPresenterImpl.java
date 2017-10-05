@@ -7,6 +7,7 @@ import com.bsmwireless.common.utils.DateUtils;
 import com.bsmwireless.common.utils.DutyUtils;
 import com.bsmwireless.common.utils.LogHeaderUtils;
 import com.bsmwireless.data.network.ServiceApi;
+import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
 import com.bsmwireless.domain.interactors.LogSheetInteractor;
 import com.bsmwireless.domain.interactors.UserInteractor;
@@ -33,6 +34,7 @@ import javax.inject.Inject;
 
 import app.bsmuniversal.com.R;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
@@ -53,6 +55,7 @@ public final class EditedEventsPresenterImpl implements EditedEventsPresenter {
     private final VehiclesInteractor mVehiclesInteractor;
     private final ServiceApi mServiceApi;
     private CompositeDisposable mDisposable;
+    private final AccountManager mAccountManager;
     private Disposable mUpdateEventsDisposable = Disposables.disposed();;
     private Disposable mSendUpdatedDisposable = Disposables.disposed();;
     private EditedEventsView mView;
@@ -64,7 +67,8 @@ public final class EditedEventsPresenterImpl implements EditedEventsPresenter {
     @Inject
     public EditedEventsPresenterImpl(ELDEventsInteractor eldEventsInteractor,
                                      LogSheetInteractor logSheetInteractor, UserInteractor userInteractor,
-                                     VehiclesInteractor vehiclesInteractor, ServiceApi serviceApi, LogHeaderUtils logHeaderUtils, Context context) {
+                                     VehiclesInteractor vehiclesInteractor, ServiceApi serviceApi, AccountManager accountManager, LogHeaderUtils logHeaderUtils, Context context) {
+        mAccountManager = accountManager;
         Timber.v("EditedEventsPresenterImpl: ");
         mELDEventsInteractor = eldEventsInteractor;
         mLogSheetInteractor = logSheetInteractor;
@@ -221,6 +225,129 @@ public final class EditedEventsPresenterImpl implements EditedEventsPresenter {
     }
 
     private void setLogHeaderData(long logDay) {
+        mDisposable.add(mUserInteractor.getTimezoneOnce()
+                .flatMap(timezone -> Single
+                        .zip(loadUserHeaderInfo(timezone),
+                                loadLogHeaderInfo(logDay),
+                                loadOdometerValue(timezone),
+                                this::mapUserAndHeader))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(logHeaderModel -> mView.setLogHeader(logHeaderModel)));
+    }
+
+    private Single<UserHeaderInfo> loadUserHeaderInfo(String timeZone) {
+
+        return mUserInteractor.getFullUser()
+                .map(user -> {
+                    if (user == null) return new UserHeaderInfo();
+
+                    String driverName = mLogHeaderUtils.makeDriverName(user);
+                    String selectedExemptions = user.getRuleException();
+                    String allExemptions = mLogHeaderUtils.getAllExemptions(user,
+                            SyncConfiguration.Type.EXCEPT);
+                    String carrierName = mLogHeaderUtils.makeCarrierName(user);
+
+                    return new UserHeaderInfo(timeZone, driverName, selectedExemptions,
+                            allExemptions, carrierName);
+                });
+    }
+
+    private Single<SelectedLogHeaderInfo> loadLogHeaderInfo(long logDay) {
+
+        return mLogSheetInteractor.getLogSheet(logDay)
+                .map(selectedLogHeader -> {
+                    if (selectedLogHeader == null) return new SelectedLogHeaderInfo();
+
+                    int vehicleId = selectedLogHeader.getVehicleId();
+                    Vehicle vehicle;
+                    if (mVehicleIdToNameMap.containsKey(vehicleId)) {
+                        vehicle = mVehicleIdToNameMap.get(vehicleId);
+                    } else {
+                        vehicle = mVehiclesInteractor.getVehicle(vehicleId);
+                    }
+                    String vehicleName;
+                    String vehicleLicense;
+                    if (vehicle != null) {
+                        vehicleName = vehicle.getName();
+                        vehicleLicense = vehicle.getLicense();
+                    } else {
+                        vehicleName = "";
+                        vehicleLicense = "";
+                    }
+
+                    String vehicleTrailers = selectedLogHeader.getTrailerIds();
+
+                    String homeTerminalAddress;
+                    String homeTerminalName;
+                    if (selectedLogHeader.getHomeTerminal() != null) {
+                        homeTerminalAddress = selectedLogHeader.getHomeTerminal().getAddress();
+                        homeTerminalName = selectedLogHeader.getHomeTerminal().getName();
+                    } else {
+                        homeTerminalAddress = "";
+                        homeTerminalName = "";
+                    }
+
+                    String shippingId = selectedLogHeader.getShippingId();
+                    String coDriversName = mLogHeaderUtils.getCoDriversName(selectedLogHeader);
+
+                    return new SelectedLogHeaderInfo(logDay, vehicleName, vehicleLicense, vehicleTrailers,
+                            homeTerminalAddress, homeTerminalName, shippingId, coDriversName);
+                });
+    }
+
+    private Single<LogHeaderUtils.OdometerResult> loadOdometerValue(String mTimeZone) {
+
+        final long startDate = DateUtils.getStartDate(mTimeZone, mView.getSelectedDay().getCalendar());
+
+        // Day may stared from event in previous day, that's why loads event for previous day
+        return mELDEventsInteractor
+                .getActiveDutyEventsForDay(startDate)
+                .zipWith(mELDEventsInteractor
+                                .getLatestActiveDutyEventFromDBOnce(startDate,
+                                        mAccountManager.getCurrentUserId()),
+                        this::mapLatestAndCurrentEvents)
+                .flatMap(events -> Single.fromCallable(() ->
+                        mLogHeaderUtils.calculateOdometersValue(events)));
+    }
+
+    private List<ELDEvent> mapLatestAndCurrentEvents(List<ELDEvent> current, List<ELDEvent> prevDayEvents) {
+
+        List<ELDEvent> eldEvents = new ArrayList<>(current.size() + (prevDayEvents.isEmpty() ? 0 : 1));
+        if (!prevDayEvents.isEmpty()) {
+            eldEvents.add(prevDayEvents.get(prevDayEvents.size() - 1));
+        }
+        eldEvents.addAll(current);
+        return eldEvents;
+    }
+
+    private LogHeaderModel mapUserAndHeader(UserHeaderInfo userHeaderInfo,
+                                            SelectedLogHeaderInfo selectedLogHeaderInfo,
+                                            LogHeaderUtils.OdometerResult odometerResult) {
+
+        LogHeaderModel model = new LogHeaderModel();
+        model.setLogDay(selectedLogHeaderInfo.logDay);
+        model.setTimezone(userHeaderInfo.mTimezone);
+        model.setDriverName(userHeaderInfo.mDriverName);
+        model.setSelectedExemptions(userHeaderInfo.mSelectedExemption);
+        model.setAllExemptions(userHeaderInfo.mAllExemptions);
+        model.setCarrierName(userHeaderInfo.mCarrierName);
+
+        model.setVehicleName(selectedLogHeaderInfo.mVehicleName);
+        model.setVehicleLicense(selectedLogHeaderInfo.mVehicleLicense);
+        model.setTrailers(selectedLogHeaderInfo.mTrailers);
+        model.setHomeTerminalAddress(selectedLogHeaderInfo.mHomeTerminalAddress);
+        model.setHomeTerminalName(selectedLogHeaderInfo.mHomeTerminalName);
+        model.setShippingId(selectedLogHeaderInfo.mShippingId);
+        model.setCoDriversName(selectedLogHeaderInfo.mCoDriversName);
+
+        model.setStartOdometer(odometerResult.startValue);
+        model.setEndOdometer(odometerResult.endValue);
+        model.setDistanceDriven(String.valueOf(odometerResult.distance));
+        return model;
+    }
+
+    /*private void setLogHeaderData(long logDay) {
         Timber.v("setLogHeaderData: ");
         LogHeaderModel model = new LogHeaderModel();
         mDisposable.add(mUserInteractor.getFullUser()
@@ -230,7 +357,7 @@ public final class EditedEventsPresenterImpl implements EditedEventsPresenter {
                 .doOnSuccess(logSheetHeader -> updateLogHeaderModelByLogSheet(model, logSheetHeader))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(eventLogModels -> mView.setLogHeader(model), Timber::e));
-    }
+    }*/
 
     private void setGraphData(long startDayTime, String timezone) {
         Timber.v("setGraphData: ");
@@ -368,5 +495,73 @@ public final class EditedEventsPresenterImpl implements EditedEventsPresenter {
             }
         }
         return eventLogModels;
+    }
+
+    private static final class UserHeaderInfo {
+        final String mTimezone;
+        final String mDriverName;
+        final String mSelectedExemption;
+        final String mAllExemptions;
+        final String mCarrierName;
+
+        private UserHeaderInfo(String timezone,
+                               String driverName,
+                               String selectedExemption,
+                               String allExemptions,
+                               String carrierName) {
+            this.mTimezone = timezone;
+            this.mDriverName = driverName;
+            this.mSelectedExemption = selectedExemption;
+            this.mAllExemptions = allExemptions;
+            this.mCarrierName = carrierName;
+        }
+
+        public UserHeaderInfo() {
+            mTimezone = "";
+            mDriverName = "";
+            mSelectedExemption = "";
+            mAllExemptions = "";
+            mCarrierName = "";
+        }
+    }
+
+    private static final class SelectedLogHeaderInfo {
+        final long logDay;
+        final String mVehicleName;
+        final String mVehicleLicense;
+        final String mTrailers;
+        final String mHomeTerminalAddress;
+        final String mHomeTerminalName;
+        final String mShippingId;
+        final String mCoDriversName;
+
+        private SelectedLogHeaderInfo(long logDay,
+                                      String vehicleName,
+                                      String vehicleLicense,
+                                      String trailers,
+                                      String homeTerminalAddress,
+                                      String homeTerminalName,
+                                      String shippingId,
+                                      String coDriversName) {
+            this.logDay = logDay;
+            this.mVehicleName = vehicleName;
+            this.mVehicleLicense = vehicleLicense;
+            this.mTrailers = trailers;
+            this.mHomeTerminalAddress = homeTerminalAddress;
+            this.mHomeTerminalName = homeTerminalName;
+            this.mShippingId = shippingId;
+            this.mCoDriversName = coDriversName;
+        }
+
+        public SelectedLogHeaderInfo() {
+            this.logDay = 0;
+            this.mVehicleName = "";
+            this.mVehicleLicense = "";
+            this.mTrailers = "";
+            this.mHomeTerminalAddress = "";
+            this.mHomeTerminalName = "";
+            this.mShippingId = "";
+            this.mCoDriversName = "";
+        }
     }
 }

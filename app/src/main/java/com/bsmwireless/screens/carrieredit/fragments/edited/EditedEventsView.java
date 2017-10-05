@@ -22,4 +22,6 @@ public interface EditedEventsView {
     void updateCalendarItems(List<CalendarItem> calendarItems);
 
     Context getContext();
+
+    CalendarItem getSelectedDay();
 }
