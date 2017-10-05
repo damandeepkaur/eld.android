@@ -5,6 +5,7 @@ import android.support.v4.content.ContextCompat;
 
 import com.bsmwireless.common.utils.DateUtils;
 import com.bsmwireless.common.utils.DutyUtils;
+import com.bsmwireless.common.utils.LogHeaderUtils;
 import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
 import com.bsmwireless.domain.interactors.LogSheetInteractor;
@@ -24,6 +25,7 @@ import com.bsmwireless.widgets.logs.calendar.CalendarItem;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -34,12 +36,14 @@ import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.disposables.Disposables;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
 import static com.bsmwireless.common.utils.DateUtils.MS_IN_DAY;
 import static com.bsmwireless.widgets.alerts.DutyType.CLEAR_PU;
 import static com.bsmwireless.widgets.alerts.DutyType.CLEAR_YM;
+import static java.util.stream.Collectors.toList;
 
 public final class EditedEventsPresenterImpl implements EditedEventsPresenter {
 
@@ -48,23 +52,23 @@ public final class EditedEventsPresenterImpl implements EditedEventsPresenter {
     private final UserInteractor mUserInteractor;
     private final VehiclesInteractor mVehiclesInteractor;
     private final ServiceApi mServiceApi;
-    private final CompositeDisposable mDisposable;
-    private Disposable mUpdateEventsDisposable;
-    private Disposable mSendUpdatedDisposable;
+    private volatile CompositeDisposable mDisposable;
+    private Disposable mUpdateEventsDisposable = Disposables.disposed();;
+    private Disposable mSendUpdatedDisposable = Disposables.disposed();;
     private EditedEventsView mView;
     private String mTimeZone;
-    private User mUser;
-    private Map<Long, LogSheetHeader> mLogSheetHeadersMap = new HashMap<>();
+    private final LogHeaderUtils mLogHeaderUtils;
     private Map<Integer, Vehicle> mVehicleIdToNameMap = new HashMap<>();
     private Context mContext;
 
     @Inject
     public EditedEventsPresenterImpl(ELDEventsInteractor eldEventsInteractor,
                                      LogSheetInteractor logSheetInteractor, UserInteractor userInteractor,
-                                     VehiclesInteractor vehiclesInteractor, ServiceApi serviceApi, Context context) {
+                                     VehiclesInteractor vehiclesInteractor, ServiceApi serviceApi, LogHeaderUtils logHeaderUtils, Context context) {
         Timber.v("EditedEventsPresenterImpl: ");
         mELDEventsInteractor = eldEventsInteractor;
         mLogSheetInteractor = logSheetInteractor;
+        mLogHeaderUtils = logHeaderUtils;
         mUserInteractor = userInteractor;
         mVehiclesInteractor = vehiclesInteractor;
         mServiceApi = serviceApi;
@@ -93,16 +97,12 @@ public final class EditedEventsPresenterImpl implements EditedEventsPresenter {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(logSheetHeaders -> {
-                    mLogSheetHeadersMap = new HashMap<>(logSheetHeaders.size());
-                    for (LogSheetHeader logSheetHeader : logSheetHeaders) {
-                        mLogSheetHeadersMap.put(logSheetHeader.getLogDay(), logSheetHeader);
-                    }
                     mView.setLogSheetHeaders(logSheetHeaders);
                 }));
     }
 
     private void setEventListData(long startDayTime, String timezone) {
-        Timber.v("setEventListData: ");
+        Timber.v("setEventListData: startDayTime = %d, timezone = %s", startDayTime, timezone);
         mDisposable.add(mELDEventsInteractor.getUnidentifiedEvents()
                 .subscribeOn(Schedulers.io())
                 .switchMap(list -> Observable.fromIterable(list))
@@ -110,17 +110,19 @@ public final class EditedEventsPresenterImpl implements EditedEventsPresenter {
                         && eldEvent.getEventTime() < startDayTime + MS_IN_DAY)
                 .toList()
                 .map(eldEvents -> convertToEventLogModels(eldEvents, startDayTime, timezone))
+                .doOnSuccess(this::setVehicleNames)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(eventLogModels -> mView.setEvents(eventLogModels), Timber::e));
     }
 
     public void onCalendarDaySelected(CalendarItem calendarItem) {
-        Timber.v("onCalendarDaySelected: ");
+        Timber.v("onCalendarDaySelected: %d", calendarItem.getLogDay());
         updateDataForDay(calendarItem.getLogDay());
     }
 
     public void updateDataForDay(long logDay) {
-        if (mUpdateEventsDisposable == null || mUpdateEventsDisposable.isDisposed()) {
+
+        if (mUpdateEventsDisposable.isDisposed()) {
             Timber.v("updateDataForDay: ");
             mUpdateEventsDisposable = mUserInteractor.getTimezone()
                     .subscribeOn(Schedulers.io())
@@ -163,8 +165,8 @@ public final class EditedEventsPresenterImpl implements EditedEventsPresenter {
                 .map(eldEvents -> {
                     for (int i = 0; i < list.size(); ++i) {
                         CalendarItem calendarItem = list.get(i);
+                        long startTime = DateUtils.getStartDayTimeInMs(calendarItem.getLogDay(), mTimeZone);
                         for (ELDEvent eldEvent : eldEvents) {
-                            long startTime = DateUtils.getStartDayTimeInMs(calendarItem.getLogDay(), mTimeZone);
                             if (eldEvent.getEventTime() > startTime &&
                                     eldEvent.getEventTime() <= startTime + MS_IN_DAY) {
                                 calendarItem.setExternalColor(ContextCompat.getColor(mContext, R.color.coral));
@@ -185,16 +187,16 @@ public final class EditedEventsPresenterImpl implements EditedEventsPresenter {
         if (mDisposable != null && !mDisposable.isDisposed()) {
             mDisposable.dispose();
         }
-        if (mSendUpdatedDisposable != null && !mSendUpdatedDisposable.isDisposed()) {
+        if (!mSendUpdatedDisposable.isDisposed()) {
             mSendUpdatedDisposable.dispose();
         }
-        if (mUpdateEventsDisposable != null && !mUpdateEventsDisposable.isDisposed()) {
+        if (!mUpdateEventsDisposable.isDisposed()) {
             mUpdateEventsDisposable.dispose();
         }
     }
 
     private void sendUpdatedEvents(List<EventLogModel> events, long logDay, ELDEvent.StatusCode code) {
-        if (mSendUpdatedDisposable == null || mSendUpdatedDisposable.isDisposed()) {
+        if (mSendUpdatedDisposable.isDisposed()) {
             Timber.v("sendUpdatedEvents: ");
             final List<ELDEvent> cachedEvents = new ArrayList<>();
             mSendUpdatedDisposable = Observable.fromIterable(events)
@@ -248,7 +250,8 @@ public final class EditedEventsPresenterImpl implements EditedEventsPresenter {
         Timber.v("updateLogHeaderModelByUser: ");
         logHeaderModel.setTimezone(user.getTimezone());
         logHeaderModel.setDriverName(user.getFirstName() + " " + user.getLastName());
-        logHeaderModel.setSelectedExemptions(user.getRuleException() != null ? user.getRuleException() : "");
+        logHeaderModel.setSelectedExemptions(mLogHeaderUtils.getAllExemptions(user,
+                SyncConfiguration.Type.EXCEPT));
 
         List<SyncConfiguration> configurations = user.getConfigurations();
         if (configurations != null) {
@@ -263,16 +266,8 @@ public final class EditedEventsPresenterImpl implements EditedEventsPresenter {
         }
 
         //set carrier name
-        List<Carrier> carriers = user.getCarriers();
-        if (carriers != null && !carriers.isEmpty()) {
-            StringBuilder sb = new StringBuilder();
-            for (Carrier carrier : carriers) {
-                sb.append(carrier.getName());
-                sb.append(",");
-            }
-            sb.deleteCharAt(sb.length() - 1);
-            logHeaderModel.setCarrierName(sb.toString());
-        }
+        String carrierName = mLogHeaderUtils.makeCarrierName(user);
+        logHeaderModel.setCarrierName(carrierName);
         logHeaderModel.setSelectedExemptions(user.getRuleException());
     }
 
@@ -360,5 +355,27 @@ public final class EditedEventsPresenterImpl implements EditedEventsPresenter {
             }
         }
         return logs;
+    }
+
+    private List<EventLogModel> setVehicleNames(List<EventLogModel> eventLogModels) {
+        HashSet<Integer> vehicleIds = new HashSet<>();
+        for (EventLogModel log : eventLogModels) {
+            int vehicleId = log.getEvent().getVehicleId();
+            if (mVehicleIdToNameMap.containsKey(vehicleId)) {
+                vehicleIds.add(vehicleId);
+            }
+        }
+        if (!vehicleIds.isEmpty()) {
+            List<Vehicle> vehicles = mVehiclesInteractor.getVehiclesByIds(new ArrayList<>(vehicleIds));
+            for (Vehicle vehicle : vehicles) {
+                mVehicleIdToNameMap.put(vehicle.getId(), vehicle);
+            }
+        }
+        for (EventLogModel log : eventLogModels) {
+            if (mVehicleIdToNameMap.containsKey(log.getEvent().getVehicleId())) {
+                log.setVehicleName(mVehicleIdToNameMap.get(log.getEvent().getVehicleId()).getName());
+            }
+        }
+        return eventLogModels;
     }
 }

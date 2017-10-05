@@ -43,7 +43,7 @@ public final class CarrierEditModule {
                                                        ServiceApi serviceApi,
                                                        VehiclesInteractor vehiclesInteractor,
                                                        Context context) {
-        return new EditedEventsPresenterImpl(eldEventsInteractor, logSheetInteractor, userInteractor, vehiclesInteractor, serviceApi, context);
+        return new EditedEventsPresenterImpl(eldEventsInteractor, logSheetInteractor, userInteractor, vehiclesInteractor, serviceApi, logHeaderUtils, context);
     }
 
     @Provides

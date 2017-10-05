@@ -17,6 +17,7 @@ import javax.inject.Inject;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.disposables.Disposables;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
@@ -29,7 +30,7 @@ public final class UnassignedEventsPresenterImpl implements UnassignedEventsPres
     private final ELDEventsInteractor mELDEventsInteractor;
     private final ServiceApi mServiceApi;
     private final CompositeDisposable mDisposable;
-    private Disposable mUpdateEventDisposable;
+    private Disposable mUpdateEventDisposable = Disposables.disposed();
     private UnassignedEventsView mView;
 
     @Inject
@@ -55,7 +56,7 @@ public final class UnassignedEventsPresenterImpl implements UnassignedEventsPres
     }
 
     public void acceptEvent(EventLogModel event, int driverId, int position) {
-        if (mUpdateEventDisposable == null || mUpdateEventDisposable.isDisposed()) {
+        if (mUpdateEventDisposable.isDisposed()) {
             Timber.v("acceptEvent: ");
             List<ELDEvent> eldEvents = new ArrayList<>();
             event.getEvent().setDriverId(driverId);
@@ -92,7 +93,7 @@ public final class UnassignedEventsPresenterImpl implements UnassignedEventsPres
         if (mDisposable != null && !mDisposable.isDisposed()) {
             mDisposable.dispose();
         }
-        if (mUpdateEventDisposable != null && !mUpdateEventDisposable.isDisposed()) {
+        if (!mUpdateEventDisposable.isDisposed()) {
             mUpdateEventDisposable.dispose();
         }
     }

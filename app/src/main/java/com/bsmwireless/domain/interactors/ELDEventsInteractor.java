@@ -164,10 +164,6 @@ public final class ELDEventsInteractor {
     }
 
     public void storeUnidentifiedEvents(List<ELDEvent> events) {
-        //TODO: probably additional action with unidentified records is required.
-        for (ELDEvent eldEvent : events) {
-            Timber.d(eldEvent.toString());
-        }
         mELDEventDao.insertAll(ELDEventConverter.toEntityArray(events));
     }
 
