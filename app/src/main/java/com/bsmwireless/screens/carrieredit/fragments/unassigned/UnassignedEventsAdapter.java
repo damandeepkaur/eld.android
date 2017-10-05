@@ -64,11 +64,13 @@ public class UnassignedEventsAdapter extends RecyclerView.Adapter<UnassignedEven
     }
 
     public void setVehicleName(String vehicleName) {
+        Timber.v("setVehicleName: %s", vehicleName);
         mVehicleName = vehicleName;
         notifyItemChanged(HEADER);
     }
 
     public void setDriverId(int driverId) {
+        Timber.v("setDriverId: %d", driverId);
         mDriverId = driverId;
     }
 

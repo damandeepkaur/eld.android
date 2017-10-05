@@ -19,6 +19,7 @@ import javax.inject.Inject;
 import app.bsmuniversal.com.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import timber.log.Timber;
 
 public final class CarrierEditActivity extends BaseMenuActivity implements CarrierEditView {
 
@@ -38,6 +39,7 @@ public final class CarrierEditActivity extends BaseMenuActivity implements Carri
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Timber.d("onCreate: ");
         setContentView(R.layout.activity_carrier_edit);
         ButterKnife.bind(this);
         mComponent = DaggerCarrierEditComponent.builder()
@@ -63,27 +65,32 @@ public final class CarrierEditActivity extends BaseMenuActivity implements Carri
 
     @Override
     protected void onDestroy() {
+        Timber.d("onDestroy: ");
         mPresenter.destroy();
         super.onDestroy();
     }
 
     public CarrierEditComponent getComponent() {
+        Timber.v("getComponent: ");
         return mComponent;
     }
 
     @Override
     public void setDriverName(String driverName) {
+        Timber.v("setDriverName: ");
         getSupportActionBar().setTitle(driverName);
     }
 
     @Override
     public void setVehicleName(String vehicleName) {
+        Timber.v("setVehicleName: ");
         getSupportActionBar().setSubtitle(vehicleName);
         mPagerAdapter.setVehicleName(vehicleName);
     }
 
     @Override
     public void setDriverId(int driverId) {
+        Timber.v("setDriverId: ");
         mPagerAdapter.setDriverId(driverId);
     }
 

@@ -31,7 +31,7 @@ public final class CarrierEditAdapter extends FragmentStatePagerAdapter {
     }
 
     public void setDriverId(int driverId) {
-
+        mUnassignedEventsView.setDriverId(driverId);
     }
 
     @Override

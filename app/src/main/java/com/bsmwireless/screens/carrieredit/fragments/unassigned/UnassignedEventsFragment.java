@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +30,8 @@ public final class UnassignedEventsFragment extends BaseFragment implements Unas
     @Inject
     UnassignedEventsPresenter mPresenter;
     private UnassignedEventsAdapter mAdapter;
+    private int mDriverId = -1;
+    private String mVehicleName;
 
     @Nullable
     @Override
@@ -48,6 +51,13 @@ public final class UnassignedEventsFragment extends BaseFragment implements Unas
         mAdapter = new UnassignedEventsAdapter(getActivity(), mPresenter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setAdapter(mAdapter);
+        if (!TextUtils.isEmpty(mVehicleName)) {
+            mAdapter.setVehicleName(mVehicleName);
+            mRecyclerView.setVisibility(View.VISIBLE);
+        }
+        if (mDriverId != -1) {
+            mAdapter.setDriverId(mDriverId);
+        }
         mPresenter.fetchEldEvents();
     }
 
@@ -71,12 +81,20 @@ public final class UnassignedEventsFragment extends BaseFragment implements Unas
 
     @Override
     public void setVehicleName(String vehicleName) {
-        mRecyclerView.setVisibility(View.VISIBLE);
-        mAdapter.setVehicleName(vehicleName);
+        if (mRecyclerView == null || mAdapter == null) {
+            mVehicleName = vehicleName;
+        } else {
+            mRecyclerView.setVisibility(View.VISIBLE);
+            mAdapter.setVehicleName(vehicleName);
+        }
     }
 
     @Override
     public void setDriverId(int driverId) {
-
+        if (mAdapter == null) {
+            mDriverId = driverId;
+        } else {
+            mAdapter.setDriverId(driverId);
+        }
     }
 }

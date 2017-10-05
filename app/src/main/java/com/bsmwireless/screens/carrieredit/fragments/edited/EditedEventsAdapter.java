@@ -66,6 +66,7 @@ public class EditedEventsAdapter extends RecyclerView.Adapter<EditedEventsAdapte
     private final EditedEventsPresenter mPresenter;
 
     public EditedEventsAdapter(Context context, RecyclerView recyclerView, EditedEventsPresenter presenter) {
+        Timber.v("EditedEventsAdapter: ");
         mContext = context;
         mRecyclerView = recyclerView;
         mPresenter = presenter;
@@ -102,11 +103,13 @@ public class EditedEventsAdapter extends RecyclerView.Adapter<EditedEventsAdapte
     }
 
     public void setLogHeader(LogHeaderModel logHeaderModel) {
+        Timber.v("setLogHeader: ");
         mLogHeader = logHeaderModel;
         notifyDataSetChanged();
     }
 
     public void updateCalendarItems(List<CalendarItem> calendarItems) {
+        Timber.v("updateCalendarItems: ");
         mCalendarLayout.setAllItems(calendarItems);
     }
 
@@ -197,6 +200,7 @@ public class EditedEventsAdapter extends RecyclerView.Adapter<EditedEventsAdapte
     }
 
     public void updateGraph(GraphModel graphModel) {
+        Timber.v("updateGraph: ");
         mGraphModel = graphModel;
         if (mGraphLayout != null) {
             mGraphLayout.updateGraph(graphModel);
@@ -204,6 +208,7 @@ public class EditedEventsAdapter extends RecyclerView.Adapter<EditedEventsAdapte
     }
 
     public void setLogSheetHeaders(List<LogSheetHeader> logHeaders) {
+        Timber.v("setLogSheetHeaders: ");
         mLogHeaders = logHeaders;
         if (mCalendarLayout != null) {
             mCalendarLayout.setLogs(logHeaders);

@@ -61,6 +61,7 @@ public final class EditedEventsPresenterImpl implements EditedEventsPresenter {
     public EditedEventsPresenterImpl(ELDEventsInteractor eldEventsInteractor,
                                      LogSheetInteractor logSheetInteractor, UserInteractor userInteractor,
                                      VehiclesInteractor vehiclesInteractor, ServiceApi serviceApi, Context context) {
+        Timber.v("EditedEventsPresenterImpl: ");
         mELDEventsInteractor = eldEventsInteractor;
         mLogSheetInteractor = logSheetInteractor;
         mUserInteractor = userInteractor;
@@ -71,6 +72,7 @@ public final class EditedEventsPresenterImpl implements EditedEventsPresenter {
     }
 
     public void setView(EditedEventsView view) {
+        Timber.v("setView: ");
         mView = view;
         mDisposable.add(mUserInteractor.getTimezone()
                 .subscribeOn(Schedulers.io())
@@ -83,6 +85,7 @@ public final class EditedEventsPresenterImpl implements EditedEventsPresenter {
     }
 
     private void updateCalendarData() {
+        Timber.v("updateCalendarData: ");
         mDisposable.add(mUserInteractor.getTimezone()
                 .flatMap(timezone ->
                         mLogSheetInteractor.getLogSheetHeadersForMonth(timezone))
@@ -98,6 +101,7 @@ public final class EditedEventsPresenterImpl implements EditedEventsPresenter {
     }
 
     private void setEventListData(long startDayTime, String timezone) {
+        Timber.v("setEventListData: ");
         mDisposable.add(mELDEventsInteractor.getUnidentifiedEvents()
                 .subscribeOn(Schedulers.io())
                 .switchMap(list -> Observable.fromIterable(list))
@@ -110,11 +114,13 @@ public final class EditedEventsPresenterImpl implements EditedEventsPresenter {
     }
 
     public void onCalendarDaySelected(CalendarItem calendarItem) {
+        Timber.v("onCalendarDaySelected: ");
         updateDataForDay(calendarItem.getLogDay());
     }
 
     public void updateDataForDay(long logDay) {
         if (mUpdateEventsDisposable == null || mUpdateEventsDisposable.isDisposed()) {
+            Timber.v("updateDataForDay: ");
             mUpdateEventsDisposable = mUserInteractor.getTimezone()
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
@@ -132,6 +138,7 @@ public final class EditedEventsPresenterImpl implements EditedEventsPresenter {
     @Override
     public void approveEdits(List<EventLogModel> events, long logDay) {
         if (events != null && !events.isEmpty()) {
+            Timber.v("approveEdits: ");
             sendUpdatedEvents(events, logDay, ELDEvent.StatusCode.ACTIVE);
         }
     }
@@ -139,12 +146,14 @@ public final class EditedEventsPresenterImpl implements EditedEventsPresenter {
     @Override
     public void disapproveEdits(List<EventLogModel> events, long logDay) {
         if (events != null && !events.isEmpty()) {
+            Timber.v("disapproveEdits: ");
             sendUpdatedEvents(events, logDay, ELDEvent.StatusCode.INACTIVE_CHANGE_REJECTED);
         }
     }
 
     @Override
     public void markCalendarItems(List<CalendarItem> list) {
+        Timber.v("markCalendarItems: ");
         mDisposable.add(mUserInteractor.getTimezone()
                 .subscribeOn(Schedulers.io())
                 .doOnNext(timezone -> mTimeZone = timezone)
@@ -171,6 +180,7 @@ public final class EditedEventsPresenterImpl implements EditedEventsPresenter {
 
     @Override
     public void destroy() {
+        Timber.v("destroy: ");
         if (mDisposable != null && !mDisposable.isDisposed()) {
             mDisposable.dispose();
         }
@@ -184,6 +194,7 @@ public final class EditedEventsPresenterImpl implements EditedEventsPresenter {
 
     private void sendUpdatedEvents(List<EventLogModel> events, long logDay, ELDEvent.StatusCode code) {
         if (mSendUpdatedDisposable == null || mSendUpdatedDisposable.isDisposed()) {
+            Timber.v("sendUpdatedEvents: ");
             final List<ELDEvent> cachedEvents = new ArrayList<>();
             mSendUpdatedDisposable = Observable.fromIterable(events)
                     .subscribeOn(Schedulers.io())
@@ -199,6 +210,7 @@ public final class EditedEventsPresenterImpl implements EditedEventsPresenter {
     }
 
     private void updateDbEldEvents(List<ELDEvent> events, long logDay) {
+        Timber.v("updateDbEldEvents: ");
         mDisposable.add(mELDEventsInteractor.updateELDEvents(events)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -206,6 +218,7 @@ public final class EditedEventsPresenterImpl implements EditedEventsPresenter {
     }
 
     private void setLogHeaderData(long logDay) {
+        Timber.v("setLogHeaderData: ");
         LogHeaderModel model = new LogHeaderModel();
         mDisposable.add(mUserInteractor.getFullUser()
                 .subscribeOn(Schedulers.io())
@@ -217,6 +230,7 @@ public final class EditedEventsPresenterImpl implements EditedEventsPresenter {
     }
 
     private void setGraphData(long startDayTime, String timezone) {
+        Timber.v("setGraphData: ");
         GraphModel graphModel = new GraphModel();
         graphModel.setStartDayTime(startDayTime);
         mDisposable.add(mELDEventsInteractor.getActiveDutyEventsForDay(startDayTime)
@@ -230,6 +244,7 @@ public final class EditedEventsPresenterImpl implements EditedEventsPresenter {
     }
 
     private void updateLogHeaderModelByUser(LogHeaderModel logHeaderModel, User user) {
+        Timber.v("updateLogHeaderModelByUser: ");
         logHeaderModel.setTimezone(user.getTimezone());
         logHeaderModel.setDriverName(user.getFirstName() + " " + user.getLastName());
         logHeaderModel.setSelectedExemptions(user.getRuleException() != null ? user.getRuleException() : "");
@@ -261,6 +276,7 @@ public final class EditedEventsPresenterImpl implements EditedEventsPresenter {
     }
 
     private void updateLogHeaderModelByLogSheet(LogHeaderModel logHeaderModel, LogSheetHeader logSheetHeader) {
+        Timber.v("updateLogHeaderModelByLogSheet: ");
         logHeaderModel.setLogDay(logSheetHeader.getLogDay());
         int vehicleId = logSheetHeader.getVehicleId();
         Vehicle vehicle;
@@ -294,6 +310,7 @@ public final class EditedEventsPresenterImpl implements EditedEventsPresenter {
     }
 
     private List<EventLogModel> convertToEventLogModels(List<ELDEvent> events, long startDayTime, String timezone) {
+        Timber.v("convertToEventLogModels: ");
         List<EventLogModel> logs = new ArrayList<>();
 
         long endDayTime = Math.min(System.currentTimeMillis(), startDayTime + MS_IN_DAY);
@@ -341,61 +358,6 @@ public final class EditedEventsPresenterImpl implements EditedEventsPresenter {
             if (lastActiveIndex >= 0) {
                 logs.get(lastActiveIndex).setDuration(endDayTime - logs.get(lastActiveIndex).getEventTime());
             }
-        }
-        return logs;
-    }
-
-    private List<EventLogModel> preparingLogs(List<ELDEvent> events) {
-        List<EventLogModel> logs = new ArrayList<>();
-
-        if (!events.isEmpty()) {
-            //convert to logs model
-            long duration;
-            long startDayTime = Long.MAX_VALUE;
-            long endDayTime = -1;
-            for (int i = 0; i < events.size(); i++) {
-                ELDEvent event = events.get(i);
-                EventLogModel log = new EventLogModel(event, mTimeZone);
-                if (event.getEventType() == ELDEvent.EventType.CHANGE_IN_DRIVER_INDICATION.getValue()
-                        && event.getEventCode() == DutyType.CLEAR.getCode()) {
-                    log.setDutyType(DutyType.CLEAR);
-                    //get code of indication ON event for indication OFF event
-                    for (int j = i - 1; j >= 0; j--) {
-                        ELDEvent dutyEvent = events.get(j);
-                        long time = event.getEventTime();
-                        if (time < startDayTime) {
-                            startDayTime = time;
-                        }
-                        if (time > endDayTime) {
-                            endDayTime = time;
-                        }
-
-                        if (dutyEvent.getEventType() == ELDEvent.EventType.CHANGE_IN_DRIVER_INDICATION.getValue()) {
-                            if (dutyEvent.getEventCode() == DutyType.PERSONAL_USE.getCode()) {
-                                log.setDutyType(CLEAR_PU);
-                                break;
-                            } else if (dutyEvent.getEventCode() == DutyType.YARD_MOVES.getCode()) {
-                                log.setDutyType(CLEAR_YM);
-                                break;
-                            }
-                        }
-                    }
-                } else {
-                    log.setDutyType(DutyType.getTypeByCode(log.getEventType(), log.getEventCode()));
-                }
-                logs.add(log);
-                if (logs.get(0).getEventTime() < startDayTime) {
-                    logs.get(0).setEventTime(startDayTime);
-                }
-                if (i < events.size() - 1) {
-                    duration = events.get(i + 1).getEventTime() - events.get(i).getEventTime();
-                    logs.get(i).setDuration(duration);
-                }
-            }
-
-            //set duration for last event
-            EventLogModel lastEvent = logs.get(logs.size() - 1);
-            lastEvent.setDuration(endDayTime - lastEvent.getEventTime());
         }
         return logs;
     }

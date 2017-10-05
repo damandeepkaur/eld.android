@@ -24,7 +24,6 @@ public final class CarrierEditPresenterImpl extends BaseMenuPresenter implements
     private final VehiclesInteractor mVehiclesInteractor;
 
     private CarrierEditView mView;
-    private CompositeDisposable mDisposable;
     private Disposable mDriverDisposable;
     private Disposable mVehicleDisposable;
 
@@ -34,6 +33,7 @@ public final class CarrierEditPresenterImpl extends BaseMenuPresenter implements
                                     AccountManager accountManager,
                                     PreferencesManager preferencesManager, VehiclesInteractor vehiclesInteractor) {
         super(dutyTypeManager, eventsInteractor, userInteractor, accountManager);
+        Timber.d("CarrierEditPresenterImpl: ");
         mPreferencesManager = preferencesManager;
         mVehiclesInteractor = vehiclesInteractor;
     }
@@ -45,12 +45,14 @@ public final class CarrierEditPresenterImpl extends BaseMenuPresenter implements
 
     @Override
     public void bind(CarrierEditView view) {
+        Timber.d("bind: ");
         mView = view;
     }
 
     @Override
     public void requestDriverName() {
         if (mDriverDisposable == null) {
+            Timber.d("requestDriverName: ");
             mDriverDisposable = mUserInteractor.getDriver()
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
@@ -65,6 +67,7 @@ public final class CarrierEditPresenterImpl extends BaseMenuPresenter implements
 
     @Override
     public void requestVehicleId() {
+        Timber.v("requestVehicleId: ");
         mVehicleDisposable = Observable.fromCallable(() -> mVehiclesInteractor.getVehicle(mPreferencesManager.getVehicleId()))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -74,10 +77,8 @@ public final class CarrierEditPresenterImpl extends BaseMenuPresenter implements
 
     @Override
     public void destroy() {
+        Timber.d("destroy: ");
         mView = null;
-        if (mDisposable != null && !mDisposable.isDisposed()) {
-            mDisposable.dispose();
-        }
         if (mDriverDisposable != null && !mDriverDisposable.isDisposed()) {
             mDriverDisposable.dispose();
         }

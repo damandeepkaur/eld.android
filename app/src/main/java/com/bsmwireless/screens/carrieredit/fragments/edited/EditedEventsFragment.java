@@ -38,6 +38,7 @@ public final class EditedEventsFragment extends BaseFragment implements EditedEv
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        Timber.v("onCreateView: ");
         View view = inflater.inflate(R.layout.fragment_edited_events, container, false);
         mUnbinder = ButterKnife.bind(this, view);
         return view;
@@ -46,6 +47,7 @@ public final class EditedEventsFragment extends BaseFragment implements EditedEv
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        Timber.v("onActivityCreated: ");
         ((CarrierEditView) getActivity()).getComponent().inject(this);
         mPresenter.setView(this);
         mAdapter = new EditedEventsAdapter(mContext, mRecyclerView, mPresenter);
@@ -62,21 +64,25 @@ public final class EditedEventsFragment extends BaseFragment implements EditedEv
 
     @Override
     public void setLogSheetHeaders(List<LogSheetHeader> logs) {
+        Timber.v("setLogSheetHeaders: ");
         mAdapter.setLogSheetHeaders(logs);
     }
 
     @Override
     public void updateGraph(GraphModel graphModel) {
+        Timber.v("updateGraph: ");
         mAdapter.updateGraph(graphModel);
     }
 
     @Override
     public void setLogHeader(LogHeaderModel logHeader) {
+        Timber.v("setLogHeader: ");
         mAdapter.setLogHeader(logHeader);
     }
 
     @Override
     public void updateCalendarItems(List<CalendarItem> calendarItems) {
+        Timber.v("updateCalendarItems: ");
         mAdapter.updateCalendarItems(calendarItems);
     }
 
@@ -84,5 +90,6 @@ public final class EditedEventsFragment extends BaseFragment implements EditedEv
     public void onDestroy() {
         mPresenter.destroy();
         super.onDestroy();
+        Timber.v("onDestroy: ");
     }
 }

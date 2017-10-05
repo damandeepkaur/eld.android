@@ -55,6 +55,7 @@ public final class UnassignedEventsPresenterImpl implements UnassignedEventsPres
 
     public void acceptEvent(EventLogModel event, int driverId, int position) {
         if (mUpdateEventDisposable == null || mUpdateEventDisposable.isDisposed()) {
+            Timber.v("acceptEvent: ");
             List<ELDEvent> eldEvents = new ArrayList<>();
             event.getEvent().setDriverId(driverId);
             eldEvents.add(event.getEvent());
@@ -73,10 +74,12 @@ public final class UnassignedEventsPresenterImpl implements UnassignedEventsPres
 
     public void rejectEvent(EventLogModel event, int position) {
         //TODO: remove from db?
+        Timber.v("rejectEvent: ");
         mView.removeEvent(position);
     }
 
     private void updateDb(List<ELDEvent> eldEvents, int position) {
+        Timber.v("updateDb: ");
         mDisposable.add(mELDEventsInteractor.updateELDEvents(eldEvents)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
