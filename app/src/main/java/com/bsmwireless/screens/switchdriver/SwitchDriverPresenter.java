@@ -1,6 +1,7 @@
 package com.bsmwireless.screens.switchdriver;
 
 import com.bsmwireless.common.dagger.ActivityScope;
+import com.bsmwireless.common.utils.DateUtils;
 import com.bsmwireless.common.utils.BlackBoxStateChecker;
 import com.bsmwireless.data.network.RetrofitException;
 import com.bsmwireless.data.storage.AccountManager;
@@ -120,22 +121,22 @@ public final class SwitchDriverPresenter {
     public void onReassignEventDialogCreated() {
         mGetCoDriversDisposable.dispose();
         mGetCoDriversDisposable = mUserInteractor.getDriver()
-                    .zipWith(mUserInteractor.getCoDriversFromDB(),
-                    (driver, coDrivers) -> {
-                        mAccountManager.getCurrentUserId();
-                        List<SwitchDriverDialog.UserModel> users = SwitchDriverDialog.UserModel.fromEntity(coDrivers);
-                        SwitchDriverDialog.UserModel driverModel = new SwitchDriverDialog.UserModel(driver);
-                        users.add(0, driverModel);
-                        return users;
-                    })
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .doOnNext(users -> mView.setUsersForReassignDialog(users))
-                    .observeOn(Schedulers.io())
-                    .map(this::updateStatus)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .doOnNext(users -> mView.setUsersForReassignDialog(users))
-                    .subscribe();
+                .zipWith(mUserInteractor.getCoDriversFromDB(),
+                        (driver, coDrivers) -> {
+                            mAccountManager.getCurrentUserId();
+                            List<SwitchDriverDialog.UserModel> users = SwitchDriverDialog.UserModel.fromEntity(coDrivers);
+                            SwitchDriverDialog.UserModel driverModel = new SwitchDriverDialog.UserModel(driver);
+                            users.add(0, driverModel);
+                            return users;
+                        })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnNext(users -> mView.setUsersForReassignDialog(users))
+                .observeOn(Schedulers.io())
+                .map(this::updateStatus)
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnNext(users -> mView.setUsersForReassignDialog(users))
+                .subscribe();
     }
 
     public void onAddCoDriverCreated() {
@@ -248,18 +249,18 @@ public final class SwitchDriverPresenter {
         mReassignEventDisposable.dispose();
         mView.showProgress();
         mReassignEventDisposable = mELDEventsInteractor.updateELDEvents(events)
-                                   .subscribeOn(Schedulers.io())
-                                   .observeOn(AndroidSchedulers.mainThread())
-                                   .doOnEach(notification -> mView.hideProgress())
-                                   .subscribe(result -> mView.eventReassigned(),
-                                           throwable -> {
-                                               Timber.e(throwable);
-                                               if (throwable instanceof RetrofitException) {
-                                                   mView.showError((RetrofitException) throwable);
-                                               } else {
-                                                   mView.showError(SwitchDriverView.Error.ERROR_REASSIGN_EVENT);
-                                               }
-                                           });
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnEach(notification -> mView.hideProgress())
+                .subscribe(result -> mView.eventReassigned(),
+                        throwable -> {
+                            Timber.e(throwable);
+                            if (throwable instanceof RetrofitException) {
+                                mView.showError((RetrofitException) throwable);
+                            } else {
+                                mView.showError(SwitchDriverView.Error.ERROR_REASSIGN_EVENT);
+                            }
+                        });
     }
 
     private void getDriverInfo() {
@@ -277,7 +278,7 @@ public final class SwitchDriverPresenter {
 
     private List<SwitchDriverDialog.UserModel> updateStatus(List<SwitchDriverDialog.UserModel> userEntities) {
         for (SwitchDriverDialog.UserModel user : userEntities) {
-            List<ELDEvent> events = mELDEventsInteractor.getLatestActiveDutyEventFromDBSync(System.currentTimeMillis(), user.getUser().getId());
+            List<ELDEvent> events = mELDEventsInteractor.getLatestActiveDutyEventFromDBSync(DateUtils.currentTimeMillis(), user.getUser().getId());
             if (events != null && !events.isEmpty()) {
                 ELDEvent event = events.get(events.size() - 1);
                 user.setDutyType(DutyType.getDutyTypeByCode(event.getEventType(), event.getEventCode()));

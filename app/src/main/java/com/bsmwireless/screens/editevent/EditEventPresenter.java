@@ -78,7 +78,7 @@ public final class EditEventPresenter extends BaseMenuPresenter {
             mCalendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
             mCalendar.set(Calendar.MINUTE, minute);
             mCalendar.set(Calendar.SECOND, 0);
-            mView.setStartTime(DateUtils.convertTimeToAMPMString(mCalendar.getTimeInMillis(), mTimezone));
+            mView.setStartTime(DateUtils.convertTimeToAMPMString(DateUtils.currentTimeMillis(), mTimezone));
         }, hours, minutes);
     }
 
@@ -87,7 +87,7 @@ public final class EditEventPresenter extends BaseMenuPresenter {
         long eventTime = DateUtils.convertStringAMPMToTime(startTime, mEventDay, mTimezone);
         ELDEvent newEvent;
 
-        if (eventTime > System.currentTimeMillis()) {
+        if (eventTime > DateUtils.currentTimeMillis()) {
             mView.showError(EditEventView.Error.ERROR_INVALID_TIME);
             return;
         }

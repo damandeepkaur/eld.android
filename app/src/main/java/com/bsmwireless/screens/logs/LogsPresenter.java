@@ -88,7 +88,7 @@ public final class LogsPresenter implements AccountManager.AccountListener {
         mDisposables.add(mUserInteractor.getTimezone()
                 .subscribeOn(Schedulers.io())
                 .subscribe(timezone -> {
-                    long logDay = DateUtils.convertTimeToLogDay(timezone, System.currentTimeMillis());
+                    long logDay = DateUtils.convertTimeToLogDay(timezone, DateUtils.currentTimeMillis());
                     updateDataForDay(logDay);
                 }));
         updateCalendarData();
@@ -322,7 +322,7 @@ public final class LogsPresenter implements AccountManager.AccountListener {
     private List<EventLogModel> convertToEventLogModels(List<ELDEvent> events, long startDayTime, String timezone) {
         List<EventLogModel> logs = new ArrayList<>();
 
-        long endDayTime = Math.min(System.currentTimeMillis(), startDayTime + MS_IN_DAY);
+        long endDayTime = Math.min(DateUtils.currentTimeMillis(), startDayTime + MS_IN_DAY);
         int lastActiveIndex = -1;
 
         if (!events.isEmpty()) {

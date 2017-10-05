@@ -114,7 +114,7 @@ public final class SyncInteractor {
                             .setDriverId(userEntity.getId())
                             .setRuleException(userEntity.getRuleException())
                             .setDutyCycle(userEntity.getDutyCycle())
-                            .setApplyTime(Calendar.getInstance().getTimeInMillis()))
+                            .setApplyTime(DateUtils.currentTimeMillis()))
                             .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS))
                             .onErrorReturn(throwable -> false);
                     Single<Boolean> homeTerminalUpdate = mServiceApi.updateDriverHomeTerminal(new DriverHomeTerminal()
@@ -133,7 +133,7 @@ public final class SyncInteractor {
     }
 
     public void syncEventsForDaysAgo(int days, String timezone) {
-        long current = System.currentTimeMillis();
+        long current = DateUtils.currentTimeMillis();
         long start = DateUtils.getStartDayTimeInMs(timezone, current - days * MS_IN_DAY);
         long end = DateUtils.getEndDayTimeInMs(timezone, current);
         if (NetworkUtils.isOnlineMode()) {

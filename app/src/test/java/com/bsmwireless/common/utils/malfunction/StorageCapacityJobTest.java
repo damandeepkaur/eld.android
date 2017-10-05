@@ -15,7 +15,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 
-import io.reactivex.Maybe;
+import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.plugins.RxJavaPlugins;
@@ -71,7 +71,7 @@ public class StorageCapacityJobTest extends BaseTest {
         doReturn(Observable.just(1L)).when(mStorageCapacityJob).getIntervalObservable();
 
         when(mELDEventsInteractor.getLatestMalfunctionEvent(Malfunction.DATA_RECORDING_COMPLIANCE))
-                .thenReturn(Maybe.empty());
+                .thenReturn(Flowable.empty());
         ELDEvent defaultEvent = new ELDEvent();
         defaultEvent.setEventCode(ELDEvent.MalfunctionCode.MALFUNCTION_CLEARED.getCode());
         when(mELDEventsInteractor.getEvent(any(), any(), any())).thenReturn(defaultEvent);
@@ -99,7 +99,7 @@ public class StorageCapacityJobTest extends BaseTest {
         doReturn(Observable.just(1L)).when(mStorageCapacityJob).getIntervalObservable();
 
         when(mELDEventsInteractor.getLatestMalfunctionEvent(Malfunction.DATA_RECORDING_COMPLIANCE))
-                .thenReturn(Maybe.empty());
+                .thenReturn(Flowable.empty());
         ELDEvent defaultEvent = new ELDEvent();
         defaultEvent.setEventCode(ELDEvent.MalfunctionCode.MALFUNCTION_CLEARED.getCode());
         when(mELDEventsInteractor.getEvent(any(), any(), any())).thenReturn(defaultEvent);
