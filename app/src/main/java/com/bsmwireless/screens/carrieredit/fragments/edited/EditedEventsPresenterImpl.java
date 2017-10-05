@@ -52,11 +52,11 @@ public final class EditedEventsPresenterImpl implements EditedEventsPresenter {
     private final UserInteractor mUserInteractor;
     private final VehiclesInteractor mVehiclesInteractor;
     private final ServiceApi mServiceApi;
-    private volatile CompositeDisposable mDisposable;
+    private CompositeDisposable mDisposable;
     private Disposable mUpdateEventsDisposable = Disposables.disposed();;
     private Disposable mSendUpdatedDisposable = Disposables.disposed();;
     private EditedEventsView mView;
-    private String mTimeZone;
+    private volatile String mTimeZone;
     private final LogHeaderUtils mLogHeaderUtils;
     private Map<Integer, Vehicle> mVehicleIdToNameMap = new HashMap<>();
     private Context mContext;

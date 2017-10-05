@@ -3,6 +3,7 @@ package com.bsmwireless.screens.carrieredit.dagger;
 import android.content.Context;
 
 import com.bsmwireless.common.dagger.ActivityScope;
+import com.bsmwireless.common.utils.LogHeaderUtils;
 import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.data.storage.DutyTypeManager;
@@ -42,6 +43,7 @@ public final class CarrierEditModule {
                                                        UserInteractor userInteractor,
                                                        ServiceApi serviceApi,
                                                        VehiclesInteractor vehiclesInteractor,
+                                                       LogHeaderUtils logHeaderUtils,
                                                        Context context) {
         return new EditedEventsPresenterImpl(eldEventsInteractor, logSheetInteractor, userInteractor, vehiclesInteractor, serviceApi, logHeaderUtils, context);
     }
