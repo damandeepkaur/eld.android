@@ -3,6 +3,7 @@ ELD app for Android
 
 # Version history
 
+* **1.1.1** - Fix current time (_EA-11_, _EA-475_)
 * **1.1.0** - Showing events for all types (_EA-271_)
 * **1.0.105** - Update date and time
 * **1.0.104** - Hide keyboard to show snackbar error (_EA-327_)
