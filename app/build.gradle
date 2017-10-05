@@ -10,19 +10,14 @@ android {
         applicationId "app.bsmuniversal.com"
         minSdkVersion 15
         targetSdkVersion 26
-<<<<<<< HEAD
-
         versionCode 77
         versionName "1.0.76"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         versionCode 100
         versionName "1.0.99"
-=======
         versionCode 103
         versionName "1.0.102"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
->>>>>>> origin/develop
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
