@@ -22,6 +22,7 @@ import com.bsmwireless.widgets.alerts.DutyType;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.mockito.ArgumentMatcher;
 import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -29,10 +30,11 @@ import org.mockito.Mockito;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
-import app.bsmuniversal.com.RxSchedulerRule;
 import io.reactivex.Flowable;
+import io.reactivex.Maybe;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.annotations.NonNull;
@@ -47,6 +49,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -615,6 +619,62 @@ public class ELDEventsInteractorTest extends BaseTest {
     }
 
     @Test
+    public void testPostNewDutyTypeEventWithTime() {
+        DutyType[] dutyTypes = {
+                DutyType.DRIVING,
+                DutyType.OFF_DUTY,
+                DutyType.ON_DUTY,
+                DutyType.PERSONAL_USE,
+                DutyType.SLEEPER_BERTH,
+                DutyType.YARD_MOVES
+        };
+
+        for(int i=0; i<dutyTypes.length; i++) {
+            testPostNewDutyTypeEventWithTimeHelper(dutyTypes[i]);
+        }
+    }
+
+    /**
+     * Helper for testPostNewDutyTypeEventWithTime().
+     *
+     * @param dutyType
+     */
+    private void testPostNewDutyTypeEventWithTimeHelper(DutyType dutyType) {
+        // given
+        long[] rowIds = {111L, 222L};
+        String comment = "any comment";
+        long time = 214092140L;
+
+        when(mBlackBoxInteractor.getLastData()).thenReturn(new BlackBoxModel());
+        when(mELDEventDao.insertAll(any(ELDEventEntity.class))).thenReturn(rowIds);
+
+        TestObserver<long[]> testObserver = TestObserver.create();
+        ELDEventsInteractor eldEventsInteractorSpy = Mockito.spy(mELDEventsInteractor);
+
+        // when
+        eldEventsInteractorSpy.postNewDutyTypeEvent(dutyType, comment, time).subscribe(testObserver);
+
+        // then
+        verify(eldEventsInteractorSpy).postNewELDEvents(argThat(new ArgumentMatcher<List<ELDEvent>>() {
+            @Override
+            public boolean matches(List<ELDEvent> argument) {
+                Iterator<ELDEvent> itr = argument.iterator();
+                boolean result = true;
+
+                if(argument.size() < 1) return false;
+
+                while(itr.hasNext()) {
+                    result &= (itr.next().getEventTime() == time);
+                }
+
+                return result;
+            }
+        }));
+
+        verify(mDutyTypeManager).setDutyType(eq(dutyType), eq(true));
+    }
+
+    @Test
     public void testPostNewDutyTypeEvent() {
         // given
         DutyType dutyType = DutyType.DRIVING;
@@ -818,10 +878,103 @@ public class ELDEventsInteractorTest extends BaseTest {
         testObserver.assertError(error);
     }
 
-    // TODO: test getDiagnosticEvents() when it is implemented
-    // TODO: test getMalfunctionEvents() when it is implemented
     // TODO: test hasMalfunctionEvents() after modifying scope of getMalfunctionCount() for testing
     // TODO: test hasDiagnosticEvents() after modifying scope of getMalfunctionCount() for testing
+
+    @Test
+    public void testGetLatestMalfunctionEventSuccess() {
+        // given
+        Malfunction malfunction = Malfunction.DATA_RECORDING_COMPLIANCE;
+        ELDEventEntity eldEventEntity = new ELDEventEntity();
+
+        TestObserver<ELDEvent> testObserver = TestObserver.create();
+
+        when(mELDEventDao.getLatestEvent(anyInt(), anyInt(), anyString(), anyInt()))
+                .thenReturn(Maybe.just(eldEventEntity));
+
+        // when
+        mELDEventsInteractor.getLatestMalfunctionEvent(malfunction).subscribe(testObserver);
+
+        // then
+        verify(mELDEventDao).getLatestEvent(anyInt(),
+                eq(ELDEvent.EventType.DATA_DIAGNOSTIC.getValue()),
+                eq(malfunction.getCode()),
+                eq(ELDEvent.StatusCode.ACTIVE.getValue()));
+
+    }
+
+    @Test
+    public void testGetLatestMalfunctionEventComplete() {
+        // given
+        Malfunction malfunction = Malfunction.DATA_RECORDING_COMPLIANCE;
+
+        TestObserver<ELDEvent> testObserver = TestObserver.create();
+
+        when(mELDEventDao.getLatestEvent(anyInt(), anyInt(), anyString(), anyInt()))
+                .thenReturn(Maybe.empty());
+
+        // when
+        mELDEventsInteractor.getLatestMalfunctionEvent(malfunction).subscribe(testObserver);
+
+        // then
+        verify(mELDEventDao).getLatestEvent(anyInt(),
+                eq(ELDEvent.EventType.DATA_DIAGNOSTIC.getValue()),
+                eq(malfunction.getCode()),
+                eq(ELDEvent.StatusCode.ACTIVE.getValue()));
+
+        testObserver.assertComplete();
+        testObserver.assertNoValues(); // Redundant test for Maybe. Documenting that no values is a valid outcome for latest malfunction event...
+    }
+
+    @Test
+    public void testGetLatestMalfunctionEventError() {
+        // given
+        Malfunction malfunction = Malfunction.DATA_RECORDING_COMPLIANCE;
+        String errorString = "dao error";
+
+        TestObserver<ELDEvent> testObserver = TestObserver.create();
+
+        when(mELDEventDao.getLatestEvent(anyInt(), anyInt(), anyString(), anyInt()))
+                .thenReturn(Maybe.error(new RuntimeException(errorString)));
+
+
+        // when
+        mELDEventsInteractor.getLatestMalfunctionEvent(malfunction).subscribe(testObserver);
+
+        // then
+        verify(mELDEventDao).getLatestEvent(anyInt(),
+                eq(ELDEvent.EventType.DATA_DIAGNOSTIC.getValue()),
+                eq(malfunction.getCode()),
+                eq(ELDEvent.StatusCode.ACTIVE.getValue()));
+
+        testObserver.assertErrorMessage(errorString);  // error is propagated and not handled in this function
+    }
+
+    @Test
+    public void testIsLocationUpdateEventExistsTrue() {
+        // given
+        TestObserver<Boolean> testObserver = TestObserver.create();
+        when(mELDEventDao.getChangingLocationEventCount(anyInt(), any(), anyInt())).thenReturn(Single.just(1)); // not 0
+
+        // when
+        mELDEventsInteractor.isLocationUpdateEventExists().subscribe(testObserver);
+
+        // then
+        verify(mELDEventDao).getChangingLocationEventCount(anyInt(), any(), anyInt());
+    }
+
+    @Test
+    public void testIsLocationUpdateEventExistsFalse() {
+        // given
+        TestObserver<Boolean> testObserver = TestObserver.create();
+        when(mELDEventDao.getChangingLocationEventCount(anyInt(), any(), anyInt())).thenReturn(Single.just(0)); // 0
+
+        // when
+        mELDEventsInteractor.isLocationUpdateEventExists().subscribe(testObserver);
+
+        // then
+        verify(mELDEventDao).getChangingLocationEventCount(anyInt(), any(), anyInt());
+    }
 
     @Test
     public void testGetMalfunctionCountSync() {
@@ -998,6 +1151,45 @@ public class ELDEventsInteractorTest extends BaseTest {
 
         // then
     }
+
+    @Test
+    public void testGetLogSheetEvent() {
+        // given
+        String comment = "no comment.";
+        int driverId = 124122;
+        int vehicleId = 90124091;
+        BlackBoxModel blackBoxModel = new BlackBoxModel();
+        blackBoxModel.setLat(124.214);
+        blackBoxModel.setLon(10.124);
+        blackBoxModel.setEngineHours(12412);
+        blackBoxModel.setOdometer(124125);
+
+        when(mDutyTypeManager.getDutyType()).thenReturn(DutyType.DRIVING); // e.g. not PERSONAL_USE
+        when(mPreferencesManager.getVehicleId()).thenReturn(vehicleId);
+        when(mAccountManager.getCurrentUserId()).thenReturn(driverId);
+        when(mBlackBoxInteractor.getLastData()).thenReturn(blackBoxModel);
+
+        // when
+        ELDEvent result = mELDEventsInteractor.getLogSheetEvent(comment);
+
+        // then
+        assertEquals(comment, result.getComment());
+        assertEquals((Integer)driverId, result.getDriverId());
+        assertEquals((Integer)vehicleId, result.getVehicleId());
+        assertEquals((Integer)blackBoxModel.getEngineHours(), result.getEngineHours());
+        assertEquals((Integer)blackBoxModel.getOdometer(), result.getOdometer());
+        assertEquals((Double)blackBoxModel.getLat(), result.getLat());
+        assertEquals((Double)blackBoxModel.getLon(), result.getLng());
+        // TODO: test event time
+        // TODO: test timezone
+        // TODO: test mobile time
+        // TODO: test app info
+    }
+
+
+    // TODO: getLatLngFlag after scope change for testing
+    // TODO: getBlackBoxState after scope change for testing
+    // TODO: roundOneDecimal after scope change for testing
 
 
     /**
