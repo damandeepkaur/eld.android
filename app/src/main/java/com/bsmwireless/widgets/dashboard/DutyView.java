@@ -2,6 +2,7 @@ package com.bsmwireless.widgets.dashboard;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
@@ -16,6 +17,7 @@ import app.bsmuniversal.com.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+
 
 public final class DutyView extends CardView {
     @BindView(R.id.duty_time_title)
@@ -76,6 +78,7 @@ public final class DutyView extends CardView {
         mUnbinder = ButterKnife.bind(rootView, this);
 
         setDutyType(dutyType);
+        setContentPadding();
     }
 
     @Override
@@ -134,6 +137,17 @@ public final class DutyView extends CardView {
 
             mTapToChangeTitle.setVisibility(canChange ? VISIBLE : GONE);
             mDutyDivider.setVisibility(canChange ? VISIBLE : GONE);
+        }
+    }
+
+    /**
+     * On pre-Lollipop platforms, CardView does not clip the bounds of the Card for the rounded
+     * corners. Remove padding from content in this case, but preserve round corners
+     * for platforms above Lollilop.
+     */
+    private void setContentPadding() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            setContentPadding(-8, -8, -8, -8);
         }
     }
 }

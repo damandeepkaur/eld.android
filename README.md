@@ -3,6 +3,7 @@ ELD app for Android
 
 # Version history
 
+* **1.1.4** - Fix UI issues prior Lollilop platfom (_EA-391_)
 * **1.1.3** - App Menu option "Roadside Inspection" typo (_EA-482_)
 * **1.1.2** - Records Time format should be 24h instead of 12h (_EA-485_)
 * **1.1.1** - Fix current time (_EA-11_, _EA-475_)
