@@ -29,7 +29,10 @@ public final class SyncNtpService extends IntentService {
                             Timber.i("Ntp sync date = %s", date.toString());
                             NtpClientManager.setRealTimeInMillisDiff(date);
                         },
-                        throwable -> Timber.e("Something went wrong when trying to initializeRx TrueTime: %s", throwable));
+                        throwable -> {
+                            Timber.e("Something went wrong when trying to initializeRx TrueTime: %s", throwable);
+                            NtpClientManager.resetRealTimeInMillisDiff();
+                        });
 
         SyncNtpAlarmReceiver.completeWakefulIntent(intent);
     }

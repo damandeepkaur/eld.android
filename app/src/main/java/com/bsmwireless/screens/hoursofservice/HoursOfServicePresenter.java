@@ -80,7 +80,7 @@ public final class HoursOfServicePresenter extends BaseMenuPresenter {
         mResetTimeDisposable.dispose();
         mResetTimeDisposable = getUserInteractor().getTimezone()
                 .flatMap(timeZone -> {
-                    long current = System.currentTimeMillis();
+                    long current = DateUtils.currentTimeMillis();
                     time[0] = DateUtils.getStartDayTimeInMs(timeZone, current);
                     time[1] = DateUtils.getEndDayTimeInMs(timeZone, current);
 
@@ -119,7 +119,7 @@ public final class HoursOfServicePresenter extends BaseMenuPresenter {
             event = events.get(i);
 
             if (event.isDutyEvent() && event.isActive()) {
-                eventDutyType = DutyType.getTypeByCode(event.getEventType(), event.getEventCode());
+                eventDutyType = DutyType.getDutyTypeByCode(event.getEventType(), event.getEventCode());
 
                 if (lastEventType == null) {
                     lastEventType = eventDutyType;
@@ -152,7 +152,7 @@ public final class HoursOfServicePresenter extends BaseMenuPresenter {
             }
         }
 
-        long[] times = DutyTypeManager.getDutyTypeTimes(new ArrayList<>(events), startOfDay, System.currentTimeMillis());
+        long[] times = DutyTypeManager.getDutyTypeTimes(new ArrayList<>(events), startOfDay, DateUtils.currentTimeMillis());
 
         getDutyTypeManager().setDutyTypeTime(
                 (int) (times[DutyType.ON_DUTY.ordinal()]),

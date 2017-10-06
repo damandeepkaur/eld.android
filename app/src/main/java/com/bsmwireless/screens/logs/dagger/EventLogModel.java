@@ -3,6 +3,7 @@ package com.bsmwireless.screens.logs.dagger;
 import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.widgets.alerts.DutyType;
+import com.bsmwireless.widgets.alerts.Type;
 
 public final class EventLogModel implements DutyTypeManager.DutyTypeCheckable {
 
@@ -10,7 +11,7 @@ public final class EventLogModel implements DutyTypeManager.DutyTypeCheckable {
     private Long mDuration;
     private String mDriverTimezone;
     private String mVehicleName;
-    private DutyType mDutyType;
+    private Type mType;
 
     public EventLogModel() {
     }
@@ -73,12 +74,12 @@ public final class EventLogModel implements DutyTypeManager.DutyTypeCheckable {
         mVehicleName = vehicleName;
     }
 
-    public DutyType getDutyType() {
-        return mDutyType;
+    public Type getType() {
+        return mType;
     }
 
-    public void setDutyType(DutyType dutyType) {
-        mDutyType = dutyType;
+    public void setType(Type type) {
+        mType = type;
     }
 
     @Override

@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 
 import com.bsmwireless.common.App;
+import com.bsmwireless.common.utils.DateUtils;
 import com.bsmwireless.screens.autologout.dagger.AutoLogoutModule;
 import com.bsmwireless.screens.autologout.dagger.DaggerAutoLogoutComponent;
 import com.bsmwireless.screens.common.BaseActivity;
@@ -24,6 +25,7 @@ public final class AutoDutyDialogActivity extends BaseActivity implements AutoDu
     private static final String TAG = AutoDutyDialogActivity.class.getSimpleName();
 
     public static final String EXTRA_AUTO_LOGOUT = "auto_logout";
+    public static final String EXTRA_TOKEN_EXPIRED = "token_expired";
     public static final String EXTRA_AUTO_ON_DUTY = "auto_on_duty";
     public static final String EXTRA_AUTO_ON_DUTY_TIME = "auto_on_duty_time";
     public static final String EXTRA_AUTO_DRIVING = "auto_driving";
@@ -67,12 +69,14 @@ public final class AutoDutyDialogActivity extends BaseActivity implements AutoDu
                 showAutoDrivingDialog();
 
             } else if (intent.hasExtra(EXTRA_AUTO_ON_DUTY)) {
-                long time = intent.getLongExtra(EXTRA_AUTO_ON_DUTY_TIME, System.currentTimeMillis());
+                long time = intent.getLongExtra(EXTRA_AUTO_ON_DUTY_TIME, DateUtils.currentTimeMillis());
                 showAutoOnDutyDialog(time);
 
             } else if (intent.hasExtra(EXTRA_AUTO_DRIVING_WITHOUT_CONFIRM) && mIsAutoDrivingDialogShown) {
                 mPresenter.onDrivingClick();
 
+            } else if (intent.hasExtra(EXTRA_TOKEN_EXPIRED)) {
+                showTokenExpiredDialog();
             } else {
                 onActionDone();
             }
@@ -152,5 +156,18 @@ public final class AutoDutyDialogActivity extends BaseActivity implements AutoDu
 
         mAutoOnDutyTask = () -> mPresenter.onOnDutyClick(time);
         mHandler.postDelayed(mAutoOnDutyTask, MS_IN_MIN);
+    }
+
+    private void showTokenExpiredDialog() {
+        if (mAlertDialog != null) {
+            mAlertDialog.dismiss();
+        }
+
+        mAlertDialog = new AlertDialog.Builder(this, R.style.AlertDialogTheme_Positive)
+                .setTitle(R.string.on_duty_dialog_title)
+                .setMessage(R.string.token_expired_dialog_message)
+                .setCancelable(false)
+                .setPositiveButton(R.string.on_duty_accept, (dialog, which) -> mPresenter.onAutoLogoutClick())
+                .show();
     }
 }

@@ -25,6 +25,8 @@ public final class CalendarItem {
     private String mDay;
     private String mDayOfWeek;
 
+    private int mExternalColor;
+
     public CalendarItem(Long timestamp, LogSheetHeader log) {
         mAssociatedLog = log;
         mTimestamp = timestamp;
@@ -53,6 +55,14 @@ public final class CalendarItem {
 
     public Long getLogDay() {
         return mLogDay;
+    }
+
+    public int getExternalColor() {
+        return mExternalColor;
+    }
+
+    public void setExternalColor(int externalColor) {
+        mExternalColor = externalColor;
     }
 
     @Nullable

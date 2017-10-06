@@ -2,18 +2,19 @@ package com.bsmwireless.widgets.logs.graphview;
 
 import com.bsmwireless.screens.logs.dagger.EventLogModel;
 import com.bsmwireless.widgets.alerts.DutyType;
+import com.bsmwireless.widgets.alerts.Type;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public final class DrawableLog {
-    private DutyType mType;
+    private Type mType;
     private long mTime;
 
     public DrawableLog() {
     }
 
-    public DrawableLog(DutyType type, long time) {
+    public DrawableLog(Type type, long time) {
         mType = type;
         mTime = time;
     }
@@ -22,12 +23,12 @@ public final class DrawableLog {
         List<DrawableLog> result = new ArrayList<>();
         for (int i = 0; i < events.size(); i++) {
             EventLogModel event = events.get(i);
-            DutyType dutyType = DutyType.getTypeByCode(event.getEventType(), event.getEventCode());
+            DutyType dutyType = DutyType.getDutyTypeByCode(event.getEventType(), event.getEventCode());
             DrawableLog log;
             if (event.isActive() && event.isDutyEvent()) {
                 if (DutyType.CLEAR.equals(dutyType) || DutyType.CLEAR_PU.equals(dutyType)
                         || DutyType.CLEAR_YM.equals(dutyType)) {
-                    DutyType type = event.getDutyType();
+                    Type type = event.getType();
                     log = new DrawableLog(type, event.getEventTime());
                 } else {
                     log = new DrawableLog(dutyType, event.getEventTime());
@@ -42,7 +43,7 @@ public final class DrawableLog {
         return mType.getType();
     }
 
-    public DutyType getEventDutyType() {
+    public Type getEventDutyType() {
         return mType;
     }
 
