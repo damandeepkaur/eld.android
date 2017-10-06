@@ -201,6 +201,7 @@ public final class LockScreenPresenter {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::closeLockScreen);
+        mCompositeDisposable.add(mIdlingTDisposable);
     }
 
     void handleMoving() {
