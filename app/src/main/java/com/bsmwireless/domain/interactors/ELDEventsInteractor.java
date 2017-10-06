@@ -1,6 +1,7 @@
 package com.bsmwireless.domain.interactors;
 
 import com.bsmwireless.common.Constants;
+import com.bsmwireless.common.utils.DateUtils;
 import com.bsmwireless.data.network.RetrofitException;
 import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.network.authenticator.TokenManager;
@@ -104,6 +105,14 @@ public final class ELDEventsInteractor {
         return ELDEventConverter.toModelList(mELDEventDao.getLatestActiveDutyEventSync(latestTime, userId));
     }
 
+    public Observable<List<ELDEvent>> getUnidentifiedEvents() {
+        return Observable.fromCallable(() -> ELDEventConverter.toModelList(mELDEventDao.getUnidentifiedEvents()));
+    }
+
+    public Observable<List<ELDEvent>> getUnassignedEvents() {
+        return Observable.fromCallable(() -> ELDEventConverter.toModelList(mELDEventDao.getUnassignedEvents()));
+    }
+
     public Single<List<ELDEvent>> getLatestActiveDutyEventFromDBOnce(long latestTime, int userId) {
         return mELDEventDao.getLatestActiveDutyEventOnce(latestTime, userId)
                 .map(ELDEventConverter::toModelList);
@@ -114,8 +123,8 @@ public final class ELDEventsInteractor {
         return ELDEventConverter.toModelList(mELDEventDao.getActiveEventsFromStartToEndTimeSync(startTime, endTime, driverId));
     }
 
-    public Single<List<ELDEvent>> getDutyEventsForDay(long startDayTime) {
-        return mELDEventDao.getDutyEventsFromStartToEndTimeSync(startDayTime,
+    public Single<List<ELDEvent>> getEventsForDayOnce(long startDayTime) {
+        return mELDEventDao.getEventsFromStartToEndTimeOnce(startDayTime,
                 startDayTime + MS_IN_DAY, mAccountManager.getCurrentUserId())
                 .onErrorReturn(throwable -> Collections.emptyList())
                 .map(ELDEventConverter::toModelList);
@@ -164,7 +173,6 @@ public final class ELDEventsInteractor {
     }
 
     public void storeUnidentifiedEvents(List<ELDEvent> events) {
-        //TODO: probably additional action with unidentified records is required.
         mELDEventDao.insertAll(ELDEventConverter.toEntityArray(events));
     }
 
@@ -471,7 +479,7 @@ public final class ELDEventsInteractor {
     }
 
     private ELDEvent getEvent(BlackBoxModel blackBoxModel, boolean isAuto) {
-        long currentTime = System.currentTimeMillis();
+        long currentTime = DateUtils.currentTimeMillis();
         int driverId = mAccountManager.getCurrentUserId();
 
         ELDEvent event = new ELDEvent();
@@ -501,7 +509,7 @@ public final class ELDEventsInteractor {
 
     public ELDEvent getLogSheetEvent(String comment) {
         BlackBoxModel blackBoxModel = getBlackBoxState(mDutyTypeManager.getDutyType() == DutyType.PERSONAL_USE);
-        long currentTime = System.currentTimeMillis();
+        long currentTime = DateUtils.currentTimeMillis();
         int driverId = mAccountManager.getCurrentUserId();
 
         ELDEvent event = new ELDEvent();

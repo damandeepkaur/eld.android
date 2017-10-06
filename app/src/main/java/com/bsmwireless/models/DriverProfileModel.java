@@ -3,6 +3,7 @@ package com.bsmwireless.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.bsmwireless.common.utils.DateUtils;
 import com.bsmwireless.data.storage.users.UserEntity;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -64,7 +65,7 @@ public final class DriverProfileModel implements Parcelable {
     public DriverProfileModel(UserEntity userEntity) {
         mEmail = userEntity.getEmail();
         mLicense = userEntity.getLicense();
-        mLastModified = System.currentTimeMillis();
+        mLastModified = DateUtils.currentTimeMillis();
         mDriverId = userEntity.getId();
         mFirstName = userEntity.getFirstName();
         mMidName = userEntity.getMidName();

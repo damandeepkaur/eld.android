@@ -87,7 +87,7 @@ public final class EditEventPresenter extends BaseMenuPresenter {
         long eventTime = DateUtils.convertStringAMPMToTime(startTime, mEventDay, mTimezone);
         ELDEvent newEvent;
 
-        if (eventTime > System.currentTimeMillis()) {
+        if (eventTime > DateUtils.currentTimeMillis()) {
             mView.showError(EditEventView.Error.ERROR_INVALID_TIME);
             return;
         }
@@ -122,7 +122,7 @@ public final class EditEventPresenter extends BaseMenuPresenter {
     public void setEvent(ELDEvent event) {
         mELDEvent = event;
         if (mELDEvent != null) {
-            DutyType type = DutyType.getTypeByCode(event.getEventType(), event.getEventCode());
+            DutyType type = DutyType.getDutyTypeByCode(event.getEventType(), event.getEventCode());
             mView.setStatus(type);
 
             Long time = mELDEvent.getEventTime();

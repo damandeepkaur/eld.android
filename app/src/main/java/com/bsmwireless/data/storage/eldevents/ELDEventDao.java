@@ -14,6 +14,9 @@ import static android.arch.persistence.room.OnConflictStrategy.REPLACE;
 
 @Dao
 public interface ELDEventDao {
+    String INACTIVE_STATUS = "3";
+    String INVALID_DRIVER_ID = "-1";
+
     @Query("SELECT * FROM events")
     List<ELDEventEntity> getAll();
 
@@ -23,7 +26,14 @@ public interface ELDEventDao {
     @Query("SELECT * FROM events WHERE sync = 2 ORDER BY inner_id")
     List<ELDEventEntity> getNewUnsyncEvents();
 
-    @Query("SELECT * FROM events WHERE event_time >= :startTime AND event_time < :endTime and driver_id = :driverId ORDER BY event_time")
+    @Query("SELECT * FROM events WHERE status = " + INACTIVE_STATUS)
+    List<ELDEventEntity> getUnidentifiedEvents();
+
+    @Query("SELECT * FROM events WHERE driver_id = " + INVALID_DRIVER_ID)
+    List<ELDEventEntity> getUnassignedEvents();
+
+    @Query("SELECT * FROM events WHERE event_time >= :startTime AND event_time < :endTime AND " +
+            "driver_id = :driverId ORDER BY event_time, mobile_time, status DESC")
     Single<List<ELDEventEntity>> getEventsFromStartToEndTimeOnce(long startTime, long endTime, int driverId);
 
     @Query("SELECT * FROM events WHERE event_time >= :startTime AND event_time < :endTime " +

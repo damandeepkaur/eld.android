@@ -14,6 +14,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ScrollView;
 
 import com.bsmwireless.common.App;
+import com.bsmwireless.common.utils.DateUtils;
 import com.bsmwireless.common.utils.NetworkUtils;
 import com.bsmwireless.common.utils.ViewUtils;
 import com.bsmwireless.data.network.RetrofitException;
@@ -196,8 +197,11 @@ public final class DriverProfileActivity extends BaseMenuActivity implements Dri
 
     @Override
     public void setHomeTerminalInfo(HomeTerminalEntity homeTerminal) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(DateUtils.currentTimeMillis());
+
         mTerminalAddress.setText(homeTerminal.getAddress());
-        mHomeTerminalTimeZone.setText(getFullTimeZone(homeTerminal.getTimezone(), Calendar.getInstance().getTimeInMillis()));
+        mHomeTerminalTimeZone.setText(getFullTimeZone(homeTerminal.getTimezone(), calendar.getTimeInMillis()));
     }
 
     @Override

@@ -109,9 +109,8 @@ public final class LogsFragment extends BaseFragment implements LogsView {
             }
         });
 
-        RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
-        recyclerView.setLayoutManager(new WrapLinearLayoutManager(mContext));
-        recyclerView.setAdapter(mAdapter);
+        mRecyclerView.setLayoutManager(new WrapLinearLayoutManager(mContext));
+        mRecyclerView.setAdapter(mAdapter);
 
         mPresenter.onViewCreated();
         return view;

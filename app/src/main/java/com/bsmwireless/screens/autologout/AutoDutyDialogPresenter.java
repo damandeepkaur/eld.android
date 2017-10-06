@@ -53,7 +53,10 @@ public final class AutoDutyDialogPresenter {
                                 mView.goToLoginScreen();
                             }
                         },
-                        error -> Timber.e("Auto Logout error: %s", error)
+                        error -> {
+                            Timber.e("Auto Logout error: %s", error);
+                            mView.goToLoginScreen();
+                        }
                 ));
     }
 

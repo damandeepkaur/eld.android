@@ -3,6 +3,8 @@ package com.bsmwireless.common.utils;
 import android.content.Context;
 
 import com.bsmwireless.common.App;
+import com.bsmwireless.common.dagger.AppComponent;
+import com.bsmwireless.data.network.NtpClientManager;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -186,7 +188,7 @@ public class DateUtils {
      * @return long with format time like 11:12
      */
     public static String convertTimeToHHMM(TimeZone timeZone, long time) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm", Locale.US);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm", Locale.US);
         dateFormat.setTimeZone(timeZone);
         return dateFormat.format(time);
     }
@@ -197,7 +199,7 @@ public class DateUtils {
      * @return long with format time like 20170708
      */
     public static long getLogDayForDaysAgo(int daysAgo, String timezone) {
-        return DateUtils.convertTimeToLogDay(timezone, System.currentTimeMillis()
+        return DateUtils.convertTimeToLogDay(timezone, DateUtils.currentTimeMillis()
                 - MS_IN_DAY * daysAgo);
     }
 
@@ -301,10 +303,15 @@ public class DateUtils {
     /**
      * @return real time which is sync with the ntp server
      */
-    public static Long currentTimeMillis() {
-        long realTimeInMilisecondsDiff = App.getComponent().ntpClientManager().getRealTimeInMillisDiff();
-        long realTimeInMiliseconds = System.currentTimeMillis() + realTimeInMilisecondsDiff;
-        return realTimeInMiliseconds;
+    public static long currentTimeMillis() {
+        AppComponent appComponent = App.getComponent();
+        if (appComponent == null) {
+            return System.currentTimeMillis();
+        }
+
+        NtpClientManager ntpClientManager = appComponent.ntpClientManager();
+        long realTimeInMillisecondsDiff = ntpClientManager.getRealTimeInMillisDiff();
+        return System.currentTimeMillis() + realTimeInMillisecondsDiff;
     }
 
     public static String convertToFullTime(String timezone, Date date) {

@@ -55,8 +55,8 @@ public final class TransferPresenter extends BaseMenuPresenter {
     void onConfirmClick(String comment, int option) {
         getDisposables().add(getUserInteractor().getTimezone()
                 .flatMap(timezone -> {
-                    long endDay = DateUtils.convertTimeToLogDay(timezone, System.currentTimeMillis());
-                    long startDay = DateUtils.convertTimeToLogDay(timezone, System.currentTimeMillis() - 8 * MS_IN_DAY);
+                    long endDay = DateUtils.convertTimeToLogDay(timezone, DateUtils.currentTimeMillis());
+                    long startDay = DateUtils.convertTimeToLogDay(timezone, DateUtils.currentTimeMillis() - 8 * MS_IN_DAY);
                     return getEventsInteractor().sendReport(startDay, endDay, option, comment).toFlowable();
                 })
                 .subscribeOn(Schedulers.io())

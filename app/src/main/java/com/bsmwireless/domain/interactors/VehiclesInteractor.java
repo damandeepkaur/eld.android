@@ -1,6 +1,7 @@
 package com.bsmwireless.domain.interactors;
 
 import com.bsmwireless.common.Constants;
+import com.bsmwireless.common.utils.DateUtils;
 import com.bsmwireless.common.utils.ListConverter;
 import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.storage.AppDatabase;
@@ -100,7 +101,7 @@ public final class VehiclesInteractor {
         ELDEvent event = new ELDEvent();
         int id = mUserInteractor.getDriverId();
 
-        event.setMobileTime(System.currentTimeMillis());
+        event.setMobileTime(DateUtils.currentTimeMillis());
         event.setDriverId(id);
         event.setVehicleId(vehicle.getId());
         event.setBoxId(vehicle.getBoxId());
