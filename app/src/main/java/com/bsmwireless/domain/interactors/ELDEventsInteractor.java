@@ -104,6 +104,14 @@ public final class ELDEventsInteractor {
         return ELDEventConverter.toModelList(mELDEventDao.getLatestActiveDutyEventSync(latestTime, userId));
     }
 
+    public Observable<List<ELDEvent>> getUnidentifiedEvents() {
+        return Observable.fromCallable(() -> ELDEventConverter.toModelList(mELDEventDao.getUnidentifiedEvents()));
+    }
+
+    public Observable<List<ELDEvent>> getUnassignedEvents() {
+        return Observable.fromCallable(() -> ELDEventConverter.toModelList(mELDEventDao.getUnassignedEvents()));
+    }
+
     public Single<List<ELDEvent>> getLatestActiveDutyEventFromDBOnce(long latestTime, int userId) {
         return mELDEventDao.getLatestActiveDutyEventOnce(latestTime, userId)
                 .map(ELDEventConverter::toModelList);
@@ -156,7 +164,6 @@ public final class ELDEventsInteractor {
     }
 
     public void storeUnidentifiedEvents(List<ELDEvent> events) {
-        //TODO: probably additional action with unidentified records is required.
         mELDEventDao.insertAll(ELDEventConverter.toEntityArray(events));
     }
 

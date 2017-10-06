@@ -384,6 +384,7 @@
 
     <!-- Navigation drawer-->
     <string name="nav_home">Home</string>
+    <string name="nav_carrier_edit_view">Carrier Edit View</string>
     <string name="nav_inspector_view">Roadside Inspections</string>
     <string name="nav_transfer_view">Data Transfer</string>
     <string name="nav_help">Help</string>
@@ -463,6 +464,7 @@
     <string name="sign_dialog_visibility_note">Signed logsheets will be visible to supervisors</string>
     <string name="decline">decline</string>
     <string name="accept">accept</string>
+    <string name="reject">reject</string>
     <!--Logs Events-->
     <string name="event_changed">(CHANGED)</string>
     <string name="event_type_off_duty">Off Duty</string>
@@ -659,6 +661,19 @@
     <string name="malfunction_data_transfer">Data Transfer</string>
     <string name="malfunction_other">Other</string>
 
+    <!--Carrier Edit-->
+    <string name="unassigned_events">Unassigned</string>
+    <string name="edited_events">Edited</string>
+    <string name="edited_events_disapprove">Disapprove edits</string>
+    <string name="edited_events_approve">approve edits</string>
+    <string name="logsheet_edited"> of your logsheets were edited by the\ncarrier. Please review and re-sign them.</string>
+    <string name="has">has</string>
+    <string name="unassigned_driving">unassigned driving events. Please review and assign them.</string>
+    <string name="carrier_edit_warning">Please review unidentified driver records or carrier edited logs</string>
+    <string name="carrier_edit_dialog_title">Warning</string>
+    <string name="carrier_edit_dialog_message">Please review unidentified driver records or carrier edited logs</string>
+    <string name="carrier_edit_dialog_ok">switch to carrier edit</string>
+
     <!-- Roadside -->
     <string name="roadside_title">Roadside</string>
     <string name="roadside_view">View</string>
@@ -708,7 +723,7 @@
     <string name="transfer_dialog_message">You are going to send data for current 24 hours and last 7 days. Please confirm your action to proceed with data transfer.</string>
     <string name="transfer_dialog_positive">Confirm</string>
     <string name="transfer_dialog_negative">Cancel</string>
-    
+
     <!--Home screen-->
     <string name="home_screen_label">Home</string>
     <string name="home_screen_current_status">Current status:</string>
@@ -720,5 +735,4 @@
     <!-- Hours of Service-->
     <string name="hos_box_name">@string/box</string>
     <string name="hos_not_in_vehicle">@string/select_asset_not_in_vehicle</string>
-
 </resources>

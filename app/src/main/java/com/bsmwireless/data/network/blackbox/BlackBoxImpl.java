@@ -130,7 +130,9 @@ public final class BlackBoxImpl implements BlackBox {
             mSocket.connect(new InetSocketAddress(WIFI_GATEWAY_IP, WIFI_REMOTE_PORT),
                     UPDATE_RATE_MILLIS);
         } catch (IOException e) {
-            throw new BlackBoxConnectionException(UNKNOWN_ERROR);
+            if (getEmitter().hasObservers()) {
+                throw new BlackBoxConnectionException(UNKNOWN_ERROR);
+            }
         }
         if (retryIndex == RETRY_COUNT - 1) {
             Timber.e("initializeCommunication error");

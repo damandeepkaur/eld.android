@@ -11,6 +11,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
@@ -20,6 +21,7 @@ import android.widget.Toast;
 
 import com.bsmwireless.common.App;
 import com.bsmwireless.screens.autologout.AutoDutyDialogActivity;
+import com.bsmwireless.screens.carrieredit.CarrierEditActivity;
 import com.bsmwireless.screens.common.BaseFragment;
 import com.bsmwireless.screens.common.menu.BaseMenuActivity;
 import com.bsmwireless.screens.common.menu.BaseMenuPresenter;
@@ -66,6 +68,8 @@ public final class NavigationActivity extends BaseMenuActivity implements
     private HeaderViewHolder mHeaderViewHolder;
 
     private View.OnClickListener mOnAssetMenuClickListener;
+
+    private AlertDialog mAlertDialog;
 
     public static Intent createIntent(Context context) {
         return new Intent(context, NavigationActivity.class);
@@ -122,6 +126,9 @@ public final class NavigationActivity extends BaseMenuActivity implements
             case R.id.nav_logout:
                 mPresenter.onLogoutItemSelected();
                 break;
+            case R.id.nav_carrier_edit:
+                mDrawerToggle.runWhenIdle(() -> goToCarrierEditScreen());
+                break;
             default:
                 break;
         }
@@ -175,6 +182,12 @@ public final class NavigationActivity extends BaseMenuActivity implements
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
         finish();
+    }
+
+    @Override
+    public void goToCarrierEditScreen() {
+        Intent intent = new Intent(this, CarrierEditActivity.class);
+        startActivity(intent);
     }
 
     @Override
@@ -241,6 +254,24 @@ public final class NavigationActivity extends BaseMenuActivity implements
         dialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         dialogIntent.putExtra(EXTRA_AUTO_DRIVING_WITHOUT_CONFIRM, true);
         startActivity(dialogIntent);
+    }
+
+    @Override
+    public void showUnassignedDialog() {
+        if (mAlertDialog != null) {
+            mAlertDialog.dismiss();
+        }
+
+        mAlertDialog = new AlertDialog.Builder(this, R.style.AlertDialogTheme_Positive)
+                .setTitle(R.string.carrier_edit_dialog_title)
+                .setMessage(R.string.carrier_edit_dialog_message)
+                .setCancelable(false)
+                .setPositiveButton(R.string.carrier_edit_dialog_ok, (dialog, which) -> {
+                    goToCarrierEditScreen();
+                    dialog.dismiss();
+                })
+                .setNegativeButton(android.R.string.cancel, (dialog, which) -> mAlertDialog.dismiss())
+                .show();
     }
 
     protected static final class HeaderViewHolder {

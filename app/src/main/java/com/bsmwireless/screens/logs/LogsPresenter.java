@@ -45,7 +45,6 @@ import static com.bsmwireless.widgets.alerts.DutyType.CLEAR_YM;
 @ActivityScope
 public final class LogsPresenter implements AccountManager.AccountListener {
 
-
     private LogsView mView;
     private ELDEventsInteractor mELDEventsInteractor;
     private LogSheetInteractor mLogSheetInteractor;
