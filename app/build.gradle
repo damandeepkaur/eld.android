@@ -37,12 +37,12 @@ android {
             buildConfigField "boolean", "USE_LOG", "false"
             signingConfig signingConfigs.release
 
-            testCoverageEnabled = false
+            testCoverageEnabled = true
         }
         debug {
             buildConfigField "boolean", "USE_LOG", "true"
 
-            testCoverageEnabled = false
+            testCoverageEnabled = true
         }
     }
 
@@ -180,4 +180,4 @@ dependencies {
 }
 
 
-//apply from: "jacoco.gradle"
+apply from: "jacoco.gradle"
