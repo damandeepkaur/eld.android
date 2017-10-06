@@ -110,7 +110,7 @@ public final class RoadsidePresenter {
                             mView.showEvents(result.getEventsData());
                             mView.showGraph(result.getGraphData());
                         },
-                        throwable -> Timber.e(throwable)
+                        Timber::e
                 );
     }
 
