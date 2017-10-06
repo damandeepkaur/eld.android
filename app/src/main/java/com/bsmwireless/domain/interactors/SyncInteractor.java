@@ -26,6 +26,7 @@ import com.bsmwireless.models.RuleSelectionModel;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.concurrent.TimeUnit;
@@ -42,8 +43,7 @@ import timber.log.Timber;
 
 import static com.bsmwireless.common.Constants.SUCCESS;
 import static com.bsmwireless.common.utils.DateUtils.MS_IN_DAY;
-import static com.bsmwireless.common.utils.DateUtils.MS_IN_SEC;
-import static com.bsmwireless.data.storage.eldevents.ELDEventEntity.SyncType.SYNC;
+import static com.bsmwireless.data.storage.eldevents.ELDEventEntity.SyncType.SEND;
 import static com.bsmwireless.data.storage.logsheets.LogSheetEntity.SyncType.UNSYNC;
 
 public final class SyncInteractor {
@@ -57,7 +57,6 @@ public final class SyncInteractor {
     private AccountManager mAccountManager;
     private ResponseMessage mErrorResponse;
 
-    private RoomDatabase mRoomDatabase;
     private Disposable mDriverProfileDisposable;
     private Disposable mSyncEventsDisposable;
     private LogSheetDao mLogSheetDao;
@@ -69,7 +68,6 @@ public final class SyncInteractor {
                           AccountManager accountManager, LogSheetInteractor logSheetInteractor) {
         mServiceApi = serviceApi;
         mPreferencesManager = preferencesManager;
-        mRoomDatabase = appDatabase;
         mELDEventDao = appDatabase.ELDEventDao();
         mUserDao = appDatabase.userDao();
         mLogSheetDao = appDatabase.logSheetDao();
@@ -152,10 +150,10 @@ public final class SyncInteractor {
                 .subscribeOn(Schedulers.io())
                 .filter(t -> NetworkUtils.isOnlineMode())
                 .map(t -> mAccountManager.getCurrentUserId())
-                .map(userId -> ELDEventConverter.toModelList(mELDEventDao.getNewUnsyncEvents(userId)))
+                .map(userId -> ELDEventConverter.toModelList(mELDEventDao.getNewUnsyncEvents()))
                 .filter(eldEvents -> !eldEvents.isEmpty())
                 .flatMap(events -> Observable.fromIterable(parseELDEventsList(events)))
-                .flatMapSingle(events -> mServiceApi.postNewELDEvents(events)
+                .flatMapSingle(events -> mServiceApi.postNewELDEvents(setActive(events))
                         .onErrorResumeNext(Single.just(mErrorResponse))
                         .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS) ? events : new ArrayList<ELDEvent>())
                 )
@@ -175,10 +173,10 @@ public final class SyncInteractor {
                 .subscribeOn(Schedulers.io())
                 .filter(t -> NetworkUtils.isOnlineMode())
                 .map(t -> ELDEventConverter.toModelList(mELDEventDao.getUpdateUnsyncEvents()))
+                .map(this::filterDoubleEvents)
                 .filter(dbEvents -> !dbEvents.isEmpty())
                 .flatMap(dbEvents -> Observable.fromIterable(parseELDEventsList(dbEvents)))
-                .filter(activeDbEvents -> activeDbEvents.size() > 0)
-                .flatMapSingle(dbEvents -> mServiceApi.updateELDEvents(filterInactiveEvents(dbEvents))
+                .flatMapSingle(dbEvents -> mServiceApi.updateELDEvents(setActive(dbEvents))
                         .onErrorResumeNext(Single.just(mErrorResponse))
                         .map(responseMessage -> responseMessage.getMessage().equals(SUCCESS) ? dbEvents : new ArrayList<ELDEvent>())
                 )
@@ -197,18 +195,42 @@ public final class SyncInteractor {
     private List<ELDEvent> setSync(List<ELDEvent> events) {
         List<ELDEventEntity> entities = ELDEventConverter.toEntityList(events);
         for (ELDEventEntity entity : entities) {
-            entity.setSync(SYNC.ordinal());
+            entity.setSync(SEND.ordinal());
         }
         mELDEventDao.insertAll(entities.toArray(new ELDEventEntity[entities.size()]));
         return events;
     }
 
+    private List<ELDEvent> setActive(List<ELDEvent> events) {
+        ArrayList<ELDEvent> activeEvents = new ArrayList<>();
+        for (ELDEvent event : events) {
+            ELDEvent activeEvent = event.clone();
+            activeEvent.setStatus(ELDEvent.StatusCode.ACTIVE.getValue());
+            activeEvents.add(activeEvent);
+        }
+        return activeEvents;
+    }
+
     public void replaceRecords(List<ELDEvent> events) {
         for (ELDEvent event : events) {
-            mRoomDatabase.runInTransaction(() -> {
-                mELDEventDao.delete(event.getDriverId(), event.getEventTime(), event.getEventTime() + MS_IN_SEC, event.getMobileTime(), event.getEventCode(), event.getEventType(), event.getStatus());
-                mELDEventDao.insertEvent(ELDEventConverter.toEntity(event));
-            });
+            ELDEventEntity oldEvent = mELDEventDao.getEventById(event.getId());
+
+            if (oldEvent != null) {
+                ELDEventEntity updatedEvent = ELDEventConverter.toEntity(event);
+                updatedEvent.setInnerId(oldEvent.getInnerId());
+                mELDEventDao.insertEvent(updatedEvent);
+            } else {
+                ELDEventEntity sentEvent = mELDEventDao.getSentEvent(event.getDriverId(), event.getMobileTime());
+
+                if (sentEvent != null) {
+                    sentEvent.setSync(event.getSync());
+                    sentEvent.setId(event.getId());
+                    sentEvent.setLocation(event.getLocation());
+                    mELDEventDao.insertEvent(sentEvent);
+                } else {
+                    mELDEventDao.insertEvent(ELDEventConverter.toEntity(event));
+                }
+            }
         }
     }
 
@@ -266,14 +288,24 @@ public final class SyncInteractor {
         return list;
     }
 
-    private List<ELDEvent> filterInactiveEvents(List<ELDEvent> list) {
-        ArrayList<ELDEvent> filterList = new ArrayList<>();
-        for (ELDEvent event : list) {
-            if (event.getStatus() != ELDEvent.StatusCode.INACTIVE_CHANGED.getValue()) {
-                filterList.add(event);
+    /**
+     * If user updates single event several times we should send separate request to each
+     * update to prevent loosing data
+     * @param list all updated events
+     * @return filtered list
+     */
+    private List<ELDEvent> filterDoubleEvents(List<ELDEvent> list) {
+        HashSet<Long> uniqueTimes = new HashSet<>();
+        ListIterator<ELDEvent> iterator = list.listIterator();
+        while (iterator.hasNext()) {
+            Long time = iterator.next().getMobileTime();
+            if (uniqueTimes.contains(time)) {
+                iterator.remove();
+            } else {
+                uniqueTimes.add(time);
             }
         }
-        return filterList;
+        return list;
     }
 
     private List<List<ELDEvent>> parseELDEventsList(List<ELDEvent> events) {
