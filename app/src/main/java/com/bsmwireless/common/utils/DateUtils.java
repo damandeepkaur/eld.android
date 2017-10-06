@@ -188,7 +188,7 @@ public class DateUtils {
      * @return long with format time like 11:12
      */
     public static String convertTimeToHHMM(TimeZone timeZone, long time) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm", Locale.US);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm", Locale.US);
         dateFormat.setTimeZone(timeZone);
         return dateFormat.format(time);
     }
