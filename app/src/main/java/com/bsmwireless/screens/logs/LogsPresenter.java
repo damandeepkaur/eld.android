@@ -214,8 +214,9 @@ public final class LogsPresenter implements AccountManager.AccountListener {
                     ELDEvent originEvent = updatedEvent.clone();
                     updatedEvent.setEventCode(latestEvent.getEventCode());
                     updatedEvent.setEventType(latestEvent.getEventType());
+                    updatedEvent.setId(null);
+                    updatedEvent.setInnerId(null);
                     originEvent.setStatus(ELDEvent.StatusCode.INACTIVE_CHANGED.getValue());
-                    originEvent.setId(null);
                     return Arrays.asList(updatedEvent, originEvent);
                 })
                 .flatMapObservable(events -> mELDEventsInteractor.updateELDEvents(events))

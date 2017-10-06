@@ -17,11 +17,11 @@ public interface ELDEventDao {
     @Query("SELECT * FROM events")
     List<ELDEventEntity> getAll();
 
-    @Query("SELECT * FROM events WHERE sync = 2 AND mobile_time NOT IN (SELECT mobile_time FROM events WHERE sync = 1) ORDER BY id")
+    @Query("SELECT * FROM events WHERE sync = 3 AND mobile_time NOT IN (SELECT mobile_time FROM events WHERE sync = 2) ORDER BY inner_id")
     List<ELDEventEntity> getUpdateUnsyncEvents();
 
-    @Query("SELECT * FROM events WHERE sync = 1 AND driver_id=:userId ORDER BY id")
-    List<ELDEventEntity> getNewUnsyncEvents(int userId);
+    @Query("SELECT * FROM events WHERE sync = 2 ORDER BY inner_id")
+    List<ELDEventEntity> getNewUnsyncEvents();
 
     @Query("SELECT * FROM events WHERE event_time >= :startTime AND event_time < :endTime and driver_id = :driverId ORDER BY event_time")
     Single<List<ELDEventEntity>> getEventsFromStartToEndTimeOnce(long startTime, long endTime, int driverId);
@@ -35,24 +35,24 @@ public interface ELDEventDao {
     Single<List<ELDEventEntity>> getDutyEventsFromStartToEndTimeSync(long startTime, long endTime, int driverId);
 
     @Query("SELECT * FROM events WHERE event_time < :latestTime AND driver_id = :driverId " +
-            "AND (event_type = 1 or event_type = 3) AND status = 1 ORDER BY event_time, id DESC")
+            "AND (event_type = 1 or event_type = 3) AND status = 1 ORDER BY event_time, inner_id DESC")
     List<ELDEventEntity> getLatestActiveDutyEventSync(long latestTime, int driverId);
 
     @Query("SELECT * FROM events WHERE event_time < :latestTime AND driver_id = :driverId " +
-            "AND (event_type = 1 or event_type = 3) AND status = 1 ORDER BY event_time, id DESC")
+            "AND (event_type = 1 or event_type = 3) AND status = 1 ORDER BY event_time, inner_id DESC")
     Single<List<ELDEventEntity>> getLatestActiveDutyEventOnce(long latestTime, int driverId);
 
     @Query("SELECT * FROM events WHERE event_time >= :startTime AND event_time < :endTime " +
             "AND driver_id = :driverId AND (event_type = 1 or event_type = 3) AND status = 1 ORDER BY event_time, mobile_time, status DESC")
     List<ELDEventEntity> getActiveEventsFromStartToEndTimeSync(long startTime, long endTime, int driverId);
 
-    @Query("SELECT count(id) FROM events WHERE event_time >= :startTime AND event_time < :endTime AND driver_id = :driverId AND event_type = 7 AND (event_code = 1 OR event_code = 2)")
+    @Query("SELECT count(inner_id) FROM events WHERE event_time >= :startTime AND event_time < :endTime AND driver_id = :driverId AND event_type = 7 AND (event_code = 1 OR event_code = 2)")
     Integer getMalfunctionEventCountSync(int driverId, long startTime, long endTime);
 
-    @Query("SELECT count(id) FROM events WHERE event_time >= :startTime AND event_time < :endTime AND driver_id = :driverId AND event_type = 7 AND (event_code = 3 OR event_code = 4)")
+    @Query("SELECT count(inner_id) FROM events WHERE event_time >= :startTime AND event_time < :endTime AND driver_id = :driverId AND event_type = 7 AND (event_code = 3 OR event_code = 4)")
     Integer getDiagnosticEventCountSync(int driverId, long startTime, long endTime);
 
-    @Query("SELECT count(id) FROM events WHERE driver_id = :driverId AND event_type = :type and event_code = :code and mal_code IN (:malCodes)")
+    @Query("SELECT count(inner_id) FROM events WHERE driver_id = :driverId AND event_type = :type and event_code = :code and mal_code IN (:malCodes)")
     Flowable<Integer> getMalfunctionEventCount(int driverId, int type, int code, String[] malCodes);
 
     /**
@@ -87,7 +87,7 @@ public interface ELDEventDao {
      * @param status event status
      * @return count of events
      */
-    @Query("SELECT count(id) FROM events WHERE driver_id = :driverId AND latlng_code IN (:latLngCode) AND status = :status")
+    @Query("SELECT count(inner_id) FROM events WHERE driver_id = :driverId AND latlng_code IN (:latLngCode) AND status = :status")
     Single<Integer> getChangingLocationEventCount(int driverId, String[] latLngCode, int status);
 
     /**
@@ -116,6 +116,9 @@ public interface ELDEventDao {
     @Insert(onConflict = REPLACE)
     long[] insertAll(ELDEventEntity... events);
 
-    @Query("DELETE FROM events WHERE id IN (SELECT id FROM events WHERE driver_id = :driverId AND sync = 0 AND event_time >= :eventTimeStart AND event_time < :eventTimeEnd AND mobile_time = :mobileTime AND event_code = :eventCode AND event_type = :eventType ORDER BY status DESC LIMIT 1)")
-    int delete(long driverId, long eventTimeStart, long eventTimeEnd, long mobileTime, int eventCode, int eventType);
+    @Query("SELECT * FROM events WHERE driver_id = :driverId AND mobile_time = :mobileTime AND sync = 1 LIMIT 1")
+    ELDEventEntity getSentEvent(long driverId, long mobileTime);
+
+    @Query("SELECT * FROM events WHERE id = :id")
+    ELDEventEntity getEventById(int id);
 }

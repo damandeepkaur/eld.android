@@ -207,6 +207,8 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
         }
     }
 
+    private transient Integer mInnerId;
+
     @SerializedName("id")
     @Expose
     private Integer mId;
@@ -411,6 +413,10 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
             mAppInfo = in.readString();
         }
         mSync = in.readInt();
+        notNull = in.readByte() == 1;
+        if (notNull) {
+            this.mInnerId = in.readInt();
+        }
     }
 
     public Integer getStatus() {
@@ -645,6 +651,14 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
         mSync = sync;
     }
 
+    public Integer getInnerId() {
+        return mInnerId;
+    }
+
+    public void setInnerId(Integer innerId) {
+        mInnerId = innerId;
+    }
+
     @Override
     public Boolean isActive() {
         return mStatus.equals(ELDEvent.StatusCode.ACTIVE.getValue());
@@ -697,6 +711,7 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
                 .append(mMalCode, rhs.mMalCode)
                 .append(mAppInfo, rhs.mAppInfo)
                 .append(mSync, rhs.mSync)
+                .append(mInnerId, rhs.mInnerId)
                 .isEquals();
     }
 
@@ -732,6 +747,7 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
                 .append(mMalCode)
                 .append(mAppInfo)
                 .append(mSync)
+                .append(mInnerId)
                 .toHashCode();
     }
 
@@ -882,6 +898,11 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
         }
 
         dest.writeInt(mSync);
+
+        dest.writeByte(this.mInnerId == null ? (byte) 0 : 1);
+        if (this.mInnerId != null) {
+            dest.writeInt(this.mInnerId);
+        }
     }
 
     public static final Creator<ELDEvent> CREATOR = new Creator<ELDEvent>() {
@@ -938,6 +959,7 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
         sb.append(", mMalCode=").append(mMalCode);
         sb.append(", mAppInfo=").append(mAppInfo);
         sb.append(", mSync=").append(mSync);
+        sb.append(", mInnerId=").append(mInnerId);
         sb.append('}');
         return sb.toString();
     }

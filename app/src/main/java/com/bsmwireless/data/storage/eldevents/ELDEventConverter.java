@@ -37,6 +37,7 @@ public class ELDEventConverter {
             event.setDiagnostic(entity.getDiagnostic());
             event.setMalCode(Malfunction.createByCode(entity.getMalCode()));
             event.setSync(entity.getSync());
+            event.setInnerId(entity.getInnerId());
         }
 
         return event;
@@ -77,6 +78,7 @@ public class ELDEventConverter {
             entity.setDiagnostic(event.getDiagnostic());
             Malfunction malCode = event.getMalCode();
             entity.setMalCode(malCode == null ? Malfunction.UNKNOWN.getCode() : malCode.getCode());
+            entity.setInnerId(event.getInnerId());
         }
         return entity;
     }

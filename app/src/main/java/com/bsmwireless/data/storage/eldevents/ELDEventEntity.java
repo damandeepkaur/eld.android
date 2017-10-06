@@ -8,11 +8,14 @@ import android.arch.persistence.room.PrimaryKey;
 public final class ELDEventEntity {
     public enum SyncType {
         SYNC,
+        SEND,
         NEW_UNSYNC,
         UPDATE_UNSYNC
     }
 
     @PrimaryKey
+    @ColumnInfo(name = "inner_id")
+    private Integer mInnerId;
     @ColumnInfo(name = "id")
     private Integer mId;
     @ColumnInfo(name = "sync")
@@ -69,6 +72,14 @@ public final class ELDEventEntity {
     private String mMalCode;
     @ColumnInfo(name = "latlng_code")
     private String mLatLngCode;
+
+    public Integer getInnerId() {
+        return mInnerId;
+    }
+
+    public void setInnerId(Integer innerId) {
+        mInnerId = innerId;
+    }
 
     public Integer getId() {
         return mId;
