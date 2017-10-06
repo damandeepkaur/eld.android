@@ -39,7 +39,7 @@ public final class LockScreenPresenter {
     LockScreenView mView;
     final DutyTypeManager mDutyManager;
     final BlackBoxInteractor mBlackBoxInteractor;
-    private final CompositeDisposable mCompositeDisposable;
+    private CompositeDisposable mCompositeDisposable;
     private final PreferencesManager mPreferencesManager;
     final BlackBoxStateChecker mChecker;
     private final ELDEventsInteractor mEventsInteractor;
@@ -65,14 +65,14 @@ public final class LockScreenPresenter {
         mEventsInteractor = eventsInteractor;
         mAppSettings = appSettings;
         mAccountManager = accountManager;
-        mCompositeDisposable = new CompositeDisposable();
         mReconnectionReference = new AtomicReference<>();
         mIdlingTDisposable = Disposables.disposed();
         mCurrentResponseType = BlackBoxResponseModel.ResponseType.NONE;
+        mCompositeDisposable = new CompositeDisposable();
     }
 
     public void bind(@NonNull LockScreenView view) {
-
+        mCompositeDisposable = new CompositeDisposable();
         mView = view;
 
         DutyType currentDutyType = mDutyManager.getDutyType();
@@ -92,13 +92,9 @@ public final class LockScreenPresenter {
     }
 
     public void unbind() {
-        mCompositeDisposable.clear();
+        mCompositeDisposable.dispose();
         mAccountManager.removeListener(accountListener);
         mView = null;
-    }
-
-    public void destroy(){
-        mCompositeDisposable.dispose();
     }
 
     public void switchCoDriver() {
@@ -160,7 +156,6 @@ public final class LockScreenPresenter {
                             break;
 
                         case STOPPED:
-                            System.out.println("Stopped");
                             handleStopped();
                             break;
 

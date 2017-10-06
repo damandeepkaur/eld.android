@@ -77,12 +77,6 @@ public final class LockScreenActivity extends BaseActivity implements LockScreen
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        mPresenter.destroy();
-    }
-
-    @Override
     public void onBackPressed() {
         /*no op*/
     }
