@@ -71,7 +71,7 @@ public final class LockScreenPresenter {
         mCurrentResponseType = BlackBoxResponseModel.ResponseType.NONE;
     }
 
-    public void onStart(@NonNull LockScreenView view) {
+    public void bind(@NonNull LockScreenView view) {
 
         mView = view;
 
@@ -91,10 +91,14 @@ public final class LockScreenPresenter {
         mAccountManager.addListener(accountListener);
     }
 
-    public void onStop() {
+    public void unbind() {
         mCompositeDisposable.clear();
         mAccountManager.removeListener(accountListener);
         mView = null;
+    }
+
+    public void destroy(){
+        mCompositeDisposable.dispose();
     }
 
     public void switchCoDriver() {
@@ -108,17 +112,13 @@ public final class LockScreenPresenter {
         if (dutyType == DutyType.ON_DUTY &&
                 mCurrentResponseType == BlackBoxResponseModel.ResponseType.IGNITION_OFF) {
             // just close screen, status already changed in this case
-            mView.closeLockScreen();
+            closeLockScreen();
             return;
         }
 
         Disposable disposable = createPostNewEventCompletable(mEventsInteractor.getEvent(dutyType))
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(() -> {
-                    if (mView != null) {
-                        mView.closeLockScreen();
-                    }
-                });
+                .subscribe(this::closeLockScreen);
         mCompositeDisposable.add(disposable);
     }
 
@@ -146,7 +146,7 @@ public final class LockScreenPresenter {
         if (mView != null) {
             mView.removeAnyPopup();
         }
-        mBlackBoxInteractor.getData(mPreferencesManager.getBoxId())
+        Disposable disposable = mBlackBoxInteractor.getData(mPreferencesManager.getBoxId())
                 .skip(1) // first element already handled, skip it
                 .distinctUntilChanged(BlackBoxModel::getResponseType)
                 .doOnNext(blackBoxModel -> mCurrentResponseType = blackBoxModel.getResponseType())
@@ -160,6 +160,7 @@ public final class LockScreenPresenter {
                             break;
 
                         case STOPPED:
+                            System.out.println("Stopped");
                             handleStopped();
                             break;
 
@@ -175,6 +176,7 @@ public final class LockScreenPresenter {
                         handleDisconnection();
                     }
                 });
+        mCompositeDisposable.add(disposable);
     }
 
     void handleIgnitionOff() {
@@ -194,12 +196,11 @@ public final class LockScreenPresenter {
             //already running
             return;
         }
-
         mIdlingTDisposable = Completable
                 .timer(mAppSettings.lockScreenIdlingTimeout(), TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(mView::closeLockScreen);
+                .subscribe(this::closeLockScreen);
     }
 
     void handleMoving() {
@@ -259,8 +260,14 @@ public final class LockScreenPresenter {
                 .andThen(createPostNewEventCompletable(eldEvent))
                 .observeOn(AndroidSchedulers.mainThread())
                 .doFinally(() -> mReconnectionReference.set(null))
-                .subscribe(this::startMonitoring, throwable -> mView.closeLockScreen());
+                .subscribe(this::startMonitoring, throwable -> closeLockScreen());
         mCompositeDisposable.add(disposable);
+    }
+
+    void closeLockScreen(){
+        if (mView != null) {
+            mView.closeLockScreen();
+        }
     }
 
     private Completable createPostNewEventCompletable(ELDEvent eldEventInfo) {
@@ -283,8 +290,8 @@ public final class LockScreenPresenter {
     private final AccountManager.AccountListener accountListener = new AccountManager.AccountListener() {
         @Override
         public void onUserChanged() {
-            if (!mAccountManager.isCurrentUserDriver() & mView != null) {
-                mView.closeLockScreen();
+            if (!mAccountManager.isCurrentUserDriver()) {
+                closeLockScreen();
             }
         }
 

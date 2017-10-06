@@ -65,15 +65,21 @@ public final class LockScreenActivity extends BaseActivity implements LockScreen
     @Override
     protected void onStart() {
         super.onStart();
-        mPresenter.onStart(this);
+        mPresenter.bind(this);
         setListenersForPromtDialog(false);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        mPresenter.onStop();
+        mPresenter.unbind();
         setListenersForPromtDialog(true);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mPresenter.destroy();
     }
 
     @Override
