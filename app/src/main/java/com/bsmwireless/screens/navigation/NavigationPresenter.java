@@ -13,6 +13,7 @@ import com.bsmwireless.screens.common.menu.BaseMenuView;
 
 import javax.inject.Inject;
 
+import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -125,7 +126,11 @@ public final class NavigationPresenter extends BaseMenuPresenter {
     }
 
     private void checkForUnassignedEvents() {
-        add(mEventsInteractor.getUnidentifiedEvents()
+        add(Observable.zip(mEventsInteractor.getUnidentifiedEvents(), mEventsInteractor.getUnidentifiedEvents(),
+                (eldEvents, eldEvents2) -> {
+                    eldEvents.addAll(eldEvents2);
+                    return eldEvents;
+                })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(res -> {

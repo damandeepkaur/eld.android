@@ -186,7 +186,6 @@ public final class NavigationActivity extends BaseMenuActivity implements
 
     @Override
     public void goToCarrierEditScreen() {
-        //TODO: ea_235
         Intent intent = new Intent(this, CarrierEditActivity.class);
         startActivity(intent);
     }

@@ -56,22 +56,23 @@ public final class UnassignedEventsPresenterImpl implements UnassignedEventsPres
     }
 
     public void acceptEvent(EventLogModel event, int driverId, int position) {
-        if (mUpdateEventDisposable.isDisposed()) {
-            Timber.v("acceptEvent: ");
-            List<ELDEvent> eldEvents = new ArrayList<>();
-            event.getEvent().setDriverId(driverId);
-            eldEvents.add(event.getEvent());
-            mUpdateEventDisposable = mServiceApi.updateELDEvents(eldEvents)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(responseMessage -> {
-                        updateDb(eldEvents, position);
-                        mUpdateEventDisposable.dispose();
-                    }, throwable -> {
-                            Timber.e(throwable);
-                            mDisposable.dispose();
-                    });
+        if (!mUpdateEventDisposable.isDisposed()) {
+            return;
         }
+        Timber.v("acceptEvent: ");
+        List<ELDEvent> eldEvents = new ArrayList<>();
+        event.getEvent().setDriverId(driverId);
+        eldEvents.add(event.getEvent());
+        mUpdateEventDisposable = mServiceApi.updateELDEvents(eldEvents)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(responseMessage -> {
+                    updateDb(eldEvents, position);
+                    mUpdateEventDisposable.dispose();
+                }, throwable -> {
+                    Timber.e(throwable);
+                    mDisposable.dispose();
+                });
     }
 
     public void rejectEvent(EventLogModel event, int position) {

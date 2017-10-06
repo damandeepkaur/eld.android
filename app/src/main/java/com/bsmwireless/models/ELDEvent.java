@@ -298,107 +298,107 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
     private ELDEvent(Parcel in) {
         boolean notNull = in.readByte() == 1;
         if (notNull) {
-            this.mStatus = in.readInt();
+            mStatus = in.readInt();
         }
         notNull = in.readByte() == 1;
         if (notNull) {
-            this.mOrigin = in.readInt();
+            mOrigin = in.readInt();
         }
         notNull = in.readByte() == 1;
         if (notNull) {
-            this.mEventType = in.readInt();
+            mEventType = in.readInt();
         }
         notNull = in.readByte() == 1;
         if (notNull) {
-            this.mEventCode = in.readInt();
+            mEventCode = in.readInt();
         }
         notNull = in.readByte() == 1;
         if (notNull) {
-            this.mEventTime = in.readLong();
+            mEventTime = in.readLong();
         }
         notNull = in.readByte() == 1;
         if (notNull) {
-            this.mLogSheet = in.readLong();
+            mLogSheet = in.readLong();
         }
         notNull = in.readByte() == 1;
         if (notNull) {
-            this.mOdometer = in.readInt();
+            mOdometer = in.readInt();
         }
         notNull = in.readByte() == 1;
         if (notNull) {
-            this.mEngineHours = in.readInt();
+            mEngineHours = in.readInt();
         }
         notNull = in.readByte() == 1;
         if (notNull) {
-            this.mLat = in.readDouble();
+            mLat = in.readDouble();
         }
         notNull = in.readByte() == 1;
         if (notNull) {
-            this.mLng = in.readDouble();
+            mLng = in.readDouble();
         }
         notNull = in.readByte() == 1;
         if (notNull) {
-            this.mLatLngFlag = LatLngFlag.createByCode(in.readString());
+            mLatLngFlag = LatLngFlag.createByCode(in.readString());
         }
         notNull = in.readByte() == 1;
         if (notNull) {
-            this.mDistance = in.readInt();
+            mDistance = in.readInt();
         }
         notNull = in.readByte() == 1;
         if (notNull) {
-            this.mComment = in.readString();
+            mComment = in.readString();
         }
         notNull = in.readByte() == 1;
         if (notNull) {
-            this.mLocation = in.readString();
+            mLocation = in.readString();
         }
         notNull = in.readByte() == 1;
         if (notNull) {
-            this.mCheckSum = in.readString();
+            mCheckSum = in.readString();
         }
         notNull = in.readByte() == 1;
         if (notNull) {
-            this.mShippingId = in.readString();
+            mShippingId = in.readString();
         }
         notNull = in.readByte() == 1;
         if (notNull) {
-            this.mCoDriverId = in.readInt();
+            mCoDriverId = in.readInt();
         }
         notNull = in.readByte() == 1;
         if (notNull) {
-            this.mBoxId = in.readInt();
+            mBoxId = in.readInt();
         }
         notNull = in.readByte() == 1;
         if (notNull) {
-            this.mVehicleId = in.readInt();
+            mVehicleId = in.readInt();
         }
         notNull = in.readByte() == 1;
         if (notNull) {
-            this.mId = in.readInt();
+            mId = in.readInt();
         }
         notNull = in.readByte() == 1;
         if (notNull) {
-            this.mTzOffset = in.readDouble();
+            mTzOffset = in.readDouble();
         }
         notNull = in.readByte() == 1;
         if (notNull) {
-            this.mTimezone = in.readString();
+            mTimezone = in.readString();
         }
         notNull = in.readByte() == 1;
         if (notNull) {
-            this.mMobileTime = in.readLong();
+            mMobileTime = in.readLong();
         }
         notNull = in.readByte() == 1;
         if (notNull) {
-            this.mDriverId = in.readInt();
+            mDriverId = in.readInt();
         }
         notNull = in.readByte() == 1;
         if (notNull) {
-            this.mMalfunction = in.readByte() != 0;
+            mMalfunction = in.readByte() != 0;
         }
         notNull = in.readByte() == 1;
         if (notNull) {
-            this.mDiagnostic = in.readByte() != 0;
+            mDiagnostic = in.readByte() != 0;
         }
         notNull = in.readByte() == 1;
         if (notNull) {
@@ -415,7 +415,7 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
     }
 
     public ELDEvent setStatus(Integer status) {
-        this.mStatus = status;
+        mStatus = status;
         return this;
     }
 
@@ -424,7 +424,7 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
     }
 
     public void setOrigin(Integer origin) {
-        this.mOrigin = origin;
+        mOrigin = origin;
     }
 
     public Integer getEventType() {
@@ -432,7 +432,7 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
     }
 
     public void setEventType(Integer eventType) {
-        this.mEventType = eventType;
+        mEventType = eventType;
     }
 
     public Integer getEventCode() {
@@ -440,7 +440,7 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
     }
 
     public void setEventCode(Integer eventCode) {
-        this.mEventCode = eventCode;
+        mEventCode = eventCode;
     }
 
     public Long getEventTime() {
@@ -464,7 +464,7 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
     }
 
     public void setOdometer(Integer odometer) {
-        this.mOdometer = odometer;
+        mOdometer = odometer;
     }
 
     public Integer getEngineHours() {
@@ -472,7 +472,7 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
     }
 
     public void setEngineHours(Integer engineHours) {
-        this.mEngineHours = engineHours;
+        mEngineHours = engineHours;
     }
 
     public Double getLat() {
@@ -480,7 +480,7 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
     }
 
     public void setLat(Double lat) {
-        this.mLat = lat;
+        mLat = lat;
     }
 
     public Double getLng() {
@@ -492,7 +492,7 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
     }
 
     public void setLng(Double lng) {
-        this.mLng = lng;
+        mLng = lng;
     }
 
     public void setLatLngFlag(LatLngFlag latLngFlag) {
@@ -504,7 +504,7 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
     }
 
     public void setDistance(Integer distance) {
-        this.mDistance = distance;
+        mDistance = distance;
     }
 
     public String getComment() {
@@ -512,7 +512,7 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
     }
 
     public void setComment(String comment) {
-        this.mComment = comment;
+        mComment = comment;
     }
 
     public String getLocation() {
@@ -520,7 +520,7 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
     }
 
     public void setLocation(String location) {
-        this.mLocation = location;
+        mLocation = location;
     }
 
     public String getCheckSum() {
@@ -528,7 +528,7 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
     }
 
     public void setCheckSum(String checkSum) {
-        this.mCheckSum = checkSum;
+        mCheckSum = checkSum;
     }
 
     public String getShippingId() {
@@ -536,7 +536,7 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
     }
 
     public void setShippingId(String shippingId) {
-        this.mShippingId = shippingId;
+        mShippingId = shippingId;
     }
 
     public Integer getCoDriverId() {
@@ -544,7 +544,7 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
     }
 
     public void setCoDriverId(Integer coDriverId) {
-        this.mCoDriverId = coDriverId;
+        mCoDriverId = coDriverId;
     }
 
     public Integer getBoxId() {
@@ -552,7 +552,7 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
     }
 
     public void setBoxId(Integer boxId) {
-        this.mBoxId = boxId;
+        mBoxId = boxId;
     }
 
     public Integer getVehicleId() {
@@ -560,7 +560,7 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
     }
 
     public void setVehicleId(Integer vehicleId) {
-        this.mVehicleId = vehicleId;
+        mVehicleId = vehicleId;
     }
 
     public Integer getId() {
@@ -568,7 +568,7 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
     }
 
     public void setId(Integer id) {
-        this.mId = id;
+        mId = id;
     }
 
     public Double getTzOffset() {
@@ -576,7 +576,7 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
     }
 
     public void setTzOffset(Double tzOffset) {
-        this.mTzOffset = tzOffset;
+        mTzOffset = tzOffset;
     }
 
     public String getTimezone() {
@@ -584,7 +584,7 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
     }
 
     public void setTimezone(String timezone) {
-        this.mTimezone = timezone;
+        mTimezone = timezone;
     }
 
     public Long getMobileTime() {
@@ -592,7 +592,7 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
     }
 
     public void setMobileTime(Long mobileTime) {
-        this.mMobileTime = mobileTime;
+        mMobileTime = mobileTime;
     }
 
     public Integer getDriverId() {
@@ -600,7 +600,7 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
     }
 
     public void setDriverId(Integer driverId) {
-        this.mDriverId = driverId;
+        mDriverId = driverId;
     }
 
     public Boolean getMalfunction() {
@@ -608,7 +608,7 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
     }
 
     public void setMalfunction(Boolean malfunction) {
-        this.mMalfunction = malfunction;
+        mMalfunction = malfunction;
     }
 
     public Boolean getDiagnostic() {
@@ -616,7 +616,7 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
     }
 
     public void setDiagnostic(Boolean diagnostic) {
-        this.mDiagnostic = diagnostic;
+        mDiagnostic = diagnostic;
     }
 
     public Malfunction getMalCode() {
@@ -624,7 +624,7 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
     }
 
     public void setMalCode(Malfunction malCode) {
-        this.mMalCode = malCode;
+        mMalCode = malCode;
     }
 
     public String getAppInfo() {
@@ -730,133 +730,133 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeByte(this.mStatus == null ? (byte) 0 : 1);
-        if (this.mStatus != null) {
-            dest.writeInt(this.mStatus);
+        dest.writeByte(mStatus == null ? (byte) 0 : 1);
+        if (mStatus != null) {
+            dest.writeInt(mStatus);
         }
 
-        dest.writeByte(this.mOrigin == null ? (byte) 0 : 1);
-        if (this.mOrigin != null) {
-            dest.writeInt(this.mOrigin);
+        dest.writeByte(mOrigin == null ? (byte) 0 : 1);
+        if (mOrigin != null) {
+            dest.writeInt(mOrigin);
         }
 
-        dest.writeByte(this.mEventType == null ? (byte) 0 : 1);
-        if (this.mEventType != null) {
-            dest.writeInt(this.mEventType);
+        dest.writeByte(mEventType == null ? (byte) 0 : 1);
+        if (mEventType != null) {
+            dest.writeInt(mEventType);
         }
 
-        dest.writeByte(this.mEventCode == null ? (byte) 0 : 1);
-        if (this.mEventCode != null) {
-            dest.writeInt(this.mEventCode);
+        dest.writeByte(mEventCode == null ? (byte) 0 : 1);
+        if (mEventCode != null) {
+            dest.writeInt(mEventCode);
         }
 
-        dest.writeByte(this.mEventTime == null ? (byte) 0 : 1);
-        if (this.mEventTime != null) {
-            dest.writeLong(this.mEventTime);
+        dest.writeByte(mEventTime == null ? (byte) 0 : 1);
+        if (mEventTime != null) {
+            dest.writeLong(mEventTime);
         }
 
-        dest.writeByte(this.mLogSheet == null ? (byte) 0 : 1);
-        if (this.mLogSheet != null) {
-            dest.writeLong(this.mLogSheet);
+        dest.writeByte(mLogSheet == null ? (byte) 0 : 1);
+        if (mLogSheet != null) {
+            dest.writeLong(mLogSheet);
         }
 
-        dest.writeByte(this.mOdometer == null ? (byte) 0 : 1);
-        if (this.mOdometer != null) {
-            dest.writeInt(this.mOdometer);
+        dest.writeByte(mOdometer == null ? (byte) 0 : 1);
+        if (mOdometer != null) {
+            dest.writeInt(mOdometer);
         }
 
-        dest.writeByte(this.mEngineHours == null ? (byte) 0 : 1);
-        if (this.mEngineHours != null) {
-            dest.writeInt(this.mEngineHours);
+        dest.writeByte(mEngineHours == null ? (byte) 0 : 1);
+        if (mEngineHours != null) {
+            dest.writeInt(mEngineHours);
         }
 
-        dest.writeByte(this.mLat == null ? (byte) 0 : 1);
-        if (this.mLat != null) {
-            dest.writeDouble(this.mLat);
+        dest.writeByte(mLat == null ? (byte) 0 : 1);
+        if (mLat != null) {
+            dest.writeDouble(mLat);
         }
 
-        dest.writeByte(this.mLng == null ? (byte) 0 : 1);
-        if (this.mLng != null) {
-            dest.writeDouble(this.mLng);
+        dest.writeByte(mLng == null ? (byte) 0 : 1);
+        if (mLng != null) {
+            dest.writeDouble(mLng);
         }
 
-        dest.writeByte(this.mLatLngFlag == null ? (byte) 0 : 1);
-        if (this.mLatLngFlag != null) {
-            dest.writeString(this.mLatLngFlag.mCode);
+        dest.writeByte(mLatLngFlag == null ? (byte) 0 : 1);
+        if (mLatLngFlag != null) {
+            dest.writeString(mLatLngFlag.mCode);
         }
 
-        dest.writeByte(this.mDistance == null ? (byte) 0 : 1);
-        if (this.mDistance != null) {
-            dest.writeInt(this.mDistance);
+        dest.writeByte(mDistance == null ? (byte) 0 : 1);
+        if (mDistance != null) {
+            dest.writeInt(mDistance);
         }
 
-        dest.writeByte(this.mComment == null ? (byte) 0 : 1);
-        if (this.mComment != null) {
-            dest.writeString(this.mComment);
+        dest.writeByte(mComment == null ? (byte) 0 : 1);
+        if (mComment != null) {
+            dest.writeString(mComment);
         }
 
-        dest.writeByte(this.mLocation == null ? (byte) 0 : 1);
-        if (this.mLocation != null) {
-            dest.writeString(this.mLocation);
+        dest.writeByte(mLocation == null ? (byte) 0 : 1);
+        if (mLocation != null) {
+            dest.writeString(mLocation);
         }
 
-        dest.writeByte(this.mCheckSum == null ? (byte) 0 : 1);
-        if (this.mCheckSum != null) {
-            dest.writeString(this.mCheckSum);
+        dest.writeByte(mCheckSum == null ? (byte) 0 : 1);
+        if (mCheckSum != null) {
+            dest.writeString(mCheckSum);
         }
 
-        dest.writeByte(this.mShippingId == null ? (byte) 0 : 1);
-        if (this.mShippingId != null) {
-            dest.writeString(this.mShippingId);
+        dest.writeByte(mShippingId == null ? (byte) 0 : 1);
+        if (mShippingId != null) {
+            dest.writeString(mShippingId);
         }
 
-        dest.writeByte(this.mCoDriverId == null ? (byte) 0 : 1);
-        if (this.mCoDriverId != null) {
-            dest.writeInt(this.mCoDriverId);
+        dest.writeByte(mCoDriverId == null ? (byte) 0 : 1);
+        if (mCoDriverId != null) {
+            dest.writeInt(mCoDriverId);
         }
 
-        dest.writeByte(this.mBoxId == null ? (byte) 0 : 1);
-        if (this.mBoxId != null) {
-            dest.writeInt(this.mBoxId);
+        dest.writeByte(mBoxId == null ? (byte) 0 : 1);
+        if (mBoxId != null) {
+            dest.writeInt(mBoxId);
         }
 
-        dest.writeByte(this.mVehicleId == null ? (byte) 0 : 1);
-        if (this.mVehicleId != null) {
-            dest.writeInt(this.mVehicleId);
+        dest.writeByte(mVehicleId == null ? (byte) 0 : 1);
+        if (mVehicleId != null) {
+            dest.writeInt(mVehicleId);
         }
 
-        dest.writeByte(this.mId == null ? (byte) 0 : 1);
-        if (this.mId != null) {
-            dest.writeInt(this.mId);
+        dest.writeByte(mId == null ? (byte) 0 : 1);
+        if (mId != null) {
+            dest.writeInt(mId);
         }
 
-        dest.writeByte(this.mTzOffset == null ? (byte) 0 : 1);
-        if (this.mTzOffset != null) {
-            dest.writeDouble(this.mTzOffset);
+        dest.writeByte(mTzOffset == null ? (byte) 0 : 1);
+        if (mTzOffset != null) {
+            dest.writeDouble(mTzOffset);
         }
 
-        dest.writeByte(this.mTimezone == null ? (byte) 0 : 1);
-        if (this.mTimezone != null) {
-            dest.writeString(this.mTimezone);
+        dest.writeByte(mTimezone == null ? (byte) 0 : 1);
+        if (mTimezone != null) {
+            dest.writeString(mTimezone);
         }
 
-        dest.writeByte(this.mMobileTime == null ? (byte) 0 : 1);
-        if (this.mMobileTime != null) {
-            dest.writeLong(this.mMobileTime);
+        dest.writeByte(mMobileTime == null ? (byte) 0 : 1);
+        if (mMobileTime != null) {
+            dest.writeLong(mMobileTime);
         }
 
-        dest.writeByte(this.mDriverId == null ? (byte) 0 : 1);
-        if (this.mDriverId != null) {
-            dest.writeInt(this.mDriverId);
+        dest.writeByte(mDriverId == null ? (byte) 0 : 1);
+        if (mDriverId != null) {
+            dest.writeInt(mDriverId);
         }
 
-        dest.writeByte(this.mMalfunction == null ? (byte) 0 : 1);
-        if (this.mMalfunction != null) {
+        dest.writeByte(mMalfunction == null ? (byte) 0 : 1);
+        if (mMalfunction != null) {
             dest.writeByte((byte) (mMalfunction ? 1 : 0));
         }
 
-        dest.writeByte(this.mDiagnostic == null ? (byte) 0 : 1);
-        if (this.mDiagnostic != null) {
+        dest.writeByte(mDiagnostic == null ? (byte) 0 : 1);
+        if (mDiagnostic != null) {
             dest.writeByte((byte) (mDiagnostic ? 1 : 0));
         }
         dest.writeByte((byte) (mMalCode == null ? 0 : 1));
@@ -864,9 +864,9 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
             dest.writeString(mMalCode.getCode());
         }
 
-        dest.writeByte(this.mAppInfo == null ? (byte) 0 : 1);
-        if (this.mAppInfo != null) {
-            dest.writeString(this.mAppInfo);
+        dest.writeByte(mAppInfo == null ? (byte) 0 : 1);
+        if (mAppInfo != null) {
+            dest.writeString(mAppInfo);
         }
     }
 

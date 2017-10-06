@@ -59,9 +59,9 @@ public class UnassignedEventsAdapter extends RecyclerView.Adapter<UnassignedEven
 
     public void removeEvent(int position) {
         Timber.v("removeEvent: %d", position);
-        mEvents.remove(position);
+        mEvents.remove(position - 1);
         notifyItemRemoved(position);
-        notifyItemRangeChanged(position - 1, mEvents.size());
+        notifyItemRangeChanged(position - 1, mEvents.size() + 1);
     }
 
     public void setVehicleName(String vehicleName) {

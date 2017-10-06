@@ -138,9 +138,6 @@ public final class BlackBoxImpl implements BlackBox {
             Timber.e("initializeCommunication error");
             throw new BlackBoxConnectionException(UNKNOWN_ERROR);
         }
-        if (!mSocket.isConnected()) {
-            return false;
-        }
         writeRawData(BlackBoxParser.generateSubscriptionRequest(getSequenceID(), mBoxId, UPDATE_RATE_MILLIS));
         BlackBoxResponseModel response = readSubscriptionResponse();
         if (response.getResponseType() == BlackBoxResponseModel.ResponseType.ACK) {

@@ -100,6 +100,7 @@ public class EditedEventsAdapter extends RecyclerView.Adapter<EditedEventsAdapte
             resId = R.drawable.red_dot;
         }
         eventsTitle.setCompoundDrawablesWithIntrinsicBounds(0, 0, resId, 0);
+        mPresenter.markCalendarItems(mCalendarLayout.getAllItems());
         notifyDataSetChanged();
     }
 
@@ -129,7 +130,6 @@ public class EditedEventsAdapter extends RecyclerView.Adapter<EditedEventsAdapte
                 mCalendarLayout.setOnItemSelectedListener(calendarItem -> {
                     mPresenter.onCalendarDaySelected(calendarItem);
                 });
-                mPresenter.markCalendarItems(mCalendarLayout.getAllItems());
                 mGraphLayout = view.findViewById(R.id.graphic);
                 //mGraphLayout.setELDEvents(mEventLogs);
                 mEditedEventsTopHeader = ButterKnife.findById(view, R.id.top_header_container);
@@ -174,10 +174,14 @@ public class EditedEventsAdapter extends RecyclerView.Adapter<EditedEventsAdapte
             } else {
                 mEditedEventsTopHeader.setVisibility(GONE);
             }
-            holder.mApprove.setOnClickListener(v -> mPresenter.approveEdits(mEventLogs,
-                    mCalendarLayout.getCurrentItem().getLogDay()));
-            holder.mDisapprove.setOnClickListener(v -> mPresenter.disapproveEdits(mEventLogs,
-                    mCalendarLayout.getCurrentItem().getLogDay()));
+            holder.mApprove.setOnClickListener(v -> {
+                mPresenter.approveEdits(mEventLogs, mCalendarLayout.getCurrentItem().getLogDay());
+                mCalendarLayout.getCurrentItem().setExternalColor(0);
+            });
+            holder.mDisapprove.setOnClickListener(v -> {
+                mPresenter.disapproveEdits(mEventLogs, mCalendarLayout.getCurrentItem().getLogDay());
+                mCalendarLayout.getCurrentItem().setExternalColor(0);
+            });
         }
     }
 

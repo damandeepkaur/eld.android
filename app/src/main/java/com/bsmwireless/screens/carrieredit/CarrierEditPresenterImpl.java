@@ -13,7 +13,6 @@ import javax.inject.Inject;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.disposables.Disposables;
 import io.reactivex.schedulers.Schedulers;
@@ -52,19 +51,20 @@ public final class CarrierEditPresenterImpl extends BaseMenuPresenter implements
 
     @Override
     public void requestDriverName() {
-        if (mDriverDisposable.isDisposed()) {
-            Timber.d("requestDriverName: ");
-            mDriverDisposable = mUserInteractor.getDriver()
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(driver -> {
-                                mView.setDriverName(driver.getFirstName() + " " + driver.getLastName());
-                                mView.setDriverId(driver.getId());
-                                mDriverDisposable.dispose();
-                            },
-                            Timber::e,
-                            () -> mDriverDisposable.dispose());
+        if (!mDriverDisposable.isDisposed()) {
+            return;
         }
+        Timber.d("requestDriverName: ");
+        mDriverDisposable = mUserInteractor.getDriver()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(driver -> {
+                            mView.setDriverName(driver.getFirstName() + " " + driver.getLastName());
+                            mView.setDriverId(driver.getId());
+                            mDriverDisposable.dispose();
+                        },
+                        Timber::e,
+                        () -> mDriverDisposable.dispose());
     }
 
     @Override
