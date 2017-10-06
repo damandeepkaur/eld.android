@@ -3,6 +3,7 @@ ELD app for Android
 
 # Version history
 
+* **1.1.2** - Records Time format should be 24h instead of 12h (_EA-485_)
 * **1.1.1** - Fix current time (_EA-11_, _EA-475_)
 * **1.1.0** - Showing events for all types (_EA-271_)
 * **1.0.105** - Update date and time
