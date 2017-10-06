@@ -385,7 +385,7 @@
     <!-- Navigation drawer-->
     <string name="nav_home">Home</string>
     <string name="nav_carrier_edit_view">Carrier Edit View</string>
-    <string name="nav_inspector_view">Roadside Inspections</string>
+    <string name="nav_inspector_view">Roadside Inspection</string>
     <string name="nav_transfer_view">Data Transfer</string>
     <string name="nav_help">Help</string>
     <string name="nav_driver_profile">Driver Profile</string>
