@@ -12,4 +12,6 @@ public interface UnassignedEventsView {
     void setVehicleName(String vehicleName);
 
     void setDriverId(int driverId);
+
+    void showConnectionError();
 }

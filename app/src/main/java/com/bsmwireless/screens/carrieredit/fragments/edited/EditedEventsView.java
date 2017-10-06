@@ -24,4 +24,6 @@ public interface EditedEventsView {
     Context getContext();
 
     CalendarItem getSelectedDay();
+
+    void showConnectionError();
 }
