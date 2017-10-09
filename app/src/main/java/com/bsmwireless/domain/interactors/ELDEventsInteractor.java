@@ -170,6 +170,7 @@ public final class ELDEventsInteractor {
     public Observable<long[]> postNewDutyTypeEvent(DutyType dutyType, String comment, long time) {
         return Observable.fromIterable(getEvents(dutyType, comment))
                 .map(event -> {
+                    //TODO: set proper time
                     event.setEventTime(time);
                     return event;
                 })
@@ -474,7 +475,7 @@ public final class ELDEventsInteractor {
         int driverId = mAccountManager.getCurrentUserId();
 
         ELDEvent event = new ELDEvent();
-        event.setEventTime(currentTime);
+        event.setEventTime(blackBoxModel.getEventTimeUTC().getTime());
         event.setEngineHours(blackBoxModel.getEngineHours());
         event.setOdometer(blackBoxModel.getOdometer());
         event.setLat(blackBoxModel.getLat());
@@ -506,7 +507,7 @@ public final class ELDEventsInteractor {
         ELDEvent event = new ELDEvent();
         event.setDriverId(driverId);
         event.setVehicleId(mPreferencesManager.getVehicleId());
-        event.setEventTime(currentTime);
+        event.setEventTime(blackBoxModel.getEventTimeUTC().getTime());
         event.setEngineHours(blackBoxModel.getEngineHours());
         event.setOdometer(blackBoxModel.getOdometer());
         event.setLat(blackBoxModel.getLat());
