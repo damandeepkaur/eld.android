@@ -3,6 +3,7 @@ ELD app for Android
 
 # Version history
 
+* **1.1.7** - Update certify events(_EA-500_, _EA-496_)
 * **1.1.6** - Fix NPE on invoke method closeLockScreen(_EA-484_)
 * **1.1.5** - Carrier edits and unassigned events functionality
 * **1.1.4** - Fix order of inactive event, fix missing events (_EA-467_, _EA-366_)
