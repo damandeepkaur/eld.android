@@ -129,6 +129,6 @@ public interface ELDEventDao {
     @Query("SELECT * FROM events WHERE driver_id = :driverId AND mobile_time = :mobileTime AND sync = 1 LIMIT 1")
     ELDEventEntity getSentEvent(long driverId, long mobileTime);
 
-    @Query("SELECT * FROM events WHERE id = :id")
-    ELDEventEntity getEventById(int id);
+    @Query("SELECT * FROM events WHERE id = :id AND driver_id = :driverId")
+    ELDEventEntity getEventById(int id, int driverId);
 }

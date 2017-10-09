@@ -214,7 +214,7 @@ public final class SyncInteractor {
 
     public void replaceRecords(List<ELDEvent> events) {
         for (ELDEvent event : events) {
-            ELDEventEntity oldEvent = mELDEventDao.getEventById(event.getId());
+            ELDEventEntity oldEvent = mELDEventDao.getEventById(event.getId(), event.getDriverId());
 
             if (oldEvent != null) {
                 ELDEventEntity updatedEvent = ELDEventConverter.toEntity(event);
