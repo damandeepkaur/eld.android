@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import com.bsmwireless.screens.carrieredit.CarrierEditView;
 import com.bsmwireless.screens.common.BaseFragment;
 import com.bsmwireless.screens.logs.dagger.EventLogModel;
+import com.bsmwireless.widgets.snackbar.SnackBarLayout;
 
 import java.util.List;
 
@@ -24,8 +25,10 @@ import timber.log.Timber;
 
 public final class UnassignedEventsFragment extends BaseFragment implements UnassignedEventsView {
 
-    @BindView(R.id.unassigned_recycler)
+    @BindView(R.id.recycler_view)
     RecyclerView mRecyclerView;
+    @BindView(R.id.snackbar)
+    SnackBarLayout mSnackBarLayout;
 
     @Inject
     UnassignedEventsPresenter mPresenter;
@@ -37,7 +40,7 @@ public final class UnassignedEventsFragment extends BaseFragment implements Unas
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Timber.v("onCreateView: ");
-        View view = inflater.inflate(R.layout.fragment_unassigned_events, container, false);
+        View view = inflater.inflate(R.layout.fragment_carrier_edits, container, false);
         mUnbinder = ButterKnife.bind(this, view);
         return view;
     }
@@ -96,5 +99,13 @@ public final class UnassignedEventsFragment extends BaseFragment implements Unas
         } else {
             mAdapter.setDriverId(driverId);
         }
+    }
+
+    @Override
+    public void showConnectionError() {
+        mSnackBarLayout
+                .setMessage(getString(R.string.error_network))
+                .setHideableOnTimeout(SnackBarLayout.DURATION_LONG)
+                .showSnackbar();
     }
 }
