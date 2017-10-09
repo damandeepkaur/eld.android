@@ -41,6 +41,7 @@ import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
 import static com.bsmwireless.common.Constants.SUCCESS;
+import static com.bsmwireless.common.Constants.SYNC_DELAY;
 import static com.bsmwireless.common.utils.DateUtils.MS_IN_DAY;
 import static com.bsmwireless.common.utils.DateUtils.MS_IN_SEC;
 import static com.bsmwireless.data.storage.eldevents.ELDEventEntity.SyncType.SYNC;
@@ -161,7 +162,7 @@ public final class SyncInteractor {
                 )
                 .filter(events -> !events.isEmpty())
                 .map(this::setSync)
-                .delay(5, TimeUnit.SECONDS)
+                .delay(SYNC_DELAY, TimeUnit.SECONDS)
                 .flatMapSingle(dbEvents -> mServiceApi.getELDEvents(dbEvents.get(0).getEventTime(), dbEvents.get(dbEvents.size() - 1).getEventTime())
                         .map(this::filterIncorrectEvents)
                         .doOnSuccess(this::replaceRecords))
@@ -184,7 +185,7 @@ public final class SyncInteractor {
                 )
                 .filter(dbEvents -> !dbEvents.isEmpty())
                 .map(this::setSync)
-                .delay(5, TimeUnit.SECONDS)
+                .delay(SYNC_DELAY, TimeUnit.SECONDS)
                 .flatMapSingle(dbEvents -> mServiceApi.getELDEvents(dbEvents.get(0).getEventTime(), dbEvents.get(dbEvents.size() - 1).getEventTime())
                         .map(this::filterIncorrectEvents)
                         .doOnSuccess(this::replaceRecords)

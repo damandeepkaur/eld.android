@@ -16,6 +16,7 @@ public interface Constants {
     long READ_TIMEOUT = 60;
     long CONNECTION_TIMEOUT = 60;
     int DEBOUNCE_TIMEOUT = 500;
+    int SYNC_DELAY = 5;
 
     int MAX_LAST_VEHICLE = 5;
     int DEFAULT_CALENDAR_DAYS_COUNT = 30;
