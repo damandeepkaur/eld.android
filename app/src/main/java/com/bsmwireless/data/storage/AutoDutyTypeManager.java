@@ -134,9 +134,7 @@ public final class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListen
             // the ELD must prompt the driver to confirm continued driving status or enter the proper duty status.
             case STOPPED:
                 mHandler.removeCallbacks(mAutoOnDutyTask);
-                Timber.d("STOPPED");
                 if (mDutyTypeManager.getDutyType() == DutyType.DRIVING) {
-                    Timber.d("Start mAutoOnDutyTask");
                     mStoppedTime = DateUtils.currentTimeMillis();
                     mHandler.postDelayed(mAutoOnDutyTask, AUTO_ON_DUTY_DELAY);
                 } else {

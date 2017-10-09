@@ -119,7 +119,6 @@ public final class LockScreenPresenter {
     }
 
     void setDutyType(DutyType currentDutyType) {
-        Timber.d("Current duty type is - " + currentDutyType);
         mView.setTimeForDutyType(currentDutyType, getTimeForDutyType(currentDutyType));
         mView.setTimeForDutyType(DutyType.SLEEPER_BERTH, getTimeForDutyType(
                 currentDutyType == DutyType.SLEEPER_BERTH ? DutyType.DRIVING : DutyType.SLEEPER_BERTH));

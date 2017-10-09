@@ -52,12 +52,6 @@ public interface ELDEventDao {
             "AND (event_type = 1 or event_type = 3) AND status = 1 ORDER BY event_time, inner_id DESC")
     Single<List<ELDEventEntity>> getLatestActiveDutyEventOnce(long latestTime, int driverId);
 
-    @Query("SELECT * FROM events " +
-            "WHERE driver_id = :driverId AND (event_type = 1 or event_type = 3) AND status = 1 " +
-            "ORDER BY event_time, id DESC " +
-            "LIMIT 1")
-    Flowable<ELDEventEntity> getLatestActiveDutyEvent(long driverId);
-
     @Query("SELECT * FROM events WHERE event_time >= :startTime AND event_time < :endTime " +
             "AND driver_id = :driverId AND (event_type = 1 or event_type = 3) AND status = 1 ORDER BY event_time, mobile_time, status DESC")
     List<ELDEventEntity> getActiveEventsFromStartToEndTimeSync(long startTime, long endTime, int driverId);
