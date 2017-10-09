@@ -60,7 +60,7 @@ public final class HomeTerminal implements Parcelable {
     }
 
     public String getTimezone() {
-        return mTimezone;
+        return mTimezone == null ? "UTC" : mTimezone;
     }
 
     public void setTimezone(String timezone) {

@@ -207,21 +207,6 @@ public class DateUtils {
      * @param logDay long with format time like 20170708
      * @return long unix time in ms
      */
-    public static long convertLogDayToUnixMs(long logDay) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd", Locale.US);
-        Date date = null;
-        try {
-            date = sdf.parse(String.valueOf(logDay));
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return date.getTime();
-    }
-
-    /**
-     * @param logDay long with format time like 20170708
-     * @return long unix time in ms
-     */
     public static long convertLogDayToUnixMs(long logDay, TimeZone timeZone) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd", Locale.US);
         sdf.setTimeZone(timeZone);

@@ -38,6 +38,14 @@ public enum NonDutyType implements Type {
             ELDEvent.MalfunctionCode.DIAGNOSTIC_CLEARED.getCode(),
             R.string.event_type_diagnostic_cleared),
 
+    INTERMEDIATE_LOG(ELDEvent.EventType.INTERMEDIATE_LOG.getValue(),
+            0,
+            R.string.event_type_intermediate_logs),
+
+    CERTIFICATION_OF_RECORDS(ELDEvent.EventType.CERTIFICATION_OF_RECORDS.getValue(),
+            0,
+            R.string.event_type_certification_record),
+
     UNKNOWN(0, 0, R.string.event_type_unknown_type);
 
     private int mType;
@@ -51,6 +59,11 @@ public enum NonDutyType implements Type {
     }
 
     public static NonDutyType getNonDutyTypeByCode(int type, int code) {
+        //should not check code for certification
+        if (type == CERTIFICATION_OF_RECORDS.getType()) {
+            return CERTIFICATION_OF_RECORDS;
+        }
+
         for (NonDutyType t : NonDutyType.values()) {
             if (t.mCode == code && t.mType == type) {
                 return t;

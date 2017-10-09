@@ -355,7 +355,7 @@ public final class LogsPresenter implements AccountManager.AccountListener {
                     logs.get(0).setEventTime(startDayTime);
                 }
 
-                if (logs.get(i).isActive()) {
+                if (logs.get(i).isActive() && logs.get(i).isDutyEvent()) {
                     if (lastActiveIndex >= 0) {
                         logs.get(lastActiveIndex).setDuration(logs.get(i).getEventTime() - logs.get(lastActiveIndex).getEventTime());
                     }
