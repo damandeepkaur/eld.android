@@ -185,6 +185,17 @@ public class DateUtils {
     /**
      * @param timeZone user timezone object"
      * @param time     unix time in ms
+     * @return long with format time like 12-29-09
+     */
+    public static String convertTimeToMMDDYY(TimeZone timeZone, long time) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MM-dd-yy", Locale.US);
+        dateFormat.setTimeZone(timeZone);
+        return dateFormat.format(time);
+    }
+
+    /**
+     * @param timeZone user timezone object"
+     * @param time     unix time in ms
      * @return long with format time like 11:12
      */
     public static String convertTimeToHHMM(TimeZone timeZone, long time) {
