@@ -105,6 +105,7 @@ public final class HoursOfServicePresenter extends BaseMenuPresenter {
                             Timber.e("Get timezone error: %s", error);
                         }
                 );
+        add(mResetTimeDisposable);
     }
 
     private void resetTime(List<ELDEvent> events, long startOfDay) {

@@ -153,7 +153,6 @@ public class LockScreenPresenterTest {
         when(mELDEventsInteractor.getEvent(any(DutyType.class))).thenReturn(new ELDEvent());
 
         mPresenter.bind(mLockScreenView);
-        verify(mLockScreenView).removeAnyPopup();
         subject.onNext(ignitionOffMock);
         subject.onNext(ignitionOffMock);
 

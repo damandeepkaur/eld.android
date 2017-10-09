@@ -17,6 +17,8 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import timber.log.Timber;
+
 public final class LogHeaderUtils {
     private static final String CARRIER_DELIMITER = ",";
     private static final String DISTANCE_DELIMITER = "/";
@@ -126,6 +128,7 @@ public final class LogHeaderUtils {
         if (header == null) return "";
 
         String codriverStringIds = header.getCoDriverIds();
+        Timber.d("CoDrivers Id - " + codriverStringIds);
         List<Integer> coDriversIds = ListConverter.toIntegerList(codriverStringIds);
 
         if (coDriversIds.isEmpty()) return "";

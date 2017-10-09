@@ -3,6 +3,7 @@ package com.bsmwireless.data.storage;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 
+import com.bsmwireless.common.Constants;
 import com.bsmwireless.common.utils.DateUtils;
 import com.bsmwireless.common.utils.SchedulerUtils;
 import com.bsmwireless.domain.interactors.BlackBoxInteractor;
@@ -12,15 +13,15 @@ import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.widgets.alerts.DutyType;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import io.reactivex.Completable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
-import static com.bsmwireless.common.utils.DateUtils.MS_IN_MIN;
-
 public final class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListener {
-    private static final int AUTO_ON_DUTY_DELAY = 5 * MS_IN_MIN;
+    private static final long AUTO_ON_DUTY_DELAY = Constants.LOCK_SCREEN_IDLE_MONITORING_TIMEOUT_MS;
 
     private BlackBoxInteractor mBlackBoxInteractor;
     private ELDEventsInteractor mEventsInteractor;
@@ -133,8 +134,9 @@ public final class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListen
             // the ELD must prompt the driver to confirm continued driving status or enter the proper duty status.
             case STOPPED:
                 mHandler.removeCallbacks(mAutoOnDutyTask);
-
+                Timber.d("STOPPED");
                 if (mDutyTypeManager.getDutyType() == DutyType.DRIVING) {
+                    Timber.d("Start mAutoOnDutyTask");
                     mStoppedTime = DateUtils.currentTimeMillis();
                     mHandler.postDelayed(mAutoOnDutyTask, AUTO_ON_DUTY_DELAY);
                 } else {
@@ -146,9 +148,7 @@ public final class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListen
                 break;
         }
 
-        if (!events.isEmpty()) {
-            mEventsInteractor.postNewELDEvents(events).subscribeOn(Schedulers.io()).subscribe();
-        }
+        saveEvents(events);
     }
 
     public void setListener(@NonNull AutoDutyTypeListener listener) {
@@ -175,6 +175,32 @@ public final class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListen
                 mHandler.postDelayed(mAutoOnDutyTask, AUTO_ON_DUTY_DELAY);
             }
         }
+    }
+
+    private void saveEvents(List<ELDEvent> events) {
+
+        if (events.isEmpty()) {
+            return;
+        }
+
+        mEventsInteractor
+                .postNewELDEvents(events)
+                .flatMapCompletable(ids -> Completable.defer(() -> {
+                    // Check events from last and if duty event is exist change duty status
+                    for (int i = events.size() - 1; i >= 0; i--) {
+                        ELDEvent eldEvent = events.get(i);
+                        if (eldEvent.isDutyEvent() && eldEvent.isActive()) {
+                            return Completable.fromAction(() -> {
+                                DutyType dutyType = DutyType
+                                        .getDutyTypeByCode(eldEvent.getEventType(), eldEvent.getEventCode());
+                                mDutyTypeManager.setDutyType(dutyType, true);
+                            });
+                        }
+                    }
+                    return Completable.complete();
+                }))
+                .subscribeOn(Schedulers.io())
+                .subscribe();
     }
 
     public interface AutoDutyTypeListener {
