@@ -15,6 +15,7 @@ import com.bsmwireless.screens.logs.LogHeaderModel;
 import com.bsmwireless.screens.logs.dagger.EventLogModel;
 import com.bsmwireless.widgets.logs.WrapLinearLayoutManager;
 import com.bsmwireless.widgets.logs.calendar.CalendarItem;
+import com.bsmwireless.widgets.snackbar.SnackBarLayout;
 
 import java.util.List;
 
@@ -29,6 +30,8 @@ public final class EditedEventsFragment extends BaseFragment implements EditedEv
 
     @BindView(R.id.recycler_view)
     RecyclerView mRecyclerView;
+    @BindView(R.id.snackbar)
+    SnackBarLayout mSnackBarLayout;
 
     @Inject
     EditedEventsPresenter mPresenter;
@@ -39,7 +42,7 @@ public final class EditedEventsFragment extends BaseFragment implements EditedEv
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Timber.v("onCreateView: ");
-        View view = inflater.inflate(R.layout.fragment_edited_events, container, false);
+        View view = inflater.inflate(R.layout.fragment_carrier_edits, container, false);
         mUnbinder = ButterKnife.bind(this, view);
         return view;
     }
@@ -89,6 +92,14 @@ public final class EditedEventsFragment extends BaseFragment implements EditedEv
     @Override
     public CalendarItem getSelectedDay() {
         return mAdapter.getCurrentItem();
+    }
+
+    @Override
+    public void showConnectionError() {
+        mSnackBarLayout
+                .setMessage(getString(R.string.error_network))
+                .setHideableOnTimeout(SnackBarLayout.DURATION_LONG)
+                .showSnackbar();
     }
 
     @Override

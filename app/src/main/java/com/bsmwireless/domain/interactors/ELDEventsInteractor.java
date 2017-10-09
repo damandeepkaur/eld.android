@@ -44,6 +44,7 @@ import timber.log.Timber;
 
 import static com.bsmwireless.common.Constants.SUCCESS;
 import static com.bsmwireless.common.utils.DateUtils.MS_IN_DAY;
+import static com.bsmwireless.common.utils.DateUtils.MS_IN_SEC;
 import static com.bsmwireless.common.utils.DateUtils.SEC_IN_HOUR;
 
 public final class ELDEventsInteractor {
@@ -146,8 +147,16 @@ public final class ELDEventsInteractor {
     }
 
     public Observable<long[]> updateELDEvents(List<ELDEvent> events) {
+        ELDEventEntity entities[] = new ELDEventEntity[events.size()];
+
+        for (int i = 0; i < entities.length; i++) {
+            ELDEvent event = events.get(i);
+            entities[i] = ELDEventConverter.toEntity(event, event.getStatus() == ELDEvent.StatusCode.ACTIVE.getValue() ?
+                    ELDEventEntity.SyncType.UPDATE_UNSYNC : ELDEventEntity.SyncType.values()[event.getSync()]);
+        }
+
         return Observable.fromCallable(() ->
-                mELDEventDao.insertAll(ELDEventConverter.toEntityArray(events, ELDEventEntity.SyncType.UPDATE_UNSYNC)))
+                mELDEventDao.insertAll(entities))
                 .doOnNext(longs -> mLogSheetInteractor.resetLogSheetHeaderSigning(events));
     }
 
@@ -170,7 +179,7 @@ public final class ELDEventsInteractor {
     public Observable<long[]> postNewDutyTypeEvent(DutyType dutyType, String comment, long time) {
         return Observable.fromIterable(getEvents(dutyType, comment))
                 .map(event -> {
-                    event.setEventTime(time);
+                    event.setEventTime(roundTime(time));
                     return event;
                 })
                 .toList()
@@ -474,7 +483,7 @@ public final class ELDEventsInteractor {
         int driverId = mAccountManager.getCurrentUserId();
 
         ELDEvent event = new ELDEvent();
-        event.setEventTime(currentTime);
+        event.setEventTime(roundTime(currentTime));
         event.setEngineHours(blackBoxModel.getEngineHours());
         event.setOdometer(blackBoxModel.getOdometer());
         event.setLat(blackBoxModel.getLat());
@@ -506,7 +515,7 @@ public final class ELDEventsInteractor {
         ELDEvent event = new ELDEvent();
         event.setDriverId(driverId);
         event.setVehicleId(mPreferencesManager.getVehicleId());
-        event.setEventTime(currentTime);
+        event.setEventTime(roundTime(currentTime));
         event.setEngineHours(blackBoxModel.getEngineHours());
         event.setOdometer(blackBoxModel.getOdometer());
         event.setLat(blackBoxModel.getLat());
@@ -560,5 +569,9 @@ public final class ELDEventsInteractor {
 
     private int multiplyAndRound(int sec) {
         return Math.round(sec / (float) SEC_IN_HOUR * 10);
+    }
+
+    private long roundTime(long time) {
+        return time / MS_IN_SEC * MS_IN_SEC;
     }
 }

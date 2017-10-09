@@ -13,9 +13,7 @@ import com.bsmwireless.domain.interactors.LogSheetInteractor;
 import com.bsmwireless.domain.interactors.UserInteractor;
 import com.bsmwireless.domain.interactors.VehiclesInteractor;
 import com.bsmwireless.models.ELDEvent;
-import com.bsmwireless.models.LogSheetHeader;
 import com.bsmwireless.models.SyncConfiguration;
-import com.bsmwireless.models.User;
 import com.bsmwireless.models.Vehicle;
 import com.bsmwireless.screens.logs.GraphModel;
 import com.bsmwireless.screens.logs.LogHeaderModel;
@@ -210,9 +208,14 @@ public final class EditedEventsPresenterImpl implements EditedEventsPresenter {
                 .doOnSuccess(eldEvents -> cachedEvents.addAll(eldEvents))
                 .flatMap(eldEvents -> mServiceApi.updateELDEvents(eldEvents))
                 .doOnSuccess(resp -> updateDbEldEvents(cachedEvents, logDay))
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(responseMessage -> {
                     mSendUpdatedDisposable.dispose();
-                }, Timber::e);
+                }, t -> {
+                    Timber.e(t);
+                    mView.showConnectionError();
+                    mSendUpdatedDisposable.dispose();
+                });
     }
 
     private void updateDbEldEvents(List<ELDEvent> events, long logDay) {

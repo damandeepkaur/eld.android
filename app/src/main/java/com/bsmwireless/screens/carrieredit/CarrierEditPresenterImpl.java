@@ -80,6 +80,7 @@ public final class CarrierEditPresenterImpl extends BaseMenuPresenter implements
     @Override
     public void destroy() {
         Timber.d("destroy: ");
+        super.onDestroy();
         mView = null;
         if (!mDriverDisposable.isDisposed()) {
             mDriverDisposable.dispose();
