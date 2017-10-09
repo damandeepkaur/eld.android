@@ -39,7 +39,7 @@ public final class LockScreenPresenter {
     LockScreenView mView;
     final DutyTypeManager mDutyManager;
     final BlackBoxInteractor mBlackBoxInteractor;
-    private final CompositeDisposable mCompositeDisposable;
+    private CompositeDisposable mCompositeDisposable;
     private final PreferencesManager mPreferencesManager;
     final BlackBoxStateChecker mChecker;
     private final ELDEventsInteractor mEventsInteractor;
@@ -65,14 +65,14 @@ public final class LockScreenPresenter {
         mEventsInteractor = eventsInteractor;
         mAppSettings = appSettings;
         mAccountManager = accountManager;
-        mCompositeDisposable = new CompositeDisposable();
         mReconnectionReference = new AtomicReference<>();
         mIdlingTDisposable = Disposables.disposed();
         mCurrentResponseType = BlackBoxResponseModel.ResponseType.NONE;
+        mCompositeDisposable = new CompositeDisposable();
     }
 
-    public void onStart(@NonNull LockScreenView view) {
-
+    public void bind(@NonNull LockScreenView view) {
+        mCompositeDisposable = new CompositeDisposable();
         mView = view;
 
         DutyType currentDutyType = mDutyManager.getDutyType();
@@ -91,8 +91,8 @@ public final class LockScreenPresenter {
         mAccountManager.addListener(accountListener);
     }
 
-    public void onStop() {
-        mCompositeDisposable.clear();
+    public void unbind() {
+        mCompositeDisposable.dispose();
         mAccountManager.removeListener(accountListener);
         mView = null;
     }
@@ -108,17 +108,13 @@ public final class LockScreenPresenter {
         if (dutyType == DutyType.ON_DUTY &&
                 mCurrentResponseType == BlackBoxResponseModel.ResponseType.IGNITION_OFF) {
             // just close screen, status already changed in this case
-            mView.closeLockScreen();
+            closeLockScreen();
             return;
         }
 
         Disposable disposable = createPostNewEventCompletable(mEventsInteractor.getEvent(dutyType))
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(() -> {
-                    if (mView != null) {
-                        mView.closeLockScreen();
-                    }
-                });
+                .subscribe(this::closeLockScreen);
         mCompositeDisposable.add(disposable);
     }
 
@@ -146,7 +142,7 @@ public final class LockScreenPresenter {
         if (mView != null) {
             mView.removeAnyPopup();
         }
-        mBlackBoxInteractor.getData(mPreferencesManager.getBoxId())
+        Disposable disposable = mBlackBoxInteractor.getData(mPreferencesManager.getBoxId())
                 .skip(1) // first element already handled, skip it
                 .distinctUntilChanged(BlackBoxModel::getResponseType)
                 .doOnNext(blackBoxModel -> mCurrentResponseType = blackBoxModel.getResponseType())
@@ -175,6 +171,7 @@ public final class LockScreenPresenter {
                         handleDisconnection();
                     }
                 });
+        mCompositeDisposable.add(disposable);
     }
 
     void handleIgnitionOff() {
@@ -194,12 +191,12 @@ public final class LockScreenPresenter {
             //already running
             return;
         }
-
         mIdlingTDisposable = Completable
                 .timer(mAppSettings.lockScreenIdlingTimeout(), TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(mView::closeLockScreen);
+                .subscribe(this::closeLockScreen);
+        mCompositeDisposable.add(mIdlingTDisposable);
     }
 
     void handleMoving() {
@@ -259,8 +256,14 @@ public final class LockScreenPresenter {
                 .andThen(createPostNewEventCompletable(eldEvent))
                 .observeOn(AndroidSchedulers.mainThread())
                 .doFinally(() -> mReconnectionReference.set(null))
-                .subscribe(this::startMonitoring, throwable -> mView.closeLockScreen());
+                .subscribe(this::startMonitoring, throwable -> closeLockScreen());
         mCompositeDisposable.add(disposable);
+    }
+
+    void closeLockScreen(){
+        if (mView != null) {
+            mView.closeLockScreen();
+        }
     }
 
     private Completable createPostNewEventCompletable(ELDEvent eldEventInfo) {
@@ -283,8 +286,8 @@ public final class LockScreenPresenter {
     private final AccountManager.AccountListener accountListener = new AccountManager.AccountListener() {
         @Override
         public void onUserChanged() {
-            if (!mAccountManager.isCurrentUserDriver() & mView != null) {
-                mView.closeLockScreen();
+            if (!mAccountManager.isCurrentUserDriver()) {
+                closeLockScreen();
             }
         }
 

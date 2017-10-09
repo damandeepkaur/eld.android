@@ -207,6 +207,8 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
         }
     }
 
+    private transient Integer mInnerId;
+
     @SerializedName("id")
     @Expose
     private Integer mId;
@@ -291,6 +293,8 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
     @SerializedName("appInfo")
     @Expose
     private String mAppInfo;
+
+    private transient int mSync;
 
     public ELDEvent() {
     }
@@ -407,6 +411,11 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
         notNull = in.readByte() == 1;
         if (notNull) {
             mAppInfo = in.readString();
+        }
+        mSync = in.readInt();
+        notNull = in.readByte() == 1;
+        if (notNull) {
+            this.mInnerId = in.readInt();
         }
     }
 
@@ -635,6 +644,22 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
         mAppInfo = appInfo;
     }
 
+    public int getSync() {
+        return mSync;
+    }
+
+    public void setSync(int sync) {
+        mSync = sync;
+    }
+
+    public Integer getInnerId() {
+        return mInnerId;
+    }
+
+    public void setInnerId(Integer innerId) {
+        mInnerId = innerId;
+    }
+
     @Override
     public Boolean isActive() {
         return mStatus.equals(ELDEvent.StatusCode.ACTIVE.getValue());
@@ -686,6 +711,8 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
                 .append(mDiagnostic, rhs.mDiagnostic)
                 .append(mMalCode, rhs.mMalCode)
                 .append(mAppInfo, rhs.mAppInfo)
+                .append(mSync, rhs.mSync)
+                .append(mInnerId, rhs.mInnerId)
                 .isEquals();
     }
 
@@ -720,6 +747,8 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
                 .append(mDiagnostic)
                 .append(mMalCode)
                 .append(mAppInfo)
+                .append(mSync)
+                .append(mInnerId)
                 .toHashCode();
     }
 
@@ -868,6 +897,13 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
         if (mAppInfo != null) {
             dest.writeString(mAppInfo);
         }
+
+        dest.writeInt(mSync);
+
+        dest.writeByte(this.mInnerId == null ? (byte) 0 : 1);
+        if (this.mInnerId != null) {
+            dest.writeInt(this.mInnerId);
+        }
     }
 
     public static final Creator<ELDEvent> CREATOR = new Creator<ELDEvent>() {
@@ -923,6 +959,8 @@ public final class ELDEvent implements Parcelable, DutyTypeManager.DutyTypeCheck
         sb.append(", mDiagnostic=").append(mDiagnostic);
         sb.append(", mMalCode=").append(mMalCode);
         sb.append(", mAppInfo=").append(mAppInfo);
+        sb.append(", mSync=").append(mSync);
+        sb.append(", mInnerId=").append(mInnerId);
         sb.append('}');
         return sb.toString();
     }

@@ -100,8 +100,9 @@ public final class EditEventPresenter extends BaseMenuPresenter {
 
         if (mELDEvent != null) {
             newEvent = mELDEvent.clone();
+            newEvent.setId(null);
+            newEvent.setInnerId(null);
             mELDEvent.setStatus(ELDEvent.StatusCode.INACTIVE_CHANGED.getValue());
-            mELDEvent.setId(null);
             events.add(mELDEvent);
         } else {
             newEvent = getEventsInteractor().getEvent(type);
