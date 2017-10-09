@@ -72,6 +72,7 @@ public final class UnassignedEventsPresenterImpl implements UnassignedEventsPres
                 }, throwable -> {
                     Timber.e(throwable);
                     mDisposable.dispose();
+                    mView.showConnectionError();
                 });
     }
 
