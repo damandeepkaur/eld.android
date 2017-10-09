@@ -40,7 +40,6 @@ import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
-import retrofit2.http.HEAD;
 import timber.log.Timber;
 
 import static com.bsmwireless.common.Constants.SUCCESS;
