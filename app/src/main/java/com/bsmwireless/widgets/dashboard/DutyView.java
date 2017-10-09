@@ -146,12 +146,12 @@ public final class DutyView extends CardView {
      * for platforms above Lollilop.
      */
     private void setContentPadding() {
-        float maxCardElevetation = getMaxCardElevation();
+        float maxCardElevation = getMaxCardElevation();
         float cornerRadius = getRadius();
         double cos45 = Math.cos(Math.toRadians(45));
 
-        int verticalPadding = (int) (maxCardElevetation + (1 - cos45) * cornerRadius);
-        int horizontalPadding = (int) (maxCardElevetation * 1.5 + (1 - cos45) * cornerRadius);
+        int verticalPadding = (int) (maxCardElevation + (1 - cos45) * cornerRadius);
+        int horizontalPadding = (int) (maxCardElevation * 1.5 + (1 - cos45) * cornerRadius);
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
             setContentPadding(-verticalPadding, -horizontalPadding, -verticalPadding, -horizontalPadding);
