@@ -83,11 +83,22 @@ public final class SelectAssetPresenter {
     }
 
     public void onNotInVehicleButtonClicked() {
-        mDisposables.add(mVehiclesInteractor.cleanSelectedVehicle()
+        mView.showProgress();
+        mDisposables.add(mVehiclesInteractor.pairNotInVehicle()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(() -> mView.goToHomeScreen(),
-                        Timber::e));
+                .subscribe(events -> {
+                            mView.goToHomeScreen();
+                            mView.hideProgress();
+                        },
+                        error -> {
+                            Timber.e("SelectAsset error: %s", error);
+                            if (error instanceof RetrofitException) {
+                                mView.showErrorMessage((RetrofitException) error);
+                            }
+
+                            mView.hideProgress();
+                        }));
     }
 
     public void onVehicleListItemClicked(Vehicle vehicle) {

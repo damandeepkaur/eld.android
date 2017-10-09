@@ -243,4 +243,7 @@ public interface ServiceApi {
 
     @POST("v1/app/reports/logsheets/{start}/{end}/{option}")
     Single<ResponseMessage> sendReport(@Path("start") long start, @Path("end") long end, @Path("option") int option, @Body ELDEvent report);
+
+    @GET("v1/sync/records/address/{start}/{end}")
+    Single<List<ELDEvent>> getLocation(@Path("start") long start, @Path("end") long end);
 }

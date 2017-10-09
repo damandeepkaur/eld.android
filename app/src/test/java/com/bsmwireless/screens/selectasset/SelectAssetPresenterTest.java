@@ -190,13 +190,13 @@ public class SelectAssetPresenterTest {
     @Test
     public void testOnNotInVehicleButtonClicked() {
         // given
-        when(mVehiclesInteractor.cleanSelectedVehicle()).thenReturn(Completable.complete());
+        when(mVehiclesInteractor.pairNotInVehicle()).thenReturn(Single.just(new ArrayList<>()));
 
         // when
         mSelectAssetPresenter.onNotInVehicleButtonClicked();
 
         // then
-        verify(mVehiclesInteractor).cleanSelectedVehicle();
+        verify(mVehiclesInteractor).pairNotInVehicle();
         verify(mView).goToHomeScreen();
     }
 

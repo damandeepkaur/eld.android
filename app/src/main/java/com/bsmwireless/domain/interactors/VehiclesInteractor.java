@@ -7,6 +7,7 @@ import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.storage.AppDatabase;
 import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.data.storage.vehicles.VehicleConverter;
+import com.bsmwireless.models.BlackBoxModel;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.Vehicle;
 
@@ -121,6 +122,30 @@ public final class VehiclesInteractor {
                 .doOnNext(events -> {
                     saveLastVehicle(id, vehicle.getId());
                     mELDEventsInteractor.storeUnidentifiedEvents(events);
+                })
+                .doOnError(error -> cleanSelectedVehicle().blockingAwait());
+    }
+
+    public Single<List<ELDEvent>> pairNotInVehicle() {
+        return cleanSelectedVehicle()
+                .andThen(mUserInteractor.getTimezoneOnce())
+                .flatMap(timezone -> {
+                    ELDEvent event = new ELDEvent();
+
+                    event.setMobileTime(System.currentTimeMillis());
+                    event.setDriverId(mUserInteractor.getDriverId());
+                    event.setVehicleId(PreferencesManager.NOT_FOUND_VALUE);
+                    event.setBoxId(PreferencesManager.NOT_FOUND_VALUE);
+                    event.setTimezone(timezone);
+
+                    BlackBoxModel blackBox = mBlackBoxInteractor.getLastData();
+                    event.setOdometer(blackBox.getOdometer());
+                    event.setLat(blackBox.getLat());
+                    event.setLng(blackBox.getLon());
+                    event.setEngineHours(blackBox.getEngineHours());
+                    event.setComment("");
+
+                    return mServiceApi.pairVehicle(event);
                 })
                 .doOnError(error -> cleanSelectedVehicle().blockingAwait());
     }
