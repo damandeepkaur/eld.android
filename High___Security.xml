@@ -253,6 +253,9 @@
   <inspection_tool class="CannotResolve" enabled="false" level="ERROR" enabled_by_default="false" />
   <inspection_tool class="CaughtExceptionImmediatelyRethrown" enabled="false" level="WARNING" enabled_by_default="false" />
   <inspection_tool class="ChangeToOperator" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+  <inspection_tool class="ChannelResource" enabled="true" level="WARNING" enabled_by_default="true">
+    <option name="insideTryAllowed" value="false" />
+  </inspection_tool>
   <inspection_tool class="CheckDtdRefs" enabled="false" level="ERROR" enabled_by_default="false" />
   <inspection_tool class="CheckEmptyScriptTag" enabled="false" level="WARNING" enabled_by_default="false" />
   <inspection_tool class="CheckTagEmptyBody" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -267,6 +270,7 @@
   <inspection_tool class="CodeBlock2Expr" enabled="false" level="WARNING" enabled_by_default="false" />
   <inspection_tool class="CollectionAddedToSelf" enabled="false" level="WARNING" enabled_by_default="false" />
   <inspection_tool class="ComparatorMethodParameterNotUsed" enabled="false" level="WARNING" enabled_by_default="false" />
+  <inspection_tool class="ConnectionResource" enabled="true" level="WARNING" enabled_by_default="true" />
   <inspection_tool class="ConstExpressionRequired" enabled="false" level="ERROR" enabled_by_default="false" />
   <inspection_tool class="ConstantConditionalExpression" enabled="false" level="WARNING" enabled_by_default="false" />
   <inspection_tool class="ConstantConditions" enabled="false" level="WARNING" enabled_by_default="false">
@@ -387,6 +391,9 @@
   <inspection_tool class="GroovyUnusedIncOrDec" enabled="false" level="WARNING" enabled_by_default="false" />
   <inspection_tool class="GroovyVariableNotAssigned" enabled="false" level="WARNING" enabled_by_default="false" />
   <inspection_tool class="Guava" enabled="false" level="WARNING" enabled_by_default="false" />
+  <inspection_tool class="HibernateResource" enabled="true" level="WARNING" enabled_by_default="true">
+    <option name="insideTryAllowed" value="false" />
+  </inspection_tool>
   <inspection_tool class="HidesUpperScope" enabled="false" level="WARNING" enabled_by_default="false" />
   <inspection_tool class="HidingNonVirtualFunction" enabled="false" level="WARNING" enabled_by_default="false" />
   <inspection_tool class="HtmlExtraClosingTag" enabled="false" level="ERROR" enabled_by_default="false" />
@@ -416,6 +423,10 @@
     <option name="myCustomValuesEnabled" value="true" />
   </inspection_tool>
   <inspection_tool class="HtmlUnknownTarget" enabled="false" level="WARNING" enabled_by_default="false" />
+  <inspection_tool class="IOResource" enabled="true" level="WARNING" enabled_by_default="true">
+    <option name="ignoredTypesString" value="java.io.ByteArrayOutputStream,java.io.ByteArrayInputStream,java.io.StringBufferInputStream,java.io.CharArrayWriter,java.io.CharArrayReader,java.io.StringWriter,java.io.StringReader" />
+    <option name="insideTryAllowed" value="false" />
+  </inspection_tool>
   <inspection_tool class="IfCanBeSwitch" enabled="false" level="WARNING" enabled_by_default="false">
     <option name="minimumBranches" value="3" />
     <option name="suggestIntSwitches" value="false" />
@@ -446,6 +457,12 @@
   <inspection_tool class="InvalidParameterAnnotations" enabled="false" level="ERROR" enabled_by_default="false" />
   <inspection_tool class="JDBCExecuteWithNonConstantString" enabled="true" level="WARNING" enabled_by_default="true" />
   <inspection_tool class="JDBCPrepareStatementWithNonConstantString" enabled="true" level="WARNING" enabled_by_default="true" />
+  <inspection_tool class="JDBCResource" enabled="true" level="WARNING" enabled_by_default="true">
+    <option name="insideTryAllowed" value="false" />
+  </inspection_tool>
+  <inspection_tool class="JNDIResource" enabled="true" level="WARNING" enabled_by_default="true">
+    <option name="insideTryAllowed" value="false" />
+  </inspection_tool>
   <inspection_tool class="JUnit4AnnotatedMethodInJUnit3TestCase" enabled="false" level="WARNING" enabled_by_default="false" />
   <inspection_tool class="Java8CollectionsApi" enabled="false" level="WARNING" enabled_by_default="false" />
   <inspection_tool class="JavaDoc" enabled="false" level="WARNING" enabled_by_default="false">
@@ -579,6 +596,7 @@
   <inspection_tool class="PrimitiveArrayArgumentToVariableArgMethod" enabled="false" level="WARNING" enabled_by_default="false" />
   <inspection_tool class="PublicStaticArrayField" enabled="true" level="WARNING" enabled_by_default="true" />
   <inspection_tool class="PublicStaticCollectionField" enabled="true" level="WARNING" enabled_by_default="true" />
+  <inspection_tool class="RecordStoreResource" enabled="true" level="WARNING" enabled_by_default="true" />
   <inspection_tool class="RedundantArrayCreation" enabled="false" level="WARNING" enabled_by_default="false" />
   <inspection_tool class="RedundantStringFormatCall" enabled="false" level="WARNING" enabled_by_default="false" />
   <inspection_tool class="RedundantThrows" enabled="false" level="WARNING" enabled_by_default="false" />
@@ -612,6 +630,9 @@
   <inspection_tool class="SimplifiableIfStatement" enabled="false" level="WARNING" enabled_by_default="false" />
   <inspection_tool class="SimplifyStreamApiCallChains" enabled="false" level="WARNING" enabled_by_default="false" />
   <inspection_tool class="Since15" enabled="false" level="ERROR" enabled_by_default="false" />
+  <inspection_tool class="SocketResource" enabled="true" level="WARNING" enabled_by_default="true">
+    <option name="insideTryAllowed" value="false" />
+  </inspection_tool>
   <inspection_tool class="SpellCheckingInspection" enabled="false" level="TYPO" enabled_by_default="false">
     <option name="processCode" value="true" />
     <option name="processLiterals" value="true" />

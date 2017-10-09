@@ -21,7 +21,6 @@ import javax.inject.Inject;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
-import retrofit2.http.HEAD;
 import timber.log.Timber;
 
 import static com.bsmwireless.screens.autologout.AutoDutyDialogActivity.EXTRA_TOKEN_EXPIRED;
@@ -145,13 +144,13 @@ public final class TokenManager {
 
     public TokenExpirationHandler getTokenExpirationHandler() {
         if (mTokenExpirationHandler == null) {
-            mTokenExpirationHandler = new TokenExpirationHandler();
+            mTokenExpirationHandler = new TokenExpirationHandler(this);
             App.getComponent().inject(mTokenExpirationHandler);
         }
         return mTokenExpirationHandler;
     }
 
-    public class TokenExpirationHandler {
+    public static final class TokenExpirationHandler {
         @Inject
         BlackBoxInteractor mBlackBoxInteractor;
         @Inject
@@ -160,6 +159,12 @@ public final class TokenManager {
         ServiceApi mServiceApi;
         @Inject
         com.bsmwireless.data.storage.AccountManager mAccountManager;
+
+        TokenManager mTokenManager;
+
+        TokenExpirationHandler(TokenManager manager) {
+            mTokenManager = manager;
+        }
 
         public boolean onTokenExpired(Context context, String accountType, String name) {
             Timber.d("onTokenExpired: accType: %s, name: %s", accountType, name);
@@ -171,7 +176,7 @@ public final class TokenManager {
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .toObservable()
-                        .flatMap(auth -> Observable.fromCallable(() -> refreshToken(accountType, name, auth)))
+                        .flatMap(auth -> Observable.fromCallable(() -> mTokenManager.refreshToken(accountType, name, auth)))
                         .subscribe(flag -> Timber.d("Token refreshed: " + flag), Timber::e);
                 retVal = true;
             } else if (mAccountManager.getCurrentUserAccountName().equals(accountType)) {

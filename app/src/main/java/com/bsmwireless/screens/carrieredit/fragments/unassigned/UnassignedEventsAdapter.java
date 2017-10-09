@@ -27,7 +27,7 @@ import timber.log.Timber;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
-public class UnassignedEventsAdapter extends RecyclerView.Adapter<UnassignedEventsAdapter.EventsHolder> {
+public final class UnassignedEventsAdapter extends RecyclerView.Adapter<UnassignedEventsAdapter.EventsHolder> {
     private static final int HEADER = 0;
     private static final int ITEM = 1;
 

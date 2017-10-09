@@ -37,7 +37,7 @@ import static android.view.View.VISIBLE;
 import static com.bsmwireless.widgets.logs.LogsTitleView.Type.EVENTS;
 import static com.bsmwireless.widgets.logs.LogsTitleView.Type.LOG_HEADER;
 
-public class EditedEventsAdapter extends RecyclerView.Adapter<EditedEventsAdapter.LogsHolder> {
+public final class EditedEventsAdapter extends RecyclerView.Adapter<EditedEventsAdapter.LogsHolder> {
     private static final int VIEW_TYPE_HEADER = 0;
     private static final int VIEW_TYPE_EVENTS_TITLE = 1;
     private static final int VIEW_TYPE_EVENTS_ITEM = 2;
