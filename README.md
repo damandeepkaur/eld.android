@@ -3,6 +3,7 @@ ELD app for Android
 
 # Version history
 
+* **1.1.5** - Carrier edits and unassigned events functionality
 * **1.1.4** - Fix order of inactive event, fix missing events (_EA-467_, _EA-366_)
 * **1.1.3** - App Menu option "Roadside Inspection" typo (_EA-482_)
 * **1.1.2** - Records Time format should be 24h instead of 12h (_EA-485_)
