@@ -7,6 +7,7 @@ import com.bsmwireless.domain.interactors.ELDEventsInteractor;
 import com.bsmwireless.domain.interactors.SyncInteractor;
 import com.bsmwireless.domain.interactors.UserInteractor;
 import com.bsmwireless.domain.interactors.VehiclesInteractor;
+import com.bsmwireless.models.ELDEvent;
 
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -16,8 +17,12 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.util.Collections;
+import java.util.List;
+
 import app.bsmuniversal.com.RxSchedulerRule;
 import io.reactivex.Flowable;
+import io.reactivex.Observable;
 import io.reactivex.Single;
 
 import static org.mockito.Matchers.anyString;
@@ -127,6 +132,7 @@ public class NavigationPresenterTest {
         final String name = "userName";
         final Flowable<String> userFlowable = Flowable.just(name);
         final Flowable<Integer> coDriverCountFlowable = Flowable.just(3);
+        final Observable<List<ELDEvent>> unassignedEvents= Observable.just(Collections.emptyList());
 
         final int coDriver = 3; // note: business logic is incorrect as can have multiple co-drivers
         // TODO: add refactor task/story to JIRA after server-side API refactors to match correct business logic
@@ -140,6 +146,8 @@ public class NavigationPresenterTest {
         when(mVehiclesInteractor.getAssetsNumber()).thenReturn(assetNumber);
 
         when(mUserInteractor.isLoginActive()).thenReturn(true);
+
+        when(mEventsInteractor.getUnidentifiedEvents()).thenReturn(unassignedEvents);
 
         // when
         mNavigationPresenter.onViewCreated();

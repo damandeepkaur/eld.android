@@ -95,7 +95,7 @@ public final class RoadsidePresenter {
                                 graphModel.setPrevDayEvent(prevDayEvent);
                                 graphModel.setStartDayTime(startTime);
                                 graphModel.setEventLogModels(preparingLogs(events, startTime,
-                                        Math.min(endTime, System.currentTimeMillis()), timezone));
+                                        Math.min(endTime, DateUtils.currentTimeMillis()), timezone));
                                 result.setGraphData(graphModel);
                                 result.setPreviousEvent(prevDayEvent);
 
@@ -110,7 +110,7 @@ public final class RoadsidePresenter {
                             mView.showEvents(result.getEventsData());
                             mView.showGraph(result.getGraphData());
                         },
-                        throwable -> Timber.e(throwable)
+                        Timber::e
                 );
     }
 
@@ -142,7 +142,7 @@ public final class RoadsidePresenter {
             }
 
             EventLogModel log = new EventLogModel(event, timezone);
-            log.setDutyType(DutyType.getTypeByCode(log.getEventType(), log.getEventCode()));
+            log.setType(DutyType.getDutyTypeByCode(log.getEventType(), log.getEventCode()));
 
             if (logs.size() == 0) {
                 if ((log.getEventTime() < startDayTime)) {

@@ -41,7 +41,7 @@ public final class LockScreenPresenter {
     LockScreenView mView;
     final DutyTypeManager mDutyManager;
     final BlackBoxInteractor mBlackBoxInteractor;
-    private final CompositeDisposable mCompositeDisposable;
+    private CompositeDisposable mCompositeDisposable;
     private final PreferencesManager mPreferencesManager;
     final BlackBoxStateChecker mChecker;
     private final ELDEventsInteractor mEventsInteractor;
@@ -69,16 +69,16 @@ public final class LockScreenPresenter {
         mEventsInteractor = eventsInteractor;
         mAppSettings = appSettings;
         mAccountManager = accountManager;
-        mCompositeDisposable = new CompositeDisposable();
         mReconnectionReference = new AtomicReference<>();
         mIdlingTDisposable = Disposables.disposed();
         mIgnitionOffDisposable = Disposables.disposed();
         mStoppedReference = new AtomicReference<>();
         mCurrentResponseType = BlackBoxResponseModel.ResponseType.NONE;
+        mCompositeDisposable = new CompositeDisposable();
     }
 
-    public void onStart(@NonNull LockScreenView view) {
-
+    public void bind(@NonNull LockScreenView view) {
+        mCompositeDisposable = new CompositeDisposable();
         mView = view;
 
         startDutyTypeMonitoring();
@@ -87,8 +87,8 @@ public final class LockScreenPresenter {
         mAccountManager.addListener(accountListener);
     }
 
-    public void onStop() {
-        mCompositeDisposable.clear();
+    public void unbind() {
+        mCompositeDisposable.dispose();
         mAccountManager.removeListener(accountListener);
         mView = null;
     }
@@ -105,7 +105,7 @@ public final class LockScreenPresenter {
 
         if (dutyType == DutyType.ON_DUTY) {
             // just close screen, status already changed in this case
-            mView.closeLockScreen();
+            closeLockScreen();
             return;
         }
 
@@ -114,11 +114,7 @@ public final class LockScreenPresenter {
                 .flatMapCompletable(this::createPostNewEventCompletable)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(() -> {
-                    if (mView != null) {
-                        mView.closeLockScreen();
-                    }
-                });
+                .subscribe(this::closeLockScreen);
         mCompositeDisposable.add(disposable);
     }
 
@@ -315,7 +311,7 @@ public final class LockScreenPresenter {
                         mView.removeAnyPopup();
                     }
                     startMonitoring();
-                }, throwable -> mView.closeLockScreen());
+                }, throwable -> closeLockScreen());
         mCompositeDisposable.add(disposable);
     }
 
@@ -340,13 +336,19 @@ public final class LockScreenPresenter {
                 }));
     }
 
+    void closeLockScreen(){
+        if (mView != null) {
+            mView.closeLockScreen();
+        }
+    }
+
     private Completable createPostNewEventCompletable(ELDEvent eldEventInfo) {
         return mEventsInteractor.postNewELDEvent(eldEventInfo)
                 .toCompletable()
                 .doOnComplete(() -> {
                     Integer eventType = eldEventInfo.getEventType();
                     Integer eventCode = eldEventInfo.getEventCode();
-                    DutyType dutyType = DutyType.getTypeByCode(eventType, eventCode);
+                    DutyType dutyType = DutyType.getDutyTypeByCode(eventType, eventCode);
                     resetTime(dutyType);
                 })
                 .onErrorComplete(throwable -> {
@@ -358,8 +360,8 @@ public final class LockScreenPresenter {
     private final AccountManager.AccountListener accountListener = new AccountManager.AccountListener() {
         @Override
         public void onUserChanged() {
-            if (!mAccountManager.isCurrentUserDriver() & mView != null) {
-                mView.closeLockScreen();
+            if (!mAccountManager.isCurrentUserDriver()) {
+                closeLockScreen();
             }
         }
 

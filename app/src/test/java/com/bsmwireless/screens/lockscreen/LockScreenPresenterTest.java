@@ -91,7 +91,7 @@ public class LockScreenPresenterTest {
 
         when(mBlackBoxInteractor.getData(anyInt())).thenReturn(Observable.empty());
 
-        mPresenter.onStart(mLockScreenView);
+        mPresenter.bind(mLockScreenView);
         subject.onNext(DutyType.DRIVING);
         subject.onComplete();
 
@@ -112,7 +112,7 @@ public class LockScreenPresenterTest {
         when(mBlackBoxInteractor.getData(anyInt())).thenReturn(Observable.empty());
         doNothing().when(mPresenter).startTimer();
 
-        mPresenter.onStart(mLockScreenView);
+        mPresenter.bind(mLockScreenView);
         mPresenter.switchCoDriver();
         verify(mLockScreenView).openCoDriverDialog();
     }
@@ -132,7 +132,7 @@ public class LockScreenPresenterTest {
         when(mELDEventsInteractor.postNewELDEvent(any())).thenReturn(Single.just(1L));
         doNothing().when(mPresenter).startTimer();
 
-        mPresenter.onStart(mLockScreenView);
+        mPresenter.bind(mLockScreenView);
         subject.onNext(stoppedMock);
         subject.onNext(stoppedMock);
         subject.onComplete();
@@ -152,7 +152,8 @@ public class LockScreenPresenterTest {
         doNothing().when(mPresenter).startTimer();
         when(mELDEventsInteractor.getEvent(any(DutyType.class))).thenReturn(new ELDEvent());
 
-        mPresenter.onStart(mLockScreenView);
+        mPresenter.bind(mLockScreenView);
+        verify(mLockScreenView).removeAnyPopup();
         subject.onNext(ignitionOffMock);
         subject.onNext(ignitionOffMock);
 

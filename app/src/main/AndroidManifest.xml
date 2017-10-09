@@ -40,6 +40,9 @@
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="stateHidden|adjustResize"/>
         <activity
+            android:name="com.bsmwireless.screens.carrieredit.CarrierEditActivity"
+            android:parentActivityName="com.bsmwireless.screens.navigation.NavigationActivity"/>
+        <activity
             android:name="com.bsmwireless.screens.navigation.NavigationActivity"
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="stateHidden|adjustResize">
@@ -104,6 +107,7 @@
             android:exported="false"
             android:permission="android.permission.BIND_JOB_SERVICE"/>
         <service android:name="com.bsmwireless.schedulers.alarmmanager.AutoLogoutService"/>
+        <service android:name="com.bsmwireless.schedulers.alarmmanager.TokenExpirationService"/>
         <service android:name="com.bsmwireless.services.monitoring.StatusMonitoringService"/>
 
         <receiver android:name="com.bsmwireless.schedulers.alarmmanager.AlarmReceiver"/>
@@ -125,6 +129,11 @@
         <service android:name="com.bsmwireless.services.malfunction.MalfunctionMonitoringService"/>
 
         <receiver android:name="com.bsmwireless.schedulers.alarmmanager.SyncNtpAlarmReceiver"/>
+
+        <service
+            android:name="com.bsmwireless.schedulers.jobscheduler.VerifyTokenScheduler"
+            android:exported="false"
+            android:permission="android.permission.BIND_JOB_SERVICE"/>
     </application>
 
 </manifest>

@@ -68,7 +68,10 @@ public final class GraphLayout extends LinearLayout {
     }
 
     private void updateHOSTimes(final List<EventLogModel> events, final long startDayTime) {
-        long currentTime = Calendar.getInstance().getTimeInMillis();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(DateUtils.currentTimeMillis());
+
+        long currentTime = calendar.getTimeInMillis();
         long endDayTime = startDayTime + MS_IN_DAY;
 
         List<DutyTypeManager.DutyTypeCheckable> checkableEvents = new ArrayList<>(events);
@@ -132,7 +135,7 @@ public final class GraphLayout extends LinearLayout {
         List<DrawableLog> result = DrawableLog.convertToDrawableLog(events);
 
         if (mPrevDayEvent != null) {
-            DutyType type = DutyType.getTypeByCode(mPrevDayEvent.getEventType(),
+            DutyType type = DutyType.getDutyTypeByCode(mPrevDayEvent.getEventType(),
                     mPrevDayEvent.getEventCode());
             DrawableLog log = new DrawableLog(type, startDayTime);
             result.add(0, log);

@@ -13,6 +13,7 @@ import com.bsmwireless.screens.common.menu.BaseMenuView;
 
 import javax.inject.Inject;
 
+import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -106,6 +107,7 @@ public final class NavigationPresenter extends BaseMenuPresenter {
                 .subscribe(count -> mView.setCoDriversNumber(count)));
         mAutoDutyTypeManager.validateBlackBoxState();
         mSyncInteractor.startSync();
+        checkForUnassignedEvents();
     }
 
     @Override
@@ -121,5 +123,20 @@ public final class NavigationPresenter extends BaseMenuPresenter {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(name -> mView.setDriverName(name));
         add(disposable);
+    }
+
+    private void checkForUnassignedEvents() {
+        add(Observable.zip(mEventsInteractor.getUnidentifiedEvents(), mEventsInteractor.getUnidentifiedEvents(),
+                (eldEvents, eldEvents2) -> {
+                    eldEvents.addAll(eldEvents2);
+                    return eldEvents;
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(res -> {
+                    if (!res.isEmpty()) {
+                        mView.showUnassignedDialog();
+                    }
+                }, Timber::e));
     }
 }

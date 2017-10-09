@@ -74,6 +74,7 @@ public final class MultidayPresenter implements AccountManager.AccountListener {
 
     public void getItems(int dayCount) {
         Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(mTimeZone));
+        calendar.setTimeInMillis(DateUtils.currentTimeMillis());
 
         long endDayTime = calendar.getTimeInMillis();
         calendar.setTimeInMillis(endDayTime - (dayCount - 1) * MS_IN_DAY);
@@ -97,7 +98,7 @@ public final class MultidayPresenter implements AccountManager.AccountListener {
         List<MultidayItemModel> items = new ArrayList<>();
         for (int i = dayCount - 1; i >= 0; i--) {
             long startDay = startTime + i * MS_IN_DAY;
-            long endDay = Math.min(startDay + MS_IN_DAY, System.currentTimeMillis());
+            long endDay = Math.min(startDay + MS_IN_DAY, DateUtils.currentTimeMillis());
 
             List<ELDEvent> dayEvents = mELDEventsInteractor.getActiveEventsFromDBSync(startDay, endDay);
 
