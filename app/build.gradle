@@ -145,9 +145,8 @@ dependencies {
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:2.10.0'
 
-    compile 'com.android.support:appcompat-v7:26.0.2'
     compile 'com.android.support:design:26.0.2'
-    compile 'com.android.support:support-v4:26.0.2'
+    compile 'com.google.android.gms:play-services-base:11.4.2'
     compile 'com.android.support:cardview-v7:26.0.2'
 
     compile 'android.arch.persistence.room:runtime:1.0.0-alpha9'

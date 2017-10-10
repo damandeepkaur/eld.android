@@ -18,6 +18,10 @@ import com.bsmwireless.screens.login.dagger.LoginModule;
 import com.bsmwireless.screens.navigation.NavigationActivity;
 import com.bsmwireless.screens.selectasset.SelectAssetActivity;
 import com.bsmwireless.widgets.snackbar.SnackBarLayout;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.security.ProviderInstaller;
 
 import javax.inject.Inject;
 
@@ -25,9 +29,12 @@ import app.bsmuniversal.com.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import timber.log.Timber;
 
 
 public final class LoginActivity extends BaseActivity implements LoginView {
+    private static final int ERROR_DIALOG_REQUEST_CODE = 1001;
+
     public static final String ARG_ACCOUNT_NAME = "name";
     public static final String ARG_DOMAIN_NAME = "domain";
 
@@ -55,10 +62,13 @@ public final class LoginActivity extends BaseActivity implements LoginView {
     @Inject
     LoginPresenter mPresenter;
 
+    private boolean mRetryProviderInstall;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         DaggerLoginComponent.builder().appComponent(App.getComponent()).loginModule(new LoginModule(this)).build().inject(this);
+        installSecurityProvider();
 
         setContentView(R.layout.activity_login);
         mUnbinder = ButterKnife.bind(this);
@@ -69,6 +79,44 @@ public final class LoginActivity extends BaseActivity implements LoginView {
                 .setPositiveLabel(getString(R.string.try_again), v -> executeLogin());
 
         initView();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode,
+                                    Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == ERROR_DIALOG_REQUEST_CODE) {
+            // Adding a fragment via GooglePlayServicesUtil.showErrorDialogFragment
+            // before the instance state is restored throws an error. So instead,
+            // set a flag here, which will cause the fragment to delay until
+            // onPostResume.
+            mRetryProviderInstall = true;
+        }
+    }
+
+    /**
+     * On resume, check to see if we flagged that we need to reinstall the
+     * provider.
+     */
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+        if (mRetryProviderInstall) {
+            // We can now safely retry installation.
+            installSecurityProvider();
+        }
+        mRetryProviderInstall = false;
+    }
+
+    private void installSecurityProvider() {
+        try {
+            ProviderInstaller.installIfNeeded(this);
+        } catch (GooglePlayServicesRepairableException e) {
+            GooglePlayServicesUtil.showErrorDialogFragment(e.getConnectionStatusCode(), this, null, ERROR_DIALOG_REQUEST_CODE, dialogInterface -> {
+            });
+        } catch (GooglePlayServicesNotAvailableException e) {
+            Timber.e(e);
+        }
     }
 
     private void initView() {
