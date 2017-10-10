@@ -108,6 +108,8 @@ public final class NavigationPresenter extends BaseMenuPresenter {
         mAutoDutyTypeManager.validateBlackBoxState();
         mSyncInteractor.startSync();
         checkForUnassignedEvents();
+
+        getEventsInteractor().resetTime();
     }
 
     @Override
@@ -138,5 +140,11 @@ public final class NavigationPresenter extends BaseMenuPresenter {
                         mView.showUnassignedDialog();
                     }
                 }, Timber::e));
+    }
+
+    @Override
+    public void onUserChanged() {
+        super.onUserChanged();
+        mEventsInteractor.resetTime();
     }
 }

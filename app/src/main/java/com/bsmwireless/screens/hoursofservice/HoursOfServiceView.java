@@ -9,8 +9,6 @@ public interface HoursOfServiceView extends BaseMenuView {
 
     SnackBarLayout getSnackBar();
 
-    void setResetTime(long time);
-
     void setTitle(long boxId, String driverName);
 
 }

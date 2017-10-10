@@ -39,6 +39,8 @@ import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.disposables.Disposables;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
@@ -61,6 +63,7 @@ public final class ELDEventsInteractor {
     private TokenManager mTokenManager;
     private LogSheetInteractor mLogSheetInteractor;
     private ELDEventEntity mLatestEldEvent;
+    private Disposable mResetTimeDisposable;
 
     @Inject
     public ELDEventsInteractor(ServiceApi serviceApi, PreferencesManager preferencesManager,
@@ -79,6 +82,7 @@ public final class ELDEventsInteractor {
         mAccountManager = accountManager;
         mTokenManager = tokenManager;
         mLogSheetInteractor = logSheetInteractor;
+        mResetTimeDisposable = Disposables.disposed();
 
         mUserInteractor.getTimezone().subscribe(timezone -> mTimezone = timezone);
 
@@ -95,9 +99,9 @@ public final class ELDEventsInteractor {
                 .map(ELDEventConverter::toModelList);
     }
 
-    public Flowable<List<ELDEvent>> getDutyEventsFromDB(long startTime, long endTime) {
+    public Single<List<ELDEvent>> getDutyEventsFromDB(long startTime, long endTime) {
         int driverId = mAccountManager.getCurrentUserId();
-        return mELDEventDao.getDutyEventsFromStartToEndTime(startTime, endTime, driverId)
+        return mELDEventDao.getDutyEventsFromStartToEndTimeOnce(startTime, endTime, driverId)
                 .map(ELDEventConverter::toModelList);
     }
 
@@ -157,19 +161,58 @@ public final class ELDEventsInteractor {
 
         return Observable.fromCallable(() ->
                 mELDEventDao.insertAll(entities))
-                .doOnNext(longs -> mLogSheetInteractor.resetLogSheetHeaderSigning(events));
+                .doOnNext(longs -> {
+                    mLogSheetInteractor.resetLogSheetHeaderSigning(events);
+                    resetTime();
+                });
     }
 
     public Single<Long> postNewELDEvent(ELDEvent event) {
         return Single.fromCallable(() ->
                 mELDEventDao.insertEvent(ELDEventConverter.toEntity(event, ELDEventEntity.SyncType.NEW_UNSYNC)))
-                .doOnSuccess(aLong -> mLogSheetInteractor.resetLogSheetHeaderSigning(Arrays.asList(event)));
+                .doOnSuccess(aLong -> {
+                    mLogSheetInteractor.resetLogSheetHeaderSigning(Arrays.asList(event));
+                    resetTime();
+                });
     }
 
     public Observable<long[]> postNewELDEvents(List<ELDEvent> events) {
         return Observable.fromCallable(() ->
                 mELDEventDao.insertAll(ELDEventConverter.toEntityArray(events, ELDEventEntity.SyncType.NEW_UNSYNC)))
-                .doOnNext(longs -> mLogSheetInteractor.resetLogSheetHeaderSigning(events));
+                .doOnNext(longs -> {
+                    mLogSheetInteractor.resetLogSheetHeaderSigning(events);
+                    resetTime();
+                });
+    }
+
+    public void resetTime() {
+        //start and end time
+        long[] time = new long[2];
+
+        mResetTimeDisposable.dispose();
+        mResetTimeDisposable = mUserInteractor.getTimezoneOnce()
+                .flatMap(timeZone -> {
+                    long current = DateUtils.currentTimeMillis();
+                    time[0] = DateUtils.getStartDayTimeInMs(timeZone, current);
+                    time[1] = DateUtils.getEndDayTimeInMs(timeZone, current);
+
+                    return getDutyEventsFromDB(time[0], time[1])
+                            .map(selectedDayEvents -> {
+                                List<ELDEvent> prevDayLatestEvents = getLatestActiveDutyEventFromDBSync(time[0], mUserInteractor.getUserId());
+                                if (!prevDayLatestEvents.isEmpty()) {
+                                    selectedDayEvents.add(0, prevDayLatestEvents.get(prevDayLatestEvents.size() - 1));
+                                }
+                                return selectedDayEvents;
+                            });
+                })
+                .subscribeOn(Schedulers.io())
+                .subscribe(
+                        events -> mDutyTypeManager.resetTime(events, time[0]),
+                        error -> {
+                            mDutyTypeManager.setDutyTypeTime(0, 0, 0, DutyType.OFF_DUTY);
+                            Timber.e("Get timezone error: %s", error);
+                        }
+                );
     }
 
     public void storeUnidentifiedEvents(List<ELDEvent> events) {
@@ -184,22 +227,12 @@ public final class ELDEventsInteractor {
                 })
                 .toList()
                 .toObservable()
-                .flatMap(this::postNewELDEvents)
-                .doOnNext(ids -> {
-                    if (ids.length > 0) {
-                        mDutyTypeManager.setDutyType(dutyType, true);
-                    }
-                });
+                .flatMap(this::postNewELDEvents);
     }
 
     public Observable<long[]> postNewDutyTypeEvent(DutyType dutyType, String comment) {
         return Single.fromCallable(() -> getEvents(dutyType, comment))
-                .flatMapObservable(this::postNewELDEvents)
-                .doOnNext(ids -> {
-                    if (ids.length > 0) {
-                        mDutyTypeManager.setDutyType(dutyType, true);
-                    }
-                });
+                .flatMapObservable(this::postNewELDEvents);
     }
 
     public Single<Boolean> postLogoutEvent() {
