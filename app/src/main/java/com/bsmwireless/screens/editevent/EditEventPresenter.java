@@ -82,7 +82,7 @@ public final class EditEventPresenter extends BaseMenuPresenter {
         }, hours, minutes);
     }
 
-    public void onSaveClick(DutyType type, String startTime, String comment) {
+    public void onSaveClick(DutyType type, String startTime, String comment, String address) {
         ArrayList<ELDEvent> events = new ArrayList<>();
         long eventTime = DateUtils.convertStringAMPMToTime(startTime, mEventDay, mTimezone);
         ELDEvent newEvent;
@@ -113,6 +113,7 @@ public final class EditEventPresenter extends BaseMenuPresenter {
         newEvent.setEventCode(type.getCode());
         newEvent.setEventTime(eventTime);
         newEvent.setComment(comment);
+        newEvent.setLocation(address);
 
         events.add(newEvent);
 

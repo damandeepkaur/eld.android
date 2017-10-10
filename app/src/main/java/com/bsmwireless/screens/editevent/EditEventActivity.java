@@ -73,8 +73,9 @@ public final class EditEventActivity extends BaseMenuActivity implements EditEve
         DutyType type = (DutyType) mEventStatus.getSelectedItem();
         String startTime = mStartTime.getText().toString();
         String comment = mComment.getText().toString();
+        String address = mAddress.getText().toString();
 
-        mPresenter.onSaveClick(type, startTime, comment);
+        mPresenter.onSaveClick(type, startTime, comment, address);
     }
 
     @Override
