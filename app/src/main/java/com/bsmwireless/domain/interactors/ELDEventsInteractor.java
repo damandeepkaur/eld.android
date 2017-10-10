@@ -484,7 +484,7 @@ public final class ELDEventsInteractor {
         int driverId = mAccountManager.getCurrentUserId();
 
         ELDEvent event = new ELDEvent();
-        event.setEventTime(roundTime(currentTime));
+        event.setEventTime(roundTime(blackBoxModel.getEventTimeUTC().getTime()));
         event.setEngineHours(blackBoxModel.getEngineHours());
         event.setOdometer(blackBoxModel.getOdometer());
         event.setLat(blackBoxModel.getLat());

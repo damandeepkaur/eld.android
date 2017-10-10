@@ -1,5 +1,7 @@
 package com.bsmwireless.common.dagger;
 
+import com.bsmwireless.common.utils.AppSettings;
+import com.bsmwireless.common.utils.BlackBoxStateChecker;
 import com.bsmwireless.data.storage.AutoDutyTypeManager;
 import com.bsmwireless.data.storage.DutyTypeManager;
 import com.bsmwireless.data.storage.PreferencesManager;
@@ -15,8 +17,14 @@ import dagger.Provides;
 final class AutoDutyModule {
     @Singleton
     @Provides
-    AutoDutyTypeManager provideAutoDutyTypeManager(BlackBoxInteractor blackBoxInteractor, PreferencesManager preferencesManager, ELDEventsInteractor eventsInteractor, DutyTypeManager dutyTypeManager) {
-        AutoDutyTypeManager manager = new AutoDutyTypeManager(blackBoxInteractor, preferencesManager, eventsInteractor, dutyTypeManager);
+    static AutoDutyTypeManager provideAutoDutyTypeManager(BlackBoxInteractor blackBoxInteractor,
+                                                          PreferencesManager preferencesManager,
+                                                          ELDEventsInteractor eventsInteractor,
+                                                          DutyTypeManager dutyTypeManager,
+                                                          AppSettings appSettings,
+                                                          BlackBoxStateChecker blackBoxStateChecker) {
+        AutoDutyTypeManager manager = new AutoDutyTypeManager(blackBoxInteractor,
+                preferencesManager, eventsInteractor, dutyTypeManager, appSettings, blackBoxStateChecker);
         manager.doSubscribe();
         return manager;
     }

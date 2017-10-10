@@ -68,7 +68,7 @@ public class LockScreenPresenterTest {
                 new BlackBoxSimpleChecker(),
                 mELDEventsInteractor,
                 mAppSettings,
-                mAccountManager));
+                mAccountManager, autoDutyTypeManager));
 
         when(mPreferencesManager.getBoxId()).thenReturn(0);
 

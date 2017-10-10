@@ -16,7 +16,7 @@ public final class BlackBoxModel {
     private int mHeading;
     private int mTERT;
     private BlackBoxResponseModel.ResponseType mResponseType;
-    private Date mEventTimeUTC;
+    private Date mEventTimeUTC = new Date(DateUtils.currentTimeMillis());
     private int mSequenceNum;
     private long mBoxId;
     private int mTDMsgQueue;
