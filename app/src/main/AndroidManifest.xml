@@ -113,7 +113,8 @@
         <receiver android:name="com.bsmwireless.schedulers.alarmmanager.AlarmReceiver"/>
         <receiver
             android:name="com.bsmwireless.schedulers.alarmmanager.AlarmBootReceiver"
-            android:enabled="false">
+            android:exported="false"
+            android:enabled="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
