@@ -1,9 +1,7 @@
 package com.bsmwireless.screens.lockscreen;
 
-import com.bsmwireless.common.utils.BlackBoxSimpleChecker;
 import com.bsmwireless.common.utils.AppSettings;
-import com.bsmwireless.data.network.blackbox.BlackBox;
-import com.bsmwireless.data.network.blackbox.BlackBoxConnectionManagerImpl;
+import com.bsmwireless.common.utils.BlackBoxSimpleChecker;
 import com.bsmwireless.data.network.blackbox.models.BlackBoxResponseModel;
 import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.data.storage.DutyTypeManager;
@@ -60,7 +58,6 @@ public class LockScreenPresenterTest {
         when(mAppSettings.lockScreenDisconnectionTimeout()).thenReturn(1L);
         when(mAppSettings.lockScreenIdlingTimeout()).thenReturn(1L);
 
-
         mPresenter = spy(new LockScreenPresenter(
                 mDutyTypeManager,
                 mBlackBoxInteractor,
@@ -90,7 +87,7 @@ public class LockScreenPresenterTest {
 
         when(mBlackBoxInteractor.getData(anyInt())).thenReturn(Observable.empty());
 
-        mPresenter.onStart(mLockScreenView);
+        mPresenter.bind(mLockScreenView);
         verify(mLockScreenView).setTimeForDutyType(DutyType.DRIVING, 1L);
         verify(mLockScreenView).setTimeForDutyType(DutyType.SLEEPER_BERTH, 2L);
         verify(mLockScreenView).setTimeForDutyType(DutyType.ON_DUTY, 3L);
@@ -108,7 +105,7 @@ public class LockScreenPresenterTest {
         when(mBlackBoxInteractor.getData(anyInt())).thenReturn(Observable.empty());
         doNothing().when(mPresenter).startTimer();
 
-        mPresenter.onStart(mLockScreenView);
+        mPresenter.bind(mLockScreenView);
         mPresenter.switchCoDriver();
         verify(mLockScreenView).openCoDriverDialog();
     }
@@ -118,7 +115,7 @@ public class LockScreenPresenterTest {
         when(mBlackBoxInteractor.getData(anyInt())).thenReturn(Observable.empty());
         doNothing().when(mPresenter).startTimer();
 
-        mPresenter.onStart(mLockScreenView);
+        mPresenter.bind(mLockScreenView);
         verify(mLockScreenView).removeAnyPopup();
     }
 
@@ -137,7 +134,7 @@ public class LockScreenPresenterTest {
         when(mELDEventsInteractor.postNewELDEvent(any())).thenReturn(Single.just(1L));
         doNothing().when(mPresenter).startTimer();
 
-        mPresenter.onStart(mLockScreenView);
+        mPresenter.bind(mLockScreenView);
         subject.onNext(stoppedMock);
         subject.onNext(stoppedMock);
         subject.onComplete();
@@ -156,7 +153,7 @@ public class LockScreenPresenterTest {
         when(mELDEventsInteractor.postNewELDEvent(any())).thenReturn(Single.just(1L));
         doNothing().when(mPresenter).startTimer();
 
-        mPresenter.onStart(mLockScreenView);
+        mPresenter.bind(mLockScreenView);
         verify(mLockScreenView).removeAnyPopup();
         subject.onNext(ignitionOffMock);
         subject.onNext(ignitionOffMock);

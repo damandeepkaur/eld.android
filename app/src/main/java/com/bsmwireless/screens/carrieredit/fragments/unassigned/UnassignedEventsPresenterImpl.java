@@ -5,6 +5,7 @@ import com.bsmwireless.common.utils.DutyUtils;
 import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
 import com.bsmwireless.models.ELDEvent;
+import com.bsmwireless.models.ELDUpdate;
 import com.bsmwireless.screens.logs.dagger.EventLogModel;
 import com.bsmwireless.widgets.alerts.DutyType;
 
@@ -26,6 +27,7 @@ import static com.bsmwireless.widgets.alerts.DutyType.CLEAR_PU;
 import static com.bsmwireless.widgets.alerts.DutyType.CLEAR_YM;
 
 public final class UnassignedEventsPresenterImpl implements UnassignedEventsPresenter {
+    private static final int UNASSIGNED_REQUEST = 1;
 
     private final ELDEventsInteractor mELDEventsInteractor;
     private final ServiceApi mServiceApi;
@@ -56,14 +58,31 @@ public final class UnassignedEventsPresenterImpl implements UnassignedEventsPres
     }
 
     public void acceptEvent(EventLogModel event, int driverId, int position) {
+        Timber.v("acceptEvent: ");
+        sendEventUpdate(event, driverId, position, true);
+    }
+
+    public void rejectEvent(EventLogModel event, int position) {
+        Timber.v("rejectEvent: ");
+        sendEventUpdate(event, -1, position, false);
+    }
+
+    private void sendEventUpdate(EventLogModel event, int driverId, int position, boolean isAccepted) {
         if (!mUpdateEventDisposable.isDisposed()) {
             return;
         }
-        Timber.v("acceptEvent: ");
         List<ELDEvent> eldEvents = new ArrayList<>();
+        List<ELDUpdate> eldUpdates = new ArrayList<>();
+        ELDUpdate eldUpdate = new ELDUpdate()
+                .setType(UNASSIGNED_REQUEST)
+                .setId(event.getEvent().getId())
+                .setMobileTime(event.getEvent().getMobileTime())
+                .setTimezone(event.getEvent().getTimezone())
+                .setAccept(isAccepted);
         event.getEvent().setDriverId(driverId);
         eldEvents.add(event.getEvent());
-        mUpdateEventDisposable = mServiceApi.updateELDEvents(eldEvents)
+        eldUpdates.add(eldUpdate);
+        mUpdateEventDisposable = mServiceApi.updateRecords(eldUpdates)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(responseMessage -> {
@@ -72,13 +91,8 @@ public final class UnassignedEventsPresenterImpl implements UnassignedEventsPres
                 }, throwable -> {
                     Timber.e(throwable);
                     mDisposable.dispose();
+                    mView.showConnectionError();
                 });
-    }
-
-    public void rejectEvent(EventLogModel event, int position) {
-        //TODO: remove from db?
-        Timber.v("rejectEvent: ");
-        mView.removeEvent(position);
     }
 
     private void updateDb(List<ELDEvent> eldEvents, int position) {

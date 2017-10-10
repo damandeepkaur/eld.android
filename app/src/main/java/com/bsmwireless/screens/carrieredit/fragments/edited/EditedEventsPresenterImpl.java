@@ -13,9 +13,8 @@ import com.bsmwireless.domain.interactors.LogSheetInteractor;
 import com.bsmwireless.domain.interactors.UserInteractor;
 import com.bsmwireless.domain.interactors.VehiclesInteractor;
 import com.bsmwireless.models.ELDEvent;
-import com.bsmwireless.models.LogSheetHeader;
+import com.bsmwireless.models.ELDUpdate;
 import com.bsmwireless.models.SyncConfiguration;
-import com.bsmwireless.models.User;
 import com.bsmwireless.models.Vehicle;
 import com.bsmwireless.screens.logs.GraphModel;
 import com.bsmwireless.screens.logs.LogHeaderModel;
@@ -46,6 +45,7 @@ import static com.bsmwireless.widgets.alerts.DutyType.CLEAR_PU;
 import static com.bsmwireless.widgets.alerts.DutyType.CLEAR_YM;
 
 public final class EditedEventsPresenterImpl implements EditedEventsPresenter {
+    private static final int CHANGE_REQUEST = 2;
 
     private final ELDEventsInteractor mELDEventsInteractor;
     private final LogSheetInteractor mLogSheetInteractor;
@@ -144,7 +144,7 @@ public final class EditedEventsPresenterImpl implements EditedEventsPresenter {
     public void approveEdits(List<EventLogModel> events, long logDay) {
         if (events != null && !events.isEmpty()) {
             Timber.v("approveEdits: ");
-            sendUpdatedEvents(events, logDay, ELDEvent.StatusCode.ACTIVE);
+            sendUpdatedEvents(events, logDay, true);
         }
     }
 
@@ -152,7 +152,7 @@ public final class EditedEventsPresenterImpl implements EditedEventsPresenter {
     public void disapproveEdits(List<EventLogModel> events, long logDay) {
         if (events != null && !events.isEmpty()) {
             Timber.v("disapproveEdits: ");
-            sendUpdatedEvents(events, logDay, ELDEvent.StatusCode.INACTIVE_CHANGE_REJECTED);
+            sendUpdatedEvents(events, logDay, false);
         }
     }
 
@@ -197,7 +197,7 @@ public final class EditedEventsPresenterImpl implements EditedEventsPresenter {
         }
     }
 
-    private void sendUpdatedEvents(List<EventLogModel> events, long logDay, ELDEvent.StatusCode code) {
+    private void sendUpdatedEvents(List<EventLogModel> events, long logDay, boolean isAccepted) {
         if (!mSendUpdatedDisposable.isDisposed()) {
             return;
         }
@@ -205,14 +205,33 @@ public final class EditedEventsPresenterImpl implements EditedEventsPresenter {
         final List<ELDEvent> cachedEvents = new ArrayList<>();
         mSendUpdatedDisposable = Observable.fromIterable(events)
                 .subscribeOn(Schedulers.io())
-                .map(logModel -> logModel.getEvent().setStatus(code.getValue()))
+                .map(logModel -> logModel.getEvent().setStatus(isAccepted ?
+                        ELDEvent.StatusCode.ACTIVE.getValue() : ELDEvent.StatusCode.INACTIVE_CHANGE_REJECTED.getValue()))
                 .toList()
                 .doOnSuccess(eldEvents -> cachedEvents.addAll(eldEvents))
-                .flatMap(eldEvents -> mServiceApi.updateELDEvents(eldEvents))
+                .map(eldEvents -> {
+                    List<ELDUpdate> updateEvents = new ArrayList<>();
+                    for (ELDEvent eldEvent : eldEvents) {
+                        ELDUpdate eldUpdate = new ELDUpdate()
+                                .setType(CHANGE_REQUEST)
+                                .setId(eldEvent.getId())
+                                .setMobileTime(eldEvent.getMobileTime())
+                                .setTimezone(eldEvent.getTimezone())
+                                .setAccept(isAccepted);
+                        updateEvents.add(eldUpdate);
+                    }
+                    return updateEvents;
+                })
+                .flatMap(eldUpdate -> mServiceApi.updateRecords(eldUpdate))
                 .doOnSuccess(resp -> updateDbEldEvents(cachedEvents, logDay))
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(responseMessage -> {
                     mSendUpdatedDisposable.dispose();
-                }, Timber::e);
+                }, t -> {
+                    Timber.e(t);
+                    mView.showConnectionError();
+                    mSendUpdatedDisposable.dispose();
+                });
     }
 
     private void updateDbEldEvents(List<ELDEvent> events, long logDay) {

@@ -17,6 +17,8 @@ android {
         versionName "1.0.99"
         versionCode 103
         versionName "1.0.102"
+        versionCode 115
+        versionName "1.1.8"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
             annotationProcessorOptions {
