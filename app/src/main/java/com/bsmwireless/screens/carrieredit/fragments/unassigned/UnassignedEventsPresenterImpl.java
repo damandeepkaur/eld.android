@@ -82,7 +82,7 @@ public final class UnassignedEventsPresenterImpl implements UnassignedEventsPres
         event.getEvent().setDriverId(driverId);
         eldEvents.add(event.getEvent());
         eldUpdates.add(eldUpdate);
-        mUpdateEventDisposable = mServiceApi.updateRescords(eldUpdates)
+        mUpdateEventDisposable = mServiceApi.updateRecords(eldUpdates)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(responseMessage -> {

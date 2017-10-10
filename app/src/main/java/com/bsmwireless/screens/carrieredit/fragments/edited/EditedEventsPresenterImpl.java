@@ -222,7 +222,7 @@ public final class EditedEventsPresenterImpl implements EditedEventsPresenter {
                     }
                     return updateEvents;
                 })
-                .flatMap(eldUpdate -> mServiceApi.updateRescords(eldUpdate))
+                .flatMap(eldUpdate -> mServiceApi.updateRecords(eldUpdate))
                 .doOnSuccess(resp -> updateDbEldEvents(cachedEvents, logDay))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(responseMessage -> {
