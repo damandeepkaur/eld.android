@@ -64,40 +64,45 @@ public final class ELDUpdate implements Parcelable {
         return mType;
     }
 
-    public void setType(Integer type) {
-        this.mType = type;
+    public ELDUpdate setType(Integer type) {
+        mType = type;
+        return this;
     }
 
     public Integer getId() {
         return mId;
     }
 
-    public void setId(Integer id) {
-        this.mId = id;
+    public ELDUpdate setId(Integer id) {
+        mId = id;
+        return this;
     }
 
     public String getTimezone() {
         return mTimezone;
     }
 
-    public void setTimezone(String timezone) {
-        this.mTimezone = timezone;
+    public ELDUpdate setTimezone(String timezone) {
+        mTimezone = timezone;
+        return this;
     }
 
     public Long getMobileTime() {
         return mMobileTime;
     }
 
-    public void setMobileTime(Long mobileTime) {
-        this.mMobileTime = mobileTime;
+    public ELDUpdate setMobileTime(Long mobileTime) {
+        mMobileTime = mobileTime;
+        return this;
     }
 
     public Boolean getAccept() {
         return mAccept;
     }
 
-    public void setAccept(Boolean accept) {
-        this.mAccept = accept;
+    public ELDUpdate setAccept(Boolean accept) {
+        mAccept = accept;
+        return this;
     }
 
     @Override
