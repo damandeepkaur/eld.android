@@ -39,8 +39,6 @@ import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.disposables.Disposables;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
@@ -499,7 +497,7 @@ public final class ELDEventsInteractor {
         int driverId = mAccountManager.getCurrentUserId();
 
         ELDEvent event = new ELDEvent();
-        event.setEventTime(roundTime(blackBoxModel.getEventTimeUTC().getTime()));
+        event.setEventTime(roundTime(currentTime));
         event.setEngineHours(blackBoxModel.getEngineHours());
         event.setOdometer(blackBoxModel.getOdometer());
         event.setLat(blackBoxModel.getLat());

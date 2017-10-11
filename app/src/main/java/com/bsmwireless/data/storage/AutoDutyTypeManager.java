@@ -15,7 +15,6 @@ import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.widgets.alerts.DutyType;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -44,20 +43,15 @@ public final class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListen
     private OnDisconnectListener mOnDisconnectListener;
 
     private volatile DutyType mDutyType;
-    private volatile BlackBoxModel mBlackBoxModel;
+    private volatile long mStoppedTime;
 
     private Handler mHandler = new Handler();
     private Runnable mAutoOnDutyTask = new Runnable() {
         @Override
         public void run() {
-            if (mBlackBoxModel == null) {
-                Timber.w("AutoOnDutyTask is triggered but blackbox model is empty");
-                return;
-            }
-
             if (mListener != null) {
-                mListener.onAutoOnDuty(mBlackBoxModel.getEventTimeUTC().getTime());
-                mBlackBoxModel.setEventTimeUTC(new Date(DateUtils.currentTimeMillis()));
+                mListener.onAutoOnDuty(mStoppedTime);
+                mStoppedTime = DateUtils.currentTimeMillis();
                 mHandler.postDelayed(this, mAppSettings.lockScreenIdlingTimeout());
             }
         }
@@ -87,7 +81,6 @@ public final class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListen
         mPreferencesManager = preferencesManager;
         mAppSettings = appSettings;
         mBlackBoxStateChecker = blackBoxStateChecker;
-        mBlackBoxModel = blackBoxInteractor.getLastData();
         SchedulerUtils.schedule();
     }
 
@@ -171,16 +164,13 @@ public final class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListen
 
             if (dutyType == DutyType.DRIVING && mBlackBoxInteractor.getLastData().getSpeed() == 0) {
                 mHandler.removeCallbacks(mAutoDrivingTask);
-                if (mBlackBoxModel != null) {
-                    mBlackBoxModel.setEventTimeUTC(new Date(DateUtils.currentTimeMillis()));
-                }
+                mStoppedTime = DateUtils.currentTimeMillis();
                 mHandler.postDelayed(mAutoOnDutyTask, mAppSettings.lockScreenIdlingTimeout());
             }
         }
     }
 
     private List<ELDEvent> handleIgnitionOff(BlackBoxModel blackBoxModel) {
-        mBlackBoxModel = blackBoxModel;
 
         List<ELDEvent> events = new ArrayList<>();
 
@@ -210,10 +200,10 @@ public final class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListen
     }
 
     private void handleStopped(BlackBoxModel blackBoxModel) {
-        mBlackBoxModel = blackBoxModel;
         clearStoppedTasks();
         mHandler.postDelayed(mStoppedInNotDrivingDutyTask, mAppSettings.lockScreenIdlingTimeout());
         if (mDutyTypeManager.getDutyType() == DutyType.DRIVING) {
+            mStoppedTime = DateUtils.currentTimeMillis();
             mHandler.postDelayed(mAutoOnDutyTask, mAppSettings.lockScreenIdlingTimeout());
         } else {
             SchedulerUtils.schedule();
@@ -221,7 +211,6 @@ public final class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListen
     }
 
     private List<ELDEvent> handleMoving(BlackBoxModel blackBoxState) {
-        mBlackBoxModel = blackBoxState;
         SchedulerUtils.cancel();
 
         clearStoppedTasks();
@@ -243,7 +232,6 @@ public final class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListen
     }
 
     private List<ELDEvent> handleIgnitionOn(BlackBoxModel blackBoxModel) {
-        mBlackBoxModel = blackBoxModel;
         List<ELDEvent> events = new ArrayList<>(1);
         events.add(mEventsInteractor.getEvent(mDutyTypeManager.getDutyType() == DutyType.PERSONAL_USE ?
                 ELDEvent.EnginePowerCode.POWER_UP_REDUCE_DECISION :
