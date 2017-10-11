@@ -150,7 +150,7 @@ public final class LogSheetHeader implements Parcelable {
     }
 
     public HomeTerminal getHomeTerminal() {
-        return mHomeTerminal;
+        return mHomeTerminal == null ? new HomeTerminal() : mHomeTerminal;
     }
 
     public void setHomeTerminal(HomeTerminal homeTerminal) {

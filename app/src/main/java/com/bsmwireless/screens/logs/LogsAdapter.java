@@ -17,6 +17,7 @@ import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.LogSheetHeader;
 import com.bsmwireless.screens.logs.dagger.EventLogModel;
 import com.bsmwireless.widgets.alerts.DutyType;
+import com.bsmwireless.widgets.alerts.NonDutyType;
 import com.bsmwireless.widgets.alerts.Type;
 import com.bsmwireless.widgets.logs.LogsTitleView;
 import com.bsmwireless.widgets.logs.calendar.CalendarItem;
@@ -26,6 +27,7 @@ import com.bsmwireless.widgets.logs.graphview.GraphLayout;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 import app.bsmuniversal.com.R;
 import butterknife.BindView;
@@ -311,10 +313,16 @@ public final class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHold
 
         Type currentDuty = log.getType();
 
-        holder.mMenuButton.setVisibility(log.isDutyEvent() ? VISIBLE : GONE);
+        holder.mMenuButton.setVisibility(log.isDutyEvent() && log.isActive() ? VISIBLE : GONE);
 
         holder.mEventStatus.setTextColor(mColors.get(currentDuty.getColor()));
-        holder.mEventStatus.setText(currentDuty.getTitle());
+
+        String title = mContext.getString(currentDuty.getTitle());
+        if (currentDuty.getType() == NonDutyType.CERTIFICATION_OF_RECORDS.getType()) {
+            title = String.format(Locale.US, "%s (%d)", title, log.getEventCode());
+        }
+
+        holder.mEventStatus.setText(title);
 
         if (log.isActive()) {
             holder.itemView.setBackgroundColor(mAdapterColors.mTransparentColor);

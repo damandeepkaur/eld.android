@@ -1,14 +1,11 @@
 package com.bsmwireless.domain.interactors;
 
-import android.arch.persistence.room.RoomDatabase;
-
 import com.bsmwireless.common.Constants;
 import com.bsmwireless.common.utils.DateUtils;
 import com.bsmwireless.common.utils.NetworkUtils;
 import com.bsmwireless.data.network.ServiceApi;
 import com.bsmwireless.data.storage.AccountManager;
 import com.bsmwireless.data.storage.AppDatabase;
-import com.bsmwireless.data.storage.PreferencesManager;
 import com.bsmwireless.data.storage.eldevents.ELDEventConverter;
 import com.bsmwireless.data.storage.eldevents.ELDEventDao;
 import com.bsmwireless.data.storage.eldevents.ELDEventEntity;
@@ -50,7 +47,6 @@ public final class SyncInteractor {
     private static final int MAX_EVENTS_IN_REQUEST = 5;
     private CompositeDisposable mSyncCompositeDisposable;
     private ServiceApi mServiceApi;
-    private PreferencesManager mPreferencesManager;
     private ELDEventDao mELDEventDao;
     private UserDao mUserDao;
     private volatile boolean mIsSyncActive;
@@ -64,10 +60,9 @@ public final class SyncInteractor {
 
 
     @Inject
-    public SyncInteractor(ServiceApi serviceApi, PreferencesManager preferencesManager, AppDatabase appDatabase,
+    public SyncInteractor(ServiceApi serviceApi, AppDatabase appDatabase,
                           AccountManager accountManager, LogSheetInteractor logSheetInteractor) {
         mServiceApi = serviceApi;
-        mPreferencesManager = preferencesManager;
         mELDEventDao = appDatabase.ELDEventDao();
         mUserDao = appDatabase.userDao();
         mLogSheetDao = appDatabase.logSheetDao();
@@ -212,7 +207,8 @@ public final class SyncInteractor {
     }
 
     public void replaceRecords(List<ELDEvent> events) {
-        for (ELDEvent event : events) {
+        for (int i = events.size() - 1; i >= 0; i--) {
+            ELDEvent event = events.get(i);
             ELDEventEntity oldEvent = mELDEventDao.getEventById(event.getId());
 
             if (oldEvent != null) {

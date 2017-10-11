@@ -6,6 +6,7 @@ import com.bsmwireless.common.App;
 import com.bsmwireless.common.dagger.AppComponent;
 import com.bsmwireless.data.network.NtpClientManager;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -34,10 +35,7 @@ public class DateUtils {
      * @return formatted date according to the timezone
      */
     public static String getLocalDate(String zone, long time) {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MMM-dd HH:mm:ss z", Locale.US);
-        simpleDateFormat.setTimeZone(TimeZone.getTimeZone(zone));
-
-        return simpleDateFormat.format(new Date(time));
+        return getDateFormat(zone, "yyyy-MMM-dd HH:mm:ss z").format(new Date(time));
     }
 
     /**
@@ -151,11 +149,9 @@ public class DateUtils {
      */
     public static long convertTimeToLogDay(String zone, long time) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
-        Calendar calendar = Calendar.getInstance();
         TimeZone timeZone = TimeZone.getTimeZone(zone);
-        calendar.setTimeZone(timeZone);
-        calendar.setTimeInMillis(time);
-        String todayDate = dateFormat.format(calendar.getTime());
+        dateFormat.setTimeZone(timeZone);
+        String todayDate = dateFormat.format(time);
         return Long.parseLong(todayDate);
     }
 
@@ -165,9 +161,7 @@ public class DateUtils {
      * @return long with format time like 20170708
      */
     public static long convertTimeToLogDay(TimeZone timeZone, long time) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
-        dateFormat.setTimeZone(timeZone);
-        String todayDate = dateFormat.format(time);
+        String todayDate = getDateFormat(timeZone.getID(), "yyyyMMdd").format(time);
         return Long.parseLong(todayDate);
     }
 
@@ -177,9 +171,16 @@ public class DateUtils {
      * @return long with format time like 07-07-09
      */
     public static String convertTimeToDDMMYY(TimeZone timeZone, long time) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yy", Locale.US);
-        dateFormat.setTimeZone(timeZone);
-        return dateFormat.format(time);
+        return getDateFormat(timeZone.getID(), "dd-MM-yy").format(time);
+    }
+
+    /**
+     * @param timeZone user timezone object"
+     * @param time     unix time in ms
+     * @return long with format time like 12-29-09
+     */
+    public static String convertTimeToMMDDYY(TimeZone timeZone, long time) {
+        return getDateFormat(timeZone.getID(), "MM-dd-yy").format(time);
     }
 
     /**
@@ -188,9 +189,7 @@ public class DateUtils {
      * @return long with format time like 11:12
      */
     public static String convertTimeToHHMM(TimeZone timeZone, long time) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm", Locale.US);
-        dateFormat.setTimeZone(timeZone);
-        return dateFormat.format(time);
+        return getDateFormat(timeZone.getID(), "HH:mm").format(time);
     }
 
     /**
@@ -207,27 +206,10 @@ public class DateUtils {
      * @param logDay long with format time like 20170708
      * @return long unix time in ms
      */
-    public static long convertLogDayToUnixMs(long logDay) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd", Locale.US);
-        Date date = null;
-        try {
-            date = sdf.parse(String.valueOf(logDay));
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return date.getTime();
-    }
-
-    /**
-     * @param logDay long with format time like 20170708
-     * @return long unix time in ms
-     */
     public static long convertLogDayToUnixMs(long logDay, TimeZone timeZone) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd", Locale.US);
-        sdf.setTimeZone(timeZone);
         Date date = null;
         try {
-            date = sdf.parse(String.valueOf(logDay));
+            date = getDateFormat(timeZone.getID(), "yyyyMMdd").parse(String.valueOf(logDay));
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -240,10 +222,7 @@ public class DateUtils {
      * @return long unix time in ms
      */
     public static long getStartDayTimeInMs(long logday, String zone) throws ParseException {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd", Locale.US);
-        TimeZone timeZone = TimeZone.getTimeZone(zone);
-        sdf.setTimeZone(timeZone);
-        Date  date = sdf.parse(String.valueOf(logday));
+        Date date = getDateFormat(zone, "yyyyMMdd").parse(String.valueOf(logday));
         return date.getTime();
     }
 
@@ -252,10 +231,7 @@ public class DateUtils {
      * @return string with format time like "12:35 AM"
      */
     public static String convertTimeToAMPMString(long time, String timezone) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("hh:mm:ss aaa", Locale.US);
-        TimeZone timeZone = TimeZone.getTimeZone(timezone);
-        dateFormat.setTimeZone(timeZone);
-        return dateFormat.format(time);
+        return getDateFormat(timezone, "hh:mm:ss aaa").format(time);
     }
 
     /**
@@ -264,12 +240,10 @@ public class DateUtils {
      * @return long unix time in ms
      */
     public static Long convertStringAMPMToTime(String time, long day, String timezone) {
-        SimpleDateFormat format = new SimpleDateFormat("hh:mm:ss aaa", Locale.US);
-        TimeZone timeZone = TimeZone.getTimeZone(timezone);
-        format.setTimeZone(timeZone);
         try {
+            TimeZone timeZone = TimeZone.getTimeZone(timezone);
             // Parse hour of day and minute
-            Date date = format.parse(time);
+            Date date = getDateFormat(timezone, "hh:mm:ss aaa").parse(time);
             Calendar calendar = Calendar.getInstance(timeZone);
             calendar.setTime(date);
 
@@ -315,9 +289,7 @@ public class DateUtils {
     }
 
     public static String convertToFullTime(String timezone, Date date) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm MMM dd, yyyy", Locale.US);
-        dateFormat.setTimeZone(TimeZone.getTimeZone(timezone));
-        return dateFormat.format(date);
+        return getDateFormat(timezone, "HH:mm MMM dd, yyyy").format(date);
     }
 
     /**
@@ -348,4 +320,9 @@ public class DateUtils {
         return durations;
     }
 
+    private static DateFormat getDateFormat(String timezone, String pattern) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat(pattern, Locale.US);
+        dateFormat.setTimeZone(TimeZone.getTimeZone(timezone));
+        return dateFormat;
+    }
 }

@@ -41,9 +41,6 @@ public final class HoursOfServiceActivity extends BaseMenuActivity implements Vi
     @Inject
     HoursOfServicePresenter mPresenter;
 
-    private Runnable mResetTimeTask = () -> mPresenter.onResetTime();
-    private Handler mHandler = new Handler();
-
     public static Intent createIntent(Context context) {
         return new Intent(context, HoursOfServiceActivity.class);
     }
@@ -82,7 +79,6 @@ public final class HoursOfServiceActivity extends BaseMenuActivity implements Vi
         }
 
         mPresenter.loadTitle();
-        mPresenter.onResetTime();
     }
 
     @Override
@@ -90,7 +86,6 @@ public final class HoursOfServiceActivity extends BaseMenuActivity implements Vi
         mPresenter.onDestroy();
         mViewPager.removeOnPageChangeListener(this);
         super.onDestroy();
-        mHandler.removeCallbacks(mResetTimeTask);
     }
 
     @Override
@@ -111,16 +106,6 @@ public final class HoursOfServiceActivity extends BaseMenuActivity implements Vi
     @Override
     public SnackBarLayout getSnackBar() {
         return mSnackBarLayout;
-    }
-
-    @Override
-    public void setResetTime(long time) {
-        mHandler.removeCallbacks(mResetTimeTask);
-        if (time == 0) {
-            mHandler.post(mResetTimeTask);
-        } else {
-            mHandler.postAtTime(mResetTimeTask, time);
-        }
     }
 
     @Override

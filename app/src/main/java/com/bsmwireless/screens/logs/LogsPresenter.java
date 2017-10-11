@@ -286,10 +286,7 @@ public final class LogsPresenter implements AccountManager.AccountListener {
 
     private LogSheetHeader updateLogSheetHeader(LogSheetHeader logSheetHeader, LogHeaderModel logHeaderModel) {
         HomeTerminal homeTerminal = logSheetHeader.getHomeTerminal();
-        if (homeTerminal == null) {
-            homeTerminal = new HomeTerminal();
-            homeTerminal.setTimezone(logHeaderModel.getTimezone());
-        }
+        homeTerminal.setTimezone(logHeaderModel.getTimezone());
 
         homeTerminal.setName(logHeaderModel.getHomeTerminalName());
         homeTerminal.setAddress(logHeaderModel.getHomeTerminalAddress());
@@ -355,7 +352,7 @@ public final class LogsPresenter implements AccountManager.AccountListener {
                     logs.get(0).setEventTime(startDayTime);
                 }
 
-                if (logs.get(i).isActive()) {
+                if (logs.get(i).isActive() && logs.get(i).isDutyEvent()) {
                     if (lastActiveIndex >= 0) {
                         logs.get(lastActiveIndex).setDuration(logs.get(i).getEventTime() - logs.get(lastActiveIndex).getEventTime());
                     }
@@ -415,13 +412,8 @@ public final class LogsPresenter implements AccountManager.AccountListener {
 
                     String homeTerminalAddress;
                     String homeTerminalName;
-                    if (selectedLogHeader.getHomeTerminal() != null) {
-                        homeTerminalAddress = selectedLogHeader.getHomeTerminal().getAddress();
-                        homeTerminalName = selectedLogHeader.getHomeTerminal().getName();
-                    } else {
-                        homeTerminalAddress = "";
-                        homeTerminalName = "";
-                    }
+                    homeTerminalAddress = selectedLogHeader.getHomeTerminal().getAddress();
+                    homeTerminalName = selectedLogHeader.getHomeTerminal().getName();
 
                     String shippingId = selectedLogHeader.getShippingId();
                     String coDriversName = mLogHeaderUtils.getCoDriversName(selectedLogHeader);

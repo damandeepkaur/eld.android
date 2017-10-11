@@ -126,7 +126,7 @@ public final class RoadsideFragment extends BaseFragment implements RoadsideView
             TimeZone timezone = TimeZone.getTimeZone(event.getTimezone());
 
             //write date
-            current = DateUtils.convertTimeToDDMMYY(timezone, event.getEventTime());
+            current = DateUtils.convertTimeToMMDDYY(timezone, event.getEventTime());
             if (!current.equals(last)) {
                 data.add(current);
                 data.add(getString(R.string.roadside_empty));
@@ -155,8 +155,7 @@ public final class RoadsideFragment extends BaseFragment implements RoadsideView
     public List<String> getHeadersData(LogSheetHeader header, ELDEvent lastEvent, Vehicle vehicle) {
         List<String> data = new ArrayList<>();
 
-        HomeTerminal terminal = header.getHomeTerminal();
-        TimeZone timeZone = TimeZone.getTimeZone(terminal == null ? "UTC" : header.getHomeTerminal().getTimezone());
+        TimeZone timeZone = TimeZone.getTimeZone(header.getHomeTerminal().getTimezone());
 
         long time = DateUtils.convertLogDayToUnixMs(header.getLogDay(), timeZone);
         long startDate = DateUtils.getStartDayTimeInMs(timeZone.getID(), time);
@@ -175,7 +174,8 @@ public final class RoadsideFragment extends BaseFragment implements RoadsideView
                 location,
                 driver.getExempt(),
                 mPresenter.getMalfunctionsCount(header.getDriverId(), startDate, endDate) > 0,
-                mPresenter.getDiagnosticsCount(header.getDriverId(), startDate, endDate) > 0));
+                mPresenter.getDiagnosticsCount(header.getDriverId(), startDate, endDate) > 0,
+                DateUtils.convertTimeToMMDDYY(timeZone, DateUtils.currentTimeMillis())));
 
         return data;
     }
@@ -202,7 +202,7 @@ public final class RoadsideFragment extends BaseFragment implements RoadsideView
         data.add(mContext.getString(R.string.roadside_empty));
         data.add(mContext.getString(R.string.roadside_empty));
 
-        data.add(DateUtils.convertTimeToDDMMYY(timeZone, time));
+        data.add(DateUtils.convertTimeToMMDDYY(timeZone, time));
         data.add(mContext.getString(R.string.roadside_midnight));
         data.add(DateUtils.getFullTimeZone(timeZone.getID(), time));
         data.add(carrierBuilder.toString());
@@ -270,14 +270,14 @@ public final class RoadsideFragment extends BaseFragment implements RoadsideView
         return data;
     }
 
-    private List<String> getStatusesData(String location, boolean isExempt, boolean hasMulfunctions, boolean hasDiagnostic) {
+    private List<String> getStatusesData(String location, boolean isExempt, boolean hasMulfunctions, boolean hasDiagnostic, String printDate) {
         List<String> data = new ArrayList<>();
         data.add(mContext.getString(R.string.roadside_location));
         data.add(mContext.getString(R.string.roadside_unidentified_records));
         data.add(mContext.getString(R.string.roadside_exempt));
         data.add(mContext.getString(R.string.roadside_malfunctions));
         data.add(mContext.getString(R.string.roadside_diagnostic));
-        data.add(mContext.getString(R.string.roadside_empty));
+        data.add(mContext.getString(R.string.roadside_print_date));
         data.add(mContext.getString(R.string.roadside_empty));
 
         data.add(location == null ? mContext.getString(R.string.roadside_not_set) : location);
@@ -285,7 +285,7 @@ public final class RoadsideFragment extends BaseFragment implements RoadsideView
         data.add(isExempt ? mContext.getString(R.string.roadside_yes) : mContext.getString(R.string.roadside_no));
         data.add(hasMulfunctions ? mContext.getString(R.string.roadside_yes) : mContext.getString(R.string.roadside_no));
         data.add(hasDiagnostic ? mContext.getString(R.string.roadside_yes) : mContext.getString(R.string.roadside_no));
-        data.add(mContext.getString(R.string.roadside_empty));
+        data.add(printDate);
         data.add(mContext.getString(R.string.roadside_empty));
 
         return data;

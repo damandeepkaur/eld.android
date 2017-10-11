@@ -38,7 +38,7 @@ public interface ELDEventDao {
 
     @Query("SELECT * FROM events WHERE event_time >= :startTime AND event_time < :endTime " +
             "AND driver_id = :driverId AND (event_type = 1 or event_type = 3) ORDER BY event_time, mobile_time, status DESC, sync")
-    Flowable<List<ELDEventEntity>> getDutyEventsFromStartToEndTime(long startTime, long endTime, int driverId);
+    Single<List<ELDEventEntity>> getDutyEventsFromStartToEndTimeOnce(long startTime, long endTime, int driverId);
 
     @Query("SELECT * FROM events WHERE event_time >= :startTime AND event_time < :endTime " +
             "AND driver_id = :driverId AND (event_type = 1 or event_type = 3) ORDER BY event_time, mobile_time, status DESC, sync")

@@ -133,6 +133,7 @@ public class NavigationPresenterTest {
         final Flowable<String> userFlowable = Flowable.just(name);
         final Flowable<Integer> coDriverCountFlowable = Flowable.just(3);
         final Observable<List<ELDEvent>> unassignedEvents= Observable.just(Collections.emptyList());
+        final Single<List<ELDEvent>> resetEvents= Single.just(Collections.emptyList());
 
         final int coDriver = 3; // note: business logic is incorrect as can have multiple co-drivers
         // TODO: add refactor task/story to JIRA after server-side API refactors to match correct business logic
@@ -148,6 +149,7 @@ public class NavigationPresenterTest {
         when(mUserInteractor.isLoginActive()).thenReturn(true);
 
         when(mEventsInteractor.getUnidentifiedEvents()).thenReturn(unassignedEvents);
+        when(mEventsInteractor.resetTime()).thenReturn(resetEvents);
 
         // when
         mNavigationPresenter.onViewCreated();
