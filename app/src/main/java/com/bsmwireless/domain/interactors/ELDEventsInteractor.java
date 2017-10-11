@@ -160,29 +160,21 @@ public final class ELDEventsInteractor {
         return Observable.fromCallable(() ->
                 mELDEventDao.insertAll(entities))
                 .zipWith(resetTime().toObservable(), (ids, dutyEvents) -> ids)
-                .doOnNext(longs -> {
-                    mLogSheetInteractor.resetLogSheetHeaderSigning(events);
-                    resetTime();
-                });
+                .doOnNext(longs -> mLogSheetInteractor.resetLogSheetHeaderSigning(events));
     }
 
     public Single<Long> postNewELDEvent(ELDEvent event) {
         return Single.fromCallable(() ->
                 mELDEventDao.insertEvent(ELDEventConverter.toEntity(event, ELDEventEntity.SyncType.NEW_UNSYNC)))
                 .zipWith(resetTime(), (id, events) -> id)
-                .doOnSuccess(aLong -> {
-                    mLogSheetInteractor.resetLogSheetHeaderSigning(Arrays.asList(event));
-                });
+                .doOnSuccess(aLong -> mLogSheetInteractor.resetLogSheetHeaderSigning(Arrays.asList(event)));
     }
 
     public Observable<long[]> postNewELDEvents(List<ELDEvent> events) {
         return Observable.fromCallable(() ->
                 mELDEventDao.insertAll(ELDEventConverter.toEntityArray(events, ELDEventEntity.SyncType.NEW_UNSYNC)))
                 .zipWith(resetTime().toObservable(), (ids, dutyEvents) -> ids)
-                .doOnNext(longs -> {
-                    mLogSheetInteractor.resetLogSheetHeaderSigning(events);
-                    resetTime();
-                });
+                .doOnNext(longs -> mLogSheetInteractor.resetLogSheetHeaderSigning(events));
     }
 
     public Single<List<ELDEvent>> resetTime() {
