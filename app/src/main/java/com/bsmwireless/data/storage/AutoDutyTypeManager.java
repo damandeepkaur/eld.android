@@ -3,7 +3,6 @@ package com.bsmwireless.data.storage;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 
-import com.bsmwireless.common.Constants;
 import com.bsmwireless.common.utils.AppSettings;
 import com.bsmwireless.common.utils.BlackBoxStateChecker;
 import com.bsmwireless.common.utils.DateUtils;
@@ -28,7 +27,6 @@ import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
 public final class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListener {
-    private static final long AUTO_ON_DUTY_DELAY = Constants.LOCK_SCREEN_IDLE_MONITORING_TIMEOUT_MS;
 
     private BlackBoxInteractor mBlackBoxInteractor;
     private ELDEventsInteractor mEventsInteractor;
@@ -57,14 +55,10 @@ public final class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListen
                 return;
             }
 
-            if (mOnStoppedListener != null) {
-                mOnStoppedListener.onStopped();
-            }
-
             if (mListener != null) {
                 mListener.onAutoOnDuty(mBlackBoxModel.getEventTimeUTC().getTime());
                 mBlackBoxModel.setEventTimeUTC(new Date(DateUtils.currentTimeMillis()));
-                mHandler.postDelayed(this, AUTO_ON_DUTY_DELAY);
+                mHandler.postDelayed(this, mAppSettings.lockScreenIdlingTimeout());
             }
         }
     };
@@ -180,7 +174,7 @@ public final class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListen
                 if (mBlackBoxModel != null) {
                     mBlackBoxModel.setEventTimeUTC(new Date(DateUtils.currentTimeMillis()));
                 }
-                mHandler.postDelayed(mAutoOnDutyTask, AUTO_ON_DUTY_DELAY);
+                mHandler.postDelayed(mAutoOnDutyTask, mAppSettings.lockScreenIdlingTimeout());
             }
         }
     }
@@ -218,10 +212,10 @@ public final class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListen
     private void handleStopped(BlackBoxModel blackBoxModel) {
         mBlackBoxModel = blackBoxModel;
         clearStoppedTasks();
+        mHandler.postDelayed(mStoppedInNotDrivingDutyTask, mAppSettings.lockScreenIdlingTimeout());
         if (mDutyTypeManager.getDutyType() == DutyType.DRIVING) {
-            mHandler.postDelayed(mAutoOnDutyTask, AUTO_ON_DUTY_DELAY);
+            mHandler.postDelayed(mAutoOnDutyTask, mAppSettings.lockScreenIdlingTimeout());
         } else {
-            mHandler.postDelayed(mStoppedInNotDrivingDutyTask, AUTO_ON_DUTY_DELAY);
             SchedulerUtils.schedule();
         }
     }
