@@ -24,7 +24,7 @@ public interface Constants {
     int SYNC_ALL_EVENTS_IN_MIN = 60;
     int SYNC_NTP_RETRY_COUNT = 3;
 
-    long LOCK_SCREEN_IDLE_MONITORING_TIMEOUT_MS = TimeUnit.SECONDS.toMillis(10);
+    long LOCK_SCREEN_IDLE_MONITORING_TIMEOUT_MS = TimeUnit.MINUTES.toMillis(5);
     long LOCK_SCREEN_DISCONNECTION_TIMEOUT_MS = TimeUnit.MINUTES.toMillis(5);
     long LOCK_SCREEN_IGNITION_OFF_DIALOG_TIMEOUT = TimeUnit.MINUTES.toMillis(5);
 
