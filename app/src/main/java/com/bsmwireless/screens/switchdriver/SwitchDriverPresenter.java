@@ -26,6 +26,7 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.disposables.Disposables;
 import io.reactivex.schedulers.Schedulers;
+import retrofit2.HttpException;
 import timber.log.Timber;
 
 import static com.bsmwireless.common.Constants.MAX_CODRIVERS;
@@ -45,6 +46,8 @@ public final class SwitchDriverPresenter {
     private Disposable mLoginDisposable;
     private Disposable mLogoutDisposable;
     private Disposable mReassignEventDisposable;
+    private Disposable mCheckMaxCoDriversNumberDisposable;
+    private Disposable mCheckMinCoDriversNumberDisposable;
     private final CompositeDisposable mCommonDisposables;
 
     @Inject
@@ -63,6 +66,8 @@ public final class SwitchDriverPresenter {
         mLoginDisposable = Disposables.disposed();
         mLogoutDisposable = Disposables.disposed();
         mReassignEventDisposable = Disposables.disposed();
+        mCheckMaxCoDriversNumberDisposable = Disposables.disposed();
+        mCheckMinCoDriversNumberDisposable = Disposables.disposed();
         mCommonDisposables = new CompositeDisposable();
         Timber.d("CREATED");
     }
@@ -73,6 +78,8 @@ public final class SwitchDriverPresenter {
         mLoginDisposable.dispose();
         mLogoutDisposable.dispose();
         mReassignEventDisposable.dispose();
+        mCheckMaxCoDriversNumberDisposable.dispose();
+        mCheckMinCoDriversNumberDisposable.dispose();
         mCommonDisposables.clear();
     }
 
@@ -169,6 +176,8 @@ public final class SwitchDriverPresenter {
                     mView.hideProgress();
                     if (throwable instanceof RetrofitException) {
                         mView.showError((RetrofitException) throwable);
+                    } else if (throwable instanceof HttpException) {
+                        mView.showError(SwitchDriverView.Error.ERROR_INVALID_CREDENTIALS);
                     } else {
                         mView.showError(SwitchDriverView.Error.ERROR_LOGIN_CO_DRIVER);
                     }
@@ -285,5 +294,43 @@ public final class SwitchDriverPresenter {
             }
         }
         return userEntities;
+    }
+
+    public void enableAddCoDrivers() {
+        mCheckMaxCoDriversNumberDisposable.dispose();
+        mCheckMaxCoDriversNumberDisposable = isMaxCoDriversReached()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(status -> {
+                    if (status) {
+                        mView.setAddCoDriverButtonEnabled(true);
+                    } else {
+                        mView.setAddCoDriverButtonEnabled(false);
+                    }
+                });
+    }
+
+    private Single<Boolean> isMaxCoDriversReached() {
+        return Single.fromCallable(() -> mUserInteractor.getCoDriversNumberSync())
+                .map(count -> count < MAX_CODRIVERS);
+    }
+
+    public void enableLogoutButton() {
+        mCheckMinCoDriversNumberDisposable.dispose();
+        mCheckMinCoDriversNumberDisposable = isCoDriverAdded()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(status -> {
+                    if (status) {
+                        mView.setLogOutButtonEnabled(false);
+                    } else {
+                        mView.setLogOutButtonEnabled(true);
+                    }
+                });
+    }
+
+    private Single<Boolean> isCoDriverAdded() {
+        return Single.fromCallable(() -> mUserInteractor.getCoDriversNumberSync())
+                .map(count -> count == 0);
     }
 }

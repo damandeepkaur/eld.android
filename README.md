@@ -2,6 +2,7 @@
 ELD app for Android
 
 # Version history
+* **1.1.11** - Fix different co-driver buttons, fix 'Add co-driver' view (_EA-487_, _EA-488_, _EA-508_)
 * **1.1.10** - Update certify events(_EA-500_, _EA-496_)
 * **1.1.9** - Fix getting for last duty and driver profile info (_EA-491_)
 * **1.1.8** - Fix UI issues prior Lollilop platfom (_EA-391_)

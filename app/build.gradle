@@ -10,8 +10,8 @@ android {
         applicationId "app.bsmuniversal.com"
         minSdkVersion 15
         targetSdkVersion 26
-        versionCode 117
-        versionName "1.1.10"
+        versionCode 118
+        versionName "1.1.11"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         javaCompileOptions {
@@ -37,12 +37,12 @@ android {
             buildConfigField "boolean", "USE_LOG", "false"
             signingConfig signingConfigs.release
 
-            testCoverageEnabled = true
+            testCoverageEnabled = false
         }
         debug {
             buildConfigField "boolean", "USE_LOG", "true"
 
-            testCoverageEnabled = true
+            testCoverageEnabled = false
         }
     }
 
@@ -180,4 +180,4 @@ dependencies {
 }
 
 
-apply from: "jacoco.gradle"
+//apply from: "jacoco.gradle"

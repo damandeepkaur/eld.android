@@ -217,6 +217,8 @@ public final class SwitchDriverDialog implements SwitchDriverView, DriverDialog 
                 show(SwitchDriverStatus.SWITCH_DRIVER);
                 break;
             }
+            case ERROR_INVALID_CREDENTIALS:
+                break;
         }
     }
 
@@ -267,7 +269,12 @@ public final class SwitchDriverDialog implements SwitchDriverView, DriverDialog 
                 .setCancelable(true)
                 .create();
 
-        switchDriverDialog.setOnShowListener(dialog -> mPresenter.onSwitchDriverCreated());
+        switchDriverDialog.setOnShowListener(dialog -> {
+            mPresenter.enableLogoutButton();
+            mPresenter.enableAddCoDrivers();
+
+            mPresenter.onSwitchDriverCreated();
+        });
         showDialog(switchDriverDialog);
     }
 
@@ -385,6 +392,23 @@ public final class SwitchDriverDialog implements SwitchDriverView, DriverDialog 
             mPresenter.onReassignEventDialogCreated();
         });
         showDialog(reassignDialog);
+    }
+
+    @Override
+    public void setAddCoDriverButtonEnabled(boolean enabled) {
+        mDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(enabled);
+    }
+
+    @Override
+    public void setLogOutButtonEnabled(boolean enabled) {
+        mDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setEnabled(enabled);
+    }
+
+    @Override
+    public void hide() {
+        if (mDialog != null) {
+            mDialog.dismiss();
+        }
     }
 
     @Override
