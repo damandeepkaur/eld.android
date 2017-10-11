@@ -111,7 +111,7 @@ public final class NavigationPresenter extends BaseMenuPresenter {
 
         add(mEventsInteractor.resetTime()
                 .subscribeOn(Schedulers.io())
-                .subscribe(error -> Timber.e("Reset time error: %s", error)));
+                .subscribe(events -> {}, error -> Timber.e("Reset time error: %s", error)));
     }
 
     @Override
@@ -149,6 +149,6 @@ public final class NavigationPresenter extends BaseMenuPresenter {
         super.onUserChanged();
         add(mEventsInteractor.resetTime()
                 .subscribeOn(Schedulers.io())
-                .subscribe(error -> Timber.e("Reset time error: %s", error)));
+                .subscribe(events -> {}, error -> Timber.e("Reset time error: %s", error)));
     }
 }
