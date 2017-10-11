@@ -109,7 +109,9 @@ public final class NavigationPresenter extends BaseMenuPresenter {
         mSyncInteractor.startSync();
         checkForUnassignedEvents();
 
-        getEventsInteractor().resetTime();
+        add(mEventsInteractor.resetTime()
+                .subscribeOn(Schedulers.io())
+                .subscribe(error -> Timber.e("Reset time error: %s", error)));
     }
 
     @Override
