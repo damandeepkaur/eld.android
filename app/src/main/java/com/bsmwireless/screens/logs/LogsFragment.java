@@ -210,7 +210,6 @@ public final class LogsFragment extends BaseFragment implements LogsView {
         showNotificationSnackBar(getString(R.string.event_added));
         CalendarItem item = mAdapter.getCurrentItem();
         mPresenter.updateDataForDay(item.getLogDay());
-        mHoursOfServiceView.setResetTime(0);
     }
 
     @Override
@@ -218,7 +217,6 @@ public final class LogsFragment extends BaseFragment implements LogsView {
         showNotificationSnackBar(getString(R.string.event_updated));
         CalendarItem item = mAdapter.getCurrentItem();
         mPresenter.updateDataForDay(item.getLogDay());
-        mHoursOfServiceView.setResetTime(0);
     }
 
     @Override
@@ -226,7 +224,6 @@ public final class LogsFragment extends BaseFragment implements LogsView {
         showNotificationSnackBar(getString(R.string.event_removed));
         CalendarItem item = mAdapter.getCurrentItem();
         mPresenter.updateDataForDay(item.getLogDay());
-        mHoursOfServiceView.setResetTime(0);
     }
 
     @Override

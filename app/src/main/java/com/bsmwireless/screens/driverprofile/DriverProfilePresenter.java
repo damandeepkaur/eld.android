@@ -207,6 +207,7 @@ public final class DriverProfilePresenter extends BaseMenuPresenter {
         if (mHomeTerminals != null && !mHomeTerminals.isEmpty()) {
             int position = findHomeTerminalById(mHomeTerminals, userEntity.getUserEntity().getHomeTermId());
             mView.setHomeTerminalsSpinner(getHomeTerminalNames(mHomeTerminals), position);
+            mView.setHomeTerminalInfo(mHomeTerminals.get(position));
         } else {
             mView.setHomeTerminalsSpinner(Collections.emptyList(), 0);
         }

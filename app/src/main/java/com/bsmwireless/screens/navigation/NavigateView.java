@@ -1,6 +1,5 @@
 package com.bsmwireless.screens.navigation;
 
-import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.screens.common.menu.BaseMenuView;
 
 public interface NavigateView extends BaseMenuView {

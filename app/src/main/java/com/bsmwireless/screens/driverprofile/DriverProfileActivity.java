@@ -180,8 +180,7 @@ public final class DriverProfileActivity extends BaseMenuActivity implements Dri
         mEmployeeIDTextView.setText(String.valueOf(user.getId()));
         mLicenseTextView.setText(user.getLicense());
         mELDToggle.setChecked(user.getExempt());
-        // TODO: set real role
-        mRole.setText(User.DriverType.DRIVER.name());
+        mRole.setText(user.getExempt() ? User.DriverType.EXEMPT.name() : User.DriverType.DRIVER.name());
 
         mSignatureLayout.setImageData(user.getSignature());
     }
