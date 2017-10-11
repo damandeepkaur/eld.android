@@ -117,24 +117,24 @@ public final class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListen
         switch (blackBoxState.getResponseType()) {
             //4.3.2.2.2 Driver's indication of situations impacting drive time recording
             case IGNITION_OFF:
-                events = handleIgnitionOff(blackBoxState);
+                events = handleIgnitionOff();
                 break;
 
             //4.3.2.2.2 Driver's indication of situations impacting drive time recording
             case IGNITION_ON:
-                events = handleIgnitionOn(blackBoxState);
+                events = handleIgnitionOn();
                 break;
 
             //4.4.1.1 Automatic Setting of Duty Status to Driving
             case MOVING:
-                events = handleMoving(blackBoxState);
+                events = handleMoving();
                 break;
 
             // 4.4.1.2
             // When the duty status is set to driving, and the CMV has not been in-motion for 5 consecutive minutes,
             // the ELD must prompt the driver to confirm continued driving status or enter the proper duty status.
             case STOPPED:
-                handleStopped(blackBoxState);
+                handleStopped();
                 break;
 
             case STATUS_UPDATE:
@@ -170,7 +170,7 @@ public final class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListen
         }
     }
 
-    private List<ELDEvent> handleIgnitionOff(BlackBoxModel blackBoxModel) {
+    private List<ELDEvent> handleIgnitionOff() {
 
         List<ELDEvent> events = new ArrayList<>();
 
@@ -199,7 +199,7 @@ public final class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListen
         return events;
     }
 
-    private void handleStopped(BlackBoxModel blackBoxModel) {
+    private void handleStopped() {
         clearStoppedTasks();
         mHandler.postDelayed(mStoppedInNotDrivingDutyTask, mAppSettings.lockScreenIdlingTimeout());
         if (mDutyTypeManager.getDutyType() == DutyType.DRIVING) {
@@ -210,7 +210,7 @@ public final class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListen
         }
     }
 
-    private List<ELDEvent> handleMoving(BlackBoxModel blackBoxState) {
+    private List<ELDEvent> handleMoving() {
         SchedulerUtils.cancel();
 
         clearStoppedTasks();
@@ -231,7 +231,7 @@ public final class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListen
         return eldEvents;
     }
 
-    private List<ELDEvent> handleIgnitionOn(BlackBoxModel blackBoxModel) {
+    private List<ELDEvent> handleIgnitionOn() {
         List<ELDEvent> events = new ArrayList<>(1);
         events.add(mEventsInteractor.getEvent(mDutyTypeManager.getDutyType() == DutyType.PERSONAL_USE ?
                 ELDEvent.EnginePowerCode.POWER_UP_REDUCE_DECISION :
