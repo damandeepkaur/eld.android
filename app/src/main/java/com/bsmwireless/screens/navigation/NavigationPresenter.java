@@ -147,6 +147,8 @@ public final class NavigationPresenter extends BaseMenuPresenter {
     @Override
     public void onUserChanged() {
         super.onUserChanged();
-        mEventsInteractor.resetTime();
+        add(mEventsInteractor.resetTime()
+                .subscribeOn(Schedulers.io())
+                .subscribe(error -> Timber.e("Reset time error: %s", error)));
     }
 }
