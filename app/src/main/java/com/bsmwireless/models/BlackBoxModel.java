@@ -88,6 +88,9 @@ public final class BlackBoxModel {
     }
 
     public Date getEventTimeUTC() {
+        if (mEventTimeUTC == null) {
+            mEventTimeUTC = new Date(DateUtils.currentTimeMillis());
+        }
         return mEventTimeUTC;
     }
 
