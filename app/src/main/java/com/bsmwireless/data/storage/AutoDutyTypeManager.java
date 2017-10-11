@@ -21,16 +21,12 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
 import io.reactivex.Completable;
 import io.reactivex.Single;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
-@Singleton
 public final class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListener {
     private static final long AUTO_ON_DUTY_DELAY = Constants.LOCK_SCREEN_IDLE_MONITORING_TIMEOUT_MS;
 
@@ -50,7 +46,6 @@ public final class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListen
     private OnDisconnectListener mOnDisconnectListener;
 
     private volatile DutyType mDutyType;
-    //    private volatile long mStoppedTime;
     private volatile BlackBoxModel mBlackBoxModel;
 
     private Handler mHandler = new Handler();
@@ -69,8 +64,7 @@ public final class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListen
             if (mListener != null) {
                 mListener.onAutoOnDuty(mBlackBoxModel.getEventTimeUTC().getTime());
                 mBlackBoxModel.setEventTimeUTC(new Date(DateUtils.currentTimeMillis()));
-//                mStoppedTime = DateUtils.currentTimeMillis();
-//                mHandler.postDelayed(this, AUTO_ON_DUTY_DELAY);
+                mHandler.postDelayed(this, AUTO_ON_DUTY_DELAY);
             }
         }
     };
@@ -87,7 +81,6 @@ public final class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListen
         }
     };
 
-    @Inject
     public AutoDutyTypeManager(BlackBoxInteractor blackBoxInteractor,
                                PreferencesManager preferencesManager,
                                ELDEventsInteractor eventsInteractor,
@@ -100,7 +93,7 @@ public final class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListen
         mPreferencesManager = preferencesManager;
         mAppSettings = appSettings;
         mBlackBoxStateChecker = blackBoxStateChecker;
-
+        mBlackBoxModel = blackBoxInteractor.getLastData();
         SchedulerUtils.schedule();
     }
 
@@ -187,7 +180,6 @@ public final class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListen
                 if (mBlackBoxModel != null) {
                     mBlackBoxModel.setEventTimeUTC(new Date(DateUtils.currentTimeMillis()));
                 }
-//                mStoppedTime = DateUtils.currentTimeMillis();
                 mHandler.postDelayed(mAutoOnDutyTask, AUTO_ON_DUTY_DELAY);
             }
         }
@@ -273,14 +265,11 @@ public final class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListen
 
     private void handleDisconnect() {
 
-        if (!mBlackBoxStateChecker.isMoving(mBlackBoxModel)) {
-            return;
-        }
-        // if last state was in driving put on duty first
+        // Create on-duty event when disconnect is detected
         Single.fromCallable(() -> mEventsInteractor.getEvent(DutyType.ON_DUTY))
                 .subscribeOn(Schedulers.io())
                 .flatMapCompletable(this::startReconnect)
-                .subscribe();
+                .subscribe(this::validateBlackBoxState, throwable -> Timber.e(throwable, "Reconnection error"));
     }
 
     private Completable startReconnect(ELDEvent eldEvent) {
@@ -289,23 +278,24 @@ public final class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListen
                 .toCompletable()
                 .timeout(mAppSettings.lockScreenDisconnectionTimeout(), TimeUnit.MILLISECONDS)
                 .onErrorResumeNext(throwable -> {
-                    Timber.d("start reconnection again");
-                    if (throwable instanceof TimeoutException) {
+                    if (throwable instanceof TimeoutException || throwable instanceof BlackBoxConnectionException) {
                         // and show disconnection popup and continue monitoring
                         return Completable
                                 // If timeout is occurs save ON_DUTY for DRIVING
                                 .defer(() -> {
                                     DutyType dutyType = mDutyTypeManager.getDutyType();
+                                    Completable completable;
                                     if (dutyType == DutyType.DRIVING) {
-                                        return createPostNewEventCompletable(eldEvent)
-                                                .andThen(Completable.fromAction(() -> {
-                                                    if (mOnDisconnectListener != null) {
-                                                        mOnDisconnectListener.onDisconnect();
-                                                    }
-                                                }));
+                                        completable = createPostNewEventCompletable(eldEvent);
 
+                                    } else {
+                                        completable = Completable.complete();
                                     }
-                                    return Completable.complete();
+                                    return completable.andThen(Completable.fromAction(() -> {
+                                        if (mOnDisconnectListener != null) {
+                                            mOnDisconnectListener.onDisconnect();
+                                        }
+                                    }));
                                 })
                                 .andThen(createReconnectionCompletable());
                     }

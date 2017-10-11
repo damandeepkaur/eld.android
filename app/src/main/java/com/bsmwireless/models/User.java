@@ -254,7 +254,7 @@ public final class User implements Parcelable {
     }
 
     public String getRuleException() {
-        return mRuleException;
+        return mRuleException == null ? "" : mRuleException;
     }
 
     public void setRuleException(String ruleException) {

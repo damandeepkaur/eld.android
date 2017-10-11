@@ -156,8 +156,6 @@ public final class LockScreenPresenter {
     }
 
     void handleIgnitionOff(DutyType dutyType) {
-        Timber.d("Handle ignition off");
-
         if (mView == null) {
             return;
         }
@@ -176,19 +174,23 @@ public final class LockScreenPresenter {
     }
 
     void handleStopped() {
-        Timber.d("Handle stopped");
         closeLockScreen();
     }
 
     void handleMoving() {
-        Timber.d("Handle moving");
-
         if (mView != null) {
             mView.removeAnyPopup();
         }
     }
 
     void handleDisconnection() {
+
+        DutyType dutyType = mDutyManager.getDutyType();
+        if (dutyType != DutyType.DRIVING) {
+            closeLockScreen();
+            return;
+        }
+
         Disposable disposable = Completable
                 .fromAction(() -> {
                     if (mView != null) {
