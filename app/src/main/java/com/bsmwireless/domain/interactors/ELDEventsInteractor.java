@@ -483,7 +483,11 @@ public final class ELDEventsInteractor {
         int driverId = mAccountManager.getCurrentUserId();
 
         ELDEvent event = new ELDEvent();
-        event.setEventTime(roundTime(blackBoxModel.getEventTimeUTC().getTime()));
+        if (blackBoxModel.getEventTimeUTC() != null) {
+            event.setEventTime(roundTime(blackBoxModel.getEventTimeUTC().getTime()));
+        } else {
+            event.setEventTime(roundTime(currentTime));
+        }
         event.setEngineHours(blackBoxModel.getEngineHours());
         event.setOdometer(blackBoxModel.getOdometer());
         event.setLat(blackBoxModel.getLat());
@@ -515,7 +519,11 @@ public final class ELDEventsInteractor {
         ELDEvent event = new ELDEvent();
         event.setDriverId(driverId);
         event.setVehicleId(mPreferencesManager.getVehicleId());
-        event.setEventTime(roundTime(blackBoxModel.getEventTimeUTC().getTime()));
+        if (blackBoxModel.getEventTimeUTC() != null) {
+            event.setEventTime(roundTime(blackBoxModel.getEventTimeUTC().getTime()));
+        } else {
+            event.setEventTime(roundTime(currentTime));
+        }
         event.setEngineHours(blackBoxModel.getEngineHours());
         event.setOdometer(blackBoxModel.getOdometer());
         event.setLat(blackBoxModel.getLat());
