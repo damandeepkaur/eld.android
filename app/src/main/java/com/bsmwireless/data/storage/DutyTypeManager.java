@@ -4,6 +4,7 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 
 import com.bsmwireless.common.utils.DateUtils;
+import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.widgets.alerts.DutyType;
 
 import java.util.ArrayList;
@@ -104,6 +105,55 @@ public final class DutyTypeManager {
         mPreferencesManager.setDutyType(dutyType.ordinal());
 
         notifyListeners();
+    }
+
+    public void resetTime(List<ELDEvent> events, long startOfDay) {
+        DutyType dutyType = DutyType.OFF_DUTY;
+        DutyType eventDutyType;
+        ELDEvent event;
+
+        boolean isClear = false;
+
+        for (int i = events.size() - 1; i >= 0; i--) {
+            event = events.get(i);
+
+            if (event.isDutyEvent() && event.isActive()) {
+                eventDutyType = DutyType.getDutyTypeByCode(event.getEventType(), event.getEventCode());
+
+                if (eventDutyType == DutyType.CLEAR) {
+                    isClear = true;
+
+                //find previous duty event with actual status
+                } else if (isClear) {
+                    switch (eventDutyType) {
+                        case PERSONAL_USE:
+                            dutyType = DutyType.OFF_DUTY;
+                            break;
+
+                        case YARD_MOVES:
+                            dutyType = DutyType.ON_DUTY;
+                            break;
+
+                        default:
+                            dutyType = eventDutyType;
+                            break;
+                    }
+                    break;
+
+                } else {
+                    dutyType = eventDutyType;
+                    break;
+                }
+            }
+        }
+
+        long[] times = DutyTypeManager.getDutyTypeTimes(new ArrayList<>(events), startOfDay, DateUtils.currentTimeMillis());
+
+        setDutyTypeTime(
+                (int) (times[DutyType.ON_DUTY.ordinal()]),
+                (int) (times[DutyType.DRIVING.ordinal()]),
+                (int) (times[DutyType.SLEEPER_BERTH.ordinal()]), dutyType
+        );
     }
 
     public DutyType getDutyType() {

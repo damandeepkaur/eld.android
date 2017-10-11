@@ -2,7 +2,8 @@
 ELD app for Android
 
 # Version history
-* **1.1.9** - Update certify events(_EA-500_, _EA-496_)
+* **1.1.10** - Update certify events(_EA-500_, _EA-496_)
+* **1.1.9** - Fix getting for last duty and driver profile info (_EA-491_)
 * **1.1.8** - Fix UI issues prior Lollilop platfom (_EA-391_)
 * **1.1.7** - Print/Display Date field is missing(_EA-483_)
 * **1.1.6** - Fix NPE on invoke method closeLockScreen(_EA-484_)

@@ -39,6 +39,8 @@ import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.disposables.Disposables;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
@@ -95,9 +97,9 @@ public final class ELDEventsInteractor {
                 .map(ELDEventConverter::toModelList);
     }
 
-    public Flowable<List<ELDEvent>> getDutyEventsFromDB(long startTime, long endTime) {
+    public Single<List<ELDEvent>> getDutyEventsFromDB(long startTime, long endTime) {
         int driverId = mAccountManager.getCurrentUserId();
-        return mELDEventDao.getDutyEventsFromStartToEndTime(startTime, endTime, driverId)
+        return mELDEventDao.getDutyEventsFromStartToEndTimeOnce(startTime, endTime, driverId)
                 .map(ELDEventConverter::toModelList);
     }
 
@@ -157,19 +159,42 @@ public final class ELDEventsInteractor {
 
         return Observable.fromCallable(() ->
                 mELDEventDao.insertAll(entities))
+                .zipWith(resetTime().toObservable(), (ids, dutyEvents) -> ids)
                 .doOnNext(longs -> mLogSheetInteractor.resetLogSheetHeaderSigning(events));
     }
 
     public Single<Long> postNewELDEvent(ELDEvent event) {
         return Single.fromCallable(() ->
                 mELDEventDao.insertEvent(ELDEventConverter.toEntity(event, ELDEventEntity.SyncType.NEW_UNSYNC)))
+                .zipWith(resetTime(), (id, events) -> id)
                 .doOnSuccess(aLong -> mLogSheetInteractor.resetLogSheetHeaderSigning(Arrays.asList(event)));
     }
 
     public Observable<long[]> postNewELDEvents(List<ELDEvent> events) {
         return Observable.fromCallable(() ->
                 mELDEventDao.insertAll(ELDEventConverter.toEntityArray(events, ELDEventEntity.SyncType.NEW_UNSYNC)))
+                .zipWith(resetTime().toObservable(), (ids, dutyEvents) -> ids)
                 .doOnNext(longs -> mLogSheetInteractor.resetLogSheetHeaderSigning(events));
+    }
+
+    public Single<List<ELDEvent>> resetTime() {
+        return mUserInteractor.getTimezoneOnce()
+                .flatMap(timeZone -> {
+                    long current = DateUtils.currentTimeMillis();
+                    long start = DateUtils.getStartDayTimeInMs(timeZone, current);
+                    long end = DateUtils.getEndDayTimeInMs(timeZone, current);
+
+                    return getDutyEventsFromDB(start, end)
+                            .map(selectedDayEvents -> {
+                                List<ELDEvent> prevDayLatestEvents = getLatestActiveDutyEventFromDBSync(start, mUserInteractor.getUserId());
+                                if (!prevDayLatestEvents.isEmpty()) {
+                                    selectedDayEvents.add(0, prevDayLatestEvents.get(prevDayLatestEvents.size() - 1));
+                                }
+                                return selectedDayEvents;
+                            })
+                            .doOnSuccess(events -> mDutyTypeManager.resetTime(events, start))
+                            .doOnError(error -> mDutyTypeManager.setDutyTypeTime(0, 0, 0, DutyType.OFF_DUTY));
+                });
     }
 
     public void storeUnidentifiedEvents(List<ELDEvent> events) {
@@ -184,22 +209,12 @@ public final class ELDEventsInteractor {
                 })
                 .toList()
                 .toObservable()
-                .flatMap(this::postNewELDEvents)
-                .doOnNext(ids -> {
-                    if (ids.length > 0) {
-                        mDutyTypeManager.setDutyType(dutyType, true);
-                    }
-                });
+                .flatMap(this::postNewELDEvents);
     }
 
     public Observable<long[]> postNewDutyTypeEvent(DutyType dutyType, String comment) {
         return Single.fromCallable(() -> getEvents(dutyType, comment))
-                .flatMapObservable(this::postNewELDEvents)
-                .doOnNext(ids -> {
-                    if (ids.length > 0) {
-                        mDutyTypeManager.setDutyType(dutyType, true);
-                    }
-                });
+                .flatMapObservable(this::postNewELDEvents);
     }
 
     public Single<Boolean> postLogoutEvent() {
