@@ -706,6 +706,7 @@
     <string name="roadside_exempt">Exempt Driver Status</string>
     <string name="roadside_malfunctions">Malfunction Status</string>
     <string name="roadside_diagnostic">Diagnostic Status</string>
+    <string name="roadside_print_date">Print/Display Date</string>
     <string name="roadside_yes">Yes</string>
     <string name="roadside_no">No</string>
     <string name="roadside_not_set"/>
