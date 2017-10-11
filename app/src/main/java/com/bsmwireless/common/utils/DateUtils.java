@@ -149,11 +149,9 @@ public class DateUtils {
      */
     public static long convertTimeToLogDay(String zone, long time) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
-        Calendar calendar = Calendar.getInstance();
         TimeZone timeZone = TimeZone.getTimeZone(zone);
-        calendar.setTimeZone(timeZone);
-        calendar.setTimeInMillis(time);
-        String todayDate = dateFormat.format(calendar.getTime());
+        dateFormat.setTimeZone(timeZone);
+        String todayDate = dateFormat.format(time);
         return Long.parseLong(todayDate);
     }
 
@@ -202,21 +200,6 @@ public class DateUtils {
     public static long getLogDayForDaysAgo(int daysAgo, String timezone) {
         return DateUtils.convertTimeToLogDay(timezone, DateUtils.currentTimeMillis()
                 - MS_IN_DAY * daysAgo);
-    }
-
-    /**
-     * @param logDay long with format time like 20170708
-     * @return long unix time in ms
-     */
-    public static long convertLogDayToUnixMs(long logDay) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd", Locale.US);
-        Date date = null;
-        try {
-            date = sdf.parse(String.valueOf(logDay));
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return date.getTime();
     }
 
     /**

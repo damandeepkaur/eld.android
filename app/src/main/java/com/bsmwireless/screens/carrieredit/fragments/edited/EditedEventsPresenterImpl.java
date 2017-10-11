@@ -298,13 +298,8 @@ public final class EditedEventsPresenterImpl implements EditedEventsPresenter {
 
                     String homeTerminalAddress;
                     String homeTerminalName;
-                    if (selectedLogHeader.getHomeTerminal() != null) {
-                        homeTerminalAddress = selectedLogHeader.getHomeTerminal().getAddress();
-                        homeTerminalName = selectedLogHeader.getHomeTerminal().getName();
-                    } else {
-                        homeTerminalAddress = "";
-                        homeTerminalName = "";
-                    }
+                    homeTerminalAddress = selectedLogHeader.getHomeTerminal().getAddress();
+                    homeTerminalName = selectedLogHeader.getHomeTerminal().getName();
 
                     String shippingId = selectedLogHeader.getShippingId();
                     String coDriversName = mLogHeaderUtils.getCoDriversName(selectedLogHeader);

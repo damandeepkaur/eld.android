@@ -19,6 +19,7 @@ import com.bsmwireless.models.LogSheetHeader;
 
 import java.util.Calendar;
 import java.util.List;
+import java.util.TimeZone;
 
 import javax.inject.Inject;
 
@@ -105,7 +106,9 @@ public final class LogSheetInteractor {
     }
 
     private ELDEvent createCertificationEvent(LogSheetHeader logSheetHeader, int code) {
-        long certDay = DateUtils.convertLogDayToUnixMs(logSheetHeader.getLogDay());
+        TimeZone timeZone = TimeZone.getTimeZone(logSheetHeader.getHomeTerminal().getTimezone());
+
+        long certDay = DateUtils.convertLogDayToUnixMs(logSheetHeader.getLogDay(), timeZone);
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(DateUtils.currentTimeMillis());
 
@@ -119,10 +122,8 @@ public final class LogSheetInteractor {
         event.setVehicleId(logSheetHeader.getVehicleId());
         event.setEventTime(certDay);
         event.setMobileTime(calendar.getTimeInMillis());
-        String timezone = logSheetHeader.getHomeTerminal().getTimezone();
-        event.setTimezone(timezone);
+        event.setTimezone(timeZone.getID());
         event.setBoxId(logSheetHeader.getBoxId());
-        event.setMobileTime(calendar.getTimeInMillis());
         return event;
     }
 
