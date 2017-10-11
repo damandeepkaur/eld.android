@@ -86,7 +86,7 @@ public final class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.
         if (logs != null) {
             clearItems();
             for (LogSheetHeader log : logs) {
-                TimeZone timeZone = TimeZone.getTimeZone(log.getHomeTerminal() == null ? "UTC" : log.getHomeTerminal().getTimezone());
+                TimeZone timeZone = TimeZone.getTimeZone(log.getHomeTerminal().getTimezone());
                 CalendarItem item = findItemByDate(DateUtils.convertLogDayToUnixMs(log.getLogDay(), timeZone));
                 if (item != null) {
                     item.setAssociatedLog(log);

@@ -151,11 +151,9 @@ public class DateUtils {
      */
     public static long convertTimeToLogDay(String zone, long time) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.US);
-        Calendar calendar = Calendar.getInstance();
         TimeZone timeZone = TimeZone.getTimeZone(zone);
-        calendar.setTimeZone(timeZone);
-        calendar.setTimeInMillis(time);
-        String todayDate = dateFormat.format(calendar.getTime());
+        dateFormat.setTimeZone(timeZone);
+        String todayDate = dateFormat.format(time);
         return Long.parseLong(todayDate);
     }
 

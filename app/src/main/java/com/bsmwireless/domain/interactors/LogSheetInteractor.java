@@ -106,7 +106,7 @@ public final class LogSheetInteractor {
     }
 
     private ELDEvent createCertificationEvent(LogSheetHeader logSheetHeader, int code) {
-        TimeZone timeZone = TimeZone.getTimeZone(logSheetHeader.getHomeTerminal() == null ? "UTC" : logSheetHeader.getHomeTerminal().getTimezone());
+        TimeZone timeZone = TimeZone.getTimeZone(logSheetHeader.getHomeTerminal().getTimezone());
 
         long certDay = DateUtils.convertLogDayToUnixMs(logSheetHeader.getLogDay(), timeZone);
         Calendar calendar = Calendar.getInstance();
