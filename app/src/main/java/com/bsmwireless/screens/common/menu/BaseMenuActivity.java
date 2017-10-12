@@ -115,6 +115,13 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
     @SuppressWarnings("DesignForExtension")
     @Override
     public void setDutyType(DutyType type) {
+        //show main statuses for special events
+        if (type == DutyType.PERSONAL_USE) {
+            type = DutyType.OFF_DUTY;
+        } else if (type == DutyType.YARD_MOVES) {
+            type = DutyType.ON_DUTY;
+        }
+
         if (mDutyItem != null) {
             mDutyItem.setIcon(type.getIcon());
             mDutyItem.setTitle(getString(type.getName()));
