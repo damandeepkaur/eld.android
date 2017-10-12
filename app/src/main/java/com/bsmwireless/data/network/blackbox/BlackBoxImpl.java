@@ -140,16 +140,19 @@ public final class BlackBoxImpl implements BlackBox {
         }
         writeRawData(BlackBoxParser.generateSubscriptionRequest(getSequenceID(), mBoxId, UPDATE_RATE_MILLIS));
         BlackBoxResponseModel response = readSubscriptionResponse();
-        if (response.getResponseType() == BlackBoxResponseModel.ResponseType.ACK) {
+        if (response != null && response.getResponseType() == BlackBoxResponseModel.ResponseType.ACK) {
             mVinNumber = response.getVinNumber();
             Timber.d("readSubscriptionResponse ok");
             return true;
-        } else if (response.getResponseType() == BlackBoxResponseModel.ResponseType.NACK) {
+        } else {
             Timber.e("readSubscriptionResponse error");
             closeSocket();
-            throw new BlackBoxConnectionException(response.getErrReasonCode());
+            BlackBoxConnectionException error = new BlackBoxConnectionException(UNKNOWN_ERROR);
+            if (response != null && response.getResponseType() == BlackBoxResponseModel.ResponseType.NACK) {
+                error = new BlackBoxConnectionException(response.getErrReasonCode());
+            }
+            throw error;
         }
-        return false;
     }
 
     private Observable<BlackBoxModel> startContinuousRead() {
@@ -179,12 +182,25 @@ public final class BlackBoxImpl implements BlackBox {
     }
 
 
-    private BlackBoxResponseModel readSubscriptionResponse() throws Exception {
-        byte[] response;
-        response = readRawData(getInputStream());
+    private BlackBoxResponseModel readSubscriptionResponse() {
+        InputStream stream = null;
         BlackBoxResponseModel responseModel = null;
-        if (response != null) {
-            responseModel = BlackBoxParser.parseSubscription(response);
+        try {
+            stream = getInputStream();
+            byte[] response = readRawData(stream);
+            if (response != null) {
+                responseModel = BlackBoxParser.parseSubscription(response);
+            }
+        } catch (Exception e) {
+            Timber.e(e);
+        } finally {
+            if (stream != null) {
+                try {
+                    stream.close();
+                } catch (IOException e) {
+                    Timber.e(e);
+                }
+            }
         }
         return responseModel;
     }
