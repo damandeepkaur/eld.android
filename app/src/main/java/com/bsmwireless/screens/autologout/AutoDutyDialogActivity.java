@@ -73,7 +73,7 @@ public final class AutoDutyDialogActivity extends BaseActivity implements AutoDu
                 showAutoOnDutyDialog(time);
 
             } else if (intent.hasExtra(EXTRA_AUTO_DRIVING_WITHOUT_CONFIRM) && mIsAutoDrivingDialogShown) {
-                mPresenter.onDrivingClick();
+                mPresenter.onSwitchStatusClick(true);
 
             } else if (intent.hasExtra(EXTRA_TOKEN_EXPIRED)) {
                 showTokenExpiredDialog();
@@ -133,7 +133,7 @@ public final class AutoDutyDialogActivity extends BaseActivity implements AutoDu
                 .setMessage(R.string.driving_dialog_message)
                 .setCancelable(false)
                 .setPositiveButton(R.string.driving_accept, (dialog, which) -> onActionDone())
-                .setNegativeButton(R.string.driving_cancel, (dialog, which) -> mPresenter.onDrivingClick())
+                .setNegativeButton(R.string.driving_cancel, (dialog, which) -> mPresenter.onSwitchStatusClick(false))
                 .show();
 
         mIsAutoDrivingDialogShown = true;
@@ -149,12 +149,12 @@ public final class AutoDutyDialogActivity extends BaseActivity implements AutoDu
                 .setMessage(R.string.on_duty_dialog_message)
                 .setCancelable(false)
                 .setPositiveButton(R.string.on_duty_accept, (dialog, which) -> onActionDone())
-                .setNegativeButton(R.string.on_duty_cancel, (dialog, which) -> mPresenter.onSwitchStatusClick(time))
+                .setNegativeButton(R.string.on_duty_cancel, (dialog, which) -> mPresenter.onOnDutyClick(time))
                 .show();
 
         mHandler.removeCallbacks(mAutoOnDutyTask);
 
-        mAutoOnDutyTask = () -> mPresenter.onSwitchStatusClick(time);
+        mAutoOnDutyTask = () -> mPresenter.onOnDutyClick(time);
         mHandler.postDelayed(mAutoOnDutyTask, MS_IN_MIN);
     }
 
