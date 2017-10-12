@@ -147,15 +147,14 @@ public final class LogsFragment extends BaseFragment implements LogsView {
     }
 
     public void showSignDialog(CalendarItem calendarItem) {
-        View alertView = getActivity().getLayoutInflater().inflate(R.layout.sign_dialog_view, null);
         AlertDialog signDialog = new AlertDialog.Builder(mContext)
                 .setTitle(R.string.sign_dialog_title)
+                .setMessage(R.string.sign_dialog_confirmation_text)
                 .setPositiveButton(R.string.accept,
                         (dialog, whichButton) -> mPresenter.onSignLogsheetButtonClicked(
                                 calendarItem))
                 .setNegativeButton(R.string.decline, null)
                 .create();
-        signDialog.setView(alertView);
         signDialog.show();
     }
 
@@ -210,7 +209,6 @@ public final class LogsFragment extends BaseFragment implements LogsView {
         showNotificationSnackBar(getString(R.string.event_added));
         CalendarItem item = mAdapter.getCurrentItem();
         mPresenter.updateDataForDay(item.getLogDay());
-        mHoursOfServiceView.setResetTime(0);
     }
 
     @Override
@@ -218,7 +216,6 @@ public final class LogsFragment extends BaseFragment implements LogsView {
         showNotificationSnackBar(getString(R.string.event_updated));
         CalendarItem item = mAdapter.getCurrentItem();
         mPresenter.updateDataForDay(item.getLogDay());
-        mHoursOfServiceView.setResetTime(0);
     }
 
     @Override
@@ -226,7 +223,6 @@ public final class LogsFragment extends BaseFragment implements LogsView {
         showNotificationSnackBar(getString(R.string.event_removed));
         CalendarItem item = mAdapter.getCurrentItem();
         mPresenter.updateDataForDay(item.getLogDay());
-        mHoursOfServiceView.setResetTime(0);
     }
 
     @Override

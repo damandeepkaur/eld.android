@@ -13,6 +13,7 @@ import com.bsmwireless.common.utils.DateUtils;
 import com.bsmwireless.models.LogSheetHeader;
 
 import java.util.List;
+import java.util.TimeZone;
 
 import app.bsmuniversal.com.R;
 import butterknife.BindView;
@@ -85,7 +86,8 @@ public final class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.
         if (logs != null) {
             clearItems();
             for (LogSheetHeader log : logs) {
-                CalendarItem item = findItemByDate(DateUtils.convertLogDayToUnixMs(log.getLogDay()));
+                TimeZone timeZone = TimeZone.getTimeZone(log.getHomeTerminal().getTimezone());
+                CalendarItem item = findItemByDate(DateUtils.convertLogDayToUnixMs(log.getLogDay(), timeZone));
                 if (item != null) {
                     item.setAssociatedLog(log);
                 }

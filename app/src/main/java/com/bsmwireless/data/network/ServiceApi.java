@@ -123,7 +123,7 @@ public interface ServiceApi {
      * @return Response {@link ResponseMessage}.
      */
     @PUT("v1/sync/records/update")
-    Single<ResponseMessage> updateRescords(@Body List<ELDUpdate> events);
+    Single<ResponseMessage> updateRecords(@Body List<ELDUpdate> events);
 
     /**
      * Update user profile.

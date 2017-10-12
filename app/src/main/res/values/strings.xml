@@ -460,10 +460,10 @@
     <string name="hours">hrs</string>
     <string name="minutes">mins</string>
     <string name="sign_dialog_title">Sign confirmation</string>
-    <string name="sign_dialog_confirmation_text">Are you sure you want to sign this logsheet?</string>
+    <string name="sign_dialog_confirmation_text">I hereby certify that my data entries and my record of duty status for this 24-hour period are true and correct</string>
     <string name="sign_dialog_visibility_note">Signed logsheets will be visible to supervisors</string>
-    <string name="decline">decline</string>
-    <string name="accept">accept</string>
+    <string name="decline">Not ready</string>
+    <string name="accept">Agree</string>
     <string name="reject">reject</string>
     <!--Logs Events-->
     <string name="event_changed">(CHANGED)</string>
@@ -484,6 +484,8 @@
     <string name="event_type_malfunction_cleared">Malfunction cleared</string>
     <string name="event_type_diagnostic_logged">Diagnostic logged</string>
     <string name="event_type_diagnostic_cleared">Diagnostic cleared</string>
+    <string name="event_type_intermediate_logs">Intermediate log</string>
+    <string name="event_type_certification_record">Log Signed</string>
     <string name="event_type_unknown_type">Unknown event type</string>
     <string name="event_type_personal_use_title">Off Duty (Start of Personal Use)</string>
     <string name="event_type_yard_moves_title">On Duty (Start of Yard Moves)</string>
@@ -704,6 +706,7 @@
     <string name="roadside_exempt">Exempt Driver Status</string>
     <string name="roadside_malfunctions">Malfunction Status</string>
     <string name="roadside_diagnostic">Diagnostic Status</string>
+    <string name="roadside_print_date">Print/Display Date</string>
     <string name="roadside_yes">Yes</string>
     <string name="roadside_no">No</string>
     <string name="roadside_not_set"/>
