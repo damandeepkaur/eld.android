@@ -11,6 +11,7 @@ import com.bsmwireless.models.BlackBoxModel;
 import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.models.Vehicle;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
@@ -123,7 +124,14 @@ public final class VehiclesInteractor {
                     saveLastVehicle(id, vehicle.getId());
                     mELDEventsInteractor.storeUnidentifiedEvents(events);
                 })
-                .doOnError(error -> cleanSelectedVehicle().blockingAwait());
+                .doOnError(error -> {
+                    //work in offline mode here
+                    if (error instanceof IOException) {
+                        saveLastVehicle(id, vehicle.getId());
+                    } else {
+                        cleanSelectedVehicle().blockingAwait();
+                    }
+                });
     }
 
     public Single<List<ELDEvent>> pairNotInVehicle() {
@@ -146,8 +154,7 @@ public final class VehiclesInteractor {
                     event.setComment("");
 
                     return mServiceApi.pairVehicle(event);
-                })
-                .doOnError(error -> cleanSelectedVehicle().blockingAwait());
+                });
     }
 
     public Flowable<List<Vehicle>> getLastVehicles() {

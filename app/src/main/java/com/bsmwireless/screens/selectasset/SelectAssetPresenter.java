@@ -8,6 +8,7 @@ import com.bsmwireless.domain.interactors.UserInteractor;
 import com.bsmwireless.domain.interactors.VehiclesInteractor;
 import com.bsmwireless.models.Vehicle;
 
+import java.io.IOException;
 import java.net.ConnectException;
 
 import javax.inject.Inject;
@@ -93,6 +94,11 @@ public final class SelectAssetPresenter {
                         },
                         error -> {
                             Timber.e("SelectAsset error: %s", error);
+                            //offline work
+                            if (error instanceof IOException) {
+                                mView.goToHomeScreen();
+                            }
+
                             if (error instanceof RetrofitException) {
                                 mView.showErrorMessage((RetrofitException) error);
                             }
@@ -113,6 +119,11 @@ public final class SelectAssetPresenter {
                             },
                             error -> {
                                 Timber.e("SelectAsset error: %s", error);
+                                //offline work
+                                if (error instanceof IOException) {
+                                    mView.goToHomeScreen();
+                                }
+
                                 if (error instanceof RetrofitException) {
                                     mView.showErrorMessage((RetrofitException) error);
                                 }
