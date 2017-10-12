@@ -37,10 +37,7 @@ public final class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListen
     private Disposable mBlackBoxDisposable;
 
     private AutoDutyTypeListener mListener = null;
-    private OnIgnitionOffListener mIgnitionOffListener;
-    private OnStoppedListener mOnStoppedListener;
-    private OnMovingListener mOnMovingListener;
-    private OnDisconnectListener mOnDisconnectListener;
+    private OnDriverCycleListener mDriverCycleListener = null;
 
     private volatile DutyType mDutyType;
     private volatile long mStoppedTime;
@@ -58,8 +55,8 @@ public final class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListen
     };
 
     private Runnable mStoppedInNotDrivingDutyTask = () -> {
-        if (mOnStoppedListener != null) {
-            mOnStoppedListener.onStopped();
+        if (mDriverCycleListener != null) {
+            mDriverCycleListener.onStopped();
         }
     };
 
@@ -192,8 +189,8 @@ public final class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListen
             default:
         }
 
-        if (mIgnitionOffListener != null) {
-            mIgnitionOffListener.onIgnitionOff(dutyType);
+        if (mDriverCycleListener != null) {
+            mDriverCycleListener.onIgnitionOff(dutyType);
         }
 
         return events;
@@ -225,8 +222,8 @@ public final class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListen
             mListener.onAutoDrivingWithoutConfirm();
         }
 
-        if (mOnMovingListener != null) {
-            mOnMovingListener.onMoving();
+        if (mDriverCycleListener != null) {
+            mDriverCycleListener.onMoving();
         }
         return eldEvents;
     }
@@ -274,8 +271,8 @@ public final class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListen
                                         completable = Completable.complete();
                                     }
                                     return completable.andThen(Completable.fromAction(() -> {
-                                        if (mOnDisconnectListener != null) {
-                                            mOnDisconnectListener.onDisconnect();
+                                        if (mDriverCycleListener != null) {
+                                            mDriverCycleListener.onDisconnect();
                                         }
                                     }));
                                 })
@@ -342,20 +339,8 @@ public final class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListen
         mHandler.removeCallbacks(mStoppedInNotDrivingDutyTask);
     }
 
-    public void setOnIgnitionOffListener(OnIgnitionOffListener listener) {
-        mIgnitionOffListener = listener;
-    }
-
-    public void setOnStoppedListener(OnStoppedListener listener) {
-        mOnStoppedListener = listener;
-    }
-
-    public void setOnMovingListener(OnMovingListener onMovingListener) {
-        mOnMovingListener = onMovingListener;
-    }
-
-    public void setOnDisconnectListener(OnDisconnectListener onDisconnectListener) {
-        mOnDisconnectListener = onDisconnectListener;
+    public void setDriverCycleListener(OnDriverCycleListener driverCycleListener) {
+        mDriverCycleListener = driverCycleListener;
     }
 
     public interface AutoDutyTypeListener {
@@ -366,24 +351,15 @@ public final class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListen
         void onAutoDrivingWithoutConfirm();
     }
 
-    public interface OnIgnitionOffListener {
+    public interface OnDriverCycleListener {
         /**
          * Called when ignition off is detected
          *
          * @param currentDutyType current duty type when ignition off is detected
          */
         void onIgnitionOff(DutyType currentDutyType);
-    }
-
-    public interface OnStoppedListener {
         void onStopped();
-    }
-
-    public interface OnMovingListener {
         void onMoving();
-    }
-
-    public interface OnDisconnectListener {
         void onDisconnect();
     }
 }

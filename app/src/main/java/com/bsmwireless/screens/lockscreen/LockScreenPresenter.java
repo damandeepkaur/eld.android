@@ -142,17 +142,11 @@ public final class LockScreenPresenter {
      * Start the monitoring statuses task.
      */
     void startMonitoring() {
-        mAutoDutyTypeManager.setOnIgnitionOffListener(ignitionOffListener);
-        mAutoDutyTypeManager.setOnMovingListener(mOnMovingListener);
-        mAutoDutyTypeManager.setOnStoppedListener(mOnStoppedListener);
-        mAutoDutyTypeManager.setOnDisconnectListener(mOnDisconnectListener);
+        mAutoDutyTypeManager.setDriverCycleListener(mDriverCycleListener);
     }
 
     private void stopMonitoring() {
-        mAutoDutyTypeManager.setOnIgnitionOffListener(null);
-        mAutoDutyTypeManager.setOnMovingListener(null);
-        mAutoDutyTypeManager.setOnStoppedListener(null);
-        mAutoDutyTypeManager.setOnDisconnectListener(null);
+        mAutoDutyTypeManager.setDriverCycleListener(null);
     }
 
     void handleIgnitionOff(DutyType dutyType) {
@@ -212,12 +206,6 @@ public final class LockScreenPresenter {
     private Completable createPostNewEventCompletable(ELDEvent eldEventInfo) {
         return mEventsInteractor.postNewELDEvent(eldEventInfo)
                 .toCompletable()
-                .doOnComplete(() -> {
-                    Integer eventType = eldEventInfo.getEventType();
-                    Integer eventCode = eldEventInfo.getEventCode();
-                    DutyType dutyType = DutyType.getDutyTypeByCode(eventType, eventCode);
-                    mDutyManager.setDutyType(dutyType, true);
-                })
                 .onErrorComplete(throwable -> {
                     Timber.e(throwable, "Post new duty event error");
                     return true;
@@ -238,13 +226,26 @@ public final class LockScreenPresenter {
         }
     };
 
-    private final AutoDutyTypeManager.OnIgnitionOffListener ignitionOffListener =
-            this::handleIgnitionOff;
+    private final AutoDutyTypeManager.OnDriverCycleListener mDriverCycleListener =
+            new AutoDutyTypeManager.OnDriverCycleListener() {
+                @Override
+                public void onIgnitionOff(DutyType currentDutyType) {
+                    handleIgnitionOff(currentDutyType);
+                }
 
-    private final AutoDutyTypeManager.OnStoppedListener mOnStoppedListener = this::handleStopped;
+                @Override
+                public void onStopped() {
+                    handleStopped();
+                }
 
-    private final AutoDutyTypeManager.OnMovingListener mOnMovingListener = this::handleMoving;
+                @Override
+                public void onMoving() {
+                    handleMoving();
+                }
 
-    private final AutoDutyTypeManager.OnDisconnectListener mOnDisconnectListener =
-            this::handleDisconnection;
+                @Override
+                public void onDisconnect() {
+                    handleDisconnection();
+                }
+            };
 }
