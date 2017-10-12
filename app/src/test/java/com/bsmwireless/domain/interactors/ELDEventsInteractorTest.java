@@ -177,7 +177,7 @@ public class ELDEventsInteractorTest extends BaseTest {
     @Test
     public void getEventGpsNoFixNoCompliance() throws Exception {
 
-        BlackBoxModel blackBoxModel = mock(BlackBoxModel.class);
+        BlackBoxModel blackBoxModel = spy(BlackBoxModel.class);
         when(blackBoxModel.getSensorState(BlackBoxSensorState.GPS)).thenReturn(false);
 
         when(mBlackBoxInteractor.getLastData()).thenReturn(blackBoxModel);

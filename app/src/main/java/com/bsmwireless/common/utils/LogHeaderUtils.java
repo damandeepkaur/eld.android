@@ -25,13 +25,18 @@ public final class LogHeaderUtils {
     private final UserInteractor mUserInteractor;
 
     @Inject
-    public LogHeaderUtils(UserInteractor userInteractor){
+    public LogHeaderUtils(UserInteractor userInteractor) {
         mUserInteractor = userInteractor;
     }
 
     @NonNull
     public String makeDriverName(@NonNull User user) {
         return String.format("%1$s %2$s", user.getFirstName(), user.getLastName());
+    }
+
+    @NonNull
+    public String getSelectedExemption(@NonNull User user) {
+        return user.getRuleException();
     }
 
     @NonNull

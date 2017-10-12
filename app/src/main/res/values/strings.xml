@@ -522,7 +522,7 @@
 
     <string name="driving_dialog_title">Confirmation required</string>
     <string name="driving_dialog_message">You are still in Personal Use (Off Duty) mode. Please confirm your status or switch to the proper duty status.</string>
-    <string name="driving_cancel">Switch to Driving</string>
+    <string name="driving_cancel">Switch Status</string>
     <string name="driving_accept">Confirm</string>
 
     <string name="on_duty_dialog_title">Confirmation required</string>

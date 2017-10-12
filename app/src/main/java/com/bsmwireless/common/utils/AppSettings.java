@@ -36,6 +36,10 @@ public final class AppSettings {
         return Constants.LOCK_SCREEN_DISCONNECTION_TIMEOUT_MS;
     }
 
+    public long ignitionOffDialogTimeout(){
+        return Constants.LOCK_SCREEN_IGNITION_OFF_DIALOG_TIMEOUT;
+    }
+
     /**
      * Returns time interval for running a storage capacity check
      * @return time interval

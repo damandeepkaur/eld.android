@@ -23,7 +23,7 @@ import static com.bsmwireless.widgets.alerts.DutyType.YARD_MOVES;
 
 public final class DutyTypeManager {
 
-    //Suppressed, but the problem is fixed by createDataTypeList funcrion which returns unmodifiable colleaction
+    //Suppressed, but the problem is fixed by createDataTypeList function which returns unmodifiable colleaction
     @SuppressWarnings("PublicStaticCollectionField")
     public static final List<DutyType> DRIVER_DUTY_EXTENDED_WITH_CLEAR = createDataTypeList(ON_DUTY, OFF_DUTY, SLEEPER_BERTH, DRIVING, YARD_MOVES, PERSONAL_USE, CLEAR);
     @SuppressWarnings("PublicStaticCollectionField")

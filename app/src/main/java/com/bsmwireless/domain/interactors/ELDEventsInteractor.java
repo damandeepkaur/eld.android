@@ -39,8 +39,6 @@ import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.disposables.Disposables;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
@@ -202,7 +200,8 @@ public final class ELDEventsInteractor {
     }
 
     public Observable<long[]> postNewDutyTypeEvent(DutyType dutyType, String comment, long time) {
-        return Observable.fromIterable(getEvents(dutyType, comment))
+        return Single.fromCallable(() -> getEvents(dutyType, comment))
+                .flatMapObservable(Observable::fromIterable)
                 .map(event -> {
                     event.setEventTime(roundTime(time));
                     return event;

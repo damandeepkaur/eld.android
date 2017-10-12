@@ -4,10 +4,14 @@ package com.bsmwireless.screens.autologout;
 import com.bsmwireless.common.utils.SchedulerUtils;
 import com.bsmwireless.domain.interactors.ELDEventsInteractor;
 import com.bsmwireless.domain.interactors.UserInteractor;
+import com.bsmwireless.models.ELDEvent;
 import com.bsmwireless.widgets.alerts.DutyType;
+
+import java.util.ArrayList;
 
 import javax.inject.Inject;
 
+import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
@@ -73,17 +77,29 @@ public final class AutoDutyDialogPresenter {
                 ));
     }
 
-    public void onDrivingClick() {
-        mDisposables.add(mEventsInteractor.postNewDutyTypeEvent(DutyType.DRIVING, null)
+    public void onSwitchStatusClick(boolean autoDriving) {
+
+        Single
+                .fromCallable(() -> {
+                    ArrayList<ELDEvent> events = new ArrayList<>(2);
+                    events.add(mEventsInteractor.getEvent(DutyType.CLEAR, null, autoDriving));
+                    if (autoDriving) {
+                        events.add(mEventsInteractor.getEvent(DutyType.DRIVING, null, true));
+                    }
+                    return events;
+                })
+                .flatMapCompletable(eldEvents -> mEventsInteractor.postNewELDEvents(eldEvents)
+                        .firstOrError()
+                        .toCompletable())
                 .subscribeOn(Schedulers.io())
                 .doOnTerminate(() -> {
                     SchedulerUtils.cancel();
                     mView.onActionDone();
                 })
                 .subscribe(
-                        status -> Timber.i("Auto Driving status"),
+                        () -> Timber.i("Switching status done: isAutoDriving = %1$b", autoDriving),
                         error -> Timber.e("Auto Driving error %s", error)
-                ));
+                );
     }
 
     public void onDestroy() {
