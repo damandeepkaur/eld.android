@@ -8,8 +8,10 @@ import com.bsmwireless.widgets.alerts.DutyType;
 
 import javax.inject.Inject;
 
+import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
@@ -60,18 +62,21 @@ public final class AutoDutyDialogPresenter {
                 ));
     }
 
-    public void onOnDutyClick(long time) {
-        mDisposables.add(mEventsInteractor
-                .postNewDutyTypeEvent(DutyType.ON_DUTY, null, time)
+    public void onSwitchStatusClick(long time) {
+        Disposable disposable = Single
+                .fromCallable(() -> mEventsInteractor.getEvent(DutyType.CLEAR, null, true))
+                .doOnSuccess(eldEvent -> eldEvent.setEventTime(time))
+                .flatMap(eldEvent -> mEventsInteractor.postNewELDEvent(eldEvent))
                 .subscribeOn(Schedulers.io())
-                .doOnTerminate(() -> {
+                .doAfterTerminate(() -> {
                     SchedulerUtils.cancel();
                     mView.onActionDone();
                 })
                 .subscribe(
                         status -> Timber.i("Auto OnDuty status"),
                         error -> Timber.e("Auto OnDuty error %s", error)
-                ));
+                );
+        mDisposables.add(disposable);
     }
 
     public void onDrivingClick() {

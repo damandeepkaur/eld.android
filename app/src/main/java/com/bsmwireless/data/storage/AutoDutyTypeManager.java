@@ -183,7 +183,7 @@ public final class AutoDutyTypeManager implements DutyTypeManager.DutyTypeListen
                 break;
 
             case DRIVING:
-                events.add(mEventsInteractor.getEvent(DutyType.ON_DUTY));
+                events.add(mEventsInteractor.getEvent(DutyType.ON_DUTY, null, true));
                 break;
 
             default:

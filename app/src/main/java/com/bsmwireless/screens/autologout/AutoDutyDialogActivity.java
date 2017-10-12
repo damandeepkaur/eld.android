@@ -149,12 +149,12 @@ public final class AutoDutyDialogActivity extends BaseActivity implements AutoDu
                 .setMessage(R.string.on_duty_dialog_message)
                 .setCancelable(false)
                 .setPositiveButton(R.string.on_duty_accept, (dialog, which) -> onActionDone())
-                .setNegativeButton(R.string.on_duty_cancel, (dialog, which) -> mPresenter.onOnDutyClick(time))
+                .setNegativeButton(R.string.on_duty_cancel, (dialog, which) -> mPresenter.onSwitchStatusClick(time))
                 .show();
 
         mHandler.removeCallbacks(mAutoOnDutyTask);
 
-        mAutoOnDutyTask = () -> mPresenter.onOnDutyClick(time);
+        mAutoOnDutyTask = () -> mPresenter.onSwitchStatusClick(time);
         mHandler.postDelayed(mAutoOnDutyTask, MS_IN_MIN);
     }
 
