@@ -209,13 +209,14 @@ public class DateUtils {
      */
     public static long convertLogDayToUnixMs(long logDay) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd", Locale.US);
-        Date date = null;
+        Date date;
         try {
             date = sdf.parse(String.valueOf(logDay));
+            return date.getTime();
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        return date.getTime();
+        return 0L;
     }
 
     /**
@@ -225,13 +226,14 @@ public class DateUtils {
     public static long convertLogDayToUnixMs(long logDay, TimeZone timeZone) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd", Locale.US);
         sdf.setTimeZone(timeZone);
-        Date date = null;
+        Date date;
         try {
             date = sdf.parse(String.valueOf(logDay));
+            return date.getTime();
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        return date.getTime();
+        return 0L;
     }
 
     /**

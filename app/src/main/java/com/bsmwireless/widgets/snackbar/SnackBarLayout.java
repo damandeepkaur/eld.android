@@ -58,6 +58,7 @@ public final class SnackBarLayout extends RelativeLayout {
     private Handler mHandler = new Handler();
     private Runnable mHideTask = this::hideSnackbar;
     private Runnable mReopenTask = this::showSnackbar;
+    private OnFocusChangeListener mEmptyChangeListener = (view, b) -> {};
 
     private int mCurrentState = STATE_HIDDEN;
 
@@ -149,7 +150,7 @@ public final class SnackBarLayout extends RelativeLayout {
     }
 
     public SnackBarLayout setHideableOnFocusLost(boolean hideable) {
-        setOnFocusChangeListener(!hideable ? null : (v, hasFocus) -> {
+        setOnFocusChangeListener(!hideable ? mEmptyChangeListener : (v, hasFocus) -> {
             if (!hasFocus) {
                 hideSnackbar();
             }

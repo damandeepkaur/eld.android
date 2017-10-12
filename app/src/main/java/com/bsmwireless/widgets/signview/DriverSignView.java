@@ -53,6 +53,7 @@ public final class DriverSignView extends View implements View.OnTouchListener {
     private boolean mIsDataWasSetted;
 
     private CompositeDisposable mDisposables;
+    private OnTouchListener mEmptyTouch = (view, motionEvent) -> false;
 
     public DriverSignView(Context context) {
         super(context);
@@ -191,7 +192,7 @@ public final class DriverSignView extends View implements View.OnTouchListener {
 
     public void setEditable(boolean editable) {
         mIsEditing = editable;
-        setOnTouchListener(mIsEditing ? this : null);
+        setOnTouchListener(mIsEditing ? this : mEmptyTouch);
         invalidate();
     }
 
