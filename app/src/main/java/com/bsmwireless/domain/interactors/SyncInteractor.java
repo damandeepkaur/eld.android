@@ -155,9 +155,13 @@ public final class SyncInteractor {
                 .filter(events -> !events.isEmpty())
                 .map(this::setSync)
                 .delay(1, TimeUnit.SECONDS)
-                .flatMapSingle(dbEvents -> mServiceApi.getELDEvents(dbEvents.get(0).getEventTime(), dbEvents.get(dbEvents.size() - 1).getEventTime())
-                        .map(this::filterIncorrectEvents)
-                        .doOnSuccess(this::replaceRecords))
+                .flatMapSingle(dbEvents -> {
+                    long firstEventTime = dbEvents.get(0).getEventTime();
+                    long lastEventTime = dbEvents.get(dbEvents.size() - 1).getEventTime();
+                    return mServiceApi.getELDEvents(Math.min(firstEventTime, lastEventTime), Math.max(firstEventTime, lastEventTime))
+                            .map(this::filterIncorrectEvents)
+                            .doOnSuccess(this::replaceRecords);
+                })
                 .subscribe(events -> Timber.d("Sync added events:" + events),
                         Timber::e);
         mSyncCompositeDisposable.add(syncNewEventsDisposable);
@@ -178,10 +182,14 @@ public final class SyncInteractor {
                 .filter(dbEvents -> !dbEvents.isEmpty())
                 .map(this::setSync)
                 .delay(1, TimeUnit.SECONDS)
-                .flatMapSingle(dbEvents -> mServiceApi.getELDEvents(dbEvents.get(0).getEventTime(), dbEvents.get(dbEvents.size() - 1).getEventTime())
-                        .map(this::filterIncorrectEvents)
-                        .doOnSuccess(this::replaceRecords)
-                        .map(serverEvents -> dbEvents))
+                .flatMapSingle(dbEvents -> {
+                    long firstEventTime = dbEvents.get(0).getEventTime();
+                    long lastEventTime = dbEvents.get(dbEvents.size() - 1).getEventTime();
+                    return mServiceApi.getELDEvents(Math.min(firstEventTime, lastEventTime), Math.max(firstEventTime, lastEventTime))
+                            .map(this::filterIncorrectEvents)
+                            .doOnSuccess(this::replaceRecords)
+                            .map(serverEvents -> dbEvents);
+                })
                 .subscribe(dbEvents -> Timber.d("Sync updated events:" + dbEvents),
                         Timber::e);
         mSyncCompositeDisposable.add(syncUpdatedEventDisposable);

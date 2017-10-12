@@ -228,6 +228,7 @@ public final class LogsFragment extends BaseFragment implements LogsView {
     @Override
     public void dutyUpdated() {
         CalendarItem item = mAdapter.getCurrentItem();
+        mPresenter.updateCalendarData();
         mPresenter.updateDataForDay(item.getLogDay());
     }
 
@@ -268,7 +269,7 @@ public final class LogsFragment extends BaseFragment implements LogsView {
         if (mAdapter != null) {
             CalendarItem calendarItem = mAdapter.getCurrentItem();
             if (calendarItem != null) {
-                mPresenter.updateDataForDay(mAdapter.getCurrentItem().getLogDay());
+                mPresenter.updateDataForDayOnce(mAdapter.getCurrentItem().getLogDay());
             }
         }
     }

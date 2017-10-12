@@ -313,7 +313,7 @@ public final class LogsAdapter extends RecyclerView.Adapter<LogsAdapter.LogsHold
 
         Type currentDuty = log.getType();
 
-        holder.mMenuButton.setVisibility(log.isDutyEvent() && log.isActive() ? VISIBLE : GONE);
+        holder.mMenuButton.setVisibility(log.isDutyEvent() && log.isActive() ? VISIBLE : View.INVISIBLE);
 
         holder.mEventStatus.setTextColor(mColors.get(currentDuty.getColor()));
 

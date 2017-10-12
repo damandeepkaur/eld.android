@@ -31,7 +31,7 @@ public interface LogSheetDao {
     @Query("SELECT * FROM log_sheet_header WHERE log_day < :logDay AND driver_id = :driverId ORDER BY log_day DESC LIMIT 1")
     LogSheetEntity getLatestLogSheet(Long logDay, Integer driverId);
 
-    @Query("SELECT * FROM log_sheet_header WHERE log_day > :startDay AND log_day < :endDay AND driver_id = :driverId")
+    @Query("SELECT * FROM log_sheet_header WHERE log_day >= :startDay AND log_day <= :endDay AND driver_id = :driverId")
     Flowable<List<LogSheetEntity>> getLogSheets(Long startDay, Long endDay, Integer driverId);
 
     @Query("SELECT * FROM log_sheet_header WHERE log_day = :logDay AND driver_id = :driverId LIMIT 1")

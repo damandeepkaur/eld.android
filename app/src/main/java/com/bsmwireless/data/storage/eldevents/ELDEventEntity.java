@@ -16,7 +16,7 @@ public final class ELDEventEntity {
     @PrimaryKey
     @ColumnInfo(name = "inner_id")
     private Integer mInnerId;
-    @ColumnInfo(name = "id")
+    @ColumnInfo(name = "id", index = true)
     private Integer mId;
     @ColumnInfo(name = "sync")
     private Integer mSync;
@@ -60,7 +60,7 @@ public final class ELDEventEntity {
     private String mTimezone;
     @ColumnInfo(name = "mobile_time")
     private Long mMobileTime;
-    @ColumnInfo(name = "driver_id")
+    @ColumnInfo(name = "driver_id", index = true)
     private Integer mDriverId;
     @ColumnInfo(name = "sequence")
     private Integer mSequence;

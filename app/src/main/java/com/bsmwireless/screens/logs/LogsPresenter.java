@@ -94,7 +94,7 @@ public final class LogsPresenter implements AccountManager.AccountListener {
         mAccountManager.addListener(this);
     }
 
-    private void updateCalendarData() {
+    public void updateCalendarData() {
         mUpdateEventsDisposable.dispose();
         mUpdateEventsDisposable = mUserInteractor.getTimezone()
                 .flatMap(timezone ->
@@ -112,6 +112,18 @@ public final class LogsPresenter implements AccountManager.AccountListener {
 
     public void onCalendarDaySelected(CalendarItem calendarItem) {
         updateDataForDay(calendarItem.getLogDay());
+    }
+
+    public void updateDataForDayOnce(long logDay) {
+        mUpdateDayDataDisposables.clear();
+        mUpdateDayDataDisposables.add(mUserInteractor.getTimezone()
+                .subscribeOn(Schedulers.io())
+                .subscribe(timezone -> {
+                    long startDayTime = DateUtils.getStartDayTimeInMs(logDay, timezone);
+                    setGraphData(startDayTime, timezone);
+                    setEventListDataOnce(startDayTime, timezone);
+                    setLogHeaderData(logDay);
+                }));
     }
 
     public void updateDataForDay(long logDay) {
@@ -139,11 +151,20 @@ public final class LogsPresenter implements AccountManager.AccountListener {
                 .subscribe(eldEvents -> mView.updateGraph(graphModel)));
     }
 
-    private void setEventListData(long startDayTime, String timezone) {
+    private void setEventListDataOnce(long startDayTime, String timezone) {
         mUpdateDayDataDisposables.add(mELDEventsInteractor.getEventsForDayOnce(startDayTime)
                 .subscribeOn(Schedulers.io())
                 .map(eldEvents -> convertToEventLogModels(eldEvents, startDayTime, timezone))
                 .doOnSuccess(this::setVehicleNames)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(eventLogModels -> mView.setEventLogs(eventLogModels)));
+    }
+
+    private void setEventListData(long startDayTime, String timezone) {
+        mUpdateDayDataDisposables.add(mELDEventsInteractor.getEventsForDay(startDayTime)
+                .subscribeOn(Schedulers.io())
+                .map(eldEvents -> convertToEventLogModels(eldEvents, startDayTime, timezone))
+                .doOnNext(this::setVehicleNames)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(eventLogModels -> mView.setEventLogs(eventLogModels)));
     }
@@ -166,7 +187,7 @@ public final class LogsPresenter implements AccountManager.AccountListener {
         HashSet<Integer> vehicleIds = new HashSet<>();
         for (EventLogModel log : eventLogModels) {
             int vehicleId = log.getEvent().getVehicleId();
-            if (mVehicleIdToNameMap.containsKey(vehicleId)) {
+            if (!mVehicleIdToNameMap.containsKey(vehicleId)) {
                 vehicleIds.add(vehicleId);
             }
         }
