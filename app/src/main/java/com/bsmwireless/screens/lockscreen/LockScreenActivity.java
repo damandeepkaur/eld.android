@@ -124,13 +124,6 @@ public final class LockScreenActivity extends BaseActivity implements LockScreen
     }
 
     @Override
-    protected void onPause() {
-        SwitchDriverDialog dialog = new SwitchDriverDialog(this);
-        dialog.hide();
-        super.onPause();
-    }
-
-    @Override
     public void showIgnitionOffDetectedDialog() {
         showPromtDialog(PromtDialog.newInstance(PromtDialog.DialogType.IGNITION_OFF));
     }

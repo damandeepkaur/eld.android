@@ -84,6 +84,9 @@ public final class SwitchDriverPresenter {
     }
 
     public void onSwitchDriverCreated() {
+        enableLogoutButton();
+        enableAddCoDrivers();
+
         mGetCoDriversDisposable.dispose();
         mGetCoDriversDisposable = mUserInteractor.getCoDriversFromDB()
                 .subscribeOn(Schedulers.io())
@@ -296,7 +299,7 @@ public final class SwitchDriverPresenter {
         return userEntities;
     }
 
-    public void enableAddCoDrivers() {
+    private void enableAddCoDrivers() {
         mCheckMaxCoDriversNumberDisposable.dispose();
         mCheckMaxCoDriversNumberDisposable = isMaxCoDriversReached()
                 .subscribeOn(Schedulers.io())
@@ -315,7 +318,7 @@ public final class SwitchDriverPresenter {
                 .map(count -> count < MAX_CODRIVERS);
     }
 
-    public void enableLogoutButton() {
+    private void enableLogoutButton() {
         mCheckMinCoDriversNumberDisposable.dispose();
         mCheckMinCoDriversNumberDisposable = isCoDriverAdded()
                 .subscribeOn(Schedulers.io())

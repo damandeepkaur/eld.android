@@ -269,12 +269,7 @@ public final class SwitchDriverDialog implements SwitchDriverView, DriverDialog 
                 .setCancelable(true)
                 .create();
 
-        switchDriverDialog.setOnShowListener(dialog -> {
-            mPresenter.enableLogoutButton();
-            mPresenter.enableAddCoDrivers();
-
-            mPresenter.onSwitchDriverCreated();
-        });
+        switchDriverDialog.setOnShowListener(dialog -> mPresenter.onSwitchDriverCreated());
         showDialog(switchDriverDialog);
     }
 

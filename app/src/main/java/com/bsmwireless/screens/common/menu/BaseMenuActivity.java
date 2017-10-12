@@ -72,13 +72,6 @@ public abstract class BaseMenuActivity extends BaseActivity implements BaseMenuV
     }
 
     @Override
-    protected void onPause() {
-        SwitchDriverDialog dialog = new SwitchDriverDialog(this);
-        dialog.hide();
-        super.onPause();
-    }
-
-    @Override
     public final boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_diagnostic:
