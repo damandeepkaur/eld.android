@@ -46,5 +46,4 @@ public interface SwitchDriverView {
     void createReassignDialog();
     void setAddCoDriverButtonEnabled(boolean enabled);
     void setLogOutButtonEnabled(boolean enabled);
-    void hide();
 }

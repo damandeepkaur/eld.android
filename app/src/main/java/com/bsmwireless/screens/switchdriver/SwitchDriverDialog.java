@@ -400,13 +400,6 @@ public final class SwitchDriverDialog implements SwitchDriverView, DriverDialog 
     }
 
     @Override
-    public void hide() {
-        if (mDialog != null) {
-            mDialog.dismiss();
-        }
-    }
-
-    @Override
     public void createSwitchOnlyDialog() {
         View view = View.inflate(mContext, R.layout.switch_driver_layout, null);
         ButterKnife.bind(this, view);
