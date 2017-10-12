@@ -1,5 +1,6 @@
 package com.bsmwireless.common.dagger;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.bsmwireless.common.Constants;
@@ -16,6 +17,7 @@ import com.bsmwireless.models.Malfunction;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,6 +25,7 @@ import java.util.List;
 import javax.inject.Singleton;
 
 import app.bsmuniversal.com.BuildConfig;
+import app.bsmuniversal.com.R;
 import dagger.Module;
 import dagger.Provides;
 import okhttp3.Cookie;
@@ -79,8 +82,9 @@ public final class NetworkModule {
     @Provides
     HttpClientManager provideHttpClientManager(HttpLoggingInterceptor logger, TokenManager tokenManager,
                                                PreferencesManager preferencesManager, CookieJar cookieJar,
-                                               AccountManager accountManager) {
-        return new HttpClientManager(logger, tokenManager, preferencesManager, cookieJar, accountManager);
+                                               AccountManager accountManager, Context context) {
+        InputStream inStream = context.getResources().openRawResource(R.raw.bsm_keystore);
+        return new HttpClientManager(logger, tokenManager, preferencesManager, cookieJar, accountManager, inStream);
     }
 
     @Provides
